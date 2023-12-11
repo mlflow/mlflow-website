@@ -1,0 +1,1525 @@
+
+  
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Fine-Tuning Transformers with MLflow for Enhanced Model Management &mdash; MLflow 2.9.2.dev0 documentation</title>
+  
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/llms/transformers/tutorials/fine-tuning/transformers-fine-tuning.html">
+  
+  
+    <link rel="shortcut icon" href="../../../../_static/favicon.ico"/>
+    
+
+    
+
+  
+    
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/css/cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/css/grids.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/css/mobile.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/css/simple-cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/css/tabs.css" type="text/css" />
+    
+  
+        <link rel="index" title="Index"
+              href="../../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../../search.html"/>
+    <link rel="top" title="MLflow 2.9.2.dev0 documentation" href="../../../../index.html"/>
+        <link rel="up" title="MLflow Transformers Flavor" href="../../index.html"/>
+        <link rel="next" title="🤗 Transformers within MLflow" href="/../../guide/index.html"/>
+        <link rel="prev" title="Introduction to Conversational AI with MLflow and DialoGPT" href="/../conversational/conversational-model.html"/> 
+
+  
+  <script src="../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+<script type="text/javascript" src="../../../../_static/jquery.js"></script>
+<script type="text/javascript" src="../../../../_static/underscore.js"></script>
+<script type="text/javascript" src="../../../../_static/doctools.js"></script>
+<script type="text/javascript" src="../../../../_static/languagesections.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript" src="../../../../None"></script>
+
+<body class="wy-body-for-nav" role="document">
+  
+
+  
+  <nav class="wy-nav-top header" role="navigation" aria-label="top navigation">
+    <ul>
+  <li class="menu-toggle">
+    <i data-toggle="wy-nav-top" class="wy-nav-top-menu-button db-icon db-icon-menu pull-left"></i>
+    <a href="../../../../index.html" class="wy-nav-top-logo"
+      ><img src="../../../../_static/MLflow-logo-final-black.png" alt="MLflow"
+    /></a>
+    <span class="version">2.9.2.dev0</span>
+  </li>
+</ul>
+  </nav>
+  <page>
+    
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side relative">
+      <div class="wy-side-scroll">
+  <div class="wy-side-nav-search">
+    
+
+    
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+    
+  </div>
+
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+    
+      <a href="../../../../index.html" class="main-navigation-home"><img src="../../../../_static/icons/nav-home.svg"> MLflow</a>
+    
+
+    
+      
+
+      
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../introduction/index.html">What is MLflow?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting-started/index.html">Getting Started with MLflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../new-features/index.html">New Features</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../index.html">LLMs</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../index.html#id1">MLflow Deployments Server for LLMs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../index.html#id3">LLM Evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../index.html#id4">Prompt Engineering UI</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../index.html#native-mlflow-flavors-for-llms">Native MLflow Flavors for LLMs</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../../../index.html#benefits-of-mlflow-s-native-flavors-for-llms">Benefits of MLflow’s Native Flavors for LLMs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../index.html#explore-the-native-llm-flavors">Explore the Native LLM Flavors</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../../../index.html#native-integration-guides-and-tutorials">Native Integration Guides and Tutorials</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="../../index.html">MLflow Transformers Flavor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../sentence-transformers/index.html">MLflow Sentence-Transformers Flavor</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../index.html#native-integration-examples">Native Integration Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../index.html#id5">LLM Tracking in MLflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../index.html#tutorials-and-use-case-guides-for-llms-in-mlflow">Tutorials and Use Case Guides for LLMs in MLflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../model-evaluation/index.html">Model Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deep-learning/index.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../traditional-ml/index.html">Traditional ML</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment/index.html">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tracking.html">MLflow Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../system-metrics/index.html">System Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../projects.html">MLflow Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../models.html">MLflow Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../model-registry.html">MLflow Model Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../recipes.html">MLflow Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../plugins.html">MLflow Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../auth/index.html">MLflow Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../search-runs.html">Search Runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../search-experiments.html">Search Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../python_api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../R-api.html">R API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../java_api/index.html">Java API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../rest-api.html">REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../docker.html">Official MLflow Docker Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../community-model-flavors.html">Community Model Flavors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials-and-examples/index.html">Tutorials and Examples</a></li>
+</ul>
+
+      
+    
+  </div>
+
+  <div role="contentinfo">
+    
+
+    <p>
+      <a id='feedbacklink' href="https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a>
+    </p>
+  </div>
+</div>
+    </nav>
+
+    <main class="wy-grid-for-nav">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+          <div class="rst-content">
+            
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../../index.html">Documentation</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../../../index.html">LLMs</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../../index.html">MLflow Transformers Flavor</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+    
+      <li>Fine-Tuning Transformers with MLflow for Enhanced Model Management</li>
+    
+    
+    <!-- <li class="wy-breadcrumbs-aside">
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/llms/transformers/tutorials/fine-tuning/transformers-fine-tuning.ipynb" class="fa fa-github"> Edit on GitHub</a>
+    </li> -->
+    
+  </ul>
+</div>
+            <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <div itemprop="articleBody">
+                
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div class="section" id="Fine-Tuning-Transformers-with-MLflow-for-Enhanced-Model-Management">
+<h1>Fine-Tuning Transformers with MLflow for Enhanced Model Management<a class="headerlink" href="#Fine-Tuning-Transformers-with-MLflow-for-Enhanced-Model-Management" title="Permalink to this headline"> </a></h1>
+<p>Welcome to our in-depth tutorial on fine-tuning Transformers models with enhanced management using MLflow.</p>
+<div class="section" id="What-You-Will-Learn-in-This-Tutorial">
+<h2>What You Will Learn in This Tutorial<a class="headerlink" href="#What-You-Will-Learn-in-This-Tutorial" title="Permalink to this headline"> </a></h2>
+<ul class="simple">
+<li><p>Understand the process of fine-tuning a Transformers model.</p></li>
+<li><p>Learn to effectively log and manage the training cycle using MLflow.</p></li>
+<li><p>Master logging the trained model separately in MLflow.</p></li>
+<li><p>Gain insights into using the trained model for practical inference tasks.</p></li>
+</ul>
+<p>Our approach will provide a holistic understanding of model fine-tuning and management, ensuring that you’re well-equipped to handle similar tasks in your projects.</p>
+<div class="section" id="Emphasizing-Fine-Tuning">
+<h3>Emphasizing Fine-Tuning<a class="headerlink" href="#Emphasizing-Fine-Tuning" title="Permalink to this headline"> </a></h3>
+<p>Fine-tuning pre-trained models is a common practice in machine learning, especially in the field of NLP. It involves adjusting a pre-trained model to make it more suitable for a specific task. This process is essential as it allows the leveraging of pre-existing knowledge in the model, significantly improving performance on specific datasets or tasks.</p>
+</div>
+<div class="section" id="Role-of-MLflow-in-Model-Lifecycle">
+<h3>Role of MLflow in Model Lifecycle<a class="headerlink" href="#Role-of-MLflow-in-Model-Lifecycle" title="Permalink to this headline"> </a></h3>
+<p>Integrating MLflow in this process is crucial for:</p>
+<ul class="simple">
+<li><p><strong>Training Cycle Logging</strong>: Keeping a detailed log of the training cycle, including parameters, metrics, and intermediate results.</p></li>
+<li><p><strong>Model Logging and Management</strong>: Separately logging the trained model, tracking its versions, and managing its lifecycle post-training.</p></li>
+<li><p><strong>Inference and Deployment</strong>: Using the logged model for inference, ensuring easy transition from training to deployment.</p></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Disable tokenizers warnings when constructing pipelines</span>
+<span class="o">%</span><span class="k">env</span> TOKENIZERS_PARALLELISM=false
+
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="c1"># Disable a few less-than-useful UserWarnings from setuptools and pydantic</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">UserWarning</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+env: TOKENIZERS_PARALLELISM=false
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Preparing-the-Dataset-and-Environment-for-Fine-Tuning">
+<h2>Preparing the Dataset and Environment for Fine-Tuning<a class="headerlink" href="#Preparing-the-Dataset-and-Environment-for-Fine-Tuning" title="Permalink to this headline"> </a></h2>
+<div class="section" id="Key-Steps-in-this-Section">
+<h3>Key Steps in this Section<a class="headerlink" href="#Key-Steps-in-this-Section" title="Permalink to this headline"> </a></h3>
+<ol class="arabic simple">
+<li><p><strong>Loading the Dataset</strong>: Utilizing the <code class="docutils literal notranslate"><span class="pre">sms_spam</span></code> dataset for spam detection.</p></li>
+<li><p><strong>Splitting the Dataset</strong>: Dividing the dataset into training and test sets with an 80/20 distribution.</p></li>
+<li><p><strong>Importing Necessary Libraries</strong>: Including libraries like <code class="docutils literal notranslate"><span class="pre">evaluate</span></code>, <code class="docutils literal notranslate"><span class="pre">mlflow</span></code>, <code class="docutils literal notranslate"><span class="pre">numpy</span></code>, and essential components from the <code class="docutils literal notranslate"><span class="pre">transformers</span></code> library.</p></li>
+</ol>
+<p>Before diving into the fine-tuning process, setting up our environment and preparing the dataset is crucial. This step involves loading the dataset, splitting it into training and testing sets, and initializing essential components of the Transformers library. These preparatory steps lay the groundwork for an efficient fine-tuning process.</p>
+<p>This setup ensures that we have a solid foundation for fine-tuning our model, with all the necessary data and tools at our disposal. In the following Python code, we’ll execute these steps to kickstart our model fine-tuning journey.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">load_dataset</span>
+<span class="kn">import</span> <span class="nn">evaluate</span>
+<span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AutoTokenizer</span><span class="p">,</span>
+    <span class="n">AutoModelForSequenceClassification</span><span class="p">,</span>
+    <span class="n">Trainer</span><span class="p">,</span>
+    <span class="n">TrainingArguments</span><span class="p">,</span>
+    <span class="n">pipeline</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="c1"># Load the &quot;sms_spam&quot; dataset.</span>
+<span class="n">sms_dataset</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;sms_spam&quot;</span><span class="p">)</span>
+
+<span class="c1"># Split train/test by an 8/2 ratio.</span>
+<span class="n">sms_train_test</span> <span class="o">=</span> <span class="n">sms_dataset</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">train_test_split</span><span class="p">(</span><span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+<span class="n">train_dataset</span> <span class="o">=</span> <span class="n">sms_train_test</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]</span>
+<span class="n">test_dataset</span> <span class="o">=</span> <span class="n">sms_train_test</span><span class="p">[</span><span class="s2">&quot;test&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Found cached dataset sms_spam (/Users/benjamin.wilson/.cache/huggingface/datasets/sms_spam/plain_text/1.0.0/53f051d3b5f62d99d61792c91acefe4f1577ad3e4c216fb0ad39e30b9f20019c)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "361d4272e6144267a1566abed2cd674c", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+</div>
+</div>
+<div class="section" id="Tokenization-and-Dataset-Preparation">
+<h2>Tokenization and Dataset Preparation<a class="headerlink" href="#Tokenization-and-Dataset-Preparation" title="Permalink to this headline"> </a></h2>
+<p>In the next code block, we tokenize our text data, preparing it for the fine-tuning process of our model.</p>
+<p>With our dataset loaded and split, the next step is to prepare our text data for the model. This involves tokenizing the text, a crucial process in NLP where text is converted into a format that’s understandable and usable by our model.</p>
+<div class="section" id="Tokenization-Process">
+<h3>Tokenization Process<a class="headerlink" href="#Tokenization-Process" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Loading the Tokenizer</strong>: Using the <code class="docutils literal notranslate"><span class="pre">AutoTokenizer</span></code> from the <code class="docutils literal notranslate"><span class="pre">transformers</span></code> library for the <code class="docutils literal notranslate"><span class="pre">distilbert-base-uncased</span></code> model’s tokenizer.</p></li>
+<li><p><strong>Defining the Tokenization Function</strong>: Creating a function to tokenize text data, including padding and truncation.</p></li>
+<li><p><strong>Applying Tokenization to the Dataset</strong>: Processing both the training and testing sets for model readiness.</p></li>
+</ul>
+<p>Tokenization is a critical step in preparing text data for NLP tasks. It ensures that the data is in a format that the model can process, and by handling aspects like padding and truncation, it ensures consistency across our dataset, which is vital for training stability and model performance.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load the tokenizer for &quot;distilbert-base-uncased&quot; model.</span>
+<span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;distilbert-base-uncased&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">tokenize_function</span><span class="p">(</span><span class="n">examples</span><span class="p">):</span>
+    <span class="c1"># Pad/truncate each text to 512 tokens. Enforcing the same shape</span>
+    <span class="c1"># could make the training faster.</span>
+    <span class="k">return</span> <span class="n">tokenizer</span><span class="p">(</span>
+        <span class="n">examples</span><span class="p">[</span><span class="s2">&quot;sms&quot;</span><span class="p">],</span>
+        <span class="n">padding</span><span class="o">=</span><span class="s2">&quot;max_length&quot;</span><span class="p">,</span>
+        <span class="n">truncation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="n">seed</span> <span class="o">=</span> <span class="mi">22</span>
+
+<span class="c1"># Tokenize the train and test datasets</span>
+<span class="n">train_tokenized</span> <span class="o">=</span> <span class="n">train_dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">tokenize_function</span><span class="p">)</span>
+<span class="n">train_tokenized</span> <span class="o">=</span> <span class="n">train_tokenized</span><span class="o">.</span><span class="n">remove_columns</span><span class="p">([</span><span class="s2">&quot;sms&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+
+<span class="n">test_tokenized</span> <span class="o">=</span> <span class="n">test_dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">tokenize_function</span><span class="p">)</span>
+<span class="n">test_tokenized</span> <span class="o">=</span> <span class="n">test_tokenized</span><span class="o">.</span><span class="n">remove_columns</span><span class="p">([</span><span class="s2">&quot;sms&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "be659cb8a3564464ab47279f200ec3b5", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "9c54293bbd7d433ebf6ade6703b8c22b", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+</div>
+</div>
+<div class="section" id="Model-Initialization-and-Label-Mapping">
+<h2>Model Initialization and Label Mapping<a class="headerlink" href="#Model-Initialization-and-Label-Mapping" title="Permalink to this headline"> </a></h2>
+<p>Next, we’ll set up label mappings and initialize the model for our text classification task.</p>
+<p>Having prepared our data, the next crucial step is to initialize our model and set up label mappings. This involves defining a clear relationship between the labels in our dataset and their corresponding representations in the model.</p>
+<div class="section" id="Setting-Up-Label-Mappings">
+<h3>Setting Up Label Mappings<a class="headerlink" href="#Setting-Up-Label-Mappings" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Defining Label Mappings</strong>: Creating bi-directional mappings between integer labels and textual representations (“ham” and “spam”).</p></li>
+</ul>
+</div>
+<div class="section" id="Initializing-the-Model">
+<h3>Initializing the Model<a class="headerlink" href="#Initializing-the-Model" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Model Selection</strong>: Choosing the <code class="docutils literal notranslate"><span class="pre">distilbert-base-uncased</span></code> model for its balance of performance and efficiency.</p></li>
+<li><p><strong>Model Configuration</strong>: Configuring the model for sequence classification with the defined label mappings.</p></li>
+</ul>
+<p>Proper model initialization and label mapping are key to ensuring that the model accurately understands and processes the task at hand. By explicitly defining these mappings and selecting an appropriate pre-trained model, we lay the groundwork for effective and efficient fine-tuning.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set the mapping between int label and its meaning.</span>
+<span class="n">id2label</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;ham&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;spam&quot;</span><span class="p">}</span>
+<span class="n">label2id</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ham&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;spam&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+
+<span class="c1"># Acquire the model from the Hugging Face Hub, providing label and id mappings so that both we and the model can &#39;speak&#39; the same language.</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">AutoModelForSequenceClassification</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+    <span class="s2">&quot;distilbert-base-uncased&quot;</span><span class="p">,</span>
+    <span class="n">num_labels</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">label2id</span><span class="o">=</span><span class="n">label2id</span><span class="p">,</span>
+    <span class="n">id2label</span><span class="o">=</span><span class="n">id2label</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Some weights of DistilBertForSequenceClassification were not initialized from the model checkpoint at distilbert-base-uncased and are newly initialized: [&#39;classifier.weight&#39;, &#39;pre_classifier.bias&#39;, &#39;pre_classifier.weight&#39;, &#39;classifier.bias&#39;]
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Setting-Up-Evaluation-Metrics">
+<h2>Setting Up Evaluation Metrics<a class="headerlink" href="#Setting-Up-Evaluation-Metrics" title="Permalink to this headline"> </a></h2>
+<p>Next, we focus on defining and computing evaluation metrics to measure our model’s performance accurately.</p>
+<p>After initializing our model, the next critical step is to define how we’ll evaluate its performance. Accurate evaluation is key to understanding how well our model is learning and performing on the task.</p>
+<div class="section" id="Choosing-and-Loading-the-Metric">
+<h3>Choosing and Loading the Metric<a class="headerlink" href="#Choosing-and-Loading-the-Metric" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Metric Selection</strong>: Opting for ‘accuracy’ as the evaluation metric.</p></li>
+<li><p><strong>Loading the Metric</strong>: Utilizing the <code class="docutils literal notranslate"><span class="pre">evaluate</span></code> library to load the ‘accuracy’ metric.</p></li>
+</ul>
+</div>
+<div class="section" id="Defining-the-Metric-Computation-Function">
+<h3>Defining the Metric Computation Function<a class="headerlink" href="#Defining-the-Metric-Computation-Function" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Function for Metric Computation</strong>: Creating a function, <code class="docutils literal notranslate"><span class="pre">compute_metrics</span></code>, for calculating accuracy during model evaluation.</p></li>
+<li><p><strong>Processing Predictions</strong>: Handling logits and labels from predictions to compute accuracy.</p></li>
+</ul>
+<p>Properly setting up evaluation metrics allows us to objectively measure the model’s performance. By using standardized metrics, we can compare our model’s performance against benchmarks or other models, ensuring that our fine-tuning process is effective and moving in the right direction.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define the target optimization metric</span>
+<span class="n">metric</span> <span class="o">=</span> <span class="n">evaluate</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;accuracy&quot;</span><span class="p">)</span>
+
+
+<span class="c1"># Define a function for calculating our defined target optimization metric during training</span>
+<span class="k">def</span> <span class="nf">compute_metrics</span><span class="p">(</span><span class="n">eval_pred</span><span class="p">):</span>
+    <span class="n">logits</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">eval_pred</span>
+    <span class="n">predictions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">metric</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">predictions</span><span class="o">=</span><span class="n">predictions</span><span class="p">,</span> <span class="n">references</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Configuring-the-Training-Environment">
+<h2>Configuring the Training Environment<a class="headerlink" href="#Configuring-the-Training-Environment" title="Permalink to this headline"> </a></h2>
+<p>In this step, we’re going to configure our Trainer, supplying important training configurations via the use of the <code class="docutils literal notranslate"><span class="pre">TrainingArguments</span></code> API.</p>
+<p>With our model and metrics ready, the next important step is to configure the training environment. This involves setting up the training arguments and initializing the Trainer, a component that orchestrates the model training process.</p>
+<div class="section" id="Training-Arguments-Configuration">
+<h3>Training Arguments Configuration<a class="headerlink" href="#Training-Arguments-Configuration" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Defining the Output Directory</strong>: We specify the <code class="docutils literal notranslate"><span class="pre">training_output_dir</span></code> where our model checkpoints will be saved during training. This helps in managing and storing model states at different stages of training.</p></li>
+<li><p><strong>Specifying Training Arguments</strong>: We create an instance of <code class="docutils literal notranslate"><span class="pre">TrainingArguments</span></code> to define various parameters for training, such as the output directory, evaluation strategy, batch sizes for training and evaluation, logging frequency, and the number of training epochs. These parameters are critical for controlling how the model is trained and evaluated.</p></li>
+</ul>
+</div>
+<div class="section" id="Initializing-the-Trainer">
+<h3>Initializing the Trainer<a class="headerlink" href="#Initializing-the-Trainer" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Creating the Trainer Instance</strong>: We use the Trainer class from the Transformers library, providing it with our model, the previously defined training arguments, datasets for training and evaluation, and the function to compute metrics.</p></li>
+<li><p><strong>Role of the Trainer</strong>: The Trainer handles all aspects of training and evaluating the model, including the execution of training loops, handling of data batching, and calling the compute metrics function. It simplifies the training process, making it more streamlined and efficient.</p></li>
+</ul>
+</div>
+<div class="section" id="Importance-of-Proper-Training-Configuration">
+<h3>Importance of Proper Training Configuration<a class="headerlink" href="#Importance-of-Proper-Training-Configuration" title="Permalink to this headline"> </a></h3>
+<p>Setting up the training environment correctly is essential for effective model training. Proper configuration ensures that the model is trained under optimal conditions, leading to better performance and more reliable results.</p>
+<p>In the following code block, we’ll configure our training environment and initialize the Trainer, setting the stage for the actual training process.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Checkpoints will be output to this `training_output_dir`.</span>
+<span class="n">training_output_dir</span> <span class="o">=</span> <span class="s2">&quot;/tmp/sms_trainer&quot;</span>
+<span class="n">training_args</span> <span class="o">=</span> <span class="n">TrainingArguments</span><span class="p">(</span>
+    <span class="n">output_dir</span><span class="o">=</span><span class="n">training_output_dir</span><span class="p">,</span>
+    <span class="n">evaluation_strategy</span><span class="o">=</span><span class="s2">&quot;epoch&quot;</span><span class="p">,</span>
+    <span class="n">per_device_train_batch_size</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+    <span class="n">per_device_eval_batch_size</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+    <span class="n">logging_steps</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+    <span class="n">num_train_epochs</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Instantiate a `Trainer` instance that will be used to initiate a training run.</span>
+<span class="n">trainer</span> <span class="o">=</span> <span class="n">Trainer</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+    <span class="n">args</span><span class="o">=</span><span class="n">training_args</span><span class="p">,</span>
+    <span class="n">train_dataset</span><span class="o">=</span><span class="n">train_tokenized</span><span class="p">,</span>
+    <span class="n">eval_dataset</span><span class="o">=</span><span class="n">test_tokenized</span><span class="p">,</span>
+    <span class="n">compute_metrics</span><span class="o">=</span><span class="n">compute_metrics</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># If you are running this tutorial in local mode, leave the next line commented out.</span>
+<span class="c1"># Otherwise, uncomment the following line and set your tracking uri to your local or remote tracking server.</span>
+
+<span class="c1"># mlflow.set_tracking_uri(&quot;http://127.0.0.1:8080&quot;)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Integrating-MLflow-for-Experiment-Tracking">
+<h2>Integrating MLflow for Experiment Tracking<a class="headerlink" href="#Integrating-MLflow-for-Experiment-Tracking" title="Permalink to this headline"> </a></h2>
+<p>The final preparatory step before beginning the training process is to integrate MLflow for experiment tracking.</p>
+<p>MLflow is a critical tool in our workflow, enabling us to log, monitor, and compare different runs of our model training.</p>
+<div class="section" id="Setting-up-the-MLflow-Experiment">
+<h3>Setting up the MLflow Experiment<a class="headerlink" href="#Setting-up-the-MLflow-Experiment" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Naming the Experiment</strong>: We use <code class="docutils literal notranslate"><span class="pre">mlflow.set_experiment</span></code> to create a new experiment or assign the current run to an existing experiment. In this case, we name our experiment “Spam Classifier Training”. This name should be descriptive and related to the task at hand, aiding in organizing and identifying experiments later.</p></li>
+<li><p><strong>Role of MLflow in Training</strong>: By setting up an MLflow experiment, we can track various aspects of our model training, such as parameters, metrics, and outputs. This tracking is invaluable for comparing different models, tuning hyperparameters, and maintaining a record of our experiments.</p></li>
+</ul>
+</div>
+<div class="section" id="Benefits-of-Experiment-Tracking">
+<h3>Benefits of Experiment Tracking<a class="headerlink" href="#Benefits-of-Experiment-Tracking" title="Permalink to this headline"> </a></h3>
+<p>Utilizing MLflow for experiment tracking offers several advantages:</p>
+<ul class="simple">
+<li><p><strong>Organization</strong>: Keeps your training runs organized and easily accessible.</p></li>
+<li><p><strong>Comparability</strong>: Allows for easy comparison of different training runs to understand the impact of changes in parameters or data.</p></li>
+<li><p><strong>Reproducibility</strong>: Enhances the reproducibility of experiments by logging all necessary details.</p></li>
+</ul>
+<p>With MLflow set up, we’re now ready to begin the training process, keeping track of every important aspect along the way.</p>
+<p>In the next code snippet, we’ll set up our MLflow experiment for tracking the training of our spam classification model.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Pick a name that you like and reflects the nature of the runs that you will be recording to the experiment.</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s2">&quot;Spam Classifier Training&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;Experiment: artifact_location=&#39;file:///Users/benjamin.wilson/repos/mlflow-fork/mlflow/docs/source/llms/transformers/tutorials/fine-tuning/mlruns/258758267044147956&#39;, creation_time=1701291176206, experiment_id=&#39;258758267044147956&#39;, last_update_time=1701291176206, lifecycle_stage=&#39;active&#39;, name=&#39;Spam Classifier Training&#39;, tags={}&gt;
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Starting-the-Training-Process-with-MLflow">
+<h2>Starting the Training Process with MLflow<a class="headerlink" href="#Starting-the-Training-Process-with-MLflow" title="Permalink to this headline"> </a></h2>
+<p>In this step, we initiate the fine-tuning training run, utilizing the native auto-logging functionality to record the parameters used and loss metrics calculated during the training process.</p>
+<p>With our model, training arguments, and MLflow experiment set up, we are now ready to start the actual training process. This step involves initiating an MLflow run, which will encapsulate all the training activities and metrics.</p>
+<div class="section" id="Initiating-the-MLflow-Run">
+<h3>Initiating the MLflow Run<a class="headerlink" href="#Initiating-the-MLflow-Run" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Starting an MLflow Run</strong>: We use <code class="docutils literal notranslate"><span class="pre">mlflow.start_run()</span></code> to begin a new MLflow run. This function creates a new run context, under which all the training operations and logging will occur.</p></li>
+<li><p><strong>Training the Model</strong>: Inside the MLflow run context, we call <code class="docutils literal notranslate"><span class="pre">trainer.train()</span></code> to start training our model. This function will run the training loop, processing the data in batches, updating model parameters, and evaluating the model.</p></li>
+</ul>
+</div>
+<div class="section" id="Monitoring-the-Training-Progress">
+<h3>Monitoring the Training Progress<a class="headerlink" href="#Monitoring-the-Training-Progress" title="Permalink to this headline"> </a></h3>
+<p>During training, the <code class="docutils literal notranslate"><span class="pre">Trainer</span></code> object will output logs that provide valuable insights into the training progress:</p>
+<ul class="simple">
+<li><p><strong>Loss</strong>: Indicates the model’s performance, with lower values signifying better performance.</p></li>
+<li><p><strong>Learning Rate</strong>: Shows the current learning rate used during training.</p></li>
+<li><p><strong>Epoch Progress</strong>: Displays the progress through the current epoch.</p></li>
+</ul>
+<p>These logs are crucial for monitoring the model’s learning process and making any necessary adjustments. By tracking these metrics within an MLflow run, we can maintain a comprehensive record of the training process, enhancing reproducibility and analysis.</p>
+<p>In the next code block, we will start our MLflow run and begin training our model, closely observing the output to gauge the training progress.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">()</span> <span class="k">as</span> <span class="n">run</span><span class="p">:</span>
+    <span class="n">trainer</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "7ed21a1cc1ee4dc2bb66c903b8fccdb5", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;loss&#39;: 0.4891, &#39;learning_rate&#39;: 4.9761051373954604e-05, &#39;epoch&#39;: 0.01}
+{&#39;loss&#39;: 0.2662, &#39;learning_rate&#39;: 4.95221027479092e-05, &#39;epoch&#39;: 0.03}
+{&#39;loss&#39;: 0.1756, &#39;learning_rate&#39;: 4.92831541218638e-05, &#39;epoch&#39;: 0.04}
+{&#39;loss&#39;: 0.107, &#39;learning_rate&#39;: 4.90442054958184e-05, &#39;epoch&#39;: 0.06}
+{&#39;loss&#39;: 0.0831, &#39;learning_rate&#39;: 4.8805256869773e-05, &#39;epoch&#39;: 0.07}
+{&#39;loss&#39;: 0.0688, &#39;learning_rate&#39;: 4.8566308243727596e-05, &#39;epoch&#39;: 0.09}
+{&#39;loss&#39;: 0.0959, &#39;learning_rate&#39;: 4.83273596176822e-05, &#39;epoch&#39;: 0.1}
+{&#39;loss&#39;: 0.0831, &#39;learning_rate&#39;: 4.80884109916368e-05, &#39;epoch&#39;: 0.11}
+{&#39;loss&#39;: 0.1653, &#39;learning_rate&#39;: 4.78494623655914e-05, &#39;epoch&#39;: 0.13}
+{&#39;loss&#39;: 0.1865, &#39;learning_rate&#39;: 4.7610513739546e-05, &#39;epoch&#39;: 0.14}
+{&#39;loss&#39;: 0.0887, &#39;learning_rate&#39;: 4.73715651135006e-05, &#39;epoch&#39;: 0.16}
+{&#39;loss&#39;: 0.1009, &#39;learning_rate&#39;: 4.71326164874552e-05, &#39;epoch&#39;: 0.17}
+{&#39;loss&#39;: 0.1017, &#39;learning_rate&#39;: 4.6893667861409805e-05, &#39;epoch&#39;: 0.19}
+{&#39;loss&#39;: 0.0057, &#39;learning_rate&#39;: 4.66547192353644e-05, &#39;epoch&#39;: 0.2}
+{&#39;loss&#39;: 0.0157, &#39;learning_rate&#39;: 4.6415770609319e-05, &#39;epoch&#39;: 0.22}
+{&#39;loss&#39;: 0.0302, &#39;learning_rate&#39;: 4.61768219832736e-05, &#39;epoch&#39;: 0.23}
+{&#39;loss&#39;: 0.0013, &#39;learning_rate&#39;: 4.59378733572282e-05, &#39;epoch&#39;: 0.24}
+{&#39;loss&#39;: 0.0863, &#39;learning_rate&#39;: 4.56989247311828e-05, &#39;epoch&#39;: 0.26}
+{&#39;loss&#39;: 0.1122, &#39;learning_rate&#39;: 4.54599761051374e-05, &#39;epoch&#39;: 0.27}
+{&#39;loss&#39;: 0.1092, &#39;learning_rate&#39;: 4.5221027479092e-05, &#39;epoch&#39;: 0.29}
+{&#39;loss&#39;: 0.0853, &#39;learning_rate&#39;: 4.49820788530466e-05, &#39;epoch&#39;: 0.3}
+{&#39;loss&#39;: 0.1852, &#39;learning_rate&#39;: 4.4743130227001195e-05, &#39;epoch&#39;: 0.32}
+{&#39;loss&#39;: 0.0913, &#39;learning_rate&#39;: 4.4504181600955796e-05, &#39;epoch&#39;: 0.33}
+{&#39;loss&#39;: 0.0232, &#39;learning_rate&#39;: 4.42652329749104e-05, &#39;epoch&#39;: 0.34}
+{&#39;loss&#39;: 0.0888, &#39;learning_rate&#39;: 4.402628434886499e-05, &#39;epoch&#39;: 0.36}
+{&#39;loss&#39;: 0.195, &#39;learning_rate&#39;: 4.378733572281959e-05, &#39;epoch&#39;: 0.37}
+{&#39;loss&#39;: 0.0198, &#39;learning_rate&#39;: 4.3548387096774194e-05, &#39;epoch&#39;: 0.39}
+{&#39;loss&#39;: 0.056, &#39;learning_rate&#39;: 4.3309438470728796e-05, &#39;epoch&#39;: 0.4}
+{&#39;loss&#39;: 0.1656, &#39;learning_rate&#39;: 4.307048984468339e-05, &#39;epoch&#39;: 0.42}
+{&#39;loss&#39;: 0.0032, &#39;learning_rate&#39;: 4.283154121863799e-05, &#39;epoch&#39;: 0.43}
+{&#39;loss&#39;: 0.1277, &#39;learning_rate&#39;: 4.259259259259259e-05, &#39;epoch&#39;: 0.44}
+{&#39;loss&#39;: 0.0029, &#39;learning_rate&#39;: 4.2353643966547194e-05, &#39;epoch&#39;: 0.46}
+{&#39;loss&#39;: 0.1007, &#39;learning_rate&#39;: 4.2114695340501795e-05, &#39;epoch&#39;: 0.47}
+{&#39;loss&#39;: 0.0038, &#39;learning_rate&#39;: 4.1875746714456396e-05, &#39;epoch&#39;: 0.49}
+{&#39;loss&#39;: 0.0035, &#39;learning_rate&#39;: 4.1636798088411e-05, &#39;epoch&#39;: 0.5}
+{&#39;loss&#39;: 0.0015, &#39;learning_rate&#39;: 4.13978494623656e-05, &#39;epoch&#39;: 0.52}
+{&#39;loss&#39;: 0.1423, &#39;learning_rate&#39;: 4.115890083632019e-05, &#39;epoch&#39;: 0.53}
+{&#39;loss&#39;: 0.0316, &#39;learning_rate&#39;: 4.0919952210274794e-05, &#39;epoch&#39;: 0.54}
+{&#39;loss&#39;: 0.0012, &#39;learning_rate&#39;: 4.0681003584229395e-05, &#39;epoch&#39;: 0.56}
+{&#39;loss&#39;: 0.0009, &#39;learning_rate&#39;: 4.0442054958183996e-05, &#39;epoch&#39;: 0.57}
+{&#39;loss&#39;: 0.1287, &#39;learning_rate&#39;: 4.020310633213859e-05, &#39;epoch&#39;: 0.59}
+{&#39;loss&#39;: 0.0893, &#39;learning_rate&#39;: 3.996415770609319e-05, &#39;epoch&#39;: 0.6}
+{&#39;loss&#39;: 0.0021, &#39;learning_rate&#39;: 3.972520908004779e-05, &#39;epoch&#39;: 0.62}
+{&#39;loss&#39;: 0.0031, &#39;learning_rate&#39;: 3.9486260454002395e-05, &#39;epoch&#39;: 0.63}
+{&#39;loss&#39;: 0.0022, &#39;learning_rate&#39;: 3.924731182795699e-05, &#39;epoch&#39;: 0.65}
+{&#39;loss&#39;: 0.0008, &#39;learning_rate&#39;: 3.900836320191159e-05, &#39;epoch&#39;: 0.66}
+{&#39;loss&#39;: 0.1119, &#39;learning_rate&#39;: 3.876941457586619e-05, &#39;epoch&#39;: 0.67}
+{&#39;loss&#39;: 0.0012, &#39;learning_rate&#39;: 3.8530465949820786e-05, &#39;epoch&#39;: 0.69}
+{&#39;loss&#39;: 0.2618, &#39;learning_rate&#39;: 3.829151732377539e-05, &#39;epoch&#39;: 0.7}
+{&#39;loss&#39;: 0.0018, &#39;learning_rate&#39;: 3.805256869772999e-05, &#39;epoch&#39;: 0.72}
+{&#39;loss&#39;: 0.0736, &#39;learning_rate&#39;: 3.781362007168459e-05, &#39;epoch&#39;: 0.73}
+{&#39;loss&#39;: 0.0126, &#39;learning_rate&#39;: 3.7574671445639184e-05, &#39;epoch&#39;: 0.75}
+{&#39;loss&#39;: 0.2125, &#39;learning_rate&#39;: 3.7335722819593785e-05, &#39;epoch&#39;: 0.76}
+{&#39;loss&#39;: 0.0018, &#39;learning_rate&#39;: 3.7096774193548386e-05, &#39;epoch&#39;: 0.77}
+{&#39;loss&#39;: 0.1386, &#39;learning_rate&#39;: 3.685782556750299e-05, &#39;epoch&#39;: 0.79}
+{&#39;loss&#39;: 0.0024, &#39;learning_rate&#39;: 3.661887694145759e-05, &#39;epoch&#39;: 0.8}
+{&#39;loss&#39;: 0.0016, &#39;learning_rate&#39;: 3.637992831541219e-05, &#39;epoch&#39;: 0.82}
+{&#39;loss&#39;: 0.0011, &#39;learning_rate&#39;: 3.614097968936679e-05, &#39;epoch&#39;: 0.83}
+{&#39;loss&#39;: 0.0307, &#39;learning_rate&#39;: 3.590203106332139e-05, &#39;epoch&#39;: 0.85}
+{&#39;loss&#39;: 0.0007, &#39;learning_rate&#39;: 3.566308243727599e-05, &#39;epoch&#39;: 0.86}
+{&#39;loss&#39;: 0.005, &#39;learning_rate&#39;: 3.542413381123059e-05, &#39;epoch&#39;: 0.87}
+{&#39;loss&#39;: 0.0534, &#39;learning_rate&#39;: 3.518518518518519e-05, &#39;epoch&#39;: 0.89}
+{&#39;loss&#39;: 0.0155, &#39;learning_rate&#39;: 3.494623655913979e-05, &#39;epoch&#39;: 0.9}
+{&#39;loss&#39;: 0.0136, &#39;learning_rate&#39;: 3.4707287933094385e-05, &#39;epoch&#39;: 0.92}
+{&#39;loss&#39;: 0.1108, &#39;learning_rate&#39;: 3.4468339307048986e-05, &#39;epoch&#39;: 0.93}
+{&#39;loss&#39;: 0.0017, &#39;learning_rate&#39;: 3.422939068100359e-05, &#39;epoch&#39;: 0.95}
+{&#39;loss&#39;: 0.0009, &#39;learning_rate&#39;: 3.399044205495819e-05, &#39;epoch&#39;: 0.96}
+{&#39;loss&#39;: 0.0008, &#39;learning_rate&#39;: 3.375149342891278e-05, &#39;epoch&#39;: 0.97}
+{&#39;loss&#39;: 0.0846, &#39;learning_rate&#39;: 3.3512544802867384e-05, &#39;epoch&#39;: 0.99}
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "e2e52d9525394738afccabbc30f79407", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;eval_loss&#39;: 0.03877367451786995, &#39;eval_accuracy&#39;: 0.9919282511210762, &#39;eval_runtime&#39;: 5.0257, &#39;eval_samples_per_second&#39;: 221.862, &#39;eval_steps_per_second&#39;: 27.857, &#39;epoch&#39;: 1.0}
+{&#39;loss&#39;: 0.109, &#39;learning_rate&#39;: 3.3273596176821985e-05, &#39;epoch&#39;: 1.0}
+{&#39;loss&#39;: 0.0084, &#39;learning_rate&#39;: 3.3034647550776586e-05, &#39;epoch&#39;: 1.02}
+{&#39;loss&#39;: 0.0014, &#39;learning_rate&#39;: 3.279569892473118e-05, &#39;epoch&#39;: 1.03}
+{&#39;loss&#39;: 0.0008, &#39;learning_rate&#39;: 3.255675029868578e-05, &#39;epoch&#39;: 1.05}
+{&#39;loss&#39;: 0.0006, &#39;learning_rate&#39;: 3.231780167264038e-05, &#39;epoch&#39;: 1.06}
+{&#39;loss&#39;: 0.0005, &#39;learning_rate&#39;: 3.207885304659498e-05, &#39;epoch&#39;: 1.08}
+{&#39;loss&#39;: 0.0004, &#39;learning_rate&#39;: 3.183990442054958e-05, &#39;epoch&#39;: 1.09}
+{&#39;loss&#39;: 0.0518, &#39;learning_rate&#39;: 3.160095579450418e-05, &#39;epoch&#39;: 1.1}
+{&#39;loss&#39;: 0.0005, &#39;learning_rate&#39;: 3.136200716845878e-05, &#39;epoch&#39;: 1.12}
+{&#39;loss&#39;: 0.149, &#39;learning_rate&#39;: 3.112305854241338e-05, &#39;epoch&#39;: 1.13}
+{&#39;loss&#39;: 0.0022, &#39;learning_rate&#39;: 3.0884109916367984e-05, &#39;epoch&#39;: 1.15}
+{&#39;loss&#39;: 0.0013, &#39;learning_rate&#39;: 3.0645161290322585e-05, &#39;epoch&#39;: 1.16}
+{&#39;loss&#39;: 0.0051, &#39;learning_rate&#39;: 3.0406212664277183e-05, &#39;epoch&#39;: 1.18}
+{&#39;loss&#39;: 0.0005, &#39;learning_rate&#39;: 3.016726403823178e-05, &#39;epoch&#39;: 1.19}
+{&#39;loss&#39;: 0.0026, &#39;learning_rate&#39;: 2.9928315412186382e-05, &#39;epoch&#39;: 1.2}
+{&#39;loss&#39;: 0.0005, &#39;learning_rate&#39;: 2.9689366786140983e-05, &#39;epoch&#39;: 1.22}
+{&#39;loss&#39;: 0.0871, &#39;learning_rate&#39;: 2.9450418160095584e-05, &#39;epoch&#39;: 1.23}
+{&#39;loss&#39;: 0.0004, &#39;learning_rate&#39;: 2.921146953405018e-05, &#39;epoch&#39;: 1.25}
+{&#39;loss&#39;: 0.0004, &#39;learning_rate&#39;: 2.897252090800478e-05, &#39;epoch&#39;: 1.26}
+{&#39;loss&#39;: 0.0003, &#39;learning_rate&#39;: 2.873357228195938e-05, &#39;epoch&#39;: 1.28}
+{&#39;loss&#39;: 0.0003, &#39;learning_rate&#39;: 2.8494623655913982e-05, &#39;epoch&#39;: 1.29}
+{&#39;loss&#39;: 0.0003, &#39;learning_rate&#39;: 2.8255675029868577e-05, &#39;epoch&#39;: 1.3}
+{&#39;loss&#39;: 0.0478, &#39;learning_rate&#39;: 2.8016726403823178e-05, &#39;epoch&#39;: 1.32}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 2.777777777777778e-05, &#39;epoch&#39;: 1.33}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 2.753882915173238e-05, &#39;epoch&#39;: 1.35}
+{&#39;loss&#39;: 0.0003, &#39;learning_rate&#39;: 2.7299880525686978e-05, &#39;epoch&#39;: 1.36}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 2.706093189964158e-05, &#39;epoch&#39;: 1.38}
+{&#39;loss&#39;: 0.0005, &#39;learning_rate&#39;: 2.682198327359618e-05, &#39;epoch&#39;: 1.39}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 2.6583034647550775e-05, &#39;epoch&#39;: 1.41}
+{&#39;loss&#39;: 0.0003, &#39;learning_rate&#39;: 2.6344086021505376e-05, &#39;epoch&#39;: 1.42}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 2.6105137395459977e-05, &#39;epoch&#39;: 1.43}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 2.586618876941458e-05, &#39;epoch&#39;: 1.45}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 2.5627240143369173e-05, &#39;epoch&#39;: 1.46}
+{&#39;loss&#39;: 0.0007, &#39;learning_rate&#39;: 2.5388291517323774e-05, &#39;epoch&#39;: 1.48}
+{&#39;loss&#39;: 0.1336, &#39;learning_rate&#39;: 2.5149342891278375e-05, &#39;epoch&#39;: 1.49}
+{&#39;loss&#39;: 0.0004, &#39;learning_rate&#39;: 2.4910394265232977e-05, &#39;epoch&#39;: 1.51}
+{&#39;loss&#39;: 0.0671, &#39;learning_rate&#39;: 2.4671445639187578e-05, &#39;epoch&#39;: 1.52}
+{&#39;loss&#39;: 0.0004, &#39;learning_rate&#39;: 2.4432497013142176e-05, &#39;epoch&#39;: 1.53}
+{&#39;loss&#39;: 0.1246, &#39;learning_rate&#39;: 2.4193548387096777e-05, &#39;epoch&#39;: 1.55}
+{&#39;loss&#39;: 0.1142, &#39;learning_rate&#39;: 2.3954599761051375e-05, &#39;epoch&#39;: 1.56}
+{&#39;loss&#39;: 0.002, &#39;learning_rate&#39;: 2.3715651135005976e-05, &#39;epoch&#39;: 1.58}
+{&#39;loss&#39;: 0.002, &#39;learning_rate&#39;: 2.3476702508960574e-05, &#39;epoch&#39;: 1.59}
+{&#39;loss&#39;: 0.0009, &#39;learning_rate&#39;: 2.3237753882915175e-05, &#39;epoch&#39;: 1.61}
+{&#39;loss&#39;: 0.0778, &#39;learning_rate&#39;: 2.2998805256869773e-05, &#39;epoch&#39;: 1.62}
+{&#39;loss&#39;: 0.0007, &#39;learning_rate&#39;: 2.2759856630824374e-05, &#39;epoch&#39;: 1.63}
+{&#39;loss&#39;: 0.0008, &#39;learning_rate&#39;: 2.2520908004778972e-05, &#39;epoch&#39;: 1.65}
+{&#39;loss&#39;: 0.0009, &#39;learning_rate&#39;: 2.2281959378733573e-05, &#39;epoch&#39;: 1.66}
+{&#39;loss&#39;: 0.1032, &#39;learning_rate&#39;: 2.2043010752688174e-05, &#39;epoch&#39;: 1.68}
+{&#39;loss&#39;: 0.0014, &#39;learning_rate&#39;: 2.1804062126642775e-05, &#39;epoch&#39;: 1.69}
+{&#39;loss&#39;: 0.001, &#39;learning_rate&#39;: 2.1565113500597373e-05, &#39;epoch&#39;: 1.71}
+{&#39;loss&#39;: 0.1199, &#39;learning_rate&#39;: 2.132616487455197e-05, &#39;epoch&#39;: 1.72}
+{&#39;loss&#39;: 0.0009, &#39;learning_rate&#39;: 2.1087216248506572e-05, &#39;epoch&#39;: 1.73}
+{&#39;loss&#39;: 0.0011, &#39;learning_rate&#39;: 2.084826762246117e-05, &#39;epoch&#39;: 1.75}
+{&#39;loss&#39;: 0.0007, &#39;learning_rate&#39;: 2.060931899641577e-05, &#39;epoch&#39;: 1.76}
+{&#39;loss&#39;: 0.0006, &#39;learning_rate&#39;: 2.037037037037037e-05, &#39;epoch&#39;: 1.78}
+{&#39;loss&#39;: 0.0004, &#39;learning_rate&#39;: 2.013142174432497e-05, &#39;epoch&#39;: 1.79}
+{&#39;loss&#39;: 0.0005, &#39;learning_rate&#39;: 1.989247311827957e-05, &#39;epoch&#39;: 1.81}
+{&#39;loss&#39;: 0.1246, &#39;learning_rate&#39;: 1.9653524492234173e-05, &#39;epoch&#39;: 1.82}
+{&#39;loss&#39;: 0.0974, &#39;learning_rate&#39;: 1.941457586618877e-05, &#39;epoch&#39;: 1.84}
+{&#39;loss&#39;: 0.0003, &#39;learning_rate&#39;: 1.9175627240143372e-05, &#39;epoch&#39;: 1.85}
+{&#39;loss&#39;: 0.0007, &#39;learning_rate&#39;: 1.893667861409797e-05, &#39;epoch&#39;: 1.86}
+{&#39;loss&#39;: 0.1998, &#39;learning_rate&#39;: 1.869772998805257e-05, &#39;epoch&#39;: 1.88}
+{&#39;loss&#39;: 0.0426, &#39;learning_rate&#39;: 1.845878136200717e-05, &#39;epoch&#39;: 1.89}
+{&#39;loss&#39;: 0.002, &#39;learning_rate&#39;: 1.821983273596177e-05, &#39;epoch&#39;: 1.91}
+{&#39;loss&#39;: 0.0009, &#39;learning_rate&#39;: 1.7980884109916368e-05, &#39;epoch&#39;: 1.92}
+{&#39;loss&#39;: 0.0027, &#39;learning_rate&#39;: 1.774193548387097e-05, &#39;epoch&#39;: 1.94}
+{&#39;loss&#39;: 0.0004, &#39;learning_rate&#39;: 1.7502986857825567e-05, &#39;epoch&#39;: 1.95}
+{&#39;loss&#39;: 0.0003, &#39;learning_rate&#39;: 1.7264038231780168e-05, &#39;epoch&#39;: 1.96}
+{&#39;loss&#39;: 0.1081, &#39;learning_rate&#39;: 1.702508960573477e-05, &#39;epoch&#39;: 1.98}
+{&#39;loss&#39;: 0.0005, &#39;learning_rate&#39;: 1.678614097968937e-05, &#39;epoch&#39;: 1.99}
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "4673a0ec21594e5e813744311d94f23e", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;eval_loss&#39;: 0.014878345653414726, &#39;eval_accuracy&#39;: 0.9973094170403587, &#39;eval_runtime&#39;: 4.0209, &#39;eval_samples_per_second&#39;: 277.3, &#39;eval_steps_per_second&#39;: 34.818, &#39;epoch&#39;: 2.0}
+{&#39;loss&#39;: 0.0005, &#39;learning_rate&#39;: 1.6547192353643968e-05, &#39;epoch&#39;: 2.01}
+{&#39;loss&#39;: 0.0005, &#39;learning_rate&#39;: 1.630824372759857e-05, &#39;epoch&#39;: 2.02}
+{&#39;loss&#39;: 0.0004, &#39;learning_rate&#39;: 1.6069295101553167e-05, &#39;epoch&#39;: 2.04}
+{&#39;loss&#39;: 0.0005, &#39;learning_rate&#39;: 1.5830346475507768e-05, &#39;epoch&#39;: 2.05}
+{&#39;loss&#39;: 0.0004, &#39;learning_rate&#39;: 1.5591397849462366e-05, &#39;epoch&#39;: 2.06}
+{&#39;loss&#39;: 0.0135, &#39;learning_rate&#39;: 1.5352449223416964e-05, &#39;epoch&#39;: 2.08}
+{&#39;loss&#39;: 0.0014, &#39;learning_rate&#39;: 1.5113500597371565e-05, &#39;epoch&#39;: 2.09}
+{&#39;loss&#39;: 0.0003, &#39;learning_rate&#39;: 1.4874551971326165e-05, &#39;epoch&#39;: 2.11}
+{&#39;loss&#39;: 0.0003, &#39;learning_rate&#39;: 1.4635603345280766e-05, &#39;epoch&#39;: 2.12}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 1.4396654719235364e-05, &#39;epoch&#39;: 2.14}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 1.4157706093189965e-05, &#39;epoch&#39;: 2.15}
+{&#39;loss&#39;: 0.0003, &#39;learning_rate&#39;: 1.3918757467144564e-05, &#39;epoch&#39;: 2.16}
+{&#39;loss&#39;: 0.0008, &#39;learning_rate&#39;: 1.3679808841099166e-05, &#39;epoch&#39;: 2.18}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 1.3440860215053763e-05, &#39;epoch&#39;: 2.19}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 1.3201911589008365e-05, &#39;epoch&#39;: 2.21}
+{&#39;loss&#39;: 0.0003, &#39;learning_rate&#39;: 1.2962962962962962e-05, &#39;epoch&#39;: 2.22}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 1.2724014336917564e-05, &#39;epoch&#39;: 2.24}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 1.2485065710872163e-05, &#39;epoch&#39;: 2.25}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 1.2246117084826763e-05, &#39;epoch&#39;: 2.27}
+{&#39;loss&#39;: 0.0006, &#39;learning_rate&#39;: 1.2007168458781362e-05, &#39;epoch&#39;: 2.28}
+{&#39;loss&#39;: 0.0875, &#39;learning_rate&#39;: 1.1768219832735962e-05, &#39;epoch&#39;: 2.29}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 1.1529271206690561e-05, &#39;epoch&#39;: 2.31}
+{&#39;loss&#39;: 0.0003, &#39;learning_rate&#39;: 1.129032258064516e-05, &#39;epoch&#39;: 2.32}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 1.1051373954599762e-05, &#39;epoch&#39;: 2.34}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 1.0812425328554361e-05, &#39;epoch&#39;: 2.35}
+{&#39;loss&#39;: 0.0003, &#39;learning_rate&#39;: 1.0573476702508961e-05, &#39;epoch&#39;: 2.37}
+{&#39;loss&#39;: 0.0006, &#39;learning_rate&#39;: 1.033452807646356e-05, &#39;epoch&#39;: 2.38}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 1.009557945041816e-05, &#39;epoch&#39;: 2.39}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 9.856630824372761e-06, &#39;epoch&#39;: 2.41}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 9.61768219832736e-06, &#39;epoch&#39;: 2.42}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 9.37873357228196e-06, &#39;epoch&#39;: 2.44}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 9.13978494623656e-06, &#39;epoch&#39;: 2.45}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 8.90083632019116e-06, &#39;epoch&#39;: 2.47}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 8.661887694145759e-06, &#39;epoch&#39;: 2.48}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 8.42293906810036e-06, &#39;epoch&#39;: 2.49}
+{&#39;loss&#39;: 0.0909, &#39;learning_rate&#39;: 8.18399044205496e-06, &#39;epoch&#39;: 2.51}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 7.945041816009559e-06, &#39;epoch&#39;: 2.52}
+{&#39;loss&#39;: 0.0788, &#39;learning_rate&#39;: 7.706093189964159e-06, &#39;epoch&#39;: 2.54}
+{&#39;loss&#39;: 0.0003, &#39;learning_rate&#39;: 7.467144563918758e-06, &#39;epoch&#39;: 2.55}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 7.228195937873358e-06, &#39;epoch&#39;: 2.57}
+{&#39;loss&#39;: 0.0011, &#39;learning_rate&#39;: 6.989247311827957e-06, &#39;epoch&#39;: 2.58}
+{&#39;loss&#39;: 0.0003, &#39;learning_rate&#39;: 6.7502986857825566e-06, &#39;epoch&#39;: 2.59}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 6.511350059737156e-06, &#39;epoch&#39;: 2.61}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 6.2724014336917564e-06, &#39;epoch&#39;: 2.62}
+{&#39;loss&#39;: 0.0003, &#39;learning_rate&#39;: 6.033452807646357e-06, &#39;epoch&#39;: 2.64}
+{&#39;loss&#39;: 0.0003, &#39;learning_rate&#39;: 5.794504181600956e-06, &#39;epoch&#39;: 2.65}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 5.555555555555556e-06, &#39;epoch&#39;: 2.67}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 5.316606929510155e-06, &#39;epoch&#39;: 2.68}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 5.077658303464755e-06, &#39;epoch&#39;: 2.7}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 4.838709677419355e-06, &#39;epoch&#39;: 2.71}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 4.599761051373955e-06, &#39;epoch&#39;: 2.72}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 4.360812425328554e-06, &#39;epoch&#39;: 2.74}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 4.121863799283155e-06, &#39;epoch&#39;: 2.75}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 3.882915173237754e-06, &#39;epoch&#39;: 2.77}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 3.643966547192354e-06, &#39;epoch&#39;: 2.78}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 3.405017921146954e-06, &#39;epoch&#39;: 2.8}
+{&#39;loss&#39;: 0.0429, &#39;learning_rate&#39;: 3.1660692951015535e-06, &#39;epoch&#39;: 2.81}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 2.927120669056153e-06, &#39;epoch&#39;: 2.82}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 2.688172043010753e-06, &#39;epoch&#39;: 2.84}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 2.449223416965353e-06, &#39;epoch&#39;: 2.85}
+{&#39;loss&#39;: 0.0761, &#39;learning_rate&#39;: 2.2102747909199524e-06, &#39;epoch&#39;: 2.87}
+{&#39;loss&#39;: 0.0007, &#39;learning_rate&#39;: 1.971326164874552e-06, &#39;epoch&#39;: 2.88}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 1.7323775388291518e-06, &#39;epoch&#39;: 2.9}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 1.4934289127837516e-06, &#39;epoch&#39;: 2.91}
+{&#39;loss&#39;: 0.0003, &#39;learning_rate&#39;: 1.2544802867383513e-06, &#39;epoch&#39;: 2.92}
+{&#39;loss&#39;: 0.0003, &#39;learning_rate&#39;: 1.015531660692951e-06, &#39;epoch&#39;: 2.94}
+{&#39;loss&#39;: 0.0144, &#39;learning_rate&#39;: 7.765830346475508e-07, &#39;epoch&#39;: 2.95}
+{&#39;loss&#39;: 0.0568, &#39;learning_rate&#39;: 5.376344086021506e-07, &#39;epoch&#39;: 2.97}
+{&#39;loss&#39;: 0.0001, &#39;learning_rate&#39;: 2.9868578255675034e-07, &#39;epoch&#39;: 2.98}
+{&#39;loss&#39;: 0.0002, &#39;learning_rate&#39;: 5.973715651135006e-08, &#39;epoch&#39;: 3.0}
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "90aeb32c487c4b88a1162f9e9942608e", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;eval_loss&#39;: 0.026208847761154175, &#39;eval_accuracy&#39;: 0.9937219730941704, &#39;eval_runtime&#39;: 4.0835, &#39;eval_samples_per_second&#39;: 273.052, &#39;eval_steps_per_second&#39;: 34.285, &#39;epoch&#39;: 3.0}
+{&#39;train_runtime&#39;: 244.4781, &#39;train_samples_per_second&#39;: 54.717, &#39;train_steps_per_second&#39;: 6.847, &#39;train_loss&#39;: 0.0351541918909871, &#39;epoch&#39;: 3.0}
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Creating-a-Pipeline-with-the-Fine-Tuned-Model">
+<h2>Creating a Pipeline with the Fine-Tuned Model<a class="headerlink" href="#Creating-a-Pipeline-with-the-Fine-Tuned-Model" title="Permalink to this headline"> </a></h2>
+<p>In this section, we’re going to create a pipeline that contains our fine-tuned model.</p>
+<p>After completing the training process, our next step is to create a pipeline for inference using our fine-tuned model. This pipeline will enable us to easily make predictions with the model.</p>
+<div class="section" id="Setting-Up-the-Inference-Pipeline">
+<h3>Setting Up the Inference Pipeline<a class="headerlink" href="#Setting-Up-the-Inference-Pipeline" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Pipeline Creation</strong>: We use the <code class="docutils literal notranslate"><span class="pre">pipeline</span></code> function from the Transformers library to create an inference pipeline. This pipeline is configured for the task of text classification.</p></li>
+<li><p><strong>Model Integration</strong>: We integrate our fine-tuned model (<code class="docutils literal notranslate"><span class="pre">trainer.model</span></code>) into the pipeline. This ensures that the pipeline uses our newly trained model for inference.</p></li>
+<li><p><strong>Configuring the Pipeline</strong>: We set the batch size and tokenizer in the pipeline configuration. Additionally, we specify the device type, which is crucial for performance considerations.</p></li>
+</ul>
+</div>
+<div class="section" id="Device-Configuration-for-Different-Platforms">
+<h3>Device Configuration for Different Platforms<a class="headerlink" href="#Device-Configuration-for-Different-Platforms" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Apple Silicon (M1/M2) Devices</strong>: For those using Apple Silicon (e.g., M1 or M2 chips), we set the device type to <code class="docutils literal notranslate"><span class="pre">&quot;mps&quot;</span></code> in the pipeline. This leverages Apple’s Metal Performance Shaders for optimized performance on these devices.</p></li>
+<li><p><strong>Other Devices</strong>: If you’re using a device other than a MacBook Pro with Apple Silicon, you’ll need to adjust the device setting to match your hardware (e.g., <code class="docutils literal notranslate"><span class="pre">&quot;cuda&quot;</span></code> for NVIDIA GPUs or <code class="docutils literal notranslate"><span class="pre">&quot;cpu&quot;</span></code> for CPU-only inference).</p></li>
+</ul>
+</div>
+<div class="section" id="Importance-of-a-Customized-Pipeline">
+<h3>Importance of a Customized Pipeline<a class="headerlink" href="#Importance-of-a-Customized-Pipeline" title="Permalink to this headline"> </a></h3>
+<p>Creating a customized pipeline with our fine-tuned model allows for easy and efficient inference, tailored to our specific task and hardware. This step is vital in transitioning from model training to practical application.</p>
+<p>In the following code block, we’ll set up our pipeline with the fine-tuned model and configure it for our device.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># If you&#39;re going to run this on something other than a Macbook Pro, change the device to the applicable type. &quot;mps&quot; is for Apple Silicon architecture in torch.</span>
+
+<span class="n">tuned_pipeline</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span>
+    <span class="n">task</span><span class="o">=</span><span class="s2">&quot;text-classification&quot;</span><span class="p">,</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">trainer</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
+    <span class="n">batch_size</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+    <span class="n">tokenizer</span><span class="o">=</span><span class="n">tokenizer</span><span class="p">,</span>
+    <span class="n">device</span><span class="o">=</span><span class="s2">&quot;mps&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Validating-the-Fine-Tuned-Model">
+<h2>Validating the Fine-Tuned Model<a class="headerlink" href="#Validating-the-Fine-Tuned-Model" title="Permalink to this headline"> </a></h2>
+<p>In this next step, we’re going to validate that our fine-tuning training was effective prior to logging the tuned model to our run.</p>
+<p>Before finalizing our model by logging it to MLflow, it’s crucial to validate its performance. This validation step ensures that the model meets our expectations and is ready for deployment.</p>
+<div class="section" id="Importance-of-Model-Validation">
+<h3>Importance of Model Validation<a class="headerlink" href="#Importance-of-Model-Validation" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Assessing Model Performance</strong>: We need to evaluate the model’s performance on realistic scenarios to ensure it behaves as expected. This helps in identifying any issues or shortcomings in the model before it is logged and potentially deployed.</p></li>
+<li><p><strong>Avoiding Costly Redo’s</strong>: Given the large size of Transformer models and the computational resources required for training, it’s essential to validate the model beforehand. If a model doesn’t perform well, we wouldn’t want to log the model, only to have to later delete the run and the logged artifacts.</p></li>
+</ul>
+</div>
+<div class="section" id="Evaluating-with-a-Test-Query">
+<h3>Evaluating with a Test Query<a class="headerlink" href="#Evaluating-with-a-Test-Query" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Test Query</strong>: We will pass a realistic test query to our tuned pipeline to see how the model performs. This query should be representative of the kind of input the model is expected to handle in a real-world scenario.</p></li>
+<li><p><strong>Observing the Output</strong>: By analyzing the output of the model for this query, we can gauge its understanding and response to complex situations. This provides a practical insight into the model’s capabilities post-fine-tuning.</p></li>
+</ul>
+</div>
+<div class="section" id="Validating-Before-Logging-to-MLflow">
+<h3>Validating Before Logging to MLflow<a class="headerlink" href="#Validating-Before-Logging-to-MLflow" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Rationale</strong>: The reason for this validation step is to ensure that the model we log to MLflow is of high quality and ready for further steps like deployment or sharing. Logging a poorly performing model would lead to unnecessary complications, especially considering the large size and complexity of these models.</p></li>
+</ul>
+<p>After validating the model and ensuring satisfactory performance, we can confidently proceed to log it in MLflow, knowing it’s ready for real-world applications.</p>
+<p>In the next code block, we will run a test query through our fine-tuned model to evaluate its performance before proceeding to log it in MLflow.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Perform a validation of our assembled pipeline that contains our fine-tuned model.</span>
+<span class="n">quick_check</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;I have a question regarding the project development timeline and allocated resources; &quot;</span>
+    <span class="s2">&quot;specifically, how certain are you that John and Ringo can work together on writing this next song? &quot;</span>
+    <span class="s2">&quot;Do we need to get Paul involved here, or do you truly believe, as you said, &#39;nah, they got this&#39;?&quot;</span>
+<span class="p">)</span>
+
+<span class="n">tuned_pipeline</span><span class="p">(</span><span class="n">quick_check</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[{&#39;label&#39;: &#39;ham&#39;, &#39;score&#39;: 0.9985793828964233}]
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Model-Configuration-and-Signature-Inference">
+<h2>Model Configuration and Signature Inference<a class="headerlink" href="#Model-Configuration-and-Signature-Inference" title="Permalink to this headline"> </a></h2>
+<p>In this next step, we generate a signature for our pipeline in preparation for logging.</p>
+<p>After validating our model’s performance, the next critical step is to prepare it for logging to MLflow. This involves setting up the model’s configuration and inferring its signature, which are essential aspects of the model management process.</p>
+<div class="section" id="Configuring-the-Model-for-MLflow">
+<h3>Configuring the Model for MLflow<a class="headerlink" href="#Configuring-the-Model-for-MLflow" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Setting Model Configuration</strong>: We define a <code class="docutils literal notranslate"><span class="pre">model_config</span></code> dictionary to specify configuration parameters such as batch size and the device type (e.g., <code class="docutils literal notranslate"><span class="pre">&quot;mps&quot;</span></code> for Apple Silicon). This configuration is vital for ensuring that the model operates correctly in different environments.</p></li>
+</ul>
+</div>
+<div class="section" id="Inferring-the-Model-Signature">
+<h3>Inferring the Model Signature<a class="headerlink" href="#Inferring-the-Model-Signature" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Purpose of Signature Inference</strong>: The model signature defines the input and output schema of the model. Inferring this signature is crucial as it helps MLflow understand the data types and shapes that the model expects and produces.</p></li>
+<li><p><strong>Using mlflow.models.infer_signature</strong>: We use this function to automatically infer the model signature. We provide sample input and output data to the function, which analyzes them to determine the appropriate schema.</p></li>
+<li><p><strong>Including Model Parameters</strong>: Along with the input and output, we also include the <code class="docutils literal notranslate"><span class="pre">model_config</span></code> in the signature. This ensures that all relevant information about how the model should be run is captured.</p></li>
+</ul>
+</div>
+<div class="section" id="Importance-of-Signature-Inference">
+<h3>Importance of Signature Inference<a class="headerlink" href="#Importance-of-Signature-Inference" title="Permalink to this headline"> </a></h3>
+<p>Inferring the signature is a key step in preparing the model for logging and future deployment. It ensures that anyone who uses the model later, either for further development or in production, has clear information about the expected data format, making the model more robust and user-friendly.</p>
+<p>With the model configuration set and its signature inferred, we are now ready to log the model into MLflow. This will be our next step, ensuring our model is properly managed and ready for deployment.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define a set of parameters that we would like to be able to flexibly override at inference time, along with their default values</span>
+<span class="n">model_config</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;batch_size&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="s2">&quot;mps&quot;</span><span class="p">}</span>
+
+<span class="c1"># Infer the model signature, including a representative input, the expected output, and the parameters that we would like to be able to override at inference time.</span>
+<span class="n">signature</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">infer_signature</span><span class="p">(</span>
+    <span class="p">[</span><span class="s2">&quot;This is a test!&quot;</span><span class="p">,</span> <span class="s2">&quot;And this is also a test.&quot;</span><span class="p">],</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">transformers</span><span class="o">.</span><span class="n">generate_signature_output</span><span class="p">(</span>
+        <span class="n">tuned_pipeline</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;This is a test response!&quot;</span><span class="p">,</span> <span class="s2">&quot;So is this.&quot;</span><span class="p">]</span>
+    <span class="p">),</span>
+    <span class="n">params</span><span class="o">=</span><span class="n">model_config</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Logging-the-Fine-Tuned-Model-to-MLflow">
+<h2>Logging the Fine-Tuned Model to MLflow<a class="headerlink" href="#Logging-the-Fine-Tuned-Model-to-MLflow" title="Permalink to this headline"> </a></h2>
+<p>In this next section, we’re going to log our validated pipeline to the training run.</p>
+<p>With our model configuration and signature ready, the final step in our model training and validation process is to log the model to MLflow. This step is crucial for tracking and managing the model in a systematic way.</p>
+<div class="section" id="Accessing-the-existing-Run-used-for-training">
+<h3>Accessing the existing Run used for training<a class="headerlink" href="#Accessing-the-existing-Run-used-for-training" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Initiating MLflow Run</strong>: We start a new run in MLflow using <code class="docutils literal notranslate"><span class="pre">mlflow.start_run()</span></code>. This new run is specifically for the purpose of logging the model, separate from the training run.</p></li>
+</ul>
+</div>
+<div class="section" id="Logging-the-Model-in-MLflow">
+<h3>Logging the Model in MLflow<a class="headerlink" href="#Logging-the-Model-in-MLflow" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Using mlflow.transformers.log_model</strong>: We log our fine-tuned model using this function. It’s specially designed for logging models from the Transformers library, making the process streamlined and efficient.</p></li>
+<li><p><strong>Specifying Model Information</strong>: We provide several pieces of information to the logging function:</p>
+<ul>
+<li><p><strong>transformers_model</strong>: The fine-tuned model pipeline.</p></li>
+<li><p><strong>artifact_path</strong>: The path where the model artifacts will be stored.</p></li>
+<li><p><strong>signature</strong>: The inferred signature of the model, which includes input and output schemas.</p></li>
+<li><p><strong>input_example</strong>: Sample inputs to give users an idea of what input the model expects.</p></li>
+<li><p><strong>model_config</strong>: The configuration parameters of the model.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="Importance-of-Model-Logging">
+<h3>Importance of Model Logging<a class="headerlink" href="#Importance-of-Model-Logging" title="Permalink to this headline"> </a></h3>
+<p>Logging the model in MLflow serves multiple purposes:</p>
+<ul class="simple">
+<li><p><strong>Version Control</strong>: It helps in keeping track of different versions of the model.</p></li>
+<li><p><strong>Model Management</strong>: Facilitates the management of the model lifecycle, from training to deployment.</p></li>
+<li><p><strong>Reproducibility and Sharing</strong>: Enhances reproducibility and makes it easier to share the model with others.</p></li>
+</ul>
+<p>By logging our model in MLflow, we ensure that it is well-documented, versioned, and ready for future use, whether for further development or deployment.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Log the pipeline to the existing training run</span>
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">(</span><span class="n">run_id</span><span class="o">=</span><span class="n">run</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">run_id</span><span class="p">):</span>
+    <span class="n">model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">transformers</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+        <span class="n">transformers_model</span><span class="o">=</span><span class="n">tuned_pipeline</span><span class="p">,</span>
+        <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;fine_tuned&quot;</span><span class="p">,</span>
+        <span class="n">signature</span><span class="o">=</span><span class="n">signature</span><span class="p">,</span>
+        <span class="n">input_example</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Pass in a string&quot;</span><span class="p">,</span> <span class="s2">&quot;And have it mark as spam or not.&quot;</span><span class="p">],</span>
+        <span class="n">model_config</span><span class="o">=</span><span class="n">model_config</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2023/11/30 12:17:11 WARNING mlflow.utils.environment: Encountered an unexpected error while inferring pip requirements (model URI: /var/folders/cd/n8n0rm2x53l_s0xv_j_xklb00000gp/T/tmp77_imuy9/model, flavor: transformers), fall back to return [&#39;transformers==4.34.1&#39;, &#39;torch==2.1.0&#39;, &#39;torchvision==0.16.0&#39;, &#39;accelerate==0.21.0&#39;]. Set logging level to DEBUG to see the full traceback.
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Loading-and-Testing-the-Model-from-MLflow">
+<h2>Loading and Testing the Model from MLflow<a class="headerlink" href="#Loading-and-Testing-the-Model-from-MLflow" title="Permalink to this headline"> </a></h2>
+<p>After logging our fine-tuned model to MLflow, we’ll now load and test it.</p>
+<div class="section" id="Loading-the-Model-from-MLflow">
+<h3>Loading the Model from MLflow<a class="headerlink" href="#Loading-the-Model-from-MLflow" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Using mlflow.transformers.load_model</strong>: We use this function to load the model stored in MLflow. This demonstrates how models can be retrieved and utilized post-training, ensuring they are accessible for future use.</p></li>
+<li><p><strong>Retrieving Model URI</strong>: We use the <code class="docutils literal notranslate"><span class="pre">model_uri</span></code> obtained from logging the model to MLflow. This URI is the unique identifier for our logged model, allowing us to retrieve it accurately.</p></li>
+</ul>
+</div>
+<div class="section" id="Testing-the-Model-with-Validation-Text">
+<h3>Testing the Model with Validation Text<a class="headerlink" href="#Testing-the-Model-with-Validation-Text" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Preparing Validation Text</strong>: We use a creatively crafted text to test the model’s performance. This text is designed to mimic a typical spam message, which is relevant to our model’s training on spam classification.</p></li>
+<li><p><strong>Evaluating Model Output</strong>: By passing this text through the loaded model, we can observe its performance and effectiveness in a practical scenario. This step is crucial to ensure that the model works as expected in real-world conditions.</p></li>
+</ul>
+<p>Testing the model after loading it from MLflow is essential for several reasons:</p>
+<ul class="simple">
+<li><p><strong>Validation of Logging Process</strong>: It confirms that the model was logged and loaded correctly.</p></li>
+<li><p><strong>Practical Performance Assessment</strong>: Provides a real-world assessment of the model’s performance, which is critical for deployment decisions.</p></li>
+<li><p><strong>Demonstrating End-to-End Workflow</strong>: Showcases a complete workflow from training, logging, loading, to using the model, which is vital for understanding the entire model lifecycle.</p></li>
+</ul>
+<p>In the next code block, we’ll load our model from MLflow and test it with a validation text to assess its real-world performance.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load our saved model in the native transformers format</span>
+<span class="n">loaded</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">transformers</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_uri</span><span class="o">=</span><span class="n">model_info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
+
+<span class="c1"># Define a test example that we expect to be classified as spam</span>
+<span class="n">validation_text</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;Want to learn how to make MILLIONS with no effort? Click HERE now! See for yourself! Guaranteed to make you instantly rich! &quot;</span>
+    <span class="s2">&quot;Don&#39;t miss out you could be a winner!&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># validate the performance of our fine-tuning</span>
+<span class="n">loaded</span><span class="p">(</span><span class="n">validation_text</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2023/11/30 12:17:11 INFO mlflow.transformers: &#39;runs:/e3260e8511c94c38aafb7124509240a4/fine_tuned&#39; resolved as &#39;file:///Users/benjamin.wilson/repos/mlflow-fork/mlflow/docs/source/llms/transformers/tutorials/fine-tuning/mlruns/258758267044147956/e3260e8511c94c38aafb7124509240a4/artifacts/fine_tuned&#39;
+2023/11/30 12:17:11 WARNING mlflow.transformers: Could not specify device parameter for this pipeline type
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[{&#39;label&#39;: &#39;spam&#39;, &#39;score&#39;: 0.9873914122581482}]
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Conclusion:-Mastering-Fine-Tuning-and-MLflow-Integration">
+<h2>Conclusion: Mastering Fine-Tuning and MLflow Integration<a class="headerlink" href="#Conclusion:-Mastering-Fine-Tuning-and-MLflow-Integration" title="Permalink to this headline"> </a></h2>
+<p>Congratulations on completing this comprehensive tutorial on fine-tuning a Transformers model and integrating it with MLflow! Let’s recap the essential skills and knowledge you’ve acquired through this journey.</p>
+<div class="section" id="Key-Takeaways">
+<h3>Key Takeaways<a class="headerlink" href="#Key-Takeaways" title="Permalink to this headline"> </a></h3>
+<ol class="arabic simple">
+<li><p><strong>Fine-Tuning Transformers Models</strong>: You’ve learned how to fine-tune a foundational model from the Transformers library. This process demonstrates the power of adapting advanced pre-trained models to specific tasks, tailoring their performance to meet unique requirements.</p></li>
+<li><p><strong>Ease of Fine-Tuning</strong>: We’ve seen firsthand how straightforward it is to fine-tune these advanced Large Language Models (LLMs). With the right tools and understanding, fine-tuning can significantly enhance a model’s performance on specific tasks.</p></li>
+<li><p><strong>Specificity in Performance</strong>: The ability to fine-tune LLMs opens up a world of possibilities, allowing us to create models that excel in particular domains or tasks. This specificity in performance is crucial in deploying models in real-world scenarios where specialized understanding is required.</p></li>
+</ol>
+</div>
+<div class="section" id="Integrating-MLflow-with-Transformers">
+<h3>Integrating MLflow with Transformers<a class="headerlink" href="#Integrating-MLflow-with-Transformers" title="Permalink to this headline"> </a></h3>
+<ol class="arabic simple">
+<li><p><strong>Tracking and Managing the Fine-Tuning Process</strong>: A significant part of this tutorial was dedicated to using MLflow for experiment tracking, model logging, and management. You’ve learned how MLflow simplifies these aspects, making the machine learning workflow more manageable and efficient.</p></li>
+<li><p><strong>Benefits of MLflow in Fine-Tuning</strong>: MLflow plays a crucial role in ensuring reproducibility, managing model versions, and streamlining the deployment process. Its integration with the Transformers fine-tuning process demonstrates the potential for synergy between advanced model training techniques and lifecycle management tools.</p></li>
+</ol>
+</div>
+</div>
+</div>
+
+
+              </div>
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../conversational/conversational-model.html" class="btn btn-neutral" title="Introduction to Conversational AI with MLflow and DialoGPT" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+      
+      
+        <a href="../../guide/index.html" class="btn btn-neutral" title="🤗 Transformers within MLflow" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+      <p class="copyright">
+          &copy; MLflow Project, a Series of LF Projects, LLC. All rights reserved.
+      </p>
+
+  </div> 
+
+</footer>
+          </div>
+        </div>
+      </section>
+    </main>
+  </page>
+
+  
+
+
+  
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+      URL_ROOT:'../../../../',
+      VERSION:'2.9.2.dev0',
+      COLLAPSE_INDEX:false,
+      FILE_SUFFIX:'.html',
+      LINK_SUFFIX: '.html',
+      HAS_SOURCE:  true
+    };
+  </script>
+
+  
+
+  <script type="text/javascript" src="../../../../_static/js/clipboard.min.js"></script>
+  <script type="text/javascript" src="../../../../_static/js/jquery.waypoints.min.js"></script>
+
+  
+  
+  
+  <script type="text/javascript">var CLIPPY_SVG_PATH = "../../../../_static/clippy.svg";</script>
+  <script type="text/javascript" src="../../../../_static/js/custom.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.StickyNav.enable();
+    });
+
+  </script>
+  
+
+  
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        // Get the code block designator class entries
+        const allHighlights = document.querySelectorAll('.highlight');
+        // Disable copyable links for notebook cell numbering and for cell outputs
+        const highlights = Array.from(allHighlights).filter(highlight => !highlight.closest('.highlight-none') && 
+            !highlight.closest('.nboutput'));
+    
+        highlights.forEach(function(highlight) {
+            const copyIcon = document.createElement('span');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.innerHTML = '&#xf0ea;';
+
+            copyIcon.addEventListener('click', function() {
+                const code = highlight.querySelector('pre').textContent;
+                copyToClipboard(code);
+
+                // Flash effect on click
+                this.style.color = '#0194E2';
+                setTimeout(() => {
+                    this.style.color = ''; 
+                }, 100);
+
+                // Display "Code copied to clipboard" near the clicked icon
+                const message = document.createElement('span');
+                message.textContent = "Copied!";
+                message.classList.add('copy-message'); 
+
+                // Append the message to the icon
+                this.appendChild(message);
+
+                setTimeout(() => {
+                    this.removeChild(message);
+                }, 500);
+            });
+
+            highlight.appendChild(copyIcon);
+        });
+    });
+  </script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Force download for notebook-download-btn
+        const downloadButtons = document.querySelectorAll('.notebook-download-btn');
+        downloadButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                // Fetch the raw content of the notebook from GitHub
+                fetch(button.href)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = url;
+                        const filename = button.href.split('/').pop();
+                        link.download = filename; 
+
+                        document.body.appendChild(link);
+                        link.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    })
+                    .catch(err => console.error('Error fetching the notebook:', err));
+            });
+        });
+    });
+</script> 
+</body>
+</html>

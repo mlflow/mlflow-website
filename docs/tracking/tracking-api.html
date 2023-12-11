@@ -1,0 +1,708 @@
+
+  
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>MLflow Tracking APIs &mdash; MLflow 2.9.2.dev0 documentation</title>
+  
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/tracking/tracking-api.html">
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    
+
+    
+
+  
+    
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/cards.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/grids.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/mobile.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/simple-cards.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/tabs.css" type="text/css" />
+    
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="MLflow 2.9.2.dev0 documentation" href="../index.html"/>
+        <link rel="up" title="MLflow Tracking" href="../tracking.html"/>
+        <link rel="next" title="Automatic Logging with MLflow Tracking" href="/autolog.html"/>
+        <link rel="prev" title="MLflow Tracking" href="/../tracking.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+<script type="text/javascript" src="../_static/jquery.js"></script>
+<script type="text/javascript" src="../_static/underscore.js"></script>
+<script type="text/javascript" src="../_static/doctools.js"></script>
+<script type="text/javascript" src="../_static/languagesections.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+
+<body class="wy-body-for-nav" role="document">
+  
+
+  
+  <nav class="wy-nav-top header" role="navigation" aria-label="top navigation">
+    <ul>
+  <li class="menu-toggle">
+    <i data-toggle="wy-nav-top" class="wy-nav-top-menu-button db-icon db-icon-menu pull-left"></i>
+    <a href="../index.html" class="wy-nav-top-logo"
+      ><img src="../_static/MLflow-logo-final-black.png" alt="MLflow"
+    /></a>
+    <span class="version">2.9.2.dev0</span>
+  </li>
+</ul>
+  </nav>
+  <page>
+    
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side relative">
+      <div class="wy-side-scroll">
+  <div class="wy-side-nav-search">
+    
+
+    
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+    
+  </div>
+
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+    
+      <a href="../index.html" class="main-navigation-home"><img src="../_static/icons/nav-home.svg"> MLflow</a>
+    
+
+    
+      
+
+      
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../introduction/index.html">What is MLflow?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/index.html">Getting Started with MLflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../new-features/index.html">New Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../llms/index.html">LLMs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../model-evaluation/index.html">Model Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deep-learning/index.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../traditional-ml/index.html">Traditional ML</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/index.html">Deployment</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../tracking.html">MLflow Tracking</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../tracking.html#quickstart">Quickstart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tracking.html#concepts">Concepts</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../tracking.html#tracking-runs">Tracking Runs</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">MLflow Tracking APIs</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id1">Auto Logging</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#manual-logging">Manual Logging</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tracking-tips">Tracking Tips</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../tracking.html#explore-runs-and-results">Explore Runs and Results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tracking.html#set-up-the-mlflow-tracking-environment">Set up the MLflow Tracking Environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tracking.html#faq">FAQ</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../system-metrics/index.html">System Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../projects.html">MLflow Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.html">MLflow Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../model-registry.html">MLflow Model Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../recipes.html">MLflow Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plugins.html">MLflow Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auth/index.html">MLflow Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../search-runs.html">Search Runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../search-experiments.html">Search Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python_api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../R-api.html">R API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../java_api/index.html">Java API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rest-api.html">REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docker.html">Official MLflow Docker Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../community-model-flavors.html">Community Model Flavors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials-and-examples/index.html">Tutorials and Examples</a></li>
+</ul>
+
+      
+    
+  </div>
+
+  <div role="contentinfo">
+    
+
+    <p>
+      <a id='feedbacklink' href="https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a>
+    </p>
+  </div>
+</div>
+    </nav>
+
+    <main class="wy-grid-for-nav">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+          <div class="rst-content">
+            
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Documentation</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../tracking.html">MLflow Tracking</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+    
+      <li>MLflow Tracking APIs</li>
+    
+    
+    <!-- <li class="wy-breadcrumbs-aside">
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/tracking/tracking-api.rst" class="fa fa-github"> Edit on GitHub</a>
+    </li> -->
+    
+  </ul>
+</div>
+            <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <div itemprop="articleBody">
+                
+  <div class="section" id="mlflow-tracking-apis">
+<h1>MLflow Tracking APIs<a class="headerlink" href="#mlflow-tracking-apis" title="Permalink to this headline"> </a></h1>
+<p><a class="reference external" href="../tracking.html">MLflow Tracking</a> provides Python, R, Java, or REST API to log your experiment data and models.</p>
+<div class="section" id="id1">
+<h2><a class="reference external" href="autolog.html">Auto Logging</a><a class="headerlink" href="#id1" title="Permalink to this headline"> </a></h2>
+<div class="toctree-wrapper compound">
+</div>
+<p><a class="reference external" href="autolog.html">Auto logging</a> is a powerful feature that allows you to log metrics, parameters, and models without the need for explicit log statements
+but just a single <code class="docutils literal notranslate"><span class="pre">mlflow.autolog()</span></code> call at the top of your ML code. See <a class="reference internal" href="autolog.html#automatic-logging"><span class="std std-ref">auto logging documentation</span></a> for supported libraries and how to use autolog APIs with each of them.</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">autolog</span><span class="p">()</span>
+
+<span class="c1"># Your training code...</span>
+</pre></div>
+</div>
+</div></blockquote>
+</div>
+<div class="section" id="manual-logging">
+<h2>Manual Logging<a class="headerlink" href="#manual-logging" title="Permalink to this headline"> </a></h2>
+<p>Alternatively, you log MLflow metrics by adding <code class="docutils literal notranslate"><span class="pre">log</span></code> methods in your ML code. For example:</p>
+<dl>
+<dt>Python</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_metric</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s2">&quot;quality&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">2</span> <span class="o">*</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="n">epoch</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+<dt>Java and Scala</dt><dd><div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">MlflowClient</span><span class="w"> </span><span class="n">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">MlflowClient</span><span class="p">();</span>
+<span class="n">RunInfo</span><span class="w"> </span><span class="n">run</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">client</span><span class="p">.</span><span class="na">createRun</span><span class="p">();</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">epoch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">epoch</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span><span class="w"> </span><span class="n">epoch</span><span class="w"> </span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">client</span><span class="p">.</span><span class="na">logMetric</span><span class="p">(</span><span class="n">run</span><span class="p">.</span><span class="na">getRunId</span><span class="p">(),</span><span class="w"> </span><span class="s">&quot;quality&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">epoch</span><span class="p">,</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">currentTimeMillis</span><span class="p">(),</span><span class="w"> </span><span class="n">epoch</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<div class="section" id="logging-functions">
+<span id="tracking-logging-functions"></span><h3>Logging functions<a class="headerlink" href="#logging-functions" title="Permalink to this headline"> </a></h3>
+<p>Here are the full list of logging functions provided by the Tracking API (Python). Note that Java and R APIs provide similar but
+limited set of logging functions.</p>
+<p><a class="reference internal" href="../python_api/mlflow.html#mlflow.set_tracking_uri" title="mlflow.set_tracking_uri"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.set_tracking_uri()</span></code></a> connects to a tracking URI. You can also set the
+<code class="docutils literal notranslate"><span class="pre">MLFLOW_TRACKING_URI</span></code> environment variable to have MLflow find a URI from there. In both cases,
+the URI can either be a HTTP/HTTPS URI for a remote server, a database connection string, or a
+local path to log data to a directory. The URI defaults to <code class="docutils literal notranslate"><span class="pre">mlruns</span></code>.</p>
+<p><a class="reference internal" href="../python_api/mlflow.html#mlflow.get_tracking_uri" title="mlflow.get_tracking_uri"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.get_tracking_uri()</span></code></a> returns the current tracking URI.</p>
+<p><a class="reference internal" href="../python_api/mlflow.html#mlflow.create_experiment" title="mlflow.create_experiment"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.create_experiment()</span></code></a> creates a new experiment and returns its ID. Runs can be
+launched under the experiment by passing the experiment ID to <code class="docutils literal notranslate"><span class="pre">mlflow.start_run</span></code>.</p>
+<p><a class="reference internal" href="../python_api/mlflow.html#mlflow.set_experiment" title="mlflow.set_experiment"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.set_experiment()</span></code></a> sets an experiment as active. If the experiment does not exist,
+creates a new experiment. If you do not specify an experiment in <a class="reference internal" href="../python_api/mlflow.html#mlflow.start_run" title="mlflow.start_run"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.start_run()</span></code></a>, new
+runs are launched under this experiment.</p>
+<p><a class="reference internal" href="../python_api/mlflow.html#mlflow.start_run" title="mlflow.start_run"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.start_run()</span></code></a> returns the currently active run (if one exists), or starts a new run
+and returns a <a class="reference internal" href="../python_api/mlflow.html#mlflow.ActiveRun" title="mlflow.ActiveRun"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.ActiveRun</span></code></a> object usable as a context manager for the
+current run. You do not need to call <code class="docutils literal notranslate"><span class="pre">start_run</span></code> explicitly: calling one of the logging functions
+with no active run automatically starts a new one.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>If the argument <code class="docutils literal notranslate"><span class="pre">run_name</span></code> is not set within <a class="reference internal" href="../python_api/mlflow.html#mlflow.start_run" title="mlflow.start_run"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.start_run()</span></code></a>, a unique run name will be generated for each run.</p></li>
+</ul>
+</div>
+<p><a class="reference internal" href="../python_api/mlflow.html#mlflow.end_run" title="mlflow.end_run"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.end_run()</span></code></a> ends the currently active run, if any, taking an optional run status.</p>
+<p><a class="reference internal" href="../python_api/mlflow.html#mlflow.active_run" title="mlflow.active_run"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.active_run()</span></code></a> returns a <a class="reference internal" href="../python_api/mlflow.entities.html#mlflow.entities.Run" title="mlflow.entities.Run"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.entities.Run</span></code></a> object corresponding to the
+currently active run, if any.
+<strong>Note</strong>: You cannot access currently-active run attributes
+(parameters, metrics, etc.) through the run returned by <code class="docutils literal notranslate"><span class="pre">mlflow.active_run</span></code>. In order to access
+such attributes, use the <a class="reference internal" href="../python_api/mlflow.client.html#mlflow.client.MlflowClient" title="mlflow.client.MlflowClient"><code class="xref py py-class docutils literal notranslate"><span class="pre">MlflowClient</span></code></a> as follows:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">client</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">MlflowClient</span><span class="p">()</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_run</span><span class="p">(</span><span class="n">mlflow</span><span class="o">.</span><span class="n">active_run</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">run_id</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="../python_api/mlflow.html#mlflow.last_active_run" title="mlflow.last_active_run"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.last_active_run()</span></code></a> returns a <a class="reference internal" href="../python_api/mlflow.entities.html#mlflow.entities.Run" title="mlflow.entities.Run"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.entities.Run</span></code></a> object corresponding to the
+currently active run, if any. Otherwise, it returns a <a class="reference internal" href="../python_api/mlflow.entities.html#mlflow.entities.Run" title="mlflow.entities.Run"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.entities.Run</span></code></a> object corresponding
+the last run started from the current Python process that reached a terminal status (i.e. FINISHED, FAILED, or KILLED).</p>
+<p><a class="reference internal" href="../python_api/mlflow.html#mlflow.get_parent_run" title="mlflow.get_parent_run"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.get_parent_run()</span></code></a> returns a <a class="reference internal" href="../python_api/mlflow.entities.html#mlflow.entities.Run" title="mlflow.entities.Run"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.entities.Run</span></code></a> object corresponding to the
+parent run for the given run id, if one exists. Otherwise, it returns None.</p>
+<p><a class="reference internal" href="../python_api/mlflow.html#mlflow.log_param" title="mlflow.log_param"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.log_param()</span></code></a> logs a single key-value param in the currently active run. The key and
+value are both strings. Use <a class="reference internal" href="../python_api/mlflow.html#mlflow.log_params" title="mlflow.log_params"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.log_params()</span></code></a> to log multiple params at once.</p>
+<p><a class="reference internal" href="../python_api/mlflow.html#mlflow.log_metric" title="mlflow.log_metric"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.log_metric()</span></code></a> logs a single key-value metric. The value must always be a number.
+MLflow remembers the history of values for each metric. Use <a class="reference internal" href="../python_api/mlflow.html#mlflow.log_metrics" title="mlflow.log_metrics"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.log_metrics()</span></code></a> to log
+multiple metrics at once.</p>
+<p><a class="reference internal" href="../python_api/mlflow.html#mlflow.log_input" title="mlflow.log_input"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.log_input()</span></code></a> logs a single <a class="reference internal" href="../python_api/mlflow.data.html#mlflow.data.dataset.Dataset" title="mlflow.data.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.data.dataset.Dataset</span></code></a> object corresponding to the currently
+active run. You may also log a dataset context string and a dict of key-value tags.</p>
+<p><a class="reference internal" href="../python_api/mlflow.html#mlflow.set_tag" title="mlflow.set_tag"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.set_tag()</span></code></a> sets a single key-value tag in the currently active run. The key and
+value are both strings. Use <a class="reference internal" href="../python_api/mlflow.html#mlflow.set_tags" title="mlflow.set_tags"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.set_tags()</span></code></a> to set multiple tags at once.</p>
+<p><a class="reference internal" href="../python_api/mlflow.html#mlflow.log_artifact" title="mlflow.log_artifact"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.log_artifact()</span></code></a> logs a local file or directory as an artifact, optionally taking an
+<code class="docutils literal notranslate"><span class="pre">artifact_path</span></code> to place it in within the run’s artifact URI. Run artifacts can be organized into
+directories, so you can place the artifact in a directory this way.</p>
+<p><a class="reference internal" href="../python_api/mlflow.html#mlflow.log_artifacts" title="mlflow.log_artifacts"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.log_artifacts()</span></code></a> logs all the files in a given directory as artifacts, again taking
+an optional <code class="docutils literal notranslate"><span class="pre">artifact_path</span></code>.</p>
+<p><a class="reference internal" href="../python_api/mlflow.html#mlflow.get_artifact_uri" title="mlflow.get_artifact_uri"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.get_artifact_uri()</span></code></a> returns the URI that artifacts from the current run should be
+logged to.</p>
+</div>
+</div>
+<div class="section" id="tracking-tips">
+<h2>Tracking Tips<a class="headerlink" href="#tracking-tips" title="Permalink to this headline"> </a></h2>
+<div class="section" id="logging-with-explicit-step-and-timestamp">
+<h3>Logging with explicit step and timestamp<a class="headerlink" href="#logging-with-explicit-step-and-timestamp" title="Permalink to this headline"> </a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">log</span></code> methods support two alternative methods for distinguishing metric values on the x-axis: <code class="docutils literal notranslate"><span class="pre">timestamp</span></code> and <code class="docutils literal notranslate"><span class="pre">step</span></code> (number of training iterations, number of epochs, and so on).
+By default, <code class="docutils literal notranslate"><span class="pre">timestamp</span></code> is set to the current time and <code class="docutils literal notranslate"><span class="pre">step</span></code> is set to 0. You can override these values by passing
+<code class="docutils literal notranslate"><span class="pre">timestamp</span></code> and <code class="docutils literal notranslate"><span class="pre">step</span></code> arguments to the <code class="docutils literal notranslate"><span class="pre">log</span></code> methods. For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mlflow</span><span class="o">.</span><span class="n">log_metric</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s2">&quot;train_loss&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">train_loss</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="n">epoch</span><span class="p">,</span> <span class="n">timestamp</span><span class="o">=</span><span class="n">now</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">step</span></code>  has the following requirements and properties:</p>
+<ul class="simple">
+<li><p>Must be a valid 64-bit integer value.</p></li>
+<li><p>Can be negative.</p></li>
+<li><p>Can be out of order in successive write calls. For example, (1, 3, 2) is a valid sequence.</p></li>
+<li><p>Can have “gaps” in the sequence of values specified in successive write calls. For example, (1, 5, 75, -20) is a valid sequence.</p></li>
+</ul>
+<p>If you specify both a timestamp and a step, metrics are recorded against both axes independently.</p>
+</div>
+<div class="section" id="organizing-runs-in-experiments">
+<span id="id3"></span><h3>Organizing Runs in Experiments<a class="headerlink" href="#organizing-runs-in-experiments" title="Permalink to this headline"> </a></h3>
+<p>MLflow allows you to group runs under experiments, which can be useful for comparing runs intended
+to tackle a particular task. You can create experiments via multiple way - MLflow UI, the <a class="reference internal" href="../cli.html#cli"><span class="std std-ref">Command-Line Interface</span></a> (<code class="docutils literal notranslate"><span class="pre">mlflow</span> <span class="pre">experiments</span></code>),
+or the <a class="reference internal" href="../python_api/mlflow.html#mlflow.create_experiment" title="mlflow.create_experiment"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.create_experiment()</span></code></a> Python API. You can pass the experiment name for an individual run
+using the CLI (for example, <code class="docutils literal notranslate"><span class="pre">mlflow</span> <span class="pre">run</span> <span class="pre">...</span> <span class="pre">--experiment-name</span> <span class="pre">[name]</span></code>) or the <code class="docutils literal notranslate"><span class="pre">MLFLOW_EXPERIMENT_NAME</span></code>
+environment variable. Alternatively, you can use the experiment ID instead, via the
+<code class="docutils literal notranslate"><span class="pre">--experiment-id</span></code> CLI flag or the <code class="docutils literal notranslate"><span class="pre">MLFLOW_EXPERIMENT_ID</span></code> environment variable.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set the experiment via environment variables</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">MLFLOW_EXPERIMENT_NAME</span><span class="o">=</span>fraud-detection
+
+mlflow<span class="w"> </span>experiments<span class="w"> </span>create<span class="w"> </span>--experiment-name<span class="w"> </span>fraud-detection
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Launch a run. The experiment is inferred from the MLFLOW_EXPERIMENT_NAME environment</span>
+<span class="c1"># variable, or from the --experiment-name parameter passed to the MLflow CLI (the latter</span>
+<span class="c1"># taking precedence)</span>
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_param</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_metric</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="creating-child-runs">
+<span id="child-runs"></span><h3>Creating Child Runs<a class="headerlink" href="#creating-child-runs" title="Permalink to this headline"> </a></h3>
+<p>You can also create multiple runs inside a single run. This is useful for scenario like hyperparameter tuning,
+cross-validation folds, where you need another level of organization within an experiment. You can create child runs
+by passing <code class="docutils literal notranslate"><span class="pre">parent_run_id</span></code> to <a class="reference internal" href="../python_api/mlflow.html#mlflow.start_run" title="mlflow.start_run"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.start_run()</span></code></a> function. For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Start parent run</span>
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">()</span> <span class="k">as</span> <span class="n">parent_run</span><span class="p">:</span>
+    <span class="n">param</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">]</span>
+
+    <span class="c1"># Create a child run for each parameter setting</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">param</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">(</span><span class="n">nested</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">child_run</span><span class="p">:</span>
+            <span class="n">mlflow</span><span class="o">.</span><span class="n">log_param</span><span class="p">(</span><span class="s2">&quot;p&quot;</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+            <span class="o">...</span>
+            <span class="n">mlflow</span><span class="o">.</span><span class="n">log_metric</span><span class="p">(</span><span class="s2">&quot;val_loss&quot;</span><span class="p">,</span> <span class="n">val_loss</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You can fetch all child runs under a parent run using tags.</p>
+</div>
+<div class="section" id="launching-multiple-runs-in-one-program">
+<span id="launching-multiple-runs"></span><h3>Launching Multiple Runs in One Program<a class="headerlink" href="#launching-multiple-runs-in-one-program" title="Permalink to this headline"> </a></h3>
+<p>Sometimes you want to launch multiple MLflow runs in the same program: for example, maybe you are
+performing a hyperparameter search locally or your experiments are just very fast to run. The way to
+do this depends on whether you want to run them <a class="reference internal" href="#sequential-runs"><span class="std std-ref">sequentially</span></a> or in <a class="reference internal" href="#parallel-runs"><span class="std std-ref">parallel</span></a>.</p>
+<div class="section" id="sequantial-runs">
+<span id="sequential-runs"></span><h4>Sequantial Runs<a class="headerlink" href="#sequantial-runs" title="Permalink to this headline"> </a></h4>
+<p>Running multiple runs one-by-one is easy to do because the <code class="docutils literal notranslate"><span class="pre">ActiveRun</span></code> object returned by <a class="reference internal" href="../python_api/mlflow.html#mlflow.start_run" title="mlflow.start_run"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.start_run()</span></code></a>
+is a Python <a class="reference external" href="https://docs.python.org/2.5/whatsnew/pep-343.html">context manager</a>. You can “scope” each run to
+just one block of code as follows:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># First run</span>
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_param</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_metric</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="o">...</span>
+
+<span class="c1"># Another run</span>
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p>The run remains open throughout the <code class="docutils literal notranslate"><span class="pre">with</span></code> statement, and is automatically closed when the
+statement exits, even if it exits due to an exception.</p>
+</div>
+<div class="section" id="parallel-runs">
+<span id="id4"></span><h4>Parallel Runs<a class="headerlink" href="#parallel-runs" title="Permalink to this headline"> </a></h4>
+<p>MLflow also supports running multiple runs in parallel using <a class="reference external" href="https://docs.python.org/2/library/multiprocessing.html">multiprocessing</a> or multi threading.</p>
+<p><strong>Multi-processing</strong> is straightforward: just call <a class="reference internal" href="../python_api/mlflow.html#mlflow.start_run" title="mlflow.start_run"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.start_run()</span></code></a> in a separate process and it creates a new run for each. For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">import</span> <span class="nn">multiprocessing</span> <span class="k">as</span> <span class="nn">mp</span>
+
+
+<span class="k">def</span> <span class="nf">train_model</span><span class="p">(</span><span class="n">params</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_param</span><span class="p">(</span><span class="s2">&quot;p&quot;</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+        <span class="o">...</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+    <span class="n">pool</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">processes</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">pool</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">train_model</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Multi-threading</strong> is a bit more complicated because MLflow uses a global state to keep track of the currently active run i.e. having multiple active
+runs in the same process may cause data corruption. However, you can avoid this issue and use multi threading by using <a class="reference internal" href="#child-runs"><span class="std std-ref">Child Runs</span></a>.
+You can start child runs in each thread by passing <code class="docutils literal notranslate"><span class="pre">nested=True</span></code> to <a class="reference internal" href="../python_api/mlflow.html#mlflow.start_run" title="mlflow.start_run"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.start_run()</span></code></a> as described in the previous section. For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+
+
+<span class="k">def</span> <span class="nf">train_model</span><span class="p">(</span><span class="n">params</span><span class="p">):</span>
+    <span class="c1"># Create a child run by passing nested=True</span>
+    <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">(</span><span class="n">nested</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_param</span><span class="p">(</span><span class="s2">&quot;p&quot;</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+        <span class="o">...</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+    <span class="n">threads</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">train_model</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">p</span><span class="p">,))</span>
+        <span class="n">threads</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">threads</span><span class="p">:</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Also <a class="reference external" href="https://github.com/mlflow/mlflow/blob/master/examples/hyperparam/search_random.py">here</a> is the full example of hyperparameter tuning using child runs with multi threading.</p>
+</div>
+</div>
+<div class="section" id="adding-tags-to-runs">
+<span id="add-tags-to-runs"></span><h3>Adding Tags to Runs<a class="headerlink" href="#adding-tags-to-runs" title="Permalink to this headline"> </a></h3>
+<p>You can annotate runs with arbitrary tags to organize them into groups. This allows you to easily filter and search
+Runs in Tracking UI by using <a class="reference internal" href="../search-runs.html#mlflow-tags"><span class="std std-ref">filter experssion</span></a>.</p>
+<div class="section" id="system-tags">
+<span id="id5"></span><h4>System Tags<a class="headerlink" href="#system-tags" title="Permalink to this headline"> </a></h4>
+<p>Tag keys that start with <code class="docutils literal notranslate"><span class="pre">mlflow.</span></code> are reserved for internal use.
+The following tags are set automatically by MLflow, when appropriate:</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">mlflow.note.content</span></code> is an exceptional case where the tag is <strong>not set automatically</strong> and can be overridden by the user to include additional information about the run.</p>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 26%" />
+<col style="width: 74%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">mlflow.note.content</span></code></p></td>
+<td><p>A descriptive note about this run. This reserved tag is <strong>not set automatically</strong> and
+can be overridden by the user to include additional information about the run. The
+content is displayed on the run’s page under the Notes section.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">mlflow.parentRunId</span></code></p></td>
+<td><p>The ID of the parent run, if this is a nested run.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">mlflow.user</span></code></p></td>
+<td><p>Identifier of the user who created the run.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">mlflow.source.type</span></code></p></td>
+<td><p>Source type. Possible values: <code class="docutils literal notranslate"><span class="pre">&quot;NOTEBOOK&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;JOB&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;PROJECT&quot;</span></code>,
+<code class="docutils literal notranslate"><span class="pre">&quot;LOCAL&quot;</span></code>, and <code class="docutils literal notranslate"><span class="pre">&quot;UNKNOWN&quot;</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">mlflow.source.name</span></code></p></td>
+<td><p>Source identifier (e.g., GitHub URL, local Python filename, name of notebook)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">mlflow.source.git.commit</span></code></p></td>
+<td><p>Commit hash of the executed code, if in a git repository.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">mlflow.source.git.branch</span></code></p></td>
+<td><p>Name of the branch of the executed code, if in a git repository.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">mlflow.source.git.repoURL</span></code></p></td>
+<td><p>URL that the executed code was cloned from.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">mlflow.project.env</span></code></p></td>
+<td><p>The runtime context used by the MLflow project.
+Possible values: <code class="docutils literal notranslate"><span class="pre">&quot;docker&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;conda&quot;</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">mlflow.project.entryPoint</span></code></p></td>
+<td><p>Name of the project entry point associated with the current run, if any.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">mlflow.docker.image.name</span></code></p></td>
+<td><p>Name of the Docker image used to execute this run.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">mlflow.docker.image.id</span></code></p></td>
+<td><p>ID of the Docker image used to execute this run.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">mlflow.log-model.history</span></code></p></td>
+<td><p>Model metadata collected by log-model calls. Includes the serialized
+form of the MLModel model files logged to a run, although the exact format and
+information captured is subject to change.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="custom-tags">
+<h4>Custom Tags<a class="headerlink" href="#custom-tags" title="Permalink to this headline"> </a></h4>
+<p>The <a class="reference internal" href="../python_api/mlflow.client.html#mlflow.client.MlflowClient.set_tag" title="mlflow.client.MlflowClient.set_tag"><code class="xref py py-func docutils literal notranslate"><span class="pre">MlflowClient.set_tag()</span></code></a> function lets you add custom tags to runs. A tag can only have a single unique value mapped to it at a time. For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">client</span><span class="o">.</span><span class="n">set_tag</span><span class="p">(</span><span class="n">run</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">run_id</span><span class="p">,</span> <span class="s2">&quot;tag_key&quot;</span><span class="p">,</span> <span class="s2">&quot;tag_value&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="get-mlflow-run-instance-from-autologged-results">
+<h3>Get MLflow Run instance from autologged results<a class="headerlink" href="#get-mlflow-run-instance-from-autologged-results" title="Permalink to this headline"> </a></h3>
+<p>In some cases, you may want to access the MLflow Run instance associated with the autologged results, similarly to you can get the run context with <cite>mlflow.start_run()</cite>
+You can access the most recent autolog run through the <a class="reference internal" href="../python_api/mlflow.html#mlflow.last_active_run" title="mlflow.last_active_run"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.last_active_run()</span></code></a> function. Here’s a short sklearn autolog example that makes use of this function:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_diabetes</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestRegressor</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">autolog</span><span class="p">()</span>
+
+<span class="n">db</span> <span class="o">=</span> <span class="n">load_diabetes</span><span class="p">()</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">target</span><span class="p">)</span>
+
+<span class="c1"># Create and train models.</span>
+<span class="n">rf</span> <span class="o">=</span> <span class="n">RandomForestRegressor</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">max_depth</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">max_features</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">rf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Use the model to make predictions on the test dataset.</span>
+<span class="n">predictions</span> <span class="o">=</span> <span class="n">rf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<span class="n">autolog_run</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">last_active_run</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">autolog_run</span><span class="p">)</span>
+<span class="c1"># &lt;Run:</span>
+<span class="c1">#    data=&lt;RunData:</span>
+<span class="c1">#        metrics={&#39;accuracy&#39;: 0.0},</span>
+<span class="c1">#        params={&#39;n_estimators&#39;: &#39;100&#39;, &#39;max_depth&#39;: &#39;6&#39;, &#39;max_features&#39;: &#39;3&#39;},</span>
+<span class="c1">#        tags={&#39;estimator_class&#39;: &#39;sklearn.ensemble._forest.RandomForestRegressor&#39;, &#39;estimator_name&#39;: &#39;RandomForestRegressor&#39;}</span>
+<span class="c1">#    &gt;,</span>
+<span class="c1">#    info=&lt;RunInfo:</span>
+<span class="c1">#        artifact_uri=&#39;file:///Users/andrew/Code/mlflow/mlruns/0/0c0b.../artifacts&#39;,</span>
+<span class="c1">#        end_time=163...0,</span>
+<span class="c1">#        run_id=&#39;0c0b...&#39;,</span>
+<span class="c1">#        run_uuid=&#39;0c0b...&#39;,</span>
+<span class="c1">#        start_time=163...0,</span>
+<span class="c1">#        status=&#39;FINISHED&#39;,</span>
+<span class="c1">#        user_id=&#39;ME&#39;&gt;</span>
+<span class="c1">#    &gt;</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+              </div>
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../tracking.html" class="btn btn-neutral" title="MLflow Tracking" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+      
+      
+        <a href="autolog.html" class="btn btn-neutral" title="Automatic Logging with MLflow Tracking" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+      <p class="copyright">
+          &copy; MLflow Project, a Series of LF Projects, LLC. All rights reserved.
+      </p>
+
+  </div> 
+
+</footer>
+          </div>
+        </div>
+      </section>
+    </main>
+  </page>
+
+  
+
+
+  
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+      URL_ROOT:'../',
+      VERSION:'2.9.2.dev0',
+      COLLAPSE_INDEX:false,
+      FILE_SUFFIX:'.html',
+      LINK_SUFFIX: '.html',
+      HAS_SOURCE:  true
+    };
+  </script>
+
+  
+
+  <script type="text/javascript" src="../_static/js/clipboard.min.js"></script>
+  <script type="text/javascript" src="../_static/js/jquery.waypoints.min.js"></script>
+
+  
+  
+  
+  <script type="text/javascript">var CLIPPY_SVG_PATH = "../_static/clippy.svg";</script>
+  <script type="text/javascript" src="../_static/js/custom.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.StickyNav.enable();
+    });
+
+  </script>
+  
+
+  
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        // Get the code block designator class entries
+        const allHighlights = document.querySelectorAll('.highlight');
+        // Disable copyable links for notebook cell numbering and for cell outputs
+        const highlights = Array.from(allHighlights).filter(highlight => !highlight.closest('.highlight-none') && 
+            !highlight.closest('.nboutput'));
+    
+        highlights.forEach(function(highlight) {
+            const copyIcon = document.createElement('span');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.innerHTML = '&#xf0ea;';
+
+            copyIcon.addEventListener('click', function() {
+                const code = highlight.querySelector('pre').textContent;
+                copyToClipboard(code);
+
+                // Flash effect on click
+                this.style.color = '#0194E2';
+                setTimeout(() => {
+                    this.style.color = ''; 
+                }, 100);
+
+                // Display "Code copied to clipboard" near the clicked icon
+                const message = document.createElement('span');
+                message.textContent = "Copied!";
+                message.classList.add('copy-message'); 
+
+                // Append the message to the icon
+                this.appendChild(message);
+
+                setTimeout(() => {
+                    this.removeChild(message);
+                }, 500);
+            });
+
+            highlight.appendChild(copyIcon);
+        });
+    });
+  </script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Force download for notebook-download-btn
+        const downloadButtons = document.querySelectorAll('.notebook-download-btn');
+        downloadButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                // Fetch the raw content of the notebook from GitHub
+                fetch(button.href)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = url;
+                        const filename = button.href.split('/').pop();
+                        link.download = filename; 
+
+                        document.body.appendChild(link);
+                        link.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    })
+                    .catch(err => console.error('Error fetching the notebook:', err));
+            });
+        });
+    });
+</script> 
+</body>
+</html>

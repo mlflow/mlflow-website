@@ -1,0 +1,1183 @@
+
+  
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Introduction to Translation with Transformers and MLflow &mdash; MLflow 2.9.2.dev0 documentation</title>
+  
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/llms/transformers/tutorials/translation/component-translation.html">
+  
+  
+    <link rel="shortcut icon" href="../../../../_static/favicon.ico"/>
+    
+
+    
+
+  
+    
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/css/cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/css/grids.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/css/mobile.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/css/simple-cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/css/tabs.css" type="text/css" />
+    
+  
+        <link rel="index" title="Index"
+              href="../../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../../search.html"/>
+    <link rel="top" title="MLflow 2.9.2.dev0 documentation" href="../../../../index.html"/>
+        <link rel="up" title="MLflow Transformers Flavor" href="../../index.html"/>
+        <link rel="next" title="Introduction to Conversational AI with MLflow and DialoGPT" href="/../conversational/conversational-model.html"/>
+        <link rel="prev" title="Introduction to MLflow and OpenAI’s Whisper" href="/../audio-transcription/whisper.html"/> 
+
+  
+  <script src="../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+<script type="text/javascript" src="../../../../_static/jquery.js"></script>
+<script type="text/javascript" src="../../../../_static/underscore.js"></script>
+<script type="text/javascript" src="../../../../_static/doctools.js"></script>
+<script type="text/javascript" src="../../../../_static/languagesections.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript" src="../../../../None"></script>
+
+<body class="wy-body-for-nav" role="document">
+  
+
+  
+  <nav class="wy-nav-top header" role="navigation" aria-label="top navigation">
+    <ul>
+  <li class="menu-toggle">
+    <i data-toggle="wy-nav-top" class="wy-nav-top-menu-button db-icon db-icon-menu pull-left"></i>
+    <a href="../../../../index.html" class="wy-nav-top-logo"
+      ><img src="../../../../_static/MLflow-logo-final-black.png" alt="MLflow"
+    /></a>
+    <span class="version">2.9.2.dev0</span>
+  </li>
+</ul>
+  </nav>
+  <page>
+    
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side relative">
+      <div class="wy-side-scroll">
+  <div class="wy-side-nav-search">
+    
+
+    
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+    
+  </div>
+
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+    
+      <a href="../../../../index.html" class="main-navigation-home"><img src="../../../../_static/icons/nav-home.svg"> MLflow</a>
+    
+
+    
+      
+
+      
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../introduction/index.html">What is MLflow?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting-started/index.html">Getting Started with MLflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../new-features/index.html">New Features</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../index.html">LLMs</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../index.html#id1">MLflow Deployments Server for LLMs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../index.html#id3">LLM Evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../index.html#id4">Prompt Engineering UI</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../index.html#native-mlflow-flavors-for-llms">Native MLflow Flavors for LLMs</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../../../index.html#benefits-of-mlflow-s-native-flavors-for-llms">Benefits of MLflow’s Native Flavors for LLMs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../index.html#explore-the-native-llm-flavors">Explore the Native LLM Flavors</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../../../index.html#native-integration-guides-and-tutorials">Native Integration Guides and Tutorials</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="../../index.html">MLflow Transformers Flavor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../sentence-transformers/index.html">MLflow Sentence-Transformers Flavor</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../index.html#native-integration-examples">Native Integration Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../index.html#id5">LLM Tracking in MLflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../index.html#tutorials-and-use-case-guides-for-llms-in-mlflow">Tutorials and Use Case Guides for LLMs in MLflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../model-evaluation/index.html">Model Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deep-learning/index.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../traditional-ml/index.html">Traditional ML</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment/index.html">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tracking.html">MLflow Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../system-metrics/index.html">System Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../projects.html">MLflow Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../models.html">MLflow Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../model-registry.html">MLflow Model Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../recipes.html">MLflow Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../plugins.html">MLflow Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../auth/index.html">MLflow Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../search-runs.html">Search Runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../search-experiments.html">Search Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../python_api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../R-api.html">R API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../java_api/index.html">Java API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../rest-api.html">REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../docker.html">Official MLflow Docker Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../community-model-flavors.html">Community Model Flavors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials-and-examples/index.html">Tutorials and Examples</a></li>
+</ul>
+
+      
+    
+  </div>
+
+  <div role="contentinfo">
+    
+
+    <p>
+      <a id='feedbacklink' href="https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a>
+    </p>
+  </div>
+</div>
+    </nav>
+
+    <main class="wy-grid-for-nav">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+          <div class="rst-content">
+            
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../../index.html">Documentation</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../../../index.html">LLMs</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../../index.html">MLflow Transformers Flavor</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+    
+      <li>Introduction to Translation with Transformers and MLflow</li>
+    
+    
+    <!-- <li class="wy-breadcrumbs-aside">
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/llms/transformers/tutorials/translation/component-translation.ipynb" class="fa fa-github"> Edit on GitHub</a>
+    </li> -->
+    
+  </ul>
+</div>
+            <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <div itemprop="articleBody">
+                
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div class="section" id="Introduction-to-Translation-with-Transformers-and-MLflow">
+<h1>Introduction to Translation with Transformers and MLflow<a class="headerlink" href="#Introduction-to-Translation-with-Transformers-and-MLflow" title="Permalink to this headline"> </a></h1>
+<p>In this tutorial, we delve into the world of language translation by leveraging the power of <a class="reference external" href="https://huggingface.co/docs/transformers">Transformers</a> and MLflow. This guide is crafted for practitioners with a grasp of machine learning concepts who seek to streamline their translation model workflows. We will showcase the use of MLflow to log, manage, and serve a cutting-edge translation model - the <code class="docutils literal notranslate"><span class="pre">google/flan-t5-base</span></code> from the <a class="reference external" href="https://huggingface.co/">🤗 Hugging Face</a> library.</p>
+<div class="section" id="Learning-Objectives">
+<h2>Learning Objectives<a class="headerlink" href="#Learning-Objectives" title="Permalink to this headline"> </a></h2>
+<p>Throughout this tutorial, you will:</p>
+<ul class="simple">
+<li><p>Construct a translation <strong>pipeline</strong> using <code class="docutils literal notranslate"><span class="pre">flan-t5-base</span></code> from the Transformers library.</p></li>
+<li><p><strong>Log</strong> the translation model and its configurations using MLflow.</p></li>
+<li><p>Determine the input and output <strong>signature</strong> of the translation model automatically.</p></li>
+<li><p><strong>Retrieve</strong> a logged translation model from MLflow for direct interaction.</p></li>
+<li><p>Emulate the deployment of the translation model using MLflow’s <strong>pyfunc</strong> model flavor for language translation tasks.</p></li>
+</ul>
+<p>By the conclusion of this tutorial, you’ll gain a thorough insight into managing and deploying translation models with MLflow, thereby enhancing your machine learning operations for language processing.</p>
+</div>
+<div class="section" id="Why-was-this-model-chosen?">
+<h2>Why was this model chosen?<a class="headerlink" href="#Why-was-this-model-chosen?" title="Permalink to this headline"> </a></h2>
+<p>The <a class="reference external" href="https://huggingface.co/google/flan-t5-base">flan-t5-base</a> offers a few benefits:</p>
+<ul class="simple">
+<li><p><strong>Size</strong>: it’s a relatively small model for the comparatively powerful performance.</p></li>
+<li><p><strong>Enhanced Language Coverage</strong>: Expanding on the original <a class="reference external" href="https://huggingface.co/t5-base">T5 model</a>, the flan-t5 has a much larger breadth of languages that it supports.</p></li>
+</ul>
+</div>
+<div class="section" id="Setting-Up-the-Translation-Environment">
+<h2>Setting Up the Translation Environment<a class="headerlink" href="#Setting-Up-the-Translation-Environment" title="Permalink to this headline"> </a></h2>
+<p>Begin by setting up the essential components for translation tasks using the google/flan-t5-base model.</p>
+<div class="section" id="Importing-Libraries">
+<h3>Importing Libraries<a class="headerlink" href="#Importing-Libraries" title="Permalink to this headline"> </a></h3>
+<p>We import the <code class="docutils literal notranslate"><span class="pre">transformers</span></code> library for access to the translation model and tokenizer. Additionally, <code class="docutils literal notranslate"><span class="pre">mlflow</span></code> is included for model tracking and management, creating a comprehensive environment for our translation tasks.</p>
+</div>
+<div class="section" id="Initializing-the-Model">
+<h3>Initializing the Model<a class="headerlink" href="#Initializing-the-Model" title="Permalink to this headline"> </a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">google/flan-t5-base</span></code> model, known for its translation effectiveness, is loaded from the Hugging Face repository. This pre-trained model is a key component of our setup.</p>
+</div>
+<div class="section" id="Setting-Up-the-Tokenizer">
+<h3>Setting Up the Tokenizer<a class="headerlink" href="#Setting-Up-the-Tokenizer" title="Permalink to this headline"> </a></h3>
+<p>We initialize the tokenizer corresponding to our model. The tokenizer plays a critical role in processing text input, making it understandable for the model.</p>
+</div>
+<div class="section" id="Creating-the-Pipeline">
+<h3>Creating the Pipeline<a class="headerlink" href="#Creating-the-Pipeline" title="Permalink to this headline"> </a></h3>
+<p>A translation pipeline for English to French is created. This pipeline streamlines the process, allowing us to focus on inputting text and receiving translations without managing model and tokenizer interactions directly.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Disable tokenizers warnings when constructing pipelines</span>
+<span class="o">%</span><span class="k">env</span> TOKENIZERS_PARALLELISM=false
+
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="c1"># Disable a few less-than-useful UserWarnings from setuptools and pydantic</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">UserWarning</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+env: TOKENIZERS_PARALLELISM=false
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">transformers</span>
+
+<span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="n">model_architecture</span> <span class="o">=</span> <span class="s2">&quot;google/flan-t5-base&quot;</span>
+
+<span class="n">translation_pipeline</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">pipeline</span><span class="p">(</span>
+    <span class="n">task</span><span class="o">=</span><span class="s2">&quot;translation_en_to_fr&quot;</span><span class="p">,</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">transformers</span><span class="o">.</span><span class="n">T5ForConditionalGeneration</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+        <span class="n">model_architecture</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">1000</span>
+    <span class="p">),</span>
+    <span class="n">tokenizer</span><span class="o">=</span><span class="n">transformers</span><span class="o">.</span><span class="n">T5TokenizerFast</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_architecture</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Testing-the-Translation-Pipeline">
+<h2>Testing the Translation Pipeline<a class="headerlink" href="#Testing-the-Translation-Pipeline" title="Permalink to this headline"> </a></h2>
+<p>We perform a preliminary check on our translation pipeline to ensure its proper functioning before logging it with MLflow.</p>
+<div class="section" id="Model-Verification">
+<h3>Model Verification<a class="headerlink" href="#Model-Verification" title="Permalink to this headline"> </a></h3>
+<p>A test translation allows us to verify that the model accurately translates text, in this case from English to French, ensuring the model’s basic functionality.</p>
+</div>
+<div class="section" id="Error-Prevention">
+<h3>Error Prevention<a class="headerlink" href="#Error-Prevention" title="Permalink to this headline"> </a></h3>
+<p>Identifying potential issues before model logging helps prevent future errors during deployment or inference, saving time and resources.</p>
+</div>
+<div class="section" id="Resource-Management">
+<h3>Resource Management<a class="headerlink" href="#Resource-Management" title="Permalink to this headline"> </a></h3>
+<p>Testing minimizes wasteful use of resources, particularly important given the large size of these models and the resources needed to save and load them.</p>
+</div>
+<div class="section" id="Pipeline-Validation">
+<h3>Pipeline Validation<a class="headerlink" href="#Pipeline-Validation" title="Permalink to this headline"> </a></h3>
+<p>This step confirms that both the model and tokenizer in the pipeline are correctly configured and capable of processing the input as expected.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Evaluate the pipeline on a sample sentence prior to logging</span>
+<span class="n">translation_pipeline</span><span class="p">(</span>
+    <span class="s2">&quot;translate English to French: I enjoyed my slow saunter along the Champs-Élysées.&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[{&#39;translation_text&#39;: &#34;J&#39;ai apprécié mon sajour lente sur les Champs-Élysées.&#34;}]
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Evaluating-the-Translation-Results">
+<h2>Evaluating the Translation Results<a class="headerlink" href="#Evaluating-the-Translation-Results" title="Permalink to this headline"> </a></h2>
+<p>Upon running our initial translation through the pipeline, we observed that the output, while generally accurate, exhibited areas for improvement.</p>
+<p>The initial translation output was:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>`[{&#39;translation_text&#39;: &quot;J&#39;ai apprécié mon sajour lente sur les Champs-Élysées.&quot;}]`
+</pre></div>
+</div>
+<p>This translation captures the essence of the original English sentence but shows minor grammatical errors and word choice issues. For instance, a more refined translation might be:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>`&quot;J&#39;ai apprécié ma lente promenade le long des Champs-Élysées.&quot;`
+</pre></div>
+</div>
+<p>This version corrects grammatical gender and adds necessary articles, accentuation, and hyphenation. These subtle nuances enhance the translation quality significantly. The base model’s performance is encouraging, indicating the potential for more precise translations with further fine-tuning and context. MLflow’s tracking and management capabilities will be instrumental in monitoring the iterative improvements of such models.</p>
+<p>In summary, while the pursuit of perfection in machine translation is ongoing, the initial results are a promising step towards achieving natural and accurate translations.</p>
+</div>
+<div class="section" id="Setting-Model-Parameters-and-Inferring-Signature">
+<h2>Setting Model Parameters and Inferring Signature<a class="headerlink" href="#Setting-Model-Parameters-and-Inferring-Signature" title="Permalink to this headline"> </a></h2>
+<p>We establish crucial model parameters and infer the signature to ensure consistency and reliability in our model’s deployment.</p>
+<div class="section" id="Defining-Model-Parameters">
+<h3>Defining Model Parameters<a class="headerlink" href="#Defining-Model-Parameters" title="Permalink to this headline"> </a></h3>
+<p>Setting key parameters like <code class="docutils literal notranslate"><span class="pre">max_length</span></code> is vital for controlling model behavior during inference. For example, a <code class="docutils literal notranslate"><span class="pre">max_length</span></code> of 1000 ensures the model handles longer sentences effectively, crucial for maintaining context in translations.</p>
+</div>
+<div class="section" id="Importance-of-Inferring-Signature">
+<h3>Importance of Inferring Signature<a class="headerlink" href="#Importance-of-Inferring-Signature" title="Permalink to this headline"> </a></h3>
+<p>The signature, defining the model’s input and output schema, is critical for MLflow’s understanding of the expected data structures. By inferring this signature, we document the types and structures of data that the model works with, enhancing its reliability and portability.</p>
+</div>
+<div class="section" id="Benefits-of-This-Process">
+<h3>Benefits of This Process<a class="headerlink" href="#Benefits-of-This-Process" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Enhanced Portability</strong>: Properly defined parameters and signatures make the model more adaptable to different environments.</p></li>
+<li><p><strong>Error Reduction</strong>: This step minimizes the risk of encountering schema-related errors during deployment.</p></li>
+<li><p><strong>Clear Documentation</strong>: It serves as a clear guide for developers and users, simplifying the model’s integration into applications.</p></li>
+</ul>
+<p>By establishing these parameters and signature, we lay a robust foundation for our model’s subsequent tracking, management, and serving via MLflow.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define the parameters that we are permitting to be used at inference time, along with their default values if not overridden</span>
+<span class="n">model_params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;max_length&quot;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">}</span>
+
+<span class="c1"># Generate the model signature by providing an input, the expected output, and (optionally), parameters available for overriding at inference time</span>
+<span class="n">signature</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">infer_signature</span><span class="p">(</span>
+    <span class="s2">&quot;This is a sample input sentence.&quot;</span><span class="p">,</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">transformers</span><span class="o">.</span><span class="n">generate_signature_output</span><span class="p">(</span><span class="n">translation_pipeline</span><span class="p">,</span> <span class="s2">&quot;This is another sample.&quot;</span><span class="p">),</span>
+    <span class="n">params</span><span class="o">=</span><span class="n">model_params</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Reviewing-the-Model-Signature">
+<h2>Reviewing the Model Signature<a class="headerlink" href="#Reviewing-the-Model-Signature" title="Permalink to this headline"> </a></h2>
+<p>After configuring the translation model and inferring its signature, it’s crucial to review the signature to confirm it matches our model’s input and output structures.</p>
+<p>The model signature serves as a blueprint for MLflow to interact with the model, encompassing:</p>
+<ul class="simple">
+<li><p><strong>Inputs:</strong> The expected input types, such as a string for the text to be translated.</p></li>
+<li><p><strong>Outputs:</strong> The output data types, which in our case is a string representing the translated text.</p></li>
+<li><p><strong>Parameters:</strong> Additional configurable settings like <code class="docutils literal notranslate"><span class="pre">max_length</span></code>, determining the maximum length of the translation output.</p></li>
+</ul>
+<p>Reviewing the signature through the <code class="docutils literal notranslate"><span class="pre">signature</span></code> command allows us to validate the data formats and ensure that our model will function as expected when deployed. This step is vital for consistent model performance and avoiding errors in a production environment. Furthermore, the inclusion of parameters in the signature with default values ensures that any modifications during inference are deliberate and well-documented, contributing to the model’s predictability and transparency.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Visualize the model signature</span>
+<span class="n">signature</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+inputs:
+  [string]
+outputs:
+  [string]
+params:
+  [&#39;max_length&#39;: long (default: 1000)]
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Creating-an-experiment">
+<h2>Creating an experiment<a class="headerlink" href="#Creating-an-experiment" title="Permalink to this headline"> </a></h2>
+<p>We create a new MLflow Experiment so that the run we’re going to log our model to does not log to the default experiment and instead has its own contextually relevant entry.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># If you are running this tutorial in local mode, leave the next line commented out.</span>
+<span class="c1"># Otherwise, uncomment the following line and set your tracking uri to your local or remote tracking server.</span>
+
+<span class="c1"># mlflow.set_tracking_uri(&quot;http://127.0.0.1:8080&quot;)</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s2">&quot;Translation&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;Experiment: artifact_location=&#39;file:///Users/benjamin.wilson/repos/mlflow-fork/mlflow/docs/source/llms/transformers/tutorials/translation/mlruns/996217394074032926&#39;, creation_time=1701286351921, experiment_id=&#39;996217394074032926&#39;, last_update_time=1701286351921, lifecycle_stage=&#39;active&#39;, name=&#39;Translation&#39;, tags={}&gt;
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Logging-the-Model-with-MLflow">
+<h2>Logging the Model with MLflow<a class="headerlink" href="#Logging-the-Model-with-MLflow" title="Permalink to this headline"> </a></h2>
+<p>We are now set to log our translation model with MLflow, ensuring its trackability and version control.</p>
+<div class="section" id="Starting-an-MLflow-Run">
+<h3>Starting an MLflow Run<a class="headerlink" href="#Starting-an-MLflow-Run" title="Permalink to this headline"> </a></h3>
+<p>We initiate the logging process by starting an MLflow run. This encapsulates all the model information, including artifacts and parameters, within a unique run ID.</p>
+</div>
+<div class="section" id="Using-mlflow.transformers.log_model">
+<h3>Using <code class="docutils literal notranslate"><span class="pre">mlflow.transformers.log_model</span></code><a class="headerlink" href="#Using-mlflow.transformers.log_model" title="Permalink to this headline"> </a></h3>
+<p>This function is integral to logging our model in MLflow. It records various aspects of the model:</p>
+<ul class="simple">
+<li><p><strong>Model Pipeline</strong>: The complete translation model pipeline, encompassing the model and tokenizer.</p></li>
+<li><p><strong>Artifact Path</strong>: The directory path in the MLflow run where the model artifacts are stored.</p></li>
+<li><p><strong>Model Signature</strong>: The pre-defined signature indicating the model’s expected input-output formats.</p></li>
+<li><p><strong>Model Parameters</strong>: Key parameters of the model, like <code class="docutils literal notranslate"><span class="pre">max_length</span></code>, providing insights into model behavior.</p></li>
+</ul>
+</div>
+<div class="section" id="Outcome-of-Model-Logging">
+<h3>Outcome of Model Logging<a class="headerlink" href="#Outcome-of-Model-Logging" title="Permalink to this headline"> </a></h3>
+<p>Post logging, we obtain the <code class="docutils literal notranslate"><span class="pre">model_info</span></code> object, which encompasses all the essential metadata about the logged model, such as its storage location. This metadata is vital for future deployment and performance analysis.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="n">model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">transformers</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+        <span class="n">transformers_model</span><span class="o">=</span><span class="n">translation_pipeline</span><span class="p">,</span>
+        <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;french_translator&quot;</span><span class="p">,</span>
+        <span class="n">signature</span><span class="o">=</span><span class="n">signature</span><span class="p">,</span>
+        <span class="n">model_params</span><span class="o">=</span><span class="n">model_params</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Inspecting-the-Loaded-Model-Components">
+<h2>Inspecting the Loaded Model Components<a class="headerlink" href="#Inspecting-the-Loaded-Model-Components" title="Permalink to this headline"> </a></h2>
+<p>After loading the model from MLflow, we delve into its individual components to verify their setup and functionality.</p>
+<div class="section" id="Component-Breakdown">
+<h3>Component Breakdown<a class="headerlink" href="#Component-Breakdown" title="Permalink to this headline"> </a></h3>
+<p>The loaded model comprises several key components, each playing a crucial role in its operation:</p>
+<ul class="simple">
+<li><p><strong>Task</strong>: Defines the model’s specific use-case, confirming its suitability for the intended task.</p></li>
+<li><p><strong>Device Map</strong>: Details the hardware configuration, important for performance optimization.</p></li>
+<li><p><strong>Model Instance</strong>: The core <code class="docutils literal notranslate"><span class="pre">T5ForConditionalGeneration</span></code> model, central to the translation process.</p></li>
+<li><p><strong>Tokenizer</strong>: The <code class="docutils literal notranslate"><span class="pre">T5TokenizerFast</span></code>, responsible for processing text inputs into a format understandable by the model.</p></li>
+<li><p><strong>Framework</strong>: Indicates the underlying deep learning framework, essential for compatibility considerations.</p></li>
+</ul>
+</div>
+<div class="section" id="Ensuring-Component-Integrity-and-Functionality">
+<h3>Ensuring Component Integrity and Functionality<a class="headerlink" href="#Ensuring-Component-Integrity-and-Functionality" title="Permalink to this headline"> </a></h3>
+<p>Inspecting these components ensures that:</p>
+<ul class="simple">
+<li><p>The model aligns with our task requirements.</p></li>
+<li><p>Hardware resources are optimally utilized.</p></li>
+<li><p>Text inputs are correctly preprocessed for model consumption.</p></li>
+<li><p>The model’s compatibility with the selected deep learning framework is confirmed.</p></li>
+</ul>
+<p>This verification step is vital for the successful application of the model in practical scenarios, reinforcing the robustness and flexibility of MLflow.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load our saved model as a dictionary of components, comprising the model itself, the tokenizer, and any other components that were saved</span>
+<span class="n">translation_components</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">transformers</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span>
+    <span class="n">model_info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">return_type</span><span class="o">=</span><span class="s2">&quot;components&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># Show the components that made up our pipeline that we saved and what type each are</span>
+<span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">translation_components</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2023/11/30 12:00:44 INFO mlflow.transformers: &#39;runs:/2357c12ca17a4f328b2f72cbb7d70343/french_translator&#39; resolved as &#39;file:///Users/benjamin.wilson/repos/mlflow-fork/mlflow/docs/source/llms/transformers/tutorials/translation/mlruns/996217394074032926/2357c12ca17a4f328b2f72cbb7d70343/artifacts/french_translator&#39;
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "27c1be08b2254db391ae15c7150442fe", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+task -&gt; str
+device_map -&gt; str
+model -&gt; T5ForConditionalGeneration
+tokenizer -&gt; T5TokenizerFast
+framework -&gt; str
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Understanding-Model-Flavors-in-MLflow">
+<h2>Understanding Model Flavors in MLflow<a class="headerlink" href="#Understanding-Model-Flavors-in-MLflow" title="Permalink to this headline"> </a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">model_info.flavors</span></code> attribute in MLflow provides insights into the model’s capabilities and deployment requirements across various platforms.</p>
+<p>Flavors in MLflow represent different ways the model can be utilized and deployed. Key aspects include:</p>
+<ul class="simple">
+<li><p><strong>Python Function Flavor:</strong> Indicates the model’s compatibility as a generic Python function, including model binary, loader module, Python version, and environment specifications.</p></li>
+<li><p><strong>Transformers Flavor:</strong> Tailored for models from the Hugging Face Transformers library, covering transformers version, code dependencies, task, instance type, source model name, pipeline model type, framework, tokenizer type, components, and model binary.</p></li>
+</ul>
+<p>This information guides how to interact with the model within MLflow, ensuring proper deployment with the right environment and dependencies, whether for inference or further model refinement.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Show the model parameters that were saved with our model to gain an understanding of what is recorded when saving a transformers pipeline</span>
+<span class="n">model_info</span><span class="o">.</span><span class="n">flavors</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;python_function&#39;: {&#39;model_binary&#39;: &#39;model&#39;,
+  &#39;loader_module&#39;: &#39;mlflow.transformers&#39;,
+  &#39;python_version&#39;: &#39;3.8.13&#39;,
+  &#39;env&#39;: {&#39;conda&#39;: &#39;conda.yaml&#39;, &#39;virtualenv&#39;: &#39;python_env.yaml&#39;}},
+ &#39;transformers&#39;: {&#39;transformers_version&#39;: &#39;4.34.1&#39;,
+  &#39;code&#39;: None,
+  &#39;task&#39;: &#39;translation_en_to_fr&#39;,
+  &#39;instance_type&#39;: &#39;TranslationPipeline&#39;,
+  &#39;source_model_name&#39;: &#39;google/flan-t5-base&#39;,
+  &#39;pipeline_model_type&#39;: &#39;T5ForConditionalGeneration&#39;,
+  &#39;framework&#39;: &#39;pt&#39;,
+  &#39;tokenizer_type&#39;: &#39;T5TokenizerFast&#39;,
+  &#39;components&#39;: [&#39;tokenizer&#39;],
+  &#39;model_binary&#39;: &#39;model&#39;}}
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Evaluating-the-Translation-Output">
+<h2>Evaluating the Translation Output<a class="headerlink" href="#Evaluating-the-Translation-Output" title="Permalink to this headline"> </a></h2>
+<p>After testing our pipeline with a challenging sentence, we assess the translation’s accuracy.</p>
+<div class="section" id="Assessing-Translation-Nuances">
+<h3>Assessing Translation Nuances<a class="headerlink" href="#Assessing-Translation-Nuances" title="Permalink to this headline"> </a></h3>
+<p>The model impressively interprets “Nice” correctly as a city name, rather than an adjective. This shows its ability to discern context and proper nouns. Furthermore, it cleverly substitutes the English play on words with the French adjective “bien,” maintaining the sentence’s intended sentiment.</p>
+</div>
+<div class="section" id="Contextual-Understanding">
+<h3>Contextual Understanding<a class="headerlink" href="#Contextual-Understanding" title="Permalink to this headline"> </a></h3>
+<p>This translation exemplifies the model’s strength in understanding context and language subtleties, which is essential for practical applications where precision and contextual accuracy are key.</p>
+</div>
+<div class="section" id="The-Importance-of-Rigorous-Testing">
+<h3>The Importance of Rigorous Testing<a class="headerlink" href="#The-Importance-of-Rigorous-Testing" title="Permalink to this headline"> </a></h3>
+<p>Testing with linguistically complex sentences is vital. It ensures the model can handle various linguistic challenges, an important aspect of deploying models in real-world scenarios.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load our saved model as a transformers pipeline and validate the performance for a simple translation task</span>
+<span class="n">translation_pipeline</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">transformers</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">translation_pipeline</span><span class="p">(</span><span class="s2">&quot;I have heard that Nice is nice this time of year.&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2023/11/30 12:00:45 INFO mlflow.transformers: &#39;runs:/2357c12ca17a4f328b2f72cbb7d70343/french_translator&#39; resolved as &#39;file:///Users/benjamin.wilson/repos/mlflow-fork/mlflow/docs/source/llms/transformers/tutorials/translation/mlruns/996217394074032926/2357c12ca17a4f328b2f72cbb7d70343/artifacts/french_translator&#39;
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "bdefabfef935484da1aed84ac32b2d0c", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[{&#39;translation_text&#39;: &#34;J&#39;ai entendu que Nice est bien cette période de l&#39;année.&#34;}]
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Assessing-the-Reconstructed-Pipeline’s-Translation">
+<h2>Assessing the Reconstructed Pipeline’s Translation<a class="headerlink" href="#Assessing-the-Reconstructed-Pipeline’s-Translation" title="Permalink to this headline"> </a></h2>
+<p>We now evaluate the performance of a pipeline reconstructed from loaded components.</p>
+<div class="section" id="Reconstruction-and-Testing">
+<h3>Reconstruction and Testing<a class="headerlink" href="#Reconstruction-and-Testing" title="Permalink to this headline"> </a></h3>
+<p>Using the dictionary of loaded components, we successfully reconstruct a new translation pipeline. This step is essential to confirm that our logged and retrieved components function cohesively when reassembled.</p>
+</div>
+<div class="section" id="Translation-Quality">
+<h3>Translation Quality<a class="headerlink" href="#Translation-Quality" title="Permalink to this headline"> </a></h3>
+<p>The reconstructed pipeline adeptly translates English into French, maintaining both the syntactic accuracy and semantic coherence of the original sentence. This reflects the Transformers library’s ability to simplify the utilization of complex deep learning models.</p>
+</div>
+<div class="section" id="Verifying-Model-Integrity">
+<h3>Verifying Model Integrity<a class="headerlink" href="#Verifying-Model-Integrity" title="Permalink to this headline"> </a></h3>
+<p>This test is key in verifying that the saved model and its components are not only retrievable but also function effectively post-deployment. It ensures the continued integrity and performance of the model in practical applications.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Verify that the components that we loaded can be constructed into a pipeline manually</span>
+<span class="n">reconstructed_pipeline</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">pipeline</span><span class="p">(</span><span class="o">**</span><span class="n">translation_components</span><span class="p">)</span>
+
+<span class="n">reconstructed_response</span> <span class="o">=</span> <span class="n">reconstructed_pipeline</span><span class="p">(</span>
+    <span class="s2">&quot;transformers makes using Deep Learning models easy and fun!&quot;</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">reconstructed_response</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[{&#39;translation_text&#39;: &#34;transformers simplifie l&#39;utilisation des modèles de l&#39;apprentissage profonde!&#34;}]
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Direct-Utilization-of-Model-Components">
+<h2>Direct Utilization of Model Components<a class="headerlink" href="#Direct-Utilization-of-Model-Components" title="Permalink to this headline"> </a></h2>
+<p>Explore the granular control over individual model components for custom translation processes.</p>
+<div class="section" id="Component-Interaction">
+<h3>Component Interaction<a class="headerlink" href="#Component-Interaction" title="Permalink to this headline"> </a></h3>
+<p>Interacting with the model’s individual components offers a deeper level of customization. This approach is particularly beneficial when integrating the model into larger systems or when specific manipulations of inputs and outputs are required.</p>
+</div>
+<div class="section" id="Insight-into-Model-Structure">
+<h3>Insight into Model Structure<a class="headerlink" href="#Insight-into-Model-Structure" title="Permalink to this headline"> </a></h3>
+<p>Examining the keys of the <code class="docutils literal notranslate"><span class="pre">translation_components</span></code> dictionary reveals the structure and components of our model. This includes the task, device mapping, core model, tokenizer, and framework information, each crucial for the translation process.</p>
+</div>
+<div class="section" id="Benefits-of-Component-Level-Control">
+<h3>Benefits of Component-Level Control<a class="headerlink" href="#Benefits-of-Component-Level-Control" title="Permalink to this headline"> </a></h3>
+<p>Utilizing components individually allows for precise adjustments and custom integrations. It’s an effective way to tailor the translation process to specific needs, ensuring more control over the model’s behavior and output.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># View the components that were saved with our model</span>
+<span class="n">translation_components</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+dict_keys([&#39;task&#39;, &#39;device_map&#39;, &#39;model&#39;, &#39;tokenizer&#39;, &#39;framework&#39;])
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Advanced-Usage:-Direct-Interaction-with-Model-Components">
+<h2>Advanced Usage: Direct Interaction with Model Components<a class="headerlink" href="#Advanced-Usage:-Direct-Interaction-with-Model-Components" title="Permalink to this headline"> </a></h2>
+<p>Direct interaction with a model’s components offers flexibility and control for advanced use cases in translation.</p>
+<p>Using the model and tokenizer components directly, as opposed to the higher-level pipeline, allows for:</p>
+<ul class="simple">
+<li><p>Customization of the tokenization process.</p></li>
+<li><p>Specific tensor handling, including device specification (CPU, GPU, MPS, etc.).</p></li>
+<li><p>Generation and adjustment of predictions on-the-fly.</p></li>
+<li><p>Decoding outputs with options for post-processing.</p></li>
+</ul>
+<p>This approach provides granular control, enabling interventions in the model’s operations, such as dynamic input adjustments or output post-processing. However, it also increases complexity, requiring a deeper understanding of the model and tokenizer and the management of more code. Opting for direct interaction over the pipeline means balancing ease of use against the level of control required for your application. It’s a critical decision, especially for advanced scenarios demanding precise
+manipulation of the translation process.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Access the individual components from the components dictionary</span>
+<span class="n">tokenizer</span> <span class="o">=</span> <span class="n">translation_components</span><span class="p">[</span><span class="s2">&quot;tokenizer&quot;</span><span class="p">]</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">translation_components</span><span class="p">[</span><span class="s2">&quot;model&quot;</span><span class="p">]</span>
+
+<span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;Translate to French: Liberty, equality, fraternity, or death.&quot;</span>
+
+<span class="c1"># This notebook was run on a Mac laptop, so we&#39;ll send the output tensor to the &quot;mps&quot; device.</span>
+<span class="c1"># If you&#39;re running this on a different system, ensure that you&#39;re sending the tensor output to the appropriate device to ensure that</span>
+<span class="c1"># the model is able to read it from memory.</span>
+<span class="n">inputs</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">&quot;mps&quot;</span><span class="p">)</span>
+<span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">&quot;mps&quot;</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="c1"># Since we&#39;re not using a pipeline here, we need to modify the output slightly to get only the translated text.</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&lt;pad&gt; &quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&lt;/s&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+La liberté, l&#39;égalité, la fraternité ou la mort.
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Tutorial-Recap">
+<h2>Tutorial Recap<a class="headerlink" href="#Tutorial-Recap" title="Permalink to this headline"> </a></h2>
+<p>This tutorial provided insights into combining MLflow with advanced language translation models, emphasizing streamlined model management and deployment.</p>
+<p>We explored several key aspects:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>- Setting up and testing a translation pipeline using Transformers.
+- Logging the model and its configurations to MLflow for effective versioning and tracking.
+- Inferring and examining the model&#39;s signature for ensuring input and output consistency.
+- Interacting with logged model components for enhanced flexibility in deployment.
+- Discussing the nuances of language translation and the role of context in achieving accurate results.
+</pre></div>
+</div>
+</div>
+<div class="section" id="The-Power-of-MLflow-and-Model-Metadata">
+<h2>The Power of MLflow and Model Metadata<a class="headerlink" href="#The-Power-of-MLflow-and-Model-Metadata" title="Permalink to this headline"> </a></h2>
+<p>MLflow’s integration proved instrumental in managing and deploying the translation model. The tutorial highlighted how MLflow’s metadata, including the model’s signature and flavors, aids in consistent and reliable deployment, catering to production needs.</p>
+</div>
+<div class="section" id="Reflection-on-the-Translation-Output">
+<h2>Reflection on the Translation Output<a class="headerlink" href="#Reflection-on-the-Translation-Output" title="Permalink to this headline"> </a></h2>
+<p>The final translation output, while not exact, captured the essence of the iconic French motto, highlighting the model’s effectiveness and the importance of contextual understanding in translations. Further exploration on the cultural significance of the phrase can be found on its <a class="reference external" href="https://en.wikipedia.org/wiki/Libert%C3%A9,_%C3%A9galit%C3%A9,_fraternit%C3%A9">Wikipedia Page</a>.</p>
+</div>
+<div class="section" id="Conclusion">
+<h2>Conclusion<a class="headerlink" href="#Conclusion" title="Permalink to this headline"> </a></h2>
+<p>The combination of MLflow and advanced language models like Transformers offers a powerful approach to deploying sophisticated AI solutions. This tutorial aimed to empower your journey in machine learning, whether in translation tasks or other ML applications.</p>
+</div>
+</div>
+
+
+              </div>
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../audio-transcription/whisper.html" class="btn btn-neutral" title="Introduction to MLflow and OpenAI’s Whisper" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+      
+      
+        <a href="../conversational/conversational-model.html" class="btn btn-neutral" title="Introduction to Conversational AI with MLflow and DialoGPT" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+      <p class="copyright">
+          &copy; MLflow Project, a Series of LF Projects, LLC. All rights reserved.
+      </p>
+
+  </div> 
+
+</footer>
+          </div>
+        </div>
+      </section>
+    </main>
+  </page>
+
+  
+
+
+  
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+      URL_ROOT:'../../../../',
+      VERSION:'2.9.2.dev0',
+      COLLAPSE_INDEX:false,
+      FILE_SUFFIX:'.html',
+      LINK_SUFFIX: '.html',
+      HAS_SOURCE:  true
+    };
+  </script>
+
+  
+
+  <script type="text/javascript" src="../../../../_static/js/clipboard.min.js"></script>
+  <script type="text/javascript" src="../../../../_static/js/jquery.waypoints.min.js"></script>
+
+  
+  
+  
+  <script type="text/javascript">var CLIPPY_SVG_PATH = "../../../../_static/clippy.svg";</script>
+  <script type="text/javascript" src="../../../../_static/js/custom.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.StickyNav.enable();
+    });
+
+  </script>
+  
+
+  
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        // Get the code block designator class entries
+        const allHighlights = document.querySelectorAll('.highlight');
+        // Disable copyable links for notebook cell numbering and for cell outputs
+        const highlights = Array.from(allHighlights).filter(highlight => !highlight.closest('.highlight-none') && 
+            !highlight.closest('.nboutput'));
+    
+        highlights.forEach(function(highlight) {
+            const copyIcon = document.createElement('span');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.innerHTML = '&#xf0ea;';
+
+            copyIcon.addEventListener('click', function() {
+                const code = highlight.querySelector('pre').textContent;
+                copyToClipboard(code);
+
+                // Flash effect on click
+                this.style.color = '#0194E2';
+                setTimeout(() => {
+                    this.style.color = ''; 
+                }, 100);
+
+                // Display "Code copied to clipboard" near the clicked icon
+                const message = document.createElement('span');
+                message.textContent = "Copied!";
+                message.classList.add('copy-message'); 
+
+                // Append the message to the icon
+                this.appendChild(message);
+
+                setTimeout(() => {
+                    this.removeChild(message);
+                }, 500);
+            });
+
+            highlight.appendChild(copyIcon);
+        });
+    });
+  </script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Force download for notebook-download-btn
+        const downloadButtons = document.querySelectorAll('.notebook-download-btn');
+        downloadButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                // Fetch the raw content of the notebook from GitHub
+                fetch(button.href)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = url;
+                        const filename = button.href.split('/').pop();
+                        link.download = filename; 
+
+                        document.body.appendChild(link);
+                        link.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    })
+                    .catch(err => console.error('Error fetching the notebook:', err));
+            });
+        });
+    });
+</script> 
+</body>
+</html>

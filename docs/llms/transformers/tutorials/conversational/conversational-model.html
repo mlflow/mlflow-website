@@ -1,0 +1,905 @@
+
+  
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Introduction to Conversational AI with MLflow and DialoGPT &mdash; MLflow 2.9.2.dev0 documentation</title>
+  
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/llms/transformers/tutorials/conversational/conversational-model.html">
+  
+  
+    <link rel="shortcut icon" href="../../../../_static/favicon.ico"/>
+    
+
+    
+
+  
+    
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/css/cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/css/grids.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/css/mobile.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/css/simple-cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/css/tabs.css" type="text/css" />
+    
+  
+        <link rel="index" title="Index"
+              href="../../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../../search.html"/>
+    <link rel="top" title="MLflow 2.9.2.dev0 documentation" href="../../../../index.html"/>
+        <link rel="up" title="MLflow Transformers Flavor" href="../../index.html"/>
+        <link rel="next" title="Fine-Tuning Transformers with MLflow for Enhanced Model Management" href="/../fine-tuning/transformers-fine-tuning.html"/>
+        <link rel="prev" title="Introduction to Translation with Transformers and MLflow" href="/../translation/component-translation.html"/> 
+
+  
+  <script src="../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+<script type="text/javascript" src="../../../../_static/jquery.js"></script>
+<script type="text/javascript" src="../../../../_static/underscore.js"></script>
+<script type="text/javascript" src="../../../../_static/doctools.js"></script>
+<script type="text/javascript" src="../../../../_static/languagesections.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript" src="../../../../None"></script>
+
+<body class="wy-body-for-nav" role="document">
+  
+
+  
+  <nav class="wy-nav-top header" role="navigation" aria-label="top navigation">
+    <ul>
+  <li class="menu-toggle">
+    <i data-toggle="wy-nav-top" class="wy-nav-top-menu-button db-icon db-icon-menu pull-left"></i>
+    <a href="../../../../index.html" class="wy-nav-top-logo"
+      ><img src="../../../../_static/MLflow-logo-final-black.png" alt="MLflow"
+    /></a>
+    <span class="version">2.9.2.dev0</span>
+  </li>
+</ul>
+  </nav>
+  <page>
+    
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side relative">
+      <div class="wy-side-scroll">
+  <div class="wy-side-nav-search">
+    
+
+    
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+    
+  </div>
+
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+    
+      <a href="../../../../index.html" class="main-navigation-home"><img src="../../../../_static/icons/nav-home.svg"> MLflow</a>
+    
+
+    
+      
+
+      
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../introduction/index.html">What is MLflow?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting-started/index.html">Getting Started with MLflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../new-features/index.html">New Features</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../index.html">LLMs</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../index.html#id1">MLflow Deployments Server for LLMs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../index.html#id3">LLM Evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../index.html#id4">Prompt Engineering UI</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../index.html#native-mlflow-flavors-for-llms">Native MLflow Flavors for LLMs</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../../../index.html#benefits-of-mlflow-s-native-flavors-for-llms">Benefits of MLflow’s Native Flavors for LLMs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../index.html#explore-the-native-llm-flavors">Explore the Native LLM Flavors</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../../../index.html#native-integration-guides-and-tutorials">Native Integration Guides and Tutorials</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="../../index.html">MLflow Transformers Flavor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../sentence-transformers/index.html">MLflow Sentence-Transformers Flavor</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../index.html#native-integration-examples">Native Integration Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../index.html#id5">LLM Tracking in MLflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../index.html#tutorials-and-use-case-guides-for-llms-in-mlflow">Tutorials and Use Case Guides for LLMs in MLflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../model-evaluation/index.html">Model Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deep-learning/index.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../traditional-ml/index.html">Traditional ML</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment/index.html">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tracking.html">MLflow Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../system-metrics/index.html">System Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../projects.html">MLflow Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../models.html">MLflow Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../model-registry.html">MLflow Model Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../recipes.html">MLflow Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../plugins.html">MLflow Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../auth/index.html">MLflow Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../search-runs.html">Search Runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../search-experiments.html">Search Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../python_api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../R-api.html">R API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../java_api/index.html">Java API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../rest-api.html">REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../docker.html">Official MLflow Docker Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../community-model-flavors.html">Community Model Flavors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials-and-examples/index.html">Tutorials and Examples</a></li>
+</ul>
+
+      
+    
+  </div>
+
+  <div role="contentinfo">
+    
+
+    <p>
+      <a id='feedbacklink' href="https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a>
+    </p>
+  </div>
+</div>
+    </nav>
+
+    <main class="wy-grid-for-nav">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+          <div class="rst-content">
+            
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../../index.html">Documentation</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../../../index.html">LLMs</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../../index.html">MLflow Transformers Flavor</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+    
+      <li>Introduction to Conversational AI with MLflow and DialoGPT</li>
+    
+    
+    <!-- <li class="wy-breadcrumbs-aside">
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/llms/transformers/tutorials/conversational/conversational-model.ipynb" class="fa fa-github"> Edit on GitHub</a>
+    </li> -->
+    
+  </ul>
+</div>
+            <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <div itemprop="articleBody">
+                
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div class="section" id="Introduction-to-Conversational-AI-with-MLflow-and-DialoGPT">
+<h1>Introduction to Conversational AI with MLflow and DialoGPT<a class="headerlink" href="#Introduction-to-Conversational-AI-with-MLflow-and-DialoGPT" title="Permalink to this headline"> </a></h1>
+<p>Welcome to our tutorial on integrating <a class="reference external" href="https://huggingface.co/microsoft/DialoGPT-medium">Microsoft’s DialoGPT</a> with MLflow’s transformers flavor to explore conversational AI.</p>
+<div class="section" id="Learning-Objectives">
+<h2>Learning Objectives<a class="headerlink" href="#Learning-Objectives" title="Permalink to this headline"> </a></h2>
+<p>In this tutorial, you will:</p>
+<ul class="simple">
+<li><p>Set up a conversational AI <strong>pipeline</strong> using DialoGPT from the Transformers library.</p></li>
+<li><p><strong>Log</strong> the DialoGPT model along with its configurations using MLflow.</p></li>
+<li><p>Infer the input and output <strong>signature</strong> of the DialoGPT model.</p></li>
+<li><p><strong>Load</strong> a stored DialoGPT model from MLflow for interactive usage.</p></li>
+<li><p>Interact with the chatbot model and understand the nuances of conversational AI.</p></li>
+</ul>
+<p>By the end of this tutorial, you will have a solid understanding of managing and deploying conversational AI models with MLflow, enhancing your capabilities in natural language processing.</p>
+<div class="section" id="What-is-DialoGPT?">
+<h3>What is DialoGPT?<a class="headerlink" href="#What-is-DialoGPT?" title="Permalink to this headline"> </a></h3>
+<p>DialoGPT is a conversational model developed by Microsoft, fine-tuned on a large dataset of dialogues to generate human-like responses. Part of the GPT family, DialoGPT excels in natural language understanding and generation, making it ideal for chatbots.</p>
+</div>
+<div class="section" id="Why-MLflow-with-DialoGPT?">
+<h3>Why MLflow with DialoGPT?<a class="headerlink" href="#Why-MLflow-with-DialoGPT?" title="Permalink to this headline"> </a></h3>
+<p>Integrating MLflow with DialoGPT enhances conversational AI model development:</p>
+<ul class="simple">
+<li><p><strong>Experiment Tracking</strong>: Tracks configurations and metrics across experiments.</p></li>
+<li><p><strong>Model Management</strong>: Manages different versions and configurations of chatbot models.</p></li>
+<li><p><strong>Reproducibility</strong>: Ensures the reproducibility of the model’s behavior.</p></li>
+<li><p><strong>Deployment</strong>: Simplifies deploying conversational models in production.</p></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Disable tokenizers warnings when constructing pipelines</span>
+<span class="o">%</span><span class="k">env</span> TOKENIZERS_PARALLELISM=false
+
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="c1"># Disable a few less-than-useful UserWarnings from setuptools and pydantic</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">UserWarning</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+env: TOKENIZERS_PARALLELISM=false
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Setting-Up-the-Conversational-Pipeline">
+<h2>Setting Up the Conversational Pipeline<a class="headerlink" href="#Setting-Up-the-Conversational-Pipeline" title="Permalink to this headline"> </a></h2>
+<p>We begin by setting up a conversational pipeline with DialoGPT using <code class="docutils literal notranslate"><span class="pre">transformers</span></code> and managing it with MLflow.</p>
+<p>We start by importing essential libraries. The <code class="docutils literal notranslate"><span class="pre">transformers</span></code> library from Hugging Face offers a rich collection of pre-trained models, including DialoGPT, for various NLP tasks. MLflow, a comprehensive tool for the ML lifecycle, aids in experiment tracking, reproducibility, and deployment.</p>
+<div class="section" id="Initializing-the-Conversational-Pipeline">
+<h3>Initializing the Conversational Pipeline<a class="headerlink" href="#Initializing-the-Conversational-Pipeline" title="Permalink to this headline"> </a></h3>
+<p>Using the <code class="docutils literal notranslate"><span class="pre">transformers.pipeline</span></code> function, we set up a conversational pipeline. We choose the “<code class="docutils literal notranslate"><span class="pre">microsoft/DialoGPT-medium</span></code>” model, balancing performance and resource efficiency, ideal for conversational AI. This step is pivotal for ensuring the model is ready for interaction and integration into various applications.</p>
+</div>
+<div class="section" id="Inferring-the-Model-Signature-with-MLflow">
+<h3>Inferring the Model Signature with MLflow<a class="headerlink" href="#Inferring-the-Model-Signature-with-MLflow" title="Permalink to this headline"> </a></h3>
+<p>Model signature is key in defining how the model interacts with input data. To infer it, we use a sample input (“<code class="docutils literal notranslate"><span class="pre">Hi</span> <span class="pre">there,</span> <span class="pre">chatbot!</span></code>”) and leverage <code class="docutils literal notranslate"><span class="pre">mlflow.transformers.generate_signature_output</span></code> to understand the model’s input-output schema. This process ensures clarity in the model’s data requirements and prediction format, crucial for seamless deployment and usage.</p>
+<p>This configuration phase sets the stage for a robust conversational AI system, leveraging the strengths of DialoGPT and MLflow for efficient and effective conversational interactions.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">transformers</span>
+
+<span class="kn">import</span> <span class="nn">mlflow</span>
+
+
+<span class="c1"># Define our pipeline, using the default configuration specified in the model card for DialoGPT-medium</span>
+<span class="n">conversational_pipeline</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">pipeline</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="s2">&quot;microsoft/DialoGPT-medium&quot;</span><span class="p">)</span>
+
+<span class="c1"># Infer the signature by providing a representnative input and the output from the pipeline inference abstraction in the transformers flavor in MLflow</span>
+<span class="n">signature</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">infer_signature</span><span class="p">(</span>
+    <span class="s2">&quot;Hi there, chatbot!&quot;</span><span class="p">,</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">transformers</span><span class="o">.</span><span class="n">generate_signature_output</span><span class="p">(</span><span class="n">conversational_pipeline</span><span class="p">,</span> <span class="s2">&quot;Hi there, chatbot!&quot;</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input&#39;s `attention_mask` to obtain reliable results.
+Setting `pad_token_id` to `eos_token_id`:50256 for open-end generation.
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side=&#39;left&#39;` when initializing the tokenizer.
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Creating-an-experiment">
+<h2>Creating an experiment<a class="headerlink" href="#Creating-an-experiment" title="Permalink to this headline"> </a></h2>
+<p>We create a new MLflow Experiment so that the run we’re going to log our model to does not log to the default experiment and instead has its own contextually relevant entry.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># If you are running this tutorial in local mode, leave the next line commented out.</span>
+<span class="c1"># Otherwise, uncomment the following line and set your tracking uri to your local or remote tracking server.</span>
+
+<span class="c1"># mlflow.set_tracking_uri(&quot;http://127.0.0.1:8080&quot;)</span>
+
+<span class="c1"># Set a name for the experiment that is indicative of what the runs being created within it are in regards to</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s2">&quot;Conversational&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;Experiment: artifact_location=&#39;file:///Users/benjamin.wilson/repos/mlflow-fork/mlflow/docs/source/llms/transformers/tutorials/conversational/mlruns/370178017237207703&#39;, creation_time=1701292102618, experiment_id=&#39;370178017237207703&#39;, last_update_time=1701292102618, lifecycle_stage=&#39;active&#39;, name=&#39;Conversational&#39;, tags={}&gt;
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Logging-the-Model-with-MLflow">
+<h2>Logging the Model with MLflow<a class="headerlink" href="#Logging-the-Model-with-MLflow" title="Permalink to this headline"> </a></h2>
+<p>We’ll now use MLflow to log our conversational AI model, ensuring systematic versioning, tracking, and management.</p>
+<div class="section" id="Initiating-an-MLflow-Run">
+<h3>Initiating an MLflow Run<a class="headerlink" href="#Initiating-an-MLflow-Run" title="Permalink to this headline"> </a></h3>
+<p>Our first step is to start an MLflow run with <code class="docutils literal notranslate"><span class="pre">mlflow.start_run()</span></code>. This action initiates a new tracking environment, capturing all model-related data under a unique run ID. It’s a crucial step to segregate and organize different modeling experiments.</p>
+</div>
+<div class="section" id="Logging-the-Conversational-Model">
+<h3>Logging the Conversational Model<a class="headerlink" href="#Logging-the-Conversational-Model" title="Permalink to this headline"> </a></h3>
+<p>We log our DialoGPT conversational model using <code class="docutils literal notranslate"><span class="pre">mlflow.transformers.log_model</span></code>. This specialized function efficiently logs Transformer models and requires several key parameters:</p>
+<ul class="simple">
+<li><p><strong>transformers_model</strong>: We pass our DialoGPT conversational pipeline.</p></li>
+<li><p><strong>artifact_path</strong>: The storage location within the MLflow run, aptly named <code class="docutils literal notranslate"><span class="pre">&quot;chatbot&quot;</span></code>.</p></li>
+<li><p><strong>task</strong>: Set to <code class="docutils literal notranslate"><span class="pre">&quot;conversational&quot;</span></code> to reflect the model’s purpose.</p></li>
+<li><p><strong>signature</strong>: The inferred model signature, dictating expected inputs and outputs.</p></li>
+<li><p><strong>input_example</strong>: A sample prompt, like <code class="docutils literal notranslate"><span class="pre">&quot;A</span> <span class="pre">clever</span> <span class="pre">and</span> <span class="pre">witty</span> <span class="pre">question&quot;</span></code>, to demonstrate expected usage.</p></li>
+</ul>
+<p>Through this process, MLflow not only tracks our model but also organizes its metadata, facilitating future retrieval, understanding, and deployment.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="n">model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">transformers</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+        <span class="n">transformers_model</span><span class="o">=</span><span class="n">conversational_pipeline</span><span class="p">,</span>
+        <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;chatbot&quot;</span><span class="p">,</span>
+        <span class="n">task</span><span class="o">=</span><span class="s2">&quot;conversational&quot;</span><span class="p">,</span>
+        <span class="n">signature</span><span class="o">=</span><span class="n">signature</span><span class="p">,</span>
+        <span class="n">input_example</span><span class="o">=</span><span class="s2">&quot;A clever and witty question&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Loading-and-Interacting-with-the-Chatbot-Model">
+<h2>Loading and Interacting with the Chatbot Model<a class="headerlink" href="#Loading-and-Interacting-with-the-Chatbot-Model" title="Permalink to this headline"> </a></h2>
+<p>Next, we’ll load the MLflow-logged chatbot model and interact with it to see it in action.</p>
+<div class="section" id="Loading-the-Model-with-MLflow">
+<h3>Loading the Model with MLflow<a class="headerlink" href="#Loading-the-Model-with-MLflow" title="Permalink to this headline"> </a></h3>
+<p>We use <code class="docutils literal notranslate"><span class="pre">mlflow.pyfunc.load_model</span></code> to load our conversational AI model. This function is a crucial aspect of MLflow’s Python function flavor, offering a versatile way to interact with Python models. By specifying <code class="docutils literal notranslate"><span class="pre">model_uri=model_info.model_uri</span></code>, we precisely target the stored location of our DialoGPT model within MLflow’s tracking system.</p>
+</div>
+<div class="section" id="Interacting-with-the-Chatbot">
+<h3>Interacting with the Chatbot<a class="headerlink" href="#Interacting-with-the-Chatbot" title="Permalink to this headline"> </a></h3>
+<p>Once loaded, the model, referenced as <code class="docutils literal notranslate"><span class="pre">chatbot</span></code>, is ready for interaction. We demonstrate its conversational capabilities by:</p>
+<ul class="simple">
+<li><p><strong>Asking Questions</strong>: Posing a question like “What is the best way to get to Antarctica?” to the chatbot.</p></li>
+<li><p><strong>Capturing Responses</strong>: The chatbot’s response, generated through the <code class="docutils literal notranslate"><span class="pre">predict</span></code> method, provides a practical example of its conversational skills. For instance, it might respond with suggestions about reaching Antarctica by boat.</p></li>
+</ul>
+<p>This demonstration highlights the practicality and convenience of deploying and using models logged with MLflow, especially in dynamic and interactive scenarios like conversational AI.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load the model as a generic python function in order to leverage the integrated Conversational Context</span>
+<span class="c1"># Note that loading a conversational model with the native flavor (i.e., `mlflow.transformers.load_model()`) will not include anything apart from the</span>
+<span class="c1"># pipeline itself; if choosing to load in this way, you will need to manage your own Conversational Context instance to maintain state on the</span>
+<span class="c1"># conversation history.</span>
+<span class="n">chatbot</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_uri</span><span class="o">=</span><span class="n">model_info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
+
+<span class="c1"># Validate that the model is capable of responding to a question</span>
+<span class="n">first</span> <span class="o">=</span> <span class="n">chatbot</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;What is the best way to get to Antarctica?&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "f46b4d8422cd4fac874bc5b87e85e474", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input&#39;s `attention_mask` to obtain reliable results.
+Setting `pad_token_id` to `eos_token_id`:50256 for open-end generation.
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side=&#39;left&#39;` when initializing the tokenizer.
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Response: </span><span class="si">{</span><span class="n">first</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Response: I think you can get there by boat.
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Continuing-the-Conversation-with-the-Chatbot">
+<h2>Continuing the Conversation with the Chatbot<a class="headerlink" href="#Continuing-the-Conversation-with-the-Chatbot" title="Permalink to this headline"> </a></h2>
+<p>We further explore the MLflow <code class="docutils literal notranslate"><span class="pre">pyfunc</span></code> implementation’s conversational contextual statefulness with the DialoGPT chatbot model.</p>
+<div class="section" id="Testing-Contextual-Memory">
+<h3>Testing Contextual Memory<a class="headerlink" href="#Testing-Contextual-Memory" title="Permalink to this headline"> </a></h3>
+<p>We pose a follow-up question, “What sort of boat should I use?” to test the chatbot’s contextual understanding. The response we get, “A boat that can go to Antarctica,” while straightforward, showcases the MLflow pyfunc model’s ability to retain and utilize conversation history for coherent responses with <code class="docutils literal notranslate"><span class="pre">ConversationalPipeline</span></code> types of models.</p>
+</div>
+<div class="section" id="Understanding-the-Response-Style">
+<h3>Understanding the Response Style<a class="headerlink" href="#Understanding-the-Response-Style" title="Permalink to this headline"> </a></h3>
+<p>The response’s style – witty and slightly facetious – reflects the training data’s nature, primarily conversational exchanges from Reddit. This training source significantly influences the model’s tone and style, leading to responses that can be humorous and diverse.</p>
+</div>
+<div class="section" id="Implications-of-Training-Data">
+<h3>Implications of Training Data<a class="headerlink" href="#Implications-of-Training-Data" title="Permalink to this headline"> </a></h3>
+<p>This interaction underlines the importance of the training data’s source in shaping the model’s responses. When deploying such models in real-world applications, it’s essential to understand and consider the training data’s influence on the model’s conversational style and knowledge base.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Verify that the PyFunc implementation has maintained state on the conversation history by asking a vague follow-up question that requires context</span>
+<span class="c1"># in order to answer properly</span>
+<span class="n">second</span> <span class="o">=</span> <span class="n">chatbot</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;What sort of boat should I use?&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input&#39;s `attention_mask` to obtain reliable results.
+Setting `pad_token_id` to `eos_token_id`:50256 for open-end generation.
+A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side=&#39;left&#39;` when initializing the tokenizer.
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Response: </span><span class="si">{</span><span class="n">second</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Response: A boat that can go to Antarctica.
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Conclusion-and-Key-Takeaways">
+<h2>Conclusion and Key Takeaways<a class="headerlink" href="#Conclusion-and-Key-Takeaways" title="Permalink to this headline"> </a></h2>
+<p>In this tutorial, we’ve explored the integration of MLflow with a conversational AI model, specifically using the DialoGPT model from Microsoft. We’ve covered several important aspects and techniques that are crucial for anyone looking to work with advanced machine learning models in a practical, real-world setting.</p>
+<div class="section" id="Key-Takeaways">
+<h3>Key Takeaways<a class="headerlink" href="#Key-Takeaways" title="Permalink to this headline"> </a></h3>
+<ol class="arabic simple">
+<li><p><strong>MLflow for Model Management</strong>: We demonstrated how MLflow can be effectively used for managing and deploying machine learning models. The ability to log models, track experiments, and manage different versions of models is invaluable in a machine learning workflow.</p></li>
+<li><p><strong>Conversational AI</strong>: By using the DialoGPT model, we delved into the world of conversational AI, showcasing how to set up and interact with a conversational model. This included understanding the nuances of maintaining conversational context and the impact of training data on the model’s responses.</p></li>
+<li><p><strong>Practical Implementation</strong>: Through practical examples, we showed how to log a model in MLflow, infer a model signature, and use the <code class="docutils literal notranslate"><span class="pre">pyfunc</span></code> model flavor for easy deployment and interaction. This hands-on approach is designed to provide you with the skills needed to implement these techniques in your own projects.</p></li>
+<li><p><strong>Understanding Model Responses</strong>: We emphasized the importance of understanding the nature of the model’s training data. This understanding is crucial for interpreting the model’s responses and for tailoring the model to specific use cases.</p></li>
+<li><p><strong>Contextual History</strong>: MLflow’s <code class="docutils literal notranslate"><span class="pre">transformers</span></code> <code class="docutils literal notranslate"><span class="pre">pyfunc</span></code> implementation for <code class="docutils literal notranslate"><span class="pre">ConversationalPipelines</span></code> maintains a <code class="docutils literal notranslate"><span class="pre">Conversation</span></code> context without the need for managing state yourself. This enables chat bots to be created with minimal effort, since statefulness is maintained for you.</p></li>
+</ol>
+</div>
+</div>
+<div class="section" id="Wrapping-Up">
+<h2>Wrapping Up<a class="headerlink" href="#Wrapping-Up" title="Permalink to this headline"> </a></h2>
+<p>As we conclude this tutorial, we hope that you have gained a deeper understanding of how to integrate MLflow with conversational AI models and the practical considerations involved in deploying these models. The skills and knowledge acquired here are not only applicable to conversational AI but also to a broader range of machine learning applications.</p>
+<p>Remember, the field of machine learning is vast and constantly evolving. Continuous learning and experimentation are key to staying updated and making the most out of these exciting technologies.</p>
+<p>Thank you for joining us in this journey through the world of MLflow and conversational AI. We encourage you to take these learnings and apply them to your own unique challenges and projects. Happy coding!</p>
+</div>
+</div>
+
+
+              </div>
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../translation/component-translation.html" class="btn btn-neutral" title="Introduction to Translation with Transformers and MLflow" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+      
+      
+        <a href="../fine-tuning/transformers-fine-tuning.html" class="btn btn-neutral" title="Fine-Tuning Transformers with MLflow for Enhanced Model Management" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+      <p class="copyright">
+          &copy; MLflow Project, a Series of LF Projects, LLC. All rights reserved.
+      </p>
+
+  </div> 
+
+</footer>
+          </div>
+        </div>
+      </section>
+    </main>
+  </page>
+
+  
+
+
+  
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+      URL_ROOT:'../../../../',
+      VERSION:'2.9.2.dev0',
+      COLLAPSE_INDEX:false,
+      FILE_SUFFIX:'.html',
+      LINK_SUFFIX: '.html',
+      HAS_SOURCE:  true
+    };
+  </script>
+
+  
+
+  <script type="text/javascript" src="../../../../_static/js/clipboard.min.js"></script>
+  <script type="text/javascript" src="../../../../_static/js/jquery.waypoints.min.js"></script>
+
+  
+  
+  
+  <script type="text/javascript">var CLIPPY_SVG_PATH = "../../../../_static/clippy.svg";</script>
+  <script type="text/javascript" src="../../../../_static/js/custom.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.StickyNav.enable();
+    });
+
+  </script>
+  
+
+  
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        // Get the code block designator class entries
+        const allHighlights = document.querySelectorAll('.highlight');
+        // Disable copyable links for notebook cell numbering and for cell outputs
+        const highlights = Array.from(allHighlights).filter(highlight => !highlight.closest('.highlight-none') && 
+            !highlight.closest('.nboutput'));
+    
+        highlights.forEach(function(highlight) {
+            const copyIcon = document.createElement('span');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.innerHTML = '&#xf0ea;';
+
+            copyIcon.addEventListener('click', function() {
+                const code = highlight.querySelector('pre').textContent;
+                copyToClipboard(code);
+
+                // Flash effect on click
+                this.style.color = '#0194E2';
+                setTimeout(() => {
+                    this.style.color = ''; 
+                }, 100);
+
+                // Display "Code copied to clipboard" near the clicked icon
+                const message = document.createElement('span');
+                message.textContent = "Copied!";
+                message.classList.add('copy-message'); 
+
+                // Append the message to the icon
+                this.appendChild(message);
+
+                setTimeout(() => {
+                    this.removeChild(message);
+                }, 500);
+            });
+
+            highlight.appendChild(copyIcon);
+        });
+    });
+  </script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Force download for notebook-download-btn
+        const downloadButtons = document.querySelectorAll('.notebook-download-btn');
+        downloadButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                // Fetch the raw content of the notebook from GitHub
+                fetch(button.href)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = url;
+                        const filename = button.href.split('/').pop();
+                        link.download = filename; 
+
+                        document.body.appendChild(link);
+                        link.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    })
+                    .catch(err => console.error('Error fetching the notebook:', err));
+            });
+        });
+    });
+</script> 
+</body>
+</html>

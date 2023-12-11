@@ -1,0 +1,512 @@
+
+  
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Custom PyFuncs with MLflow - Notebooks &mdash; MLflow 2.9.2.dev0 documentation</title>
+  
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/traditional-ml/creating-custom-pyfunc/notebooks/index.html">
+  
+  
+    <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
+    
+
+    
+
+  
+    
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/grids.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/mobile.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/simple-cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/tabs.css" type="text/css" />
+    
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="MLflow 2.9.2.dev0 documentation" href="../../../index.html"/>
+        <link rel="up" title="Building Custom Python Function Models with MLflow" href="../index.html"/>
+        <link rel="next" title="Creating a Custom Model: “Add N” Model" href="/introduction.html"/>
+        <link rel="prev" title="Understanding PyFunc in MLflow" href="/../part2-pyfunc-components.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+<script type="text/javascript" src="../../../_static/jquery.js"></script>
+<script type="text/javascript" src="../../../_static/underscore.js"></script>
+<script type="text/javascript" src="../../../_static/doctools.js"></script>
+<script type="text/javascript" src="../../../_static/languagesections.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+
+<body class="wy-body-for-nav" role="document">
+  
+
+  
+  <nav class="wy-nav-top header" role="navigation" aria-label="top navigation">
+    <ul>
+  <li class="menu-toggle">
+    <i data-toggle="wy-nav-top" class="wy-nav-top-menu-button db-icon db-icon-menu pull-left"></i>
+    <a href="../../../index.html" class="wy-nav-top-logo"
+      ><img src="../../../_static/MLflow-logo-final-black.png" alt="MLflow"
+    /></a>
+    <span class="version">2.9.2.dev0</span>
+  </li>
+</ul>
+  </nav>
+  <page>
+    
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side relative">
+      <div class="wy-side-scroll">
+  <div class="wy-side-nav-search">
+    
+
+    
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+    
+  </div>
+
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+    
+      <a href="../../../index.html" class="main-navigation-home"><img src="../../../_static/icons/nav-home.svg"> MLflow</a>
+    
+
+    
+      
+
+      
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../introduction/index.html">What is MLflow?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting-started/index.html">Getting Started with MLflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../new-features/index.html">New Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../llms/index.html">LLMs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../model-evaluation/index.html">Model Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deep-learning/index.html">Deep Learning</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">Traditional ML</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#native-library-support">Native Library Support</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../index.html#tutorials-and-guides">Tutorials and Guides</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../../hyperparameter-tuning-with-child-runs/index.html">Hyperparameter Tuning with MLflow and Optuna</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../index.html">Building Custom Python Function Models with MLflow</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../part1-named-flavors.html">Models, Flavors, and PyFuncs in MLflow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../part2-pyfunc-components.html">Understanding Pyfunc Components</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Full Notebooks</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#mlflow-tracking">MLflow Tracking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#mlflow-recipes">MLflow Recipes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#mlflow-evaluate">MLflow Evaluate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#model-registry">Model Registry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#deployment">Deployment</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deployment/index.html">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tracking.html">MLflow Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../system-metrics/index.html">System Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../projects.html">MLflow Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../models.html">MLflow Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../model-registry.html">MLflow Model Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../recipes.html">MLflow Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../plugins.html">MLflow Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../auth/index.html">MLflow Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../search-runs.html">Search Runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../search-experiments.html">Search Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../python_api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../R-api.html">R API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../java_api/index.html">Java API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rest-api.html">REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docker.html">Official MLflow Docker Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../community-model-flavors.html">Community Model Flavors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials-and-examples/index.html">Tutorials and Examples</a></li>
+</ul>
+
+      
+    
+  </div>
+
+  <div role="contentinfo">
+    
+
+    <p>
+      <a id='feedbacklink' href="https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a>
+    </p>
+  </div>
+</div>
+    </nav>
+
+    <main class="wy-grid-for-nav">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+          <div class="rst-content">
+            
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Documentation</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../../index.html">Traditional ML</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../index.html">Building Custom Python Function Models with MLflow</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+    
+      <li>Custom PyFuncs with MLflow - Notebooks</li>
+    
+    
+    <!-- <li class="wy-breadcrumbs-aside">
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/traditional-ml/creating-custom-pyfunc/notebooks/index.rst" class="fa fa-github"> Edit on GitHub</a>
+    </li> -->
+    
+  </ul>
+</div>
+            <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <div itemprop="articleBody">
+                
+  <div class="section" id="custom-pyfuncs-with-mlflow-notebooks">
+<h1>Custom PyFuncs with MLflow - Notebooks<a class="headerlink" href="#custom-pyfuncs-with-mlflow-notebooks" title="Permalink to this headline"> </a></h1>
+<p>If you would like to view the notebooks in this guide in their entirety, each notebook can viewed or downloaded directly below.</p>
+<div class="toctree-wrapper compound">
+</div>
+<div class="section" id="basics-of-creating-a-custom-python-model-with-mlflow-s-pyfunc">
+<h2>Basics of Creating a Custom Python Model with MLflow’s Pyfunc<a class="headerlink" href="#basics-of-creating-a-custom-python-model-with-mlflow-s-pyfunc" title="Permalink to this headline"> </a></h2>
+<div class="section" id="introduction">
+<h3>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline"> </a></h3>
+<p>In this initial tutorial, we’ll introduce you to the foundational concepts of MLflow’s <cite>pyfunc</cite>. We’ll illustrate the simplicity and
+adaptability of creating, saving, and invoking a custom Python function model within the MLflow ecosystem. By the end, you’ll have a
+hands-on understanding of a model that adds a specified numeric value to DataFrame columns, highlighting the innate flexibility
+of the <cite>pyfunc</cite> flavor.</p>
+</div>
+<div class="section" id="what-you-will-learn">
+<h3>What you will learn<a class="headerlink" href="#what-you-will-learn" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Simplicity of Custom PyFunc Models</strong>: Grasp the basic structure of the <cite>PythonModel</cite> class and how it forms the backbone of custom models in MLflow.</p></li>
+<li><p><strong>Model Persistence</strong>: Understand the straightforward process of saving and retrieving custom models.</p></li>
+<li><p><strong>Invoking Predictions</strong>: Learn the mechanics of how to use a loaded custom <cite>pyfunc</cite> model for predictions.</p></li>
+</ul>
+</div>
+<div class="section" id="step-by-step-guide">
+<h3>Step-by-step Guide<a class="headerlink" href="#step-by-step-guide" title="Permalink to this headline"> </a></h3>
+<ol class="arabic simple">
+<li><p><strong>Model Definition</strong>: Begin by crafting a Python class encapsulating the logic for our straightforward “Add N” model.</p></li>
+<li><p><strong>Persisting the Model</strong>: Use MLflow’s capabilities to save the defined model, ensuring it can be retrieved later.</p></li>
+<li><p><strong>Model Retrieval</strong>: Load the model from its saved location and prepare it for predictions.</p></li>
+<li><p><strong>Model Evaluation</strong>: Use the retrieved model on sample data to witness its functionality.</p></li>
+</ol>
+</div>
+<div class="section" id="wrap-up">
+<h3>Wrap Up<a class="headerlink" href="#wrap-up" title="Permalink to this headline"> </a></h3>
+<p>By the conclusion of this tutorial, you’ll appreciate the ease and consistency that MLflow’s custom <cite>pyfunc</cite> offers, even for the simplest of models. It sets the stage for more advanced functionalities and use-cases you might explore in subsequent tutorials.</p>
+<a href="introduction.html" class="download-btn">View the Notebook</a><div class="toctree-wrapper compound">
+</div>
+</div>
+</div>
+<div class="section" id="building-a-basic-custom-python-model">
+<h2>Building a Basic Custom Python Model<a class="headerlink" href="#building-a-basic-custom-python-model" title="Permalink to this headline"> </a></h2>
+<div class="section" id="id1">
+<h3>Introduction<a class="headerlink" href="#id1" title="Permalink to this headline"> </a></h3>
+<p>In this tutorial, we deepen our understanding of MLflow’s Custom Pyfunc. The <code class="docutils literal notranslate"><span class="pre">PythonModel</span></code> class serves as the cornerstone, allowing
+you to define, save, load, and predict using custom PyFunc models.
+We’ll be developing a very non-standard model; one that generates plotted figures in order to showcase the flexibility of custom PyFunc models.
+By the end, we’ll have a functional Lissajous curve generator, wrapped and managed within the Pyfunc framework.</p>
+</div>
+<div class="section" id="id2">
+<h3>What you will learn<a class="headerlink" href="#id2" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Defining Custom PyFunc Models</strong>: Explore the structure of the <code class="docutils literal notranslate"><span class="pre">PythonModel</span></code> class and its essential methods.</p></li>
+<li><p><strong>Understanding Pyfunc Components</strong>: Get acquainted with the foundational building blocks of the Pyfunc flavor.</p></li>
+<li><p><strong>Saving and Loading Models</strong>: Experience the seamless integration of MLflow’s storage and retrieval capabilities.</p></li>
+<li><p><strong>Predicting with Custom Logic</strong>: Interface with the loaded custom Pyfunc to generate interesting Lissajous curve plots.</p></li>
+</ul>
+</div>
+<div class="section" id="the-pythonmodel-class">
+<h3>The <code class="docutils literal notranslate"><span class="pre">PythonModel</span></code> class<a class="headerlink" href="#the-pythonmodel-class" title="Permalink to this headline"> </a></h3>
+<p>MLflow’s commitment to flexibility and standardization shines through the <code class="docutils literal notranslate"><span class="pre">PythonModel</span></code> class. This class, crucial to the Pyfunc
+flavor, provides the necessary scaffolding to define custom logic, load resources, and make predictions.</p>
+<p>There are two primary ways to create an instance of the PythonModel:
+1. <strong>Class-based approach</strong>: Define a class with necessary methods and use it as a blueprint for the model.
+2. <strong>Function-based approach</strong>: Capture the entire prediction logic within a single function, letting MLflow handle the rest.</p>
+<p>For this tutorial, we’ll focus on the class-based approach, delving into methods like <code class="docutils literal notranslate"><span class="pre">load_context</span></code> and <code class="docutils literal notranslate"><span class="pre">predict</span></code> and
+understanding their roles in the larger ecosystem.</p>
+</div>
+<div class="section" id="lissajous-curves">
+<h3>Lissajous Curves<a class="headerlink" href="#lissajous-curves" title="Permalink to this headline"> </a></h3>
+<p>As our vehicle for understanding, we’ll employ the Lissajous curves – sinusoidal parametric curves whose shapes and orientations are
+determined by their parameters. Instead of a conventional machine learning model, this mathematical curve will demonstrate the versatility
+and power of the Pyfunc flavor.</p>
+</div>
+<div class="section" id="id3">
+<h3>Step-by-step Guide<a class="headerlink" href="#id3" title="Permalink to this headline"> </a></h3>
+<ol class="arabic simple">
+<li><p><strong>Define the Custom PyFunc Model</strong>: We start by creating a Python class encapsulating the logic for generating Lissajous curves.</p></li>
+<li><p><strong>Save the Model</strong>: With the model defined, we leverage MLflow’s capabilities to save it, ensuring future reproducibility.</p></li>
+<li><p><strong>Load the Model</strong>: Retrieve the model from storage and prepare it for predictions.</p></li>
+<li><p><strong>Generate Curves</strong>: Use the loaded model to create and visualize Lissajous curves, showcasing the end-to-end capabilities of the Pyfunc flavor.</p></li>
+</ol>
+</div>
+<div class="section" id="id4">
+<h3>Wrap Up<a class="headerlink" href="#id4" title="Permalink to this headline"> </a></h3>
+<p>With a practical example under our belt, the power and flexibility of MLflow’s Custom Pyfunc are evident. Whether you’re working with
+traditional machine learning models or unique use cases like the Lissajous curve generator, Pyfunc ensures a standardized, reproducible,
+and efficient workflow.</p>
+<a href="basic-pyfunc.html" class="download-btn">View the Notebook</a><div class="toctree-wrapper compound">
+</div>
+</div>
+</div>
+<div class="section" id="overriding-a-model-s-prediction-method">
+<h2>Overriding a model’s prediction method<a class="headerlink" href="#overriding-a-model-s-prediction-method" title="Permalink to this headline"> </a></h2>
+<div class="section" id="id5">
+<h3>Introduction<a class="headerlink" href="#id5" title="Permalink to this headline"> </a></h3>
+<p>Diving deeper into the realm of custom PyFuncs with MLflow, this tutorial addresses a common challenge in model deployment: retaining and
+customizing the behavior of a model’s prediction method after serialization and deployment. Leveraging the power of MLflow’s PyFunc flavor,
+we’ll learn how to override the default <cite>predict</cite> behavior, ensuring our model retains all its original capabilities when deployed in
+different environments.</p>
+</div>
+<div class="section" id="id6">
+<h3>What you will learn<a class="headerlink" href="#id6" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>The Challenge with Default PyFuncs</strong>: Recognize the limitations of default PyFunc behavior with complex models, especially when methods other than <cite>predict</cite> are vital.</p></li>
+<li><p><strong>Customizing Predict Method</strong>: Discover the technique to override the default <cite>predict</cite> method, enabling the support of various prediction methodologies.</p></li>
+<li><p><strong>Harnessing Joblib with PyFunc</strong>: Understand why <cite>joblib</cite> is preferred over <cite>pickle</cite> for serializing scikit-learn models and how to integrate it with PyFunc.</p></li>
+<li><p><strong>Dynamic Prediction with Params</strong>: Learn to make the <cite>predict</cite> method more versatile by accepting parameters that dictate the type of prediction.</p></li>
+</ul>
+</div>
+<div class="section" id="why-override-predict">
+<h3>Why Override <cite>predict</cite>?<a class="headerlink" href="#why-override-predict" title="Permalink to this headline"> </a></h3>
+<p>Models, especially in libraries like scikit-learn, often come with multiple methods for prediction, such as <cite>predict</cite>, <cite>predict_proba</cite>, and <cite>predict_log_proba</cite>.
+When deploying such models, it’s essential to retain the flexibility to choose the prediction methodology dynamically. This section sheds light
+on the need for such flexibility and the challenges with default PyFunc deployments.</p>
+</div>
+<div class="section" id="creating-a-custom-pyfunc">
+<h3>Creating a Custom PyFunc<a class="headerlink" href="#creating-a-custom-pyfunc" title="Permalink to this headline"> </a></h3>
+<p>Venturing into the solution, we craft a custom PyFunc by extending MLflow’s <cite>PythonModel</cite>. This custom class serves as a wrapper around the
+original model, providing a flexible <cite>predict</cite> method that can mimic the behavior of various original methods based on provided parameters.</p>
+</div>
+<div class="section" id="id7">
+<h3>Step-by-step Guide<a class="headerlink" href="#id7" title="Permalink to this headline"> </a></h3>
+<ol class="arabic simple">
+<li><p><strong>Prepare a Basic Model</strong>: Use the Iris dataset to create a simple Logistic Regression model, illustrating the different prediction methods.</p></li>
+<li><p><strong>Challenges with Default Deployment</strong>: Recognize the limitations when deploying the model as a default PyFunc.</p></li>
+<li><p><strong>Crafting the Custom PyFunc</strong>: Design a <cite>ModelWrapper</cite> class that can dynamically switch between prediction methods.</p></li>
+<li><p><strong>Saving and Loading the Custom Model</strong>: Integrate with MLflow to save the custom PyFunc and load it for predictions.</p></li>
+<li><p><strong>Dynamic Predictions</strong>: Test the loaded model, ensuring it supports all original prediction methods.</p></li>
+</ol>
+</div>
+<div class="section" id="id8">
+<h3>Wrap Up<a class="headerlink" href="#id8" title="Permalink to this headline"> </a></h3>
+<p>Overcoming the challenges of default deployments, this tutorial showcases the prowess of custom PyFuncs in MLflow. The ability to override and
+customize prediction methods ensures that our deployed models remain as versatile and capable as their original incarnations. As ML workflows
+grow in complexity, such customization becomes invaluable, ensuring our deployments are robust and adaptable.</p>
+<a href="override-predict.html" class="download-btn">View the Notebook</a></div>
+</div>
+<div class="section" id="run-the-notebooks-in-your-environment">
+<h2>Run the Notebooks in your Environment<a class="headerlink" href="#run-the-notebooks-in-your-environment" title="Permalink to this headline"> </a></h2>
+<p>Additionally, if you would like to download a copy locally to run in your own environment, you can download by
+clicking the respective links to each notebook in this guide:</p>
+<a href="https://raw.githubusercontent.com/mlflow/mlflow/master/docs/source/traditional-ml/creating-custom-pyfunc/notebooks/introduction.ipynb" class="notebook-download-btn">Download the Introduction notebook</a><br/>
+<a href="https://raw.githubusercontent.com/mlflow/mlflow/master/docs/source/traditional-ml/creating-custom-pyfunc/notebooks/basic-pyfunc.ipynb" class="notebook-download-btn">Download the Basic Pyfunc notebook</a><br/>
+<a href="https://raw.githubusercontent.com/mlflow/mlflow/master/docs/source/traditional-ml/creating-custom-pyfunc/notebooks/override-predict.ipynb" class="notebook-download-btn">Download the Predict Override notebook</a><br/><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In order to run the notebooks, please ensure that you either have a local MLflow Tracking Server started or modify the
+<code class="docutils literal notranslate"><span class="pre">mlflow.set_tracking_uri()</span></code> values to point to a running instance of the MLflow Tracking Server. In order to interact with
+the MLflow UI, ensure that you are either running the UI server locally or have a configured deployed MLflow UI server that
+you are able to access.</p>
+</div>
+</div>
+</div>
+
+
+              </div>
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../part2-pyfunc-components.html" class="btn btn-neutral" title="Understanding PyFunc in MLflow" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+      
+      
+        <a href="introduction.html" class="btn btn-neutral" title="Creating a Custom Model: “Add N” Model" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+      <p class="copyright">
+          &copy; MLflow Project, a Series of LF Projects, LLC. All rights reserved.
+      </p>
+
+  </div> 
+
+</footer>
+          </div>
+        </div>
+      </section>
+    </main>
+  </page>
+
+  
+
+
+  
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+      URL_ROOT:'../../../',
+      VERSION:'2.9.2.dev0',
+      COLLAPSE_INDEX:false,
+      FILE_SUFFIX:'.html',
+      LINK_SUFFIX: '.html',
+      HAS_SOURCE:  true
+    };
+  </script>
+
+  
+
+  <script type="text/javascript" src="../../../_static/js/clipboard.min.js"></script>
+  <script type="text/javascript" src="../../../_static/js/jquery.waypoints.min.js"></script>
+
+  
+  
+  
+  <script type="text/javascript">var CLIPPY_SVG_PATH = "../../../_static/clippy.svg";</script>
+  <script type="text/javascript" src="../../../_static/js/custom.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.StickyNav.enable();
+    });
+
+  </script>
+  
+
+  
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        // Get the code block designator class entries
+        const allHighlights = document.querySelectorAll('.highlight');
+        // Disable copyable links for notebook cell numbering and for cell outputs
+        const highlights = Array.from(allHighlights).filter(highlight => !highlight.closest('.highlight-none') && 
+            !highlight.closest('.nboutput'));
+    
+        highlights.forEach(function(highlight) {
+            const copyIcon = document.createElement('span');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.innerHTML = '&#xf0ea;';
+
+            copyIcon.addEventListener('click', function() {
+                const code = highlight.querySelector('pre').textContent;
+                copyToClipboard(code);
+
+                // Flash effect on click
+                this.style.color = '#0194E2';
+                setTimeout(() => {
+                    this.style.color = ''; 
+                }, 100);
+
+                // Display "Code copied to clipboard" near the clicked icon
+                const message = document.createElement('span');
+                message.textContent = "Copied!";
+                message.classList.add('copy-message'); 
+
+                // Append the message to the icon
+                this.appendChild(message);
+
+                setTimeout(() => {
+                    this.removeChild(message);
+                }, 500);
+            });
+
+            highlight.appendChild(copyIcon);
+        });
+    });
+  </script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Force download for notebook-download-btn
+        const downloadButtons = document.querySelectorAll('.notebook-download-btn');
+        downloadButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                // Fetch the raw content of the notebook from GitHub
+                fetch(button.href)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = url;
+                        const filename = button.href.split('/').pop();
+                        link.download = filename; 
+
+                        document.body.appendChild(link);
+                        link.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    })
+                    .catch(err => console.error('Error fetching the notebook:', err));
+            });
+        });
+    });
+</script> 
+</body>
+</html>

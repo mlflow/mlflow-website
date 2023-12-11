@@ -1,0 +1,541 @@
+
+  
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Artifact Stores &mdash; MLflow 2.9.2.dev0 documentation</title>
+  
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/tracking/artifacts-stores.html">
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    
+
+    
+
+  
+    
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/cards.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/grids.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/mobile.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/simple-cards.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/tabs.css" type="text/css" />
+    
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="MLflow 2.9.2.dev0 documentation" href="../index.html"/>
+        <link rel="up" title="MLflow Tracking" href="../tracking.html"/>
+        <link rel="next" title="MLflow Tracking Server" href="/server.html"/>
+        <link rel="prev" title="Backend Stores" href="/backend-stores.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+<script type="text/javascript" src="../_static/jquery.js"></script>
+<script type="text/javascript" src="../_static/underscore.js"></script>
+<script type="text/javascript" src="../_static/doctools.js"></script>
+<script type="text/javascript" src="../_static/languagesections.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+
+<body class="wy-body-for-nav" role="document">
+  
+
+  
+  <nav class="wy-nav-top header" role="navigation" aria-label="top navigation">
+    <ul>
+  <li class="menu-toggle">
+    <i data-toggle="wy-nav-top" class="wy-nav-top-menu-button db-icon db-icon-menu pull-left"></i>
+    <a href="../index.html" class="wy-nav-top-logo"
+      ><img src="../_static/MLflow-logo-final-black.png" alt="MLflow"
+    /></a>
+    <span class="version">2.9.2.dev0</span>
+  </li>
+</ul>
+  </nav>
+  <page>
+    
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side relative">
+      <div class="wy-side-scroll">
+  <div class="wy-side-nav-search">
+    
+
+    
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+    
+  </div>
+
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+    
+      <a href="../index.html" class="main-navigation-home"><img src="../_static/icons/nav-home.svg"> MLflow</a>
+    
+
+    
+      
+
+      
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../introduction/index.html">What is MLflow?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/index.html">Getting Started with MLflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../new-features/index.html">New Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../llms/index.html">LLMs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../model-evaluation/index.html">Model Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deep-learning/index.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../traditional-ml/index.html">Traditional ML</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/index.html">Deployment</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../tracking.html">MLflow Tracking</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../tracking.html#quickstart">Quickstart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tracking.html#concepts">Concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tracking.html#tracking-runs">Tracking Runs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tracking.html#explore-runs-and-results">Explore Runs and Results</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../tracking.html#set-up-the-mlflow-tracking-environment">Set up the MLflow Tracking Environment</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../tracking.html#components">Components</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../tracking.html#id4">MLflow Tracking APIs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tracking.html#id5">Backend Store</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../tracking.html#artifact-stores">Artifact Store</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tracking.html#mlflow-tracking-server-optional">MLflow Tracking Server (Optional)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../tracking.html#common-setups">Common Setups</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tracking.html#other-configuration-with-mlflow-tracking-server">Other Configuration with <span class="xref std std-ref">MLflow Tracking Server</span></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../tracking.html#faq">FAQ</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../system-metrics/index.html">System Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../projects.html">MLflow Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.html">MLflow Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../model-registry.html">MLflow Model Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../recipes.html">MLflow Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plugins.html">MLflow Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auth/index.html">MLflow Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../search-runs.html">Search Runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../search-experiments.html">Search Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python_api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../R-api.html">R API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../java_api/index.html">Java API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rest-api.html">REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docker.html">Official MLflow Docker Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../community-model-flavors.html">Community Model Flavors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials-and-examples/index.html">Tutorials and Examples</a></li>
+</ul>
+
+      
+    
+  </div>
+
+  <div role="contentinfo">
+    
+
+    <p>
+      <a id='feedbacklink' href="https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a>
+    </p>
+  </div>
+</div>
+    </nav>
+
+    <main class="wy-grid-for-nav">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+          <div class="rst-content">
+            
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Documentation</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../tracking.html">MLflow Tracking</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+    
+      <li>Artifact Stores</li>
+    
+    
+    <!-- <li class="wy-breadcrumbs-aside">
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/tracking/artifacts-stores.rst" class="fa fa-github"> Edit on GitHub</a>
+    </li> -->
+    
+  </ul>
+</div>
+            <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <div itemprop="articleBody">
+                
+  <div class="section" id="artifact-stores">
+<h1>Artifact Stores<a class="headerlink" href="#artifact-stores" title="Permalink to this headline"> </a></h1>
+<p>The artifact store is a core component in <a class="reference external" href="../index.html">MLflow Tracking</a> where MLflow stores (typicaly large) arifacts
+for each run such as model weights (e.g. a pickled scikit-learn model), images (e.g. PNGs), model and data files (e.g. <a class="reference external" href="https://parquet.apache.org/">Parquet</a> file).
+Note that metadata like parameters, metrics, and tags are stored in a <a class="reference external" href="backend-stores.html">backend store</a> (e.g., PostGres, MySQL, or MSSQL Database), the other component of the MLflow Tracking.</p>
+<div class="section" id="configuring-an-artifact-store">
+<h2>Configuring an Artifact Store<a class="headerlink" href="#configuring-an-artifact-store" title="Permalink to this headline"> </a></h2>
+<p>MLflow by default stores artifacts in local <code class="docutils literal notranslate"><span class="pre">./mlruns</span></code> directory, but also supports various locations suitable for large data:
+Amazon S3, Azure Blob Storage, Google Cloud Storage, SFTP server, and NFS. You can connect those remote storages via the MLflow Tracking server.
+See <a class="reference internal" href="server.html#tracking-server-artifact-store"><span class="std std-ref">tracking server setup</span></a> and the specific section for your storage in <a class="reference internal" href="#artifacts-store-supported-storages"><span class="std std-ref">supported storages</span></a> for guidance on
+how to connect to your remote storage of choice.</p>
+<div class="section" id="managing-artifact-store-access">
+<span id="artifacts-stores-manage-access"></span><h3>Managing Artifact Store Access<a class="headerlink" href="#managing-artifact-store-access" title="Permalink to this headline"> </a></h3>
+<p>To allow the server and clients to access the artifact location, you should configure your cloud
+provider credentials as you would for accessing them in any other capacity. For example, for S3, you can set the <code class="docutils literal notranslate"><span class="pre">AWS_ACCESS_KEY_ID</span></code>
+and <code class="docutils literal notranslate"><span class="pre">AWS_SECRET_ACCESS_KEY</span></code> environment variables, use an IAM role, or configure a default
+profile in <code class="docutils literal notranslate"><span class="pre">~/.aws/credentials</span></code>.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Access credentials and configuration for the artifact storage location are configured <strong>once during server initialization</strong> in the place
+of having users handle access credentials for artifact-based operations. Note that <strong>all users who have access to the
+Tracking Server in this mode will have access to artifacts served through this assumed role</strong>.</p>
+</div>
+</div>
+<div class="section" id="setting-an-access-timeout">
+<h3>Setting an access Timeout<a class="headerlink" href="#setting-an-access-timeout" title="Permalink to this headline"> </a></h3>
+<p>You can set an environment variable <code class="docutils literal notranslate"><span class="pre">MLFLOW_ARTIFACT_UPLOAD_DOWNLOAD_TIMEOUT</span></code> (in seconds) to configure the timeout for artifact uploads and downloads.
+If it’s not set, MLflow will use the default timeout for the underlying storage client library (e.g. boto3 for S3).
+Note that this is experimental feature, may be changed or removed.</p>
+</div>
+<div class="section" id="setting-a-default-artifact-location-for-logging">
+<h3>Setting a Default Artifact Location for Logging<a class="headerlink" href="#setting-a-default-artifact-location-for-logging" title="Permalink to this headline"> </a></h3>
+<p>MLflow automatically records the <code class="docutils literal notranslate"><span class="pre">artifact_uri</span></code> property as a part of <a class="reference internal" href="../python_api/mlflow.entities.html#mlflow.entities.RunInfo" title="mlflow.entities.RunInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.entities.RunInfo</span></code></a>, so you can
+retrieve the location of the artifacts for historical runs using the <a class="reference internal" href="../python_api/mlflow.html#mlflow.get_artifact_uri" title="mlflow.get_artifact_uri"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.get_artifact_uri()</span></code></a> API.
+Also, <code class="docutils literal notranslate"><span class="pre">artifact_location</span></code> is a property recorded on <a class="reference internal" href="../python_api/mlflow.entities.html#mlflow.entities.Experiment" title="mlflow.entities.Experiment"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.entities.Experiment</span></code></a> for setting the
+default location to store artifacts for all runs in a given experiment.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>If you do not specify a <code class="docutils literal notranslate"><span class="pre">--default-artifact-root</span></code> or an artifact URI when creating the experiment
+(for example, <code class="docutils literal notranslate"><span class="pre">mlflow</span> <span class="pre">experiments</span> <span class="pre">create</span> <span class="pre">--artifact-location</span> <span class="pre">s3://&lt;my-bucket&gt;</span></code>), the artifact root
+will be set as a path inside the local file store (the hard drive of the computer executing your run). Typically this is not an appropriate location, as the client and
+server probably refer to different physical locations (that is, the same path on different disks).</p>
+</div>
+</div>
+</div>
+<div class="section" id="supported-storage-types-for-the-artifact-store">
+<span id="artifacts-store-supported-storages"></span><h2>Supported storage types for the Artifact Store<a class="headerlink" href="#supported-storage-types-for-the-artifact-store" title="Permalink to this headline"> </a></h2>
+<div class="section" id="amazon-s3-and-s3-compatible-storage">
+<h3>Amazon S3 and S3-compatible storage<a class="headerlink" href="#amazon-s3-and-s3-compatible-storage" title="Permalink to this headline"> </a></h3>
+<p>To store artifacts in S3 (whether on Amazon S3 or on an S3-compatible alternative, such as
+<a class="reference external" href="https://min.io/">MinIO</a> or <a class="reference external" href="https://www.digitalocean.com/products/spaces">Digital Ocean Spaces</a>), specify a URI of the form <code class="docutils literal notranslate"><span class="pre">s3://&lt;bucket&gt;/&lt;path&gt;</span></code>. MLflow obtains
+credentials to access S3 from your machine’s IAM role, a profile in <code class="docutils literal notranslate"><span class="pre">~/.aws/credentials</span></code>, or
+the environment variables <code class="docutils literal notranslate"><span class="pre">AWS_ACCESS_KEY_ID</span></code> and <code class="docutils literal notranslate"><span class="pre">AWS_SECRET_ACCESS_KEY</span></code> depending on which of
+these are available. For more information on how to set credentials, see
+<a class="reference external" href="https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/setup-credentials.html">Set up AWS Credentials and Region for Development</a>.</p>
+<p>Followings are commonly used environment variables for configuring S3 storage access. The complete list of configurable parameters for an S3 client is available in the
+<a class="reference external" href="https://boto3.amazonaws.com/v1/documentation/api/latest/guide/configuration.html#configuration">boto3 documentation</a>.</p>
+<div class="section" id="passsing-extra-arguments-to-s3-upload">
+<h4>Passsing Extra Arguments to S3 Upload<a class="headerlink" href="#passsing-extra-arguments-to-s3-upload" title="Permalink to this headline"> </a></h4>
+<p>To add S3 file upload extra arguments, set <code class="docutils literal notranslate"><span class="pre">MLFLOW_S3_UPLOAD_EXTRA_ARGS</span></code> to a JSON object of key/value pairs.
+For example, if you want to upload to a KMS Encrypted bucket using the KMS Key 1234:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">MLFLOW_S3_UPLOAD_EXTRA_ARGS</span><span class="o">=</span><span class="s1">&#39;{&quot;ServerSideEncryption&quot;: &quot;aws:kms&quot;, &quot;SSEKMSKeyId&quot;: &quot;1234&quot;}&#39;</span>
+</pre></div>
+</div>
+<p>For a list of available extra args see <a class="reference external" href="https://github.com/boto/boto3/blob/develop/docs/source/guide/s3-uploading-files.rst#the-extraargs-parameter">Boto3 ExtraArgs Documentation</a>.</p>
+</div>
+<div class="section" id="setting-custom-s3-endpoint">
+<h4>Setting Custom S3 Endpoint<a class="headerlink" href="#setting-custom-s3-endpoint" title="Permalink to this headline"> </a></h4>
+<p>To store artifacts in a custom endpoint, set the <code class="docutils literal notranslate"><span class="pre">MLFLOW_S3_ENDPOINT_URL</span></code> to your endpoint’s URL. For example, if you are using Digital Ocean Spaces:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">MLFLOW_S3_ENDPOINT_URL</span><span class="o">=</span>https://&lt;region&gt;.digitaloceanspaces.com
+</pre></div>
+</div>
+<p>If you have a MinIO server at 1.2.3.4 on port 9000:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">MLFLOW_S3_ENDPOINT_URL</span><span class="o">=</span>http://1.2.3.4:9000
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-non-tls-authentication">
+<h4>Using Non-TLS Authentication<a class="headerlink" href="#using-non-tls-authentication" title="Permalink to this headline"> </a></h4>
+<p>If the MinIO server is configured with using SSL self-signed or signed using some internal-only CA certificate, you could set <code class="docutils literal notranslate"><span class="pre">MLFLOW_S3_IGNORE_TLS</span></code> or <code class="docutils literal notranslate"><span class="pre">AWS_CA_BUNDLE</span></code> variables (not both at the same time!) to disable certificate signature check, or add a custom CA bundle to perform this check, respectively:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">MLFLOW_S3_IGNORE_TLS</span><span class="o">=</span><span class="nb">true</span>
+<span class="c1">#or</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">AWS_CA_BUNDLE</span><span class="o">=</span>/some/ca/bundle.pem
+</pre></div>
+</div>
+</div>
+<div class="section" id="setting-bucket-region">
+<h4>Setting Bucket Region<a class="headerlink" href="#setting-bucket-region" title="Permalink to this headline"> </a></h4>
+<p>Additionally, if MinIO server is configured with non-default region, you should set <code class="docutils literal notranslate"><span class="pre">AWS_DEFAULT_REGION</span></code> variable:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">AWS_DEFAULT_REGION</span><span class="o">=</span>my_region
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The MLflow tracking server utilizes specific reserved keywords to generate a qualified path. These environment configurations, if present in the client environment, can create path resolution issues.
+For example, providing <code class="docutils literal notranslate"><span class="pre">--default-artifact-root</span> <span class="pre">$MLFLOW_S3_ENDPOINT_URL</span></code> on the server side <strong>and</strong> <code class="docutils literal notranslate"><span class="pre">MLFLOW_S3_ENDPOINT_URL</span></code> on the client side will create a client path resolution issue for the artifact storage location.
+Upon resolving the artifact storage location, the MLflow client will use the value provided by <code class="docutils literal notranslate"><span class="pre">--default-artifact-root</span></code> and suffixes the location with the values provided in the environment variable  <code class="docutils literal notranslate"><span class="pre">MLFLOW_S3_ENDPOINT_URL</span></code>.
+Depending on the value set for the environment variable <code class="docutils literal notranslate"><span class="pre">MLFLOW_S3_ENDPOINT_URL</span></code>, the resulting artifact storage path for this scenario would be one of the following invalid object store paths:  <code class="docutils literal notranslate"><span class="pre">https://&lt;bucketname&gt;.s3.&lt;region&gt;.amazonaws.com/&lt;key&gt;/&lt;bucketname&gt;/&lt;key&gt;</span></code> or  <code class="docutils literal notranslate"><span class="pre">s3://&lt;bucketname&gt;/&lt;key&gt;/&lt;bucketname&gt;/&lt;key&gt;</span></code>.
+To prevent path parsing issues, <strong>ensure that reserved environment variables are removed (``unset``) from client environments</strong>.</p>
+</div>
+</div>
+</div>
+<div class="section" id="azure-blob-storage">
+<h3>Azure Blob Storage<a class="headerlink" href="#azure-blob-storage" title="Permalink to this headline"> </a></h3>
+<p>To store artifacts in Azure Blob Storage, specify a URI of the form
+<code class="docutils literal notranslate"><span class="pre">wasbs://&lt;container&gt;&#64;&lt;storage-account&gt;.blob.core.windows.net/&lt;path&gt;</span></code>.
+MLflow expects that your Azure Storage access credentials are located in the
+<code class="docutils literal notranslate"><span class="pre">AZURE_STORAGE_CONNECTION_STRING</span></code> and <code class="docutils literal notranslate"><span class="pre">AZURE_STORAGE_ACCESS_KEY</span></code> environment variables
+or having your credentials configured such that the <a class="reference external" href="https://docs.microsoft.com/en-us/python/api/overview/azure/identity-readme?view=azure-python">DefaultAzureCredential()</a>. class can pick them up.
+The order of precedence is:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">AZURE_STORAGE_CONNECTION_STRING</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">AZURE_STORAGE_ACCESS_KEY</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DefaultAzureCredential()</span></code></p></li>
+</ol>
+<p>You must set one of these options on <strong>both your client application and your MLflow tracking server</strong>.
+Also, you must run <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">azure-storage-blob</span></code> separately (on both your client and the server) to access Azure Blob Storage.
+Finally, if you want to use DefaultAzureCredential, you must <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">azure-identity</span></code>;
+MLflow does not declare a dependency on these packages by default.</p>
+<p>You may set an MLflow environment variable to configure the timeout for artifact uploads and downloads:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">MLFLOW_ARTIFACT_UPLOAD_DOWNLOAD_TIMEOUT</span></code> - (Experimental, may be changed or removed) Sets the timeout for artifact upload/download in seconds (Default: 600 for Azure blob).</p></li>
+</ul>
+</div>
+<div class="section" id="google-cloud-storage">
+<h3>Google Cloud Storage<a class="headerlink" href="#google-cloud-storage" title="Permalink to this headline"> </a></h3>
+<p>To store artifacts in Google Cloud Storage, specify a URI of the form <code class="docutils literal notranslate"><span class="pre">gs://&lt;bucket&gt;/&lt;path&gt;</span></code>.
+You should configure credentials for accessing the GCS container on the client and server as described
+in the <a class="reference external" href="https://google-cloud.readthedocs.io/en/latest/core/auth.html">GCS documentation</a>.
+Finally, you must run <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">google-cloud-storage</span></code> (on both your client and the server)
+to access Google Cloud Storage; MLflow does not declare a dependency on this package by default.</p>
+<p>You may set some MLflow environment variables to troubleshoot GCS read-timeouts (eg. due to slow transfer speeds) using the following variables:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">MLFLOW_ARTIFACT_UPLOAD_DOWNLOAD_TIMEOUT</span></code> - (Experimental, may be changed or removed) Sets the standard timeout for transfer operations in seconds (Default: 60 for GCS). Use -1 for indefinite timeout.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MLFLOW_GCS_DEFAULT_TIMEOUT</span></code> - (Deprecated, please use <code class="docutils literal notranslate"><span class="pre">MLFLOW_ARTIFACT_UPLOAD_DOWNLOAD_TIMEOUT</span></code>) Sets the standard timeout for transfer operations in seconds (Default: 60). Use -1 for indefinite timeout.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MLFLOW_GCS_UPLOAD_CHUNK_SIZE</span></code> - Sets the standard upload chunk size for bigger files in bytes (Default: 104857600 ≙ 100MiB), must be multiple of 256 KB.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MLFLOW_GCS_DOWNLOAD_CHUNK_SIZE</span></code> - Sets the standard download chunk size for bigger files in bytes (Default: 104857600 ≙ 100MiB), must be multiple of 256 KB</p></li>
+</ul>
+</div>
+<div class="section" id="ftp-server">
+<h3>FTP server<a class="headerlink" href="#ftp-server" title="Permalink to this headline"> </a></h3>
+<p>To store artifacts in a FTP server, specify a URI of the form <a class="reference external" href="ftp://user&#64;host/path/to/directory">ftp://user&#64;host/path/to/directory</a> .
+The URI may optionally include a password for logging into the server, e.g. <code class="docutils literal notranslate"><span class="pre">ftp://user:pass&#64;host/path/to/directory</span></code></p>
+</div>
+<div class="section" id="sftp-server">
+<h3>SFTP Server<a class="headerlink" href="#sftp-server" title="Permalink to this headline"> </a></h3>
+<p>To store artifacts in an SFTP server, specify a URI of the form <code class="docutils literal notranslate"><span class="pre">sftp://user&#64;host/path/to/directory</span></code>.
+You should configure the client to be able to log in to the SFTP server without a password over SSH (e.g. public key, identity file in ssh_config, etc.).</p>
+<p>The format <code class="docutils literal notranslate"><span class="pre">sftp://user:pass&#64;host/</span></code> is supported for logging in. However, for safety reasons this is not recommended.</p>
+<p>When using this store, <code class="docutils literal notranslate"><span class="pre">pysftp</span></code> must be installed on both the server and the client. Run <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">pysftp</span></code> to install the required package.</p>
+</div>
+<div class="section" id="nfs">
+<h3>NFS<a class="headerlink" href="#nfs" title="Permalink to this headline"> </a></h3>
+<p>To store artifacts in an NFS mount, specify a URI as a normal file system path, e.g., <code class="docutils literal notranslate"><span class="pre">/mnt/nfs</span></code>.
+This path must be the same on both the server and the client – you may need to use symlinks or remount
+the client in order to enforce this property.</p>
+</div>
+<div class="section" id="hdfs">
+<h3>HDFS<a class="headerlink" href="#hdfs" title="Permalink to this headline"> </a></h3>
+<p>To store artifacts in HDFS, specify a <code class="docutils literal notranslate"><span class="pre">hdfs:</span></code> URI. It can contain host and port: <code class="docutils literal notranslate"><span class="pre">hdfs://&lt;host&gt;:&lt;port&gt;/&lt;path&gt;</span></code> or just the path: <code class="docutils literal notranslate"><span class="pre">hdfs://&lt;path&gt;</span></code>.</p>
+<p>There are also two ways to authenticate to HDFS:</p>
+<ul class="simple">
+<li><p>Use current UNIX account authorization</p></li>
+<li><p>Kerberos credentials using the following environment variables:</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">MLFLOW_KERBEROS_TICKET_CACHE</span><span class="o">=</span>/tmp/krb5cc_22222222
+<span class="nb">export</span><span class="w"> </span><span class="nv">MLFLOW_KERBEROS_USER</span><span class="o">=</span>user_name_to_use
+</pre></div>
+</div>
+<p>Most of the cluster contest settings are read from <code class="docutils literal notranslate"><span class="pre">hdfs-site.xml</span></code> accessed by the HDFS native
+driver using the <code class="docutils literal notranslate"><span class="pre">CLASSPATH</span></code> environment variable.</p>
+<p>The HDFS driver that is used is <code class="docutils literal notranslate"><span class="pre">libhdfs</span></code>.</p>
+</div>
+</div>
+<div class="section" id="deletion-behavior">
+<h2>Deletion Behavior<a class="headerlink" href="#deletion-behavior" title="Permalink to this headline"> </a></h2>
+<p>In order to allow MLflow Runs to be restored, Run metadata and artifacts are not automatically removed
+from the backend store or artifact store when a Run is deleted. The <a class="reference internal" href="../cli.html#cli"><span class="std std-ref">mlflow gc</span></a> CLI is provided
+for permanently removing Run metadata and artifacts for deleted runs.</p>
+</div>
+</div>
+
+
+              </div>
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="backend-stores.html" class="btn btn-neutral" title="Backend Stores" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+      
+      
+        <a href="server.html" class="btn btn-neutral" title="MLflow Tracking Server" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+      <p class="copyright">
+          &copy; MLflow Project, a Series of LF Projects, LLC. All rights reserved.
+      </p>
+
+  </div> 
+
+</footer>
+          </div>
+        </div>
+      </section>
+    </main>
+  </page>
+
+  
+
+
+  
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+      URL_ROOT:'../',
+      VERSION:'2.9.2.dev0',
+      COLLAPSE_INDEX:false,
+      FILE_SUFFIX:'.html',
+      LINK_SUFFIX: '.html',
+      HAS_SOURCE:  true
+    };
+  </script>
+
+  
+
+  <script type="text/javascript" src="../_static/js/clipboard.min.js"></script>
+  <script type="text/javascript" src="../_static/js/jquery.waypoints.min.js"></script>
+
+  
+  
+  
+  <script type="text/javascript">var CLIPPY_SVG_PATH = "../_static/clippy.svg";</script>
+  <script type="text/javascript" src="../_static/js/custom.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.StickyNav.enable();
+    });
+
+  </script>
+  
+
+  
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        // Get the code block designator class entries
+        const allHighlights = document.querySelectorAll('.highlight');
+        // Disable copyable links for notebook cell numbering and for cell outputs
+        const highlights = Array.from(allHighlights).filter(highlight => !highlight.closest('.highlight-none') && 
+            !highlight.closest('.nboutput'));
+    
+        highlights.forEach(function(highlight) {
+            const copyIcon = document.createElement('span');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.innerHTML = '&#xf0ea;';
+
+            copyIcon.addEventListener('click', function() {
+                const code = highlight.querySelector('pre').textContent;
+                copyToClipboard(code);
+
+                // Flash effect on click
+                this.style.color = '#0194E2';
+                setTimeout(() => {
+                    this.style.color = ''; 
+                }, 100);
+
+                // Display "Code copied to clipboard" near the clicked icon
+                const message = document.createElement('span');
+                message.textContent = "Copied!";
+                message.classList.add('copy-message'); 
+
+                // Append the message to the icon
+                this.appendChild(message);
+
+                setTimeout(() => {
+                    this.removeChild(message);
+                }, 500);
+            });
+
+            highlight.appendChild(copyIcon);
+        });
+    });
+  </script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Force download for notebook-download-btn
+        const downloadButtons = document.querySelectorAll('.notebook-download-btn');
+        downloadButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                // Fetch the raw content of the notebook from GitHub
+                fetch(button.href)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = url;
+                        const filename = button.href.split('/').pop();
+                        link.download = filename; 
+
+                        document.body.appendChild(link);
+                        link.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    })
+                    .catch(err => console.error('Error fetching the notebook:', err));
+            });
+        });
+    });
+</script> 
+</body>
+</html>

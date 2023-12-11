@@ -1,0 +1,523 @@
+
+  
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Logging our first runs with MLflow &mdash; MLflow 2.9.2.dev0 documentation</title>
+  
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/getting-started/logging-first-model/step6-logging-a-run.html">
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    
+
+    
+
+  
+    
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/grids.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/mobile.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/simple-cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/tabs.css" type="text/css" />
+    
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="MLflow 2.9.2.dev0 documentation" href="../../index.html"/>
+        <link rel="up" title="Getting Started with MLflow" href="../index.html"/>
+        <link rel="next" title="Logging Your First MLflow Model Notebook" href="/notebooks/index.html"/>
+        <link rel="prev" title="Create a dataset about apples" href="/step5-synthetic-data.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+<script type="text/javascript" src="../../_static/jquery.js"></script>
+<script type="text/javascript" src="../../_static/underscore.js"></script>
+<script type="text/javascript" src="../../_static/doctools.js"></script>
+<script type="text/javascript" src="../../_static/languagesections.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+
+<body class="wy-body-for-nav" role="document">
+  
+
+  
+  <nav class="wy-nav-top header" role="navigation" aria-label="top navigation">
+    <ul>
+  <li class="menu-toggle">
+    <i data-toggle="wy-nav-top" class="wy-nav-top-menu-button db-icon db-icon-menu pull-left"></i>
+    <a href="../../index.html" class="wy-nav-top-logo"
+      ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
+    /></a>
+    <span class="version">2.9.2.dev0</span>
+  </li>
+</ul>
+  </nav>
+  <page>
+    
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side relative">
+      <div class="wy-side-scroll">
+  <div class="wy-side-nav-search">
+    
+
+    
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+    
+  </div>
+
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+    
+      <a href="../../index.html" class="main-navigation-home"><img src="../../_static/icons/nav-home.svg"> MLflow</a>
+    
+
+    
+      
+
+      
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../introduction/index.html">What is MLflow?</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Getting Started with MLflow</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#id1">5-minute Quickstart - MLflow Tracking</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#id2">Logging your first MLflow Model</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../index.html#guide-sections">Guide sections</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="index.html">Tutorial Overview</a></li>
+<li class="toctree-l4"><a class="reference internal" href="step1-tracking-server.html">Starting the MLflow Tracking Server</a></li>
+<li class="toctree-l4"><a class="reference internal" href="step2-mlflow-client.html">Using the MLflow Client API</a></li>
+<li class="toctree-l4"><a class="reference internal" href="step3-create-experiment.html">Creating Experiments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="step4-experiment-search.html">Searching Experiments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="step5-synthetic-data.html">Create a dataset about apples</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Logging our first runs with MLflow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="notebooks/index.html">Logging Your First MLflow Model Notebook</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#id3">15 minute Quickstart - Autologging in MLflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#id4">15 minute Quickstart - Comparing Runs and Deploying your Best Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#id5">5 Minute Tracking Server Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../new-features/index.html">New Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../llms/index.html">LLMs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../model-evaluation/index.html">Model Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../deep-learning/index.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../traditional-ml/index.html">Traditional ML</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../deployment/index.html">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tracking.html">MLflow Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../system-metrics/index.html">System Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../projects.html">MLflow Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../models.html">MLflow Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../model-registry.html">MLflow Model Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../recipes.html">MLflow Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plugins.html">MLflow Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auth/index.html">MLflow Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../search-runs.html">Search Runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../search-experiments.html">Search Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../python_api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../R-api.html">R API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../java_api/index.html">Java API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rest-api.html">REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../docker.html">Official MLflow Docker Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../community-model-flavors.html">Community Model Flavors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials-and-examples/index.html">Tutorials and Examples</a></li>
+</ul>
+
+      
+    
+  </div>
+
+  <div role="contentinfo">
+    
+
+    <p>
+      <a id='feedbacklink' href="https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a>
+    </p>
+  </div>
+</div>
+    </nav>
+
+    <main class="wy-grid-for-nav">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+          <div class="rst-content">
+            
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Documentation</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../index.html">Getting Started with MLflow</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+    
+      <li>Logging our first runs with MLflow</li>
+    
+    
+    <!-- <li class="wy-breadcrumbs-aside">
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/getting-started/logging-first-model/step6-logging-a-run.rst" class="fa fa-github"> Edit on GitHub</a>
+    </li> -->
+    
+  </ul>
+</div>
+            <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <div itemprop="articleBody">
+                
+  <div class="section" id="logging-our-first-runs-with-mlflow">
+<h1>Logging our first runs with MLflow<a class="headerlink" href="#logging-our-first-runs-with-mlflow" title="Permalink to this headline"> </a></h1>
+<p>In our previous segments, we worked through setting up our first MLflow Experiment and equipped it
+with custom tags. These tags, as we’ll soon discover, are instrumental in seamlessly retrieving
+related experiments that belong to a broader project.</p>
+<p>In the last section, we created a dataset that we’ll be using to train a series of models.</p>
+<p>As we advance in this section, we’ll delve deeper into the core features of MLflow Tracking:</p>
+<ul class="simple">
+<li><p>Making use of the <code class="docutils literal notranslate"><span class="pre">start_run</span></code> context for creating and efficiently managing runs.</p></li>
+<li><p>An introduction to logging, covering tags, parameters, and metrics.</p></li>
+<li><p>Understanding the role and formation of a model signature.</p></li>
+<li><p>Logging a trained model, solidifying its presence in our MLflow run.</p></li>
+</ul>
+<p>But first, a foundational step awaits us. For our upcoming tasks, we need a dataset, specifically
+focused on apple sales. While it’s tempting to scour the internet for one, crafting our own dataset
+will ensure it aligns perfectly with our objectives.</p>
+<div class="section" id="crafting-the-apple-sales-dataset">
+<h2>Crafting the Apple Sales Dataset<a class="headerlink" href="#crafting-the-apple-sales-dataset" title="Permalink to this headline"> </a></h2>
+<p>Let’s roll up our sleeves and construct this dataset.</p>
+<p>We need a data set that defines the dynamics of apple sales influenced by various factors like
+weekends, promotions, and fluctuating prices. This dataset will serve as the bedrock upon which
+our predictive models will be built and tested.</p>
+<p>Before we get to that, though, let’s take a look at what we’ve learned so far and how these principles
+were used when crafting this data set for the purposes of this tutorial.</p>
+<div class="section" id="using-experiments-in-early-stage-project-development">
+<h3>Using Experiments in early-stage project development<a class="headerlink" href="#using-experiments-in-early-stage-project-development" title="Permalink to this headline"> </a></h3>
+<p>As the diagram below shows, I tried taking a series of shortcuts. In order to record what I was trying,
+I created a new MLflow Experiment to record the state of what I tried. Since I was using different data
+sets and models, each subsequent modification that I was trying necessitated a new Experiment.</p>
+<div class="figure align-center" id="id1">
+<a class="reference internal image-reference" href="../../_images/dogfood-diagram.svg"><img alt="Using MLflow Tracking for building this demo" src="../../_images/dogfood-diagram.svg" width="1024px" /></a>
+<p class="caption"><span class="caption-text">Using Experiments in MLflow Tracking to keep track of building this tutorial</span><a class="headerlink" href="#id1" title="Permalink to this image"> </a></p>
+</div>
+<p>After finding a workable approach for the dataset generator, the results can be seen in the MLflow
+UI.</p>
+<div class="figure align-center" id="id2">
+<a class="reference internal image-reference" href="../../_images/dogfood.gif"><img alt="Checking the results of the test" src="../../_images/dogfood.gif" style="width: 1024px;" /></a>
+<p class="caption"><span class="caption-text">Validating the results of a training run in the MLflow UI</span><a class="headerlink" href="#id2" title="Permalink to this image"> </a></p>
+</div>
+<p>Once I found something that actually worked, I cleaned everything up (deleted them).</p>
+<div class="figure align-center" id="id3">
+<a class="reference internal image-reference" href="../../_images/cleanup-experiments.gif"><img alt="Tidying up" src="../../_images/cleanup-experiments.gif" style="width: 1024px;" /></a>
+<p class="caption"><span class="caption-text">Removing experiments that were filled with failed attempts</span><a class="headerlink" href="#id3" title="Permalink to this image"> </a></p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you’re precisely following along to this tutorial and you delete your <code class="docutils literal notranslate"><span class="pre">Apple_Models</span></code>
+Experiment, recreate it before proceeding to the next step in the tutorial.</p>
+</div>
+</div>
+</div>
+<div class="section" id="using-mlflow-tracking-to-keep-track-of-training">
+<h2>Using MLflow Tracking to keep track of training<a class="headerlink" href="#using-mlflow-tracking-to-keep-track-of-training" title="Permalink to this headline"> </a></h2>
+<p>Now that we have our data set and have seen a little bit of how runs are recorded, let’s dive in to
+using MLflow to tracking a training iteration.</p>
+<p>To start with, we will need to import our required modules.</p>
+<div class="code-section docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestRegressor</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">mean_absolute_error</span><span class="p">,</span> <span class="n">mean_squared_error</span><span class="p">,</span> <span class="n">r2_score</span>
+</pre></div>
+</div>
+</div>
+<p>Notice that here we aren’t importing the <code class="docutils literal notranslate"><span class="pre">MlflowClient</span></code> directly. For this portion, we’re going to
+be using the <code class="docutils literal notranslate"><span class="pre">fluent</span></code> API. The fluent APIs use a globally referenced state of the MLflow tracking
+server’s uri. This global instance allows for us to use these ‘higher-level’ (simpler) APIs to perform
+every action that we can otherwise do with the <code class="docutils literal notranslate"><span class="pre">MlflowClient</span></code>, with the addition of some other useful
+syntax (such as context handlers that we’ll be using very shortly) to make integrating MLflow to
+ML workloads as simple as possible.</p>
+<p>In order to use the <code class="docutils literal notranslate"><span class="pre">fluent</span></code> API, we’ll need to set the global reference to the Tracking server’s
+address. We do this via the following command:</p>
+<div class="code-section docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mlflow</span><span class="o">.</span><span class="n">set_tracking_uri</span><span class="p">(</span><span class="s2">&quot;http://127.0.0.1:8080&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Once this is set, we can define a few more constants that we’re going to be using when logging our
+training events to MLflow in the form of runs. We’ll start by defining an Experiment that will be used
+to log runs to. The parent-child relationship of Experiments to Runs and its utility will become very
+clear once we start iterating over some ideas and need to compare the results of our tests.</p>
+<div class="code-section docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Sets the current active experiment to the &quot;Apple_Models&quot; experiment and</span>
+<span class="c1"># returns the Experiment metadata</span>
+<span class="n">apple_experiment</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s2">&quot;Apple_Models&quot;</span><span class="p">)</span>
+
+<span class="c1"># Define a run name for this iteration of training.</span>
+<span class="c1"># If this is not set, a unique name will be auto-generated for your run.</span>
+<span class="n">run_name</span> <span class="o">=</span> <span class="s2">&quot;apples_rf_test&quot;</span>
+
+<span class="c1"># Define an artifact path that the model will be saved to.</span>
+<span class="n">artifact_path</span> <span class="o">=</span> <span class="s2">&quot;rf_apples&quot;</span>
+</pre></div>
+</div>
+</div>
+<p>With these variables defined, we can commence with actually training a model.</p>
+<p>Firstly, let’s look at what we’re going to be running. Following the code display, we’ll look at
+an annotated version of the code.</p>
+<div class="code-section docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Split the data into features and target and drop irrelevant date field and target field</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;date&quot;</span><span class="p">,</span> <span class="s2">&quot;demand&quot;</span><span class="p">])</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;demand&quot;</span><span class="p">]</span>
+
+<span class="c1"># Split the data into training and validation sets</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_val</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_val</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+
+<span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;n_estimators&quot;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+    <span class="s2">&quot;max_depth&quot;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
+    <span class="s2">&quot;min_samples_split&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="s2">&quot;min_samples_leaf&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="s2">&quot;bootstrap&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s2">&quot;oob_score&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s2">&quot;random_state&quot;</span><span class="p">:</span> <span class="mi">888</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="c1"># Train the RandomForestRegressor</span>
+<span class="n">rf</span> <span class="o">=</span> <span class="n">RandomForestRegressor</span><span class="p">(</span><span class="o">**</span><span class="n">params</span><span class="p">)</span>
+
+<span class="c1"># Fit the model on the training data</span>
+<span class="n">rf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Predict on the validation set</span>
+<span class="n">y_pred</span> <span class="o">=</span> <span class="n">rf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_val</span><span class="p">)</span>
+
+<span class="c1"># Calculate error metrics</span>
+<span class="n">mae</span> <span class="o">=</span> <span class="n">mean_absolute_error</span><span class="p">(</span><span class="n">y_val</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+<span class="n">mse</span> <span class="o">=</span> <span class="n">mean_squared_error</span><span class="p">(</span><span class="n">y_val</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+<span class="n">rmse</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">mse</span><span class="p">)</span>
+<span class="n">r2</span> <span class="o">=</span> <span class="n">r2_score</span><span class="p">(</span><span class="n">y_val</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+
+<span class="c1"># Assemble the metrics we&#39;re going to write into a collection</span>
+<span class="n">metrics</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;mae&quot;</span><span class="p">:</span> <span class="n">mae</span><span class="p">,</span> <span class="s2">&quot;mse&quot;</span><span class="p">:</span> <span class="n">mse</span><span class="p">,</span> <span class="s2">&quot;rmse&quot;</span><span class="p">:</span> <span class="n">rmse</span><span class="p">,</span> <span class="s2">&quot;r2&quot;</span><span class="p">:</span> <span class="n">r2</span><span class="p">}</span>
+
+<span class="c1"># Initiate the MLflow run context</span>
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">(</span><span class="n">run_name</span><span class="o">=</span><span class="n">run_name</span><span class="p">)</span> <span class="k">as</span> <span class="n">run</span><span class="p">:</span>
+    <span class="c1"># Log the parameters used for the model fit</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_params</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+    <span class="c1"># Log the error metrics that were calculated during validation</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_metrics</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span>
+
+    <span class="c1"># Log an instance of the trained model for later use</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">sklearn</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+        <span class="n">sk_model</span><span class="o">=</span><span class="n">rf</span><span class="p">,</span> <span class="n">input_example</span><span class="o">=</span><span class="n">X_val</span><span class="p">,</span> <span class="n">artifact_path</span><span class="o">=</span><span class="n">artifact_path</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>To aid in visualizing how MLflow tracking API calls add in to an ML training code base, see the figure below.</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="../../_images/training-annotation.svg"><img alt="Explanation of MLflow integration into ML training code" src="../../_images/training-annotation.svg" width="1024px" /></a>
+</div>
+</div>
+<div class="section" id="putting-it-all-together">
+<h2>Putting it all together<a class="headerlink" href="#putting-it-all-together" title="Permalink to this headline"> </a></h2>
+<p>Let’s see what this looks like when we run our model training code and navigate to the MLflow UI.</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="../../_images/logging-first-model.gif"><img alt="Log the model to MLflow" src="../../_images/logging-first-model.gif" style="width: 1024px;" /></a>
+</div>
+</div>
+</div>
+
+
+              </div>
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="step5-synthetic-data.html" class="btn btn-neutral" title="Create a dataset about apples" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+      
+      
+        <a href="notebooks/index.html" class="btn btn-neutral" title="Logging Your First MLflow Model Notebook" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+      <p class="copyright">
+          &copy; MLflow Project, a Series of LF Projects, LLC. All rights reserved.
+      </p>
+
+  </div> 
+
+</footer>
+          </div>
+        </div>
+      </section>
+    </main>
+  </page>
+
+  
+
+
+  
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+      URL_ROOT:'../../',
+      VERSION:'2.9.2.dev0',
+      COLLAPSE_INDEX:false,
+      FILE_SUFFIX:'.html',
+      LINK_SUFFIX: '.html',
+      HAS_SOURCE:  true
+    };
+  </script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/clipboard.min.js"></script>
+  <script type="text/javascript" src="../../_static/js/jquery.waypoints.min.js"></script>
+
+  
+  
+  
+  <script type="text/javascript">var CLIPPY_SVG_PATH = "../../_static/clippy.svg";</script>
+  <script type="text/javascript" src="../../_static/js/custom.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.StickyNav.enable();
+    });
+
+  </script>
+  
+
+  
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        // Get the code block designator class entries
+        const allHighlights = document.querySelectorAll('.highlight');
+        // Disable copyable links for notebook cell numbering and for cell outputs
+        const highlights = Array.from(allHighlights).filter(highlight => !highlight.closest('.highlight-none') && 
+            !highlight.closest('.nboutput'));
+    
+        highlights.forEach(function(highlight) {
+            const copyIcon = document.createElement('span');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.innerHTML = '&#xf0ea;';
+
+            copyIcon.addEventListener('click', function() {
+                const code = highlight.querySelector('pre').textContent;
+                copyToClipboard(code);
+
+                // Flash effect on click
+                this.style.color = '#0194E2';
+                setTimeout(() => {
+                    this.style.color = ''; 
+                }, 100);
+
+                // Display "Code copied to clipboard" near the clicked icon
+                const message = document.createElement('span');
+                message.textContent = "Copied!";
+                message.classList.add('copy-message'); 
+
+                // Append the message to the icon
+                this.appendChild(message);
+
+                setTimeout(() => {
+                    this.removeChild(message);
+                }, 500);
+            });
+
+            highlight.appendChild(copyIcon);
+        });
+    });
+  </script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Force download for notebook-download-btn
+        const downloadButtons = document.querySelectorAll('.notebook-download-btn');
+        downloadButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                // Fetch the raw content of the notebook from GitHub
+                fetch(button.href)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = url;
+                        const filename = button.href.split('/').pop();
+                        link.download = filename; 
+
+                        document.body.appendChild(link);
+                        link.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    })
+                    .catch(err => console.error('Error fetching the notebook:', err));
+            });
+        });
+    });
+</script> 
+</body>
+</html>

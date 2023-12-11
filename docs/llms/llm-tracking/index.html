@@ -1,0 +1,402 @@
+
+  
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>MLflow’s LLM Tracking Capabilities &mdash; MLflow 2.9.2.dev0 documentation</title>
+  
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/llms/llm-tracking/index.html">
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    
+
+    
+
+  
+    
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/grids.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/mobile.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/simple-cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/tabs.css" type="text/css" />
+    
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="MLflow 2.9.2.dev0 documentation" href="../../index.html"/>
+        <link rel="up" title="LLMs" href="../index.html"/>
+        <link rel="next" title="Retrieval Augmented Generation (RAG)" href="/../rag/index.html"/>
+        <link rel="prev" title="Sentence Transformers within MLflow" href="/../sentence-transformers/guide/index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+<script type="text/javascript" src="../../_static/jquery.js"></script>
+<script type="text/javascript" src="../../_static/underscore.js"></script>
+<script type="text/javascript" src="../../_static/doctools.js"></script>
+<script type="text/javascript" src="../../_static/languagesections.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+
+<body class="wy-body-for-nav" role="document">
+  
+
+  
+  <nav class="wy-nav-top header" role="navigation" aria-label="top navigation">
+    <ul>
+  <li class="menu-toggle">
+    <i data-toggle="wy-nav-top" class="wy-nav-top-menu-button db-icon db-icon-menu pull-left"></i>
+    <a href="../../index.html" class="wy-nav-top-logo"
+      ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
+    /></a>
+    <span class="version">2.9.2.dev0</span>
+  </li>
+</ul>
+  </nav>
+  <page>
+    
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side relative">
+      <div class="wy-side-scroll">
+  <div class="wy-side-nav-search">
+    
+
+    
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+    
+  </div>
+
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+    
+      <a href="../../index.html" class="main-navigation-home"><img src="../../_static/icons/nav-home.svg"> MLflow</a>
+    
+
+    
+      
+
+      
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../introduction/index.html">What is MLflow?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started/index.html">Getting Started with MLflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../new-features/index.html">New Features</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">LLMs</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#id1">MLflow Deployments Server for LLMs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#id3">LLM Evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#id4">Prompt Engineering UI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#native-mlflow-flavors-for-llms">Native MLflow Flavors for LLMs</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#id5">LLM Tracking in MLflow</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">MLflow’s LLM Tracking Capabilities</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#introduction-to-llm-tracking">Introduction to LLM Tracking</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#detailed-logging-of-llm-interactions">Detailed Logging of LLM Interactions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#structured-storage-of-llm-tracking-data">Structured Storage of LLM Tracking Data</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../index.html#benefits-of-the-mlflow-llm-tracking-system">Benefits of the MLflow LLM Tracking System</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#tutorials-and-use-case-guides-for-llms-in-mlflow">Tutorials and Use Case Guides for LLMs in MLflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../model-evaluation/index.html">Model Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../deep-learning/index.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../traditional-ml/index.html">Traditional ML</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../deployment/index.html">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tracking.html">MLflow Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../system-metrics/index.html">System Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../projects.html">MLflow Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../models.html">MLflow Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../model-registry.html">MLflow Model Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../recipes.html">MLflow Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plugins.html">MLflow Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auth/index.html">MLflow Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../search-runs.html">Search Runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../search-experiments.html">Search Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../python_api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../R-api.html">R API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../java_api/index.html">Java API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rest-api.html">REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../docker.html">Official MLflow Docker Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../community-model-flavors.html">Community Model Flavors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials-and-examples/index.html">Tutorials and Examples</a></li>
+</ul>
+
+      
+    
+  </div>
+
+  <div role="contentinfo">
+    
+
+    <p>
+      <a id='feedbacklink' href="https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a>
+    </p>
+  </div>
+</div>
+    </nav>
+
+    <main class="wy-grid-for-nav">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+          <div class="rst-content">
+            
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Documentation</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../index.html">LLMs</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+    
+      <li>MLflow’s LLM Tracking Capabilities</li>
+    
+    
+    <!-- <li class="wy-breadcrumbs-aside">
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/llms/llm-tracking/index.rst" class="fa fa-github"> Edit on GitHub</a>
+    </li> -->
+    
+  </ul>
+</div>
+            <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <div itemprop="articleBody">
+                
+  <div class="section" id="mlflow-s-llm-tracking-capabilities">
+<span id="llm-tracking"></span><h1>MLflow’s LLM Tracking Capabilities<a class="headerlink" href="#mlflow-s-llm-tracking-capabilities" title="Permalink to this headline"> </a></h1>
+<p>MLflow’s LLM Tracking system is an enhancement to the existing MLflow Tracking system, offerring additional capabilities for monitoring,
+managing, and interpreting interactions with Large Language Models (LLMs).</p>
+<p>At its core, MLflow’s LLM suite builds upon the standard logging capabilities familiar to professionals working with traditional
+Machine Learning (ML) and Deep Learning (DL). However, it introduces distinct features tailored for the unique intricacies of LLMs.</p>
+<p>One such standout feature is the introduction of “prompts” – the queries or inputs directed towards an LLM – and the subsequent data
+the model generates in response. While MLflow’s offerings for other model types typically exclude built-in mechanisms for preserving
+inference results, LLMs necessitate this due to their dynamic and generative nature. Recognizing this, MLflow introduces the term
+‘predictions’ alongside the existing tracking components of <strong>artifacts</strong>, <strong>parameters</strong>, <strong>tags</strong>, and <strong>metrics</strong>, ensuring comprehensive
+lineage and quality tracking for text-generating models.</p>
+<div class="section" id="introduction-to-llm-tracking">
+<span id="llm-tracking-introduction"></span><h2>Introduction to LLM Tracking<a class="headerlink" href="#introduction-to-llm-tracking" title="Permalink to this headline"> </a></h2>
+<p>The world of Large Language Models is vast, and as these models become more intricate and sophisticated, the need for a robust
+tracking system becomes paramount. MLflow’s LLM Tracking is centered around the concept of <em>runs</em>. In essence, a run is a
+distinct execution or interaction with the LLM — whether it’s a single query, a batch of prompts, or an entire fine-tuning session.</p>
+<p>Each run meticulously records:</p>
+<ul class="simple">
+<li><p><strong>Parameters</strong>: Key-value pairs that detail the input parameters for the LLM. These could range from model-specific parameters like <cite>top_k</cite> and <cite>temperature</cite> to more generic ones. They provide context and configuration for each run. Parameters can be logged using both <a class="reference internal" href="../../python_api/mlflow.html#mlflow.log_param" title="mlflow.log_param"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.log_param()</span></code></a> for individual entries and <a class="reference internal" href="../../python_api/mlflow.html#mlflow.log_params" title="mlflow.log_params"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.log_params()</span></code></a> for bulk logging.</p></li>
+<li><p><strong>Metrics</strong>: These are quantitative measures, often numeric, that give insights into the performance, accuracy, or any other measurable aspect of the LLM interaction. Metrics are dynamic and can be updated as the run progresses, offering a real-time or post-process insight into the model’s behavior. Logging of metrics is facilitated through <a class="reference internal" href="../../python_api/mlflow.html#mlflow.log_metric" title="mlflow.log_metric"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.log_metric()</span></code></a> and <a class="reference internal" href="../../python_api/mlflow.html#mlflow.log_metrics" title="mlflow.log_metrics"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.log_metrics()</span></code></a>.</p></li>
+<li><p><strong>Predictions</strong>: To understand and evaluate LLM outputs, MLflow allows for the logging of predictions. This encompasses the prompts or inputs sent to the LLM and the outputs or responses received. For structured storage and easy retrieval, these predictions are stored as artifacts in CSV format, ensuring that each interaction is preserved in its entirety. This logging is achieved using the dedicated <a class="reference internal" href="../../python_api/mlflow.html#mlflow.log_table" title="mlflow.log_table"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.log_table()</span></code></a>.</p></li>
+<li><p><strong>Artifacts</strong>: Beyond predictions, MLflow’s LLM Tracking can store a myriad of output files, ranging from visualization images (e.g., PNGs), serialized models (e.g., an <cite>openai</cite> model), to structured data files (e.g., a <a class="reference external" href="https://parquet.apache.org/">Parquet</a> file). The <a class="reference internal" href="../../python_api/mlflow.html#mlflow.log_artifact" title="mlflow.log_artifact"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.log_artifact()</span></code></a> function is at the heart of this, allowing users to log and organize their artifacts with ease.</p></li>
+</ul>
+<p>Furthermore, to provide structured organization and comparative analysis capabilities, runs can be grouped into <em>experiments</em>.
+These experiments act as containers, grouping related runs, and providing a higher level of organization. This organization ensures
+that related runs can be compared, analyzed, and managed as a cohesive unit.</p>
+</div>
+<div class="section" id="detailed-logging-of-llm-interactions">
+<span id="how-llm-data-is-captured"></span><h2>Detailed Logging of LLM Interactions<a class="headerlink" href="#detailed-logging-of-llm-interactions" title="Permalink to this headline"> </a></h2>
+<p>MLflow’s LLM Tracking doesn’t just record data — it offers structured logging mechanisms tailored to the needs of LLM interactions:</p>
+<ul class="simple">
+<li><p><strong>Parameters</strong>: Logging parameters is straightforward. Whether you’re logging a single parameter using <a class="reference internal" href="../../python_api/mlflow.html#mlflow.log_param" title="mlflow.log_param"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.log_param()</span></code></a> or multiple parameters simultaneously with <a class="reference internal" href="../../python_api/mlflow.html#mlflow.log_params" title="mlflow.log_params"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.log_params()</span></code></a>, MLflow ensures that every detail is captured.</p></li>
+<li><p><strong>Metrics</strong>: Quantitative insights are crucial. Whether it’s tracking the accuracy of a fine-tuned LLM or understanding its response time, metrics provide this insight. They can be logged individually via <a class="reference internal" href="../../python_api/mlflow.html#mlflow.log_metric" title="mlflow.log_metric"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.log_metric()</span></code></a> or in bulk using <a class="reference internal" href="../../python_api/mlflow.html#mlflow.log_metrics" title="mlflow.log_metrics"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.log_metrics()</span></code></a>.</p></li>
+<li><p><strong>Predictions</strong>: Every interaction with an LLM yields a result — a prediction. Capturing this prediction, along with the inputs that led to it, is crucial. The <a class="reference internal" href="../../python_api/mlflow.html#mlflow.log_table" title="mlflow.log_table"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.log_table()</span></code></a> function is specifically designed for this, ensuring that both inputs and outputs are logged cohesively.</p></li>
+<li><p><strong>Artifacts</strong>: Artifacts act as the tangible outputs of an LLM run. They can be images, models, or any other form of data. Logging them is seamless with <a class="reference internal" href="../../python_api/mlflow.html#mlflow.log_artifact" title="mlflow.log_artifact"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.log_artifact()</span></code></a>, which ensures that every piece of data, regardless of its format, is stored and linked to its respective run.</p></li>
+</ul>
+</div>
+<div class="section" id="structured-storage-of-llm-tracking-data">
+<span id="storage-of-llm-data"></span><h2>Structured Storage of LLM Tracking Data<a class="headerlink" href="#structured-storage-of-llm-tracking-data" title="Permalink to this headline"> </a></h2>
+<p>Every piece of data, every parameter, metric, prediction, and artifact is not just logged — it’s structured and stored as part of an
+MLflow Experiment run. This organization ensures data integrity, easy retrieval, and a structured approach to analyzing and understanding
+LLM interactions in the grand scheme of machine learning workflows.</p>
+</div>
+</div>
+
+
+              </div>
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../sentence-transformers/guide/index.html" class="btn btn-neutral" title="Sentence Transformers within MLflow" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+      
+      
+        <a href="../rag/index.html" class="btn btn-neutral" title="Retrieval Augmented Generation (RAG)" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+      <p class="copyright">
+          &copy; MLflow Project, a Series of LF Projects, LLC. All rights reserved.
+      </p>
+
+  </div> 
+
+</footer>
+          </div>
+        </div>
+      </section>
+    </main>
+  </page>
+
+  
+
+
+  
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+      URL_ROOT:'../../',
+      VERSION:'2.9.2.dev0',
+      COLLAPSE_INDEX:false,
+      FILE_SUFFIX:'.html',
+      LINK_SUFFIX: '.html',
+      HAS_SOURCE:  true
+    };
+  </script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/clipboard.min.js"></script>
+  <script type="text/javascript" src="../../_static/js/jquery.waypoints.min.js"></script>
+
+  
+  
+  
+  <script type="text/javascript">var CLIPPY_SVG_PATH = "../../_static/clippy.svg";</script>
+  <script type="text/javascript" src="../../_static/js/custom.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.StickyNav.enable();
+    });
+
+  </script>
+  
+
+  
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        // Get the code block designator class entries
+        const allHighlights = document.querySelectorAll('.highlight');
+        // Disable copyable links for notebook cell numbering and for cell outputs
+        const highlights = Array.from(allHighlights).filter(highlight => !highlight.closest('.highlight-none') && 
+            !highlight.closest('.nboutput'));
+    
+        highlights.forEach(function(highlight) {
+            const copyIcon = document.createElement('span');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.innerHTML = '&#xf0ea;';
+
+            copyIcon.addEventListener('click', function() {
+                const code = highlight.querySelector('pre').textContent;
+                copyToClipboard(code);
+
+                // Flash effect on click
+                this.style.color = '#0194E2';
+                setTimeout(() => {
+                    this.style.color = ''; 
+                }, 100);
+
+                // Display "Code copied to clipboard" near the clicked icon
+                const message = document.createElement('span');
+                message.textContent = "Copied!";
+                message.classList.add('copy-message'); 
+
+                // Append the message to the icon
+                this.appendChild(message);
+
+                setTimeout(() => {
+                    this.removeChild(message);
+                }, 500);
+            });
+
+            highlight.appendChild(copyIcon);
+        });
+    });
+  </script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Force download for notebook-download-btn
+        const downloadButtons = document.querySelectorAll('.notebook-download-btn');
+        downloadButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                // Fetch the raw content of the notebook from GitHub
+                fetch(button.href)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = url;
+                        const filename = button.href.split('/').pop();
+                        link.download = filename; 
+
+                        document.body.appendChild(link);
+                        link.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    })
+                    .catch(err => console.error('Error fetching the notebook:', err));
+            });
+        });
+    });
+</script> 
+</body>
+</html>

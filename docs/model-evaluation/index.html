@@ -1,0 +1,423 @@
+
+  
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Model Evaluation &mdash; MLflow 2.9.2.dev0 documentation</title>
+  
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/model-evaluation/index.html">
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    
+
+    
+
+  
+    
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/cards.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/grids.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/mobile.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/simple-cards.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/tabs.css" type="text/css" />
+    
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="MLflow 2.9.2.dev0 documentation" href="../index.html"/>
+        <link rel="next" title="Deep Learning" href="/../deep-learning/index.html"/>
+        <link rel="prev" title="MLflow AI Gateway Migration Guide" href="/../llms/gateway/migration.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+<script type="text/javascript" src="../_static/jquery.js"></script>
+<script type="text/javascript" src="../_static/underscore.js"></script>
+<script type="text/javascript" src="../_static/doctools.js"></script>
+<script type="text/javascript" src="../_static/languagesections.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+
+<body class="wy-body-for-nav" role="document">
+  
+
+  
+  <nav class="wy-nav-top header" role="navigation" aria-label="top navigation">
+    <ul>
+  <li class="menu-toggle">
+    <i data-toggle="wy-nav-top" class="wy-nav-top-menu-button db-icon db-icon-menu pull-left"></i>
+    <a href="../index.html" class="wy-nav-top-logo"
+      ><img src="../_static/MLflow-logo-final-black.png" alt="MLflow"
+    /></a>
+    <span class="version">2.9.2.dev0</span>
+  </li>
+</ul>
+  </nav>
+  <page>
+    
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side relative">
+      <div class="wy-side-scroll">
+  <div class="wy-side-nav-search">
+    
+
+    
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+    
+  </div>
+
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+    
+      <a href="../index.html" class="main-navigation-home"><img src="../_static/icons/nav-home.svg"> MLflow</a>
+    
+
+    
+      
+
+      
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../introduction/index.html">What is MLflow?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/index.html">Getting Started with MLflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../new-features/index.html">New Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../llms/index.html">LLMs</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Model Evaluation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#harnessing-the-power-of-automation">Harnessing the Power of Automation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id1">LLM Model Evaluation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#guides-and-tutorials-for-llm-model-evaluation">Guides and Tutorials for LLM Model Evaluation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id2">Traditional ML Evaluation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../deep-learning/index.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../traditional-ml/index.html">Traditional ML</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/index.html">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tracking.html">MLflow Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system-metrics/index.html">System Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../projects.html">MLflow Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.html">MLflow Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../model-registry.html">MLflow Model Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../recipes.html">MLflow Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plugins.html">MLflow Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auth/index.html">MLflow Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../search-runs.html">Search Runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../search-experiments.html">Search Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python_api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../R-api.html">R API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../java_api/index.html">Java API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rest-api.html">REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docker.html">Official MLflow Docker Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../community-model-flavors.html">Community Model Flavors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials-and-examples/index.html">Tutorials and Examples</a></li>
+</ul>
+
+      
+    
+  </div>
+
+  <div role="contentinfo">
+    
+
+    <p>
+      <a id='feedbacklink' href="https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a>
+    </p>
+  </div>
+</div>
+    </nav>
+
+    <main class="wy-grid-for-nav">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+          <div class="rst-content">
+            
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Documentation</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+    
+      <li>Model Evaluation</li>
+    
+    
+    <!-- <li class="wy-breadcrumbs-aside">
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/model-evaluation/index.rst" class="fa fa-github"> Edit on GitHub</a>
+    </li> -->
+    
+  </ul>
+</div>
+            <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <div itemprop="articleBody">
+                
+  <div class="section" id="model-evaluation">
+<h1>Model Evaluation<a class="headerlink" href="#model-evaluation" title="Permalink to this headline"> </a></h1>
+<div class="section" id="harnessing-the-power-of-automation">
+<h2>Harnessing the Power of Automation<a class="headerlink" href="#harnessing-the-power-of-automation" title="Permalink to this headline"> </a></h2>
+<p>In the evolving landscape of machine learning, the evaluation phase of model development is just as important as ever.
+Ensuring the accuracy, reliability, and efficiency of models is paramount to ensure that the model that has been trained has been as thoroughly
+validated as it can be prior to promoting it beyond the development phase.</p>
+<p>However, manual evaluation can be tedious, error-prone, and time-consuming.</p>
+<p>MLflow addresses these challenges head-on, offering a suite of automated tools that streamline the evaluation process,
+saving time and enhancing accuracy, helping you to have confidence that the solution that you’ve spent so much time working on will meet the
+needs of the problem you’re trying to solve.</p>
+</div>
+<div class="section" id="id1">
+<h2><a class="reference external" href="../llms/llm-evaluate/index.html">LLM Model Evaluation</a><a class="headerlink" href="#id1" title="Permalink to this headline"> </a></h2>
+<p>The rise of Large Language Models (LLMs) like ChatGPT has transformed the landscape of text generation, finding applications in question answering, translation, and text summarization. However, evaluating LLMs introduces unique challenges, primarily because there’s often no single ground truth to compare against. MLflow’s evaluation tools are tailored for LLMs, ensuring a streamlined and accurate evaluation process.</p>
+<p><strong>Key Features</strong>:</p>
+<ul class="simple">
+<li><p><strong>Versatile Model Evaluation</strong>: MLflow supports evaluating various types of LLMs, whether it’s an MLflow pyfunc model, a URI pointing to a registered MLflow model, or any python callable representing your model.</p></li>
+<li><p><strong>Comprehensive Metrics</strong>: MLflow offers a range of metrics for LLM evaluation. From metrics that rely on SaaS models like OpenAI for scoring (e.g., <a class="reference internal" href="../python_api/mlflow.metrics.html#mlflow.metrics.genai.answer_relevance" title="mlflow.metrics.genai.answer_relevance"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.metrics.genai.answer_relevance()</span></code></a>) to function-based per-row metrics such as Rouge (<a class="reference internal" href="../python_api/mlflow.metrics.html#mlflow.metrics.rougeL" title="mlflow.metrics.rougeL"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.metrics.rougeL()</span></code></a>) or Flesch Kincaid (<a class="reference internal" href="../python_api/mlflow.metrics.html#mlflow.metrics.flesch_kincaid_grade_level" title="mlflow.metrics.flesch_kincaid_grade_level"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.metrics.flesch_kincaid_grade_level()</span></code></a>).</p></li>
+<li><p><strong>Predefined Metric Collections</strong>: Depending on your LLM use case, MLflow provides predefined metric collections, such as “question-answering” or “text-summarization”, simplifying the evaluation process.</p></li>
+<li><p><strong>Custom Metric Creation</strong>: Beyond the predefined metrics, MLflow allows users to create custom LLM evaluation metrics. Whether you’re looking to evaluate the professionalism of a response or any other custom criteria, MLflow provides the tools to define and implement these metrics.</p></li>
+<li><p><strong>Evaluation with Static Datasets</strong>: As of MLflow 2.8.0, you can evaluate a static dataset without specifying a model. This is especially useful when you’ve saved model outputs in a dataset and want a swift evaluation without rerunning the model.</p></li>
+<li><p><strong>Integrated Results View</strong>: MLflow’s <a class="reference internal" href="../python_api/mlflow.html#mlflow.evaluate" title="mlflow.evaluate"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code></a> returns comprehensive evaluation results, which can be viewed directly in the code or through the MLflow UI for a more visual representation.</p></li>
+</ul>
+<p>Harnessing these features, MLflow’s LLM evaluation tools eliminate the complexities and ambiguities associated with evaluating large language models. By automating these critical evaluation tasks, MLflow ensures that users can confidently assess the performance of their LLMs, leading to more informed decisions in the deployment and application of these models.</p>
+<div class="section" id="guides-and-tutorials-for-llm-model-evaluation">
+<h3>Guides and Tutorials for LLM Model Evaluation<a class="headerlink" href="#guides-and-tutorials-for-llm-model-evaluation" title="Permalink to this headline"> </a></h3>
+<p>To learn more about how you can leverage MLflow’s evaluation features for your LLM-powered project work, see the tutorials below:</p>
+<section>
+    <article class="simple-grid">
+        <div class="simple-card">
+            <a href="../llms/llm-evaluate/notebooks/rag-evaluation.html">
+                <div class="header">
+                    RAG Evaluation
+                </div>
+                <p>
+                    Learn how to evaluate a Retrieval Augmented Generation setup with MLflow Evaluate
+                </p>
+            </a>
+        </div>
+        <div class="simple-card">
+            <a href="../llms/llm-evaluate/notebooks/question-answering-evaluation.html">
+                <div class="header">
+                    Question-Answering Evaluation
+                </div>
+                <p>
+                    See a working example of how to evaluate the quality of an LLM Question-Answering solution
+                </p>
+            </a>
+        </div>
+        <div class="simple-card">
+            <a href="../llms/rag/notebooks/question-generation-retrieval-evaluation.html">
+                <div class="header">
+                    RAG Question Generation Evaluation
+                </div>
+                <p>
+                    See how to generate Questions for RAG generation and how to evaluate a RAG solution using MLflow
+                </p>
+            </a>
+        </div>
+    </article>
+</section></div>
+</div>
+<div class="section" id="id2">
+<h2><a class="reference external" href="../models.html#model-evaluation">Traditional ML Evaluation</a><a class="headerlink" href="#id2" title="Permalink to this headline"> </a></h2>
+<p>Traditional machine learning techniques, from classification to regression, have been the bedrock of many industries. MLflow recognizes
+their significance and offers automated evaluation tools tailored for these classic techniques.</p>
+<p><strong>Key Features</strong>:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="../models.html#evaluating-with-a-function">Evaluating a Function</a>: To get immediate results, you can evaluate a python function directly without logging the model. This is especially useful when you want a quick evaluation without the overhead of logging.</p></li>
+<li><p><a class="reference external" href="../models.html#evaluating-with-a-static-dataset">Evaluating a Dataset</a>: MLflow also supports evaluating a static dataset without specifying a model. This is invaluable when you’ve saved model outputs in a dataset and want a swift evaluation without having to rerun model inference.</p></li>
+<li><p><a class="reference external" href="../models.html#performing-model-validation">Evaluating a Model</a>: With MLflow, you can set validation thresholds for your metrics. If a model doesn’t meet these thresholds compared to a baseline, MLflow will alert you. This automated validation ensures that only high-quality models progress to the next stages.</p></li>
+<li><p><a class="reference external" href="../models.html#model-evaluation">Common Metrics and Visualizations</a>: MLflow automatically logs common metrics like accuracy, precision, recall, and more. Additionally, visual graphs such as the confusion matrix, lift_curve_plot, and others are auto-logged, providing a comprehensive view of your model’s performance.</p></li>
+<li><p><strong>SHAP Integration</strong>: MLflow is integrated with SHAP, allowing for the auto-logging of SHAP’s summarization importances validation visualizations when using the evaluate APIs.</p></li>
+</ul>
+</div>
+</div>
+
+
+              </div>
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../llms/gateway/migration.html" class="btn btn-neutral" title="MLflow AI Gateway Migration Guide" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+      
+      
+        <a href="../deep-learning/index.html" class="btn btn-neutral" title="Deep Learning" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+      <p class="copyright">
+          &copy; MLflow Project, a Series of LF Projects, LLC. All rights reserved.
+      </p>
+
+  </div> 
+
+</footer>
+          </div>
+        </div>
+      </section>
+    </main>
+  </page>
+
+  
+
+
+  
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+      URL_ROOT:'../',
+      VERSION:'2.9.2.dev0',
+      COLLAPSE_INDEX:false,
+      FILE_SUFFIX:'.html',
+      LINK_SUFFIX: '.html',
+      HAS_SOURCE:  true
+    };
+  </script>
+
+  
+
+  <script type="text/javascript" src="../_static/js/clipboard.min.js"></script>
+  <script type="text/javascript" src="../_static/js/jquery.waypoints.min.js"></script>
+
+  
+  
+  
+  <script type="text/javascript">var CLIPPY_SVG_PATH = "../_static/clippy.svg";</script>
+  <script type="text/javascript" src="../_static/js/custom.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.StickyNav.enable();
+    });
+
+  </script>
+  
+
+  
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        // Get the code block designator class entries
+        const allHighlights = document.querySelectorAll('.highlight');
+        // Disable copyable links for notebook cell numbering and for cell outputs
+        const highlights = Array.from(allHighlights).filter(highlight => !highlight.closest('.highlight-none') && 
+            !highlight.closest('.nboutput'));
+    
+        highlights.forEach(function(highlight) {
+            const copyIcon = document.createElement('span');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.innerHTML = '&#xf0ea;';
+
+            copyIcon.addEventListener('click', function() {
+                const code = highlight.querySelector('pre').textContent;
+                copyToClipboard(code);
+
+                // Flash effect on click
+                this.style.color = '#0194E2';
+                setTimeout(() => {
+                    this.style.color = ''; 
+                }, 100);
+
+                // Display "Code copied to clipboard" near the clicked icon
+                const message = document.createElement('span');
+                message.textContent = "Copied!";
+                message.classList.add('copy-message'); 
+
+                // Append the message to the icon
+                this.appendChild(message);
+
+                setTimeout(() => {
+                    this.removeChild(message);
+                }, 500);
+            });
+
+            highlight.appendChild(copyIcon);
+        });
+    });
+  </script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Force download for notebook-download-btn
+        const downloadButtons = document.querySelectorAll('.notebook-download-btn');
+        downloadButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                // Fetch the raw content of the notebook from GitHub
+                fetch(button.href)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = url;
+                        const filename = button.href.split('/').pop();
+                        link.download = filename; 
+
+                        document.body.appendChild(link);
+                        link.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    })
+                    .catch(err => console.error('Error fetching the notebook:', err));
+            });
+        });
+    });
+</script> 
+</body>
+</html>

@@ -1,0 +1,1805 @@
+
+  
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Retriever Evaluation Tutorial &mdash; MLflow 2.9.2.dev0 documentation</title>
+  
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/llms/rag/notebooks/retriever-evaluation-tutorial.html">
+  
+  
+    <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
+    
+
+    
+
+  
+    
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/grids.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/mobile.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/simple-cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/tabs.css" type="text/css" />
+    
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="MLflow 2.9.2.dev0 documentation" href="../../../index.html"/>
+        <link rel="up" title="RAG Tutorials" href="index.html"/>
+        <link rel="next" title="Deploying Advanced LLMs with Custom PyFuncs in MLflow" href="/../../custom-pyfunc-for-llms/index.html"/>
+        <link rel="prev" title="Question Generation For Retrieval Evaluation" href="/question-generation-retrieval-evaluation.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+<script type="text/javascript" src="../../../_static/jquery.js"></script>
+<script type="text/javascript" src="../../../_static/underscore.js"></script>
+<script type="text/javascript" src="../../../_static/doctools.js"></script>
+<script type="text/javascript" src="../../../_static/languagesections.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript" src="../../../None"></script>
+
+<body class="wy-body-for-nav" role="document">
+  
+
+  
+  <nav class="wy-nav-top header" role="navigation" aria-label="top navigation">
+    <ul>
+  <li class="menu-toggle">
+    <i data-toggle="wy-nav-top" class="wy-nav-top-menu-button db-icon db-icon-menu pull-left"></i>
+    <a href="../../../index.html" class="wy-nav-top-logo"
+      ><img src="../../../_static/MLflow-logo-final-black.png" alt="MLflow"
+    /></a>
+    <span class="version">2.9.2.dev0</span>
+  </li>
+</ul>
+  </nav>
+  <page>
+    
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side relative">
+      <div class="wy-side-scroll">
+  <div class="wy-side-nav-search">
+    
+
+    
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+    
+  </div>
+
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+    
+      <a href="../../../index.html" class="main-navigation-home"><img src="../../../_static/icons/nav-home.svg"> MLflow</a>
+    
+
+    
+      
+
+      
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../introduction/index.html">What is MLflow?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting-started/index.html">Getting Started with MLflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../new-features/index.html">New Features</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">LLMs</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#id1">MLflow Deployments Server for LLMs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#id3">LLM Evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#id4">Prompt Engineering UI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#native-mlflow-flavors-for-llms">Native MLflow Flavors for LLMs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#id5">LLM Tracking in MLflow</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../index.html#tutorials-and-use-case-guides-for-llms-in-mlflow">Tutorials and Use Case Guides for LLMs in MLflow</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../index.html">Retrieval Augmented Generation (RAG)</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../index.html#benefits-of-rag">Benefits of RAG</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../index.html#understanding-the-power-of-rag">Understanding the Power of RAG</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../index.html#explore-the-tutorial">Explore the Tutorial</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../custom-pyfunc-for-llms/index.html">Deploying Advanced LLMs with Custom PyFuncs in MLflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../llm-evaluate/notebooks/index.html">LLM Evaluation Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../gateway/index.html">MLflow AI Gateway (Experimental)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../model-evaluation/index.html">Model Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deep-learning/index.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../traditional-ml/index.html">Traditional ML</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deployment/index.html">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tracking.html">MLflow Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../system-metrics/index.html">System Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../projects.html">MLflow Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../models.html">MLflow Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../model-registry.html">MLflow Model Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../recipes.html">MLflow Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../plugins.html">MLflow Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../auth/index.html">MLflow Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../search-runs.html">Search Runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../search-experiments.html">Search Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../python_api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../R-api.html">R API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../java_api/index.html">Java API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rest-api.html">REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docker.html">Official MLflow Docker Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../community-model-flavors.html">Community Model Flavors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials-and-examples/index.html">Tutorials and Examples</a></li>
+</ul>
+
+      
+    
+  </div>
+
+  <div role="contentinfo">
+    
+
+    <p>
+      <a id='feedbacklink' href="https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a>
+    </p>
+  </div>
+</div>
+    </nav>
+
+    <main class="wy-grid-for-nav">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+          <div class="rst-content">
+            
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Documentation</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../../index.html">LLMs</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../index.html">Retrieval Augmented Generation (RAG)</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="index.html">RAG Tutorials</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+    
+      <li>Retriever Evaluation Tutorial</li>
+    
+    
+    <!-- <li class="wy-breadcrumbs-aside">
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/llms/rag/notebooks/retriever-evaluation-tutorial.ipynb" class="fa fa-github"> Edit on GitHub</a>
+    </li> -->
+    
+  </ul>
+</div>
+            <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <div itemprop="articleBody">
+                
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div class="section" id="Retriever-Evaluation-Tutorial">
+<h1>Retriever Evaluation Tutorial<a class="headerlink" href="#Retriever-Evaluation-Tutorial" title="Permalink to this headline"> </a></h1>
+<p>In MLflow 2.8.0, we introduced a new model type “retriever” to the <code class="docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code> API. It helps you to evaluate the retriever in a RAG application. It contains two built-in metrics <code class="docutils literal notranslate"><span class="pre">precision_at_k</span></code> and <code class="docutils literal notranslate"><span class="pre">recall_at_k</span></code>. In MLflow 2.9.0, <code class="docutils literal notranslate"><span class="pre">ndcg_at_k</span></code> is available.</p>
+<p>This notebook illustrates how to use <code class="docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code> to evaluate the retriever in a RAG application. It has the following steps:</p>
+<ul class="simple">
+<li><p>Step 1: Install and Load Packages</p></li>
+<li><p>Step 2: Evaluation Dataset Preparation</p></li>
+<li><p>Step 3: Calling <code class="docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code></p></li>
+<li><p>Step 4: Result Analysis and Visualization</p></li>
+</ul>
+<div class="section" id="Step-1:-Install-and-Load-Packages">
+<h2>Step 1: Install and Load Packages<a class="headerlink" href="#Step-1:-Install-and-Load-Packages" title="Permalink to this headline"> </a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">pip</span> install mlflow==2.9.0 langchain==0.0.339 openai faiss-cpu gensim nltk pyLDAvis tiktoken
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ast</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pprint</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">langchain.docstore.document</span> <span class="kn">import</span> <span class="n">Document</span>
+<span class="kn">from</span> <span class="nn">langchain.embeddings.openai</span> <span class="kn">import</span> <span class="n">OpenAIEmbeddings</span>
+<span class="kn">from</span> <span class="nn">langchain.text_splitter</span> <span class="kn">import</span> <span class="n">CharacterTextSplitter</span>
+<span class="kn">from</span> <span class="nn">langchain.vectorstores</span> <span class="kn">import</span> <span class="n">FAISS</span>
+
+<span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;OPENAI_API_KEY&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&lt;redacted&gt;&quot;</span>
+
+<span class="n">CHUNK_SIZE</span> <span class="o">=</span> <span class="mi">1000</span>
+
+<span class="c1"># Assume running from https://github.com/mlflow/mlflow/blob/master/examples/llms/rag</span>
+<span class="n">OUTPUT_DF_PATH</span> <span class="o">=</span> <span class="s2">&quot;question_answer_source.csv&quot;</span>
+<span class="n">SCRAPPED_DOCS_PATH</span> <span class="o">=</span> <span class="s2">&quot;mlflow_docs_scraped.csv&quot;</span>
+<span class="n">EVALUATION_DATASET_PATH</span> <span class="o">=</span> <span class="s2">&quot;static_evaluation_dataset.csv&quot;</span>
+<span class="n">DB_PERSIST_DIR</span> <span class="o">=</span> <span class="s2">&quot;faiss_index&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Step-2:-Evaluation-Dataset-Preparation">
+<h2>Step 2: Evaluation Dataset Preparation<a class="headerlink" href="#Step-2:-Evaluation-Dataset-Preparation" title="Permalink to this headline"> </a></h2>
+<p>The evaluation dataset should contain three columns: questions, ground truth doc IDs, retrieved relevant doc IDs. A “doc ID” is a unique string identifier of the documents in you RAG application. For example, it could be the URL of a documentation web page, or the file path of a PDF document.</p>
+<p>If you have a list of questions that you would like to evaluate, please see 1.1 Manual Preparation. If you do not have a question list yet, please see 1.2 Generate the Evaluation Dataset.</p>
+<div class="section" id="Manual-Preparation">
+<h3>Manual Preparation<a class="headerlink" href="#Manual-Preparation" title="Permalink to this headline"> </a></h3>
+<p>When evaluating a retriever, it’s recommended to save the retrieved document IDs into a static dataset represented by a Pandas Dataframe or an MLflow Pandas Dataset containing the input queries, retrieved relevant document IDs, and the ground-truth document IDs for the evaluation.</p>
+<div class="section" id="Concepts">
+<h4>Concepts<a class="headerlink" href="#Concepts" title="Permalink to this headline"> </a></h4>
+<p>A “document ID” is a string that identifies a document.</p>
+<p>A list of “retrieved relevant document IDs” are the output of the retriever for a specific input query and a <code class="docutils literal notranslate"><span class="pre">k</span></code> value.</p>
+<p>A list of “ground-truth document IDs” are the labeled relevant documents for a specific input query.</p>
+</div>
+<div class="section" id="Expected-Data-Format">
+<h4>Expected Data Format<a class="headerlink" href="#Expected-Data-Format" title="Permalink to this headline"> </a></h4>
+<p>For each row, the retrieved relevant document IDs and the ground-truth relevant document IDs should be provided as a tuple of document ID strings.</p>
+<p>The column name of the retrieved relevant document IDs should be specified by the <code class="docutils literal notranslate"><span class="pre">predictions</span></code> parameter, and the column name of the ground-truth relevant document IDs should be specified by the <code class="docutils literal notranslate"><span class="pre">targets</span></code> parameter.</p>
+<p>Here is a simple example dataset that illustrates the expected data format. The doc IDs are the paths of the documentation pages.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;questions&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;What is MLflow?&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;What is Databricks?&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;How to serve a model on Databricks?&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;How to enable MLflow Autologging for my workspace by default?&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="s2">&quot;retrieved_context&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">[</span>
+                <span class="s2">&quot;mlflow/index.html&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;mlflow/quick-start.html&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="p">[</span>
+                <span class="s2">&quot;introduction/index.html&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;getting-started/overview.html&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="p">[</span>
+                <span class="s2">&quot;machine-learning/model-serving/index.html&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;machine-learning/model-serving/model-serving-intro.html&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="p">[],</span>
+        <span class="p">],</span>
+        <span class="s2">&quot;ground_truth_context&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">[</span><span class="s2">&quot;mlflow/index.html&quot;</span><span class="p">],</span>
+            <span class="p">[</span><span class="s2">&quot;introduction/index.html&quot;</span><span class="p">],</span>
+            <span class="p">[</span>
+                <span class="s2">&quot;machine-learning/model-serving/index.html&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;machine-learning/model-serving/llm-optimized-model-serving.html&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="p">[</span><span class="s2">&quot;mlflow/databricks-autologging.html&quot;</span><span class="p">],</span>
+        <span class="p">],</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Generate-the-Evaluation-Dataset">
+<h3>Generate the Evaluation Dataset<a class="headerlink" href="#Generate-the-Evaluation-Dataset" title="Permalink to this headline"> </a></h3>
+<p>There are two steps to generate the evaluation dataset: generate questions with ground truth doc IDs and retrieve relevant doc IDs.</p>
+<div class="section" id="Generate-Questions-with-Ground-Truth-Doc-IDs">
+<h4>Generate Questions with Ground Truth Doc IDs<a class="headerlink" href="#Generate-Questions-with-Ground-Truth-Doc-IDs" title="Permalink to this headline"> </a></h4>
+<p>If you don’t have a list of questions to evaluate, you can generate them using LLMs. The <a class="reference external" href="https://mlflow.org/docs/latest/llms/rag/notebooks/question-generation-retrieval-evaluation.html">Question Generation Notebook</a> provides an example way to do it. Here is the result of running that notebook.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">generated_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">OUTPUT_DF_PATH</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">generated_df</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>question</th>
+      <th>answer</th>
+      <th>chunk</th>
+      <th>chunk_id</th>
+      <th>source</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>What is the purpose of the MLflow Model Registry?</td>
+      <td>The purpose of the MLflow Model Registry is to...</td>
+      <td>Documentation MLflow Model Registry MLflow Mod...</td>
+      <td>0</td>
+      <td>model-registry.html</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>What is the purpose of registering a model wit...</td>
+      <td>The purpose of registering a model with the Mo...</td>
+      <td>logged, this model can then be registered with...</td>
+      <td>1</td>
+      <td>model-registry.html</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>What can you do with registered models and mod...</td>
+      <td>With registered models and model versions, you...</td>
+      <td>associate with registered models and model ver...</td>
+      <td>2</td>
+      <td>model-registry.html</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Prepare dataframe `data` with the required format</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({})</span>
+<span class="n">data</span><span class="p">[</span><span class="s2">&quot;question&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generated_df</span><span class="p">[</span><span class="s2">&quot;question&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">data</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generated_df</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">[</span><span class="n">x</span><span class="p">])</span>
+<span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>question</th>
+      <th>source</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>What is the purpose of the MLflow Model Registry?</td>
+      <td>[model-registry.html]</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>What is the purpose of registering a model wit...</td>
+      <td>[model-registry.html]</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>What can you do with registered models and mod...</td>
+      <td>[model-registry.html]</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="Retrieve-Relevant-Doc-IDs">
+<h4>Retrieve Relevant Doc IDs<a class="headerlink" href="#Retrieve-Relevant-Doc-IDs" title="Permalink to this headline"> </a></h4>
+<p>Once we have a list of questions with ground truth doc IDs from 1.1, we can collect the retrieved relevant doc IDs. In this tutorial, we use a LangChain retriever. You can plug in your own retriever as needed.</p>
+<p>First, we build a FAISS retriever from the docs saved at <a class="reference external" href="https://github.com/mlflow/mlflow/blob/master/examples/llms/question_generation/mlflow_docs_scraped.csv">https://github.com/mlflow/mlflow/blob/master/examples/llms/question_generation/mlflow_docs_scraped.csv</a>. See the <a class="reference external" href="https://mlflow.org/docs/latest/llms/rag/notebooks/question-generation-retrieval-evaluation.html">Question Generation Notebook</a> for how to create this csv file.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">embeddings</span> <span class="o">=</span> <span class="n">OpenAIEmbeddings</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">scrapped_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">SCRAPPED_DOCS_PATH</span><span class="p">)</span>
+<span class="n">list_of_documents</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">Document</span><span class="p">(</span><span class="n">page_content</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">],</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]})</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">scrapped_df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()</span>
+<span class="p">]</span>
+<span class="n">text_splitter</span> <span class="o">=</span> <span class="n">CharacterTextSplitter</span><span class="p">(</span><span class="n">chunk_size</span><span class="o">=</span><span class="n">CHUNK_SIZE</span><span class="p">,</span> <span class="n">chunk_overlap</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">docs</span> <span class="o">=</span> <span class="n">text_splitter</span><span class="o">.</span><span class="n">split_documents</span><span class="p">(</span><span class="n">list_of_documents</span><span class="p">)</span>
+<span class="n">db</span> <span class="o">=</span> <span class="n">FAISS</span><span class="o">.</span><span class="n">from_documents</span><span class="p">(</span><span class="n">docs</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">)</span>
+
+<span class="c1"># Save the db to local disk</span>
+<span class="n">db</span><span class="o">.</span><span class="n">save_local</span><span class="p">(</span><span class="n">DB_PERSIST_DIR</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load the db from local disk</span>
+<span class="n">db</span> <span class="o">=</span> <span class="n">FAISS</span><span class="o">.</span><span class="n">load_local</span><span class="p">(</span><span class="n">DB_PERSIST_DIR</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">)</span>
+<span class="n">retriever</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">as_retriever</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Test the retriever with a query</span>
+<span class="n">retrieved_docs</span> <span class="o">=</span> <span class="n">retriever</span><span class="o">.</span><span class="n">get_relevant_documents</span><span class="p">(</span>
+    <span class="s2">&quot;What is the purpose of the MLflow Model Registry?&quot;</span>
+<span class="p">)</span>
+<span class="nb">len</span><span class="p">(</span><span class="n">retrieved_docs</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+4
+</pre></div></div>
+</div>
+<p>After building a retriever, we define a function that takes a question string as input and returns a list of relevant doc ID strings.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define a function to return a list of retrieved doc ids</span>
+<span class="k">def</span> <span class="nf">retrieve_doc_ids</span><span class="p">(</span><span class="n">question</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="n">docs</span> <span class="o">=</span> <span class="n">retriever</span><span class="o">.</span><span class="n">get_relevant_documents</span><span class="p">(</span><span class="n">question</span><span class="p">)</span>
+    <span class="n">doc_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">doc</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">docs</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">doc_ids</span>
+</pre></div>
+</div>
+</div>
+<p>We can store the retrieved doc IDs in the dataframe as a column “retrieved_doc_ids”.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;retrieved_doc_ids&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;question&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">retrieve_doc_ids</span><span class="p">)</span>
+<span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>question</th>
+      <th>source</th>
+      <th>retrieved_doc_ids</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>What is the purpose of the MLflow Model Registry?</td>
+      <td>[model-registry.html]</td>
+      <td>[model-registry.html, introduction/index.html,...</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>What is the purpose of registering a model wit...</td>
+      <td>[model-registry.html]</td>
+      <td>[model-registry.html, models.html, introductio...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>What can you do with registered models and mod...</td>
+      <td>[model-registry.html]</td>
+      <td>[model-registry.html, models.html, deployment/...</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Persist the static evaluation dataset to disk</span>
+<span class="n">data</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">EVALUATION_DATASET_PATH</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load the static evaluation dataset from disk and deserialize the source and retrieved doc ids</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">EVALUATION_DATASET_PATH</span><span class="p">)</span>
+<span class="n">data</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">)</span>
+<span class="n">data</span><span class="p">[</span><span class="s2">&quot;retrieved_doc_ids&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;retrieved_doc_ids&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">)</span>
+<span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>question</th>
+      <th>source</th>
+      <th>retrieved_doc_ids</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>What is the purpose of the MLflow Model Registry?</td>
+      <td>[model-registry.html]</td>
+      <td>[model-registry.html, introduction/index.html,...</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>What is the purpose of registering a model wit...</td>
+      <td>[model-registry.html]</td>
+      <td>[model-registry.html, models.html, introductio...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>What can you do with registered models and mod...</td>
+      <td>[model-registry.html]</td>
+      <td>[model-registry.html, models.html, deployment/...</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Step-3:-Calling-mlflow.evaluate()">
+<h2>Step 3: Calling <code class="docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code><a class="headerlink" href="#Step-3:-Calling-mlflow.evaluate()" title="Permalink to this headline"> </a></h2>
+<div class="section" id="Metrics-Definition">
+<h3>Metrics Definition<a class="headerlink" href="#Metrics-Definition" title="Permalink to this headline"> </a></h3>
+<p>There are three built-in metrics provided for the retriever model type. Click the metric name below to see the metrics definitions.</p>
+<ol class="arabic simple">
+<li><p><a class="reference external" href="https://mlflow.org/docs/latest/python_api/mlflow.metrics.html#mlflow.metrics.precision_at_k">mlflow.metrics.precision_at_k(k)</a></p></li>
+<li><p><a class="reference external" href="https://mlflow.org/docs/latest/python_api/mlflow.metrics.html#mlflow.metrics.recall_at_k">mlflow.metrics.recall_at_k(k)</a></p></li>
+<li><p><a class="reference external" href="https://mlflow.org/docs/latest/python_api/mlflow.metrics.html#mlflow.metrics.ndcg_at_k">mlflow.metrics.ndcg_at_k(k)</a></p></li>
+</ol>
+<p>All metrics compute a score between 0 and 1 for each row representing the corresponding metric of the retriever model at the given <code class="docutils literal notranslate"><span class="pre">k</span></code> value.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">k</span></code> parameter should be a positive integer representing the number of retrieved documents to evaluate for each row. <code class="docutils literal notranslate"><span class="pre">k</span></code> defaults to 3.</p>
+<p>When the model type is <code class="docutils literal notranslate"><span class="pre">&quot;retriever&quot;</span></code>, these metrics will be calculated automatically with the default <code class="docutils literal notranslate"><span class="pre">k</span></code> value of 3.</p>
+</div>
+<div class="section" id="Basic-usage">
+<h3>Basic usage<a class="headerlink" href="#Basic-usage" title="Permalink to this headline"> </a></h3>
+<p>There are two supported ways to specify the retriever’s output:</p>
+<ul class="simple">
+<li><p>Case 1: Save the retriever’s output to a static evaluation dataset</p></li>
+<li><p>Case 2: Wrap the retriever in a function</p></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Case 1: Evaluating a static evaluation dataset</span>
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">()</span> <span class="k">as</span> <span class="n">run</span><span class="p">:</span>
+    <span class="n">evaluate_results</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+        <span class="n">model_type</span><span class="o">=</span><span class="s2">&quot;retriever&quot;</span><span class="p">,</span>
+        <span class="n">targets</span><span class="o">=</span><span class="s2">&quot;source&quot;</span><span class="p">,</span>
+        <span class="n">predictions</span><span class="o">=</span><span class="s2">&quot;retrieved_doc_ids&quot;</span><span class="p">,</span>
+        <span class="n">evaluators</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2023/11/22 14:39:59 WARNING mlflow.data.pandas_dataset: Failed to infer schema for Pandas dataset. Exception: Unable to map &#39;object&#39; type to MLflow DataType. object can be mapped iff all values have identical data type which is one of (string, (bytes or byterray),  int, float).
+2023/11/22 14:39:59 INFO mlflow.models.evaluation.base: Evaluating the model with the default evaluator.
+2023/11/22 14:39:59 INFO mlflow.models.evaluation.default_evaluator: Testing metrics on first row...
+2023/11/22 14:39:59 INFO mlflow.models.evaluation.default_evaluator: Evaluating builtin metrics: precision_at_3
+2023/11/22 14:39:59 INFO mlflow.models.evaluation.default_evaluator: Evaluating builtin metrics: recall_at_3
+2023/11/22 14:39:59 INFO mlflow.models.evaluation.default_evaluator: Evaluating builtin metrics: ndcg_at_3
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">question_source_df</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="s2">&quot;question&quot;</span><span class="p">,</span> <span class="s2">&quot;source&quot;</span><span class="p">]]</span>
+<span class="n">question_source_df</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>question</th>
+      <th>source</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>What is the purpose of the MLflow Model Registry?</td>
+      <td>[model-registry.html]</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>What is the purpose of registering a model wit...</td>
+      <td>[model-registry.html]</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>What can you do with registered models and mod...</td>
+      <td>[model-registry.html]</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Case 2: Evaluating a function</span>
+<span class="k">def</span> <span class="nf">retriever_model_function</span><span class="p">(</span><span class="n">question_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">question_df</span><span class="p">[</span><span class="s2">&quot;question&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">retrieve_doc_ids</span><span class="p">)</span>
+
+
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">()</span> <span class="k">as</span> <span class="n">run</span><span class="p">:</span>
+    <span class="n">evaluate_results</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">=</span><span class="n">retriever_model_function</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">question_source_df</span><span class="p">,</span>
+        <span class="n">model_type</span><span class="o">=</span><span class="s2">&quot;retriever&quot;</span><span class="p">,</span>
+        <span class="n">targets</span><span class="o">=</span><span class="s2">&quot;source&quot;</span><span class="p">,</span>
+        <span class="n">evaluators</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2023/11/22 14:09:12 WARNING mlflow.data.pandas_dataset: Failed to infer schema for Pandas dataset. Exception: Unable to map &#39;object&#39; type to MLflow DataType. object can be mapped iff all values have identical data type which is one of (string, (bytes or byterray),  int, float).
+2023/11/22 14:09:12 INFO mlflow.models.evaluation.base: Evaluating the model with the default evaluator.
+2023/11/22 14:09:12 INFO mlflow.models.evaluation.default_evaluator: Computing model predictions.
+2023/11/22 14:09:24 INFO mlflow.models.evaluation.default_evaluator: Testing metrics on first row...
+2023/11/22 14:09:24 INFO mlflow.models.evaluation.default_evaluator: Evaluating builtin metrics: precision_at_3
+2023/11/22 14:09:24 INFO mlflow.models.evaluation.default_evaluator: Evaluating builtin metrics: recall_at_3
+2023/11/22 14:09:24 INFO mlflow.models.evaluation.default_evaluator: Evaluating builtin metrics: ndcg_at_3
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pp</span> <span class="o">=</span> <span class="n">pprint</span><span class="o">.</span><span class="n">PrettyPrinter</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">pp</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">evaluate_results</span><span class="o">.</span><span class="n">metrics</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{   &#39;ndcg_at_3/mean&#39;: 0.7530888125490431,
+    &#39;ndcg_at_3/p90&#39;: 1.0,
+    &#39;ndcg_at_3/variance&#39;: 0.1209151911325433,
+    &#39;precision_at_3/mean&#39;: 0.26785714285714285,
+    &#39;precision_at_3/p90&#39;: 0.3333333333333333,
+    &#39;precision_at_3/variance&#39;: 0.017538265306122448,
+    &#39;recall_at_3/mean&#39;: 0.8035714285714286,
+    &#39;recall_at_3/p90&#39;: 1.0,
+    &#39;recall_at_3/variance&#39;: 0.15784438775510204}
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Try-different-k-values">
+<h3>Try different k values<a class="headerlink" href="#Try-different-k-values" title="Permalink to this headline"> </a></h3>
+<p>To use another <code class="docutils literal notranslate"><span class="pre">k</span></code> value, use the <code class="docutils literal notranslate"><span class="pre">evaluator_config</span></code> parameter in the <code class="docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code> API as follows: <code class="docutils literal notranslate"><span class="pre">evaluator_config={&quot;k&quot;:</span> <span class="pre">&lt;k_value&gt;}</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Case 1: Specifying the model type</span>
+<span class="n">evaluate_results</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+    <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+    <span class="n">model_type</span><span class="o">=</span><span class="s2">&quot;retriever&quot;</span><span class="p">,</span>
+    <span class="n">targets</span><span class="o">=</span><span class="s2">&quot;ground_truth_context&quot;</span><span class="p">,</span>
+    <span class="n">predictions</span><span class="o">=</span><span class="s2">&quot;retrieved_context&quot;</span><span class="p">,</span>
+    <span class="n">evaluators</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+    <span class="n">evaluator_config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;k&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">}</span>
+  <span class="p">)</span>
+</pre></div>
+</div>
+<p>Alternatively, you can directly specify the desired metrics in the <code class="docutils literal notranslate"><span class="pre">extra_metrics</span></code> parameter of the <code class="docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code> API without specifying a model type. In this case, the <code class="docutils literal notranslate"><span class="pre">k</span></code> value specified in the <code class="docutils literal notranslate"><span class="pre">evaluator_config</span></code> parameter will be ignored.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Case 2: Specifying the extra_metrics</span>
+<span class="n">evaluate_results</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+    <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+    <span class="n">targets</span><span class="o">=</span><span class="s2">&quot;ground_truth_context&quot;</span><span class="p">,</span>
+    <span class="n">predictions</span><span class="o">=</span><span class="s2">&quot;retrieved_context&quot;</span><span class="p">,</span>
+    <span class="n">extra_matrics</span><span class="o">=</span><span class="p">[</span>
+      <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">precision_at_k</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span>
+      <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">precision_at_k</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+    <span class="p">],</span>
+  <span class="p">)</span>
+</pre></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">()</span> <span class="k">as</span> <span class="n">run</span><span class="p">:</span>
+    <span class="n">evaluate_results</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+        <span class="n">targets</span><span class="o">=</span><span class="s2">&quot;source&quot;</span><span class="p">,</span>
+        <span class="n">predictions</span><span class="o">=</span><span class="s2">&quot;retrieved_doc_ids&quot;</span><span class="p">,</span>
+        <span class="n">evaluators</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+        <span class="n">extra_metrics</span><span class="o">=</span><span class="p">[</span>
+            <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">precision_at_k</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+            <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">precision_at_k</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
+            <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">precision_at_k</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>
+            <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">recall_at_k</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+            <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">recall_at_k</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
+            <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">recall_at_k</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>
+            <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">ndcg_at_k</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+            <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">ndcg_at_k</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
+            <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">ndcg_at_k</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>
+        <span class="p">],</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2023/11/22 14:40:22 WARNING mlflow.data.pandas_dataset: Failed to infer schema for Pandas dataset. Exception: Unable to map &#39;object&#39; type to MLflow DataType. object can be mapped iff all values have identical data type which is one of (string, (bytes or byterray),  int, float).
+2023/11/22 14:40:22 INFO mlflow.models.evaluation.base: Evaluating the model with the default evaluator.
+2023/11/22 14:40:22 INFO mlflow.models.evaluation.default_evaluator: Testing metrics on first row...
+2023/11/22 14:40:22 INFO mlflow.models.evaluation.default_evaluator: Evaluating metrics: precision_at_1
+2023/11/22 14:40:22 INFO mlflow.models.evaluation.default_evaluator: Evaluating metrics: precision_at_2
+2023/11/22 14:40:22 INFO mlflow.models.evaluation.default_evaluator: Evaluating metrics: precision_at_3
+2023/11/22 14:40:22 INFO mlflow.models.evaluation.default_evaluator: Evaluating metrics: recall_at_1
+2023/11/22 14:40:22 INFO mlflow.models.evaluation.default_evaluator: Evaluating metrics: recall_at_2
+2023/11/22 14:40:22 INFO mlflow.models.evaluation.default_evaluator: Evaluating metrics: recall_at_3
+2023/11/22 14:40:22 INFO mlflow.models.evaluation.default_evaluator: Evaluating metrics: ndcg_at_1
+2023/11/22 14:40:22 INFO mlflow.models.evaluation.default_evaluator: Evaluating metrics: ndcg_at_2
+2023/11/22 14:40:22 INFO mlflow.models.evaluation.default_evaluator: Evaluating metrics: ndcg_at_3
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="c1"># Plotting each metric</span>
+<span class="k">for</span> <span class="n">metric_name</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;precision&quot;</span><span class="p">,</span> <span class="s2">&quot;recall&quot;</span><span class="p">,</span> <span class="s2">&quot;ndcg&quot;</span><span class="p">]:</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="n">evaluate_results</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">metric_name</span><span class="si">}</span><span class="s2">_at_</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">/mean&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">)]</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">y</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">metric_name</span><span class="si">}</span><span class="s2">@k&quot;</span><span class="p">)</span>
+
+<span class="c1"># Adding labels and title</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;k&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Metric Value&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Metrics Comparison at Different Ks&quot;</span><span class="p">)</span>
+<span class="c1"># Setting x-axis ticks</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+<span class="c1"># Display the plot</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../../_images/llms_rag_notebooks_retriever-evaluation-tutorial_33_0.png" src="../../../_images/llms_rag_notebooks_retriever-evaluation-tutorial_33_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="Corner-case-handling">
+<h3>Corner case handling<a class="headerlink" href="#Corner-case-handling" title="Permalink to this headline"> </a></h3>
+<p>There are a few corner cases handle specially for each built-in metric.</p>
+<div class="section" id="Empty-retrieved-document-IDs">
+<h4>Empty retrieved document IDs<a class="headerlink" href="#Empty-retrieved-document-IDs" title="Permalink to this headline"> </a></h4>
+<p>When no relevant docs are retrieved:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">mlflow.metrics.precision_at_k(k)</span></code> is defined as:</p>
+<ul>
+<li><p>0 if the ground-truth doc IDs is non-empty</p></li>
+<li><p>1 if the ground-truth doc IDs is also empty</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mlflow.metrics.ndcg_at_k(k)</span></code> is defined as:</p>
+<ul>
+<li><p>0 if the ground-truth doc IDs is non-empty</p></li>
+<li><p>1 if the ground-truth doc IDs is also empty</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="Empty-ground-truth-document-IDs">
+<h4>Empty ground-truth document IDs<a class="headerlink" href="#Empty-ground-truth-document-IDs" title="Permalink to this headline"> </a></h4>
+<p>When no ground-truth document IDs are provided:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">mlflow.metrics.recall_at_k(k)</span></code> is defined as:</p>
+<ul>
+<li><p>0 if the retrieved doc IDs is non-empty</p></li>
+<li><p>1 if the retrieved doc IDs is also empty</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mlflow.metrics.ndcg_at_k(k)</span></code> is defined as:</p>
+<ul>
+<li><p>0 if the retrieved doc IDs is non-empty</p></li>
+<li><p>1 if the retrieved doc IDs is also empty</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="Duplicate-retreived-document-IDs">
+<h4>Duplicate retreived document IDs<a class="headerlink" href="#Duplicate-retreived-document-IDs" title="Permalink to this headline"> </a></h4>
+<p>It is a common case for the retriever in a RAG system to retrieve multiple chunks in the same document for a given query. In this case, <code class="docutils literal notranslate"><span class="pre">mlflow.metrics.ndcg_at_k(k)</span></code> is calculated as follows:</p>
+<p>If the duplicate doc IDs are in the ground truth, they will be treated as different docs. For example, if the ground truth doc IDs are [1, 2] and the retrieved doc IDs are [1, 1, 1, 3], the score will be equavalent to ground truth doc IDs [10, 11, 12, 2] and retrieved doc IDs [10, 11, 12, 3].</p>
+<p>If the duplicate doc IDs are not in the ground truth, the ndcg score is calculated as normal.</p>
+</div>
+</div>
+</div>
+<div class="section" id="Step-4:-Result-Analysis-and-Visualization">
+<h2>Step 4: Result Analysis and Visualization<a class="headerlink" href="#Step-4:-Result-Analysis-and-Visualization" title="Permalink to this headline"> </a></h2>
+<p>You can view the per-row scores in the logged “eval_results_table.json” in artifacts by either loading it to a pandas dataframe (shown below) or visiting the MLflow run comparison UI.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">eval_results_table</span> <span class="o">=</span> <span class="n">evaluate_results</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="s2">&quot;eval_results_table&quot;</span><span class="p">]</span>
+<span class="n">eval_results_table</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "ee4bfb1998174c558e537ebb1dd737d9", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>question</th>
+      <th>source</th>
+      <th>retrieved_doc_ids</th>
+      <th>precision_at_1/score</th>
+      <th>precision_at_2/score</th>
+      <th>precision_at_3/score</th>
+      <th>recall_at_1/score</th>
+      <th>recall_at_2/score</th>
+      <th>recall_at_3/score</th>
+      <th>ndcg_at_1/score</th>
+      <th>ndcg_at_2/score</th>
+      <th>ndcg_at_3/score</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>What is the purpose of the MLflow Model Registry?</td>
+      <td>[model-registry.html]</td>
+      <td>[model-registry.html, introduction/index.html,...</td>
+      <td>1</td>
+      <td>0.5</td>
+      <td>0.333333</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>0.919721</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>What is the purpose of registering a model wit...</td>
+      <td>[model-registry.html]</td>
+      <td>[model-registry.html, models.html, introductio...</td>
+      <td>1</td>
+      <td>0.5</td>
+      <td>0.333333</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>1.000000</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>What can you do with registered models and mod...</td>
+      <td>[model-registry.html]</td>
+      <td>[model-registry.html, models.html, deployment/...</td>
+      <td>1</td>
+      <td>0.5</td>
+      <td>0.333333</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>1.000000</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>How can you add, modify, update, or delete a m...</td>
+      <td>[model-registry.html]</td>
+      <td>[model-registry.html, models.html, deployment/...</td>
+      <td>1</td>
+      <td>0.5</td>
+      <td>0.333333</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>1.000000</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>How can you deploy and organize models in the ...</td>
+      <td>[model-registry.html]</td>
+      <td>[model-registry.html, deployment/index.html, d...</td>
+      <td>1</td>
+      <td>0.5</td>
+      <td>0.333333</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>0.919721</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>With the evaluate results table, you can further visualize the well-answered questions and poorly-answered questions using topical analysis techniques.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">nltk</span>
+<span class="kn">import</span> <span class="nn">pyLDAvis.gensim_models</span> <span class="k">as</span> <span class="nn">gensimvis</span>
+<span class="kn">from</span> <span class="nn">gensim</span> <span class="kn">import</span> <span class="n">corpora</span><span class="p">,</span> <span class="n">models</span>
+<span class="kn">from</span> <span class="nn">nltk.corpus</span> <span class="kn">import</span> <span class="n">stopwords</span>
+<span class="kn">from</span> <span class="nn">nltk.tokenize</span> <span class="kn">import</span> <span class="n">word_tokenize</span>
+
+<span class="c1"># Initialize NLTK resources</span>
+<span class="n">nltk</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="s2">&quot;punkt&quot;</span><span class="p">)</span>
+<span class="n">nltk</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="s2">&quot;stopwords&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">topical_analysis</span><span class="p">(</span><span class="n">questions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+    <span class="n">stop_words</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">stopwords</span><span class="o">.</span><span class="n">words</span><span class="p">(</span><span class="s2">&quot;english&quot;</span><span class="p">))</span>
+
+    <span class="c1"># Tokenize and remove stop words</span>
+    <span class="n">tokenized_data</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">question</span> <span class="ow">in</span> <span class="n">questions</span><span class="p">:</span>
+        <span class="n">tokens</span> <span class="o">=</span> <span class="n">word_tokenize</span><span class="p">(</span><span class="n">question</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+        <span class="n">filtered_tokens</span> <span class="o">=</span> <span class="p">[</span><span class="n">word</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">tokens</span> <span class="k">if</span> <span class="n">word</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">stop_words</span> <span class="ow">and</span> <span class="n">word</span><span class="o">.</span><span class="n">isalpha</span><span class="p">()]</span>
+        <span class="n">tokenized_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">filtered_tokens</span><span class="p">)</span>
+
+    <span class="c1"># Create a dictionary and corpus</span>
+    <span class="n">dictionary</span> <span class="o">=</span> <span class="n">corpora</span><span class="o">.</span><span class="n">Dictionary</span><span class="p">(</span><span class="n">tokenized_data</span><span class="p">)</span>
+    <span class="n">corpus</span> <span class="o">=</span> <span class="p">[</span><span class="n">dictionary</span><span class="o">.</span><span class="n">doc2bow</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="n">tokenized_data</span><span class="p">]</span>
+
+    <span class="c1"># Apply LDA model</span>
+    <span class="n">lda_model</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">LdaModel</span><span class="p">(</span><span class="n">corpus</span><span class="p">,</span> <span class="n">num_topics</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">id2word</span><span class="o">=</span><span class="n">dictionary</span><span class="p">,</span> <span class="n">passes</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+
+    <span class="c1"># Get topic distribution for each question</span>
+    <span class="n">topic_distribution</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ques</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">questions</span><span class="p">):</span>
+        <span class="n">bow</span> <span class="o">=</span> <span class="n">dictionary</span><span class="o">.</span><span class="n">doc2bow</span><span class="p">(</span><span class="n">tokenized_data</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">topics</span> <span class="o">=</span> <span class="n">lda_model</span><span class="o">.</span><span class="n">get_document_topics</span><span class="p">(</span><span class="n">bow</span><span class="p">)</span>
+        <span class="n">topic_distribution</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">topics</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Question: </span><span class="si">{</span><span class="n">ques</span><span class="si">}</span><span class="se">\n</span><span class="s2">Topic: </span><span class="si">{</span><span class="n">topics</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Print all topics</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Topics found are:&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">topic</span> <span class="ow">in</span> <span class="n">lda_model</span><span class="o">.</span><span class="n">print_topics</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Topic: </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">Words: </span><span class="si">{</span><span class="n">topic</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">lda_model</span><span class="p">,</span> <span class="n">corpus</span><span class="p">,</span> <span class="n">dictionary</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+[nltk_data] Downloading package punkt to
+[nltk_data]     /Users/liang.zhang/nltk_data...
+[nltk_data]   Package punkt is already up-to-date!
+[nltk_data] Downloading package stopwords to
+[nltk_data]     /Users/liang.zhang/nltk_data...
+[nltk_data]   Package stopwords is already up-to-date!
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">filtered_df</span> <span class="o">=</span> <span class="n">eval_results_table</span><span class="p">[</span><span class="n">eval_results_table</span><span class="p">[</span><span class="s2">&quot;precision_at_1/score&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span>
+<span class="n">hit_questions</span> <span class="o">=</span> <span class="n">filtered_df</span><span class="p">[</span><span class="s2">&quot;question&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+<span class="n">filtered_df</span> <span class="o">=</span> <span class="n">eval_results_table</span><span class="p">[</span><span class="n">eval_results_table</span><span class="p">[</span><span class="s2">&quot;precision_at_1/score&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span>
+<span class="n">miss_questions</span> <span class="o">=</span> <span class="n">filtered_df</span><span class="p">[</span><span class="s2">&quot;question&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lda_model</span><span class="p">,</span> <span class="n">corpus</span><span class="p">,</span> <span class="n">dictionary</span> <span class="o">=</span> <span class="n">topical_analysis</span><span class="p">(</span><span class="n">hit_questions</span><span class="p">)</span>
+<span class="n">vis_data</span> <span class="o">=</span> <span class="n">gensimvis</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="n">lda_model</span><span class="p">,</span> <span class="n">corpus</span><span class="p">,</span> <span class="n">dictionary</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Question: What is the purpose of the MLflow Model Registry?
+Topic: [(0, 0.0400703), (1, 0.040002838), (2, 0.040673085), (3, 0.04075462), (4, 0.8384991)]
+Question: What is the purpose of registering a model with the Model Registry?
+Topic: [(0, 0.0334267), (1, 0.033337697), (2, 0.033401005), (3, 0.033786207), (4, 0.8660484)]
+Question: What can you do with registered models and model versions?
+Topic: [(0, 0.04019648), (1, 0.04000775), (2, 0.040166058), (3, 0.8391777), (4, 0.040452003)]
+Question: How can you add, modify, update, or delete a model in the Model Registry?
+Topic: [(0, 0.025052568), (1, 0.025006149), (2, 0.025024023), (3, 0.025236268), (4, 0.899681)]
+Question: How can you deploy and organize models in the Model Registry?
+Topic: [(0, 0.033460867), (1, 0.033337582), (2, 0.033362914), (3, 0.8659808), (4, 0.033857808)]
+Question: What method do you use to create a new registered model?
+Topic: [(0, 0.028867528), (1, 0.028582651), (2, 0.882546), (3, 0.030021703), (4, 0.029982116)]
+Question: How can you deploy and organize models in the Model Registry?
+Topic: [(0, 0.033460878), (1, 0.033337586), (2, 0.033362918), (3, 0.8659798), (4, 0.03385884)]
+Question: How can you fetch a list of registered models in the MLflow registry?
+Topic: [(0, 0.0286206), (1, 0.028577656), (2, 0.02894385), (3, 0.88495284), (4, 0.028905064)]
+Question: What is the default channel logged for models using MLflow v1.18 and above?
+Topic: [(0, 0.02862059), (1, 0.028577654), (2, 0.028883327), (3, 0.8851736), (4, 0.028744776)]
+Question: What information is stored in the conda.yaml file?
+Topic: [(0, 0.050020963), (1, 0.051287953), (2, 0.051250603), (3, 0.7968765), (4, 0.05056402)]
+Question: How can you save a model with a manually specified conda environment?
+Topic: [(0, 0.02862434), (1, 0.02858204), (2, 0.02886313), (3, 0.8851747), (4, 0.028755778)]
+Question: What are inference params and how are they used during model inference?
+Topic: [(0, 0.86457103), (1, 0.03353862), (2, 0.033417325), (3, 0.034004394), (4, 0.034468662)]
+Question: What is the purpose of model signatures in MLflow?
+Topic: [(0, 0.040070876), (1, 0.04000346), (2, 0.040688124), (3, 0.040469088), (4, 0.8387685)]
+Question: What is the API used to set signatures on models?
+Topic: [(0, 0.033873636), (1, 0.033508822), (2, 0.033337757), (3, 0.035357967), (4, 0.8639218)]
+Question: What components are used to generate the final time series?
+Topic: [(0, 0.028693806), (1, 0.8853218), (2, 0.028573763), (3, 0.02862714), (4, 0.0287835)]
+Question: What functionality does the configuration DataFrame submitted to the pyfunc flavor provide?
+Topic: [(0, 0.02519801), (1, 0.025009492), (2, 0.025004204), (3, 0.025004204), (4, 0.8997841)]
+Question: What is a common configuration for lowering the total memory pressure for pytorch models within transformers pipelines?
+Topic: [(0, 0.93316424), (1, 0.016669936), (2, 0.016668117), (3, 0.016788227), (4, 0.016709473)]
+Question: What does the save_model() function do?
+Topic: [(0, 0.10002145), (1, 0.59994656), (2, 0.10001026), (3, 0.10001026), (4, 0.10001151)]
+Question: What is an MLflow Project?
+Topic: [(0, 0.06667001), (1, 0.06667029), (2, 0.7321751), (3, 0.06711196), (4, 0.06737265)]
+Question: What are the entry points in a MLproject file and how can you specify parameters for them?
+Topic: [(0, 0.02857626), (1, 0.88541776), (2, 0.02868285), (3, 0.028626908), (4, 0.02869626)]
+Question: What are the project environments supported by MLflow?
+Topic: [(0, 0.040009078), (1, 0.040009864), (2, 0.839655), (3, 0.040126894), (4, 0.040199146)]
+Question: What is the purpose of specifying a Conda environment in an MLflow project?
+Topic: [(0, 0.028579442), (1, 0.028580135), (2, 0.8841217), (3, 0.028901232), (4, 0.029817443)]
+Question: What is the purpose of the MLproject file?
+Topic: [(0, 0.05001335), (1, 0.052611485), (2, 0.050071735), (3, 0.05043289), (4, 0.7968705)]
+Question: How can you pass runtime parameters to the entry point of an MLflow Project?
+Topic: [(0, 0.025007373), (1, 0.025498485), (2, 0.8993807), (3, 0.02504522), (4, 0.025068246)]
+Question: How does MLflow run a Project on Kubernetes?
+Topic: [(0, 0.04000677), (1, 0.040007353), (2, 0.83931196), (3, 0.04012452), (4, 0.04054937)]
+Question: What fields are replaced when MLflow creates a Kubernetes Job for an MLflow Project?
+Topic: [(0, 0.022228329), (1, 0.022228856), (2, 0.023192631), (3, 0.02235802), (4, 0.90999216)]
+Question: What is the syntax for searching runs using the MLflow UI and API?
+Topic: [(0, 0.025003674), (1, 0.02500399), (2, 0.02527212), (3, 0.89956146), (4, 0.025158761)]
+Question: What is the syntax for searching runs using the MLflow UI and API?
+Topic: [(0, 0.025003672), (1, 0.025003988), (2, 0.025272164), (3, 0.8995614), (4, 0.025158769)]
+Question: What are the key parts of a search expression in MLflow?
+Topic: [(0, 0.03334423), (1, 0.03334517), (2, 0.8662702), (3, 0.033611353), (4, 0.033429127)]
+Question: What are the key attributes for the model with the run_id &#39;a1b2c3d4&#39; and run_name &#39;my-run&#39;?
+Topic: [(0, 0.05017508), (1, 0.05001634), (2, 0.05058142), (3, 0.7985237), (4, 0.050703418)]
+Question: What information does each run record in MLflow Tracking?
+Topic: [(0, 0.03333968), (1, 0.033340227), (2, 0.86639804), (3, 0.03349555), (4, 0.033426523)]
+Question: What are the two components used by MLflow for storage?
+Topic: [(0, 0.0334928), (1, 0.033938777), (2, 0.033719826), (3, 0.03357158), (4, 0.86527705)]
+Question: What interfaces does the MLflow client use to record MLflow entities and artifacts when running MLflow on a local machine with a SQLAlchemy-compatible database?
+Topic: [(0, 0.014289577), (1, 0.014289909), (2, 0.94276434), (3, 0.014325481), (4, 0.014330726)]
+Question: What is the default backend store used by MLflow?
+Topic: [(0, 0.033753525), (1, 0.03379533), (2, 0.033777602), (3, 0.86454684), (4, 0.0341267)]
+Question: What information does autologging capture when launching short-lived MLflow runs?
+Topic: [(0, 0.028579954), (1, 0.02858069), (2, 0.8851724), (3, 0.029027484), (4, 0.028639426)]
+Question: What is the purpose of the --serve-artifacts flag?
+Topic: [(0, 0.06670548), (1, 0.066708855), (2, 0.067003354), (3, 0.3969311), (4, 0.40265122)]
+
+Topics found are:
+Topic: 0
+Words: 0.059*&#34;inference&#34; + 0.032*&#34;models&#34; + 0.032*&#34;used&#34; + 0.032*&#34;configuration&#34; + 0.032*&#34;common&#34; + 0.032*&#34;transformers&#34; + 0.032*&#34;total&#34; + 0.032*&#34;within&#34; + 0.032*&#34;pytorch&#34; + 0.032*&#34;pipelines&#34;
+
+Topic: 1
+Words: 0.036*&#34;file&#34; + 0.035*&#34;mlproject&#34; + 0.035*&#34;used&#34; + 0.035*&#34;components&#34; + 0.035*&#34;entry&#34; + 0.035*&#34;parameters&#34; + 0.035*&#34;specify&#34; + 0.035*&#34;final&#34; + 0.035*&#34;points&#34; + 0.035*&#34;time&#34;
+
+Topic: 2
+Words: 0.142*&#34;mlflow&#34; + 0.066*&#34;project&#34; + 0.028*&#34;information&#34; + 0.028*&#34;use&#34; + 0.028*&#34;record&#34; + 0.028*&#34;run&#34; + 0.015*&#34;key&#34; + 0.015*&#34;running&#34; + 0.015*&#34;artifacts&#34; + 0.015*&#34;client&#34;
+
+Topic: 3
+Words: 0.066*&#34;models&#34; + 0.066*&#34;model&#34; + 0.066*&#34;mlflow&#34; + 0.041*&#34;using&#34; + 0.041*&#34;registry&#34; + 0.028*&#34;api&#34; + 0.028*&#34;registered&#34; + 0.028*&#34;runs&#34; + 0.028*&#34;syntax&#34; + 0.028*&#34;searching&#34;
+
+Topic: 4
+Words: 0.089*&#34;model&#34; + 0.074*&#34;purpose&#34; + 0.074*&#34;mlflow&#34; + 0.046*&#34;registry&#34; + 0.031*&#34;used&#34; + 0.031*&#34;signatures&#34; + 0.017*&#34;kubernetes&#34; + 0.017*&#34;fields&#34; + 0.017*&#34;job&#34; + 0.017*&#34;replaced&#34;
+
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Uncomment the following line to render the interactive widget</span>
+<span class="c1"># pyLDAvis.display(vis_data)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lda_model</span><span class="p">,</span> <span class="n">corpus</span><span class="p">,</span> <span class="n">dictionary</span> <span class="o">=</span> <span class="n">topical_analysis</span><span class="p">(</span><span class="n">miss_questions</span><span class="p">)</span>
+<span class="n">vis_data</span> <span class="o">=</span> <span class="n">gensimvis</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="n">lda_model</span><span class="p">,</span> <span class="n">corpus</span><span class="p">,</span> <span class="n">dictionary</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Question: What is the purpose of the mlflow.sklearn.log_model() method?
+Topic: [(0, 0.0669118), (1, 0.06701085), (2, 0.06667974), (3, 0.73235476), (4, 0.06704286)]
+Question: How can you fetch a specific model version?
+Topic: [(0, 0.83980393), (1, 0.040003464), (2, 0.04000601), (3, 0.040101767), (4, 0.040084846)]
+Question: How can you fetch the latest model version in a specific stage?
+Topic: [(0, 0.88561153), (1, 0.028575428), (2, 0.028578365), (3, 0.0286214), (4, 0.028613236)]
+Question: What can you do to promote MLflow Models across environments?
+Topic: [(0, 0.8661927), (1, 0.0333396), (2, 0.03362743), (3, 0.033428304), (4, 0.033411972)]
+Question: What is the name of the model and its version details?
+Topic: [(0, 0.83978903), (1, 0.04000637), (2, 0.04001106), (3, 0.040105395), (4, 0.040088095)]
+Question: What is the purpose of saving the model in pickled format?
+Topic: [(0, 0.033948876), (1, 0.03339717), (2, 0.033340737), (3, 0.86575514), (4, 0.033558063)]
+Question: What is an MLflow Model and what is its purpose?
+Topic: [(0, 0.7940762), (1, 0.05068333), (2, 0.050770763), (3, 0.053328265), (4, 0.05114142)]
+Question: What are the flavors defined in the MLmodel file for the mlflow.sklearn library?
+Topic: [(0, 0.86628276), (1, 0.033341788), (2, 0.03334801), (3, 0.03368498), (4, 0.033342462)]
+Question: What command can be used to package and deploy models to AWS SageMaker?
+Topic: [(0, 0.89991224), (1, 0.025005225), (2, 0.025009066), (3, 0.025006713), (4, 0.025066752)]
+Question: What is the purpose of the --build-image flag when running mlflow run?
+Topic: [(0, 0.033957016), (1, 0.033506736), (2, 0.034095332), (3, 0.034164555), (4, 0.86427635)]
+Question: What is the relative path to the python_env YAML file within the MLflow project&#39;s directory?
+Topic: [(0, 0.02243), (1, 0.02222536), (2, 0.022470985), (3, 0.9105873), (4, 0.02228631)]
+Question: What are the additional local volume mounted and environment variables in the docker container?
+Topic: [(0, 0.022225259), (1, 0.9110914), (2, 0.02222932), (3, 0.022227468), (4, 0.022226628)]
+Question: What are some examples of entity names that contain special characters?
+Topic: [(0, 0.028575381), (1, 0.88568854), (2, 0.02858065), (3, 0.028578246), (4, 0.028577149)]
+Question: What type of constant does the RHS need to be if LHS is a metric?
+Topic: [(0, 0.028575381), (1, 0.8856886), (2, 0.028580645), (3, 0.028578239), (4, 0.028577147)]
+Question: How can you get all active runs from experiments IDs 3, 4, and 17 that used a CNN model with 10 layers and had a prediction accuracy of 94.5% or higher?
+Topic: [(0, 0.015563371), (1, 0.015387185), (2, 0.015389071), (3, 0.015427767), (4, 0.9382326)]
+Question: What is the purpose of the &#39;experimentIds&#39; variable in the given paragraph?
+Topic: [(0, 0.040206533), (1, 0.8384999), (2, 0.040013183), (3, 0.040967643), (4, 0.040312726)]
+Question: What is the MLflow Tracking component used for?
+Topic: [(0, 0.8390845), (1, 0.04000697), (2, 0.040462855), (3, 0.04014182), (4, 0.040303845)]
+Question: How can you create an experiment in MLflow?
+Topic: [(0, 0.050333958), (1, 0.0500024), (2, 0.7993825), (3, 0.050153885), (4, 0.05012722)]
+Question: How can you create an experiment using MLflow?
+Topic: [(0, 0.04019285), (1, 0.04000254), (2, 0.8396381), (3, 0.040091105), (4, 0.04007539)]
+Question: What is the architecture depicted in this example scenario?
+Topic: [(0, 0.04000523), (1, 0.040007014), (2, 0.040012203), (3, 0.04000902), (4, 0.83996654)]
+
+Topics found are:
+Topic: 0
+Words: 0.078*&#34;model&#34; + 0.059*&#34;mlflow&#34; + 0.059*&#34;version&#34; + 0.041*&#34;models&#34; + 0.041*&#34;fetch&#34; + 0.041*&#34;specific&#34; + 0.041*&#34;used&#34; + 0.022*&#34;command&#34; + 0.022*&#34;deploy&#34; + 0.022*&#34;sagemaker&#34;
+
+Topic: 1
+Words: 0.030*&#34;local&#34; + 0.030*&#34;container&#34; + 0.030*&#34;variables&#34; + 0.030*&#34;docker&#34; + 0.030*&#34;mounted&#34; + 0.030*&#34;environment&#34; + 0.030*&#34;volume&#34; + 0.030*&#34;additional&#34; + 0.030*&#34;special&#34; + 0.030*&#34;names&#34;
+
+Topic: 2
+Words: 0.096*&#34;experiment&#34; + 0.096*&#34;create&#34; + 0.096*&#34;mlflow&#34; + 0.051*&#34;using&#34; + 0.009*&#34;purpose&#34; + 0.009*&#34;model&#34; + 0.009*&#34;method&#34; + 0.009*&#34;file&#34; + 0.009*&#34;version&#34; + 0.009*&#34;used&#34;
+
+Topic: 3
+Words: 0.071*&#34;purpose&#34; + 0.039*&#34;file&#34; + 0.039*&#34;mlflow&#34; + 0.039*&#34;yaml&#34; + 0.039*&#34;directory&#34; + 0.039*&#34;relative&#34; + 0.039*&#34;within&#34; + 0.039*&#34;path&#34; + 0.039*&#34;project&#34; + 0.039*&#34;format&#34;
+
+Topic: 4
+Words: 0.032*&#34;purpose&#34; + 0.032*&#34;used&#34; + 0.032*&#34;model&#34; + 0.032*&#34;prediction&#34; + 0.032*&#34;get&#34; + 0.032*&#34;accuracy&#34; + 0.032*&#34;active&#34; + 0.032*&#34;layers&#34; + 0.032*&#34;higher&#34; + 0.032*&#34;experiments&#34;
+
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Uncomment the following line to render the interactive widget</span>
+<span class="c1"># pyLDAvis.display(vis_data)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+              </div>
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="question-generation-retrieval-evaluation.html" class="btn btn-neutral" title="Question Generation For Retrieval Evaluation" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+      
+      
+        <a href="../../custom-pyfunc-for-llms/index.html" class="btn btn-neutral" title="Deploying Advanced LLMs with Custom PyFuncs in MLflow" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+      <p class="copyright">
+          &copy; MLflow Project, a Series of LF Projects, LLC. All rights reserved.
+      </p>
+
+  </div> 
+
+</footer>
+          </div>
+        </div>
+      </section>
+    </main>
+  </page>
+
+  
+
+
+  
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+      URL_ROOT:'../../../',
+      VERSION:'2.9.2.dev0',
+      COLLAPSE_INDEX:false,
+      FILE_SUFFIX:'.html',
+      LINK_SUFFIX: '.html',
+      HAS_SOURCE:  true
+    };
+  </script>
+
+  
+
+  <script type="text/javascript" src="../../../_static/js/clipboard.min.js"></script>
+  <script type="text/javascript" src="../../../_static/js/jquery.waypoints.min.js"></script>
+
+  
+  
+  
+  <script type="text/javascript">var CLIPPY_SVG_PATH = "../../../_static/clippy.svg";</script>
+  <script type="text/javascript" src="../../../_static/js/custom.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.StickyNav.enable();
+    });
+
+  </script>
+  
+
+  
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        // Get the code block designator class entries
+        const allHighlights = document.querySelectorAll('.highlight');
+        // Disable copyable links for notebook cell numbering and for cell outputs
+        const highlights = Array.from(allHighlights).filter(highlight => !highlight.closest('.highlight-none') && 
+            !highlight.closest('.nboutput'));
+    
+        highlights.forEach(function(highlight) {
+            const copyIcon = document.createElement('span');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.innerHTML = '&#xf0ea;';
+
+            copyIcon.addEventListener('click', function() {
+                const code = highlight.querySelector('pre').textContent;
+                copyToClipboard(code);
+
+                // Flash effect on click
+                this.style.color = '#0194E2';
+                setTimeout(() => {
+                    this.style.color = ''; 
+                }, 100);
+
+                // Display "Code copied to clipboard" near the clicked icon
+                const message = document.createElement('span');
+                message.textContent = "Copied!";
+                message.classList.add('copy-message'); 
+
+                // Append the message to the icon
+                this.appendChild(message);
+
+                setTimeout(() => {
+                    this.removeChild(message);
+                }, 500);
+            });
+
+            highlight.appendChild(copyIcon);
+        });
+    });
+  </script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Force download for notebook-download-btn
+        const downloadButtons = document.querySelectorAll('.notebook-download-btn');
+        downloadButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                // Fetch the raw content of the notebook from GitHub
+                fetch(button.href)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = url;
+                        const filename = button.href.split('/').pop();
+                        link.download = filename; 
+
+                        document.body.appendChild(link);
+                        link.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    })
+                    .catch(err => console.error('Error fetching the notebook:', err));
+            });
+        });
+    });
+</script> 
+</body>
+</html>

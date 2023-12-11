@@ -1,0 +1,615 @@
+
+  
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Remote Experiment Tracking with MLflow Tracking Server &mdash; MLflow 2.9.2.dev0 documentation</title>
+  
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/tracking/tutorials/remote-server.html">
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    
+
+    
+
+  
+    
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/grids.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/mobile.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/simple-cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/tabs.css" type="text/css" />
+    
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="MLflow 2.9.2.dev0 documentation" href="../../index.html"/>
+        <link rel="up" title="MLflow Tracking" href="../../tracking.html"/>
+        <link rel="next" title="System Metrics" href="/../../system-metrics/index.html"/>
+        <link rel="prev" title="Tracking Experiments with a Local Database" href="/local-database.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+<script type="text/javascript" src="../../_static/jquery.js"></script>
+<script type="text/javascript" src="../../_static/underscore.js"></script>
+<script type="text/javascript" src="../../_static/doctools.js"></script>
+<script type="text/javascript" src="../../_static/languagesections.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+
+<body class="wy-body-for-nav" role="document">
+  
+
+  
+  <nav class="wy-nav-top header" role="navigation" aria-label="top navigation">
+    <ul>
+  <li class="menu-toggle">
+    <i data-toggle="wy-nav-top" class="wy-nav-top-menu-button db-icon db-icon-menu pull-left"></i>
+    <a href="../../index.html" class="wy-nav-top-logo"
+      ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
+    /></a>
+    <span class="version">2.9.2.dev0</span>
+  </li>
+</ul>
+  </nav>
+  <page>
+    
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side relative">
+      <div class="wy-side-scroll">
+  <div class="wy-side-nav-search">
+    
+
+    
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+    
+  </div>
+
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+    
+      <a href="../../index.html" class="main-navigation-home"><img src="../../_static/icons/nav-home.svg"> MLflow</a>
+    
+
+    
+      
+
+      
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../introduction/index.html">What is MLflow?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started/index.html">Getting Started with MLflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../new-features/index.html">New Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../llms/index.html">LLMs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../model-evaluation/index.html">Model Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../deep-learning/index.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../traditional-ml/index.html">Traditional ML</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../deployment/index.html">Deployment</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../tracking.html">MLflow Tracking</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../tracking.html#quickstart">Quickstart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tracking.html#concepts">Concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tracking.html#tracking-runs">Tracking Runs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tracking.html#explore-runs-and-results">Explore Runs and Results</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../tracking.html#set-up-the-mlflow-tracking-environment">Set up the MLflow Tracking Environment</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../../tracking.html#components">Components</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../../tracking.html#common-setups">Common Setups</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../../getting-started/intro-quickstart/index.html">MLflow Tracking Quickstart</a></li>
+<li class="toctree-l4"><a class="reference internal" href="local-database.html">Tracking Experiments with a Local Database</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Remote Experiment Tracking with MLflow Tracking Server</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../tracking.html#other-configuration-with-mlflow-tracking-server">Other Configuration with <span class="xref std std-ref">MLflow Tracking Server</span></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../tracking.html#faq">FAQ</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../system-metrics/index.html">System Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../projects.html">MLflow Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../models.html">MLflow Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../model-registry.html">MLflow Model Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../recipes.html">MLflow Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plugins.html">MLflow Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auth/index.html">MLflow Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../search-runs.html">Search Runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../search-experiments.html">Search Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../python_api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../R-api.html">R API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../java_api/index.html">Java API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rest-api.html">REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../docker.html">Official MLflow Docker Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../community-model-flavors.html">Community Model Flavors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials-and-examples/index.html">Tutorials and Examples</a></li>
+</ul>
+
+      
+    
+  </div>
+
+  <div role="contentinfo">
+    
+
+    <p>
+      <a id='feedbacklink' href="https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a>
+    </p>
+  </div>
+</div>
+    </nav>
+
+    <main class="wy-grid-for-nav">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+          <div class="rst-content">
+            
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Documentation</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../../tracking.html">MLflow Tracking</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+    
+      <li>Remote Experiment Tracking with MLflow Tracking Server</li>
+    
+    
+    <!-- <li class="wy-breadcrumbs-aside">
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/tracking/tutorials/remote-server.rst" class="fa fa-github"> Edit on GitHub</a>
+    </li> -->
+    
+  </ul>
+</div>
+            <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <div itemprop="articleBody">
+                
+  <div class="section" id="remote-experiment-tracking-with-mlflow-tracking-server">
+<h1>Remote Experiment Tracking with MLflow Tracking Server<a class="headerlink" href="#remote-experiment-tracking-with-mlflow-tracking-server" title="Permalink to this headline"> </a></h1>
+<p>In this tutorial, you will learn how to set up MLflow Tracking environment for team development using the <a class="reference internal" href="../../tracking.html#tracking-server"><span class="std std-ref">MLflow Tracking Server</span></a>.</p>
+<p>There are many benefits to utilize MLflow Tracking Server for remote experiment tracking:</p>
+<ul class="simple">
+<li><p><strong>Collaboration</strong>: Multiple users can log runs to the same endpoint, and query runs and models logged by other users.</p></li>
+<li><p><strong>Sharing Results</strong>: The tracking server also serves a <a class="reference internal" href="../../tracking.html#tracking-ui"><span class="std std-ref">Tracking UI</span></a> endpoint, where team members can easily explore each other’s results.</p></li>
+<li><p><strong>Centralized Access</strong>: The tracking server can be run as a proxy for the remote access for metadata and artifacts, making it easier to secure and audit access to data.</p></li>
+</ul>
+<div class="section" id="how-does-it-work">
+<h2>How does it work?<a class="headerlink" href="#how-does-it-work" title="Permalink to this headline"> </a></h2>
+<p>The following picture depicts the architecture of using a remote MLflow Tracking Server with PostgreSQL and S3</p>
+<div class="figure align-center" id="id2" style="width: 900px">
+<img alt="../../_images/scenario_5.png" src="../../_images/scenario_5.png" />
+<p class="caption"><span class="caption-text">Artifacture diagram of MLflow Tracking Server with PostgreSQL and S3</span><a class="headerlink" href="#id2" title="Permalink to this image"> </a></p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You can find the list of supported data stores in the <a class="reference external" href="../artifacts-stores.html">artifact stores</a> and <cite>backend stores &lt;../backend-stores.html&gt;</cite> documentation guides.</p>
+</div>
+<p>When you start logging runs to the MLflow Tracking Server, the following happens:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Part 1a and b</strong>:</p></li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li><p>The MLflow client creates an instance of a <cite>RestStore</cite> and sends REST API requests to log MLflow entities</p></li>
+<li><p>The Tracking Server creates an instance of an <cite>SQLAlchemyStore</cite> and connects to the remote host for inserting
+tracking information in the database (i.e., metrics, parameters, tags, etc.)</p></li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li><p><strong>Part 1c and d</strong>:</p></li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li><p>Retrieval requests by the client return information from the configured <cite>SQLAlchemyStore</cite> table</p></li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li><p><strong>Part 2a and b</strong>:</p></li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li><p>Logging events for artifacts are made by the client using the <code class="docutils literal notranslate"><span class="pre">HttpArtifactRepository</span></code> to write files to MLflow Tracking Server</p></li>
+<li><p>The Tracking Server then writes these files to the configured object store location with assumed role authentication</p></li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li><p><strong>Part 2c and d</strong>:</p></li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li><p>Retrieving artifacts from the configured backend store for a user request is done with the same authorized authentication that was configured at server start</p></li>
+<li><p>Artifacts are passed to the end user through the Tracking Server through the interface of the <code class="docutils literal notranslate"><span class="pre">HttpArtifactRepository</span></code></p></li>
+</ul>
+</div></blockquote>
+</div></blockquote>
+</div>
+<div class="section" id="getting-started">
+<h2>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline"> </a></h2>
+<div class="section" id="preface">
+<h3>Preface<a class="headerlink" href="#preface" title="Permalink to this headline"> </a></h3>
+<p>In an actual production deployment environment, you will have multiple remote hosts to run both the tracking server and databases, as shown in the diagram above. However, for the purposes of this tutorial,
+we will just use a single machine with multiple Docker containers running on different ports, mimicking the remote environment with a far easier evaluation tutorial setup. We will also use <a class="reference external" href="https://min.io/">MinIO</a>,
+an S3-compatible object storage, as an artifact store so that you don’t need to have AWS account to run this tutorial.</p>
+</div>
+<div class="section" id="step-1-get-mlflow-and-additional-dependencies">
+<h3>Step 1 - Get MLflow and additional dependencies<a class="headerlink" href="#step-1-get-mlflow-and-additional-dependencies" title="Permalink to this headline"> </a></h3>
+<p>MLflow is available on PyPI. Also <a class="reference external" href="https://pypi.org/project/psycopg2/">pyscopg2</a> and <a class="reference external" href="https://boto3.amazonaws.com/v1/documentation/api/latest/index.html">boto3</a> are required for accessing PostgreSQL and S3 with Python.
+If you don’t already have them installed on your system, you can install them with:</p>
+<div class="code-section docutils container">
+<div class="highlight-bash notranslate" id="install-mlflow"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>mlflow<span class="w"> </span>psycopg2<span class="w"> </span>boto3
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="step-2-set-up-remote-data-stores">
+<h3>Step 2 - Set up remote data stores<a class="headerlink" href="#step-2-set-up-remote-data-stores" title="Permalink to this headline"> </a></h3>
+<p>MLflow Tracking Server can interact with a variety of data stores to store experiment and run data as well as artifacts.
+In this tutorial, we will use <strong>Docker Compose</strong> to start two containers, each of them simulating remote servers in an actual environment.</p>
+<ol class="arabic simple">
+<li><p><a class="reference external" href="https://www.postgresql.org/">PostgreSQL</a> database as a backend store.</p></li>
+<li><p><a class="reference external" href="https://min.io/">MinIO</a> server as an artifact store.</p></li>
+</ol>
+<div class="section" id="install-docker-and-docker-compose">
+<h4>Install docker and docker-compose<a class="headerlink" href="#install-docker-and-docker-compose" title="Permalink to this headline"> </a></h4>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>These docker steps are only required for the tutorial purpose. MLflow itself doesn’t depend on Docker at all.</p>
+</div>
+<p>Follow the official instructions for installing <a class="reference external" href="https://docs.docker.com/install/">Docker</a> and <a class="reference external" href="https://docs.docker.com/compose/install/">Docker Compose</a>. Then, run <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">--version</span></code> and <code class="docutils literal notranslate"><span class="pre">docker-compose</span> <span class="pre">--version</span></code> to make sure they are installed correctly.</p>
+</div>
+<div class="section" id="create-compose-yaml">
+<h4>Create <code class="docutils literal notranslate"><span class="pre">compose.yaml</span></code><a class="headerlink" href="#create-compose-yaml" title="Permalink to this headline"> </a></h4>
+<p>Create a file named <code class="docutils literal notranslate"><span class="pre">compose.yaml</span></code> with the following content:</p>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">compose.yaml</span><a class="headerlink" href="#id3" title="Permalink to this code"> </a></div>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;3.7&#39;</span>
+<span class="nt">services</span><span class="p">:</span>
+<span class="w">  </span><span class="c1"># PostgreSQL database</span>
+<span class="w">  </span><span class="nt">postgres</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">postgres:latest</span>
+<span class="w">    </span><span class="nt">environment</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">POSTGRES_USER</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">user</span>
+<span class="w">      </span><span class="nt">POSTGRES_PASSWORD</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">password</span>
+<span class="w">      </span><span class="nt">POSTGRES_DB</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mlflowdb</span>
+<span class="w">    </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5432:5432</span>
+<span class="w">    </span><span class="nt">volumes</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./postgres-data:/var/lib/postgresql/data</span>
+<span class="w">  </span><span class="c1"># MinIO server</span>
+<span class="w">  </span><span class="nt">minio</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">minio/minio</span>
+<span class="w">    </span><span class="nt">expose</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;9000&quot;</span>
+<span class="w">    </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;9000:9000&quot;</span>
+<span class="w">      </span><span class="c1"># MinIO Console is available at http://localhost:9001</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;9001:9001&quot;</span>
+<span class="w">    </span><span class="nt">environment</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">MINIO_ROOT_USER</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;minio_user&quot;</span>
+<span class="w">      </span><span class="nt">MINIO_ROOT_PASSWORD</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;minio_password&quot;</span>
+<span class="w">    </span><span class="nt">healthcheck</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">test</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">timeout 5s bash -c &#39;:&gt; /dev/tcp/127.0.0.1/9000&#39; || exit 1</span>
+<span class="w">      </span><span class="nt">interval</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1s</span>
+<span class="w">      </span><span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10s</span>
+<span class="w">      </span><span class="nt">retries</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span>
+<span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server /data --console-address &quot;:9001&quot;</span>
+<span class="w">  </span><span class="c1"># Create a bucket named &quot;bucket&quot; if it doesn&#39;t exist</span>
+<span class="w">  </span><span class="nt">minio-create-bucket</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">minio/mc</span>
+<span class="w">    </span><span class="nt">depends_on</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">minio</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">condition</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">service_healthy</span>
+<span class="w">    </span><span class="nt">entrypoint</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">&gt;</span>
+<span class="w">      </span><span class="no">bash -c &quot;</span>
+<span class="w">      </span><span class="no">mc alias set minio http://minio:9000 minio_user minio_password &amp;&amp;</span>
+<span class="w">      </span><span class="no">if ! mc ls minio | grep --quiet bucket; then</span>
+<span class="w">        </span><span class="no">mc mb minio/bucket</span>
+<span class="w">      </span><span class="no">else</span>
+<span class="w">        </span><span class="no">echo &#39;bucket already exists&#39;</span>
+<span class="w">      </span><span class="no">fi</span>
+<span class="w">      </span><span class="no">&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="start-the-containers">
+<h4>Start the containers<a class="headerlink" href="#start-the-containers" title="Permalink to this headline"> </a></h4>
+<p>Run the following command from the same directory <code class="docutils literal notranslate"><span class="pre">compose.yaml</span></code> file resides to start the containers. This will start the containers for PostgreSQL and Minio server in the background, as well as create a new bucket named “bucket” in Minio.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="step-3-start-the-tracking-server">
+<h3>Step 3 - Start the Tracking Server<a class="headerlink" href="#step-3-start-the-tracking-server" title="Permalink to this headline"> </a></h3>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In actual environment, you will have a remote host that will run the tracking server, but in this tutorial we will just use our local machine as a simulated surrogate for a remote machine.</p>
+</div>
+<div class="section" id="configure-access">
+<h4>Configure access<a class="headerlink" href="#configure-access" title="Permalink to this headline"> </a></h4>
+<p>For the tracking server to access remote storage, it needs to be configured with the necessary credentials.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">MLFLOW_S3_ENDPOINT_URL</span><span class="o">=</span>http://localhost:9000<span class="w"> </span><span class="c1"># Replace this with remote storage endpoint e.g. s3://my-bucket in real use cases</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">AWS_ACCESS_KEY_ID</span><span class="o">=</span>minio_user
+<span class="nb">export</span><span class="w"> </span><span class="nv">AWS_SECRET_ACCESS_KEY</span><span class="o">=</span>minio_password
+</pre></div>
+</div>
+<p>You can find the instructions for how to configure credentials for other storages in <a class="reference internal" href="../artifacts-stores.html#artifacts-store-supported-storages"><span class="std std-ref">Supported Storage</span></a>.</p>
+</div>
+<div class="section" id="launch-the-tracking-server">
+<h4>Launch the tracking server<a class="headerlink" href="#launch-the-tracking-server" title="Permalink to this headline"> </a></h4>
+<p>To specify the backend store and artifact store, you can use the <code class="docutils literal notranslate"><span class="pre">--backend-store-uri</span></code> and <code class="docutils literal notranslate"><span class="pre">--artifacts-store-uri</span></code> options respectively.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mlflow<span class="w"> </span>server<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--backend-store-uri<span class="w"> </span>postgresql://user:password@localhost:5432/mlflowdb<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--artifacts-destination<span class="w"> </span>s3://bucket<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--host<span class="w"> </span><span class="m">0</span>.0.0.0<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--port<span class="w"> </span><span class="m">5000</span>
+</pre></div>
+</div>
+<p>Replace <code class="docutils literal notranslate"><span class="pre">localhost</span></code> with the remote host name or IP address for your database server in actual environment.</p>
+</div>
+</div>
+<div class="section" id="step-4-logging-to-the-tracking-server">
+<h3>Step 4: Logging to the Tracking Server<a class="headerlink" href="#step-4-logging-to-the-tracking-server" title="Permalink to this headline"> </a></h3>
+<p>Once the tracking server is running, you can log runs to it by setting the MLflow Tracking URI to the tracking server’s URI. Alternatively, you can use the <a class="reference internal" href="../../python_api/mlflow.html#mlflow.set_tracking_uri" title="mlflow.set_tracking_uri"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.set_tracking_uri()</span></code></a> API to set the tracking URI.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">MLFLOW_TRACKING_URI</span><span class="o">=</span>http://127.0.0.1:5000<span class="w">  </span><span class="c1"># Replace with remote host name or IP address in an actual environment</span>
+</pre></div>
+</div>
+<p>Then run your code with MLflow tracking APIs as usual. The following code runs training for a scikit-learn RandomForest model on the diabetes dataset:</p>
+<div class="code-section docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_diabetes</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestRegressor</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">autolog</span><span class="p">()</span>
+
+<span class="n">db</span> <span class="o">=</span> <span class="n">load_diabetes</span><span class="p">()</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">target</span><span class="p">)</span>
+
+<span class="c1"># Create and train models.</span>
+<span class="n">rf</span> <span class="o">=</span> <span class="n">RandomForestRegressor</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">max_depth</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">max_features</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">rf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Use the model to make predictions on the test dataset.</span>
+<span class="n">predictions</span> <span class="o">=</span> <span class="n">rf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="step-5-view-logged-run-in-tracking-ui">
+<h3>Step 5: View logged Run in Tracking UI<a class="headerlink" href="#step-5-view-logged-run-in-tracking-ui" title="Permalink to this headline"> </a></h3>
+<p>Our pseudo-remote MLflow Tracking Server also hosts the Tracking UI on the same endpoint. In an actual deployment environment with a remote tracking server, this is also the case.
+You can access the UI by navigating to <a class="reference external" href="http://127.0.0.1:5000">http://127.0.0.1:5000</a> (replace with remote host name or IP address in actual environment) in your browser.</p>
+</div>
+<div class="section" id="step-6-download-artifacts">
+<h3>Step 6: Download artifacts<a class="headerlink" href="#step-6-download-artifacts" title="Permalink to this headline"> </a></h3>
+<p>MLflow Tracking Server also serves as a proxy host for artifact access. Artifact access is enabled through the proxy URIs such as <code class="docutils literal notranslate"><span class="pre">runs:/</span></code>, <code class="docutils literal notranslate"><span class="pre">mlflow-artifacts:/</span></code>,
+giving users access to this location without having to manage credentials or permissions of direct access.</p>
+<div class="code-section docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="n">run_id</span> <span class="o">=</span> <span class="s2">&quot;YOUR_RUN_ID&quot;</span>  <span class="c1"># You can find run ID in the Tracking UI</span>
+<span class="n">artifact_path</span> <span class="o">=</span> <span class="s2">&quot;model&quot;</span>
+
+<span class="c1"># Download artifact via the tracking server</span>
+<span class="n">mlflow_artifact_uri</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;runs://</span><span class="si">{</span><span class="n">run_id</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">artifact_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="n">local_path</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">artifacts</span><span class="o">.</span><span class="n">download_artifacts</span><span class="p">(</span><span class="n">mlflow_artifact_uri</span><span class="p">)</span>
+
+<span class="c1"># Load the model</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">sklearn</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">local_path</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="what-s-next">
+<h2>What’s Next?<a class="headerlink" href="#what-s-next" title="Permalink to this headline"> </a></h2>
+<p>Now you have learned how to set up MLflow Tracking Server for remote experiment tracking!
+There are a couple of more advanced topics you can explore:</p>
+<ul class="simple">
+<li><p><strong>Other configurations for the Tracking Server</strong>: By default, MLflow Tracking Server serves both backend store and artifact store.
+You can also configure the Tracking Server to serve only backend store or artifact store, to handle different use cases such as large
+traffic or security concerns. See <a class="reference internal" href="../../tracking.html#other-tracking-setup"><span class="std std-ref">other use cases</span></a> for how to customize the Tracking Server for these use cases.</p></li>
+<li><p><strong>Secure the Tracking Server</strong>: The <code class="docutils literal notranslate"><span class="pre">--host</span></code> option exposes the service on all interfaces. If running a server in production, we
+would recommend not exposing the built-in server broadly (as it is unauthenticated and unencrypted). Read <a class="reference internal" href="../server.html#tracking-auth"><span class="std std-ref">Secure Tracking Server</span></a>
+for the best practices to secure the Tracking Server in production.</p></li>
+<li><p><strong>New Features</strong>: The MLflow team and a host of community contributors constantly develops new features to support broader use cases. See <a class="reference external" href="../../new-features/index.html">New Features</a> to catch up with the latest features!</p></li>
+</ul>
+</div>
+</div>
+
+
+              </div>
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="local-database.html" class="btn btn-neutral" title="Tracking Experiments with a Local Database" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+      
+      
+        <a href="../../system-metrics/index.html" class="btn btn-neutral" title="System Metrics" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+      <p class="copyright">
+          &copy; MLflow Project, a Series of LF Projects, LLC. All rights reserved.
+      </p>
+
+  </div> 
+
+</footer>
+          </div>
+        </div>
+      </section>
+    </main>
+  </page>
+
+  
+
+
+  
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+      URL_ROOT:'../../',
+      VERSION:'2.9.2.dev0',
+      COLLAPSE_INDEX:false,
+      FILE_SUFFIX:'.html',
+      LINK_SUFFIX: '.html',
+      HAS_SOURCE:  true
+    };
+  </script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/clipboard.min.js"></script>
+  <script type="text/javascript" src="../../_static/js/jquery.waypoints.min.js"></script>
+
+  
+  
+  
+  <script type="text/javascript">var CLIPPY_SVG_PATH = "../../_static/clippy.svg";</script>
+  <script type="text/javascript" src="../../_static/js/custom.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.StickyNav.enable();
+    });
+
+  </script>
+  
+
+  
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        // Get the code block designator class entries
+        const allHighlights = document.querySelectorAll('.highlight');
+        // Disable copyable links for notebook cell numbering and for cell outputs
+        const highlights = Array.from(allHighlights).filter(highlight => !highlight.closest('.highlight-none') && 
+            !highlight.closest('.nboutput'));
+    
+        highlights.forEach(function(highlight) {
+            const copyIcon = document.createElement('span');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.innerHTML = '&#xf0ea;';
+
+            copyIcon.addEventListener('click', function() {
+                const code = highlight.querySelector('pre').textContent;
+                copyToClipboard(code);
+
+                // Flash effect on click
+                this.style.color = '#0194E2';
+                setTimeout(() => {
+                    this.style.color = ''; 
+                }, 100);
+
+                // Display "Code copied to clipboard" near the clicked icon
+                const message = document.createElement('span');
+                message.textContent = "Copied!";
+                message.classList.add('copy-message'); 
+
+                // Append the message to the icon
+                this.appendChild(message);
+
+                setTimeout(() => {
+                    this.removeChild(message);
+                }, 500);
+            });
+
+            highlight.appendChild(copyIcon);
+        });
+    });
+  </script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Force download for notebook-download-btn
+        const downloadButtons = document.querySelectorAll('.notebook-download-btn');
+        downloadButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                // Fetch the raw content of the notebook from GitHub
+                fetch(button.href)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = url;
+                        const filename = button.href.split('/').pop();
+                        link.download = filename; 
+
+                        document.body.appendChild(link);
+                        link.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    })
+                    .catch(err => console.error('Error fetching the notebook:', err));
+            });
+        });
+    });
+</script> 
+</body>
+</html>

@@ -1,0 +1,1051 @@
+
+  
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Deploying a model to Kubernetes &mdash; MLflow 2.9.2.dev0 documentation</title>
+  
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/deployment/deploy-model-to-kubernetes/index.html">
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    
+
+    
+
+  
+    
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/grids.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/mobile.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/simple-cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/tabs.css" type="text/css" />
+    
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="MLflow 2.9.2.dev0 documentation" href="../../index.html"/>
+        <link rel="up" title="Deployment" href="../index.html"/>
+        <link rel="next" title="MLflow Tracking" href="/../../tracking.html"/>
+        <link rel="prev" title="Deployment" href="/../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+<script type="text/javascript" src="../../_static/jquery.js"></script>
+<script type="text/javascript" src="../../_static/underscore.js"></script>
+<script type="text/javascript" src="../../_static/doctools.js"></script>
+<script type="text/javascript" src="../../_static/languagesections.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+
+<body class="wy-body-for-nav" role="document">
+  
+
+  
+  <nav class="wy-nav-top header" role="navigation" aria-label="top navigation">
+    <ul>
+  <li class="menu-toggle">
+    <i data-toggle="wy-nav-top" class="wy-nav-top-menu-button db-icon db-icon-menu pull-left"></i>
+    <a href="../../index.html" class="wy-nav-top-logo"
+      ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
+    /></a>
+    <span class="version">2.9.2.dev0</span>
+  </li>
+</ul>
+  </nav>
+  <page>
+    
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side relative">
+      <div class="wy-side-scroll">
+  <div class="wy-side-nav-search">
+    
+
+    
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+    
+  </div>
+
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+    
+      <a href="../../index.html" class="main-navigation-home"><img src="../../_static/icons/nav-home.svg"> MLflow</a>
+    
+
+    
+      
+
+      
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../introduction/index.html">What is MLflow?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started/index.html">Getting Started with MLflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../new-features/index.html">New Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../llms/index.html">LLMs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../model-evaluation/index.html">Model Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../deep-learning/index.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../traditional-ml/index.html">Traditional ML</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Deployment</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#the-power-of-mlflow-in-model-serving">The Power of MLflow in Model Serving</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#deployment-avenues">Deployment Avenues</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#tutorials-and-guides">Tutorials and Guides</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Deploying a model to Kubernetes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#what-you-ll-need">What You’ll Need</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#training-the-model">Training the Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#comparing-the-models">Comparing the Models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#packaging-training-code-in-a-conda-environment">Packaging Training Code in a Conda Environment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#specifying-pip-requirements-using-pip-requirements-and-extra-pip-requirements">Specifying pip requirements using <code class="docutils literal notranslate"><span class="pre">pip_requirements</span></code> and <code class="docutils literal notranslate"><span class="pre">extra_pip_requirements</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#serving-the-model">Serving the Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#deploy-the-model-to-seldon-core-or-kserve">Deploy the Model to Seldon Core or KServe</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#conclusion">Conclusion</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../tracking.html">MLflow Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../system-metrics/index.html">System Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../projects.html">MLflow Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../models.html">MLflow Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../model-registry.html">MLflow Model Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../recipes.html">MLflow Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plugins.html">MLflow Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auth/index.html">MLflow Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../search-runs.html">Search Runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../search-experiments.html">Search Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../python_api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../R-api.html">R API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../java_api/index.html">Java API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rest-api.html">REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../docker.html">Official MLflow Docker Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../community-model-flavors.html">Community Model Flavors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials-and-examples/index.html">Tutorials and Examples</a></li>
+</ul>
+
+      
+    
+  </div>
+
+  <div role="contentinfo">
+    
+
+    <p>
+      <a id='feedbacklink' href="https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a>
+    </p>
+  </div>
+</div>
+    </nav>
+
+    <main class="wy-grid-for-nav">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+          <div class="rst-content">
+            
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Documentation</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../index.html">Deployment</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+    
+      <li>Deploying a model to Kubernetes</li>
+    
+    
+    <!-- <li class="wy-breadcrumbs-aside">
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/deployment/deploy-model-to-kubernetes/index.rst" class="fa fa-github"> Edit on GitHub</a>
+    </li> -->
+    
+  </ul>
+</div>
+            <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <div itemprop="articleBody">
+                
+  <div class="section" id="deploying-a-model-to-kubernetes">
+<h1>Deploying a model to Kubernetes<a class="headerlink" href="#deploying-a-model-to-kubernetes" title="Permalink to this headline"> </a></h1>
+<p>This guide showcases how you can use MLflow end-to-end to:</p>
+<ul class="simple">
+<li><p>Train a linear regression model</p></li>
+<li><p>Package the code that trains the model in a reusable and reproducible model format</p></li>
+<li><p>Deploy the model into a simple HTTP server that will enable you to score predictions</p></li>
+</ul>
+<p><strong>Note</strong> The modeling usecase shown here utilizes a common dataset to predict the quality of wine based on quantitative features
+like the wine’s “fixed acidity”, “pH”, “residual sugar”, and so on. The dataset
+is from UCI’s <a class="reference external" href="http://archive.ics.uci.edu/ml/datasets/Wine+Quality">machine learning repository</a>.
+<a class="footnote-reference brackets" href="#id2" id="id1">1</a></p>
+<div class="contents local topic" id="table-of-contents">
+<p class="topic-title">Table of Contents</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#what-you-ll-need" id="id3">What You’ll Need</a></p></li>
+<li><p><a class="reference internal" href="#training-the-model" id="id4">Training the Model</a></p></li>
+<li><p><a class="reference internal" href="#comparing-the-models" id="id5">Comparing the Models</a></p></li>
+<li><p><a class="reference internal" href="#packaging-training-code-in-a-conda-environment" id="id6">Packaging Training Code in a Conda Environment</a></p></li>
+<li><p><a class="reference internal" href="#specifying-pip-requirements-using-pip-requirements-and-extra-pip-requirements" id="id7">Specifying pip requirements using <code class="docutils literal notranslate"><span class="pre">pip_requirements</span></code> and <code class="docutils literal notranslate"><span class="pre">extra_pip_requirements</span></code></a></p></li>
+<li><p><a class="reference internal" href="#serving-the-model" id="id8">Serving the Model</a></p></li>
+<li><p><a class="reference internal" href="#deploy-the-model-to-seldon-core-or-kserve" id="id9">Deploy the Model to Seldon Core or KServe</a></p></li>
+</ul>
+</div>
+<div class="section" id="what-you-ll-need">
+<h2><a class="toc-backref" href="#id3">What You’ll Need</a><a class="headerlink" href="#what-you-ll-need" title="Permalink to this headline"> </a></h2>
+<p>In order to execute the code in this guide locally, you’ll need to:</p>
+<div class="plain-section docutils container">
+<div class="python docutils container">
+<ul>
+<li><p>Install MLflow and scikit-learn. There are two options for installing these dependencies:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Install MLflow with extra dependencies, including scikit-learn
+(via <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">mlflow[extras]</span></code>)</p></li>
+<li><p>Install MLflow (via <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">mlflow</span></code>) and install scikit-learn separately
+(via <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">scikit-learn</span></code>)</p></li>
+</ol>
+</div></blockquote>
+</li>
+<li><p>Install <a class="reference external" href="https://conda.io/projects/conda/en/latest/user-guide/install/index.html">conda</a></p></li>
+<li><p>Clone (download) the MLflow repository via <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/mlflow/mlflow</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cd</span></code> into the <code class="docutils literal notranslate"><span class="pre">examples</span></code> directory within your clone of MLflow - we’ll use this working
+directory for walking through the guide. We avoid running directly from our clone of MLflow as doing
+so would use MLflow from the source (master branch), rather than your PyPI installation of
+MLflow.</p></li>
+</ul>
+</div>
+<div class="r docutils container">
+<ul class="simple">
+<li><p>Install the MLflow package (via <code class="docutils literal notranslate"><span class="pre">install.packages(&quot;mlflow&quot;)</span></code>)</p></li>
+<li><p>Clone (download) the MLflow repository via <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/mlflow/mlflow</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">setwd()</span></code> into the <code class="docutils literal notranslate"><span class="pre">examples</span></code> directory within your clone of MLflow - we’ll use this
+working directory for running the code in this guide. We avoid running directly from our clone of
+MLflow as doing so would cause the code to execute using MLflow from source, rather than your
+PyPI installation of MLflow.</p></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section" id="training-the-model">
+<h2><a class="toc-backref" href="#id4">Training the Model</a><a class="headerlink" href="#training-the-model" title="Permalink to this headline"> </a></h2>
+<p>First, train a linear regression model that takes two hyperparameters: <code class="docutils literal notranslate"><span class="pre">alpha</span></code> and <code class="docutils literal notranslate"><span class="pre">l1_ratio</span></code>.</p>
+<div class="plain-section docutils container">
+<div class="python docutils container">
+<p>The code is located at <code class="docutils literal notranslate"><span class="pre">examples/sklearn_elasticnet_wine/train.py</span></code> and is reproduced below.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># The data set used in this example is from http://archive.ics.uci.edu/ml/datasets/Wine+Quality</span>
+<span class="c1"># P. Cortez, A. Cerdeira, F. Almeida, T. Matos and J. Reis.</span>
+<span class="c1"># Modeling wine preferences by data mining from physicochemical properties. In Decision Support Systems, Elsevier, 47(4):547-553, 2009.</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urlparse</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">ElasticNet</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">mean_absolute_error</span><span class="p">,</span> <span class="n">mean_squared_error</span><span class="p">,</span> <span class="n">r2_score</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+
+<span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">import</span> <span class="nn">mlflow.sklearn</span>
+<span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">infer_signature</span>
+
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">WARN</span><span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">eval_metrics</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">pred</span><span class="p">):</span>
+    <span class="n">rmse</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">mean_squared_error</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">pred</span><span class="p">))</span>
+    <span class="n">mae</span> <span class="o">=</span> <span class="n">mean_absolute_error</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">pred</span><span class="p">)</span>
+    <span class="n">r2</span> <span class="o">=</span> <span class="n">r2_score</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">pred</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">rmse</span><span class="p">,</span> <span class="n">mae</span><span class="p">,</span> <span class="n">r2</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">40</span><span class="p">)</span>
+
+    <span class="c1"># Read the wine-quality csv file from the URL</span>
+    <span class="n">csv_url</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;https://raw.githubusercontent.com/mlflow/mlflow/master/tests/datasets/winequality-red.csv&quot;</span>
+    <span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">csv_url</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;;&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span>
+            <span class="s2">&quot;Unable to download training &amp; test CSV, check your internet connection. Error: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">e</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Split the data into training and test sets. (0.75, 0.25) split.</span>
+    <span class="n">train</span><span class="p">,</span> <span class="n">test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="c1"># The predicted column is &quot;quality&quot; which is a scalar from [3, 9]</span>
+    <span class="n">train_x</span> <span class="o">=</span> <span class="n">train</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s2">&quot;quality&quot;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">test_x</span> <span class="o">=</span> <span class="n">test</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s2">&quot;quality&quot;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">train_y</span> <span class="o">=</span> <span class="n">train</span><span class="p">[[</span><span class="s2">&quot;quality&quot;</span><span class="p">]]</span>
+    <span class="n">test_y</span> <span class="o">=</span> <span class="n">test</span><span class="p">[[</span><span class="s2">&quot;quality&quot;</span><span class="p">]]</span>
+
+    <span class="n">alpha</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="mf">0.5</span>
+    <span class="n">l1_ratio</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="k">else</span> <span class="mf">0.5</span>
+
+    <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+        <span class="n">lr</span> <span class="o">=</span> <span class="n">ElasticNet</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">l1_ratio</span><span class="o">=</span><span class="n">l1_ratio</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+        <span class="n">lr</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_x</span><span class="p">,</span> <span class="n">train_y</span><span class="p">)</span>
+
+        <span class="n">predicted_qualities</span> <span class="o">=</span> <span class="n">lr</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_x</span><span class="p">)</span>
+
+        <span class="p">(</span><span class="n">rmse</span><span class="p">,</span> <span class="n">mae</span><span class="p">,</span> <span class="n">r2</span><span class="p">)</span> <span class="o">=</span> <span class="n">eval_metrics</span><span class="p">(</span><span class="n">test_y</span><span class="p">,</span> <span class="n">predicted_qualities</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Elasticnet model (alpha=</span><span class="si">{</span><span class="n">alpha</span><span class="si">:</span><span class="s2">f</span><span class="si">}</span><span class="s2">, l1_ratio=</span><span class="si">{</span><span class="n">l1_ratio</span><span class="si">:</span><span class="s2">f</span><span class="si">}</span><span class="s2">):&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  RMSE: </span><span class="si">{</span><span class="n">rmse</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  MAE: </span><span class="si">{</span><span class="n">mae</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  R2: </span><span class="si">{</span><span class="n">r2</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_param</span><span class="p">(</span><span class="s2">&quot;alpha&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="p">)</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_param</span><span class="p">(</span><span class="s2">&quot;l1_ratio&quot;</span><span class="p">,</span> <span class="n">l1_ratio</span><span class="p">)</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_metric</span><span class="p">(</span><span class="s2">&quot;rmse&quot;</span><span class="p">,</span> <span class="n">rmse</span><span class="p">)</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_metric</span><span class="p">(</span><span class="s2">&quot;r2&quot;</span><span class="p">,</span> <span class="n">r2</span><span class="p">)</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_metric</span><span class="p">(</span><span class="s2">&quot;mae&quot;</span><span class="p">,</span> <span class="n">mae</span><span class="p">)</span>
+
+        <span class="n">predictions</span> <span class="o">=</span> <span class="n">lr</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">train_x</span><span class="p">)</span>
+        <span class="n">signature</span> <span class="o">=</span> <span class="n">infer_signature</span><span class="p">(</span><span class="n">train_x</span><span class="p">,</span> <span class="n">predictions</span><span class="p">)</span>
+
+        <span class="n">tracking_url_type_store</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">mlflow</span><span class="o">.</span><span class="n">get_tracking_uri</span><span class="p">())</span><span class="o">.</span><span class="n">scheme</span>
+
+        <span class="c1"># Model registry does not work with file store</span>
+        <span class="k">if</span> <span class="n">tracking_url_type_store</span> <span class="o">!=</span> <span class="s2">&quot;file&quot;</span><span class="p">:</span>
+            <span class="c1"># Register the model</span>
+            <span class="c1"># There are other ways to use the Model Registry, which depends on the use case,</span>
+            <span class="c1"># please refer to the doc for more information:</span>
+            <span class="c1"># https://mlflow.org/docs/latest/model-registry.html#api-workflow</span>
+            <span class="n">mlflow</span><span class="o">.</span><span class="n">sklearn</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+                <span class="n">lr</span><span class="p">,</span> <span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="n">registered_model_name</span><span class="o">=</span><span class="s2">&quot;ElasticnetWineModel&quot;</span><span class="p">,</span> <span class="n">signature</span><span class="o">=</span><span class="n">signature</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">mlflow</span><span class="o">.</span><span class="n">sklearn</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span><span class="n">lr</span><span class="p">,</span> <span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="n">signature</span><span class="o">=</span><span class="n">signature</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This example uses the familiar pandas, numpy, and sklearn APIs to create a simple machine learning
+model. The <a class="reference internal" href="../../tracking.html"><span class="doc">MLflow tracking APIs</span></a> log information about each
+training run, like the hyperparameters <code class="docutils literal notranslate"><span class="pre">alpha</span></code> and <code class="docutils literal notranslate"><span class="pre">l1_ratio</span></code>, used to train the model and metrics, like
+the root mean square error, used to evaluate the model. The example also serializes the
+model in a format that MLflow knows how to deploy.</p>
+<p>You can run the example with default hyperparameters as follows:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># Make sure the current working directory is &#39;examples&#39;</span>
+python<span class="w"> </span>sklearn_elasticnet_wine/train.py
+</pre></div>
+</div>
+<p>Try out some other values for <code class="docutils literal notranslate"><span class="pre">alpha</span></code> and <code class="docutils literal notranslate"><span class="pre">l1_ratio</span></code> by passing them as arguments to <code class="docutils literal notranslate"><span class="pre">train.py</span></code>:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># Make sure the current working directory is &#39;examples&#39;</span>
+python<span class="w"> </span>sklearn_elasticnet_wine/train.py<span class="w"> </span>&lt;alpha&gt;<span class="w"> </span>&lt;l1_ratio&gt;
+</pre></div>
+</div>
+<p>Each time you run the example, MLflow logs information about your experiment runs in the directory <code class="docutils literal notranslate"><span class="pre">mlruns</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you would like to use the Jupyter notebook version of <code class="docutils literal notranslate"><span class="pre">train.py</span></code>, try out the example notebook at <code class="docutils literal notranslate"><span class="pre">examples/sklearn_elasticnet_wine/train.ipynb</span></code>.</p>
+</div>
+</div>
+<div class="r docutils container">
+<p>The code is located at <code class="docutils literal notranslate"><span class="pre">examples/r_wine/train.R</span></code> and is reproduced below.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span># The data set used in this example is from http://archive.ics.uci.edu/ml/datasets/Wine+Quality
+# P. Cortez, A. Cerdeira, F. Almeida, T. Matos and J. Reis.
+# Modeling wine preferences by data mining from physicochemical properties. In Decision Support Systems, Elsevier, 47(4):547-553, 2009.
+
+library(mlflow)
+library(glmnet)
+library(carrier)
+
+set.seed(40)
+
+# Read the wine-quality csv file
+data &lt;- read.csv(&quot;wine-quality.csv&quot;)
+
+# Split the data into training and test sets. (0.75, 0.25) split.
+sampled &lt;- sample(1:nrow(data), 0.75 * nrow(data))
+train &lt;- data[sampled, ]
+test &lt;- data[-sampled, ]
+
+# The predicted column is &quot;quality&quot; which is a scalar from [3, 9]
+train_x &lt;- as.matrix(train[, !(names(train) == &quot;quality&quot;)])
+test_x &lt;- as.matrix(test[, !(names(train) == &quot;quality&quot;)])
+train_y &lt;- train[, &quot;quality&quot;]
+test_y &lt;- test[, &quot;quality&quot;]
+
+alpha &lt;- mlflow_param(&quot;alpha&quot;, 0.5, &quot;numeric&quot;)
+lambda &lt;- mlflow_param(&quot;lambda&quot;, 0.5, &quot;numeric&quot;)
+
+with(mlflow_start_run(), {
+    model &lt;- glmnet(train_x, train_y, alpha = alpha, lambda = lambda, family= &quot;gaussian&quot;, standardize = FALSE)
+    predictor &lt;- crate(~ glmnet::predict.glmnet(!!model, as.matrix(.x)), !!model)
+    predicted &lt;- predictor(test_x)
+
+    rmse &lt;- sqrt(mean((predicted - test_y) ^ 2))
+    mae &lt;- mean(abs(predicted - test_y))
+    r2 &lt;- as.numeric(cor(predicted, test_y) ^ 2)
+
+    message(&quot;Elasticnet model (alpha=&quot;, alpha, &quot;, lambda=&quot;, lambda, &quot;):&quot;)
+    message(&quot;  RMSE: &quot;, rmse)
+    message(&quot;  MAE: &quot;, mae)
+    message(&quot;  R2: &quot;, r2)
+
+    mlflow_log_param(&quot;alpha&quot;, alpha)
+    mlflow_log_param(&quot;lambda&quot;, lambda)
+    mlflow_log_metric(&quot;rmse&quot;, rmse)
+    mlflow_log_metric(&quot;r2&quot;, r2)
+    mlflow_log_metric(&quot;mae&quot;, mae)
+
+    mlflow_log_model(predictor, &quot;model&quot;)
+})
+</pre></div>
+</div>
+<p>This example uses the familiar <code class="docutils literal notranslate"><span class="pre">glmnet</span></code> package to create a simple machine learning
+model. The <a class="reference internal" href="../../tracking.html"><span class="doc">MLflow tracking APIs</span></a> log information about each
+training run, like the hyperparameters <code class="docutils literal notranslate"><span class="pre">alpha</span></code> and <code class="docutils literal notranslate"><span class="pre">lambda</span></code>, used to train the model and metrics, like
+the root mean square error, used to evaluate the model. The example also serializes the
+model in a format that MLflow knows how to deploy.</p>
+<p>You can run the example with default hyperparameters as follows:</p>
+<div class="highlight-R notranslate"><div class="highlight"><pre><span></span><span class="c1"># Make sure the current working directory is &#39;examples&#39;</span>
+<span class="nf">mlflow_run</span><span class="p">(</span><span class="n">uri</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;r_wine&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">entry_point</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;train.R&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Try out some other values for <code class="docutils literal notranslate"><span class="pre">alpha</span></code> and <code class="docutils literal notranslate"><span class="pre">lambda</span></code> by passing them as arguments to <code class="docutils literal notranslate"><span class="pre">train.R</span></code>:</p>
+<div class="highlight-R notranslate"><div class="highlight"><pre><span></span><span class="c1"># Make sure the current working directory is &#39;examples&#39;</span>
+<span class="nf">mlflow_run</span><span class="p">(</span><span class="n">uri</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;r_wine&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">entry_point</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;train.R&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">parameters</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="n">alpha</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.1</span><span class="p">,</span><span class="w"> </span><span class="n">lambda</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.5</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Each time you run the example, MLflow logs information about your experiment runs in the directory <code class="docutils literal notranslate"><span class="pre">mlruns</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you would like to use an R notebook version of <code class="docutils literal notranslate"><span class="pre">train.R</span></code>, try the example notebook at <code class="docutils literal notranslate"><span class="pre">examples/r_wine/train.Rmd</span></code>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="comparing-the-models">
+<h2><a class="toc-backref" href="#id5">Comparing the Models</a><a class="headerlink" href="#comparing-the-models" title="Permalink to this headline"> </a></h2>
+<p>Next, use the MLflow UI to compare the models that you have produced. In the same current working directory
+as the one that contains the <code class="docutils literal notranslate"><span class="pre">mlruns</span></code> run:</p>
+<div class="code-section docutils container">
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>mlflow<span class="w"> </span>ui
+</pre></div>
+</div>
+<div class="highlight-R notranslate"><div class="highlight"><pre><span></span><span class="nf">mlflow_ui</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p>and view it at <a class="reference external" href="http://localhost:5000">http://localhost:5000</a>.</p>
+<p>On this page, you can see a list of experiment runs with metrics you can use to compare the models.</p>
+<div class="plain-section docutils container">
+<div class="python docutils container">
+<img alt="../../_images/tutorial-compare.png" src="../../_images/tutorial-compare.png" />
+</div>
+<div class="r docutils container">
+<img alt="../../_images/tutorial-compare-R.png" src="../../_images/tutorial-compare-R.png" />
+</div>
+</div>
+<p>You can  use the search feature to quickly filter out many models. For example, the query <code class="docutils literal notranslate"><span class="pre">metrics.rmse</span> <span class="pre">&lt;</span> <span class="pre">0.8</span></code>
+returns all the models with root mean squared error less than 0.8. For more complex manipulations,
+you can download this table as a CSV and use your favorite data munging software to analyze it.</p>
+</div>
+<div class="section" id="packaging-training-code-in-a-conda-environment">
+<span id="conda-example"></span><h2><a class="toc-backref" href="#id6">Packaging Training Code in a Conda Environment</a><a class="headerlink" href="#packaging-training-code-in-a-conda-environment" title="Permalink to this headline"> </a></h2>
+<p>Now that you have your training code, you can package it so that other data scientists can easily reuse the model, or so that you can run the training remotely, for example on Databricks.</p>
+<div class="plain-section docutils container">
+<div class="python docutils container">
+<p>You do this by using <a class="reference internal" href="../../projects.html"><span class="doc">MLflow Projects</span></a> conventions to specify the dependencies and entry points to your code. The <code class="docutils literal notranslate"><span class="pre">sklearn_elasticnet_wine/MLproject</span></code> file specifies that the project has the dependencies located in a <a class="reference external" href="https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-file-manually">Conda environment file</a>
+called <code class="docutils literal notranslate"><span class="pre">conda.yaml</span></code> and has one entry point that takes two parameters: <code class="docutils literal notranslate"><span class="pre">alpha</span></code> and <code class="docutils literal notranslate"><span class="pre">l1_ratio</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">name</span><span class="p">:</span> <span class="n">tutorial</span>
+
+<span class="n">python_env</span><span class="p">:</span> <span class="n">python_env</span><span class="o">.</span><span class="n">yaml</span>
+
+<span class="n">entry_points</span><span class="p">:</span>
+  <span class="n">main</span><span class="p">:</span>
+    <span class="n">parameters</span><span class="p">:</span>
+      <span class="n">alpha</span><span class="p">:</span> <span class="p">{</span><span class="nb">type</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">}</span>
+      <span class="n">l1_ratio</span><span class="p">:</span> <span class="p">{</span><span class="nb">type</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">}</span>
+    <span class="n">command</span><span class="p">:</span> <span class="s2">&quot;python train.py </span><span class="si">{alpha}</span><span class="s2"> </span><span class="si">{l1_ratio}</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">sklearn_elasticnet_wine/conda.yaml</span></code> file lists the dependencies:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">name</span><span class="p">:</span> <span class="n">tutorial</span>
+<span class="n">channels</span><span class="p">:</span>
+  <span class="o">-</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span>
+<span class="n">dependencies</span><span class="p">:</span>
+  <span class="o">-</span> <span class="n">python</span><span class="o">=</span><span class="mf">3.8</span>
+  <span class="o">-</span> <span class="n">pip</span>
+  <span class="o">-</span> <span class="n">pip</span><span class="p">:</span>
+      <span class="o">-</span> <span class="n">scikit</span><span class="o">-</span><span class="n">learn</span><span class="o">==</span><span class="mf">1.2.0</span>
+      <span class="o">-</span> <span class="n">mlflow</span><span class="o">&gt;=</span><span class="mf">1.0</span>
+      <span class="o">-</span> <span class="n">pandas</span>
+</pre></div>
+</div>
+<p>To run this project, invoke <code class="docutils literal notranslate"><span class="pre">mlflow</span> <span class="pre">run</span> <span class="pre">sklearn_elasticnet_wine</span> <span class="pre">-P</span> <span class="pre">alpha=0.42</span></code>. After running
+this command, MLflow runs your training code in a new Conda environment with the dependencies
+specified in <code class="docutils literal notranslate"><span class="pre">conda.yaml</span></code>.</p>
+<p>If the repository has an <code class="docutils literal notranslate"><span class="pre">MLproject</span></code> file in the root you can also run a project directly from GitHub. This guide is duplicated in the <a class="reference external" href="https://github.com/mlflow/mlflow-example">https://github.com/mlflow/mlflow-example</a> repository
+which you can run with <code class="docutils literal notranslate"><span class="pre">mlflow</span> <span class="pre">run</span> <span class="pre">https://github.com/mlflow/mlflow-example.git</span> <span class="pre">-P</span> <span class="pre">alpha=5.0</span></code>.</p>
+</div>
+<div class="r docutils container">
+<p>You do this by running <code class="docutils literal notranslate"><span class="pre">mlflow_snapshot()</span></code> to create an <a class="reference external" href="https://rstudio.github.io/packrat/">R dependencies packrat file</a> called <code class="docutils literal notranslate"><span class="pre">r-dependencies.txt</span></code>.</p>
+<p>The R dependencies file lists the dependencies:</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="c1"># examples/r_wine/r-dependencies.txt</span>
+
+<span class="n">PackratFormat</span><span class="o">:</span><span class="w"> </span><span class="m">1.4</span>
+<span class="n">PackratVersion</span><span class="o">:</span><span class="w"> </span><span class="m">0.4</span><span class="n">.</span><span class="m">9.3</span>
+<span class="n">RVersion</span><span class="o">:</span><span class="w"> </span><span class="m">3.5</span><span class="n">.</span><span class="m">1</span>
+<span class="n">Repos</span><span class="o">:</span><span class="w"> </span><span class="n">CRAN</span><span class="o">=</span><span class="n">https</span><span class="o">://</span><span class="n">cran.rstudio.com</span><span class="o">/</span>
+
+<span class="n">Package</span><span class="o">:</span><span class="w"> </span><span class="n">BH</span>
+<span class="n">Source</span><span class="o">:</span><span class="w"> </span><span class="n">CRAN</span>
+<span class="n">Version</span><span class="o">:</span><span class="w"> </span><span class="m">1.66</span><span class="n">.</span><span class="m">0-1</span>
+<span class="n">Hash</span><span class="o">:</span><span class="w"> </span><span class="m">4</span><span class="n">cc8883584b955ed01f38f68bc03af6d</span>
+
+<span class="n">Package</span><span class="o">:</span><span class="w"> </span><span class="n">Matrix</span>
+<span class="n">Source</span><span class="o">:</span><span class="w"> </span><span class="n">CRAN</span>
+<span class="n">Version</span><span class="o">:</span><span class="w"> </span><span class="m">1.2-14</span>
+<span class="n">Hash</span><span class="o">:</span><span class="w"> </span><span class="m">521</span><span class="n">aa8772a1941dfdb007bf532d19dde</span>
+<span class="n">Requires</span><span class="o">:</span><span class="w"> </span><span class="n">lattice</span>
+
+<span class="kc">...</span>
+</pre></div>
+</div>
+<p>To run this project, invoke:</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="c1"># Make sure the current working directory is &#39;examples&#39;</span>
+<span class="nf">mlflow_run</span><span class="p">(</span><span class="s">&quot;r_wine&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">entry_point</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;train.R&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">parameters</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="n">alpha</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.2</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>After running this command, MLflow runs your training code in a new R session.</p>
+<p>To restore the dependencies specified in <code class="docutils literal notranslate"><span class="pre">r-dependencies.txt</span></code>, you can run instead:</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">mlflow_restore_snapshot</span><span class="p">()</span>
+<span class="c1"># Make sure the current working directory is &#39;examples&#39;</span>
+<span class="nf">mlflow_run</span><span class="p">(</span><span class="s">&quot;r_wine&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">entry_point</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;train.R&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">parameters</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="n">alpha</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.2</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>You can also run a project directly from GitHub. This guide is duplicated in the <a class="reference external" href="https://github.com/rstudio/mlflow-example">https://github.com/rstudio/mlflow-example</a> repository which you can run with:</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">mlflow_run</span><span class="p">(</span>
+<span class="w">  </span><span class="s">&quot;train.R&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="s">&quot;https://github.com/rstudio/mlflow-example&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">parameters</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="n">alpha</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.2</span><span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="specifying-pip-requirements-using-pip-requirements-and-extra-pip-requirements">
+<span id="pip-requirements-example"></span><h2><a class="toc-backref" href="#id7">Specifying pip requirements using <code class="docutils literal notranslate"><span class="pre">pip_requirements</span></code> and <code class="docutils literal notranslate"><span class="pre">extra_pip_requirements</span></code></a><a class="headerlink" href="#specifying-pip-requirements-using-pip-requirements-and-extra-pip-requirements" title="Permalink to this headline"> </a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This example demonstrates how to specify pip requirements using `pip_requirements` and</span>
+<span class="sd">`extra_pip_requirements` when logging a model via `mlflow.*.log_model`.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">tempfile</span>
+
+<span class="kn">import</span> <span class="nn">sklearn</span>
+<span class="kn">import</span> <span class="nn">xgboost</span> <span class="k">as</span> <span class="nn">xgb</span>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
+
+<span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">from</span> <span class="nn">mlflow.artifacts</span> <span class="kn">import</span> <span class="n">download_artifacts</span>
+<span class="kn">from</span> <span class="nn">mlflow.models.signature</span> <span class="kn">import</span> <span class="n">infer_signature</span>
+
+
+<span class="k">def</span> <span class="nf">read_lines</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">get_pip_requirements</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">artifact_path</span><span class="p">,</span> <span class="n">return_constraints</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">req_path</span> <span class="o">=</span> <span class="n">download_artifacts</span><span class="p">(</span><span class="n">run_id</span><span class="o">=</span><span class="n">run_id</span><span class="p">,</span> <span class="n">artifact_path</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">artifact_path</span><span class="si">}</span><span class="s2">/requirements.txt&quot;</span><span class="p">)</span>
+    <span class="n">reqs</span> <span class="o">=</span> <span class="n">read_lines</span><span class="p">(</span><span class="n">req_path</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">return_constraints</span><span class="p">:</span>
+        <span class="n">con_path</span> <span class="o">=</span> <span class="n">download_artifacts</span><span class="p">(</span>
+            <span class="n">run_id</span><span class="o">=</span><span class="n">run_id</span><span class="p">,</span> <span class="n">artifact_path</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">artifact_path</span><span class="si">}</span><span class="s2">/constraints.txt&quot;</span>
+        <span class="p">)</span>
+        <span class="n">cons</span> <span class="o">=</span> <span class="n">read_lines</span><span class="p">(</span><span class="n">con_path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">reqs</span><span class="p">),</span> <span class="nb">set</span><span class="p">(</span><span class="n">cons</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">reqs</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">iris</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
+    <span class="n">dtrain</span> <span class="o">=</span> <span class="n">xgb</span><span class="o">.</span><span class="n">DMatrix</span><span class="p">(</span><span class="n">iris</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">iris</span><span class="o">.</span><span class="n">target</span><span class="p">)</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">xgb</span><span class="o">.</span><span class="n">train</span><span class="p">({},</span> <span class="n">dtrain</span><span class="p">)</span>
+    <span class="n">predictions</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">dtrain</span><span class="p">)</span>
+    <span class="n">signature</span> <span class="o">=</span> <span class="n">infer_signature</span><span class="p">(</span><span class="n">dtrain</span><span class="o">.</span><span class="n">get_data</span><span class="p">(),</span> <span class="n">predictions</span><span class="p">)</span>
+
+    <span class="n">xgb_req</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;xgboost==</span><span class="si">{</span><span class="n">xgb</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">sklearn_req</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;scikit-learn==</span><span class="si">{</span><span class="n">sklearn</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">()</span> <span class="k">as</span> <span class="n">run</span><span class="p">:</span>
+        <span class="n">run_id</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">run_id</span>
+
+        <span class="c1"># Default (both `pip_requirements` and `extra_pip_requirements` are unspecified)</span>
+        <span class="n">artifact_path</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">xgboost</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">artifact_path</span><span class="p">,</span> <span class="n">signature</span><span class="o">=</span><span class="n">signature</span><span class="p">)</span>
+        <span class="n">pip_reqs</span> <span class="o">=</span> <span class="n">get_pip_requirements</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">artifact_path</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">xgb_req</span> <span class="ow">in</span> <span class="n">pip_reqs</span><span class="p">,</span> <span class="n">pip_reqs</span>
+
+        <span class="c1"># Overwrite the default set of pip requirements using `pip_requirements`</span>
+        <span class="n">artifact_path</span> <span class="o">=</span> <span class="s2">&quot;pip_requirements&quot;</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">xgboost</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+            <span class="n">model</span><span class="p">,</span> <span class="n">artifact_path</span><span class="p">,</span> <span class="n">pip_requirements</span><span class="o">=</span><span class="p">[</span><span class="n">sklearn_req</span><span class="p">],</span> <span class="n">signature</span><span class="o">=</span><span class="n">signature</span>
+        <span class="p">)</span>
+        <span class="n">pip_reqs</span> <span class="o">=</span> <span class="n">get_pip_requirements</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">artifact_path</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">sklearn_req</span> <span class="ow">in</span> <span class="n">pip_reqs</span><span class="p">,</span> <span class="n">pip_reqs</span>
+
+        <span class="c1"># Add extra pip requirements on top of the default set of pip requirements</span>
+        <span class="c1"># using `extra_pip_requirements`</span>
+        <span class="n">artifact_path</span> <span class="o">=</span> <span class="s2">&quot;extra_pip_requirements&quot;</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">xgboost</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+            <span class="n">model</span><span class="p">,</span> <span class="n">artifact_path</span><span class="p">,</span> <span class="n">extra_pip_requirements</span><span class="o">=</span><span class="p">[</span><span class="n">sklearn_req</span><span class="p">],</span> <span class="n">signature</span><span class="o">=</span><span class="n">signature</span>
+        <span class="p">)</span>
+        <span class="n">pip_reqs</span> <span class="o">=</span> <span class="n">get_pip_requirements</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">artifact_path</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">pip_reqs</span><span class="o">.</span><span class="n">issuperset</span><span class="p">({</span><span class="n">xgb_req</span><span class="p">,</span> <span class="n">sklearn_req</span><span class="p">}),</span> <span class="n">pip_reqs</span>
+
+        <span class="c1"># Specify pip requirements using a requirements file</span>
+        <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;.requirements.txt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">sklearn_req</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+
+            <span class="c1"># Path to a pip requirements file</span>
+            <span class="n">artifact_path</span> <span class="o">=</span> <span class="s2">&quot;requirements_file_path&quot;</span>
+            <span class="n">mlflow</span><span class="o">.</span><span class="n">xgboost</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+                <span class="n">model</span><span class="p">,</span> <span class="n">artifact_path</span><span class="p">,</span> <span class="n">pip_requirements</span><span class="o">=</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">signature</span><span class="o">=</span><span class="n">signature</span>
+            <span class="p">)</span>
+            <span class="n">pip_reqs</span> <span class="o">=</span> <span class="n">get_pip_requirements</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">artifact_path</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">sklearn_req</span> <span class="ow">in</span> <span class="n">pip_reqs</span><span class="p">,</span> <span class="n">pip_reqs</span>
+
+            <span class="c1"># List of pip requirement strings</span>
+            <span class="n">artifact_path</span> <span class="o">=</span> <span class="s2">&quot;requirements_file_list&quot;</span>
+            <span class="n">mlflow</span><span class="o">.</span><span class="n">xgboost</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+                <span class="n">model</span><span class="p">,</span>
+                <span class="n">artifact_path</span><span class="p">,</span>
+                <span class="n">pip_requirements</span><span class="o">=</span><span class="p">[</span><span class="n">xgb_req</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;-r </span><span class="si">{</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">],</span>
+                <span class="n">signature</span><span class="o">=</span><span class="n">signature</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">pip_reqs</span> <span class="o">=</span> <span class="n">get_pip_requirements</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">artifact_path</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">pip_reqs</span><span class="o">.</span><span class="n">issuperset</span><span class="p">({</span><span class="n">xgb_req</span><span class="p">,</span> <span class="n">sklearn_req</span><span class="p">}),</span> <span class="n">pip_reqs</span>
+
+        <span class="c1"># Using a constraints file</span>
+        <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;.constraints.txt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">sklearn_req</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+
+            <span class="n">artifact_path</span> <span class="o">=</span> <span class="s2">&quot;constraints_file&quot;</span>
+            <span class="n">mlflow</span><span class="o">.</span><span class="n">xgboost</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+                <span class="n">model</span><span class="p">,</span>
+                <span class="n">artifact_path</span><span class="p">,</span>
+                <span class="n">pip_requirements</span><span class="o">=</span><span class="p">[</span><span class="n">xgb_req</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;-c </span><span class="si">{</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">],</span>
+                <span class="n">signature</span><span class="o">=</span><span class="n">signature</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">pip_reqs</span><span class="p">,</span> <span class="n">pip_cons</span> <span class="o">=</span> <span class="n">get_pip_requirements</span><span class="p">(</span>
+                <span class="n">run_id</span><span class="p">,</span> <span class="n">artifact_path</span><span class="p">,</span> <span class="n">return_constraints</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+            <span class="k">assert</span> <span class="n">pip_reqs</span><span class="o">.</span><span class="n">issuperset</span><span class="p">({</span><span class="n">xgb_req</span><span class="p">,</span> <span class="s2">&quot;-c constraints.txt&quot;</span><span class="p">}),</span> <span class="n">pip_reqs</span>
+            <span class="k">assert</span> <span class="n">pip_cons</span> <span class="o">==</span> <span class="p">{</span><span class="n">sklearn_req</span><span class="p">},</span> <span class="n">pip_cons</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="serving-the-model">
+<h2><a class="toc-backref" href="#id8">Serving the Model</a><a class="headerlink" href="#serving-the-model" title="Permalink to this headline"> </a></h2>
+<p>Now that you have packaged your model using the MLproject convention and have identified the best model,
+it is time to deploy the model using <a class="reference internal" href="../../models.html"><span class="doc">MLflow Models</span></a>. An MLflow Model is a standard format for
+packaging machine learning models that can be used in a variety of downstream tools — for example,
+real-time serving through a REST API or batch inference on Apache Spark.</p>
+<p>In the example training code, after training the linear regression model, a function
+in MLflow saved the model as an artifact within the run.</p>
+<div class="plain-section docutils container">
+<div class="python docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mlflow</span><span class="o">.</span><span class="n">sklearn</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span><span class="n">lr</span><span class="p">,</span> <span class="s2">&quot;model&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To view this artifact, you can use the UI again. When you click a date in the list of experiment
+runs you’ll see this page.</p>
+<img alt="../../_images/tutorial-artifact.png" src="../../_images/tutorial-artifact.png" />
+<p>At the bottom, you can see that the call to <code class="docutils literal notranslate"><span class="pre">mlflow.sklearn.log_model</span></code> produced two files in
+<code class="docutils literal notranslate"><span class="pre">/Users/mlflow/mlflow-prototype/mlruns/0/7c1a0d5c42844dcdb8f5191146925174/artifacts/model</span></code>.
+The first file, <code class="docutils literal notranslate"><span class="pre">MLmodel</span></code>, is a metadata file that tells MLflow how to load the model. The
+second file, <code class="docutils literal notranslate"><span class="pre">model.pkl</span></code>, is a serialized version of the linear regression model that you trained.</p>
+<p>In this example, you can use this MLmodel format with MLflow to deploy a local REST server that can serve predictions.</p>
+<p>To deploy the server, run (replace the path with your model’s actual path):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mlflow<span class="w"> </span>models<span class="w"> </span>serve<span class="w"> </span>-m<span class="w"> </span>/Users/mlflow/mlflow-prototype/mlruns/0/7c1a0d5c42844dcdb8f5191146925174/artifacts/model<span class="w"> </span>-p<span class="w"> </span><span class="m">1234</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The version of Python used to create the model must be the same as the one running <code class="docutils literal notranslate"><span class="pre">mlflow</span> <span class="pre">models</span> <span class="pre">serve</span></code>.
+If this is not the case, you may see the error
+<code class="docutils literal notranslate"><span class="pre">UnicodeDecodeError:</span> <span class="pre">'ascii'</span> <span class="pre">codec</span> <span class="pre">can't</span> <span class="pre">decode</span> <span class="pre">byte</span> <span class="pre">0x9f</span> <span class="pre">in</span> <span class="pre">position</span> <span class="pre">1:</span> <span class="pre">ordinal</span> <span class="pre">not</span> <span class="pre">in</span> <span class="pre">range(128)</span></code>
+or <code class="docutils literal notranslate"><span class="pre">raise</span> <span class="pre">ValueError,</span> <span class="pre">&quot;unsupported</span> <span class="pre">pickle</span> <span class="pre">protocol:</span> <span class="pre">%d&quot;</span></code>.</p>
+</div>
+<p>Once you have deployed the server, you can pass it some sample data and see the
+predictions. The following example uses <code class="docutils literal notranslate"><span class="pre">curl</span></code> to send a JSON-serialized pandas DataFrame
+with the <code class="docutils literal notranslate"><span class="pre">split</span></code> orientation to the model server. For more information about the input data
+formats accepted by the model server, see the
+<a class="reference internal" href="../../models.html#local-model-deployment"><span class="std std-ref">MLflow deployment tools documentation</span></a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># On Linux and macOS</span>
+curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type:application/json&quot;</span><span class="w"> </span>--data<span class="w"> </span><span class="s1">&#39;{&quot;dataframe_split&quot;: {&quot;columns&quot;:[&quot;fixed acidity&quot;, &quot;volatile acidity&quot;, &quot;citric acid&quot;, &quot;residual sugar&quot;, &quot;chlorides&quot;, &quot;free sulfur dioxide&quot;, &quot;total sulfur dioxide&quot;, &quot;density&quot;, &quot;pH&quot;, &quot;sulphates&quot;, &quot;alcohol&quot;],&quot;data&quot;:[[6.2, 0.66, 0.48, 1.2, 0.029, 29, 75, 0.98, 3.33, 0.39, 12.8]]}}&#39;</span><span class="w"> </span>http://127.0.0.1:1234/invocations
+
+<span class="c1"># On Windows</span>
+curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type:application/json&quot;</span><span class="w"> </span>--data<span class="w"> </span><span class="s2">&quot;{\&quot;dataframe_split\&quot;: {\&quot;columns\&quot;:[\&quot;fixed acidity\&quot;, \&quot;volatile acidity\&quot;, \&quot;citric acid\&quot;, \&quot;residual sugar\&quot;, \&quot;chlorides\&quot;, \&quot;free sulfur dioxide\&quot;, \&quot;total sulfur dioxide\&quot;, \&quot;density\&quot;, \&quot;pH\&quot;, \&quot;sulphates\&quot;, \&quot;alcohol\&quot;],\&quot;data\&quot;:[[6.2, 0.66, 0.48, 1.2, 0.029, 29, 75, 0.98, 3.33, 0.39, 12.8]]}}&quot;</span><span class="w"> </span>http://127.0.0.1:1234/invocations
+</pre></div>
+</div>
+<p>the server should respond with output similar to:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mf">6.379428821398614</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="r docutils container">
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">mlflow_log_model</span><span class="p">(</span><span class="n">predictor</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;model&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To view this artifact, you can use the UI again. When you click a date in the list of experiment
+runs you’ll see this page.</p>
+<img alt="../../_images/tutorial-artifact-r.png" src="../../_images/tutorial-artifact-r.png" />
+<p>At the bottom, you can see that the call to <code class="docutils literal notranslate"><span class="pre">mlflow_log_model()</span></code> produced two files in
+<code class="docutils literal notranslate"><span class="pre">mlruns/0/c2a7325210ef4242bd4631cec8f92351/artifacts/model/</span></code>.
+The first file, <code class="docutils literal notranslate"><span class="pre">MLmodel</span></code>, is a metadata file that tells MLflow how to load the model. The
+second file, <code class="docutils literal notranslate"><span class="pre">r_model.bin</span></code>, is a serialized version of the linear regression model that you trained.</p>
+<p>In this example, you can use this MLmodel format with MLflow to deploy a local REST server that can serve predictions.</p>
+<p>To deploy the server, run:</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">mlflow_rfunc_serve</span><span class="p">(</span><span class="n">model_uri</span><span class="o">=</span><span class="s">&quot;mlruns/0/c2a7325210ef4242bd4631cec8f92351/artifacts/model&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">port</span><span class="o">=</span><span class="m">8090</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This initializes a REST server and opens a <a class="reference external" href="https://swagger.io/">Swagger</a> interface to perform predictions against
+the REST API:</p>
+<img alt="../../_images/tutorial-serving-r.png" src="../../_images/tutorial-serving-r.png" />
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>By default, a model is served using the R packages available. To ensure the environment serving
+the prediction function matches the model, set <code class="docutils literal notranslate"><span class="pre">restore</span> <span class="pre">=</span> <span class="pre">TRUE</span></code> when calling
+<code class="docutils literal notranslate"><span class="pre">mlflow_rfunc_serve()</span></code>.</p>
+</div>
+<p>To serve a prediction, enter this in the Swagger UI:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;fixed acidity&quot;</span><span class="p">:</span> <span class="mf">6.2</span><span class="p">,</span>
+  <span class="s2">&quot;volatile acidity&quot;</span><span class="p">:</span> <span class="mf">0.66</span><span class="p">,</span>
+  <span class="s2">&quot;citric acid&quot;</span><span class="p">:</span> <span class="mf">0.48</span><span class="p">,</span>
+  <span class="s2">&quot;residual sugar&quot;</span><span class="p">:</span> <span class="mf">1.2</span><span class="p">,</span>
+  <span class="s2">&quot;chlorides&quot;</span><span class="p">:</span> <span class="mf">0.029</span><span class="p">,</span>
+  <span class="s2">&quot;free sulfur dioxide&quot;</span><span class="p">:</span> <span class="mi">29</span><span class="p">,</span>
+  <span class="s2">&quot;total sulfur dioxide&quot;</span><span class="p">:</span> <span class="mi">75</span><span class="p">,</span>
+  <span class="s2">&quot;density&quot;</span><span class="p">:</span> <span class="mf">0.98</span><span class="p">,</span>
+  <span class="s2">&quot;pH&quot;</span><span class="p">:</span> <span class="mf">3.33</span><span class="p">,</span>
+  <span class="s2">&quot;sulphates&quot;</span><span class="p">:</span> <span class="mf">0.39</span><span class="p">,</span>
+  <span class="s2">&quot;alcohol&quot;</span><span class="p">:</span> <span class="mf">12.8</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>which should return something like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+  <span class="p">[</span>
+    <span class="mf">6.4287492410792</span>
+  <span class="p">]</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>Or run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># On Linux and macOS</span>
+curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="s2">&quot;http://127.0.0.1:8090/predict/&quot;</span><span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;accept: application/json&quot;</span><span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span>-d<span class="w"> </span><span class="s2">&quot;{&quot;</span>fixed<span class="w"> </span>acidity<span class="s2">&quot;: 6.2, &quot;</span>volatile<span class="w"> </span>acidity<span class="s2">&quot;: 0.66, &quot;</span>citric<span class="w"> </span>acid<span class="s2">&quot;: 0.48, &quot;</span>residual<span class="w"> </span>sugar<span class="s2">&quot;: 1.2, &quot;</span>chlorides<span class="s2">&quot;: 0.029, &quot;</span>free<span class="w"> </span>sulfur<span class="w"> </span>dioxide<span class="s2">&quot;: 29, &quot;</span>total<span class="w"> </span>sulfur<span class="w"> </span>dioxide<span class="s2">&quot;: 75, &quot;</span>density<span class="s2">&quot;: 0.98, &quot;</span>pH<span class="s2">&quot;: 3.33, &quot;</span>sulphates<span class="s2">&quot;: 0.39, &quot;</span>alcohol<span class="s2">&quot;: 12.8}&quot;</span>
+
+<span class="c1"># On Windows</span>
+curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="s2">&quot;http://127.0.0.1:8090/predict/&quot;</span><span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;accept: application/json&quot;</span><span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span>-d<span class="w"> </span><span class="s2">&quot;{\&quot;fixed acidity\&quot;: 6.2, \&quot;volatile acidity\&quot;: 0.66, \&quot;citric acid\&quot;: 0.48, \&quot;residual sugar\&quot;: 1.2, \&quot;chlorides\&quot;: 0.029, \&quot;free sulfur dioxide\&quot;: 29, \&quot;total sulfur dioxide\&quot;: 75, \&quot;density\&quot;: 0.98, \&quot;pH\&quot;: 3.33, \&quot;sulphates\&quot;: 0.39, \&quot;alcohol\&quot;: 12.8}&quot;</span>
+</pre></div>
+</div>
+<p>the server should respond with output similar to:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[[</span><span class="mf">6.4287492410792</span><span class="p">]]</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="deploy-the-model-to-seldon-core-or-kserve">
+<h2><a class="toc-backref" href="#id9">Deploy the Model to Seldon Core or KServe</a><a class="headerlink" href="#deploy-the-model-to-seldon-core-or-kserve" title="Permalink to this headline"> </a></h2>
+<p>After training and testing our model, we are now ready to deploy it to
+production.
+MLflow allows you to <a class="reference internal" href="../../models.html#serving-with-mlserver"><span class="std std-ref">serve your model using
+MLServer</span></a>, which is already used as the core Python
+inference server in Kubernetes-native frameworks including <a class="reference external" href="https://docs.seldon.io/projects/seldon-core/en/latest/">Seldon Core</a> and <a class="reference external" href="https://kserve.github.io/website/">KServe
+(formerly known as KFServing)</a>.
+Therefore, we can leverage this support to build a Docker image compatible with
+these frameworks.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This an <strong>optional step</strong>, which is currently only available for Python models. This step also
+requires some basic Kubernetes knowledge, including familiarity with <code class="docutils literal notranslate"><span class="pre">kubectl</span></code>.</p>
+</div>
+<p>To build a Docker image containing our model, we can use the <code class="docutils literal notranslate"><span class="pre">mlflow</span> <span class="pre">models</span>
+<span class="pre">build-docker</span></code> subcommand, alongside the <code class="docutils literal notranslate"><span class="pre">--enable-mlserver</span></code> flag.
+For example, to build a image named <code class="docutils literal notranslate"><span class="pre">my-docker-image</span></code>, we could do:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mlflow<span class="w"> </span>models<span class="w"> </span>build-docker<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-m<span class="w"> </span>/Users/mlflow/mlflow-prototype/mlruns/0/7c1a0d5c42844dcdb8f5191146925174/artifacts/model<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-n<span class="w"> </span>my-docker-image<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--enable-mlserver
+</pre></div>
+</div>
+<p>Once we have our image built, the next step will be to deploy it to our
+cluster.
+One way to do this is by applying the respective Kubernetes manifests through
+the <code class="docutils literal notranslate"><span class="pre">kubectl</span></code> CLI:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>my-manifest.yaml
+</pre></div>
+</div>
+<div class="plain-section docutils container">
+<div class="seldon-core docutils container">
+<p>This step assumes that you’ve got <code class="docutils literal notranslate"><span class="pre">kubectl</span></code> access to a Kubernetes
+cluster already setup with Seldon Core.
+To read more on how to set this up, you can refer to the <a class="reference external" href="https://docs.seldon.io/projects/seldon-core/en/latest/workflow/github-readme.html">Seldon Core
+quickstart guide</a>.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">machinelearning.seldon.io/v1</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SeldonDeployment</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mlflow-model</span>
+<span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">protocol</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v2</span>
+<span class="w">  </span><span class="nt">predictors</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span>
+<span class="w">      </span><span class="nt">graph</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mlflow-model</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MODEL</span>
+<span class="w">      </span><span class="nt">componentSpecs</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">spec</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">containers</span><span class="p">:</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mlflow-model</span>
+<span class="w">                </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-docker-image</span>
+</pre></div>
+</div>
+</div>
+<div class="kserve docutils container">
+<p>This step assumes that you’ve got <code class="docutils literal notranslate"><span class="pre">kubectl</span></code> access to a Kubernetes
+cluster already setup with KServe.
+To read more on how to set this up, you can refer to the <a class="reference external" href="https://kserve.github.io/website/get_started/">KServe
+quickstart guide</a>.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">serving.kserve.io/v1beta1</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">InferenceService</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mlflow-model</span>
+<span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">predictor</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">containers</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mlflow-model</span>
+<span class="w">        </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-docker-image</span>
+<span class="w">        </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">containerPort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8080</span>
+<span class="w">            </span><span class="nt">protocol</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">TCP</span>
+<span class="w">        </span><span class="nt">env</span><span class="p">:</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PROTOCOL</span>
+<span class="w">            </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v2</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Congratulations on finishing the guide!</p>
+<dl class="footnote brackets">
+<dt class="label" id="id2"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><ol class="upperalpha simple" start="16">
+<li><p>Cortez, A. Cerdeira, F. Almeida, T. Matos and J. Reis. Modeling wine preferences by data mining from physicochemical properties. In Decision Support Systems, Elsevier, 47(4):547-553, 2009.</p></li>
+</ol>
+</dd>
+</dl>
+</div>
+</div>
+
+
+              </div>
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../index.html" class="btn btn-neutral" title="Deployment" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+      
+      
+        <a href="../../tracking.html" class="btn btn-neutral" title="MLflow Tracking" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+      <p class="copyright">
+          &copy; MLflow Project, a Series of LF Projects, LLC. All rights reserved.
+      </p>
+
+  </div> 
+
+</footer>
+          </div>
+        </div>
+      </section>
+    </main>
+  </page>
+
+  
+
+
+  
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+      URL_ROOT:'../../',
+      VERSION:'2.9.2.dev0',
+      COLLAPSE_INDEX:false,
+      FILE_SUFFIX:'.html',
+      LINK_SUFFIX: '.html',
+      HAS_SOURCE:  true
+    };
+  </script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/clipboard.min.js"></script>
+  <script type="text/javascript" src="../../_static/js/jquery.waypoints.min.js"></script>
+
+  
+  
+  
+  <script type="text/javascript">var CLIPPY_SVG_PATH = "../../_static/clippy.svg";</script>
+  <script type="text/javascript" src="../../_static/js/custom.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.StickyNav.enable();
+    });
+
+  </script>
+  
+
+  
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        // Get the code block designator class entries
+        const allHighlights = document.querySelectorAll('.highlight');
+        // Disable copyable links for notebook cell numbering and for cell outputs
+        const highlights = Array.from(allHighlights).filter(highlight => !highlight.closest('.highlight-none') && 
+            !highlight.closest('.nboutput'));
+    
+        highlights.forEach(function(highlight) {
+            const copyIcon = document.createElement('span');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.innerHTML = '&#xf0ea;';
+
+            copyIcon.addEventListener('click', function() {
+                const code = highlight.querySelector('pre').textContent;
+                copyToClipboard(code);
+
+                // Flash effect on click
+                this.style.color = '#0194E2';
+                setTimeout(() => {
+                    this.style.color = ''; 
+                }, 100);
+
+                // Display "Code copied to clipboard" near the clicked icon
+                const message = document.createElement('span');
+                message.textContent = "Copied!";
+                message.classList.add('copy-message'); 
+
+                // Append the message to the icon
+                this.appendChild(message);
+
+                setTimeout(() => {
+                    this.removeChild(message);
+                }, 500);
+            });
+
+            highlight.appendChild(copyIcon);
+        });
+    });
+  </script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Force download for notebook-download-btn
+        const downloadButtons = document.querySelectorAll('.notebook-download-btn');
+        downloadButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                // Fetch the raw content of the notebook from GitHub
+                fetch(button.href)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = url;
+                        const filename = button.href.split('/').pop();
+                        link.download = filename; 
+
+                        document.body.appendChild(link);
+                        link.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    })
+                    .catch(err => console.error('Error fetching the notebook:', err));
+            });
+        });
+    });
+</script> 
+</body>
+</html>

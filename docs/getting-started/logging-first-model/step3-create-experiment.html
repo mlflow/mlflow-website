@@ -1,0 +1,468 @@
+
+  
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Creating Experiments &mdash; MLflow 2.9.2.dev0 documentation</title>
+  
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/getting-started/logging-first-model/step3-create-experiment.html">
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    
+
+    
+
+  
+    
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/grids.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/mobile.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/simple-cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/tabs.css" type="text/css" />
+    
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="MLflow 2.9.2.dev0 documentation" href="../../index.html"/>
+        <link rel="up" title="Getting Started with MLflow" href="../index.html"/>
+        <link rel="next" title="Searching Experiments" href="/step4-experiment-search.html"/>
+        <link rel="prev" title="Using the MLflow Client API" href="/step2-mlflow-client.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+<script type="text/javascript" src="../../_static/jquery.js"></script>
+<script type="text/javascript" src="../../_static/underscore.js"></script>
+<script type="text/javascript" src="../../_static/doctools.js"></script>
+<script type="text/javascript" src="../../_static/languagesections.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+
+<body class="wy-body-for-nav" role="document">
+  
+
+  
+  <nav class="wy-nav-top header" role="navigation" aria-label="top navigation">
+    <ul>
+  <li class="menu-toggle">
+    <i data-toggle="wy-nav-top" class="wy-nav-top-menu-button db-icon db-icon-menu pull-left"></i>
+    <a href="../../index.html" class="wy-nav-top-logo"
+      ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
+    /></a>
+    <span class="version">2.9.2.dev0</span>
+  </li>
+</ul>
+  </nav>
+  <page>
+    
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side relative">
+      <div class="wy-side-scroll">
+  <div class="wy-side-nav-search">
+    
+
+    
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+    
+  </div>
+
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+    
+      <a href="../../index.html" class="main-navigation-home"><img src="../../_static/icons/nav-home.svg"> MLflow</a>
+    
+
+    
+      
+
+      
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../introduction/index.html">What is MLflow?</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Getting Started with MLflow</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#id1">5-minute Quickstart - MLflow Tracking</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#id2">Logging your first MLflow Model</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../index.html#guide-sections">Guide sections</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="index.html">Tutorial Overview</a></li>
+<li class="toctree-l4"><a class="reference internal" href="step1-tracking-server.html">Starting the MLflow Tracking Server</a></li>
+<li class="toctree-l4"><a class="reference internal" href="step2-mlflow-client.html">Using the MLflow Client API</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Creating Experiments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="step4-experiment-search.html">Searching Experiments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="step5-synthetic-data.html">Create a dataset about apples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="step6-logging-a-run.html">Logging our first runs with MLflow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="notebooks/index.html">Logging Your First MLflow Model Notebook</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#id3">15 minute Quickstart - Autologging in MLflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#id4">15 minute Quickstart - Comparing Runs and Deploying your Best Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#id5">5 Minute Tracking Server Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../new-features/index.html">New Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../llms/index.html">LLMs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../model-evaluation/index.html">Model Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../deep-learning/index.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../traditional-ml/index.html">Traditional ML</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../deployment/index.html">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tracking.html">MLflow Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../system-metrics/index.html">System Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../projects.html">MLflow Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../models.html">MLflow Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../model-registry.html">MLflow Model Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../recipes.html">MLflow Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plugins.html">MLflow Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auth/index.html">MLflow Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../search-runs.html">Search Runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../search-experiments.html">Search Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../python_api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../R-api.html">R API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../java_api/index.html">Java API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rest-api.html">REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../docker.html">Official MLflow Docker Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../community-model-flavors.html">Community Model Flavors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials-and-examples/index.html">Tutorials and Examples</a></li>
+</ul>
+
+      
+    
+  </div>
+
+  <div role="contentinfo">
+    
+
+    <p>
+      <a id='feedbacklink' href="https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a>
+    </p>
+  </div>
+</div>
+    </nav>
+
+    <main class="wy-grid-for-nav">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+          <div class="rst-content">
+            
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Documentation</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../index.html">Getting Started with MLflow</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+    
+      <li>Creating Experiments</li>
+    
+    
+    <!-- <li class="wy-breadcrumbs-aside">
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/getting-started/logging-first-model/step3-create-experiment.rst" class="fa fa-github"> Edit on GitHub</a>
+    </li> -->
+    
+  </ul>
+</div>
+            <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <div itemprop="articleBody">
+                
+  <div class="section" id="creating-experiments">
+<h1>Creating Experiments<a class="headerlink" href="#creating-experiments" title="Permalink to this headline"> </a></h1>
+<p>In the previous section, we became familiar with the MLflow Client and its <code class="docutils literal notranslate"><span class="pre">search_experiments</span></code> API.
+Before we get into creating experiments and adding metadata tags to them, let’s take a brief look at the
+MLflow UI.</p>
+<p>In the first section of this tutorial, we started the MLflow Tracking Server from a command prompt, specifying the
+host as <code class="docutils literal notranslate"><span class="pre">127.0.0.1</span></code> and the port as <code class="docutils literal notranslate"><span class="pre">8080</span></code>.  Let’s go to the UI and see what the Default Experiment looks like.</p>
+<div class="section" id="viewing-the-mlflow-ui">
+<h2>Viewing the MLflow UI<a class="headerlink" href="#viewing-the-mlflow-ui" title="Permalink to this headline"> </a></h2>
+<p>In order to see the MLflow UI, we simply have to use a web browser to connect to the MLflow Tracking Server and navigate to <a class="reference external" href="http://127.0.0.1:8080">http://127.0.0.1:8080</a>.
+Once navigating to the url for the MLflow UI, you will see the default experiment with no run data.</p>
+<div class="figure align-center" id="id1">
+<a class="reference internal image-reference" href="../../_images/default-ui.png"><img alt="A freshly initialized MLflow UI" src="../../_images/default-ui.png" style="width: 1024px;" /></a>
+<p class="caption"><span class="caption-text">The default MLflow UI</span><a class="headerlink" href="#id1" title="Permalink to this image"> </a></p>
+</div>
+<p>As you can see, there are no runs recorded and only the Default Experiment (with an ID of <cite>0</cite>) is present.
+This won’t be the case for long, as we’re about to add a new Experiment.</p>
+</div>
+<div class="section" id="notes-on-tags-vs-experiments">
+<h2>Notes on Tags vs Experiments<a class="headerlink" href="#notes-on-tags-vs-experiments" title="Permalink to this headline"> </a></h2>
+<p>While MLflow does provide a default experiment, it primarily serves as a ‘catch-all’ safety net for
+runs initiated without a specified active experiment. However, it’s not recommended for regular use.
+Instead, creating unique experiments for specific collections of runs offers numerous advantages,
+as we’ll explore below.</p>
+<p><strong>Benefits of Defining Unique Experiments:</strong></p>
+<p>1. <strong>Enhanced Organization</strong>: Experiments allow you to group related runs, making it easier to track
+and compare them. This is especially helpful when managing numerous runs, as in large-scale projects.</p>
+<p>2. <strong>Metadata Annotation</strong>: Experiments can carry metadata that aids in organizing and associating
+runs with larger projects.</p>
+<p>Consider the scenario below: we’re simulating participation in a large demand forecasting project.
+This project involves building forecasting models for various departments in a chain of grocery
+stores, each housing numerous products. Our focus here is the ‘produce’ department, which has several
+distinct items, each requiring its own forecast model. Organizing these models becomes paramount
+to ensure easy navigation and comparison.</p>
+<p><strong>When Should You Define an Experiment?</strong></p>
+<p>The guiding principle for creating an experiment is the consistency of the input data. If multiple
+runs use the same input dataset (even if they utilize different portions of it), they logically belong
+to the same experiment. For other hierarchical categorizations, using tags is advisable.</p>
+<p><strong>Example</strong>:</p>
+<p>Consider the following structure of the models, mapped to the business product hierarchy:</p>
+<div class="hierarchy-container docutils container">
+<div class="hierarchy-item">Demand Forecasting Project</div>
+<div class="hierarchy-item level-1">Dairy</div>
+<div class="hierarchy-item level-2">Cheese</div>
+<div class="hierarchy-item level-3">Parmesan</div>
+<div class="hierarchy-item level-3">Cheddar</div>
+<div class="hierarchy-item level-2">Milk</div>
+<div class="hierarchy-item level-3">Whole</div>
+<div class="hierarchy-item level-3">2%</div>
+<div class="hierarchy-item level-1">Produce</div>
+<div class="hierarchy-item level-2">Fruit</div>
+<div class="hierarchy-item level-3">Apples</div>
+<div class="hierarchy-item level-3">Cherries</div>
+<div class="hierarchy-item level-2">Vegetables</div>
+<div class="hierarchy-item level-3">Carrots</div></div>
+<p>Here, the <cite>produce</cite> and <cite>dairy</cite> departments are part of the same overarching project, but they rely
+on distinct datasets and will likely produce different model metrics. Grouping the departments together
+definitely doesn’t make sense.</p>
+<p>However, the temptation might arise to group all produce together. Grouping diverse items like apples,
+cherries, and carrots under a single experiment could dilute the effectiveness of run comparisons
+within that experiment. Thus, it’s essential to demarcate clear boundaries for your experiments
+to ensure meaningful insights.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>While the business product hierarchy in this case doesn’t explicitly need to be captured within
+the tags, there is nothing preventing you from doing so. There isn’t a limit to the number of tags
+that you can apply. Provided that the keys being used are consistent across experiments and runs to
+permit search to function properly, any number of arbitrary mappings between tracked models and your
+specific business rules can be applied.</p>
+</div>
+<p>To apply these boundaries effectively, as is shown in the figure below, tags should be employed.</p>
+<div class="figure align-center" id="id2">
+<a class="reference internal image-reference" href="../../_images/tag-exp-run-relationship.svg"><img alt="Tags, experiments, and runs relationships" src="../../_images/tag-exp-run-relationship.svg" width="860px" /></a>
+<p class="caption"><span class="caption-text">Effective grouping of modeling runs for a large project</span><a class="headerlink" href="#id2" title="Permalink to this image"> </a></p>
+</div>
+</div>
+<div class="section" id="creating-the-apples-experiment-with-meaningful-tags">
+<h2>Creating the Apples Experiment with Meaningful tags<a class="headerlink" href="#creating-the-apples-experiment-with-meaningful-tags" title="Permalink to this headline"> </a></h2>
+<div class="code-section docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Provide an Experiment description that will appear in the UI</span>
+<span class="n">experiment_description</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;This is the grocery forecasting project. &quot;</span>
+    <span class="s2">&quot;This experiment contains the produce models for apples.&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># Provide searchable tags that define characteristics of the Runs that</span>
+<span class="c1"># will be in this Experiment</span>
+<span class="n">experiment_tags</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;project_name&quot;</span><span class="p">:</span> <span class="s2">&quot;grocery-forecasting&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;store_dept&quot;</span><span class="p">:</span> <span class="s2">&quot;produce&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;team&quot;</span><span class="p">:</span> <span class="s2">&quot;stores-ml&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;project_quarter&quot;</span><span class="p">:</span> <span class="s2">&quot;Q3-2023&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;mlflow.note.content&quot;</span><span class="p">:</span> <span class="n">experiment_description</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="c1"># Create the Experiment, providing a unique name</span>
+<span class="n">produce_apples_experiment</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">create_experiment</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Apple_Models&quot;</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="n">experiment_tags</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>In the next section, we’ll take a look at what these tags can be used for, which are visible in the UI,
+and how we can leverage the power of <code class="docutils literal notranslate"><span class="pre">tags</span></code> to simplify access to experiments that are part of a
+larger project.</p>
+</div>
+</div>
+
+
+              </div>
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="step2-mlflow-client.html" class="btn btn-neutral" title="Using the MLflow Client API" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+      
+      
+        <a href="step4-experiment-search.html" class="btn btn-neutral" title="Searching Experiments" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+      <p class="copyright">
+          &copy; MLflow Project, a Series of LF Projects, LLC. All rights reserved.
+      </p>
+
+  </div> 
+
+</footer>
+          </div>
+        </div>
+      </section>
+    </main>
+  </page>
+
+  
+
+
+  
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+      URL_ROOT:'../../',
+      VERSION:'2.9.2.dev0',
+      COLLAPSE_INDEX:false,
+      FILE_SUFFIX:'.html',
+      LINK_SUFFIX: '.html',
+      HAS_SOURCE:  true
+    };
+  </script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/clipboard.min.js"></script>
+  <script type="text/javascript" src="../../_static/js/jquery.waypoints.min.js"></script>
+
+  
+  
+  
+  <script type="text/javascript">var CLIPPY_SVG_PATH = "../../_static/clippy.svg";</script>
+  <script type="text/javascript" src="../../_static/js/custom.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.StickyNav.enable();
+    });
+
+  </script>
+  
+
+  
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        // Get the code block designator class entries
+        const allHighlights = document.querySelectorAll('.highlight');
+        // Disable copyable links for notebook cell numbering and for cell outputs
+        const highlights = Array.from(allHighlights).filter(highlight => !highlight.closest('.highlight-none') && 
+            !highlight.closest('.nboutput'));
+    
+        highlights.forEach(function(highlight) {
+            const copyIcon = document.createElement('span');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.innerHTML = '&#xf0ea;';
+
+            copyIcon.addEventListener('click', function() {
+                const code = highlight.querySelector('pre').textContent;
+                copyToClipboard(code);
+
+                // Flash effect on click
+                this.style.color = '#0194E2';
+                setTimeout(() => {
+                    this.style.color = ''; 
+                }, 100);
+
+                // Display "Code copied to clipboard" near the clicked icon
+                const message = document.createElement('span');
+                message.textContent = "Copied!";
+                message.classList.add('copy-message'); 
+
+                // Append the message to the icon
+                this.appendChild(message);
+
+                setTimeout(() => {
+                    this.removeChild(message);
+                }, 500);
+            });
+
+            highlight.appendChild(copyIcon);
+        });
+    });
+  </script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Force download for notebook-download-btn
+        const downloadButtons = document.querySelectorAll('.notebook-download-btn');
+        downloadButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                // Fetch the raw content of the notebook from GitHub
+                fetch(button.href)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = url;
+                        const filename = button.href.split('/').pop();
+                        link.download = filename; 
+
+                        document.body.appendChild(link);
+                        link.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    })
+                    .catch(err => console.error('Error fetching the notebook:', err));
+            });
+        });
+    });
+</script> 
+</body>
+</html>

@@ -1,0 +1,1067 @@
+
+  
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Introduction to Advanced Semantic Similarity Analysis with Sentence Transformers and MLflow &mdash; MLflow 2.9.2.dev0 documentation</title>
+  
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/llms/sentence-transformers/tutorials/semantic-similarity/semantic-similarity-sentence-transformers.html">
+  
+  
+    <link rel="shortcut icon" href="../../../../_static/favicon.ico"/>
+    
+
+    
+
+  
+    
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/css/cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/css/grids.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/css/mobile.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/css/simple-cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/css/tabs.css" type="text/css" />
+    
+  
+        <link rel="index" title="Index"
+              href="../../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../../search.html"/>
+    <link rel="top" title="MLflow 2.9.2.dev0 documentation" href="../../../../index.html"/>
+        <link rel="up" title="MLflow Sentence-Transformers Flavor" href="../../index.html"/>
+        <link rel="next" title="Sentence Transformers within MLflow" href="/../../guide/index.html"/>
+        <link rel="prev" title="Advanced Semantic Search with Sentence Transformers and MLflow" href="/../semantic-search/semantic-search-sentence-transformers.html"/> 
+
+  
+  <script src="../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+<script type="text/javascript" src="../../../../_static/jquery.js"></script>
+<script type="text/javascript" src="../../../../_static/underscore.js"></script>
+<script type="text/javascript" src="../../../../_static/doctools.js"></script>
+<script type="text/javascript" src="../../../../_static/languagesections.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript" src="../../../../None"></script>
+
+<body class="wy-body-for-nav" role="document">
+  
+
+  
+  <nav class="wy-nav-top header" role="navigation" aria-label="top navigation">
+    <ul>
+  <li class="menu-toggle">
+    <i data-toggle="wy-nav-top" class="wy-nav-top-menu-button db-icon db-icon-menu pull-left"></i>
+    <a href="../../../../index.html" class="wy-nav-top-logo"
+      ><img src="../../../../_static/MLflow-logo-final-black.png" alt="MLflow"
+    /></a>
+    <span class="version">2.9.2.dev0</span>
+  </li>
+</ul>
+  </nav>
+  <page>
+    
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side relative">
+      <div class="wy-side-scroll">
+  <div class="wy-side-nav-search">
+    
+
+    
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+    
+  </div>
+
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+    
+      <a href="../../../../index.html" class="main-navigation-home"><img src="../../../../_static/icons/nav-home.svg"> MLflow</a>
+    
+
+    
+      
+
+      
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../introduction/index.html">What is MLflow?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting-started/index.html">Getting Started with MLflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../new-features/index.html">New Features</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../index.html">LLMs</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../index.html#id1">MLflow Deployments Server for LLMs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../index.html#id3">LLM Evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../index.html#id4">Prompt Engineering UI</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../index.html#native-mlflow-flavors-for-llms">Native MLflow Flavors for LLMs</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../../../index.html#benefits-of-mlflow-s-native-flavors-for-llms">Benefits of MLflow’s Native Flavors for LLMs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../index.html#explore-the-native-llm-flavors">Explore the Native LLM Flavors</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../../../index.html#native-integration-guides-and-tutorials">Native Integration Guides and Tutorials</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../../../transformers/index.html">MLflow Transformers Flavor</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../../index.html">MLflow Sentence-Transformers Flavor</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../index.html#native-integration-examples">Native Integration Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../index.html#id5">LLM Tracking in MLflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../index.html#tutorials-and-use-case-guides-for-llms-in-mlflow">Tutorials and Use Case Guides for LLMs in MLflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../model-evaluation/index.html">Model Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deep-learning/index.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../traditional-ml/index.html">Traditional ML</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment/index.html">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tracking.html">MLflow Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../system-metrics/index.html">System Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../projects.html">MLflow Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../models.html">MLflow Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../model-registry.html">MLflow Model Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../recipes.html">MLflow Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../plugins.html">MLflow Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../auth/index.html">MLflow Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../search-runs.html">Search Runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../search-experiments.html">Search Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../python_api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../R-api.html">R API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../java_api/index.html">Java API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../rest-api.html">REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../docker.html">Official MLflow Docker Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../community-model-flavors.html">Community Model Flavors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials-and-examples/index.html">Tutorials and Examples</a></li>
+</ul>
+
+      
+    
+  </div>
+
+  <div role="contentinfo">
+    
+
+    <p>
+      <a id='feedbacklink' href="https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a>
+    </p>
+  </div>
+</div>
+    </nav>
+
+    <main class="wy-grid-for-nav">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+          <div class="rst-content">
+            
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../../index.html">Documentation</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../../../index.html">LLMs</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../../index.html">MLflow Sentence-Transformers Flavor</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+    
+      <li>Introduction to Advanced Semantic Similarity Analysis with Sentence Transformers and MLflow</li>
+    
+    
+    <!-- <li class="wy-breadcrumbs-aside">
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/llms/sentence-transformers/tutorials/semantic-similarity/semantic-similarity-sentence-transformers.ipynb" class="fa fa-github"> Edit on GitHub</a>
+    </li> -->
+    
+  </ul>
+</div>
+            <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <div itemprop="articleBody">
+                
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div class="section" id="Introduction-to-Advanced-Semantic-Similarity-Analysis-with-Sentence-Transformers-and-MLflow">
+<h1>Introduction to Advanced Semantic Similarity Analysis with Sentence Transformers and MLflow<a class="headerlink" href="#Introduction-to-Advanced-Semantic-Similarity-Analysis-with-Sentence-Transformers-and-MLflow" title="Permalink to this headline"> </a></h1>
+<p>Dive into advanced Semantic Similarity Analysis using Sentence Transformers and MLflow in this comprehensive tutorial.</p>
+<div class="section" id="Learning-Objectives">
+<h2>Learning Objectives<a class="headerlink" href="#Learning-Objectives" title="Permalink to this headline"> </a></h2>
+<ul class="simple">
+<li><p>Configure <code class="docutils literal notranslate"><span class="pre">sentence-transformers</span></code> for semantic similarity analysis.</p></li>
+<li><p>Explore custom <code class="docutils literal notranslate"><span class="pre">PythonModel</span></code> implementation in MLflow.</p></li>
+<li><p>Log models and manage configurations with MLflow.</p></li>
+<li><p>Deploy and apply models for inference using MLflow’s features.</p></li>
+</ul>
+<div class="section" id="Unveiling-the-Power-of-Sentence-Transformers-for-NLP">
+<h3>Unveiling the Power of Sentence Transformers for NLP<a class="headerlink" href="#Unveiling-the-Power-of-Sentence-Transformers-for-NLP" title="Permalink to this headline"> </a></h3>
+<p>Sentence Transformers, specialized adaptations of transformer models, excel in producing semantically rich sentence embeddings. Ideal for semantic search and similarity analysis, these models bring a deeper semantic understanding to NLP tasks.</p>
+<p>#### MLflow: Pioneering Flexible Model Management and Deployment</p>
+<p>MLflow’s integration with Sentence Transformers introduces enhanced experiment tracking and flexible model management, crucial for NLP projects. Learn to implement a custom <code class="docutils literal notranslate"><span class="pre">PythonModel</span></code> within MLflow, extending functionalities for unique requirements.</p>
+<p>Throughout this tutorial, you’ll gain hands-on experience in managing and deploying sophisticated NLP models with MLflow, enhancing your skills in semantic similarity analysis and model lifecycle management.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Disable tokenizers warnings when constructing pipelines</span>
+<span class="o">%</span><span class="k">env</span> TOKENIZERS_PARALLELISM=false
+
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="c1"># Disable a few less-than-useful UserWarnings from setuptools and pydantic</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">UserWarning</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+env: TOKENIZERS_PARALLELISM=false
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Implementing-a-Custom-SimilarityModel-with-MLflow">
+<h2>Implementing a Custom SimilarityModel with MLflow<a class="headerlink" href="#Implementing-a-Custom-SimilarityModel-with-MLflow" title="Permalink to this headline"> </a></h2>
+<p>Discover how to create a custom <code class="docutils literal notranslate"><span class="pre">SimilarityModel</span></code> class using MLflow’s <code class="docutils literal notranslate"><span class="pre">PythonModel</span></code> to assess semantic similarity between sentences.</p>
+<div class="section" id="Overview-of-SimilarityModel">
+<h3>Overview of SimilarityModel<a class="headerlink" href="#Overview-of-SimilarityModel" title="Permalink to this headline"> </a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">SimilarityModel</span></code> is a tailored Python class that leverages MLflow’s flexible <code class="docutils literal notranslate"><span class="pre">PythonModel</span></code> interface. It is specifically designed to encapsulate the intricacies of computing semantic similarity between sentence pairs using sophisticated sentence embeddings.</p>
+</div>
+<div class="section" id="Key-Components-of-the-Custom-Model">
+<h3>Key Components of the Custom Model<a class="headerlink" href="#Key-Components-of-the-Custom-Model" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Importing Libraries</strong>: Essential libraries from MLflow, data handling, and Sentence Transformers are imported to facilitate model functionality.</p></li>
+<li><p><strong>Custom PythonModel - SimilarityModel</strong>:</p>
+<ul>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">load_context</span></code> method focuses on efficient and safe model loading, crucial for handling complex models like Sentence Transformers.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">predict</span></code> method, equipped with input type checking and error handling, ensures that the model delivers accurate cosine similarity scores, reflecting semantic correlations.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="Significance-of-Custom-SimilarityModel">
+<h3>Significance of Custom SimilarityModel<a class="headerlink" href="#Significance-of-Custom-SimilarityModel" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Flexibility and Customization</strong>: The model’s design allows for specialized handling of inputs and outputs, aligning perfectly with unique requirements of semantic similarity tasks.</p></li>
+<li><p><strong>Robust Error Handling</strong>: Detailed input type checking guarantees a user-friendly experience, preventing common input errors and ensuring the predictability of model behavior.</p></li>
+<li><p><strong>Efficient Model Loading</strong>: The strategic use of the <code class="docutils literal notranslate"><span class="pre">load_context</span></code> method for model initialization circumvents serialization challenges, ensuring a smooth operational flow.</p></li>
+<li><p><strong>Targeted Functionality</strong>: The custom <code class="docutils literal notranslate"><span class="pre">predict</span></code> method directly computes similarity scores, showcasing the model’s capability to deliver task-specific, actionable insights.</p></li>
+</ul>
+<p>This custom <code class="docutils literal notranslate"><span class="pre">SimilarityModel</span></code> exemplifies the adaptability of MLflow’s <code class="docutils literal notranslate"><span class="pre">PythonModel</span></code> in crafting bespoke NLP solutions, setting a precedent for similar endeavors in various machine learning projects.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">from</span> <span class="nn">mlflow.models.signature</span> <span class="kn">import</span> <span class="n">infer_signature</span>
+<span class="kn">from</span> <span class="nn">mlflow.pyfunc</span> <span class="kn">import</span> <span class="n">PythonModel</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">sentence_transformers</span> <span class="kn">import</span> <span class="n">SentenceTransformer</span><span class="p">,</span> <span class="n">util</span>
+
+
+<span class="k">class</span> <span class="nc">SimilarityModel</span><span class="p">(</span><span class="n">PythonModel</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">load_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load the model context for inference.&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">sentence_transformers</span> <span class="kn">import</span> <span class="n">SentenceTransformer</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">SentenceTransformer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">artifacts</span><span class="p">[</span><span class="s2">&quot;model_path&quot;</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error loading model: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">model_input</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Predict method for comparing similarity between two sentences.&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">sentence_transformers</span> <span class="kn">import</span> <span class="n">util</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_input</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">model_input</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;DataFrame input must have exactly two columns.&quot;</span><span class="p">)</span>
+            <span class="n">sentence_1</span><span class="p">,</span> <span class="n">sentence_2</span> <span class="o">=</span> <span class="n">model_input</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">model_input</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_input</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">sentence_1</span> <span class="o">=</span> <span class="n">model_input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sentence_1&quot;</span><span class="p">)</span>
+            <span class="n">sentence_2</span> <span class="o">=</span> <span class="n">model_input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sentence_2&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">sentence_1</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">sentence_2</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Both &#39;sentence_1&#39; and &#39;sentence_2&#39; must be provided in the input dictionary.&quot;</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Unexpected type for model_input: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">model_input</span><span class="p">)</span><span class="si">}</span><span class="s2">. Must be either a Dict or a DataFrame.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">embedding_1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">sentence_1</span><span class="p">)</span>
+        <span class="n">embedding_2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">sentence_2</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">cos_sim</span><span class="p">(</span><span class="n">embedding_1</span><span class="p">,</span> <span class="n">embedding_2</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Preparing-the-Sentence-Transformer-Model-and-Signature">
+<h2>Preparing the Sentence Transformer Model and Signature<a class="headerlink" href="#Preparing-the-Sentence-Transformer-Model-and-Signature" title="Permalink to this headline"> </a></h2>
+<p>Explore the essential steps for setting up the Sentence Transformer model for logging and deployment with MLflow.</p>
+<div class="section" id="Loading-and-Saving-the-Pre-trained-Model">
+<h3>Loading and Saving the Pre-trained Model<a class="headerlink" href="#Loading-and-Saving-the-Pre-trained-Model" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Model Initialization</strong>: A pre-trained Sentence Transformer model, <code class="docutils literal notranslate"><span class="pre">&quot;all-MiniLM-L6-v2&quot;</span></code>, is loaded for its efficiency in generating high-quality embeddings suitable for diverse NLP tasks.</p></li>
+<li><p><strong>Model Saving</strong>: The model is saved locally to <code class="docutils literal notranslate"><span class="pre">/tmp/sbert_model</span></code> to facilitate easy access by MLflow, a prerequisite for model logging in the platform.</p></li>
+</ul>
+</div>
+<div class="section" id="Preparing-Input-Example-and-Artifacts">
+<h3>Preparing Input Example and Artifacts<a class="headerlink" href="#Preparing-Input-Example-and-Artifacts" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Input Example Creation</strong>: A DataFrame with sample sentences is prepared, representing typical model inputs and aiding in defining the model’s input format.</p></li>
+<li><p><strong>Defining Artifacts</strong>: The saved model’s file path is specified as an artifact in MLflow, an essential step for associating the model with MLflow runs.</p></li>
+</ul>
+</div>
+<div class="section" id="Generating-Test-Output-for-Signature">
+<h3>Generating Test Output for Signature<a class="headerlink" href="#Generating-Test-Output-for-Signature" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Test Output Calculation</strong>: The cosine similarity between sentence embeddings is computed, providing a practical example of the model’s output.</p></li>
+<li><p><strong>Signature Inference</strong>: MLflow’s <code class="docutils literal notranslate"><span class="pre">infer_signature</span></code> function is utilized to generate a signature that encapsulates the expected input and output formats, reinforcing the model’s operational schema.</p></li>
+</ul>
+</div>
+<div class="section" id="Importance-of-These-Steps">
+<h3>Importance of These Steps<a class="headerlink" href="#Importance-of-These-Steps" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Model Readiness</strong>: These preparatory steps ensure the model is primed for efficient logging and seamless deployment within the MLflow ecosystem.</p></li>
+<li><p><strong>Input-Output Contract</strong>: The established signature acts as a clear contract, defining the model’s input-output dynamics, pivotal for maintaining consistency and accuracy in deployment scenarios.</p></li>
+</ul>
+<p>Having meticulously prepared the Sentence Transformer model and its signature, we are now well-equipped to advance towards its integration and management in MLflow.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load a pre-trained sentence transformer model</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">SentenceTransformer</span><span class="p">(</span><span class="s2">&quot;all-MiniLM-L6-v2&quot;</span><span class="p">)</span>
+
+<span class="c1"># Create an input example DataFrame</span>
+<span class="n">input_example</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([{</span><span class="s2">&quot;sentence_1&quot;</span><span class="p">:</span> <span class="s2">&quot;I like apples&quot;</span><span class="p">,</span> <span class="s2">&quot;sentence_2&quot;</span><span class="p">:</span> <span class="s2">&quot;I like oranges&quot;</span><span class="p">}])</span>
+
+<span class="c1"># Save the model in the /tmp directory</span>
+<span class="n">model_directory</span> <span class="o">=</span> <span class="s2">&quot;/tmp/sbert_model&quot;</span>
+<span class="n">model</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">model_directory</span><span class="p">)</span>
+
+<span class="c1"># Define artifacts with the absolute path</span>
+<span class="n">artifacts</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;model_path&quot;</span><span class="p">:</span> <span class="n">model_directory</span><span class="p">}</span>
+
+<span class="c1"># Generate test output for signature</span>
+<span class="n">test_output</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+    <span class="n">util</span><span class="o">.</span><span class="n">cos_sim</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">input_example</span><span class="p">[</span><span class="s2">&quot;sentence_1&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]),</span> <span class="n">model</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">input_example</span><span class="p">[</span><span class="s2">&quot;sentence_2&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+<span class="p">)</span>
+
+<span class="c1"># Define the signature associated with the model</span>
+<span class="n">signature</span> <span class="o">=</span> <span class="n">infer_signature</span><span class="p">(</span><span class="n">input_example</span><span class="p">,</span> <span class="n">test_output</span><span class="p">)</span>
+
+<span class="c1"># Visualize the signature</span>
+<span class="n">signature</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+inputs:
+  [&#39;sentence_1&#39;: string, &#39;sentence_2&#39;: string]
+outputs:
+  [Tensor(&#39;float64&#39;, (-1, 1))]
+params:
+  None
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Creating-an-experiment">
+<h2>Creating an experiment<a class="headerlink" href="#Creating-an-experiment" title="Permalink to this headline"> </a></h2>
+<p>We create a new MLflow Experiment so that the run we’re going to log our model to does not log to the default experiment and instead has its own contextually relevant entry.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># If you are running this tutorial in local mode, leave the next line commented out.</span>
+<span class="c1"># Otherwise, uncomment the following line and set your tracking uri to your local or remote tracking server.</span>
+
+<span class="c1"># mlflow.set_tracking_uri(&quot;http://127.0.0.1:8080&quot;)</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s2">&quot;Semantic Similarity&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;Experiment: artifact_location=&#39;file:///Users/benjamin.wilson/repos/mlflow-fork/mlflow/docs/source/llms/sentence-transformers/tutorials/semantic-similarity/mlruns/577235153137414660&#39;, creation_time=1701280997564, experiment_id=&#39;577235153137414660&#39;, last_update_time=1701280997564, lifecycle_stage=&#39;active&#39;, name=&#39;Semantic Similarity&#39;, tags={}&gt;
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Logging-the-Custom-Model-with-MLflow">
+<h2>Logging the Custom Model with MLflow<a class="headerlink" href="#Logging-the-Custom-Model-with-MLflow" title="Permalink to this headline"> </a></h2>
+<p>Learn how to log the custom SimilarityModel with MLflow for effective model management and deployment.</p>
+<div class="section" id="Creating-a-Path-for-the-PyFunc-Model">
+<h3>Creating a Path for the PyFunc Model<a class="headerlink" href="#Creating-a-Path-for-the-PyFunc-Model" title="Permalink to this headline"> </a></h3>
+<p>We establish <code class="docutils literal notranslate"><span class="pre">pyfunc_path</span></code>, a temporary storage location for the Python model. This path is crucial for MLflow to serialize and store the model effectively.</p>
+</div>
+<div class="section" id="Logging-the-Model-in-MLflow">
+<h3>Logging the Model in MLflow<a class="headerlink" href="#Logging-the-Model-in-MLflow" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Initiating MLflow Run</strong>: An MLflow run is started, encapsulating all model logging processes within a structured framework.</p></li>
+<li><p><strong>Model Logging Details</strong>: The model is identified as <code class="docutils literal notranslate"><span class="pre">&quot;similarity&quot;</span></code>, providing a clear reference for future model retrieval and analysis. An instance of <code class="docutils literal notranslate"><span class="pre">SimilarityModel</span></code> is logged, encapsulating the Sentence Transformer model and similarity prediction logic. An illustrative DataFrame demonstrates the expected model input format, aiding in user comprehension and model usability. The inferred signature, detailing the input-output schema, is included, reinforcing the correct usage of the
+model. The artifacts dictionary specifies the location of the serialized Sentence Transformer model, crucial for model reconstruction. Dependencies like <code class="docutils literal notranslate"><span class="pre">sentence_transformers</span></code> and <code class="docutils literal notranslate"><span class="pre">numpy</span></code> are listed, ensuring the model’s functional integrity in varied deployment environments.</p></li>
+</ul>
+</div>
+<div class="section" id="Significance-of-Model-Logging">
+<h3>Significance of Model Logging<a class="headerlink" href="#Significance-of-Model-Logging" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Model Tracking and Versioning</strong>: Logging facilitates comprehensive tracking and effective versioning, enhancing model lifecycle management.</p></li>
+<li><p><strong>Reproducibility and Deployment</strong>: The logged model, complete with its dependencies, input example, and signature, becomes easily reproducible and deployable, promoting consistent application across environments.</p></li>
+</ul>
+<p>Having logged our <code class="docutils literal notranslate"><span class="pre">SimilarityModel</span></code> in MLflow, it stands ready for advanced applications such as comparative analysis, version management, and deployment for practical inference use cases.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pyfunc_path</span> <span class="o">=</span> <span class="s2">&quot;/tmp/sbert_pyfunc&quot;</span>
+
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">()</span> <span class="k">as</span> <span class="n">run</span><span class="p">:</span>
+    <span class="n">model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+        <span class="s2">&quot;similarity&quot;</span><span class="p">,</span>
+        <span class="n">python_model</span><span class="o">=</span><span class="n">SimilarityModel</span><span class="p">(),</span>
+        <span class="n">input_example</span><span class="o">=</span><span class="n">input_example</span><span class="p">,</span>
+        <span class="n">signature</span><span class="o">=</span><span class="n">signature</span><span class="p">,</span>
+        <span class="n">artifacts</span><span class="o">=</span><span class="n">artifacts</span><span class="p">,</span>
+        <span class="n">pip_requirements</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;sentence_transformers&quot;</span><span class="p">,</span> <span class="s2">&quot;numpy&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "8435d539d5604197a47db3e31d7e1923", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2023/11/30 16:10:34 INFO mlflow.store.artifact.artifact_repo: The progress bar can be disabled by setting the environment variable MLFLOW_ENABLE_ARTIFACTS_PROGRESS_BAR to false
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Model-Inference-and-Testing-Similarity-Prediction">
+<h2>Model Inference and Testing Similarity Prediction<a class="headerlink" href="#Model-Inference-and-Testing-Similarity-Prediction" title="Permalink to this headline"> </a></h2>
+<p>Demonstrate the use of the <code class="docutils literal notranslate"><span class="pre">SimilarityModel</span></code> to compute semantic similarity between sentences after logging it with MLflow.</p>
+<div class="section" id="Loading-the-Model-for-Inference">
+<h3>Loading the Model for Inference<a class="headerlink" href="#Loading-the-Model-for-Inference" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Loading with MLflow</strong>: Utilize <code class="docutils literal notranslate"><span class="pre">mlflow.pyfunc.load_model</span></code> with the model’s URI to load the custom <code class="docutils literal notranslate"><span class="pre">SimilarityModel</span></code> for inference.</p></li>
+<li><p><strong>Model Readiness</strong>: The loaded model, named <code class="docutils literal notranslate"><span class="pre">loaded_dynamic</span></code>, is equipped with the logic defined in the <code class="docutils literal notranslate"><span class="pre">SimilarityModel</span></code> and is ready to compute similarities.</p></li>
+</ul>
+</div>
+<div class="section" id="Preparing-Data-for-Similarity-Prediction">
+<h3>Preparing Data for Similarity Prediction<a class="headerlink" href="#Preparing-Data-for-Similarity-Prediction" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Creating Input Data</strong>: Construct a DataFrame, <code class="docutils literal notranslate"><span class="pre">similarity_data</span></code>, with pairs of sentences for which similarity will be computed, showcasing the model’s input flexibility.</p></li>
+</ul>
+</div>
+<div class="section" id="Computing-and-Displaying-Similarity-Score">
+<h3>Computing and Displaying Similarity Score<a class="headerlink" href="#Computing-and-Displaying-Similarity-Score" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Predicting Similarity</strong>: Invoke the <code class="docutils literal notranslate"><span class="pre">predict</span></code> method on <code class="docutils literal notranslate"><span class="pre">loaded_dynamic</span></code> with <code class="docutils literal notranslate"><span class="pre">similarity_data</span></code> to calculate the cosine similarity between sentence embeddings.</p></li>
+<li><p><strong>Interpreting the Result</strong>: The resulting <code class="docutils literal notranslate"><span class="pre">similarity_score</span></code> numerically represents the semantic similarity, offering immediate insights into the model’s output.</p></li>
+</ul>
+</div>
+<div class="section" id="Importance-of-This-Testing">
+<h3>Importance of This Testing<a class="headerlink" href="#Importance-of-This-Testing" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Model Validation</strong>: Confirm the custom model’s expected behavior when predicting on new data, ensuring its validity.</p></li>
+<li><p><strong>Practical Application</strong>: Highlight the model’s practical utility in real-world scenarios, demonstrating its capability in semantic similarity analysis.</p></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load our custom semantic similarity model implementation by providing the uri that the model was logged to</span>
+<span class="n">loaded_dynamic</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
+
+<span class="c1"># Create an evaluation test DataFrame</span>
+<span class="n">similarity_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([{</span><span class="s2">&quot;sentence_1&quot;</span><span class="p">:</span> <span class="s2">&quot;I like apples&quot;</span><span class="p">,</span> <span class="s2">&quot;sentence_2&quot;</span><span class="p">:</span> <span class="s2">&quot;I like oranges&quot;</span><span class="p">}])</span>
+
+<span class="c1"># Verify that the model generates a reasonable prediction</span>
+<span class="n">similarity_score</span> <span class="o">=</span> <span class="n">loaded_dynamic</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">similarity_data</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The similarity between these sentences is: </span><span class="si">{</span><span class="n">similarity_score</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+The similarity between these sentences is: [[0.63414472]]
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Evaluating-Semantic-Similarity-with-Distinct-Text-Pairs">
+<h2>Evaluating Semantic Similarity with Distinct Text Pairs<a class="headerlink" href="#Evaluating-Semantic-Similarity-with-Distinct-Text-Pairs" title="Permalink to this headline"> </a></h2>
+<p>Explore the model’s capability to discern varying degrees of semantic similarity with carefully chosen text pairs.</p>
+<div class="section" id="Selection-of-Text-Pairs">
+<h3>Selection of Text Pairs<a class="headerlink" href="#Selection-of-Text-Pairs" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Low Similarity Pair</strong>: Diverse themes in sentences predict a low similarity score, showcasing the model’s ability to recognize contrasting semantic contents.</p></li>
+<li><p><strong>High Similarity Pair</strong>: Sentences with similar themes and tones anticipate a high similarity score, demonstrating the model’s semantic parallel detection.</p></li>
+</ul>
+</div>
+<div class="section" id="sBERT-Model’s-Role-in-Similarity-Calculation">
+<h3>sBERT Model’s Role in Similarity Calculation<a class="headerlink" href="#sBERT-Model’s-Role-in-Similarity-Calculation" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Semantic Understanding</strong>: Utilizing sBERT to encode semantic essence into vectors.</p></li>
+<li><p><strong>Cosine Similarity</strong>: Calculating similarity scores to quantify semantic closeness.</p></li>
+</ul>
+</div>
+<div class="section" id="Computing-and-Displaying-Similarity-Scores">
+<h3>Computing and Displaying Similarity Scores<a class="headerlink" href="#Computing-and-Displaying-Similarity-Scores" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Predicting for Low Similarity Pair</strong>: Observing the model’s interpretation of semantically distant sentences.</p></li>
+<li><p><strong>Predicting for High Similarity Pair</strong>: Assessing the model’s ability to detect semantic similarities in contextually related sentences.</p></li>
+</ul>
+</div>
+<div class="section" id="Why-This-Matters">
+<h3>Why This Matters<a class="headerlink" href="#Why-This-Matters" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Model Validation</strong>: These tests affirm the model’s nuanced language understanding and semantic relationship quantification.</p></li>
+<li><p><strong>Practical Implications</strong>: Insights from the model’s processing of semantic content inform applications in content recommendation, information retrieval, and text comparison.</p></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">low_similarity</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;sentence_1&quot;</span><span class="p">:</span> <span class="s2">&quot;The explorer stood at the edge of the dense rainforest, &quot;</span>
+    <span class="s2">&quot;contemplating the journey ahead. The untamed wilderness was &quot;</span>
+    <span class="s2">&quot;a labyrinth of exotic plants and unknown dangers, a challenge &quot;</span>
+    <span class="s2">&quot;for even the most seasoned adventurer, brimming with the &quot;</span>
+    <span class="s2">&quot;prospect of new discoveries and uncharted territories.&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;sentence_2&quot;</span><span class="p">:</span> <span class="s2">&quot;To install the software, begin by downloading the latest &quot;</span>
+    <span class="s2">&quot;version from the official website. Once downloaded, run the &quot;</span>
+    <span class="s2">&quot;installer and follow the on-screen instructions. Ensure that &quot;</span>
+    <span class="s2">&quot;your system meets the minimum requirements and agree to the &quot;</span>
+    <span class="s2">&quot;license terms to complete the installation process successfully.&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">high_similarity</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;sentence_1&quot;</span><span class="p">:</span> <span class="s2">&quot;Standing in the shadow of the Great Pyramids of Giza, I felt a &quot;</span>
+    <span class="s2">&quot;profound sense of awe. The towering structures, a testament to &quot;</span>
+    <span class="s2">&quot;ancient ingenuity, rose majestically against the clear blue sky. &quot;</span>
+    <span class="s2">&quot;As I walked around the base of the pyramids, the intricate &quot;</span>
+    <span class="s2">&quot;stonework and sheer scale of these wonders of the ancient world &quot;</span>
+    <span class="s2">&quot;left me speechless, enveloped in a deep sense of history.&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;sentence_2&quot;</span><span class="p">:</span> <span class="s2">&quot;My visit to the Great Pyramids of Giza was an unforgettable &quot;</span>
+    <span class="s2">&quot;experience. Gazing upon these monumental structures, I was &quot;</span>
+    <span class="s2">&quot;captivated by their grandeur and historical significance. Each &quot;</span>
+    <span class="s2">&quot;step around these ancient marvels filled me with a deep &quot;</span>
+    <span class="s2">&quot;appreciation for the architectural prowess of a civilization long &quot;</span>
+    <span class="s2">&quot;gone, yet still speaking through these timeless monuments.&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="c1"># Validate that semantically unrelated texts return a low similarity score</span>
+<span class="n">low_similarity_score</span> <span class="o">=</span> <span class="n">loaded_dynamic</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">low_similarity</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The similarity score for the &#39;low_similarity&#39; pair is: </span><span class="si">{</span><span class="n">low_similarity_score</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Validate that semantically similar texts return a high similarity score</span>
+<span class="n">high_similarity_score</span> <span class="o">=</span> <span class="n">loaded_dynamic</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">high_similarity</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The similarity score for the &#39;high_similarity&#39; pair is: </span><span class="si">{</span><span class="n">high_similarity_score</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+The similarity score for the &#39;low_similarity&#39; pair is: [[-0.00052751]]
+The similarity score for the &#39;high_similarity&#39; pair is: [[0.83703309]]
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Conclusion:-Harnessing-the-Power-of-Custom-MLflow-Python-Functions-in-NLP">
+<h2>Conclusion: Harnessing the Power of Custom MLflow Python Functions in NLP<a class="headerlink" href="#Conclusion:-Harnessing-the-Power-of-Custom-MLflow-Python-Functions-in-NLP" title="Permalink to this headline"> </a></h2>
+<p>As we conclude this tutorial, let’s recap the significant strides we’ve made in understanding and applying advanced NLP techniques using Sentence Transformers and MLflow.</p>
+<div class="section" id="Key-Takeaways-from-the-Tutorial">
+<h3>Key Takeaways from the Tutorial<a class="headerlink" href="#Key-Takeaways-from-the-Tutorial" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Versatile NLP Modeling</strong>: We explored how to harness the advanced capabilities of Sentence Transformers for semantic similarity analysis, a critical task in many NLP applications.</p></li>
+<li><p><strong>Custom MLflow Python Function</strong>: The implementation of the custom <code class="docutils literal notranslate"><span class="pre">SimilarityModel</span></code> in MLflow demonstrated the power and flexibility of using Python functions to extend and adapt the functionality of pre-trained models to suit specific project needs.</p></li>
+<li><p><strong>Model Management and Deployment</strong>: We delved into the process of logging, managing, and deploying these models with MLflow, showcasing how MLflow streamlines these aspects of the machine learning lifecycle.</p></li>
+<li><p><strong>Practical Semantic Analysis</strong>: Through hands-on examples, we demonstrated the model’s ability to discern varying degrees of semantic similarity between sentence pairs, validating its effectiveness in real-world semantic analysis tasks.</p></li>
+</ul>
+</div>
+<div class="section" id="The-Power-and-Flexibility-of-MLflow’s-Python-Functions">
+<h3>The Power and Flexibility of MLflow’s Python Functions<a class="headerlink" href="#The-Power-and-Flexibility-of-MLflow’s-Python-Functions" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Customization for Specific Needs</strong>: One of the tutorial’s highlights is the demonstration of how MLflow’s <code class="docutils literal notranslate"><span class="pre">PythonModel</span></code> can be customized. This customization is not only powerful but also necessary for tailoring models to specific NLP tasks that go beyond standard model functionalities.</p></li>
+<li><p><strong>Adaptability and Extension</strong>: The <code class="docutils literal notranslate"><span class="pre">PythonModel</span></code> framework in MLflow provides a solid foundation for implementing a wide range of NLP models. Its adaptability allows for the extension of base model functionalities, such as transforming a sentence embedding model into a semantic similarity comparison tool.</p></li>
+</ul>
+</div>
+<div class="section" id="Empowering-Advanced-NLP-Applications">
+<h3>Empowering Advanced NLP Applications<a class="headerlink" href="#Empowering-Advanced-NLP-Applications" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Ease of Modification</strong>: The tutorial showcased that modifying the provided <code class="docutils literal notranslate"><span class="pre">PythonModel</span></code> implementation for different flavors in MLflow can be done with relative ease, empowering you to create models that align precisely with your project’s requirements.</p></li>
+<li><p><strong>Wide Applicability</strong>: Whether it’s semantic search, content recommendation, or automated text comparison, the approach outlined in this tutorial can be adapted to a broad spectrum of NLP tasks, opening doors to innovative applications in the field.</p></li>
+</ul>
+</div>
+<div class="section" id="Moving-Forward">
+<h3>Moving Forward<a class="headerlink" href="#Moving-Forward" title="Permalink to this headline"> </a></h3>
+<p>Armed with the knowledge and skills acquired in this tutorial, you are now well-equipped to apply these advanced NLP techniques in your projects. The seamless integration of Sentence Transformers with MLflow’s robust model management and deployment capabilities paves the way for developing sophisticated, efficient, and effective NLP solutions.</p>
+<p>Thank you for joining us on this journey through advanced NLP modeling with Sentence Transformers and MLflow. We hope this tutorial has inspired you to explore further and innovate in your NLP endeavors!</p>
+<p>Happy Modeling!</p>
+</div>
+</div>
+</div>
+
+
+              </div>
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../semantic-search/semantic-search-sentence-transformers.html" class="btn btn-neutral" title="Advanced Semantic Search with Sentence Transformers and MLflow" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+      
+      
+        <a href="../../guide/index.html" class="btn btn-neutral" title="Sentence Transformers within MLflow" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+      <p class="copyright">
+          &copy; MLflow Project, a Series of LF Projects, LLC. All rights reserved.
+      </p>
+
+  </div> 
+
+</footer>
+          </div>
+        </div>
+      </section>
+    </main>
+  </page>
+
+  
+
+
+  
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+      URL_ROOT:'../../../../',
+      VERSION:'2.9.2.dev0',
+      COLLAPSE_INDEX:false,
+      FILE_SUFFIX:'.html',
+      LINK_SUFFIX: '.html',
+      HAS_SOURCE:  true
+    };
+  </script>
+
+  
+
+  <script type="text/javascript" src="../../../../_static/js/clipboard.min.js"></script>
+  <script type="text/javascript" src="../../../../_static/js/jquery.waypoints.min.js"></script>
+
+  
+  
+  
+  <script type="text/javascript">var CLIPPY_SVG_PATH = "../../../../_static/clippy.svg";</script>
+  <script type="text/javascript" src="../../../../_static/js/custom.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.StickyNav.enable();
+    });
+
+  </script>
+  
+
+  
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        // Get the code block designator class entries
+        const allHighlights = document.querySelectorAll('.highlight');
+        // Disable copyable links for notebook cell numbering and for cell outputs
+        const highlights = Array.from(allHighlights).filter(highlight => !highlight.closest('.highlight-none') && 
+            !highlight.closest('.nboutput'));
+    
+        highlights.forEach(function(highlight) {
+            const copyIcon = document.createElement('span');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.innerHTML = '&#xf0ea;';
+
+            copyIcon.addEventListener('click', function() {
+                const code = highlight.querySelector('pre').textContent;
+                copyToClipboard(code);
+
+                // Flash effect on click
+                this.style.color = '#0194E2';
+                setTimeout(() => {
+                    this.style.color = ''; 
+                }, 100);
+
+                // Display "Code copied to clipboard" near the clicked icon
+                const message = document.createElement('span');
+                message.textContent = "Copied!";
+                message.classList.add('copy-message'); 
+
+                // Append the message to the icon
+                this.appendChild(message);
+
+                setTimeout(() => {
+                    this.removeChild(message);
+                }, 500);
+            });
+
+            highlight.appendChild(copyIcon);
+        });
+    });
+  </script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Force download for notebook-download-btn
+        const downloadButtons = document.querySelectorAll('.notebook-download-btn');
+        downloadButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                // Fetch the raw content of the notebook from GitHub
+                fetch(button.href)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = url;
+                        const filename = button.href.split('/').pop();
+                        link.download = filename; 
+
+                        document.body.appendChild(link);
+                        link.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    })
+                    .catch(err => console.error('Error fetching the notebook:', err));
+            });
+        });
+    });
+</script> 
+</body>
+</html>

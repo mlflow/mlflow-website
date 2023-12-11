@@ -1,0 +1,668 @@
+
+  
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Leveraging Visualizations and MLflow for In-depth Model Analysis &mdash; MLflow 2.9.2.dev0 documentation</title>
+  
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/traditional-ml/hyperparameter-tuning-with-child-runs/part2-logging-plots.html">
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    
+
+    
+
+  
+    
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/grids.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/mobile.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/simple-cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/tabs.css" type="text/css" />
+    
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="MLflow 2.9.2.dev0 documentation" href="../../index.html"/>
+        <link rel="up" title="Hyperparameter Tuning with MLflow and Optuna" href="index.html"/>
+        <link rel="next" title="Building Custom Python Function Models with MLflow" href="/../creating-custom-pyfunc/index.html"/>
+        <link rel="prev" title="Understanding Parent and Child Runs in MLflow" href="/part1-child-runs.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+<script type="text/javascript" src="../../_static/jquery.js"></script>
+<script type="text/javascript" src="../../_static/underscore.js"></script>
+<script type="text/javascript" src="../../_static/doctools.js"></script>
+<script type="text/javascript" src="../../_static/languagesections.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+
+<body class="wy-body-for-nav" role="document">
+  
+
+  
+  <nav class="wy-nav-top header" role="navigation" aria-label="top navigation">
+    <ul>
+  <li class="menu-toggle">
+    <i data-toggle="wy-nav-top" class="wy-nav-top-menu-button db-icon db-icon-menu pull-left"></i>
+    <a href="../../index.html" class="wy-nav-top-logo"
+      ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
+    /></a>
+    <span class="version">2.9.2.dev0</span>
+  </li>
+</ul>
+  </nav>
+  <page>
+    
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side relative">
+      <div class="wy-side-scroll">
+  <div class="wy-side-nav-search">
+    
+
+    
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+    
+  </div>
+
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+    
+      <a href="../../index.html" class="main-navigation-home"><img src="../../_static/icons/nav-home.svg"> MLflow</a>
+    
+
+    
+      
+
+      
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../introduction/index.html">What is MLflow?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started/index.html">Getting Started with MLflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../new-features/index.html">New Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../llms/index.html">LLMs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../model-evaluation/index.html">Model Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../deep-learning/index.html">Deep Learning</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Traditional ML</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#native-library-support">Native Library Support</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#tutorials-and-guides">Tutorials and Guides</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="index.html">Hyperparameter Tuning with MLflow and Optuna</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="notebooks/index.html">Full Notebooks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="part1-child-runs.html">The Parent-Child relationship with runs</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Logging plots with MLflow</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../creating-custom-pyfunc/index.html">Building Custom Python Function Models with MLflow</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#mlflow-tracking">MLflow Tracking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#mlflow-recipes">MLflow Recipes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#mlflow-evaluate">MLflow Evaluate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#model-registry">Model Registry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#deployment">Deployment</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../deployment/index.html">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tracking.html">MLflow Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../system-metrics/index.html">System Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../projects.html">MLflow Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../models.html">MLflow Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../model-registry.html">MLflow Model Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../recipes.html">MLflow Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plugins.html">MLflow Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auth/index.html">MLflow Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../search-runs.html">Search Runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../search-experiments.html">Search Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../python_api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../R-api.html">R API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../java_api/index.html">Java API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rest-api.html">REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../docker.html">Official MLflow Docker Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../community-model-flavors.html">Community Model Flavors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials-and-examples/index.html">Tutorials and Examples</a></li>
+</ul>
+
+      
+    
+  </div>
+
+  <div role="contentinfo">
+    
+
+    <p>
+      <a id='feedbacklink' href="https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a>
+    </p>
+  </div>
+</div>
+    </nav>
+
+    <main class="wy-grid-for-nav">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+          <div class="rst-content">
+            
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Documentation</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../index.html">Traditional ML</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="index.html">Hyperparameter Tuning with MLflow and Optuna</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+    
+      <li>Leveraging Visualizations and MLflow for In-depth Model Analysis</li>
+    
+    
+    <!-- <li class="wy-breadcrumbs-aside">
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/traditional-ml/hyperparameter-tuning-with-child-runs/part2-logging-plots.rst" class="fa fa-github"> Edit on GitHub</a>
+    </li> -->
+    
+  </ul>
+</div>
+            <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <div itemprop="articleBody">
+                
+  <div class="section" id="leveraging-visualizations-and-mlflow-for-in-depth-model-analysis">
+<h1>Leveraging Visualizations and MLflow for In-depth Model Analysis<a class="headerlink" href="#leveraging-visualizations-and-mlflow-for-in-depth-model-analysis" title="Permalink to this headline"> </a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline"> </a></h2>
+<p>In any machine learning project, understanding the behavior, performance, and characteristics of the
+developed models is important. Clear, informative visualizations play a crucial role in this understanding,
+offering insights into the model’s patterns, errors, and efficiency.</p>
+<p>In this portion of the guide, we look at a notebook that is concerned with the generation and storage of
+common and useful plots associated with a regression task.</p>
+<p>We’ll be looking at two primary means of logging plots along with our logged models:</p>
+<ul class="simple">
+<li><p><strong>Direct plot logging</strong> via <code class="docutils literal notranslate"><span class="pre">mlflow.log_figure()</span></code> we will use an in-memory figure reference to a generated plot.</p></li>
+<li><p><strong>Logging a local plot file</strong> via <code class="docutils literal notranslate"><span class="pre">mlflow.log_artifact()</span></code> to allow us to log a locally stored image to the run.</p></li>
+</ul>
+</div>
+<div class="section" id="role-of-visualizations-in-model-analysis">
+<h2>Role of Visualizations in Model Analysis<a class="headerlink" href="#role-of-visualizations-in-model-analysis" title="Permalink to this headline"> </a></h2>
+<p>Visualizations act as a window into the intricate world of machine learning models. They enable the exploration of various aspects:</p>
+<ul class="simple">
+<li><p><strong>Understanding Data</strong>: Initial visualizations allow for a deep dive into the data, revealing patterns, anomalies, and relationships that can inform the entire modeling process.</p></li>
+<li><p><strong>Model Evaluation</strong>: Plots such as residual plots and prediction error plots help in diagnosing issues with the model and evaluating its performance.</p></li>
+<li><p><strong>Hyperparameter Tuning</strong>: Visualization aids in understanding the impact of different hyperparameters on the model’s performance, guiding the selection process.</p></li>
+<li><p><strong>Error Analysis</strong>: They help in analyzing the types and patterns of errors made by the model, providing insight into possible improvements.</p></li>
+</ul>
+<div class="section" id="a-warning-about-procedural-generation-of-plots">
+<h3>A Warning about Procedural Generation of Plots<a class="headerlink" href="#a-warning-about-procedural-generation-of-plots" title="Permalink to this headline"> </a></h3>
+<p>In the accompanying notebook to this subsection of this guide, you will observe plots being declared
+within functions. This approach deviates from the typical examples seen in machine learning tutorials
+and guides, so it’s essential to clarify why this method is chosen for the provided examples.</p>
+<p><strong>The Central Issue: Statefulness</strong></p>
+<div class="figure align-center" id="id1">
+<a class="reference internal image-reference" href="../../_images/notebook-dangers.svg"><img alt="Notebook state" src="../../_images/notebook-dangers.svg" width="1024px" /></a>
+<p class="caption"><span class="caption-text">Failing to execute all cells in order can lead to misleading plots</span><a class="headerlink" href="#id1" title="Permalink to this image"> </a></p>
+</div>
+<p>Notebooks inherently maintain a state across cells. While this feature can be beneficial, it poses
+significant challenges for ensuring the reliability and accuracy of code and output, especially for visualizations.</p>
+<p><strong>The Challenges of Out-of-Order Execution</strong></p>
+<p>One of the most significant issues in notebook environments is the potential for out-of-order
+execution. Cells can be run in any sequence, leading to a state where variables or outputs do not
+reflect the latest code changes. This problem is particularly acute for visualizations. If a plot
+is generated and then displayed in a separate cell, running the cells out of order can lead to
+displaying outdated or incorrect visualizations.</p>
+<p><strong>Ensuring Accurate Visualizations</strong></p>
+<p>For visualizations to serve their purpose of conveying accurate, clear, and reliable information,
+they must correspond to the current state of the data and model. Ensuring this correspondence in a
+notebook environment requires careful management of cell execution order and state, which can be cumbersome and error-prone.</p>
+<p><strong>Why Use Functions to Generate Plots</strong></p>
+<p>To mitigate these challenges, the example code opts for declaring plots within functions. This approach offers several advantages:</p>
+<ul class="simple">
+<li><p><strong>Encapsulation</strong>: By encapsulating the plot generation within a function, the code ensures that the plot is generated with the current state of the data every time the function is called. This encapsulation avoids the pitfalls of out-of-order cell execution affecting the plot’s accuracy.</p></li>
+<li><p><strong>Flexibility and Reusability</strong>: Functions provide the flexibility to generate plots with different parameters and data without duplicating code. This reusability enhances code maintainability and readability.</p></li>
+<li><p><strong>Integration with MLflow</strong>: Functions seamlessly integrate with MLflow, allowing for plots to be logged alongside metrics, parameters, and models, ensuring that the visualizations correspond to the specific run and model state. This integration provides a reliable and consolidated view of the model, metrics, and plots in the MLflow UI, avoiding the disjointed view that can occur in notebooks.</p></li>
+<li><p><strong>Avoiding Display in Stdout</strong>: The function-based approach avoids direct printing of plots to the notebook’s stdout. Direct printing can clutter the notebook, increase the saved notebook’s size, and lead to confusion with multiple plots displayed in the notebook. By logging plots directly in MLflow, the example code keeps the notebook clean, ensures plots correspond to the specific model run, and leverages MLflow’s UI for viewing and comparing plots.</p></li>
+</ul>
+<p>By encapsulating and scoping the generation of plots to within the training context (within <code class="docutils literal notranslate"><span class="pre">mlflow.start_run()</span></code>), we can get all
+of the flexibility, ease-of-use, and benefits of imperative iterative code development that notebooks bring without the risk of
+logging stale, invalid, or inaccurate plots that do not reflect the actual state of the data or model which is logged.</p>
+</div>
+</div>
+<div class="section" id="benefits-of-integrating-visualizations-with-mlflow">
+<h2>Benefits of Integrating Visualizations with MLflow<a class="headerlink" href="#benefits-of-integrating-visualizations-with-mlflow" title="Permalink to this headline"> </a></h2>
+<p>Integrating visualizations with MLflow presents several substantial benefits:</p>
+<ul class="simple">
+<li><p><strong>Persistent Storage</strong>: Storing visualizations alongside the model in MLflow ensures their availability for future reference, protecting against loss due to session termination or other issues.</p></li>
+<li><p><strong>Provenance</strong>: It provides clear provenance for visualizations, ensuring that the insights they provide can always be traced back to the exact model version and dataset.</p></li>
+<li><p><strong>Consistency</strong>: Ensures that the visualizations correspond to the correct version of the model, preventing confusion and errors.</p></li>
+<li><p><strong>Accessibility</strong>: Makes visualizations easily accessible to all team members, enhancing collaboration and insight sharing.</p></li>
+</ul>
+</div>
+<div class="section" id="generating-a-plot">
+<h2>Generating a Plot<a class="headerlink" href="#generating-a-plot" title="Permalink to this headline"> </a></h2>
+<p>In the companion notebook to this section of the guide, there are samples of many regression-relevant plots.
+Some, such as the correlation matrix plot, are relevant to the feature data set, while others, such as the coefficients plot, are relevant only after we have a trained model.</p>
+<p>Whether we’re using a trained model or not, the approach is similar for logging these image artifacts.</p>
+<div class="section" id="defining-a-plot">
+<h3>Defining a Plot<a class="headerlink" href="#defining-a-plot" title="Permalink to this headline"> </a></h3>
+<p>In the intricate world of data visualization, the structured and organized presentation of plots is
+paramount. Below is an example of generating a box plot, which compares a continuous variable to a
+categorical (ordinal) variable. The example utilizes a typical <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> implementation,
+enhanced with <code class="docutils literal notranslate"><span class="pre">seaborn</span></code> for a refined visual appearance. This structure is fundamental for ensuring
+clarity and legibility in our modeling code. By defining the plot generation as a separate,
+callable function, we maintain a clean and organized codebase. This approach is essential,
+especially in a notebook environment, to ensure that each training iteration has a specific and
+unambiguous reference to the plot generation, directly linked to the exact state of the data used
+in a training iteration. Such a method mitigates the risks associated with declaratively defined and
+materialized plots, which, if not regenerated after data modification, can lead to inconsistencies
+and errors in data representation.</p>
+<div class="code-section docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_box_weekend</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;seaborn&quot;</span><span class="p">,</span> <span class="n">plot_size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">)):</span>
+    <span class="k">with</span> <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">):</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">plot_size</span><span class="p">)</span>
+        <span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;weekend&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;demand&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;lightgray&quot;</span><span class="p">)</span>
+        <span class="n">sns</span><span class="o">.</span><span class="n">stripplot</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
+            <span class="n">x</span><span class="o">=</span><span class="s2">&quot;weekend&quot;</span><span class="p">,</span>
+            <span class="n">y</span><span class="o">=</span><span class="s2">&quot;demand&quot;</span><span class="p">,</span>
+            <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+            <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;weekend&quot;</span><span class="p">,</span>
+            <span class="n">palette</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;green&quot;</span><span class="p">},</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span>
+            <span class="n">jitter</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+            <span class="n">size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Box Plot of Demand on Weekends vs. Weekdays&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Weekend (0: No, 1: Yes)&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Demand&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">()</span> <span class="o">+</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_yticklabels</span><span class="p">():</span>
+            <span class="n">i</span><span class="o">.</span><span class="n">set_fontsize</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">legend_</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fig</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="key-elements">
+<h4>Key Elements<a class="headerlink" href="#key-elements" title="Permalink to this headline"> </a></h4>
+<ul class="simple">
+<li><p><strong>Title Application</strong>: Including a title in the plot is not just a formality, it’s a necessity for ensuring clarity and comprehensibility, especially within the MLflow UI. A well-crafted title provides a comprehensive overview, helping in immediate understanding and eliminating any ambiguity or confusion.</p></li>
+<li><p><strong>Override Default Sizing</strong>: Adjusting default sizes for various elements like fonts and plot sizes is crucial for ensuring the legibility and visual appeal of the plot in the MLflow UI. It ensures that the plot remains readable and clear, irrespective of the viewing platform or screen size.</p></li>
+<li><p><strong>Axes Labeling</strong>: Properly labeled axes are a pillar of understandable and self-sufficient plots. They offer clear information about the data dimensions, making the plot comprehensible without external references or explanations.</p></li>
+<li><p><strong>Figure Closure</strong>: Closing the figure before returning it ensures a clean and uncluttered notebook environment. It prevents the inadvertent display of the plot within the notebook’s standard output, avoiding confusion and maintaining the organization of the notebook.</p></li>
+<li><p><strong>Legend Removal</strong>: Removing auto-generated legends from the plot enhances the visual clarity and readability. It prevents unnecessary clutter, making the plot more concise and to the point, ensuring that the focus remains on the vital data representations.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="defining-a-plot-to-be-saved-locally">
+<h3>Defining a Plot to be Saved Locally<a class="headerlink" href="#defining-a-plot-to-be-saved-locally" title="Permalink to this headline"> </a></h3>
+<p>There are scenarios when saving a plot locally before logging to MLflow is more advantageous.
+The example below illustrates the generation of a correlation matrix plot, saving the image when
+called, as opposed to returning an in-memory reference. This approach, though different,
+remains seamlessly compatible with MLflow, ensuring the same level of organization and access,
+with additional flexibility in plot access and usage.</p>
+<div class="code-section docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_correlation_matrix_and_save</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;seaborn&quot;</span><span class="p">,</span> <span class="n">plot_size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">path</span><span class="o">=</span><span class="s2">&quot;/tmp/corr_plot.png&quot;</span>
+<span class="p">):</span>
+    <span class="k">with</span> <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">):</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">plot_size</span><span class="p">)</span>
+
+        <span class="c1"># Calculate the correlation matrix</span>
+        <span class="n">corr</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">corr</span><span class="p">()</span>
+
+        <span class="c1"># Generate a mask for the upper triangle</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">triu</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">corr</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">))</span>
+
+        <span class="c1"># Draw the heatmap with the mask and correct aspect ratio</span>
+        <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span>
+            <span class="n">corr</span><span class="p">,</span>
+            <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">,</span>
+            <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;coolwarm&quot;</span><span class="p">,</span>
+            <span class="n">vmax</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+            <span class="n">center</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">square</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">linewidths</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+            <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;.2f&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Feature Correlation Matrix&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+    <span class="c1"># convert to filesystem path spec for os compatibility</span>
+    <span class="n">save_path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="key-insights">
+<h4>Key Insights<a class="headerlink" href="#key-insights" title="Permalink to this headline"> </a></h4>
+<ul class="simple">
+<li><p><strong>Heatmap for Correlation</strong>: The use of a heatmap in this context provides a visually intuitive and effective representation of feature correlations. It allows for easy identification of relationships between different features, enhancing the understandability and analysis depth.</p></li>
+<li><p><strong>Title and Layout Adjustments</strong>: Including a clear and descriptive title, along with layout adjustments, ensures clarity and a compact presentation, enhancing the plot’s usability and interpretation ease.</p></li>
+<li><p><strong>Local Saving of Plot</strong>: Saving the figure locally provides easy access and reference, ensuring it’s not tied to the notebook’s execution state. It offers flexibility in access and ensures that the plot remains available independently, contributing to more organized and efficient data analysis and model evaluation processes.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="logging-plot-images">
+<h3>Logging plot images<a class="headerlink" href="#logging-plot-images" title="Permalink to this headline"> </a></h3>
+<p>In the below code snippet from the main notebook, we’re executing our training and plot generations as a single atomic operation.
+As mentioned before, this helps to ensure that regardless of the state of any other cell within the notebook, the plots that are
+generated are going to refer to the state of the training data that was used to both train and evaluate the model.</p>
+<p>For all of the plots apart from the correlation matrix, we’re using the direct <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> <code class="docutils literal notranslate"><span class="pre">Figure</span></code> object reference for the plot when
+we call <code class="docutils literal notranslate"><span class="pre">mlflow.log_figure()</span></code>. For the correlation matrix, we’re operating on a locally saved <code class="docutils literal notranslate"><span class="pre">.png</span></code> image file. This requires the usage of
+the more generic artifact writer (it supports any file type) <code class="docutils literal notranslate"><span class="pre">mlflow.log_artifact()</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For simplicity, if you have a large volume of plots that you would like to log to a model, using the directory-scoped <code class="docutils literal notranslate"><span class="pre">mlflow.log_artifacts()</span></code>
+is recommended. This API will log all files in a given local directory path, without needing to explicitly name each one and make a large volume of
+<code class="docutils literal notranslate"><span class="pre">log_artifact()</span></code> calls. If using the directory-based <code class="docutils literal notranslate"><span class="pre">log_artifacts()</span></code>, ensure that your local file names are relevant and expository enough to
+disambiguate the content of the plot within the MLflow UI. While <code class="docutils literal notranslate"><span class="pre">log_artifact()</span></code> permits you to rename the name of a given file when logging to MLflow,
+the batch processing <code class="docutils literal notranslate"><span class="pre">log_artifacts()</span></code> API does not (the file names will transfer over as-is).</p>
+</div>
+<div class="code-section docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mlflow</span><span class="o">.</span><span class="n">set_tracking_uri</span><span class="p">(</span><span class="s2">&quot;http://127.0.0.1:8080&quot;</span><span class="p">)</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s2">&quot;Visualizations Demo&quot;</span><span class="p">)</span>
+
+<span class="n">X</span> <span class="o">=</span> <span class="n">my_data</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;demand&quot;</span><span class="p">,</span> <span class="s2">&quot;date&quot;</span><span class="p">])</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">my_data</span><span class="p">[</span><span class="s2">&quot;demand&quot;</span><span class="p">]</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">fig1</span> <span class="o">=</span> <span class="n">plot_time_series_demand</span><span class="p">(</span><span class="n">my_data</span><span class="p">,</span> <span class="n">window_size</span><span class="o">=</span><span class="mi">28</span><span class="p">)</span>
+<span class="n">fig2</span> <span class="o">=</span> <span class="n">plot_box_weekend</span><span class="p">(</span><span class="n">my_data</span><span class="p">)</span>
+<span class="n">fig3</span> <span class="o">=</span> <span class="n">plot_scatter_demand_price</span><span class="p">(</span><span class="n">my_data</span><span class="p">)</span>
+<span class="n">fig4</span> <span class="o">=</span> <span class="n">plot_density_weekday_weekend</span><span class="p">(</span><span class="n">my_data</span><span class="p">)</span>
+
+<span class="c1"># Execute the correlation plot, saving the plot to a local temporary directory</span>
+<span class="n">plot_correlation_matrix_and_save</span><span class="p">(</span><span class="n">my_data</span><span class="p">)</span>
+
+<span class="c1"># Define our Ridge model</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">Ridge</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+
+<span class="c1"># Train the model</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Make predictions</span>
+<span class="n">y_pred</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+<span class="c1"># Calculate error metrics</span>
+<span class="n">mse</span> <span class="o">=</span> <span class="n">mean_squared_error</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+<span class="n">rmse</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">mse</span><span class="p">)</span>
+<span class="n">mae</span> <span class="o">=</span> <span class="n">mean_absolute_error</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+<span class="n">r2</span> <span class="o">=</span> <span class="n">r2_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+<span class="n">msle</span> <span class="o">=</span> <span class="n">mean_squared_log_error</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+<span class="n">medae</span> <span class="o">=</span> <span class="n">median_absolute_error</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+
+<span class="c1"># Generate prediction-dependent plots</span>
+<span class="n">fig5</span> <span class="o">=</span> <span class="n">plot_residuals</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+<span class="n">fig6</span> <span class="o">=</span> <span class="n">plot_coefficients</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">X_test</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+<span class="n">fig7</span> <span class="o">=</span> <span class="n">plot_prediction_error</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+<span class="n">fig8</span> <span class="o">=</span> <span class="n">plot_qq</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+
+<span class="c1"># Start an MLflow run for logging metrics, parameters, the model, and our figures</span>
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">()</span> <span class="k">as</span> <span class="n">run</span><span class="p">:</span>
+    <span class="c1"># Log the model</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">sklearn</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+        <span class="n">sk_model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">input_example</span><span class="o">=</span><span class="n">X_test</span><span class="p">,</span> <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Log the metrics</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_metrics</span><span class="p">(</span>
+        <span class="p">{</span><span class="s2">&quot;mse&quot;</span><span class="p">:</span> <span class="n">mse</span><span class="p">,</span> <span class="s2">&quot;rmse&quot;</span><span class="p">:</span> <span class="n">rmse</span><span class="p">,</span> <span class="s2">&quot;mae&quot;</span><span class="p">:</span> <span class="n">mae</span><span class="p">,</span> <span class="s2">&quot;r2&quot;</span><span class="p">:</span> <span class="n">r2</span><span class="p">,</span> <span class="s2">&quot;msle&quot;</span><span class="p">:</span> <span class="n">msle</span><span class="p">,</span> <span class="s2">&quot;medae&quot;</span><span class="p">:</span> <span class="n">medae</span><span class="p">}</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Log the hyperparameter</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_param</span><span class="p">(</span><span class="s2">&quot;alpha&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+
+    <span class="c1"># Log plots</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_figure</span><span class="p">(</span><span class="n">fig1</span><span class="p">,</span> <span class="s2">&quot;time_series_demand.png&quot;</span><span class="p">)</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_figure</span><span class="p">(</span><span class="n">fig2</span><span class="p">,</span> <span class="s2">&quot;box_weekend.png&quot;</span><span class="p">)</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_figure</span><span class="p">(</span><span class="n">fig3</span><span class="p">,</span> <span class="s2">&quot;scatter_demand_price.png&quot;</span><span class="p">)</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_figure</span><span class="p">(</span><span class="n">fig4</span><span class="p">,</span> <span class="s2">&quot;density_weekday_weekend.png&quot;</span><span class="p">)</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_figure</span><span class="p">(</span><span class="n">fig5</span><span class="p">,</span> <span class="s2">&quot;residuals_plot.png&quot;</span><span class="p">)</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_figure</span><span class="p">(</span><span class="n">fig6</span><span class="p">,</span> <span class="s2">&quot;coefficients_plot.png&quot;</span><span class="p">)</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_figure</span><span class="p">(</span><span class="n">fig7</span><span class="p">,</span> <span class="s2">&quot;prediction_errors.png&quot;</span><span class="p">)</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_figure</span><span class="p">(</span><span class="n">fig8</span><span class="p">,</span> <span class="s2">&quot;qq_plot.png&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Log the saved correlation matrix plot by referring to the local file system location</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_artifact</span><span class="p">(</span><span class="s2">&quot;/tmp/corr_plot.png&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="viewing-plots-in-the-ui">
+<h2>Viewing plots in the UI<a class="headerlink" href="#viewing-plots-in-the-ui" title="Permalink to this headline"> </a></h2>
+<p>If we head over to the MLflow UI after executing this training cell, we can see all of our plots that have been
+defined within the artifact viewer pane. Whether the plots were logged with the <code class="docutils literal notranslate"><span class="pre">log_figure()</span></code> API or were
+fetched from the local file system and logged via <code class="docutils literal notranslate"><span class="pre">log_artifacts()</span></code>, we’re able to see the run-relevant plots
+associated with our data and our trained model, capturing the state at which the run was conducted.</p>
+<div class="figure align-center" id="id2">
+<a class="reference internal image-reference" href="../../_images/plots-in-ui.gif"><img alt="Viewing plots in the UI" src="../../_images/plots-in-ui.gif" style="width: 1024px;" /></a>
+<p class="caption"><span class="caption-text">Viewing logged plots and figures in the MLflow UI</span><a class="headerlink" href="#id2" title="Permalink to this image"> </a></p>
+</div>
+<div class="section" id="challenge">
+<h3>Challenge<a class="headerlink" href="#challenge" title="Permalink to this headline"> </a></h3>
+<p>Can you think of some additional plots that would be relevant for data validation, regression modeling, or
+predictive quality in general?</p>
+<p>If you’re interested, get a copy of the notebook by clicking on the button below and follow along with the instructions.</p>
+<a href="https://raw.githubusercontent.com/mlflow/mlflow/master/docs/source/traditional-ml/hyperparameter-tuning-with-child-runs/notebooks/logging-plots-in-mlflow.ipynb" class="notebook-download-btn">Download the notebook</a><p>After downloading the notebook and opening it with Jupyter:</p>
+<ol class="arabic simple">
+<li><p>Implement a few more plots that are representative of the visualizations you would want to see when training (or retraining) a model like this.</p></li>
+<li><p>Instead of returning the figures, save each plot to a common directory.</p></li>
+<li><p>Ensure that all plot file names are unique and indicative of the plot contents.</p></li>
+<li><p>Use the <code class="docutils literal notranslate"><span class="pre">mlflow.log_artifacts()</span></code> (not <code class="docutils literal notranslate"><span class="pre">mlflow.log_artifact()</span></code>) to log the directory contents to the run.</p></li>
+<li><p>Validate the rendering of the plots within the MLflow UI.</p></li>
+</ol>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">log_artifacts()</span></code> API has an optional <code class="docutils literal notranslate"><span class="pre">artifact_path</span></code> argument that can be overridden from the default of <code class="docutils literal notranslate"><span class="pre">None</span></code> in to segregate these additional plots
+in their own directory within the MLflow artifact store (and the UI). This can be very beneficial if you’re logging dozens of plots that have distinct categorical
+groupings among them, without the need for filling the UI display pane in the artifact viewer with a large amount of files in the main root directory.</p>
+</div>
+</div>
+</div>
+<div class="section" id="in-conclusion">
+<h2>In Conclusion<a class="headerlink" href="#in-conclusion" title="Permalink to this headline"> </a></h2>
+<p>Visualizations are a critical part of building high-quality models. With its native integration to log
+figures, plots, and images, MLflow makes it very simple to incorporate visualizations for not only the
+data being used for training, but the results of a training event.</p>
+<p>With simple, high-level APIs that can be scoped within the context where the model is being trained, inconsistencies
+in state can be eliminated, ensuring that each plot reflects exactly the state of the data and the model at the time of training.</p>
+</div>
+</div>
+
+
+              </div>
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="part1-child-runs.html" class="btn btn-neutral" title="Understanding Parent and Child Runs in MLflow" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+      
+      
+        <a href="../creating-custom-pyfunc/index.html" class="btn btn-neutral" title="Building Custom Python Function Models with MLflow" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+      <p class="copyright">
+          &copy; MLflow Project, a Series of LF Projects, LLC. All rights reserved.
+      </p>
+
+  </div> 
+
+</footer>
+          </div>
+        </div>
+      </section>
+    </main>
+  </page>
+
+  
+
+
+  
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+      URL_ROOT:'../../',
+      VERSION:'2.9.2.dev0',
+      COLLAPSE_INDEX:false,
+      FILE_SUFFIX:'.html',
+      LINK_SUFFIX: '.html',
+      HAS_SOURCE:  true
+    };
+  </script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/clipboard.min.js"></script>
+  <script type="text/javascript" src="../../_static/js/jquery.waypoints.min.js"></script>
+
+  
+  
+  
+  <script type="text/javascript">var CLIPPY_SVG_PATH = "../../_static/clippy.svg";</script>
+  <script type="text/javascript" src="../../_static/js/custom.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.StickyNav.enable();
+    });
+
+  </script>
+  
+
+  
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        // Get the code block designator class entries
+        const allHighlights = document.querySelectorAll('.highlight');
+        // Disable copyable links for notebook cell numbering and for cell outputs
+        const highlights = Array.from(allHighlights).filter(highlight => !highlight.closest('.highlight-none') && 
+            !highlight.closest('.nboutput'));
+    
+        highlights.forEach(function(highlight) {
+            const copyIcon = document.createElement('span');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.innerHTML = '&#xf0ea;';
+
+            copyIcon.addEventListener('click', function() {
+                const code = highlight.querySelector('pre').textContent;
+                copyToClipboard(code);
+
+                // Flash effect on click
+                this.style.color = '#0194E2';
+                setTimeout(() => {
+                    this.style.color = ''; 
+                }, 100);
+
+                // Display "Code copied to clipboard" near the clicked icon
+                const message = document.createElement('span');
+                message.textContent = "Copied!";
+                message.classList.add('copy-message'); 
+
+                // Append the message to the icon
+                this.appendChild(message);
+
+                setTimeout(() => {
+                    this.removeChild(message);
+                }, 500);
+            });
+
+            highlight.appendChild(copyIcon);
+        });
+    });
+  </script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Force download for notebook-download-btn
+        const downloadButtons = document.querySelectorAll('.notebook-download-btn');
+        downloadButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                // Fetch the raw content of the notebook from GitHub
+                fetch(button.href)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = url;
+                        const filename = button.href.split('/').pop();
+                        link.download = filename; 
+
+                        document.body.appendChild(link);
+                        link.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    })
+                    .catch(err => console.error('Error fetching the notebook:', err));
+            });
+        });
+    });
+</script> 
+</body>
+</html>

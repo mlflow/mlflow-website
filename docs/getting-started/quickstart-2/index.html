@@ -1,0 +1,633 @@
+
+  
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Quickstart: Compare runs, choose a model, and deploy it to a REST API &mdash; MLflow 2.9.2.dev0 documentation</title>
+  
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/getting-started/quickstart-2/index.html">
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    
+
+    
+
+  
+    
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/grids.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/mobile.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/simple-cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/tabs.css" type="text/css" />
+    
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="MLflow 2.9.2.dev0 documentation" href="../../index.html"/>
+        <link rel="up" title="Getting Started with MLflow" href="../index.html"/>
+        <link rel="next" title="5 Minute Tracking Server Overview" href="/../tracking-server-overview/index.html"/>
+        <link rel="prev" title="Quickstart: Install MLflow, instrument code &amp; view results in minutes" href="/../quickstart-1/index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+<script type="text/javascript" src="../../_static/jquery.js"></script>
+<script type="text/javascript" src="../../_static/underscore.js"></script>
+<script type="text/javascript" src="../../_static/doctools.js"></script>
+<script type="text/javascript" src="../../_static/languagesections.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+
+<body class="wy-body-for-nav" role="document">
+  
+
+  
+  <nav class="wy-nav-top header" role="navigation" aria-label="top navigation">
+    <ul>
+  <li class="menu-toggle">
+    <i data-toggle="wy-nav-top" class="wy-nav-top-menu-button db-icon db-icon-menu pull-left"></i>
+    <a href="../../index.html" class="wy-nav-top-logo"
+      ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
+    /></a>
+    <span class="version">2.9.2.dev0</span>
+  </li>
+</ul>
+  </nav>
+  <page>
+    
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side relative">
+      <div class="wy-side-scroll">
+  <div class="wy-side-nav-search">
+    
+
+    
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+    
+  </div>
+
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+    
+      <a href="../../index.html" class="main-navigation-home"><img src="../../_static/icons/nav-home.svg"> MLflow</a>
+    
+
+    
+      
+
+      
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../introduction/index.html">What is MLflow?</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Getting Started with MLflow</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#id1">5-minute Quickstart - MLflow Tracking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#id2">Logging your first MLflow Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#id3">15 minute Quickstart - Autologging in MLflow</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#id4">15 minute Quickstart - Comparing Runs and Deploying your Best Model</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Quickstart: Compare runs, choose a model, and deploy it to a REST API</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#set-up">Set up</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#run-a-hyperparameter-sweep">Run a hyperparameter sweep</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#compare-the-results">Compare the results</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#register-your-best-model">Register your best model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#serve-the-model-locally">Serve the model locally</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#build-a-container-image-for-your-model">Build a container image for your model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#deploying-to-a-cloud-platform">Deploying to a cloud platform</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#id5">5 Minute Tracking Server Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../new-features/index.html">New Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../llms/index.html">LLMs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../model-evaluation/index.html">Model Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../deep-learning/index.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../traditional-ml/index.html">Traditional ML</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../deployment/index.html">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tracking.html">MLflow Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../system-metrics/index.html">System Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../projects.html">MLflow Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../models.html">MLflow Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../model-registry.html">MLflow Model Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../recipes.html">MLflow Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plugins.html">MLflow Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auth/index.html">MLflow Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../search-runs.html">Search Runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../search-experiments.html">Search Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../python_api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../R-api.html">R API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../java_api/index.html">Java API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rest-api.html">REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../docker.html">Official MLflow Docker Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../community-model-flavors.html">Community Model Flavors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials-and-examples/index.html">Tutorials and Examples</a></li>
+</ul>
+
+      
+    
+  </div>
+
+  <div role="contentinfo">
+    
+
+    <p>
+      <a id='feedbacklink' href="https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a>
+    </p>
+  </div>
+</div>
+    </nav>
+
+    <main class="wy-grid-for-nav">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+          <div class="rst-content">
+            
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Documentation</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../index.html">Getting Started with MLflow</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+    
+      <li>Quickstart: Compare runs, choose a model, and deploy it to a REST API</li>
+    
+    
+    <!-- <li class="wy-breadcrumbs-aside">
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/getting-started/quickstart-2/index.rst" class="fa fa-github"> Edit on GitHub</a>
+    </li> -->
+    
+  </ul>
+</div>
+            <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <div itemprop="articleBody">
+                
+  <div class="section" id="quickstart-compare-runs-choose-a-model-and-deploy-it-to-a-rest-api">
+<span id="quickstart-mlops"></span><h1>Quickstart: Compare runs, choose a model, and deploy it to a REST API<a class="headerlink" href="#quickstart-compare-runs-choose-a-model-and-deploy-it-to-a-rest-api" title="Permalink to this headline"> </a></h1>
+<p>In this quickstart, you will:</p>
+<ul class="simple">
+<li><p>Run a hyperparameter sweep on a training script</p></li>
+<li><p>Compare the results of the runs in the MLflow UI</p></li>
+<li><p>Choose the best run and register it as a model</p></li>
+<li><p>Deploy the model to a REST API</p></li>
+<li><p>Build a container image suitable for deployment to a cloud platform</p></li>
+</ul>
+<p>As an ML Engineer or MLOps professional, you can use MLflow to compare, share, and deploy the best models produced
+by the team. In this quickstart, you will use the MLflow Tracking UI to compare the results of a hyperparameter
+sweep, choose the best run, and register it as a model. Then, you will deploy the model to a REST API. Finally,
+you will create a Docker container image suitable for deployment to a cloud platform.</p>
+<a class="reference internal image-reference" href="../../_images/quickstart_tracking_overview.png"><img alt="Diagram showing Data Science and MLOps workflow with MLflow" class="align-center" src="../../_images/quickstart_tracking_overview.png" style="width: 800px;" /></a>
+<div class="section" id="set-up">
+<h2>Set up<a class="headerlink" href="#set-up" title="Permalink to this headline"> </a></h2>
+<ul class="simple">
+<li><p>Install MLflow. See the <a class="reference internal" href="../quickstart-1/index.html#quickstart-1"><span class="std std-ref">introductory quickstart</span></a> for instructions</p></li>
+<li><p>Run the tracking server: <code class="docutils literal notranslate"><span class="pre">mlflow</span> <span class="pre">ui</span> <span class="pre">--port</span> <span class="pre">5000</span></code></p></li>
+</ul>
+</div>
+<div class="section" id="run-a-hyperparameter-sweep">
+<h2>Run a hyperparameter sweep<a class="headerlink" href="#run-a-hyperparameter-sweep" title="Permalink to this headline"> </a></h2>
+<p>This example tries to optimize the RMSE metric of a Keras deep learning model on a wine quality dataset. It has
+two hyperparameters that it tries to optimize: <code class="docutils literal notranslate"><span class="pre">learning_rate</span></code> and <code class="docutils literal notranslate"><span class="pre">momentum</span></code>. We will use the
+<a class="reference external" href="https://github.com/hyperopt/hyperopt">Hyperopt</a> library to run a hyperparameter sweep across
+different values of <code class="docutils literal notranslate"><span class="pre">learning_rate</span></code> and <code class="docutils literal notranslate"><span class="pre">momentum</span></code> and record the results in MLflow.</p>
+<p>Before running the hyperparameter sweep, let’s set the <code class="docutils literal notranslate"><span class="pre">MLFLOW_TRACKING_URI</span></code> environment variable to the URI of
+our MLflow tracking server:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">MLFLOW_TRACKING_URI</span><span class="o">=</span>http://localhost:5000
+</pre></div>
+</div>
+<p>Import the following packages</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">keras</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">hyperopt</span> <span class="kn">import</span> <span class="n">STATUS_OK</span><span class="p">,</span> <span class="n">Trials</span><span class="p">,</span> <span class="n">fmin</span><span class="p">,</span> <span class="n">hp</span><span class="p">,</span> <span class="n">tpe</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">mean_squared_error</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+
+<span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">infer_signature</span>
+</pre></div>
+</div>
+<p>Now load the dataset and split it into training, validation, and test sets.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load dataset</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+    <span class="s2">&quot;https://raw.githubusercontent.com/mlflow/mlflow/master/tests/datasets/winequality-white.csv&quot;</span><span class="p">,</span>
+    <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;;&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Split the data into training, validation, and test sets</span>
+<span class="n">train</span><span class="p">,</span> <span class="n">test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">train_x</span> <span class="o">=</span> <span class="n">train</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s2">&quot;quality&quot;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+<span class="n">train_y</span> <span class="o">=</span> <span class="n">train</span><span class="p">[[</span><span class="s2">&quot;quality&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+<span class="n">test_x</span> <span class="o">=</span> <span class="n">test</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s2">&quot;quality&quot;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+<span class="n">test_y</span> <span class="o">=</span> <span class="n">test</span><span class="p">[[</span><span class="s2">&quot;quality&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+<span class="n">train_x</span><span class="p">,</span> <span class="n">valid_x</span><span class="p">,</span> <span class="n">train_y</span><span class="p">,</span> <span class="n">valid_y</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+    <span class="n">train_x</span><span class="p">,</span> <span class="n">train_y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span>
+<span class="p">)</span>
+<span class="n">signature</span> <span class="o">=</span> <span class="n">infer_signature</span><span class="p">(</span><span class="n">train_x</span><span class="p">,</span> <span class="n">train_y</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Then let’s define the model architecture and train the model. The <code class="docutils literal notranslate"><span class="pre">train_model</span></code> function uses MLflow to track the
+parameters, results, and model itself of each trial as a child run.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">train_model</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">epochs</span><span class="p">,</span> <span class="n">train_x</span><span class="p">,</span> <span class="n">train_y</span><span class="p">,</span> <span class="n">valid_x</span><span class="p">,</span> <span class="n">valid_y</span><span class="p">,</span> <span class="n">test_x</span><span class="p">,</span> <span class="n">test_y</span><span class="p">):</span>
+    <span class="c1"># Define model architecture</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">keras</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="n">keras</span><span class="o">.</span><span class="n">Input</span><span class="p">([</span><span class="n">train_x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]]),</span>
+            <span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Normalization</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">train_x</span><span class="p">),</span> <span class="n">variance</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">train_x</span><span class="p">)),</span>
+            <span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s2">&quot;relu&quot;</span><span class="p">),</span>
+            <span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Compile model</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+        <span class="n">optimizer</span><span class="o">=</span><span class="n">keras</span><span class="o">.</span><span class="n">optimizers</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span>
+            <span class="n">learning_rate</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;lr&quot;</span><span class="p">],</span> <span class="n">momentum</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;momentum&quot;</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="n">loss</span><span class="o">=</span><span class="s2">&quot;mean_squared_error&quot;</span><span class="p">,</span>
+        <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="n">keras</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">RootMeanSquaredError</span><span class="p">()],</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Train model with MLflow tracking</span>
+    <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">(</span><span class="n">nested</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+            <span class="n">train_x</span><span class="p">,</span>
+            <span class="n">train_y</span><span class="p">,</span>
+            <span class="n">validation_data</span><span class="o">=</span><span class="p">(</span><span class="n">valid_x</span><span class="p">,</span> <span class="n">valid_y</span><span class="p">),</span>
+            <span class="n">epochs</span><span class="o">=</span><span class="n">epochs</span><span class="p">,</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="c1"># Evaluate the model</span>
+        <span class="n">eval_result</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">valid_x</span><span class="p">,</span> <span class="n">valid_y</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">)</span>
+        <span class="n">eval_rmse</span> <span class="o">=</span> <span class="n">eval_result</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># Log parameters and results</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_params</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_metric</span><span class="p">(</span><span class="s2">&quot;eval_rmse&quot;</span><span class="p">,</span> <span class="n">eval_rmse</span><span class="p">)</span>
+
+        <span class="c1"># Log model</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">tensorflow</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="n">signature</span><span class="o">=</span><span class="n">signature</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;eval_rmse&quot;</span><span class="p">:</span> <span class="n">eval_rmse</span><span class="p">,</span> <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="n">STATUS_OK</span><span class="p">,</span> <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="n">model</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">objective</span></code> function takes in the hyperparameters and returns the results of the <code class="docutils literal notranslate"><span class="pre">train_model</span></code>
+function for that set of hyperparameters.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">objective</span><span class="p">(</span><span class="n">params</span><span class="p">):</span>
+    <span class="c1"># MLflow will track the parameters and results for each run</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">train_model</span><span class="p">(</span>
+        <span class="n">params</span><span class="p">,</span>
+        <span class="n">epochs</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="n">train_x</span><span class="o">=</span><span class="n">train_x</span><span class="p">,</span>
+        <span class="n">train_y</span><span class="o">=</span><span class="n">train_y</span><span class="p">,</span>
+        <span class="n">valid_x</span><span class="o">=</span><span class="n">valid_x</span><span class="p">,</span>
+        <span class="n">valid_y</span><span class="o">=</span><span class="n">valid_y</span><span class="p">,</span>
+        <span class="n">test_x</span><span class="o">=</span><span class="n">test_x</span><span class="p">,</span>
+        <span class="n">test_y</span><span class="o">=</span><span class="n">test_y</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+</div>
+<p>Next, we will define the search space for Hyperopt. In this case, we want to try different values of
+<code class="docutils literal notranslate"><span class="pre">learning-rate</span></code> and <code class="docutils literal notranslate"><span class="pre">momentum</span></code>. Hyperopt begins its optimization process by selecting an initial
+set of hyperparameters, typically chosen at random or based on a specified domain space. This domain
+space defines the range and distribution of possible values for each hyperparameter. After evaluating
+the initial set, Hyperopt uses the results to update its probabilistic model, guiding the selection
+of subsequent hyperparameter sets in a more informed manner, aiming to converge towards the optimal solution.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">space</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;lr&quot;</span><span class="p">:</span> <span class="n">hp</span><span class="o">.</span><span class="n">loguniform</span><span class="p">(</span><span class="s2">&quot;lr&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">1e-5</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">1e-1</span><span class="p">)),</span>
+    <span class="s2">&quot;momentum&quot;</span><span class="p">:</span> <span class="n">hp</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="s2">&quot;momentum&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Finally, we will run the hyperparameter sweep using Hyperopt, passing in the <code class="docutils literal notranslate"><span class="pre">objective</span></code> function and search space.
+Hyperopt will try different hyperparameter combinations and return the results of the best one. We will
+store the best parameters, model, and evaluation metrics in MLflow.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s2">&quot;/wine-quality&quot;</span><span class="p">)</span>
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="c1"># Conduct the hyperparameter search using Hyperopt</span>
+    <span class="n">trials</span> <span class="o">=</span> <span class="n">Trials</span><span class="p">()</span>
+    <span class="n">best</span> <span class="o">=</span> <span class="n">fmin</span><span class="p">(</span>
+        <span class="n">fn</span><span class="o">=</span><span class="n">objective</span><span class="p">,</span>
+        <span class="n">space</span><span class="o">=</span><span class="n">space</span><span class="p">,</span>
+        <span class="n">algo</span><span class="o">=</span><span class="n">tpe</span><span class="o">.</span><span class="n">suggest</span><span class="p">,</span>
+        <span class="n">max_evals</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+        <span class="n">trials</span><span class="o">=</span><span class="n">trials</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Fetch the details of the best run</span>
+    <span class="n">best_run</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">trials</span><span class="o">.</span><span class="n">results</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;eval_rmse&quot;</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Log the best parameters, loss, and model</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_params</span><span class="p">(</span><span class="n">best</span><span class="p">)</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_metric</span><span class="p">(</span><span class="s2">&quot;eval_rmse&quot;</span><span class="p">,</span> <span class="n">best_run</span><span class="p">[</span><span class="s2">&quot;loss&quot;</span><span class="p">])</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">tensorflow</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span><span class="n">best_run</span><span class="p">[</span><span class="s2">&quot;model&quot;</span><span class="p">],</span> <span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="n">signature</span><span class="o">=</span><span class="n">signature</span><span class="p">)</span>
+
+    <span class="c1"># Print out the best parameters and corresponding loss</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Best parameters: </span><span class="si">{</span><span class="n">best</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Best eval rmse: </span><span class="si">{</span><span class="n">best_run</span><span class="p">[</span><span class="s1">&#39;eval_rmse&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="compare-the-results">
+<h2>Compare the results<a class="headerlink" href="#compare-the-results" title="Permalink to this headline"> </a></h2>
+<p>Open the MLflow UI in your browser at the <cite>MLFLOW_TRACKING_URI</cite>. You should see a nested list of runs. In the
+default <strong>Table view</strong>, choose the <strong>Columns</strong> button and add the <strong>Metrics | test_rmse</strong> column and
+the <strong>Parameters | lr</strong> and <strong>Parameters | momentum</strong> column. To sort by RMSE ascending, click the <strong>test_rmse</strong>
+column header. The best run typically has an RMSE on the <strong>test</strong> dataset of ~0.70. You can see the parameters
+of the best run in the <strong>Parameters</strong> column.</p>
+<a class="reference internal image-reference" href="../../_images/mlflow_ui_table_view.png"><img alt="Screenshot of MLflow tracking UI table view showing runs" class="align-center" src="../../_images/mlflow_ui_table_view.png" style="width: 800px;" /></a>
+<p>Choose <strong>Chart view</strong>. Choose the <strong>Parallel coordinates</strong> graph and configure it to show the <strong>lr</strong> and
+<strong>momentum</strong> coordinates and the <strong>test_rmse</strong> metric. Each line in this graph represents a run and associates
+each hyperparameter evaluation run’s parameters to the evaluated error metric for the run.</p>
+<img
+  src="../../_static/images/quickstart_mlops/mlflow_ui_chart_view.png"
+  width="800px"
+  class="align-center"
+  id="chart-view"
+  alt="Screenshot of MLflow tracking UI parallel coordinates graph showing runs"
+/><p>The red graphs on this graph are runs that fared poorly. The lowest one is a baseline run with both <strong>lr</strong>
+and <strong>momentum</strong> set to 0.0. That baseline run has an RMSE of ~0.89. The other red lines show that
+high <strong>momentum</strong> can also lead to poor results with this problem and architecture.</p>
+<p>The graphs shading towards blue are runs that fared better. Hover your mouse over individual runs to see their details.</p>
+</div>
+<div class="section" id="register-your-best-model">
+<h2>Register your best model<a class="headerlink" href="#register-your-best-model" title="Permalink to this headline"> </a></h2>
+<p>Choose the best run and register it as a model. In the <strong>Table view</strong>, choose the best run. In the
+<strong>Run Detail</strong> page, open the <strong>Artifacts</strong> section and select the <strong>Register Model</strong> button. In the
+<strong>Register Model</strong> dialog, enter a name for the model, such as <code class="docutils literal notranslate"><span class="pre">wine-quality</span></code>, and click <strong>Register</strong>.</p>
+<p>Now, your model is available for deployment. You can see it in the <strong>Models</strong> page of the MLflow UI.
+Open the page for the model you just registered.</p>
+<p>You can add a description for the model, add tags, and easily navigate back to the source run that generated
+this model. You can also transition the model to different stages. For example, you can transition the model
+to <strong>Staging</strong> to indicate that it is ready for testing. You can transition it to <strong>Production</strong> to indicate
+that it is ready for deployment.</p>
+<p>Transition the model to <strong>Staging</strong> by choosing the <strong>Stage</strong> dropdown:</p>
+<a class="reference internal image-reference" href="../../_images/register_model_button.png"><img alt="Screenshot of MLflow tracking UI models page showing the registered model" class="align-center" src="../../_images/register_model_button.png" style="width: 800px;" /></a>
+</div>
+<div class="section" id="serve-the-model-locally">
+<h2>Serve the model locally<a class="headerlink" href="#serve-the-model-locally" title="Permalink to this headline"> </a></h2>
+<p>MLflow allows you to easily serve models produced by any run or model version.
+You can serve the model you just registered by running:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mlflow<span class="w"> </span>models<span class="w"> </span>serve<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;models:/wine-quality/1&quot;</span><span class="w"> </span>--port<span class="w"> </span><span class="m">5002</span>
+</pre></div>
+</div>
+<p>(Note that specifying the port as above will be necessary if you are running the tracking server on the
+same machine at the default port of <strong>5000</strong>.)</p>
+<p>You could also have used a <code class="docutils literal notranslate"><span class="pre">runs:/&lt;run_id&gt;</span></code> URI to serve a model, or any supported URI described in <a class="reference internal" href="../../tracking.html#artifact-stores"><span class="std std-ref">Artifact Store</span></a>.</p>
+<p>Please note that for production, we do not recommend deploying your model in the same VM as the tracking server
+because of resource limitation, within this guide we just run everything from the same machine for simplicity.</p>
+<p>To test the model, you can send a request to the REST API using the <code class="docutils literal notranslate"><span class="pre">curl</span></code> command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;dataframe_split&quot;: {</span>
+<span class="s1">&quot;columns&quot;: [&quot;fixed acidity&quot;,&quot;volatile acidity&quot;,&quot;citric acid&quot;,&quot;residual sugar&quot;,&quot;chlorides&quot;,&quot;free sulfur dioxide&quot;,&quot;total sulfur dioxide&quot;,&quot;density&quot;,&quot;pH&quot;,&quot;sulphates&quot;,&quot;alcohol&quot;],</span>
+<span class="s1">&quot;data&quot;: [[7,0.27,0.36,20.7,0.045,45,170,1.001,3,0.45,8.8]]}}&#39;</span><span class="w"> </span><span class="se">\</span>
+-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>localhost:5002/invocations
+</pre></div>
+</div>
+<p>Inferencing is done with a JSON <cite>POST</cite> request to the <strong>invocations</strong> path on <strong>localhost</strong> at the specified port.
+The <code class="docutils literal notranslate"><span class="pre">columns</span></code> key specifies the names of the columns in the input data. The <code class="docutils literal notranslate"><span class="pre">data</span></code> value is a list of lists,
+where each inner list is a row of data. For brevity, the above only requests one prediction of wine
+quality (on a scale of 3-8). The response is a JSON object with a <strong>predictions</strong> key that contains a list of
+predictions, one for each row of data. In this case, the response is:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="nt">&quot;predictions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="nt">&quot;0&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">5.310967445373535</span><span class="p">}]}</span>
+</pre></div>
+</div>
+<p>The schema for input and output is available in the MLflow UI in the <strong>Artifacts | Model</strong> description. The schema
+is available because the <code class="docutils literal notranslate"><span class="pre">train.py</span></code> script used the <code class="docutils literal notranslate"><span class="pre">mlflow.infer_signature</span></code> method and passed the result to
+the <code class="docutils literal notranslate"><span class="pre">mlflow.log_model</span></code> method. Passing the signature to the <code class="docutils literal notranslate"><span class="pre">log_model</span></code> method is highly recommended, as it
+provides clear error messages if the input request is malformed.</p>
+</div>
+<div class="section" id="build-a-container-image-for-your-model">
+<h2>Build a container image for your model<a class="headerlink" href="#build-a-container-image-for-your-model" title="Permalink to this headline"> </a></h2>
+<p>Most routes toward deployment will use a container to package your model, its dependencies, and relevant portions of
+the runtime environment. You can use MLflow to build a Docker image for your model.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mlflow<span class="w"> </span>models<span class="w"> </span>build-docker<span class="w"> </span>--model-uri<span class="w"> </span><span class="s2">&quot;models:/wine-quality/1&quot;</span><span class="w"> </span>--name<span class="w"> </span><span class="s2">&quot;qs_mlops&quot;</span>
+</pre></div>
+</div>
+<p>This command builds a Docker image named <code class="docutils literal notranslate"><span class="pre">qs_mlops</span></code> that contains your model and its dependencies. The <code class="docutils literal notranslate"><span class="pre">model-uri</span></code>
+in this case specifies a version number (<code class="docutils literal notranslate"><span class="pre">/1</span></code>) rather than a lifecycle stage (<code class="docutils literal notranslate"><span class="pre">/staging</span></code>), but you can use
+whichever integrates best with your workflow. It will take several minutes to build the image. Once it completes,
+you can run the image to provide real-time inferencing locally, on-prem, on a bespoke Internet server, or cloud
+platform. You can run it locally with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>run<span class="w"> </span>-p<span class="w"> </span><span class="m">5002</span>:8080<span class="w"> </span>qs_mlops
+</pre></div>
+</div>
+<p>This <a class="reference external" href="https://docs.docker.com/engine/reference/commandline/run/">Docker run command</a> runs the image you just built
+and maps port <strong>5002</strong> on your local machine to port <strong>8080</strong> in the container. You can now send requests to the
+model using the same <code class="docutils literal notranslate"><span class="pre">curl</span></code> command as before:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;dataframe_split&quot;: {&quot;columns&quot;: [&quot;fixed acidity&quot;,&quot;volatile acidity&quot;,&quot;citric acid&quot;,&quot;residual sugar&quot;,&quot;chlorides&quot;,&quot;free sulfur dioxide&quot;,&quot;total sulfur dioxide&quot;,&quot;density&quot;,&quot;pH&quot;,&quot;sulphates&quot;,&quot;alcohol&quot;], &quot;data&quot;: [[7,0.27,0.36,20.7,0.045,45,170,1.001,3,0.45,8.8]]}}&#39;</span><span class="w"> </span>-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>localhost:5002/invocations
+</pre></div>
+</div>
+</div>
+<div class="section" id="deploying-to-a-cloud-platform">
+<h2>Deploying to a cloud platform<a class="headerlink" href="#deploying-to-a-cloud-platform" title="Permalink to this headline"> </a></h2>
+<p>Virtually all cloud platforms allow you to deploy a Docker image. The process varies considerably, so you will have
+to consult your cloud provider’s documentation for details.</p>
+<p>In addition, some cloud providers have built-in support for MLflow. For instance:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://learn.microsoft.com/azure/machine-learning/">Azure ML</a></p></li>
+<li><p><a class="reference external" href="https://www.databricks.com/product/managed-mlflow">Databricks</a></p></li>
+<li><p><a class="reference external" href="https://docs.aws.amazon.com/sagemaker/index.html">Amazon SageMaker</a></p></li>
+<li><p><a class="reference external" href="https://cloud.google.com/doc">Google Cloud</a></p></li>
+</ul>
+<p>all support MLflow. Cloud platforms generally support multiple workflows for deployment: command-line,
+SDK-based, and Web-based. You can use MLflow in any of these workflows, although the details will vary between
+platforms and versions. Again, you will need to consult your cloud provider’s documentation for details.</p>
+</div>
+</div>
+
+
+              </div>
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../quickstart-1/index.html" class="btn btn-neutral" title="Quickstart: Install MLflow, instrument code &amp; view results in minutes" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+      
+      
+        <a href="../tracking-server-overview/index.html" class="btn btn-neutral" title="5 Minute Tracking Server Overview" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+      <p class="copyright">
+          &copy; MLflow Project, a Series of LF Projects, LLC. All rights reserved.
+      </p>
+
+  </div> 
+
+</footer>
+          </div>
+        </div>
+      </section>
+    </main>
+  </page>
+
+  
+
+
+  
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+      URL_ROOT:'../../',
+      VERSION:'2.9.2.dev0',
+      COLLAPSE_INDEX:false,
+      FILE_SUFFIX:'.html',
+      LINK_SUFFIX: '.html',
+      HAS_SOURCE:  true
+    };
+  </script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/clipboard.min.js"></script>
+  <script type="text/javascript" src="../../_static/js/jquery.waypoints.min.js"></script>
+
+  
+  
+  
+  <script type="text/javascript">var CLIPPY_SVG_PATH = "../../_static/clippy.svg";</script>
+  <script type="text/javascript" src="../../_static/js/custom.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.StickyNav.enable();
+    });
+
+  </script>
+  
+
+  
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        // Get the code block designator class entries
+        const allHighlights = document.querySelectorAll('.highlight');
+        // Disable copyable links for notebook cell numbering and for cell outputs
+        const highlights = Array.from(allHighlights).filter(highlight => !highlight.closest('.highlight-none') && 
+            !highlight.closest('.nboutput'));
+    
+        highlights.forEach(function(highlight) {
+            const copyIcon = document.createElement('span');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.innerHTML = '&#xf0ea;';
+
+            copyIcon.addEventListener('click', function() {
+                const code = highlight.querySelector('pre').textContent;
+                copyToClipboard(code);
+
+                // Flash effect on click
+                this.style.color = '#0194E2';
+                setTimeout(() => {
+                    this.style.color = ''; 
+                }, 100);
+
+                // Display "Code copied to clipboard" near the clicked icon
+                const message = document.createElement('span');
+                message.textContent = "Copied!";
+                message.classList.add('copy-message'); 
+
+                // Append the message to the icon
+                this.appendChild(message);
+
+                setTimeout(() => {
+                    this.removeChild(message);
+                }, 500);
+            });
+
+            highlight.appendChild(copyIcon);
+        });
+    });
+  </script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Force download for notebook-download-btn
+        const downloadButtons = document.querySelectorAll('.notebook-download-btn');
+        downloadButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                // Fetch the raw content of the notebook from GitHub
+                fetch(button.href)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = url;
+                        const filename = button.href.split('/').pop();
+                        link.download = filename; 
+
+                        document.body.appendChild(link);
+                        link.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    })
+                    .catch(err => console.error('Error fetching the notebook:', err));
+            });
+        });
+    });
+</script> 
+</body>
+</html>

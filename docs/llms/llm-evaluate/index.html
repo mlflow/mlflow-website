@@ -1,0 +1,911 @@
+
+  
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>MLflow LLM Evaluate &mdash; MLflow 2.9.2.dev0 documentation</title>
+  
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/llms/llm-evaluate/index.html">
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    
+
+    
+
+  
+    
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/grids.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/mobile.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/simple-cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/tabs.css" type="text/css" />
+    
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="MLflow 2.9.2.dev0 documentation" href="../../index.html"/>
+        <link rel="up" title="LLMs" href="../index.html"/>
+        <link rel="next" title="Prompt Engineering UI (Experimental)" href="/../prompt-engineering/index.html"/>
+        <link rel="prev" title="Querying endpoints in the MLflow Deployment Server" href="/../deployments/guides/step2-query-deployments.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+<script type="text/javascript" src="../../_static/jquery.js"></script>
+<script type="text/javascript" src="../../_static/underscore.js"></script>
+<script type="text/javascript" src="../../_static/doctools.js"></script>
+<script type="text/javascript" src="../../_static/languagesections.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+
+<body class="wy-body-for-nav" role="document">
+  
+
+  
+  <nav class="wy-nav-top header" role="navigation" aria-label="top navigation">
+    <ul>
+  <li class="menu-toggle">
+    <i data-toggle="wy-nav-top" class="wy-nav-top-menu-button db-icon db-icon-menu pull-left"></i>
+    <a href="../../index.html" class="wy-nav-top-logo"
+      ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
+    /></a>
+    <span class="version">2.9.2.dev0</span>
+  </li>
+</ul>
+  </nav>
+  <page>
+    
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side relative">
+      <div class="wy-side-scroll">
+  <div class="wy-side-nav-search">
+    
+
+    
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+    
+  </div>
+
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+    
+      <a href="../../index.html" class="main-navigation-home"><img src="../../_static/icons/nav-home.svg"> MLflow</a>
+    
+
+    
+      
+
+      
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../introduction/index.html">What is MLflow?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started/index.html">Getting Started with MLflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../new-features/index.html">New Features</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">LLMs</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#id1">MLflow Deployments Server for LLMs</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#id3">LLM Evaluation</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">MLflow LLM Evaluate</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#full-notebook-guides-and-examples">Full Notebook Guides and Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#quickstart">Quickstart</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#llm-evaluation-metrics">LLM Evaluation Metrics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#creating-custom-llm-evaluation-metrics">Creating Custom LLM-evaluation Metrics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#prepare-your-llm-for-evaluating">Prepare Your LLM for Evaluating</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#viewing-evaluation-results">Viewing Evaluation Results</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../index.html#benefits-of-mlflow-s-llm-evaluation">Benefits of MLflow’s LLM Evaluation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#id4">Prompt Engineering UI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#native-mlflow-flavors-for-llms">Native MLflow Flavors for LLMs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#id5">LLM Tracking in MLflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#tutorials-and-use-case-guides-for-llms-in-mlflow">Tutorials and Use Case Guides for LLMs in MLflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../model-evaluation/index.html">Model Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../deep-learning/index.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../traditional-ml/index.html">Traditional ML</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../deployment/index.html">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tracking.html">MLflow Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../system-metrics/index.html">System Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../projects.html">MLflow Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../models.html">MLflow Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../model-registry.html">MLflow Model Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../recipes.html">MLflow Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plugins.html">MLflow Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auth/index.html">MLflow Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../search-runs.html">Search Runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../search-experiments.html">Search Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../python_api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../R-api.html">R API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../java_api/index.html">Java API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rest-api.html">REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../docker.html">Official MLflow Docker Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../community-model-flavors.html">Community Model Flavors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials-and-examples/index.html">Tutorials and Examples</a></li>
+</ul>
+
+      
+    
+  </div>
+
+  <div role="contentinfo">
+    
+
+    <p>
+      <a id='feedbacklink' href="https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a>
+    </p>
+  </div>
+</div>
+    </nav>
+
+    <main class="wy-grid-for-nav">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+          <div class="rst-content">
+            
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Documentation</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../index.html">LLMs</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+    
+      <li>MLflow LLM Evaluate</li>
+    
+    
+    <!-- <li class="wy-breadcrumbs-aside">
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/llms/llm-evaluate/index.rst" class="fa fa-github"> Edit on GitHub</a>
+    </li> -->
+    
+  </ul>
+</div>
+            <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <div itemprop="articleBody">
+                
+  <div class="section" id="mlflow-llm-evaluate">
+<span id="llm-eval"></span><h1>MLflow LLM Evaluate<a class="headerlink" href="#mlflow-llm-evaluate" title="Permalink to this headline"> </a></h1>
+<p>With the emerging of ChatGPT, LLMs have shown its power of text generation in various fields, such as
+question answering, translating and text summarization. Evaluating LLMs’ performance is slightly different
+from traditional ML models, as very often there is no single ground truth to compare against.
+MLflow provides an API <a class="reference internal" href="../../python_api/mlflow.html#mlflow.evaluate" title="mlflow.evaluate"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code></a> to help evaluate your LLMs.</p>
+<p>MLflow’s LLM evaluation functionality consists of 3 main components:</p>
+<ol class="arabic simple">
+<li><p><strong>A model to evaluate</strong>: it can be an MLflow <code class="docutils literal notranslate"><span class="pre">pyfunc</span></code> model, a URI pointing to one registered
+MLflow model, or any python callable that represents your model, e.g, a HuggingFace text summarization pipeline.</p></li>
+<li><p><strong>Metrics</strong>: the metrics to compute, LLM evaluate will use LLM metrics.</p></li>
+<li><p><strong>Evaluation data</strong>: the data your model is evaluated at, it can be a pandas Dataframe, a python list, a
+numpy array or an <a class="reference internal" href="../../python_api/mlflow.data.html#mlflow.data.dataset.Dataset" title="mlflow.data.dataset.Dataset"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.data.dataset.Dataset()</span></code></a> instance.</p></li>
+</ol>
+<div class="section" id="full-notebook-guides-and-examples">
+<h2>Full Notebook Guides and Examples<a class="headerlink" href="#full-notebook-guides-and-examples" title="Permalink to this headline"> </a></h2>
+<p>If you’re interested in thorough use-case oriented guides that showcase the simplicity and power of MLflow’s evaluate
+functionality for LLMs, please navigate to the notebook collection below:</p>
+<a href="notebooks/index.html" class="download-btn">View the Notebook Guides</a><br/></div>
+<div class="section" id="quickstart">
+<h2>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline"> </a></h2>
+<p>Below is a simple example that gives an quick overview of how MLflow LLM evaluation works. The example builds
+a simple question-answering model by wrapping “openai/gpt-4” with custom prompt. You can paste it to
+your IPython or local editor and execute it, and install missing dependencies as prompted. Running the code
+requires OpenAI API key, if you don’t have an OpenAI key, you can set it up [here](<a class="reference external" href="https://platform.openai.com/account/api-keys">https://platform.openai.com/account/api-keys</a>).</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">OPENAI_API_KEY</span><span class="o">=</span><span class="s1">&#39;your-api-key-here&#39;</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">import</span> <span class="nn">openai</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">getpass</span> <span class="kn">import</span> <span class="n">getpass</span>
+
+<span class="n">eval_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;inputs&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;What is MLflow?&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;What is Spark?&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="s2">&quot;ground_truth&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;MLflow is an open-source platform for managing the end-to-end machine learning (ML) &quot;</span>
+            <span class="s2">&quot;lifecycle. It was developed by Databricks, a company that specializes in big data and &quot;</span>
+            <span class="s2">&quot;machine learning solutions. MLflow is designed to address the challenges that data &quot;</span>
+            <span class="s2">&quot;scientists and machine learning engineers face when developing, training, and deploying &quot;</span>
+            <span class="s2">&quot;machine learning models.&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Apache Spark is an open-source, distributed computing system designed for big data &quot;</span>
+            <span class="s2">&quot;processing and analytics. It was developed in response to limitations of the Hadoop &quot;</span>
+            <span class="s2">&quot;MapReduce computing model, offering improvements in speed and ease of use. Spark &quot;</span>
+            <span class="s2">&quot;provides libraries for various tasks such as data ingestion, processing, and analysis &quot;</span>
+            <span class="s2">&quot;through its components like Spark SQL for structured data, Spark Streaming for &quot;</span>
+            <span class="s2">&quot;real-time data processing, and MLlib for machine learning tasks&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">()</span> <span class="k">as</span> <span class="n">run</span><span class="p">:</span>
+    <span class="n">system_prompt</span> <span class="o">=</span> <span class="s2">&quot;Answer the following question in two sentences&quot;</span>
+    <span class="c1"># Wrap &quot;gpt-4&quot; as an MLflow model.</span>
+    <span class="n">logged_model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">openai</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-4&quot;</span><span class="p">,</span>
+        <span class="n">task</span><span class="o">=</span><span class="n">openai</span><span class="o">.</span><span class="n">ChatCompletion</span><span class="p">,</span>
+        <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
+        <span class="n">messages</span><span class="o">=</span><span class="p">[</span>
+            <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">system_prompt</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{question}</span><span class="s2">&quot;</span><span class="p">},</span>
+        <span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Use predefined question-answering metrics to evaluate our model.</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+        <span class="n">logged_model_info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">,</span>
+        <span class="n">eval_data</span><span class="p">,</span>
+        <span class="n">targets</span><span class="o">=</span><span class="s2">&quot;ground_truth&quot;</span><span class="p">,</span>
+        <span class="n">model_type</span><span class="o">=</span><span class="s2">&quot;question-answering&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;See aggregated evaluation results below: </span><span class="se">\n</span><span class="si">{</span><span class="n">results</span><span class="o">.</span><span class="n">metrics</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Evaluation result for each data record is available in `results.tables`.</span>
+    <span class="n">eval_table</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="s2">&quot;eval_results_table&quot;</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;See evaluation table below: </span><span class="se">\n</span><span class="si">{</span><span class="n">eval_table</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="llm-evaluation-metrics">
+<h2>LLM Evaluation Metrics<a class="headerlink" href="#llm-evaluation-metrics" title="Permalink to this headline"> </a></h2>
+<p>There are two types of LLM evaluation metrics in MLflow:</p>
+<ol class="arabic">
+<li><p>Metrics relying on SaaS model (e.g., OpenAI) for scoring, e.g., <a class="reference internal" href="../../python_api/mlflow.metrics.html#mlflow.metrics.genai.answer_relevance" title="mlflow.metrics.genai.answer_relevance"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.metrics.genai.answer_relevance()</span></code></a>. These
+metrics are created via <a class="reference internal" href="../../python_api/mlflow.metrics.html#mlflow.metrics.genai.make_genai_metric" title="mlflow.metrics.genai.make_genai_metric"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.metrics.genai.make_genai_metric()</span></code></a> method. For each data record, these metrics under the hood sends
+one prompt consisting of the following information to the SaaS model, and extract the score from model response:</p>
+<ul class="simple">
+<li><p>Metrics definition.</p></li>
+<li><p>Metrics grading criteria.</p></li>
+<li><p>Reference examples.</p></li>
+<li><p>Input data/context.</p></li>
+<li><p>Model output.</p></li>
+<li><p>[optional] Ground truth.</p></li>
+</ul>
+<p>More details of how these fields are set can be found in the section “Create your Custom LLM-evaluation Metrics”.</p>
+</li>
+<li><p>Function-based per-row metrics. These metrics calculate a score for each data record (row in terms of Pandas/Spark dataframe),
+based on certain functions, like Rouge (<a class="reference internal" href="../../python_api/mlflow.metrics.html#mlflow.metrics.rougeL" title="mlflow.metrics.rougeL"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.metrics.rougeL()</span></code></a>) or Flesch Kincaid (<a class="reference internal" href="../../python_api/mlflow.metrics.html#mlflow.metrics.flesch_kincaid_grade_level" title="mlflow.metrics.flesch_kincaid_grade_level"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.metrics.flesch_kincaid_grade_level()</span></code></a>).
+These metrics are similar to traditional metrics.</p></li>
+</ol>
+<div class="section" id="select-metrics-to-evaluate">
+<h3>Select Metrics to Evaluate<a class="headerlink" href="#select-metrics-to-evaluate" title="Permalink to this headline"> </a></h3>
+<p>There are two ways to select metrics to evaluate your model:</p>
+<ul class="simple">
+<li><p>Use <strong>default</strong> metrics for pre-defined model types.</p></li>
+<li><p>Use a <strong>custom</strong> list of metrics.</p></li>
+</ul>
+</div>
+<div class="section" id="use-default-metrics-for-pre-defined-model-types">
+<span id="llm-eval-default-metrics"></span><h3>Use Default Metrics for Pre-defined Model Types<a class="headerlink" href="#use-default-metrics-for-pre-defined-model-types" title="Permalink to this headline"> </a></h3>
+<p>MLflow LLM evaluation includes default collections of metrics for pre-selected tasks, e.g, “question-answering”. Depending on the
+LLM use case that you are evaluating, these pre-defined collections can greatly simplify the process of running evaluations. To use
+defaults metrics for pre-selected tasks, specify the <code class="docutils literal notranslate"><span class="pre">model_type</span></code> argument in <a class="reference internal" href="../../python_api/mlflow.html#mlflow.evaluate" title="mlflow.evaluate"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code></a>, as shown by the example
+below:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">,</span>
+    <span class="n">eval_data</span><span class="p">,</span>
+    <span class="n">targets</span><span class="o">=</span><span class="s2">&quot;ground_truth&quot;</span><span class="p">,</span>
+    <span class="n">model_type</span><span class="o">=</span><span class="s2">&quot;question-answering&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>The supported LLM model types and associated metrics are listed below:</p>
+<ul>
+<li><p><strong>question-answering</strong>: <code class="docutils literal notranslate"><span class="pre">model_type=&quot;question-answering&quot;</span></code>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>exact-match</p></li>
+<li><p><a class="reference external" href="https://huggingface.co/spaces/evaluate-measurement/toxicity">toxicity</a> <sup>1</sup></p></li>
+<li><p><a class="reference external" href="https://en.wikipedia.org/wiki/Automated_readability_index">ari_grade_level</a> <sup>2</sup></p></li>
+<li><p><a class="reference external" href="https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests#Flesch%E2%80%93Kincaid_grade_level">flesch_kincaid_grade_level</a> <sup>2</sup></p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>text-summarization</strong>: <code class="docutils literal notranslate"><span class="pre">model_type=&quot;text-summarization&quot;</span></code>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://huggingface.co/spaces/evaluate-metric/rouge">ROUGE</a> <sup>3</sup></p></li>
+<li><p><a class="reference external" href="https://huggingface.co/spaces/evaluate-measurement/toxicity">toxicity</a> <sup>1</sup></p></li>
+<li><p><a class="reference external" href="https://en.wikipedia.org/wiki/Automated_readability_index">ari_grade_level</a> <sup>2</sup></p></li>
+<li><p><a class="reference external" href="https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests#Flesch%E2%80%93Kincaid_grade_level">flesch_kincaid_grade_level</a> <sup>2</sup></p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>text models</strong>: <code class="docutils literal notranslate"><span class="pre">model_type=&quot;text&quot;</span></code>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://huggingface.co/spaces/evaluate-measurement/toxicity">toxicity</a> <sup>1</sup></p></li>
+<li><p><a class="reference external" href="https://en.wikipedia.org/wiki/Automated_readability_index">ari_grade_level</a> <sup>2</sup></p></li>
+<li><p><a class="reference external" href="https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests#Flesch%E2%80%93Kincaid_grade_level">flesch_kincaid_grade_level</a> <sup>2</sup></p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+<p><sup>1</sup> Requires package <a class="reference external" href="https://pypi.org/project/evaluate">evaluate</a>, <a class="reference external" href="https://pytorch.org/get-started/locally/">torch</a>, and
+<a class="reference external" href="https://huggingface.co/docs/transformers/installation">transformers</a></p>
+<p><sup>2</sup> Requires package <a class="reference external" href="https://pypi.org/project/textstat">textstat</a></p>
+<p><sup>3</sup> Requires package <a class="reference external" href="https://pypi.org/project/evaluate">evaluate</a>, <a class="reference external" href="https://pypi.org/project/nltk">nltk</a>, and
+<a class="reference external" href="https://pypi.org/project/rouge-score">rouge-score</a></p>
+</div>
+<div class="section" id="use-a-custom-list-of-metrics">
+<span id="llm-eval-custom-metrics"></span><h3>Use a Custom List of Metrics<a class="headerlink" href="#use-a-custom-list-of-metrics" title="Permalink to this headline"> </a></h3>
+<p>Using the pre-defined metrics associated with a given model type is not the only way to generate scoring metrics
+for LLM evaluation in MLflow. You can specify a custom list of metrics in the <cite>extra_metrics</cite> argument in <cite>mlflow.evaluate</cite>:</p>
+<ul>
+<li><p>To add additional metrics to the default metrics list of pre-defined model type, keep the <cite>model_type</cite> and add your metrics to <code class="docutils literal notranslate"><span class="pre">extra_metrics</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">,</span>
+    <span class="n">eval_data</span><span class="p">,</span>
+    <span class="n">targets</span><span class="o">=</span><span class="s2">&quot;ground_truth&quot;</span><span class="p">,</span>
+    <span class="n">model_type</span><span class="o">=</span><span class="s2">&quot;question-answering&quot;</span><span class="p">,</span>
+    <span class="n">extra_metrics</span><span class="o">=</span><span class="p">[</span><span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">latency</span><span class="p">()],</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>The above code will evaluate your model using all metrics for “question-answering” model plus <a class="reference internal" href="../../python_api/mlflow.metrics.html#mlflow.metrics.latency" title="mlflow.metrics.latency"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.metrics.latency()</span></code></a>.</p>
+</li>
+<li><p>To disable default metric calculation and only calculate your selected metrics, remove the <code class="docutils literal notranslate"><span class="pre">model_type</span></code> argument and define the desired metrics.</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">,</span>
+    <span class="n">eval_data</span><span class="p">,</span>
+    <span class="n">targets</span><span class="o">=</span><span class="s2">&quot;ground_truth&quot;</span><span class="p">,</span>
+    <span class="n">extra_metrics</span><span class="o">=</span><span class="p">[</span><span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">toxicity</span><span class="p">(),</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">latency</span><span class="p">()],</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ul>
+<p>The full reference for supported evaluation metrics can be found <a class="reference external" href="../../python_api/mlflow.html#mlflow.evaluate">here</a>.</p>
+</div>
+<div class="section" id="metrics-with-llm-as-the-judge">
+<h3>Metrics with LLM as the Judge<a class="headerlink" href="#metrics-with-llm-as-the-judge" title="Permalink to this headline"> </a></h3>
+<p>MLflow offers a few pre-canned metrics which uses LLM as the judge. Despite the difference under the hood, the usage
+is the same - put these metrics in the <code class="docutils literal notranslate"><span class="pre">extra_metrics</span></code> argument in <code class="docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code>. Here is the list of pre-canned
+metrics:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../../python_api/mlflow.metrics.html#mlflow.metrics.genai.answer_similarity" title="mlflow.metrics.genai.answer_similarity"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.metrics.genai.answer_similarity()</span></code></a>: Use this metric when you want to evaluate how similar the model generated output is compared to the information in the ground_truth. High scores mean that your model outputs contain similar information as the ground_truth, while low scores mean that outputs may disagree with the ground_truth.</p></li>
+<li><p><a class="reference internal" href="../../python_api/mlflow.metrics.html#mlflow.metrics.genai.answer_correctness" title="mlflow.metrics.genai.answer_correctness"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.metrics.genai.answer_correctness()</span></code></a>: Use this metric when you want to evaluate how factually correct the model generated output is based on the information in the ground_truth. High scores mean that your model outputs contain similar information as the ground_truth and that this information is correct, while low scores mean that outputs may disagree with the ground_truth or that the information in the output is incorrect. Note that this builds onto answer_similarity.</p></li>
+<li><p><a class="reference internal" href="../../python_api/mlflow.metrics.html#mlflow.metrics.genai.answer_relevance" title="mlflow.metrics.genai.answer_relevance"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.metrics.genai.answer_relevance()</span></code></a>: Use this metric when you want to evaluate how relevant the model generated output is to the input (context is ignored). High scores mean that your model outputs are about the same subject as the input, while low scores mean that outputs may be non-topical.</p></li>
+<li><p><a class="reference internal" href="../../python_api/mlflow.metrics.html#mlflow.metrics.genai.relevance" title="mlflow.metrics.genai.relevance"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.metrics.genai.relevance()</span></code></a>: Use this metric when you want to evaluate how relevant the model generated output is with respect to both the input and the context. High scores mean that the model has understood the context and correct extracted relevant information from the context, while low score mean that output has completely ignored the question and the context and could be hallucinating.</p></li>
+<li><p><a class="reference internal" href="../../python_api/mlflow.metrics.html#mlflow.metrics.genai.faithfulness" title="mlflow.metrics.genai.faithfulness"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.metrics.genai.faithfulness()</span></code></a>: Use this metric when you want to evaluate how faithful the model generated output is based on the context provided. High scores mean that the outputs contain information that is in line with the context, while low scores mean that outputs may disagree with the context (input is ignored).</p></li>
+</ul>
+</div>
+<div class="section" id="selecting-the-llm-as-judge-model">
+<h3>Selecting the LLM-as-judge Model<a class="headerlink" href="#selecting-the-llm-as-judge-model" title="Permalink to this headline"> </a></h3>
+<p>By default, llm-as-judge metrics use <code class="docutils literal notranslate"><span class="pre">openai:/gpt-4</span></code> as the judge. You can change the default judge model by passing an override to the <code class="docutils literal notranslate"><span class="pre">model</span></code> argument within the metric definition, as shown below. In addition to OpenAI models, you can also use any endpoint via MLflow Deployments. Use <a class="reference internal" href="../../python_api/mlflow.deployments.html#mlflow.deployments.set_deployments_target" title="mlflow.deployments.set_deployments_target"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.deployments.set_deployments_target()</span></code></a> to set the target deployment client.</p>
+<p>To use an endpoint hosted by a local MLflow Deployments Server, you can use the following code.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.deployments</span> <span class="kn">import</span> <span class="n">set_deployments_target</span>
+
+<span class="n">set_deployments_target</span><span class="p">(</span><span class="s2">&quot;http://localhost:5000&quot;</span><span class="p">)</span>
+<span class="n">my_answer_similarity</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">genai</span><span class="o">.</span><span class="n">answer_similarity</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;endpoints:/my-endpoint&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>To use an endpoint hosted on Databricks, you can use the following code.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.deployments</span> <span class="kn">import</span> <span class="n">set_deployments_target</span>
+
+<span class="n">set_deployments_target</span><span class="p">(</span><span class="s2">&quot;databricks&quot;</span><span class="p">)</span>
+<span class="n">llama2_answer_similarity</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">genai</span><span class="o">.</span><span class="n">answer_similarity</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;endpoints:/databricks-llama-2-70b-chat&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>For more information about how various models perform as judges, please refer to <a class="reference external" href="https://www.databricks.com/blog/LLM-auto-eval-best-practices-RAG">this blog</a>.</p>
+</div>
+</div>
+<div class="section" id="creating-custom-llm-evaluation-metrics">
+<h2>Creating Custom LLM-evaluation Metrics<a class="headerlink" href="#creating-custom-llm-evaluation-metrics" title="Permalink to this headline"> </a></h2>
+<div class="section" id="create-llm-as-judge-evaluation-metrics-category-1">
+<h3>Create LLM-as-judge Evaluation Metrics (Category 1)<a class="headerlink" href="#create-llm-as-judge-evaluation-metrics-category-1" title="Permalink to this headline"> </a></h3>
+<p>You can also create your own Saas LLM evaluation metrics with MLflow API <a class="reference internal" href="../../python_api/mlflow.metrics.html#mlflow.metrics.genai.make_genai_metric" title="mlflow.metrics.genai.make_genai_metric"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.metrics.genai.make_genai_metric()</span></code></a>, which
+needs the following information:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">name</span></code>: the name of your custom metric.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">definition</span></code>: describe what’s the metric doing.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">grading_prompt</span></code>: describe the scoring critieria.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">examples</span></code>: a few input/output examples with score, they are used as a reference for LLM judge.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">model</span></code>: the identifier of LLM judge, in the format of “openai:/gpt-4” or “endpoints:/databricks-llama-2-70b-chat”.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">parameters</span></code>: the extra parameters to send to LLM judge, e.g., <code class="docutils literal notranslate"><span class="pre">temperature</span></code> for <code class="docutils literal notranslate"><span class="pre">&quot;openai:/gpt-3.5-turbo-16k&quot;</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">aggregations</span></code>: The list of options to aggregate the per-row scores using numpy functions.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">greater_is_better</span></code>: indicates if a higher score means your model is better.</p></li>
+</ul>
+<p>Under the hood, <code class="docutils literal notranslate"><span class="pre">definition</span></code>, <code class="docutils literal notranslate"><span class="pre">grading_prompt</span></code>, <code class="docutils literal notranslate"><span class="pre">examples</span></code> together with evaluation data and model output will be
+composed into a long prompt and sent to LLM. If you are familiar with the concept of prompt engineering,
+SaaS LLM evaluation metric is basically trying to compose a “right” prompt containing instructions, data and model
+output so that LLM, e.g., GPT4 can output the information we want.</p>
+<p>Now let’s create a custom GenAI metrics called “professionalism”, which measures how professional our model output is.</p>
+<p>Let’s first create a few examples with scores, these will be the reference samples LLM judge uses. To create such examples,
+we will use <a class="reference internal" href="../../python_api/mlflow.metrics.html#mlflow.metrics.genai.EvaluationExample" title="mlflow.metrics.genai.EvaluationExample"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.metrics.genai.EvaluationExample()</span></code></a> class, which has 4 fields:</p>
+<ul class="simple">
+<li><p>input: input text.</p></li>
+<li><p>output: output text.</p></li>
+<li><p>score: the score for output in the context of input.</p></li>
+<li><p>justification: why do we give the <cite>score</cite> for the data.</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">professionalism_example_score_2</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">genai</span><span class="o">.</span><span class="n">EvaluationExample</span><span class="p">(</span>
+    <span class="nb">input</span><span class="o">=</span><span class="s2">&quot;What is MLflow?&quot;</span><span class="p">,</span>
+    <span class="n">output</span><span class="o">=</span><span class="p">(</span>
+        <span class="s2">&quot;MLflow is like your friendly neighborhood toolkit for managing your machine learning projects. It helps &quot;</span>
+        <span class="s2">&quot;you track experiments, package your code and models, and collaborate with your team, making the whole ML &quot;</span>
+        <span class="s2">&quot;workflow smoother. It&#39;s like your Swiss Army knife for machine learning!&quot;</span>
+    <span class="p">),</span>
+    <span class="n">score</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">justification</span><span class="o">=</span><span class="p">(</span>
+        <span class="s2">&quot;The response is written in a casual tone. It uses contractions, filler words such as &#39;like&#39;, and &quot;</span>
+        <span class="s2">&quot;exclamation points, which make it sound less professional. &quot;</span>
+    <span class="p">),</span>
+<span class="p">)</span>
+<span class="n">professionalism_example_score_4</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">genai</span><span class="o">.</span><span class="n">EvaluationExample</span><span class="p">(</span>
+    <span class="nb">input</span><span class="o">=</span><span class="s2">&quot;What is MLflow?&quot;</span><span class="p">,</span>
+    <span class="n">output</span><span class="o">=</span><span class="p">(</span>
+        <span class="s2">&quot;MLflow is an open-source platform for managing the end-to-end machine learning (ML) lifecycle. It was &quot;</span>
+        <span class="s2">&quot;developed by Databricks, a company that specializes in big data and machine learning solutions. MLflow is &quot;</span>
+        <span class="s2">&quot;designed to address the challenges that data scientists and machine learning engineers face when &quot;</span>
+        <span class="s2">&quot;developing, training, and deploying machine learning models.&quot;</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="n">score</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">justification</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;The response is written in a formal language and a neutral tone. &quot;</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Now let’s define the <code class="docutils literal notranslate"><span class="pre">professionalism</span></code> metric, you will see how each field is set up.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">professionalism</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">genai</span><span class="o">.</span><span class="n">make_genai_metric</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;professionalism&quot;</span><span class="p">,</span>
+    <span class="n">definition</span><span class="o">=</span><span class="p">(</span>
+        <span class="s2">&quot;Professionalism refers to the use of a formal, respectful, and appropriate style of communication that is &quot;</span>
+        <span class="s2">&quot;tailored to the context and audience. It often involves avoiding overly casual language, slang, or &quot;</span>
+        <span class="s2">&quot;colloquialisms, and instead using clear, concise, and respectful language.&quot;</span>
+    <span class="p">),</span>
+    <span class="n">grading_prompt</span><span class="o">=</span><span class="p">(</span>
+        <span class="s2">&quot;Professionalism: If the answer is written using a professional tone, below are the details for different scores: &quot;</span>
+        <span class="s2">&quot;- Score 0: Language is extremely casual, informal, and may include slang or colloquialisms. Not suitable for &quot;</span>
+        <span class="s2">&quot;professional contexts.&quot;</span>
+        <span class="s2">&quot;- Score 1: Language is casual but generally respectful and avoids strong informality or slang. Acceptable in &quot;</span>
+        <span class="s2">&quot;some informal professional settings.&quot;</span>
+        <span class="s2">&quot;- Score 2: Language is overall formal but still have casual words/phrases. Borderline for professional contexts.&quot;</span>
+        <span class="s2">&quot;- Score 3: Language is balanced and avoids extreme informality or formality. Suitable for most professional contexts. &quot;</span>
+        <span class="s2">&quot;- Score 4: Language is noticeably formal, respectful, and avoids casual elements. Appropriate for formal &quot;</span>
+        <span class="s2">&quot;business or academic settings. &quot;</span>
+    <span class="p">),</span>
+    <span class="n">examples</span><span class="o">=</span><span class="p">[</span><span class="n">professionalism_example_score_2</span><span class="p">,</span> <span class="n">professionalism_example_score_4</span><span class="p">],</span>
+    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;openai:/gpt-3.5-turbo-16k&quot;</span><span class="p">,</span>
+    <span class="n">parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">},</span>
+    <span class="n">aggregations</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;variance&quot;</span><span class="p">],</span>
+    <span class="n">greater_is_better</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="create-heuristic-based-llm-evaluation-metrics-category-2">
+<h3>Create heuristic-based LLM Evaluation Metrics (Category 2)<a class="headerlink" href="#create-heuristic-based-llm-evaluation-metrics-category-2" title="Permalink to this headline"> </a></h3>
+<p>This is very similar to creating a custom traditional metrics, with the exception of returning a <cite>EvaluationResult</cite> instance.
+Basically you need to:</p>
+<ol class="arabic simple">
+<li><p>Implement a <code class="docutils literal notranslate"><span class="pre">eval_fn</span></code> to define your scoring logic, it must take in 3 args <code class="docutils literal notranslate"><span class="pre">predictions</span></code>, <code class="docutils literal notranslate"><span class="pre">targets</span></code> and <code class="docutils literal notranslate"><span class="pre">metrics</span></code>.
+<code class="docutils literal notranslate"><span class="pre">eval_fn</span></code> must return a <a class="reference internal" href="../../python_api/mlflow.metrics.html#mlflow.metrics.MetricValue" title="mlflow.metrics.MetricValue"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.metrics.MetricValue()</span></code></a> instance.</p></li>
+<li><p>Pass <code class="docutils literal notranslate"><span class="pre">eval_fn</span></code> and other arguments to <code class="docutils literal notranslate"><span class="pre">mlflow.metrics.make_metric</span></code> API to create the metric.</p></li>
+</ol>
+<p>The following code creates a dummy per-row metric called <code class="docutils literal notranslate"><span class="pre">&quot;over_10_chars&quot;</span></code>: if the model output is greater than 10,
+the score is “yes” otherwise “no”.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">eval_fn</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">metrics</span><span class="p">):</span>
+    <span class="n">scores</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">predictions</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">predictions</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;yes&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;no&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">MetricValue</span><span class="p">(</span>
+        <span class="n">scores</span><span class="o">=</span><span class="n">scores</span><span class="p">,</span>
+        <span class="n">aggregate_results</span><span class="o">=</span><span class="n">standard_aggregations</span><span class="p">(</span><span class="n">scores</span><span class="p">),</span>
+    <span class="p">)</span>
+
+
+<span class="c1"># Create an EvaluationMetric object.</span>
+<span class="n">passing_code_metric</span> <span class="o">=</span> <span class="n">make_metric</span><span class="p">(</span>
+    <span class="n">eval_fn</span><span class="o">=</span><span class="n">eval_fn</span><span class="p">,</span> <span class="n">greater_is_better</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;over_10_chars&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="prepare-your-llm-for-evaluating">
+<h2>Prepare Your LLM for Evaluating<a class="headerlink" href="#prepare-your-llm-for-evaluating" title="Permalink to this headline"> </a></h2>
+<p>In order to evaluate your LLM with <code class="docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code>, your LLM has to be one of the following type:</p>
+<ol class="arabic simple">
+<li><p>A <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PyFuncModel" title="mlflow.pyfunc.PyFuncModel"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.pyfunc.PyFuncModel()</span></code></a> instance or a URI pointing to a logged <cite>mlflow.pyfunc.PyFuncModel</cite> model. In
+general we call that MLflow model. The</p></li>
+<li><p>A python function that takes in string inputs and outputs a single string. Your callable must match the signature of
+<a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PyFuncModel.predict" title="mlflow.pyfunc.PyFuncModel.predict"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.pyfunc.PyFuncModel.predict()</span></code></a> (without <cite>params</cite> argument), briefly it should:</p>
+<ul class="simple">
+<li><p>Has <code class="docutils literal notranslate"><span class="pre">data</span></code> as the only argument, which can be a <code class="docutils literal notranslate"><span class="pre">pandas.Dataframe</span></code>, <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>, python list, dictionary or scipy matrix.</p></li>
+<li><p>Returns one of <code class="docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code>, <code class="docutils literal notranslate"><span class="pre">pandas.Series</span></code>, <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> or list.</p></li>
+</ul>
+</li>
+<li><p>Set <code class="docutils literal notranslate"><span class="pre">model=None</span></code>, and put model outputs in <cite>data</cite>. Only applicable when the data is a Pandas dataframe.</p></li>
+</ol>
+<div class="section" id="evaluating-with-an-mlflow-model">
+<h3>Evaluating with an MLflow Model<a class="headerlink" href="#evaluating-with-an-mlflow-model" title="Permalink to this headline"> </a></h3>
+<p>For detailed instruction on how to convert your model into a <code class="docutils literal notranslate"><span class="pre">mlflow.pyfunc.PyFuncModel</span></code> instance, please read
+<a class="reference external" href="https://mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#creating-custom-pyfunc-models">this doc</a>. But in short,
+to evaluate your model as an MLflow model, we recommend following the steps below:</p>
+<ol class="arabic">
+<li><p>Package your LLM as an MLflow model and log it to MLflow server by <code class="docutils literal notranslate"><span class="pre">log_model</span></code>. Each flavor (<code class="docutils literal notranslate"><span class="pre">opeanai</span></code>, <code class="docutils literal notranslate"><span class="pre">pytorch</span></code>, …)
+has its own <code class="docutils literal notranslate"><span class="pre">log_model</span></code> API, e.g., <a class="reference internal" href="../../python_api/openai/index.html#mlflow.openai.log_model" title="mlflow.openai.log_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.openai.log_model()</span></code></a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="n">system_prompt</span> <span class="o">=</span> <span class="s2">&quot;Answer the following question in two sentences&quot;</span>
+    <span class="c1"># Wrap &quot;gpt-3.5-turbo&quot; as an MLflow model.</span>
+    <span class="n">logged_model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">openai</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-3.5-turbo&quot;</span><span class="p">,</span>
+        <span class="n">task</span><span class="o">=</span><span class="n">openai</span><span class="o">.</span><span class="n">ChatCompletion</span><span class="p">,</span>
+        <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
+        <span class="n">messages</span><span class="o">=</span><span class="p">[</span>
+            <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">system_prompt</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{question}</span><span class="s2">&quot;</span><span class="p">},</span>
+        <span class="p">],</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>Use the URI of logged model as the model instance in <code class="docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+    <span class="n">logged_model_info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">,</span>
+    <span class="n">eval_data</span><span class="p">,</span>
+    <span class="n">targets</span><span class="o">=</span><span class="s2">&quot;ground_truth&quot;</span><span class="p">,</span>
+    <span class="n">model_type</span><span class="o">=</span><span class="s2">&quot;question-answering&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+<div class="section" id="evaluating-with-a-custom-function">
+<h3>Evaluating with a Custom Function<a class="headerlink" href="#evaluating-with-a-custom-function" title="Permalink to this headline"> </a></h3>
+<p>As of MLflow 2.8.0, <a class="reference internal" href="../../python_api/mlflow.html#mlflow.evaluate" title="mlflow.evaluate"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code></a> supports evaluating a python function without requiring
+logging the model to MLflow. This is useful when you don’t want to log the model and just want to evaluate
+it. The following example uses <a class="reference internal" href="../../python_api/mlflow.html#mlflow.evaluate" title="mlflow.evaluate"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code></a> to evaluate a function. You also need to set
+up OpenAI authentication to run the code below.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">eval_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;inputs&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;What is MLflow?&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;What is Spark?&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="s2">&quot;ground_truth&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;MLflow is an open-source platform for managing the end-to-end machine learning (ML) lifecycle. It was developed by Databricks, a company that specializes in big data and machine learning solutions. MLflow is designed to address the challenges that data scientists and machine learning engineers face when developing, training, and deploying machine learning models.&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Apache Spark is an open-source, distributed computing system designed for big data processing and analytics. It was developed in response to limitations of the Hadoop MapReduce computing model, offering improvements in speed and ease of use. Spark provides libraries for various tasks such as data ingestion, processing, and analysis through its components like Spark SQL for structured data, Spark Streaming for real-time data processing, and MLlib for machine learning tasks&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">openai_qa</span><span class="p">(</span><span class="n">inputs</span><span class="p">):</span>
+    <span class="n">answers</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">system_prompt</span> <span class="o">=</span> <span class="s2">&quot;Please answer the following question in formal language.&quot;</span>
+    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">inputs</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="n">completion</span> <span class="o">=</span> <span class="n">openai</span><span class="o">.</span><span class="n">ChatCompletion</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-3.5-turbo&quot;</span><span class="p">,</span>
+            <span class="n">messages</span><span class="o">=</span><span class="p">[</span>
+                <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">system_prompt</span><span class="p">},</span>
+                <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{row}</span><span class="s2">&quot;</span><span class="p">},</span>
+            <span class="p">],</span>
+        <span class="p">)</span>
+        <span class="n">answers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">completion</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">answers</span>
+
+
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">()</span> <span class="k">as</span> <span class="n">run</span><span class="p">:</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+        <span class="n">openai_qa</span><span class="p">,</span>
+        <span class="n">eval_data</span><span class="p">,</span>
+        <span class="n">model_type</span><span class="o">=</span><span class="s2">&quot;question-answering&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="evaluating-with-a-static-dataset">
+<span id="llm-eval-static-dataset"></span><h3>Evaluating with a Static Dataset<a class="headerlink" href="#evaluating-with-a-static-dataset" title="Permalink to this headline"> </a></h3>
+<p>For MLflow &gt;= 2.8.0, <a class="reference internal" href="../../python_api/mlflow.html#mlflow.evaluate" title="mlflow.evaluate"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code></a> supports evaluating a static dataset without specifying a model.
+This is useful when you save the model output to a column in a Pandas DataFrame or an MLflow PandasDataset, and
+want to evaluate the static dataset without re-running the model.</p>
+<p>If you are using a Pandas DataFrame, you must specify the column name that contains the model output using the
+top-level <code class="docutils literal notranslate"><span class="pre">predictions</span></code> parameter in <a class="reference internal" href="../../python_api/mlflow.html#mlflow.evaluate" title="mlflow.evaluate"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code></a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="n">eval_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;inputs&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;What is MLflow?&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;What is Spark?&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="s2">&quot;ground_truth&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;MLflow is an open-source platform for managing the end-to-end machine learning (ML) lifecycle. &quot;</span>
+            <span class="s2">&quot;It was developed by Databricks, a company that specializes in big data and machine learning solutions. &quot;</span>
+            <span class="s2">&quot;MLflow is designed to address the challenges that data scientists and machine learning engineers &quot;</span>
+            <span class="s2">&quot;face when developing, training, and deploying machine learning models.&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Apache Spark is an open-source, distributed computing system designed for big data processing and &quot;</span>
+            <span class="s2">&quot;analytics. It was developed in response to limitations of the Hadoop MapReduce computing model, &quot;</span>
+            <span class="s2">&quot;offering improvements in speed and ease of use. Spark provides libraries for various tasks such as &quot;</span>
+            <span class="s2">&quot;data ingestion, processing, and analysis through its components like Spark SQL for structured data, &quot;</span>
+            <span class="s2">&quot;Spark Streaming for real-time data processing, and MLlib for machine learning tasks&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="s2">&quot;predictions&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;MLflow is an open-source platform that provides handy tools to manage Machine Learning workflow &quot;</span>
+            <span class="s2">&quot;lifecycle in a simple way&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Spark is a popular open-source distributed computing system designed for big data processing and analytics.&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">()</span> <span class="k">as</span> <span class="n">run</span><span class="p">:</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">eval_data</span><span class="p">,</span>
+        <span class="n">targets</span><span class="o">=</span><span class="s2">&quot;ground_truth&quot;</span><span class="p">,</span>
+        <span class="n">predictions</span><span class="o">=</span><span class="s2">&quot;predictions&quot;</span><span class="p">,</span>
+        <span class="n">extra_metrics</span><span class="o">=</span><span class="p">[</span><span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">genai</span><span class="o">.</span><span class="n">answer_similarity</span><span class="p">()],</span>
+        <span class="n">evaluators</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;See aggregated evaluation results below: </span><span class="se">\n</span><span class="si">{</span><span class="n">results</span><span class="o">.</span><span class="n">metrics</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">eval_table</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="s2">&quot;eval_results_table&quot;</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;See evaluation table below: </span><span class="se">\n</span><span class="si">{</span><span class="n">eval_table</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="viewing-evaluation-results">
+<h2>Viewing Evaluation Results<a class="headerlink" href="#viewing-evaluation-results" title="Permalink to this headline"> </a></h2>
+<div class="section" id="view-evaluation-results-via-code">
+<h3>View Evaluation Results via Code<a class="headerlink" href="#view-evaluation-results-via-code" title="Permalink to this headline"> </a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code> returns the evaluation results as an <a class="reference internal" href="../../python_api/mlflow.models.html#mlflow.models.EvaluationResult" title="mlflow.models.EvaluationResult"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.models.EvaluationResult()</span></code></a> instace.
+To see the score on selected metrics, you can check:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">metrics</span></code>: stores the aggregated results, like average/variance across the evaluation dataset. Let’s take a second
+pass on the code example above and focus on printing out the aggregated results.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">()</span> <span class="k">as</span> <span class="n">run</span><span class="p">:</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">eval_data</span><span class="p">,</span>
+        <span class="n">targets</span><span class="o">=</span><span class="s2">&quot;ground_truth&quot;</span><span class="p">,</span>
+        <span class="n">predictions</span><span class="o">=</span><span class="s2">&quot;predictions&quot;</span><span class="p">,</span>
+        <span class="n">extra_metrics</span><span class="o">=</span><span class="p">[</span><span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">genai</span><span class="o">.</span><span class="n">answer_similarity</span><span class="p">()],</span>
+        <span class="n">evaluators</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;See aggregated evaluation results below: </span><span class="se">\n</span><span class="si">{</span><span class="n">results</span><span class="o">.</span><span class="n">metrics</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tables[&quot;eval_results_table&quot;]</span></code>: stores the per-row evaluation results.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">()</span> <span class="k">as</span> <span class="n">run</span><span class="p">:</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">eval_data</span><span class="p">,</span>
+        <span class="n">targets</span><span class="o">=</span><span class="s2">&quot;ground_truth&quot;</span><span class="p">,</span>
+        <span class="n">predictions</span><span class="o">=</span><span class="s2">&quot;predictions&quot;</span><span class="p">,</span>
+        <span class="n">extra_metrics</span><span class="o">=</span><span class="p">[</span><span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">genai</span><span class="o">.</span><span class="n">answer_similarity</span><span class="p">()],</span>
+        <span class="n">evaluators</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;See per-data evaluation results below: </span><span class="se">\n</span><span class="si">{</span><span class="n">results</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="s1">&#39;eval_results_table&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="view-evaluation-results-via-the-mlflow-ui">
+<h3>View Evaluation Results via the MLflow UI<a class="headerlink" href="#view-evaluation-results-via-the-mlflow-ui" title="Permalink to this headline"> </a></h3>
+<p>Your evaluation result is automatically logged into MLflow server, so you can view your evaluation results directly from the
+MLflow UI. To view the evaluation results on MLflow UI, please follow the steps below:</p>
+<ol class="arabic simple">
+<li><p>Go to the experiment view of your MLflow experiment.</p></li>
+<li><p>Select the “Evaluation” tab.</p></li>
+<li><p>Select the runs you want to check evaluation results.</p></li>
+<li><p>Select the metrics from the dropdown menu on the right side.</p></li>
+</ol>
+<p>Please see the screenshot below for clarity:</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="../../_images/llm_evaluate_experiment_view.png"><img alt="Demo UI of MLflow evaluate" src="../../_images/llm_evaluate_experiment_view.png" style="width: 1024px;" /></a>
+</div>
+</div>
+</div>
+</div>
+
+
+              </div>
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../deployments/guides/step2-query-deployments.html" class="btn btn-neutral" title="Querying endpoints in the MLflow Deployment Server" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+      
+      
+        <a href="../prompt-engineering/index.html" class="btn btn-neutral" title="Prompt Engineering UI (Experimental)" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+      <p class="copyright">
+          &copy; MLflow Project, a Series of LF Projects, LLC. All rights reserved.
+      </p>
+
+  </div> 
+
+</footer>
+          </div>
+        </div>
+      </section>
+    </main>
+  </page>
+
+  
+
+
+  
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+      URL_ROOT:'../../',
+      VERSION:'2.9.2.dev0',
+      COLLAPSE_INDEX:false,
+      FILE_SUFFIX:'.html',
+      LINK_SUFFIX: '.html',
+      HAS_SOURCE:  true
+    };
+  </script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/clipboard.min.js"></script>
+  <script type="text/javascript" src="../../_static/js/jquery.waypoints.min.js"></script>
+
+  
+  
+  
+  <script type="text/javascript">var CLIPPY_SVG_PATH = "../../_static/clippy.svg";</script>
+  <script type="text/javascript" src="../../_static/js/custom.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.StickyNav.enable();
+    });
+
+  </script>
+  
+
+  
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        // Get the code block designator class entries
+        const allHighlights = document.querySelectorAll('.highlight');
+        // Disable copyable links for notebook cell numbering and for cell outputs
+        const highlights = Array.from(allHighlights).filter(highlight => !highlight.closest('.highlight-none') && 
+            !highlight.closest('.nboutput'));
+    
+        highlights.forEach(function(highlight) {
+            const copyIcon = document.createElement('span');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.innerHTML = '&#xf0ea;';
+
+            copyIcon.addEventListener('click', function() {
+                const code = highlight.querySelector('pre').textContent;
+                copyToClipboard(code);
+
+                // Flash effect on click
+                this.style.color = '#0194E2';
+                setTimeout(() => {
+                    this.style.color = ''; 
+                }, 100);
+
+                // Display "Code copied to clipboard" near the clicked icon
+                const message = document.createElement('span');
+                message.textContent = "Copied!";
+                message.classList.add('copy-message'); 
+
+                // Append the message to the icon
+                this.appendChild(message);
+
+                setTimeout(() => {
+                    this.removeChild(message);
+                }, 500);
+            });
+
+            highlight.appendChild(copyIcon);
+        });
+    });
+  </script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Force download for notebook-download-btn
+        const downloadButtons = document.querySelectorAll('.notebook-download-btn');
+        downloadButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                // Fetch the raw content of the notebook from GitHub
+                fetch(button.href)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = url;
+                        const filename = button.href.split('/').pop();
+                        link.download = filename; 
+
+                        document.body.appendChild(link);
+                        link.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    })
+                    .catch(err => console.error('Error fetching the notebook:', err));
+            });
+        });
+    });
+</script> 
+</body>
+</html>

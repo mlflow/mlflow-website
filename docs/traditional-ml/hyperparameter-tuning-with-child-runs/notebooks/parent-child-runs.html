@@ -1,0 +1,945 @@
+
+  
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Leveraging Child Runs in MLflow for Hyperparameter Tuning &mdash; MLflow 2.9.2.dev0 documentation</title>
+  
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/traditional-ml/hyperparameter-tuning-with-child-runs/notebooks/parent-child-runs.html">
+  
+  
+    <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
+    
+
+    
+
+  
+    
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/grids.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/mobile.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/simple-cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/tabs.css" type="text/css" />
+    
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="MLflow 2.9.2.dev0 documentation" href="../../../index.html"/>
+        <link rel="up" title="Hyperparameter tuning with MLflow and child runs - Notebooks" href="index.html"/>
+        <link rel="next" title="Logging Visualizations with MLflow" href="/logging-plots-in-mlflow.html"/>
+        <link rel="prev" title="MLflow with Optuna: Hyperparameter Optimization and Tracking" href="/hyperparameter-tuning-with-child-runs.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+<script type="text/javascript" src="../../../_static/jquery.js"></script>
+<script type="text/javascript" src="../../../_static/underscore.js"></script>
+<script type="text/javascript" src="../../../_static/doctools.js"></script>
+<script type="text/javascript" src="../../../_static/languagesections.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript" src="../../../None"></script>
+
+<body class="wy-body-for-nav" role="document">
+  
+
+  
+  <nav class="wy-nav-top header" role="navigation" aria-label="top navigation">
+    <ul>
+  <li class="menu-toggle">
+    <i data-toggle="wy-nav-top" class="wy-nav-top-menu-button db-icon db-icon-menu pull-left"></i>
+    <a href="../../../index.html" class="wy-nav-top-logo"
+      ><img src="../../../_static/MLflow-logo-final-black.png" alt="MLflow"
+    /></a>
+    <span class="version">2.9.2.dev0</span>
+  </li>
+</ul>
+  </nav>
+  <page>
+    
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side relative">
+      <div class="wy-side-scroll">
+  <div class="wy-side-nav-search">
+    
+
+    
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+    
+  </div>
+
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+    
+      <a href="../../../index.html" class="main-navigation-home"><img src="../../../_static/icons/nav-home.svg"> MLflow</a>
+    
+
+    
+      
+
+      
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../introduction/index.html">What is MLflow?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting-started/index.html">Getting Started with MLflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../new-features/index.html">New Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../llms/index.html">LLMs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../model-evaluation/index.html">Model Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deep-learning/index.html">Deep Learning</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">Traditional ML</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#native-library-support">Native Library Support</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../index.html#tutorials-and-guides">Tutorials and Guides</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../index.html">Hyperparameter Tuning with MLflow and Optuna</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="index.html">Full Notebooks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../part1-child-runs.html">The Parent-Child relationship with runs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../part2-logging-plots.html">Logging plots with MLflow</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../creating-custom-pyfunc/index.html">Building Custom Python Function Models with MLflow</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#mlflow-tracking">MLflow Tracking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#mlflow-recipes">MLflow Recipes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#mlflow-evaluate">MLflow Evaluate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#model-registry">Model Registry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#deployment">Deployment</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deployment/index.html">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tracking.html">MLflow Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../system-metrics/index.html">System Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../projects.html">MLflow Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../models.html">MLflow Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../model-registry.html">MLflow Model Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../recipes.html">MLflow Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../plugins.html">MLflow Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../auth/index.html">MLflow Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../search-runs.html">Search Runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../search-experiments.html">Search Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../python_api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../R-api.html">R API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../java_api/index.html">Java API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rest-api.html">REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docker.html">Official MLflow Docker Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../community-model-flavors.html">Community Model Flavors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials-and-examples/index.html">Tutorials and Examples</a></li>
+</ul>
+
+      
+    
+  </div>
+
+  <div role="contentinfo">
+    
+
+    <p>
+      <a id='feedbacklink' href="https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a>
+    </p>
+  </div>
+</div>
+    </nav>
+
+    <main class="wy-grid-for-nav">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+          <div class="rst-content">
+            
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Documentation</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../../index.html">Traditional ML</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../index.html">Hyperparameter Tuning with MLflow and Optuna</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="index.html">Hyperparameter tuning with MLflow and child runs - Notebooks</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+    
+      <li>Leveraging Child Runs in MLflow for Hyperparameter Tuning</li>
+    
+    
+    <!-- <li class="wy-breadcrumbs-aside">
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/traditional-ml/hyperparameter-tuning-with-child-runs/notebooks/parent-child-runs.ipynb" class="fa fa-github"> Edit on GitHub</a>
+    </li> -->
+    
+  </ul>
+</div>
+            <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <div itemprop="articleBody">
+                
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">starmap</span>
+<span class="kn">from</span> <span class="nn">more_itertools</span> <span class="kn">import</span> <span class="n">consume</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="Leveraging-Child-Runs-in-MLflow-for-Hyperparameter-Tuning">
+<h1>Leveraging Child Runs in MLflow for Hyperparameter Tuning<a class="headerlink" href="#Leveraging-Child-Runs-in-MLflow-for-Hyperparameter-Tuning" title="Permalink to this headline"> </a></h1>
+<p>In the world of machine learning, the task of hyperparameter tuning is central to model optimization. This process involves performing multiple runs with varying parameters to identify the most effective combination, ultimately enhancing model performance. However, this can lead to a large volume of runs, making it challenging to track, organize, and compare these experiments effectively.</p>
+<p><strong>MLflow</strong> incorporates the ability to simplify the large-data-volume issue by offering a structured approach to manage this complexity. In this notebook, we will explore the concept of <strong>Parent and Child Runs</strong> in MLflow, a feature that provides a hierarchical structure to organize runs. This hierarchy allows us to bundle a set of runs under a parent run, making it much more manageable and intuitive to analyze and compare the results of different hyperparameter combinations. This structure
+proves to be especially beneficial in understanding and visualizing the outcomes of hyperparameter tuning processes.</p>
+<p>Throughout this notebook, we will: - Understand the usage and benefits of parent and child runs in MLflow. - Walk through a practical example demonstrating the organization of runs without and with child runs. - Observe how child runs aid in effectively tracking and comparing the results of different parameter combinations. - Demonstrate a further refinement by having the parent run maintain the state of the best conditions from child run iterations.</p>
+<div class="section" id="Starting-Without-Child-Runs">
+<h2>Starting Without Child Runs<a class="headerlink" href="#Starting-Without-Child-Runs" title="Permalink to this headline"> </a></h2>
+<p>Before diving into the structured world of parent and child runs, let’s begin by observing the scenario without utilizing child runs in MLflow. In this section, we perform multiple runs with different parameters and metrics without associating them as child runs of a parent run.</p>
+<p>Below is the code executing five hyperparameter tuning runs. These runs are not organized as child runs, and hence, each run is treated as an independent entity in MLflow. We will observe the challenges this approach poses in tracking and comparing runs, setting the stage for the introduction of child runs in the subsequent sections.</p>
+<p>After running the above code, you can proceed to the MLflow UI to view the logged runs. Observing the organization (or lack thereof) of these runs will help in appreciating the structured approach offered by using child runs, which we will explore in the next sections of this notebook.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define a function to log parameters and metrics</span>
+<span class="k">def</span> <span class="nf">log_run</span><span class="p">(</span><span class="n">run_name</span><span class="p">,</span> <span class="n">test_no</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">(</span><span class="n">run_name</span><span class="o">=</span><span class="n">run_name</span><span class="p">):</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_param</span><span class="p">(</span><span class="s2">&quot;param1&quot;</span><span class="p">,</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">]))</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_param</span><span class="p">(</span><span class="s2">&quot;param2&quot;</span><span class="p">,</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="s2">&quot;e&quot;</span><span class="p">,</span> <span class="s2">&quot;f&quot;</span><span class="p">]))</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_metric</span><span class="p">(</span><span class="s2">&quot;metric1&quot;</span><span class="p">,</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_metric</span><span class="p">(</span><span class="s2">&quot;metric2&quot;</span><span class="p">,</span> <span class="nb">abs</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">gauss</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">)))</span>
+
+
+<span class="c1"># Generate run names</span>
+<span class="k">def</span> <span class="nf">generate_run_names</span><span class="p">(</span><span class="n">test_no</span><span class="p">,</span> <span class="n">num_runs</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;run_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">_test_</span><span class="si">{</span><span class="n">test_no</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_runs</span><span class="p">))</span>
+
+
+<span class="c1"># Execute tuning function</span>
+<span class="k">def</span> <span class="nf">execute_tuning</span><span class="p">(</span><span class="n">test_no</span><span class="p">):</span>
+    <span class="c1"># Partial application of the log_run function</span>
+    <span class="n">log_current_run</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">log_run</span><span class="p">,</span> <span class="n">test_no</span><span class="o">=</span><span class="n">test_no</span><span class="p">)</span>
+    <span class="c1"># Generate run names and apply log_current_run function to each run name</span>
+    <span class="n">runs</span> <span class="o">=</span> <span class="n">starmap</span><span class="p">(</span><span class="n">log_current_run</span><span class="p">,</span> <span class="p">((</span><span class="n">run_name</span><span class="p">,)</span> <span class="k">for</span> <span class="n">run_name</span> <span class="ow">in</span> <span class="n">generate_run_names</span><span class="p">(</span><span class="n">test_no</span><span class="p">)))</span>
+    <span class="c1"># Consume the iterator to execute the runs</span>
+    <span class="n">consume</span><span class="p">(</span><span class="n">runs</span><span class="p">)</span>
+
+
+<span class="c1"># Set the tracking uri and experiment</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_tracking_uri</span><span class="p">(</span><span class="s2">&quot;http://localhost:8080&quot;</span><span class="p">)</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s2">&quot;No Child Runs&quot;</span><span class="p">)</span>
+
+<span class="c1"># Execute 5 hyperparameter tuning runs</span>
+<span class="n">consume</span><span class="p">(</span><span class="n">starmap</span><span class="p">(</span><span class="n">execute_tuning</span><span class="p">,</span> <span class="p">((</span><span class="n">x</span><span class="p">,)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">))))</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="Iterative-development-simulation">
+<h3>Iterative development simulation<a class="headerlink" href="#Iterative-development-simulation" title="Permalink to this headline"> </a></h3>
+<p>It is very rare that a tuning run will be conducted in isolation. Typically, we will run many iterations of combinations of parameters, refining our search space to achieve the best possible potential results in the shortest amount of execution time.</p>
+<p>In order to arrive at this limited set of selection parameters ranges and conditions, we will be executing many such tests.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># What if we need to run this again?</span>
+<span class="n">consume</span><span class="p">(</span><span class="n">starmap</span><span class="p">(</span><span class="n">execute_tuning</span><span class="p">,</span> <span class="p">((</span><span class="n">x</span><span class="p">,)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">))))</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Using-Child-Runs-for-Improved-Organization">
+<h2>Using Child Runs for Improved Organization<a class="headerlink" href="#Using-Child-Runs-for-Improved-Organization" title="Permalink to this headline"> </a></h2>
+<p>As we proceed, the spotlight now shifts to the utilization of <strong>Child Runs in MLflow</strong>. This feature brings forth an organized structure, inherently solving the challenges we observed in the previous section. The child runs are neatly nested under a parent run, providing a clear, hierarchical view of all the runs, making it exceptionally convenient to analyze and compare the outcomes.</p>
+<div class="section" id="Benefits-of-Using-Child-Runs:">
+<h3>Benefits of Using Child Runs:<a class="headerlink" href="#Benefits-of-Using-Child-Runs:" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Structured View:</strong> The child runs, grouped under a parent run, offer a clean and structured view in the MLflow UI.</p></li>
+<li><p><strong>Efficient Filtering:</strong> The hierarchical organization facilitates efficient filtering and selection, enhancing the usability of the MLflow UI and search APIs.</p></li>
+<li><p><strong>Distinct Naming:</strong> Utilizing visually distinct naming for runs aids in effortless identification and selection within the UI.</p></li>
+</ul>
+<p>In this section, the code is enhanced to use child runs. Each <code class="docutils literal notranslate"><span class="pre">execute_tuning</span></code> function call creates a parent run, under which multiple child runs are nested. These child runs are performed with different parameters and metrics. Additionally, we incorporate tags to further enhance the search and filter capabilities in MLflow.</p>
+<p>Notice the inclusion of the <code class="docutils literal notranslate"><span class="pre">nested=True</span></code> parameter in the <code class="docutils literal notranslate"><span class="pre">mlflow.start_run()</span></code> function, indicating the creation of a child run. The addition of tags, using the <code class="docutils literal notranslate"><span class="pre">mlflow.set_tag()</span></code> function, provides an extra layer of information, useful for filtering and searching runs effectively.</p>
+<p>Let’s dive into the code and observe the seamless organization and enhanced functionality brought about by the use of child runs in MLflow.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define a function to log parameters and metrics and add tag</span>
+<span class="c1"># logging for search_runs functionality</span>
+<span class="k">def</span> <span class="nf">log_run</span><span class="p">(</span><span class="n">run_name</span><span class="p">,</span> <span class="n">test_no</span><span class="p">,</span> <span class="n">param1_choices</span><span class="p">,</span> <span class="n">param2_choices</span><span class="p">,</span> <span class="n">tag_ident</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">(</span><span class="n">run_name</span><span class="o">=</span><span class="n">run_name</span><span class="p">,</span> <span class="n">nested</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_param</span><span class="p">(</span><span class="s2">&quot;param1&quot;</span><span class="p">,</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">param1_choices</span><span class="p">))</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_param</span><span class="p">(</span><span class="s2">&quot;param2&quot;</span><span class="p">,</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">param2_choices</span><span class="p">))</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_metric</span><span class="p">(</span><span class="s2">&quot;metric1&quot;</span><span class="p">,</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_metric</span><span class="p">(</span><span class="s2">&quot;metric2&quot;</span><span class="p">,</span> <span class="nb">abs</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">gauss</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">)))</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">set_tag</span><span class="p">(</span><span class="s2">&quot;test_identifier&quot;</span><span class="p">,</span> <span class="n">tag_ident</span><span class="p">)</span>
+
+
+<span class="c1"># Generate run names</span>
+<span class="k">def</span> <span class="nf">generate_run_names</span><span class="p">(</span><span class="n">test_no</span><span class="p">,</span> <span class="n">num_runs</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;run_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">_test_</span><span class="si">{</span><span class="n">test_no</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_runs</span><span class="p">))</span>
+
+
+<span class="c1"># Execute tuning function, allowing for param overrides,</span>
+<span class="c1"># run_name disambiguation, and tagging support</span>
+<span class="k">def</span> <span class="nf">execute_tuning</span><span class="p">(</span>
+    <span class="n">test_no</span><span class="p">,</span> <span class="n">param1_choices</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">],</span> <span class="n">param2_choices</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="s2">&quot;e&quot;</span><span class="p">,</span> <span class="s2">&quot;f&quot;</span><span class="p">],</span> <span class="n">test_identifier</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+<span class="p">):</span>
+    <span class="n">ident</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">test_identifier</span> <span class="k">else</span> <span class="n">test_identifier</span>
+    <span class="c1"># Use a parent run to encapsulate the child runs</span>
+    <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">(</span><span class="n">run_name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;parent_run_test_</span><span class="si">{</span><span class="n">ident</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">test_no</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">):</span>
+        <span class="c1"># Partial application of the log_run function</span>
+        <span class="n">log_current_run</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
+            <span class="n">log_run</span><span class="p">,</span>
+            <span class="n">test_no</span><span class="o">=</span><span class="n">test_no</span><span class="p">,</span>
+            <span class="n">param1_choices</span><span class="o">=</span><span class="n">param1_choices</span><span class="p">,</span>
+            <span class="n">param2_choices</span><span class="o">=</span><span class="n">param2_choices</span><span class="p">,</span>
+            <span class="n">tag_ident</span><span class="o">=</span><span class="n">ident</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">set_tag</span><span class="p">(</span><span class="s2">&quot;test_identifier&quot;</span><span class="p">,</span> <span class="n">ident</span><span class="p">)</span>
+        <span class="c1"># Generate run names and apply log_current_run function to each run name</span>
+        <span class="n">runs</span> <span class="o">=</span> <span class="n">starmap</span><span class="p">(</span><span class="n">log_current_run</span><span class="p">,</span> <span class="p">((</span><span class="n">run_name</span><span class="p">,)</span> <span class="k">for</span> <span class="n">run_name</span> <span class="ow">in</span> <span class="n">generate_run_names</span><span class="p">(</span><span class="n">test_no</span><span class="p">)))</span>
+        <span class="c1"># Consume the iterator to execute the runs</span>
+        <span class="n">consume</span><span class="p">(</span><span class="n">runs</span><span class="p">)</span>
+
+
+<span class="c1"># Set the tracking uri and experiment</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_tracking_uri</span><span class="p">(</span><span class="s2">&quot;http://localhost:8080&quot;</span><span class="p">)</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s2">&quot;Nested Child Association&quot;</span><span class="p">)</span>
+
+<span class="c1"># Define custom parameters</span>
+<span class="n">param_1_values</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">]</span>
+<span class="n">param_2_values</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="s2">&quot;v&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">]</span>
+
+<span class="c1"># Execute hyperparameter tuning runs with custom parameter choices</span>
+<span class="n">consume</span><span class="p">(</span><span class="n">starmap</span><span class="p">(</span><span class="n">execute_tuning</span><span class="p">,</span> <span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">param_1_values</span><span class="p">,</span> <span class="n">param_2_values</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">))))</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Tailoring-the-Hyperparameter-Tuning-Process">
+<h2>Tailoring the Hyperparameter Tuning Process<a class="headerlink" href="#Tailoring-the-Hyperparameter-Tuning-Process" title="Permalink to this headline"> </a></h2>
+<p>In this segment, we are taking a step further in our iterative process of hyperparameter tuning. Observe the execution of additional hyperparameter tuning runs, where we introduce <strong>custom parameter choices</strong> and a unique identifier for tagging.</p>
+<div class="section" id="What-Are-We-Doing?">
+<h3>What Are We Doing?<a class="headerlink" href="#What-Are-We-Doing?" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Custom Parameter Choices:</strong> We are now employing different parameter values (<code class="docutils literal notranslate"><span class="pre">param_1_values</span></code> as <code class="docutils literal notranslate"><span class="pre">[&quot;x&quot;,</span> <span class="pre">&quot;y&quot;,</span> <span class="pre">&quot;z&quot;]</span></code> and <code class="docutils literal notranslate"><span class="pre">param_2_values</span></code> as <code class="docutils literal notranslate"><span class="pre">[&quot;u&quot;,</span> <span class="pre">&quot;v&quot;,</span> <span class="pre">&quot;w&quot;]</span></code>) for the runs.</p></li>
+<li><p><strong>Unique Identifier for Tagging:</strong> A distinct identifier (<code class="docutils literal notranslate"><span class="pre">ident</span></code>) is used for tagging, which provides an easy and efficient way to filter and search these specific runs in the MLflow UI.</p></li>
+</ul>
+</div>
+<div class="section" id="How-Does-It-Apply-to-Hyperparameter-Tuning?">
+<h3>How Does It Apply to Hyperparameter Tuning?<a class="headerlink" href="#How-Does-It-Apply-to-Hyperparameter-Tuning?" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Parameter Sensitivity Analysis:</strong> This step allows us to analyze the sensitivity of the model to different parameter values, aiding in a more informed and effective tuning process.</p></li>
+<li><p><strong>Efficient Search and Filter:</strong> The use of a unique identifier for tagging facilitates an efficient and quick search for these specific runs among a multitude of others, enhancing the user experience in the MLflow UI.</p></li>
+</ul>
+<p>This approach, employing custom parameters and tagging, enhances the clarity and efficiency of the hyperparameter tuning process, contributing to building a more robust and optimized model.</p>
+<p>Let’s execute this section of the code and delve deeper into the insights and improvements it offers in the hyperparameter tuning process.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Execute additional hyperparameter tuning runs with custom parameter choices</span>
+<span class="n">param_1_values</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">]</span>
+<span class="n">param_2_values</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="s2">&quot;v&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">]</span>
+<span class="n">ident</span> <span class="o">=</span> <span class="s2">&quot;params_test_2&quot;</span>
+<span class="n">consume</span><span class="p">(</span><span class="n">starmap</span><span class="p">(</span><span class="n">execute_tuning</span><span class="p">,</span> <span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">param_1_values</span><span class="p">,</span> <span class="n">param_2_values</span><span class="p">,</span> <span class="n">ident</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">))))</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Refining-the-Hyperparameter-Search-Space">
+<h2>Refining the Hyperparameter Search Space<a class="headerlink" href="#Refining-the-Hyperparameter-Search-Space" title="Permalink to this headline"> </a></h2>
+<p>In this phase, we focus on <strong>refining the hyperparameter search space</strong>. This is a crucial step in the hyperparameter tuning process. After a broad exploration of the parameter space, we are now narrowing down our search to a subset of parameter values.</p>
+<div class="section" id="id1">
+<h3>What Are We Doing?<a class="headerlink" href="#id1" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Sub-setting Parameter Values:</strong> We are focusing on a more specific set of parameter values (<code class="docutils literal notranslate"><span class="pre">param_1_values</span></code> as <code class="docutils literal notranslate"><span class="pre">[&quot;b&quot;,</span> <span class="pre">&quot;c&quot;]</span></code> and <code class="docutils literal notranslate"><span class="pre">param_2_values</span></code> as <code class="docutils literal notranslate"><span class="pre">[&quot;d&quot;,</span> <span class="pre">&quot;f&quot;]</span></code>) based on insights gathered from previous runs.</p></li>
+<li><p><strong>Tagging the Runs:</strong> Using a unique identifier (<code class="docutils literal notranslate"><span class="pre">ident</span></code>) for tagging ensures easy filtering and searching of these runs in the MLflow UI.</p></li>
+</ul>
+</div>
+<div class="section" id="id2">
+<h3>How Does It Apply to Hyperparameter Tuning?<a class="headerlink" href="#id2" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Focused Search:</strong> This narrowed search allows us to deeply explore the interactions and impacts of a specific set of parameter values, potentially leading to more optimized models.</p></li>
+<li><p><strong>Efficient Resource Utilization:</strong> It enables more efficient use of computational resources by focusing the search on promising areas of the parameter space.</p></li>
+</ul>
+</div>
+<div class="section" id="Caution">
+<h3>Caution<a class="headerlink" href="#Caution" title="Permalink to this headline"> </a></h3>
+<p>While this approach is a common tactic in hyperparameter tuning, it’s crucial to acknowledge the implications. Comparing results from the narrowed search space directly with those from the original, broader search space can be misleading.</p>
+</div>
+<div class="section" id="Why-Is-It-Invalid-to-Compare?">
+<h3>Why Is It Invalid to Compare?<a class="headerlink" href="#Why-Is-It-Invalid-to-Compare?" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Nature of Bayesian Tuning Algorithms:</strong> Bayesian optimization and other tuning algorithms often depend on the exploration of a broad parameter space to make informed decisions. Restricting the parameter space can influence the behavior of these algorithms, leading to biased or suboptimal results.</p></li>
+<li><p><strong>Interaction of Hyperparameter Selection Values:</strong> Different parameter values have different interactions and impacts on the model performance. A narrowed search space may miss out on capturing these interactions, leading to incomplete or skewed insights.</p></li>
+</ul>
+<p>In conclusion, while refining the search space is essential for efficient and effective hyperparameter tuning, it’s imperative to approach the comparison of results with caution, acknowledging the intricacies and potential biases involved.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">param_1_values</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">]</span>
+<span class="n">param_2_values</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="s2">&quot;f&quot;</span><span class="p">]</span>
+<span class="n">ident</span> <span class="o">=</span> <span class="s2">&quot;params_test_3&quot;</span>
+<span class="n">consume</span><span class="p">(</span><span class="n">starmap</span><span class="p">(</span><span class="n">execute_tuning</span><span class="p">,</span> <span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">param_1_values</span><span class="p">,</span> <span class="n">param_2_values</span><span class="p">,</span> <span class="n">ident</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">))))</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Challenge:-Logging-Best-Metrics-and-Parameters">
+<h2>Challenge: Logging Best Metrics and Parameters<a class="headerlink" href="#Challenge:-Logging-Best-Metrics-and-Parameters" title="Permalink to this headline"> </a></h2>
+<p>In the real world of machine learning, it is crucial to keep track of the best performing models and their corresponding parameters for easy comparison and reproduction. <strong>Your challenge is to enhance the ``execute_tuning`` function to log the best metrics and parameters from the child runs in each parent run.</strong> This way, you can easily compare the best-performing models across different parent runs within the MLflow UI.</p>
+<div class="section" id="Your-Task:">
+<h3>Your Task:<a class="headerlink" href="#Your-Task:" title="Permalink to this headline"> </a></h3>
+<ol class="arabic simple">
+<li><p>Modify the <code class="docutils literal notranslate"><span class="pre">execute_tuning</span></code> function such that for each parent run, it logs the best (minimum) <code class="docutils literal notranslate"><span class="pre">metric1</span></code> found among all its child runs.</p></li>
+<li><p>Alongside the best <code class="docutils literal notranslate"><span class="pre">metric1</span></code>, also log the parameters <code class="docutils literal notranslate"><span class="pre">param1</span></code> and <code class="docutils literal notranslate"><span class="pre">param2</span></code> that yielded this best <code class="docutils literal notranslate"><span class="pre">metric1</span></code>.</p></li>
+<li><p>Ensure that the <code class="docutils literal notranslate"><span class="pre">execute_tuning</span></code> function can accept a <code class="docutils literal notranslate"><span class="pre">num_child_runs</span></code> parameter to specify how many child iterations to perform per parent run.</p></li>
+</ol>
+<p>This is a common practice that allows you to keep your MLflow experiments organized and easily retrievable, making the model selection process smoother and more efficient.</p>
+<p><strong>Hint:</strong> You might want to return values from the <code class="docutils literal notranslate"><span class="pre">log_run</span></code> function and use these returned values in the <code class="docutils literal notranslate"><span class="pre">execute_tuning</span></code> function to keep track of the best metrics and parameters.</p>
+</div>
+<div class="section" id="Note:">
+<h3>Note:<a class="headerlink" href="#Note:" title="Permalink to this headline"> </a></h3>
+<p>Before moving on to the solution below, <strong>give it a try yourself!</strong> This exercise is a great opportunity to familiarize yourself with advanced features of MLflow and improve your MLOps skills. If you get stuck or want to compare your solution, you can scroll down to see a possible implementation.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define a function to log parameters and metrics and add tag</span>
+<span class="c1"># logging for search_runs functionality</span>
+<span class="k">def</span> <span class="nf">log_run</span><span class="p">(</span><span class="n">run_name</span><span class="p">,</span> <span class="n">test_no</span><span class="p">,</span> <span class="n">param1_choices</span><span class="p">,</span> <span class="n">param2_choices</span><span class="p">,</span> <span class="n">tag_ident</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">(</span><span class="n">run_name</span><span class="o">=</span><span class="n">run_name</span><span class="p">,</span> <span class="n">nested</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">run</span><span class="p">:</span>
+        <span class="n">param1</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">param1_choices</span><span class="p">)</span>
+        <span class="n">param2</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">param2_choices</span><span class="p">)</span>
+        <span class="n">metric1</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">metric2</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">gauss</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">))</span>
+
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_param</span><span class="p">(</span><span class="s2">&quot;param1&quot;</span><span class="p">,</span> <span class="n">param1</span><span class="p">)</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_param</span><span class="p">(</span><span class="s2">&quot;param2&quot;</span><span class="p">,</span> <span class="n">param2</span><span class="p">)</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_metric</span><span class="p">(</span><span class="s2">&quot;metric1&quot;</span><span class="p">,</span> <span class="n">metric1</span><span class="p">)</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_metric</span><span class="p">(</span><span class="s2">&quot;metric2&quot;</span><span class="p">,</span> <span class="n">metric2</span><span class="p">)</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">set_tag</span><span class="p">(</span><span class="s2">&quot;test_identifier&quot;</span><span class="p">,</span> <span class="n">tag_ident</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">run</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">run_id</span><span class="p">,</span> <span class="n">metric1</span><span class="p">,</span> <span class="n">param1</span><span class="p">,</span> <span class="n">param2</span>
+
+
+<span class="c1"># Generate run names</span>
+<span class="k">def</span> <span class="nf">generate_run_names</span><span class="p">(</span><span class="n">test_no</span><span class="p">,</span> <span class="n">num_runs</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;run_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">_test_</span><span class="si">{</span><span class="n">test_no</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_runs</span><span class="p">))</span>
+
+
+<span class="c1"># Execute tuning function, allowing for param overrides,</span>
+<span class="c1"># run_name disambiguation, and tagging support</span>
+<span class="k">def</span> <span class="nf">execute_tuning</span><span class="p">(</span>
+    <span class="n">test_no</span><span class="p">,</span>
+    <span class="n">param1_choices</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">],</span>
+    <span class="n">param2_choices</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="s2">&quot;e&quot;</span><span class="p">,</span> <span class="s2">&quot;f&quot;</span><span class="p">],</span>
+    <span class="n">test_identifier</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">num_child_runs</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">ident</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">test_identifier</span> <span class="k">else</span> <span class="n">test_identifier</span>
+    <span class="n">best_metric1</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span>
+    <span class="n">best_params</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1"># Use a parent run to encapsulate the child runs</span>
+    <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">(</span><span class="n">run_name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;parent_run_test_</span><span class="si">{</span><span class="n">ident</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">test_no</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">):</span>
+        <span class="c1"># Partial application of the log_run function</span>
+        <span class="n">log_current_run</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
+            <span class="n">log_run</span><span class="p">,</span>
+            <span class="n">test_no</span><span class="o">=</span><span class="n">test_no</span><span class="p">,</span>
+            <span class="n">param1_choices</span><span class="o">=</span><span class="n">param1_choices</span><span class="p">,</span>
+            <span class="n">param2_choices</span><span class="o">=</span><span class="n">param2_choices</span><span class="p">,</span>
+            <span class="n">tag_ident</span><span class="o">=</span><span class="n">ident</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">set_tag</span><span class="p">(</span><span class="s2">&quot;test_identifier&quot;</span><span class="p">,</span> <span class="n">ident</span><span class="p">)</span>
+        <span class="c1"># Generate run names and apply log_current_run function to each run name</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+            <span class="n">starmap</span><span class="p">(</span>
+                <span class="n">log_current_run</span><span class="p">,</span>
+                <span class="p">((</span><span class="n">run_name</span><span class="p">,)</span> <span class="k">for</span> <span class="n">run_name</span> <span class="ow">in</span> <span class="n">generate_run_names</span><span class="p">(</span><span class="n">test_no</span><span class="p">,</span> <span class="n">num_child_runs</span><span class="p">)),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">metric1</span><span class="p">,</span> <span class="n">param1</span><span class="p">,</span> <span class="n">param2</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">metric1</span> <span class="o">&lt;</span> <span class="n">best_metric1</span><span class="p">:</span>
+                <span class="n">best_metric1</span> <span class="o">=</span> <span class="n">metric1</span>
+                <span class="n">best_params</span> <span class="o">=</span> <span class="p">(</span><span class="n">param1</span><span class="p">,</span> <span class="n">param2</span><span class="p">)</span>
+
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_metric</span><span class="p">(</span><span class="s2">&quot;best_metric1&quot;</span><span class="p">,</span> <span class="n">best_metric1</span><span class="p">)</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_param</span><span class="p">(</span><span class="s2">&quot;best_param1&quot;</span><span class="p">,</span> <span class="n">best_params</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_param</span><span class="p">(</span><span class="s2">&quot;best_param2&quot;</span><span class="p">,</span> <span class="n">best_params</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="c1"># Consume the iterator to execute the runs</span>
+        <span class="n">consume</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+
+
+<span class="c1"># Set the tracking uri and experiment</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_tracking_uri</span><span class="p">(</span><span class="s2">&quot;http://localhost:8080&quot;</span><span class="p">)</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s2">&quot;Parent Child Association Challenge&quot;</span><span class="p">)</span>
+
+<span class="n">param_1_values</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">]</span>
+<span class="n">param_2_values</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="s2">&quot;f&quot;</span><span class="p">]</span>
+
+<span class="c1"># Execute hyperparameter tuning runs with custom parameter choices</span>
+<span class="n">consume</span><span class="p">(</span>
+    <span class="n">starmap</span><span class="p">(</span>
+        <span class="n">execute_tuning</span><span class="p">,</span> <span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">param_1_values</span><span class="p">,</span> <span class="n">param_2_values</span><span class="p">,</span> <span class="s2">&quot;subset_test&quot;</span><span class="p">,</span> <span class="mi">25</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+              </div>
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="hyperparameter-tuning-with-child-runs.html" class="btn btn-neutral" title="MLflow with Optuna: Hyperparameter Optimization and Tracking" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+      
+      
+        <a href="logging-plots-in-mlflow.html" class="btn btn-neutral" title="Logging Visualizations with MLflow" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+      <p class="copyright">
+          &copy; MLflow Project, a Series of LF Projects, LLC. All rights reserved.
+      </p>
+
+  </div> 
+
+</footer>
+          </div>
+        </div>
+      </section>
+    </main>
+  </page>
+
+  
+
+
+  
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+      URL_ROOT:'../../../',
+      VERSION:'2.9.2.dev0',
+      COLLAPSE_INDEX:false,
+      FILE_SUFFIX:'.html',
+      LINK_SUFFIX: '.html',
+      HAS_SOURCE:  true
+    };
+  </script>
+
+  
+
+  <script type="text/javascript" src="../../../_static/js/clipboard.min.js"></script>
+  <script type="text/javascript" src="../../../_static/js/jquery.waypoints.min.js"></script>
+
+  
+  
+  
+  <script type="text/javascript">var CLIPPY_SVG_PATH = "../../../_static/clippy.svg";</script>
+  <script type="text/javascript" src="../../../_static/js/custom.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.StickyNav.enable();
+    });
+
+  </script>
+  
+
+  
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        // Get the code block designator class entries
+        const allHighlights = document.querySelectorAll('.highlight');
+        // Disable copyable links for notebook cell numbering and for cell outputs
+        const highlights = Array.from(allHighlights).filter(highlight => !highlight.closest('.highlight-none') && 
+            !highlight.closest('.nboutput'));
+    
+        highlights.forEach(function(highlight) {
+            const copyIcon = document.createElement('span');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.innerHTML = '&#xf0ea;';
+
+            copyIcon.addEventListener('click', function() {
+                const code = highlight.querySelector('pre').textContent;
+                copyToClipboard(code);
+
+                // Flash effect on click
+                this.style.color = '#0194E2';
+                setTimeout(() => {
+                    this.style.color = ''; 
+                }, 100);
+
+                // Display "Code copied to clipboard" near the clicked icon
+                const message = document.createElement('span');
+                message.textContent = "Copied!";
+                message.classList.add('copy-message'); 
+
+                // Append the message to the icon
+                this.appendChild(message);
+
+                setTimeout(() => {
+                    this.removeChild(message);
+                }, 500);
+            });
+
+            highlight.appendChild(copyIcon);
+        });
+    });
+  </script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Force download for notebook-download-btn
+        const downloadButtons = document.querySelectorAll('.notebook-download-btn');
+        downloadButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                // Fetch the raw content of the notebook from GitHub
+                fetch(button.href)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = url;
+                        const filename = button.href.split('/').pop();
+                        link.download = filename; 
+
+                        document.body.appendChild(link);
+                        link.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    })
+                    .catch(err => console.error('Error fetching the notebook:', err));
+            });
+        });
+    });
+</script> 
+</body>
+</html>

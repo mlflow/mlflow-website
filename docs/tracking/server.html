@@ -1,0 +1,595 @@
+
+  
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>MLflow Tracking Server &mdash; MLflow 2.9.2.dev0 documentation</title>
+  
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/tracking/server.html">
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    
+
+    
+
+  
+    
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/cards.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/grids.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/mobile.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/simple-cards.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/tabs.css" type="text/css" />
+    
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="MLflow 2.9.2.dev0 documentation" href="../index.html"/>
+        <link rel="up" title="MLflow Tracking" href="../tracking.html"/>
+        <link rel="next" title="Tracking Experiments with a Local Database" href="/tutorials/local-database.html"/>
+        <link rel="prev" title="Artifact Stores" href="/artifacts-stores.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+<script type="text/javascript" src="../_static/jquery.js"></script>
+<script type="text/javascript" src="../_static/underscore.js"></script>
+<script type="text/javascript" src="../_static/doctools.js"></script>
+<script type="text/javascript" src="../_static/languagesections.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+
+<body class="wy-body-for-nav" role="document">
+  
+
+  
+  <nav class="wy-nav-top header" role="navigation" aria-label="top navigation">
+    <ul>
+  <li class="menu-toggle">
+    <i data-toggle="wy-nav-top" class="wy-nav-top-menu-button db-icon db-icon-menu pull-left"></i>
+    <a href="../index.html" class="wy-nav-top-logo"
+      ><img src="../_static/MLflow-logo-final-black.png" alt="MLflow"
+    /></a>
+    <span class="version">2.9.2.dev0</span>
+  </li>
+</ul>
+  </nav>
+  <page>
+    
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side relative">
+      <div class="wy-side-scroll">
+  <div class="wy-side-nav-search">
+    
+
+    
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+    
+  </div>
+
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+    
+      <a href="../index.html" class="main-navigation-home"><img src="../_static/icons/nav-home.svg"> MLflow</a>
+    
+
+    
+      
+
+      
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../introduction/index.html">What is MLflow?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/index.html">Getting Started with MLflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../new-features/index.html">New Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../llms/index.html">LLMs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../model-evaluation/index.html">Model Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deep-learning/index.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../traditional-ml/index.html">Traditional ML</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/index.html">Deployment</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../tracking.html">MLflow Tracking</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../tracking.html#quickstart">Quickstart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tracking.html#concepts">Concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tracking.html#tracking-runs">Tracking Runs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tracking.html#explore-runs-and-results">Explore Runs and Results</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../tracking.html#set-up-the-mlflow-tracking-environment">Set up the MLflow Tracking Environment</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../tracking.html#components">Components</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../tracking.html#id4">MLflow Tracking APIs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tracking.html#id5">Backend Store</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tracking.html#artifact-stores">Artifact Store</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../tracking.html#mlflow-tracking-server-optional">MLflow Tracking Server (Optional)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../tracking.html#common-setups">Common Setups</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tracking.html#other-configuration-with-mlflow-tracking-server">Other Configuration with <span class="xref std std-ref">MLflow Tracking Server</span></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../tracking.html#faq">FAQ</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../system-metrics/index.html">System Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../projects.html">MLflow Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.html">MLflow Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../model-registry.html">MLflow Model Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../recipes.html">MLflow Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plugins.html">MLflow Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auth/index.html">MLflow Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../search-runs.html">Search Runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../search-experiments.html">Search Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python_api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../R-api.html">R API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../java_api/index.html">Java API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rest-api.html">REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docker.html">Official MLflow Docker Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../community-model-flavors.html">Community Model Flavors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials-and-examples/index.html">Tutorials and Examples</a></li>
+</ul>
+
+      
+    
+  </div>
+
+  <div role="contentinfo">
+    
+
+    <p>
+      <a id='feedbacklink' href="https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a>
+    </p>
+  </div>
+</div>
+    </nav>
+
+    <main class="wy-grid-for-nav">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+          <div class="rst-content">
+            
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Documentation</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../tracking.html">MLflow Tracking</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+    
+      <li>MLflow Tracking Server</li>
+    
+    
+    <!-- <li class="wy-breadcrumbs-aside">
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/tracking/server.rst" class="fa fa-github"> Edit on GitHub</a>
+    </li> -->
+    
+  </ul>
+</div>
+            <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <div itemprop="articleBody">
+                
+  <div class="section" id="mlflow-tracking-server">
+<h1>MLflow Tracking Server<a class="headerlink" href="#mlflow-tracking-server" title="Permalink to this headline"> </a></h1>
+<p>MLflow tracking server is a stand-alone HTTP server that serves multiple REST API endpoints for tracking runs/experiments.
+While MLflow Tracking can be used in local environment, hosting a tracking server is powerful in the team development
+workflow:</p>
+<ul class="simple">
+<li><p><strong>Collaboration</strong>: Multiple users can log runs to the same endpoint, and query runs and models logged by other users.</p></li>
+<li><p><strong>Sharing Results</strong>: The tracking server also serves <a class="reference internal" href="../tracking.html#tracking-ui"><span class="std std-ref">Tracking UI</span></a> endpoint, where team members can easily explore each other’s results.</p></li>
+<li><p><strong>Centralized Access</strong>: The tracking server can be run as a proxy for the remote access for metadata and artifacts, making it easier to secure and audit access to data.</p></li>
+</ul>
+<div class="section" id="start-the-tracking-server">
+<h2>Start the Tracking Server<a class="headerlink" href="#start-the-tracking-server" title="Permalink to this headline"> </a></h2>
+<p>Starting the tracking server is as simple as running the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mlflow<span class="w"> </span>server<span class="w"> </span>--host<span class="w"> </span><span class="m">127</span>.0.0.1<span class="w"> </span>--port<span class="w"> </span><span class="m">8080</span>
+</pre></div>
+</div>
+<p>Once the server starts runing, you should see the following output:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">2023</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">01</span> <span class="mi">10</span><span class="p">:</span><span class="mi">28</span><span class="p">:</span><span class="mi">12</span> <span class="o">+</span><span class="mi">0900</span><span class="p">]</span> <span class="p">[</span><span class="mi">28550</span><span class="p">]</span> <span class="p">[</span><span class="n">INFO</span><span class="p">]</span> <span class="n">Starting</span> <span class="n">gunicorn</span> <span class="mf">20.1.0</span>
+<span class="p">[</span><span class="mi">2023</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">01</span> <span class="mi">10</span><span class="p">:</span><span class="mi">28</span><span class="p">:</span><span class="mi">12</span> <span class="o">+</span><span class="mi">0900</span><span class="p">]</span> <span class="p">[</span><span class="mi">28550</span><span class="p">]</span> <span class="p">[</span><span class="n">INFO</span><span class="p">]</span> <span class="n">Listening</span> <span class="n">at</span><span class="p">:</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="mf">127.0.0.1</span><span class="p">:</span><span class="mi">8080</span> <span class="p">(</span><span class="mi">28550</span><span class="p">)</span>
+<span class="p">[</span><span class="mi">2023</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">01</span> <span class="mi">10</span><span class="p">:</span><span class="mi">28</span><span class="p">:</span><span class="mi">12</span> <span class="o">+</span><span class="mi">0900</span><span class="p">]</span> <span class="p">[</span><span class="mi">28550</span><span class="p">]</span> <span class="p">[</span><span class="n">INFO</span><span class="p">]</span> <span class="n">Using</span> <span class="n">worker</span><span class="p">:</span> <span class="n">sync</span>
+<span class="p">[</span><span class="mi">2023</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">01</span> <span class="mi">10</span><span class="p">:</span><span class="mi">28</span><span class="p">:</span><span class="mi">12</span> <span class="o">+</span><span class="mi">0900</span><span class="p">]</span> <span class="p">[</span><span class="mi">28552</span><span class="p">]</span> <span class="p">[</span><span class="n">INFO</span><span class="p">]</span> <span class="n">Booting</span> <span class="n">worker</span> <span class="k">with</span> <span class="n">pid</span><span class="p">:</span> <span class="mi">28552</span>
+<span class="p">[</span><span class="mi">2023</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">01</span> <span class="mi">10</span><span class="p">:</span><span class="mi">28</span><span class="p">:</span><span class="mi">12</span> <span class="o">+</span><span class="mi">0900</span><span class="p">]</span> <span class="p">[</span><span class="mi">28553</span><span class="p">]</span> <span class="p">[</span><span class="n">INFO</span><span class="p">]</span> <span class="n">Booting</span> <span class="n">worker</span> <span class="k">with</span> <span class="n">pid</span><span class="p">:</span> <span class="mi">28553</span>
+<span class="p">[</span><span class="mi">2023</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">01</span> <span class="mi">10</span><span class="p">:</span><span class="mi">28</span><span class="p">:</span><span class="mi">12</span> <span class="o">+</span><span class="mi">0900</span><span class="p">]</span> <span class="p">[</span><span class="mi">28555</span><span class="p">]</span> <span class="p">[</span><span class="n">INFO</span><span class="p">]</span> <span class="n">Booting</span> <span class="n">worker</span> <span class="k">with</span> <span class="n">pid</span><span class="p">:</span> <span class="mi">28555</span>
+<span class="p">[</span><span class="mi">2023</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">01</span> <span class="mi">10</span><span class="p">:</span><span class="mi">28</span><span class="p">:</span><span class="mi">12</span> <span class="o">+</span><span class="mi">0900</span><span class="p">]</span> <span class="p">[</span><span class="mi">28558</span><span class="p">]</span> <span class="p">[</span><span class="n">INFO</span><span class="p">]</span> <span class="n">Booting</span> <span class="n">worker</span> <span class="k">with</span> <span class="n">pid</span><span class="p">:</span> <span class="mi">28558</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+<p>There are many options to configure the server, refer to <a class="reference internal" href="#configure-server"><span class="std std-ref">Configure Server</span></a> for more details.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>The server listens on <a class="reference external" href="http://localhost:5000">http://localhost:5000</a> by default and only accepts
+connections from the local machine. To let the server accept connections
+from other machines, you will need to pass <code class="docutils literal notranslate"><span class="pre">--host</span> <span class="pre">0.0.0.0</span></code> to listen on
+all network interfaces (or a specific interface address). This is typically
+required configuration when running the server <strong>in a Kubernetes pod or a
+Docker container</strong>.</p>
+<p>Note that doing this for a server running on a public network is not recommended
+for security reasons. You should consider using  a reverse proxy like NGINX or Apache
+httpd, or connecting over VPN (See <a class="reference internal" href="#tracking-auth"><span class="std std-ref">Secure Tracking Server</span></a> for more details).</p>
+</div>
+</div>
+<div class="section" id="logging-to-a-tracking-server">
+<span id="id1"></span><h2>Logging to a Tracking Server<a class="headerlink" href="#logging-to-a-tracking-server" title="Permalink to this headline"> </a></h2>
+<p>Once you started the tracking server, you can connect your local clients by set the <code class="docutils literal notranslate"><span class="pre">MLFLOW_TRACKING_URI</span></code> environment variable to the
+server’s URI, along with its scheme and port (for example, <code class="docutils literal notranslate"><span class="pre">http://10.0.0.1:5000</span></code>) or call <a class="reference internal" href="../python_api/mlflow.html#mlflow.set_tracking_uri" title="mlflow.set_tracking_uri"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.set_tracking_uri()</span></code></a>.</p>
+<p>The <a class="reference internal" href="../python_api/mlflow.html#mlflow.start_run" title="mlflow.start_run"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.start_run()</span></code></a>, <a class="reference internal" href="../python_api/mlflow.html#mlflow.log_param" title="mlflow.log_param"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.log_param()</span></code></a>, and <a class="reference internal" href="../python_api/mlflow.html#mlflow.log_metric" title="mlflow.log_metric"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.log_metric()</span></code></a> calls
+then make API requests to your remote tracking server.</p>
+<div class="code-section docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="n">remote_server_uri</span> <span class="o">=</span> <span class="s2">&quot;...&quot;</span>  <span class="c1"># set to your server URI</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_tracking_uri</span><span class="p">(</span><span class="n">remote_server_uri</span><span class="p">)</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s2">&quot;/my-experiment&quot;</span><span class="p">)</span>
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_param</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_metric</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-R notranslate"><div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">mlflow</span><span class="p">)</span>
+<span class="nf">install_mlflow</span><span class="p">()</span>
+<span class="n">remote_server_uri</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;...&quot;</span><span class="w"> </span><span class="c1"># set to your server URI</span>
+<span class="nf">mlflow_set_tracking_uri</span><span class="p">(</span><span class="n">remote_server_uri</span><span class="p">)</span>
+<span class="nf">mlflow_set_experiment</span><span class="p">(</span><span class="s">&quot;/my-experiment&quot;</span><span class="p">)</span>
+<span class="nf">mlflow_log_param</span><span class="p">(</span><span class="s">&quot;a&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;1&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-scala notranslate"><div class="highlight"><pre><span></span><span class="k">import</span><span class="w"> </span><span class="nn">org</span><span class="p">.</span><span class="nn">mlflow</span><span class="p">.</span><span class="nn">tracking</span><span class="p">.</span><span class="nc">MlflowClient</span>
+
+<span class="kd">val</span><span class="w"> </span><span class="n">remoteServerUri</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;...&quot;</span><span class="w"> </span><span class="c1">// set to your server URI</span>
+<span class="kd">val</span><span class="w"> </span><span class="n">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="nc">MlflowClient</span><span class="p">(</span><span class="n">remoteServerUri</span><span class="p">)</span>
+
+<span class="kd">val</span><span class="w"> </span><span class="n">experimentId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">client</span><span class="p">.</span><span class="n">createExperiment</span><span class="p">(</span><span class="s">&quot;my-experiment&quot;</span><span class="p">)</span>
+<span class="n">client</span><span class="p">.</span><span class="n">setExperiment</span><span class="p">(</span><span class="n">experimentId</span><span class="p">)</span>
+
+<span class="kd">val</span><span class="w"> </span><span class="n">run</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">client</span><span class="p">.</span><span class="n">createRun</span><span class="p">(</span><span class="n">experimentId</span><span class="p">)</span>
+<span class="n">client</span><span class="p">.</span><span class="n">logParam</span><span class="p">(</span><span class="n">run</span><span class="p">.</span><span class="n">getRunId</span><span class="p">(),</span><span class="w"> </span><span class="s">&quot;a&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;1&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>On Databricks, the experiment name passed to mlflow_set_experiment must be a valid path in the workspace e.g. <code class="docutils literal notranslate"><span class="pre">/Workspace/Users/mlflow-experiments/my-experiment</span></code></p>
+</div>
+</div>
+<div class="section" id="configure-server">
+<span id="id2"></span><h2>Configure Server<a class="headerlink" href="#configure-server" title="Permalink to this headline"> </a></h2>
+<p>This section describes how to configure the tracking server for some common use cases. Please run <code class="docutils literal notranslate"><span class="pre">mlflow</span> <span class="pre">server</span> <span class="pre">--help</span></code> for the full list of command line options.</p>
+<div class="section" id="backend-store">
+<h3>Backend Store<a class="headerlink" href="#backend-store" title="Permalink to this headline"> </a></h3>
+<p>By default, the tracking server logs runs metadata to the local filesystem under <code class="docutils literal notranslate"><span class="pre">./mlruns</span></code> directory.
+You can configure the different backend store by adding <code class="docutils literal notranslate"><span class="pre">--backend-store-uri</span></code> option:</p>
+<p>Example</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mlflow<span class="w"> </span>server<span class="w"> </span>--backend-store-uri<span class="w"> </span>sqlite:///my.db
+</pre></div>
+</div>
+<p>This will create a SQLite database <code class="docutils literal notranslate"><span class="pre">my.db</span></code> in the current directory, and logging requests from clients will be pointed to this database.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you are using a SQL-based backend store, the artifact store URI has to be specified, otherwise the server will fail to start (because we can’t store artifacts to a SQL database).
+Refer to the section below for details on how to configure the artifact store URI when using a SQL-based backend store.</p>
+</div>
+</div>
+<div class="section" id="remote-artifacts-store">
+<span id="tracking-server-artifact-store"></span><h3>Remote artifacts store<a class="headerlink" href="#remote-artifacts-store" title="Permalink to this headline"> </a></h3>
+<div class="section" id="using-the-tracking-server-for-proxied-artifact-access">
+<h4>Using the Tracking Server for proxied artifact access<a class="headerlink" href="#using-the-tracking-server-for-proxied-artifact-access" title="Permalink to this headline"> </a></h4>
+<p>By default, the tracking server stores artifacts in its local filesystem under <code class="docutils literal notranslate"><span class="pre">./mlartifacts</span></code> directory. To configure
+the tracking server to connect to remote storgate and serve artifacts, start the server with <code class="docutils literal notranslate"><span class="pre">--artifacts-destination</span></code> flag.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mlflow<span class="w"> </span>server<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--host<span class="w"> </span><span class="m">0</span>.0.0.0<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--port<span class="w"> </span><span class="m">8885</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--artifacts-destination<span class="w"> </span>s3://my-bucket
+</pre></div>
+</div>
+<p>With this setting, MLflow server works as a proxy for accessing remote artifacts. The MLflow clients make HTTP request to the server for fetching artifacts.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>If you are using remote storage, you have to configure the credentials for the server to access the artifacts. Be aware of that The MLflow artifact proxied
+access service enables users to have an <em>assumed role of access to all artifacts</em> that are accessible to the Tracking Server. Refer <a class="reference internal" href="artifacts-stores.html#artifacts-stores-manage-access"><span class="std std-ref">Manage Access</span></a> for further details.</p>
+</div>
+<p>The tracking server resolves the uri <code class="docutils literal notranslate"><span class="pre">mlflow-artifacts:/</span></code> in tracking request from the client to an otherwise
+explicit object store destination (e.g., “s3:/my_bucket/mlartifacts”) for interfacing with artifacts. The following patterns will all resolve to the configured proxied object store location (in above example, <code class="docutils literal notranslate"><span class="pre">s3://my-root-bucket/mlartifacts</span></code>):</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">https://&lt;host&gt;:&lt;port&gt;/mlartifacts</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">http://&lt;host&gt;/mlartifacts</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mlflow-artifacts://&lt;host&gt;/mlartifacts</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mlflow-artifacts://&lt;host&gt;:&lt;port&gt;/mlartifacts</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mlflow-artifacts:/mlartifacts</span></code></p></li>
+</ul>
+</div></blockquote>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>The MLflow client caches artifact location information on a per-run basis.
+It is therefore not recommended to alter a run’s artifact location before it has terminated.</p>
+</div>
+</div>
+<div class="section" id="use-tracking-server-w-o-proxying-artifacts-access">
+<span id="tracking-server-no-proxy"></span><h4>Use tracking server w/o proxying artifacts access<a class="headerlink" href="#use-tracking-server-w-o-proxying-artifacts-access" title="Permalink to this headline"> </a></h4>
+<p>In some cases, you may want to directly access remote storage without proxying through the tracking server.
+In this case, you can start the server with <code class="docutils literal notranslate"><span class="pre">--no-serve-artifacts</span></code> flag, and setting <code class="docutils literal notranslate"><span class="pre">--default-artifact-root</span></code> to the remote storage URI
+you want to redirect the request to.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mlflow<span class="w"> </span>server<span class="w"> </span>--no-serve-artifacts<span class="w"> </span>--default-artifact-root<span class="w"> </span>s3://my-bucket
+</pre></div>
+</div>
+<p>With this setting, the MLflow client still makes minimum HTTP requests to the tracking server for fetching proper remote storage URI,
+but can directly upload artifacts to / download artifacts from the remote storage. While this might not be a good practice for access and
+secury governance, it could be useful when you want to avoid the overhead of proxying artifacts through the tracking server.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the MLflow server is <em>not configured</em> with the <code class="docutils literal notranslate"><span class="pre">--serve-artifacts</span></code> option, the client directly pushes artifacts
+to the artifact store. It does not proxy these through the tracking server by default.</p>
+<p>For this reason, the client needs direct access to the artifact store. For instructions on setting up these credentials,
+see <a class="reference internal" href="artifacts-stores.html#artifacts-stores-manage-access"><span class="std std-ref">Artifact Stores documentation</span></a>.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When an experiment is created, the artifact storage location from the configuration of the tracking server is logged in the experiment’s metadata.
+When enabling proxied artifact storage, any existing experiments that were created while operating a tracking server in
+non-proxied mode will continue to use a non-proxied artifact location. In order to use proxied artifact logging, a new experiment must be created.
+If the intention of enabling a tracking server in <code class="docutils literal notranslate"><span class="pre">-serve-artifacts</span></code> mode is to eliminate the need for a client to have authentication to
+the underlying storage, new experiments should be created for use by clients so that the tracking server can handle authentication after this migration.</p>
+</div>
+</div>
+<div class="section" id="optionally-using-a-tracking-server-instance-exclusively-for-artifact-handling">
+<span id="tracking-server-artifacts-only"></span><h4>Optionally using a Tracking Server instance exclusively for artifact handling<a class="headerlink" href="#optionally-using-a-tracking-server-instance-exclusively-for-artifact-handling" title="Permalink to this headline"> </a></h4>
+<p>MLflow Tracking Server can be configured to use different backend store and artifact store, and provides a single endpoint for the clients.</p>
+<p>However, if the volume of tracking server requests is sufficiently large and performance issues are noticed, a tracking server
+can be configured to serve in <code class="docutils literal notranslate"><span class="pre">--artifacts-only</span></code> mode, operating in tandem with an instance that
+operates with <code class="docutils literal notranslate"><span class="pre">--no-serve-artifacts</span></code> specified. This configuration ensures that the processing of artifacts is isolated
+from all other tracking server event handling.</p>
+<p>When a tracking server is configured in <code class="docutils literal notranslate"><span class="pre">--artifacts-only</span></code> mode, any tasks apart from those concerned with artifact
+handling (i.e., model logging, loading models, logging artifacts, listing artifacts, etc.) will return an HTTPError.
+See the following example of a client REST call in Python attempting to list experiments from a server that is configured in
+<code class="docutils literal notranslate"><span class="pre">--artifacts-only</span></code> mode:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;http://0.0.0.0:8885/api/2.0/mlflow/experiments/list&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Output</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&gt;&gt; HTTPError: Endpoint: /api/2.0/mlflow/experiments/list disabled due to the mlflow server running in `--artifacts-only` mode.
+</pre></div>
+</div>
+<p>Using an additional MLflow server to handle artifacts exclusively can be useful for large-scale MLOps infrastructure.
+Decoupling the longer running and more compute-intensive tasks of artifact handling from the faster and higher-volume
+metadata functionality of the other Tracking API requests can help minimize the burden of an otherwise single MLflow
+server handling both types of payloads.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If an MLflow server is running with the <code class="docutils literal notranslate"><span class="pre">--artifacts-only</span></code> flag, the client should interact with this server explicitly by
+including either a <code class="docutils literal notranslate"><span class="pre">host</span></code> or <code class="docutils literal notranslate"><span class="pre">host:port</span></code> definition for uri location references for artifacts.
+Otherwise, all artifact requests will route to the MLflow Tracking server, defeating the purpose of running a distinct artifact server.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="secure-tracking-server">
+<span id="tracking-auth"></span><h2>Secure Tracking Server<a class="headerlink" href="#secure-tracking-server" title="Permalink to this headline"> </a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">--host</span></code> option exposes the service on all interfaces. If running a server in production, we
+would recommend not exposing the built-in server broadly (as it is unauthenticated and unencrypted),
+and instead putting it behind a reverse proxy like NGINX or Apache httpd, or connecting over VPN.</p>
+<p>You can then pass authentication headers to MLflow using these environment variables .</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">MLFLOW_TRACKING_USERNAME</span></code> and <code class="docutils literal notranslate"><span class="pre">MLFLOW_TRACKING_PASSWORD</span></code> - username and password to use with HTTP
+Basic authentication. To use Basic authentication, you must set <cite>both</cite> environment variables .</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MLFLOW_TRACKING_TOKEN</span></code> - token to use with HTTP Bearer authentication. Basic authentication takes precedence if set.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MLFLOW_TRACKING_INSECURE_TLS</span></code> - If set to the literal <code class="docutils literal notranslate"><span class="pre">true</span></code>, MLflow does not verify the TLS connection,
+meaning it does not validate certificates or hostnames for <code class="docutils literal notranslate"><span class="pre">https://</span></code> tracking URIs. This flag is not recommended for
+production environments. If this is set to <code class="docutils literal notranslate"><span class="pre">true</span></code> then <code class="docutils literal notranslate"><span class="pre">MLFLOW_TRACKING_SERVER_CERT_PATH</span></code> must not be set.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MLFLOW_TRACKING_SERVER_CERT_PATH</span></code> - Path to a CA bundle to use. Sets the <code class="docutils literal notranslate"><span class="pre">verify</span></code> param of the
+<code class="docutils literal notranslate"><span class="pre">requests.request</span></code> function
+(see <a class="reference external" href="https://requests.readthedocs.io/en/master/api/">requests main interface</a>).
+When you use a self-signed server certificate you can use this to verify it on client side.
+If this is set <code class="docutils literal notranslate"><span class="pre">MLFLOW_TRACKING_INSECURE_TLS</span></code> must not be set (false).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MLFLOW_TRACKING_CLIENT_CERT_PATH</span></code> - Path to ssl client cert file (.pem). Sets the <code class="docutils literal notranslate"><span class="pre">cert</span></code> param
+of the <code class="docutils literal notranslate"><span class="pre">requests.request</span></code> function
+(see <a class="reference external" href="https://requests.readthedocs.io/en/master/api/">requests main interface</a>).
+This can be used to use a (self-signed) client certificate.</p></li>
+</ul>
+</div>
+<div class="section" id="tracking-server-versioning">
+<h2>Tracking Server versioning<a class="headerlink" href="#tracking-server-versioning" title="Permalink to this headline"> </a></h2>
+<p>The version of MLflow running on the server can be found by querying the <code class="docutils literal notranslate"><span class="pre">/version</span></code> endpoint.
+This can be used to check that the client-side version of MLflow is up-to-date with a remote tracking server prior to running experiments.
+For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;http://&lt;mlflow-host&gt;:&lt;mlflow-port&gt;/version&quot;</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">text</span> <span class="o">==</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">__version__</span>  <span class="c1"># Checking for a strict version match</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+              </div>
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="artifacts-stores.html" class="btn btn-neutral" title="Artifact Stores" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+      
+      
+        <a href="tutorials/local-database.html" class="btn btn-neutral" title="Tracking Experiments with a Local Database" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+      <p class="copyright">
+          &copy; MLflow Project, a Series of LF Projects, LLC. All rights reserved.
+      </p>
+
+  </div> 
+
+</footer>
+          </div>
+        </div>
+      </section>
+    </main>
+  </page>
+
+  
+
+
+  
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+      URL_ROOT:'../',
+      VERSION:'2.9.2.dev0',
+      COLLAPSE_INDEX:false,
+      FILE_SUFFIX:'.html',
+      LINK_SUFFIX: '.html',
+      HAS_SOURCE:  true
+    };
+  </script>
+
+  
+
+  <script type="text/javascript" src="../_static/js/clipboard.min.js"></script>
+  <script type="text/javascript" src="../_static/js/jquery.waypoints.min.js"></script>
+
+  
+  
+  
+  <script type="text/javascript">var CLIPPY_SVG_PATH = "../_static/clippy.svg";</script>
+  <script type="text/javascript" src="../_static/js/custom.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.StickyNav.enable();
+    });
+
+  </script>
+  
+
+  
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        // Get the code block designator class entries
+        const allHighlights = document.querySelectorAll('.highlight');
+        // Disable copyable links for notebook cell numbering and for cell outputs
+        const highlights = Array.from(allHighlights).filter(highlight => !highlight.closest('.highlight-none') && 
+            !highlight.closest('.nboutput'));
+    
+        highlights.forEach(function(highlight) {
+            const copyIcon = document.createElement('span');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.innerHTML = '&#xf0ea;';
+
+            copyIcon.addEventListener('click', function() {
+                const code = highlight.querySelector('pre').textContent;
+                copyToClipboard(code);
+
+                // Flash effect on click
+                this.style.color = '#0194E2';
+                setTimeout(() => {
+                    this.style.color = ''; 
+                }, 100);
+
+                // Display "Code copied to clipboard" near the clicked icon
+                const message = document.createElement('span');
+                message.textContent = "Copied!";
+                message.classList.add('copy-message'); 
+
+                // Append the message to the icon
+                this.appendChild(message);
+
+                setTimeout(() => {
+                    this.removeChild(message);
+                }, 500);
+            });
+
+            highlight.appendChild(copyIcon);
+        });
+    });
+  </script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Force download for notebook-download-btn
+        const downloadButtons = document.querySelectorAll('.notebook-download-btn');
+        downloadButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                // Fetch the raw content of the notebook from GitHub
+                fetch(button.href)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = url;
+                        const filename = button.href.split('/').pop();
+                        link.download = filename; 
+
+                        document.body.appendChild(link);
+                        link.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    })
+                    .catch(err => console.error('Error fetching the notebook:', err));
+            });
+        });
+    });
+</script> 
+</body>
+</html>

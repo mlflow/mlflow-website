@@ -1,0 +1,1148 @@
+
+  
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>LLM RAG Evaluation with MLflow Example Notebook &mdash; MLflow 2.9.2.dev0 documentation</title>
+  
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/llms/llm-evaluate/notebooks/rag-evaluation.html">
+  
+  
+    <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
+    
+
+    
+
+  
+    
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/grids.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/mobile.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/simple-cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/tabs.css" type="text/css" />
+    
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="MLflow 2.9.2.dev0 documentation" href="../../../index.html"/>
+        <link rel="up" title="LLM Evaluation Examples" href="index.html"/>
+        <link rel="next" title="LLM RAG Evaluation with MLflow using llama2-as-judge Example Notebook" href="/rag-evaluation-llama2.html"/>
+        <link rel="prev" title="LLM Evaluation with MLflow Example Notebook" href="/question-answering-evaluation.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+<script type="text/javascript" src="../../../_static/jquery.js"></script>
+<script type="text/javascript" src="../../../_static/underscore.js"></script>
+<script type="text/javascript" src="../../../_static/doctools.js"></script>
+<script type="text/javascript" src="../../../_static/languagesections.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript" src="../../../None"></script>
+
+<body class="wy-body-for-nav" role="document">
+  
+
+  
+  <nav class="wy-nav-top header" role="navigation" aria-label="top navigation">
+    <ul>
+  <li class="menu-toggle">
+    <i data-toggle="wy-nav-top" class="wy-nav-top-menu-button db-icon db-icon-menu pull-left"></i>
+    <a href="../../../index.html" class="wy-nav-top-logo"
+      ><img src="../../../_static/MLflow-logo-final-black.png" alt="MLflow"
+    /></a>
+    <span class="version">2.9.2.dev0</span>
+  </li>
+</ul>
+  </nav>
+  <page>
+    
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side relative">
+      <div class="wy-side-scroll">
+  <div class="wy-side-nav-search">
+    
+
+    
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+    
+  </div>
+
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+    
+      <a href="../../../index.html" class="main-navigation-home"><img src="../../../_static/icons/nav-home.svg"> MLflow</a>
+    
+
+    
+      
+
+      
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../introduction/index.html">What is MLflow?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting-started/index.html">Getting Started with MLflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../new-features/index.html">New Features</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">LLMs</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#id1">MLflow Deployments Server for LLMs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#id3">LLM Evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#id4">Prompt Engineering UI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#native-mlflow-flavors-for-llms">Native MLflow Flavors for LLMs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#id5">LLM Tracking in MLflow</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../index.html#tutorials-and-use-case-guides-for-llms-in-mlflow">Tutorials and Use Case Guides for LLMs in MLflow</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../../rag/index.html">Retrieval Augmented Generation (RAG)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../custom-pyfunc-for-llms/index.html">Deploying Advanced LLMs with Custom PyFuncs in MLflow</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="index.html">LLM Evaluation Examples</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="question-answering-evaluation.html">LLM Evaluation with MLflow Example Notebook</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">LLM RAG Evaluation with MLflow Example Notebook</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rag-evaluation-llama2.html">LLM RAG Evaluation with MLflow using llama2-as-judge Example Notebook</a></li>
+<li class="toctree-l4"><a class="reference internal" href="index.html#qa-evaluation-notebook">QA Evaluation Notebook</a></li>
+<li class="toctree-l4"><a class="reference internal" href="index.html#rag-evaluation-notebook-using-gpt-4-as-judge">RAG Evaluation Notebook (using gpt-4-as-judge)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="index.html#rag-evaluation-notebook-using-llama2-70b-as-judge">RAG Evaluation Notebook (using llama2-70b-as-judge)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../gateway/index.html">MLflow AI Gateway (Experimental)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../model-evaluation/index.html">Model Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deep-learning/index.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../traditional-ml/index.html">Traditional ML</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deployment/index.html">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tracking.html">MLflow Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../system-metrics/index.html">System Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../projects.html">MLflow Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../models.html">MLflow Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../model-registry.html">MLflow Model Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../recipes.html">MLflow Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../plugins.html">MLflow Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../auth/index.html">MLflow Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../search-runs.html">Search Runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../search-experiments.html">Search Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../python_api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../R-api.html">R API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../java_api/index.html">Java API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rest-api.html">REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docker.html">Official MLflow Docker Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../community-model-flavors.html">Community Model Flavors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials-and-examples/index.html">Tutorials and Examples</a></li>
+</ul>
+
+      
+    
+  </div>
+
+  <div role="contentinfo">
+    
+
+    <p>
+      <a id='feedbacklink' href="https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a>
+    </p>
+  </div>
+</div>
+    </nav>
+
+    <main class="wy-grid-for-nav">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+          <div class="rst-content">
+            
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Documentation</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../../index.html">LLMs</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="index.html">LLM Evaluation Examples</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+    
+      <li>LLM RAG Evaluation with MLflow Example Notebook</li>
+    
+    
+    <!-- <li class="wy-breadcrumbs-aside">
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/llms/llm-evaluate/notebooks/rag-evaluation.ipynb" class="fa fa-github"> Edit on GitHub</a>
+    </li> -->
+    
+  </ul>
+</div>
+            <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <div itemprop="articleBody">
+                
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div class="section" id="LLM-RAG-Evaluation-with-MLflow-Example-Notebook">
+<h1>LLM RAG Evaluation with MLflow Example Notebook<a class="headerlink" href="#LLM-RAG-Evaluation-with-MLflow-Example-Notebook" title="Permalink to this headline"> </a></h1>
+<p>In this notebook, we will demonstrate how to evaluate various a RAG system with MLflow.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+</pre></div>
+</div>
+</div>
+<p>Set OpenAI (or Azure OpenAI) environment variables</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;OPENAI_API_KEY&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;REDACTED&quot;</span>
+
+<span class="c1"># If using Azure OpenAI</span>
+<span class="c1"># os.environ[&quot;OPENAI_API_TYPE&quot;] = &quot;azure&quot;</span>
+<span class="c1"># os.environ[&quot;OPENAI_API_VERSION&quot;] = &quot;2023-05-15&quot;</span>
+<span class="c1"># os.environ[&quot;OPENAI_API_KEY&quot;] = &quot;https://&lt;&gt;.&lt;&gt;.&lt;&gt;.com&quot;</span>
+<span class="c1"># os.environ[&quot;OPENAI_DEPLOYMENT_NAME&quot;] = &quot;deployment-name&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">import</span> <span class="nn">mlflow</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="Create-a-RAG-system">
+<h2>Create a RAG system<a class="headerlink" href="#Create-a-RAG-system" title="Permalink to this headline"> </a></h2>
+<p>Use Langchain and Chroma to create a RAG system that answers questions based on the MLflow documentation.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">langchain.chains</span> <span class="kn">import</span> <span class="n">RetrievalQA</span>
+<span class="kn">from</span> <span class="nn">langchain.document_loaders</span> <span class="kn">import</span> <span class="n">WebBaseLoader</span>
+<span class="kn">from</span> <span class="nn">langchain.embeddings.openai</span> <span class="kn">import</span> <span class="n">OpenAIEmbeddings</span>
+<span class="kn">from</span> <span class="nn">langchain.llms</span> <span class="kn">import</span> <span class="n">OpenAI</span>
+<span class="kn">from</span> <span class="nn">langchain.text_splitter</span> <span class="kn">import</span> <span class="n">CharacterTextSplitter</span>
+<span class="kn">from</span> <span class="nn">langchain.vectorstores</span> <span class="kn">import</span> <span class="n">Chroma</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">loader</span> <span class="o">=</span> <span class="n">WebBaseLoader</span><span class="p">(</span><span class="s2">&quot;https://mlflow.org/docs/latest/index.html&quot;</span><span class="p">)</span>
+
+<span class="n">documents</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<span class="n">text_splitter</span> <span class="o">=</span> <span class="n">CharacterTextSplitter</span><span class="p">(</span><span class="n">chunk_size</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">chunk_overlap</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">texts</span> <span class="o">=</span> <span class="n">text_splitter</span><span class="o">.</span><span class="n">split_documents</span><span class="p">(</span><span class="n">documents</span><span class="p">)</span>
+
+<span class="n">embeddings</span> <span class="o">=</span> <span class="n">OpenAIEmbeddings</span><span class="p">()</span>
+<span class="n">docsearch</span> <span class="o">=</span> <span class="n">Chroma</span><span class="o">.</span><span class="n">from_documents</span><span class="p">(</span><span class="n">texts</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">)</span>
+
+<span class="n">qa</span> <span class="o">=</span> <span class="n">RetrievalQA</span><span class="o">.</span><span class="n">from_chain_type</span><span class="p">(</span>
+    <span class="n">llm</span><span class="o">=</span><span class="n">OpenAI</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+    <span class="n">chain_type</span><span class="o">=</span><span class="s2">&quot;stuff&quot;</span><span class="p">,</span>
+    <span class="n">retriever</span><span class="o">=</span><span class="n">docsearch</span><span class="o">.</span><span class="n">as_retriever</span><span class="p">(),</span>
+    <span class="n">return_source_documents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Evaluate-the-RAG-system-using-mlflow.evaluate()">
+<h2>Evaluate the RAG system using <code class="docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code><a class="headerlink" href="#Evaluate-the-RAG-system-using-mlflow.evaluate()" title="Permalink to this headline"> </a></h2>
+<p>Create a simple function that runs each input through the RAG chain</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="n">input_df</span><span class="p">):</span>
+    <span class="n">answer</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">input_df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="n">answer</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">qa</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;questions&quot;</span><span class="p">]))</span>
+
+    <span class="k">return</span> <span class="n">answer</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<p>Create an eval dataset</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">eval_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;questions&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;What is MLflow?&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;How to run mlflow.evaluate()?&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;How to log_table()?&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;How to load_table()?&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Create a faithfulness metric</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.metrics.genai</span> <span class="kn">import</span> <span class="n">faithfulness</span><span class="p">,</span> <span class="n">EvaluationExample</span>
+
+<span class="c1"># Create a good and bad example for faithfulness in the context of this problem</span>
+<span class="n">faithfulness_examples</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">EvaluationExample</span><span class="p">(</span>
+        <span class="nb">input</span><span class="o">=</span><span class="s2">&quot;How do I disable MLflow autologging?&quot;</span><span class="p">,</span>
+        <span class="n">output</span><span class="o">=</span><span class="s2">&quot;mlflow.autolog(disable=True) will disable autologging for all functions. In Databricks, autologging is enabled by default. &quot;</span><span class="p">,</span>
+        <span class="n">score</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">justification</span><span class="o">=</span><span class="s2">&quot;The output provides a working solution, using the mlflow.autolog() function that is provided in the context.&quot;</span><span class="p">,</span>
+        <span class="n">grading_context</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;context&quot;</span><span class="p">:</span> <span class="s2">&quot;mlflow.autolog(log_input_examples: bool = False, log_model_signatures: bool = True, log_models: bool = True, log_datasets: bool = True, disable: bool = False, exclusive: bool = False, disable_for_unsupported_versions: bool = False, silent: bool = False, extra_tags: Optional[Dict[str, str]] = None) → None[source] Enables (or disables) and configures autologging for all supported integrations. The parameters are passed to any autologging integrations that support them. See the tracking docs for a list of supported autologging integrations. Note that framework-specific configurations set at any point will take precedence over any configurations set by this function.&quot;</span>
+        <span class="p">},</span>
+    <span class="p">),</span>
+    <span class="n">EvaluationExample</span><span class="p">(</span>
+        <span class="nb">input</span><span class="o">=</span><span class="s2">&quot;How do I disable MLflow autologging?&quot;</span><span class="p">,</span>
+        <span class="n">output</span><span class="o">=</span><span class="s2">&quot;mlflow.autolog(disable=True) will disable autologging for all functions.&quot;</span><span class="p">,</span>
+        <span class="n">score</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="n">justification</span><span class="o">=</span><span class="s2">&quot;The output provides a solution that is using the mlflow.autolog() function that is provided in the context.&quot;</span><span class="p">,</span>
+        <span class="n">grading_context</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;context&quot;</span><span class="p">:</span> <span class="s2">&quot;mlflow.autolog(log_input_examples: bool = False, log_model_signatures: bool = True, log_models: bool = True, log_datasets: bool = True, disable: bool = False, exclusive: bool = False, disable_for_unsupported_versions: bool = False, silent: bool = False, extra_tags: Optional[Dict[str, str]] = None) → None[source] Enables (or disables) and configures autologging for all supported integrations. The parameters are passed to any autologging integrations that support them. See the tracking docs for a list of supported autologging integrations. Note that framework-specific configurations set at any point will take precedence over any configurations set by this function.&quot;</span>
+        <span class="p">},</span>
+    <span class="p">),</span>
+<span class="p">]</span>
+
+<span class="n">faithfulness_metric</span> <span class="o">=</span> <span class="n">faithfulness</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="s2">&quot;openai:/gpt-4&quot;</span><span class="p">,</span> <span class="n">examples</span><span class="o">=</span><span class="n">faithfulness_examples</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">faithfulness_metric</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+EvaluationMetric(name=faithfulness, greater_is_better=True, long_name=faithfulness, version=v1, metric_details=
+Task:
+You must return the following fields in your response one below the other:
+score: Your numerical score for the model&#39;s faithfulness based on the rubric
+justification: Your step-by-step reasoning about the model&#39;s faithfulness score
+
+You are an impartial judge. You will be given an input that was sent to a machine
+learning model, and you will be given an output that the model produced. You
+may also be given additional information that was used by the model to generate the output.
+
+Your task is to determine a numerical score called faithfulness based on the input and output.
+A definition of faithfulness and a grading rubric are provided below.
+You must use the grading rubric to determine your score. You must also justify your score.
+
+Examples could be included below for reference. Make sure to use them as references and to
+understand them before completing the task.
+
+Input:
+{input}
+
+Output:
+{output}
+
+{grading_context_columns}
+
+Metric definition:
+Faithfulness is only evaluated with the provided output and provided context, please ignore the provided input entirely when scoring faithfulness. Faithfulness assesses how much of the provided output is factually consistent with the provided context. A higher score indicates that a higher proportion of claims present in the output can be derived from the provided context. Faithfulness does not consider how much extra information from the context is not present in the output.
+
+Grading rubric:
+Faithfulness: Below are the details for different scores:
+- Score 1: None of the claims in the output can be inferred from the provided context.
+- Score 2: Some of the claims in the output can be inferred from the provided context, but the majority of the output is missing from, inconsistent with, or contradictory to the provided context.
+- Score 3: Half or more of the claims in the output can be inferred from the provided context.
+- Score 4: Most of the claims in the output can be inferred from the provided context, with very little information that is not directly supported by the provided context.
+- Score 5: All of the claims in the output are directly supported by the provided context, demonstrating high faithfulness to the provided context.
+
+Examples:
+
+Example Input:
+How do I disable MLflow autologging?
+
+Example Output:
+mlflow.autolog(disable=True) will disable autologging for all functions. In Databricks, autologging is enabled by default.
+
+Additional information used by the model:
+key: context
+value:
+mlflow.autolog(log_input_examples: bool = False, log_model_signatures: bool = True, log_models: bool = True, log_datasets: bool = True, disable: bool = False, exclusive: bool = False, disable_for_unsupported_versions: bool = False, silent: bool = False, extra_tags: Optional[Dict[str, str]] = None) → None[source] Enables (or disables) and configures autologging for all supported integrations. The parameters are passed to any autologging integrations that support them. See the tracking docs for a list of supported autologging integrations. Note that framework-specific configurations set at any point will take precedence over any configurations set by this function.
+
+Example score: 2
+Example justification: The output provides a working solution, using the mlflow.autolog() function that is provided in the context.
+
+
+Example Input:
+How do I disable MLflow autologging?
+
+Example Output:
+mlflow.autolog(disable=True) will disable autologging for all functions.
+
+Additional information used by the model:
+key: context
+value:
+mlflow.autolog(log_input_examples: bool = False, log_model_signatures: bool = True, log_models: bool = True, log_datasets: bool = True, disable: bool = False, exclusive: bool = False, disable_for_unsupported_versions: bool = False, silent: bool = False, extra_tags: Optional[Dict[str, str]] = None) → None[source] Enables (or disables) and configures autologging for all supported integrations. The parameters are passed to any autologging integrations that support them. See the tracking docs for a list of supported autologging integrations. Note that framework-specific configurations set at any point will take precedence over any configurations set by this function.
+
+Example score: 5
+Example justification: The output provides a solution that is using the mlflow.autolog() function that is provided in the context.
+
+
+You must return the following fields in your response one below the other:
+score: Your numerical score for the model&#39;s faithfulness based on the rubric
+justification: Your step-by-step reasoning about the model&#39;s faithfulness score
+    )
+</pre></div></div>
+</div>
+<p>Create a relevance metric. You can see the full grading prompt by printing the metric or by accessing the <code class="docutils literal notranslate"><span class="pre">metric_details</span></code> attribute of the metric.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.metrics.genai</span> <span class="kn">import</span> <span class="n">relevance</span><span class="p">,</span> <span class="n">EvaluationExample</span>
+
+
+<span class="n">relevance_metric</span> <span class="o">=</span> <span class="n">relevance</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="s2">&quot;openai:/gpt-4&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">relevance_metric</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+EvaluationMetric(name=relevance, greater_is_better=True, long_name=relevance, version=v1, metric_details=
+Task:
+You must return the following fields in your response one below the other:
+score: Your numerical score for the model&#39;s relevance based on the rubric
+justification: Your step-by-step reasoning about the model&#39;s relevance score
+
+You are an impartial judge. You will be given an input that was sent to a machine
+learning model, and you will be given an output that the model produced. You
+may also be given additional information that was used by the model to generate the output.
+
+Your task is to determine a numerical score called relevance based on the input and output.
+A definition of relevance and a grading rubric are provided below.
+You must use the grading rubric to determine your score. You must also justify your score.
+
+Examples could be included below for reference. Make sure to use them as references and to
+understand them before completing the task.
+
+Input:
+{input}
+
+Output:
+{output}
+
+{grading_context_columns}
+
+Metric definition:
+Relevance encompasses the appropriateness, significance, and applicability of the output with respect to both the input and context. Scores should reflect the extent to which the output directly addresses the question provided in the input, given the provided context.
+
+Grading rubric:
+Relevance: Below are the details for different scores:- Score 1: The output doesn&#39;t mention anything about the question or is completely irrelevant to the provided context.
+- Score 2: The output provides some relevance to the question and is somehow related to the provided context.
+- Score 3: The output mostly answers the question and is largely consistent with the provided context.
+- Score 4: The output answers the question and is consistent with the provided context.
+- Score 5: The output answers the question comprehensively using the provided context.
+
+Examples:
+
+Example Input:
+How is MLflow related to Databricks?
+
+Example Output:
+Databricks is a data engineering and analytics platform designed to help organizations process and analyze large amounts of data. Databricks is a company specializing in big data and machine learning solutions.
+
+Additional information used by the model:
+key: context
+value:
+MLflow is an open-source platform for managing the end-to-end machine learning (ML) lifecycle. It was developed by Databricks, a company that specializes in big data and machine learning solutions. MLflow is designed to address the challenges that data scientists and machine learning engineers face when developing, training, and deploying machine learning models.
+
+Example score: 2
+Example justification: The output provides relevant information about Databricks, mentioning it as a company specializing in big data and machine learning solutions. However, it doesn&#39;t directly address how MLflow is related to Databricks, which is the specific question asked in the input. Therefore, the output is only somewhat related to the provided context.
+
+
+Example Input:
+How is MLflow related to Databricks?
+
+Example Output:
+MLflow is a product created by Databricks to enhance the efficiency of machine learning processes.
+
+Additional information used by the model:
+key: context
+value:
+MLflow is an open-source platform for managing the end-to-end machine learning (ML) lifecycle. It was developed by Databricks, a company that specializes in big data and machine learning solutions. MLflow is designed to address the challenges that data scientists and machine learning engineers face when developing, training, and deploying machine learning models.
+
+Example score: 4
+Example justification: The output provides a relevant and accurate statement about the relationship between MLflow and Databricks. While it doesn&#39;t provide extensive detail, it still offers a substantial and meaningful response. To achieve a score of 5, the response could be further improved by providing additional context or details about how MLflow specifically functions within the Databricks ecosystem.
+
+
+You must return the following fields in your response one below the other:
+score: Your numerical score for the model&#39;s relevance based on the rubric
+justification: Your step-by-step reasoning about the model&#39;s relevance score
+    )
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">,</span>
+    <span class="n">eval_df</span><span class="p">,</span>
+    <span class="n">model_type</span><span class="o">=</span><span class="s2">&quot;question-answering&quot;</span><span class="p">,</span>
+    <span class="n">evaluators</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+    <span class="n">predictions</span><span class="o">=</span><span class="s2">&quot;result&quot;</span><span class="p">,</span>
+    <span class="n">extra_metrics</span><span class="o">=</span><span class="p">[</span><span class="n">faithfulness_metric</span><span class="p">,</span> <span class="n">relevance_metric</span><span class="p">,</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">latency</span><span class="p">()],</span>
+    <span class="n">evaluator_config</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;col_mapping&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;inputs&quot;</span><span class="p">:</span> <span class="s2">&quot;questions&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;context&quot;</span><span class="p">:</span> <span class="s2">&quot;source_documents&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">metrics</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2023/11/16 09:05:21 INFO mlflow.models.evaluation.base: Evaluating the model with the default evaluator.
+2023/11/16 09:05:21 INFO mlflow.models.evaluation.default_evaluator: Computing model predictions.
+2023/11/16 09:05:28 INFO mlflow.models.evaluation.default_evaluator: Testing metrics on first row...
+Using default facebook/roberta-hate-speech-dynabench-r4-target checkpoint
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "147af1deb9fa46a38989bfd435fedf81", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "ed8448a18388443888fa9ac6d15716b0", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2023/11/16 09:05:58 INFO mlflow.models.evaluation.default_evaluator: Evaluating builtin metrics: token_count
+2023/11/16 09:05:58 INFO mlflow.models.evaluation.default_evaluator: Evaluating builtin metrics: toxicity
+2023/11/16 09:05:58 INFO mlflow.models.evaluation.default_evaluator: Evaluating builtin metrics: flesch_kincaid_grade_level
+2023/11/16 09:05:58 INFO mlflow.models.evaluation.default_evaluator: Evaluating builtin metrics: ari_grade_level
+2023/11/16 09:05:58 INFO mlflow.models.evaluation.default_evaluator: Evaluating builtin metrics: exact_match
+2023/11/16 09:05:58 INFO mlflow.models.evaluation.default_evaluator: Evaluating metrics: faithfulness
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "d30949c0522e411881a94e68396797a6", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2023/11/16 09:06:12 INFO mlflow.models.evaluation.default_evaluator: Evaluating metrics: relevance
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "8e02b3cb7d8e4418a508b19363de30b0", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;toxicity/v1/mean&#39;: 0.00022622970209340565, &#39;toxicity/v1/variance&#39;: 3.84291113351624e-09, &#39;toxicity/v1/p90&#39;: 0.0002859298692783341, &#39;toxicity/v1/ratio&#39;: 0.0, &#39;flesch_kincaid_grade_level/v1/mean&#39;: 8.1, &#39;flesch_kincaid_grade_level/v1/variance&#39;: 8.815, &#39;flesch_kincaid_grade_level/v1/p90&#39;: 11.48, &#39;ari_grade_level/v1/mean&#39;: 11.649999999999999, &#39;ari_grade_level/v1/variance&#39;: 19.527499999999993, &#39;ari_grade_level/v1/p90&#39;: 16.66, &#39;faithfulness/v1/mean&#39;: 4.0, &#39;faithfulness/v1/variance&#39;: 3.0, &#39;faithfulness/v1/p90&#39;: 5.0, &#39;relevance/v1/mean&#39;: 4.5, &#39;relevance/v1/variance&#39;: 0.25, &#39;relevance/v1/p90&#39;: 5.0}
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">results</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="s2">&quot;eval_results_table&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "747f65b309b94257b396eebffe814fa6", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>questions</th>
+      <th>outputs</th>
+      <th>source_documents</th>
+      <th>latency</th>
+      <th>token_count</th>
+      <th>toxicity/v1/score</th>
+      <th>flesch_kincaid_grade_level/v1/score</th>
+      <th>ari_grade_level/v1/score</th>
+      <th>faithfulness/v1/score</th>
+      <th>faithfulness/v1/justification</th>
+      <th>relevance/v1/score</th>
+      <th>relevance/v1/justification</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>What is MLflow?</td>
+      <td>MLflow is an open-source platform, purpose-bu...</td>
+      <td>[{'lc_attributes': {}, 'lc_namespace': ['langc...</td>
+      <td>1.989822</td>
+      <td>53</td>
+      <td>0.000137</td>
+      <td>12.5</td>
+      <td>18.4</td>
+      <td>5</td>
+      <td>The output provided by the model is a direct e...</td>
+      <td>5</td>
+      <td>The output provides a comprehensive answer to ...</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>How to run mlflow.evaluate()?</td>
+      <td>The mlflow.evaluate() API allows you to valid...</td>
+      <td>[{'lc_attributes': {}, 'lc_namespace': ['langc...</td>
+      <td>1.945368</td>
+      <td>55</td>
+      <td>0.000200</td>
+      <td>9.1</td>
+      <td>12.6</td>
+      <td>5</td>
+      <td>The output provided by the model is completely...</td>
+      <td>4</td>
+      <td>The output provides a relevant and accurate ex...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>How to log_table()?</td>
+      <td>You can log a table with MLflow using the log...</td>
+      <td>[{'lc_attributes': {}, 'lc_namespace': ['langc...</td>
+      <td>1.521511</td>
+      <td>32</td>
+      <td>0.000289</td>
+      <td>5.0</td>
+      <td>6.8</td>
+      <td>1</td>
+      <td>The output claims that you can log a table wit...</td>
+      <td>5</td>
+      <td>The output provides a comprehensive answer to ...</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>How to load_table()?</td>
+      <td>You can't load_table() with MLflow. MLflow is...</td>
+      <td>[{'lc_attributes': {}, 'lc_namespace': ['langc...</td>
+      <td>1.105279</td>
+      <td>27</td>
+      <td>0.000279</td>
+      <td>5.8</td>
+      <td>8.8</td>
+      <td>5</td>
+      <td>The output claim that "You can't load_table() ...</td>
+      <td>4</td>
+      <td>The output provides a relevant and accurate re...</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+              </div>
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="question-answering-evaluation.html" class="btn btn-neutral" title="LLM Evaluation with MLflow Example Notebook" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+      
+      
+        <a href="rag-evaluation-llama2.html" class="btn btn-neutral" title="LLM RAG Evaluation with MLflow using llama2-as-judge Example Notebook" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+      <p class="copyright">
+          &copy; MLflow Project, a Series of LF Projects, LLC. All rights reserved.
+      </p>
+
+  </div> 
+
+</footer>
+          </div>
+        </div>
+      </section>
+    </main>
+  </page>
+
+  
+
+
+  
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+      URL_ROOT:'../../../',
+      VERSION:'2.9.2.dev0',
+      COLLAPSE_INDEX:false,
+      FILE_SUFFIX:'.html',
+      LINK_SUFFIX: '.html',
+      HAS_SOURCE:  true
+    };
+  </script>
+
+  
+
+  <script type="text/javascript" src="../../../_static/js/clipboard.min.js"></script>
+  <script type="text/javascript" src="../../../_static/js/jquery.waypoints.min.js"></script>
+
+  
+  
+  
+  <script type="text/javascript">var CLIPPY_SVG_PATH = "../../../_static/clippy.svg";</script>
+  <script type="text/javascript" src="../../../_static/js/custom.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.StickyNav.enable();
+    });
+
+  </script>
+  
+
+  
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        // Get the code block designator class entries
+        const allHighlights = document.querySelectorAll('.highlight');
+        // Disable copyable links for notebook cell numbering and for cell outputs
+        const highlights = Array.from(allHighlights).filter(highlight => !highlight.closest('.highlight-none') && 
+            !highlight.closest('.nboutput'));
+    
+        highlights.forEach(function(highlight) {
+            const copyIcon = document.createElement('span');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.innerHTML = '&#xf0ea;';
+
+            copyIcon.addEventListener('click', function() {
+                const code = highlight.querySelector('pre').textContent;
+                copyToClipboard(code);
+
+                // Flash effect on click
+                this.style.color = '#0194E2';
+                setTimeout(() => {
+                    this.style.color = ''; 
+                }, 100);
+
+                // Display "Code copied to clipboard" near the clicked icon
+                const message = document.createElement('span');
+                message.textContent = "Copied!";
+                message.classList.add('copy-message'); 
+
+                // Append the message to the icon
+                this.appendChild(message);
+
+                setTimeout(() => {
+                    this.removeChild(message);
+                }, 500);
+            });
+
+            highlight.appendChild(copyIcon);
+        });
+    });
+  </script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Force download for notebook-download-btn
+        const downloadButtons = document.querySelectorAll('.notebook-download-btn');
+        downloadButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                // Fetch the raw content of the notebook from GitHub
+                fetch(button.href)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = url;
+                        const filename = button.href.split('/').pop();
+                        link.download = filename; 
+
+                        document.body.appendChild(link);
+                        link.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    })
+                    .catch(err => console.error('Error fetching the notebook:', err));
+            });
+        });
+    });
+</script> 
+</body>
+</html>

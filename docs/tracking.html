@@ -1,0 +1,652 @@
+
+  
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>MLflow Tracking &mdash; MLflow 2.9.2.dev0 documentation</title>
+  
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/tracking.html">
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    
+
+    
+
+  
+    
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="_static/css/cards.css" type="text/css" />
+    <link rel="stylesheet" href="_static/css/grids.css" type="text/css" />
+    <link rel="stylesheet" href="_static/css/mobile.css" type="text/css" />
+    <link rel="stylesheet" href="_static/css/simple-cards.css" type="text/css" />
+    <link rel="stylesheet" href="_static/css/tabs.css" type="text/css" />
+    
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="MLflow 2.9.2.dev0 documentation" href="index.html"/>
+        <link rel="next" title="MLflow Tracking APIs" href="/tracking/tracking-api.html"/>
+        <link rel="prev" title="Deploying a model to Kubernetes" href="/deployment/deploy-model-to-kubernetes/index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+<script type="text/javascript" src="_static/jquery.js"></script>
+<script type="text/javascript" src="_static/underscore.js"></script>
+<script type="text/javascript" src="_static/doctools.js"></script>
+<script type="text/javascript" src="_static/tabs.js"></script>
+<script type="text/javascript" src="_static/languagesections.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+
+<body class="wy-body-for-nav" role="document">
+  
+
+  
+  <nav class="wy-nav-top header" role="navigation" aria-label="top navigation">
+    <ul>
+  <li class="menu-toggle">
+    <i data-toggle="wy-nav-top" class="wy-nav-top-menu-button db-icon db-icon-menu pull-left"></i>
+    <a href="index.html" class="wy-nav-top-logo"
+      ><img src="_static/MLflow-logo-final-black.png" alt="MLflow"
+    /></a>
+    <span class="version">2.9.2.dev0</span>
+  </li>
+</ul>
+  </nav>
+  <page>
+    
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side relative">
+      <div class="wy-side-scroll">
+  <div class="wy-side-nav-search">
+    
+
+    
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+    
+  </div>
+
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+    
+      <a href="index.html" class="main-navigation-home"><img src="_static/icons/nav-home.svg"> MLflow</a>
+    
+
+    
+      
+
+      
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction/index.html">What is MLflow?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started/index.html">Getting Started with MLflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="new-features/index.html">New Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="llms/index.html">LLMs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model-evaluation/index.html">Model Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deep-learning/index.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="traditional-ml/index.html">Traditional ML</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deployment/index.html">Deployment</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">MLflow Tracking</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#quickstart">Quickstart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#concepts">Concepts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#runs">Runs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#experiments">Experiments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#tracking-runs">Tracking Runs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tracking/tracking-api.html">MLflow Tracking APIs</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#explore-runs-and-results">Explore Runs and Results</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#tracking-ui">Tracking UI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#querying-runs-programmatically">Querying Runs Programmatically</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#set-up-the-mlflow-tracking-environment">Set up the MLflow Tracking Environment</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#components">Components</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id4">MLflow Tracking APIs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id5">Backend Store</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#artifact-stores">Artifact Store</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#mlflow-tracking-server-optional">MLflow Tracking Server (Optional)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#common-setups">Common Setups</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="getting-started/intro-quickstart/index.html">MLflow Tracking Quickstart</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tracking/tutorials/local-database.html">Tracking Experiments with a Local Database</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tracking/tutorials/remote-server.html">Remote Experiment Tracking with MLflow Tracking Server</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#other-configuration-with-mlflow-tracking-server">Other Configuration with <span class="xref std std-ref">MLflow Tracking Server</span></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#faq">FAQ</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#can-i-launch-multiple-runs-in-parallel">Can I launch multiple runs in parallel?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#how-can-i-organize-many-mlflow-runs-neatly">How can I organize many MLflow Runs neatly?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#can-i-directly-access-remote-storage-without-running-the-tracking-server">Can I directly access remote storage without running the Tracking Server?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#how-to-integrate-mlflow-tracking-with-model-registry">How to integrate MLflow Tracking with <span class="xref std std-ref">Model Registry</span>?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#how-to-include-additional-decription-texts-about-the-run">How to include additional decription texts about the run?</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="system-metrics/index.html">System Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="projects.html">MLflow Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">MLflow Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model-registry.html">MLflow Model Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="recipes.html">MLflow Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plugins.html">MLflow Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="auth/index.html">MLflow Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="search-runs.html">Search Runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="search-experiments.html">Search Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="python_api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="R-api.html">R API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="java_api/index.html">Java API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rest-api.html">REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docker.html">Official MLflow Docker Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="community-model-flavors.html">Community Model Flavors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials-and-examples/index.html">Tutorials and Examples</a></li>
+</ul>
+
+      
+    
+  </div>
+
+  <div role="contentinfo">
+    
+
+    <p>
+      <a id='feedbacklink' href="https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a>
+    </p>
+  </div>
+</div>
+    </nav>
+
+    <main class="wy-grid-for-nav">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+          <div class="rst-content">
+            
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Documentation</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+    
+      <li>MLflow Tracking</li>
+    
+    
+    <!-- <li class="wy-breadcrumbs-aside">
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/tracking.rst" class="fa fa-github"> Edit on GitHub</a>
+    </li> -->
+    
+  </ul>
+</div>
+            <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <div itemprop="articleBody">
+                
+  <div class="section" id="mlflow-tracking">
+<span id="tracking"></span><h1>MLflow Tracking<a class="headerlink" href="#mlflow-tracking" title="Permalink to this headline"> </a></h1>
+<p>The MLflow Tracking is an API and UI for logging parameters, code versions, metrics, and output files
+when running your machine learning code and for later visualizing the results.
+MLflow Tracking provides <a class="reference internal" href="python_api/index.html#python-api"><span class="std std-ref">Python</span></a>, <a class="reference internal" href="rest-api.html#rest-api"><span class="std std-ref">REST</span></a>, <a class="reference internal" href="R-api.html#r-api"><span class="std std-ref">R</span></a>, and <a class="reference internal" href="java_api/index.html#java-api"><span class="std std-ref">Java</span></a> APIs.</p>
+<div class="figure align-center" id="id10" style="width: 100%">
+<img alt="_images/tracking-metrics-ui-temp.png" src="_images/tracking-metrics-ui-temp.png" />
+<p class="caption"><span class="caption-text">A screenshot of the MLflow Tracking UI, showing a plot of validation loss metrics during model training.</span><a class="headerlink" href="#id10" title="Permalink to this image"> </a></p>
+</div>
+<div class="section" id="quickstart">
+<h2>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline"> </a></h2>
+<p>If you haven’t used MLflow Tracking before, we strongly recommend going through the following quickstart tutorial.</p>
+<section>
+    <article class="simple-grid">
+        <div class="simple-card">
+            <a href="getting-started/intro-quickstart/index.html">
+                <div class="header">
+                    MLflow Tracking Quickstart
+                </div>
+                <p>
+                A great place to start to learn the fundamentals of MLflow Tracking! Learn in 5 minutes how to log, register, and load a model for inference.
+                </p>
+            </a>
+        </div>
+    </article>
+</section></div>
+<div class="section" id="concepts">
+<h2>Concepts<a class="headerlink" href="#concepts" title="Permalink to this headline"> </a></h2>
+<div class="section" id="runs">
+<span id="id1"></span><h3>Runs<a class="headerlink" href="#runs" title="Permalink to this headline"> </a></h3>
+<p>MLflow Tracking is organized around the concept of <strong>runs</strong>, which are executions of some piece of
+data science code, for example, a single <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">train.py</span></code> execution. Each run records metadata
+(various information about your run such as metrics, parameters, start and end times) and artifacts
+(output files from the run such as model weights, images, etc).</p>
+</div>
+<div class="section" id="experiments">
+<h3>Experiments<a class="headerlink" href="#experiments" title="Permalink to this headline"> </a></h3>
+<p>An experiment groups together runs for a specific task. You can create an experiment using the CLI, API, or UI.
+The MLflow API and UI also let you create and search for experiments. See <a class="reference internal" href="tracking/tracking-api.html#organizing-runs-in-experiments"><span class="std std-ref">Organizing Runs into Experiments</span></a>
+for more details on how to organize your runs into experiments.</p>
+</div>
+</div>
+<div class="section" id="tracking-runs">
+<span id="start-logging"></span><h2>Tracking Runs<a class="headerlink" href="#tracking-runs" title="Permalink to this headline"> </a></h2>
+<div class="toctree-wrapper compound">
+</div>
+<p><a class="reference external" href="tracking/tracking-api.html">MLflow Tracking APIs</a> provide a set of functions to track your runs. For example, you can call <a class="reference internal" href="python_api/mlflow.html#mlflow.start_run" title="mlflow.start_run"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.start_run()</span></code></a> to start a new run,
+then call <a class="reference internal" href="tracking/tracking-api.html#tracking-logging-functions"><span class="std std-ref">Logging Functions</span></a> such as <a class="reference internal" href="python_api/mlflow.html#mlflow.log_param" title="mlflow.log_param"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.log_param()</span></code></a> and <a class="reference internal" href="python_api/mlflow.html#mlflow.log_metric" title="mlflow.log_metric"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.log_metric()</span></code></a> to log a parameters and metrics respectively.
+Please visit the <a class="reference external" href="tracking/tracking-api.html">Tracking API documentation</a> for more details about using these APIs.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_param</span><span class="p">(</span><span class="s2">&quot;lr&quot;</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">)</span>
+    <span class="c1"># Your ml code</span>
+    <span class="o">...</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_metric</span><span class="p">(</span><span class="s2">&quot;val_loss&quot;</span><span class="p">,</span> <span class="n">val_loss</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Alternatively, <a class="reference external" href="tracking/autolog.html">Auto-logging</a> offers the ultra-quick setup for starting MLflow tracking. This powerful feature allows you to log metrics, parameters, and models without the need for explicit log statements -
+all you need to do is call <a class="reference internal" href="python_api/mlflow.html#mlflow.autolog" title="mlflow.autolog"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.autolog()</span></code></a> before your training code. Auto-logging supports popular libraries such as <a class="reference internal" href="tracking/autolog.html#autolog-sklearn"><span class="std std-ref">Scikit-learn</span></a>, <a class="reference internal" href="tracking/autolog.html#autolog-xgboost"><span class="std std-ref">XGBoost</span></a>, <a class="reference internal" href="tracking/autolog.html#autolog-pytorch"><span class="std std-ref">PyTorch</span></a>, <a class="reference internal" href="tracking/autolog.html#autolog-keras"><span class="std std-ref">Keras</span></a>, <a class="reference internal" href="tracking/autolog.html#autolog-spark"><span class="std std-ref">Spark</span></a>, and more.
+See <a class="reference internal" href="tracking/autolog.html#automatic-logging"><span class="std std-ref">Automatic Logging Documentation</span></a> for supported libraries and how to use auto-logging APIs with each of them.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">autolog</span><span class="p">()</span>
+
+<span class="c1"># Your training code...</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>By default, without any particular server/database configuration, MLflow Tracking logs data to the local <cite>mlruns</cite> directory. If you want to log your runs to a different location,
+such as a remote database and cloud storage, to share your results with your team, follow the instructions in the <a class="reference internal" href="#tracking-setup"><span class="std std-ref">Set up MLflow Tracking Environment</span></a> section.</p>
+</div>
+</div>
+<div class="section" id="explore-runs-and-results">
+<h2>Explore Runs and Results<a class="headerlink" href="#explore-runs-and-results" title="Permalink to this headline"> </a></h2>
+<div class="section" id="tracking-ui">
+<span id="id2"></span><h3>Tracking UI<a class="headerlink" href="#tracking-ui" title="Permalink to this headline"> </a></h3>
+<p>The Tracking UI lets you visually explore your experiments and runs, as shown on top of this page.</p>
+<ul class="simple">
+<li><p>Experiment-based run listing and comparison (including run comparison across multiple experiments)</p></li>
+<li><p>Searching for runs by parameter or metric value</p></li>
+<li><p>Visualizing run metrics</p></li>
+<li><p>Downloading run results (artifacts and metadata)</p></li>
+</ul>
+<p>If you log runs to a local <code class="docutils literal notranslate"><span class="pre">mlruns</span></code> directory, run the following command in the directory above it, then access <a class="reference external" href="http://127.0.0.1:5000">http://127.0.0.1:5000</a> in your browser.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mlflow<span class="w"> </span>ui<span class="w"> </span>--port<span class="w"> </span><span class="m">5000</span>
+</pre></div>
+</div>
+<p>Alternatively, the <a class="reference internal" href="#tracking-server"><span class="std std-ref">MLflow Tracking Server</span></a> serves the same UI and enables remote storage of run artifacts.
+In that case, you can view the UI at <code class="docutils literal notranslate"><span class="pre">http://&lt;IP</span> <span class="pre">address</span> <span class="pre">of</span> <span class="pre">your</span> <span class="pre">MLflow</span> <span class="pre">tracking</span> <span class="pre">server&gt;:5000</span></code> from any machine that can connect to your tracking server.</p>
+</div>
+<div class="section" id="querying-runs-programmatically">
+<span id="tracking-query-api"></span><h3>Querying Runs Programmatically<a class="headerlink" href="#querying-runs-programmatically" title="Permalink to this headline"> </a></h3>
+<p>You can also access all of the functions in the Tracking UI programmatically with <a class="reference internal" href="python_api/mlflow.client.html#mlflow.client.MlflowClient" title="mlflow.client.MlflowClient"><code class="xref py py-class docutils literal notranslate"><span class="pre">MlflowClient</span></code></a>.</p>
+<p>For example, the following code snippet search for runs that has the best validation loss among all runs in the experiment.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">client</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">tracking</span><span class="o">.</span><span class="n">MlflowClient</span><span class="p">()</span>
+<span class="n">experiment_id</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span>
+<span class="n">best_run</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">search_runs</span><span class="p">(</span>
+    <span class="n">experiment_id</span><span class="p">,</span> <span class="n">order_by</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;metrics.val_loss ASC&quot;</span><span class="p">],</span> <span class="n">max_results</span><span class="o">=</span><span class="mi">1</span>
+<span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">best_run</span><span class="o">.</span><span class="n">info</span><span class="p">)</span>
+<span class="c1"># {&#39;run_id&#39;: &#39;...&#39;, &#39;metrics&#39;: {&#39;val_loss&#39;: 0.123}, ...}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="set-up-the-mlflow-tracking-environment">
+<span id="tracking-setup"></span><h2>Set up the MLflow Tracking Environment<a class="headerlink" href="#set-up-the-mlflow-tracking-environment" title="Permalink to this headline"> </a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you just want to log your experiment data and models to local files, you can skip this section.</p>
+</div>
+<p>MLflow Tracking supports many different scenarios for your development workflow. This section will guide you through how to set up the MLflow Tracking environment for your particular use case.
+From a bird’s-eye view, the MLflow Tracking environment consists of the following components.</p>
+<div class="section" id="components">
+<h3>Components<a class="headerlink" href="#components" title="Permalink to this headline"> </a></h3>
+<div class="section" id="id4">
+<h4><a class="reference external" href="tracking/tracking-api.html">MLflow Tracking APIs</a><a class="headerlink" href="#id4" title="Permalink to this headline"> </a></h4>
+<p>You can call MLflow Tracking APIs in your ML code to log runs and communicate with the MLflow Tracking Server if necessary.</p>
+</div>
+<div class="section" id="id5">
+<h4><a class="reference external" href="tracking/backend-stores.html">Backend Store</a><a class="headerlink" href="#id5" title="Permalink to this headline"> </a></h4>
+<div class="toctree-wrapper compound">
+</div>
+<p>The backend store persists various metadata for each <a class="reference internal" href="#runs"><span class="std std-ref">Run</span></a>, such as run ID, start and end times, parameters, metrics, etc.
+MLflow supports two types of storage for the backend: <strong>file-system-based</strong> like local files and <strong>database-based</strong> like PostgreSQL.</p>
+</div>
+<div class="section" id="artifact-stores">
+<span id="id6"></span><h4><a class="reference external" href="tracking/artifacts-stores.html">Artifact Store</a><a class="headerlink" href="#artifact-stores" title="Permalink to this headline"> </a></h4>
+<div class="toctree-wrapper compound">
+</div>
+<p>Artifact store persists (typicaly large) arifacts for each run, such as model weights (e.g. a pickled scikit-learn model),
+images (e.g. PNGs), model and data files (e.g. <a class="reference external" href="https://parquet.apache.org/">Parquet</a> file). MLflow stores artifacts ina a
+local file (<cite>mlruns</cite>) by default, but also supports different storage options such as Amazon S3 and Azure Blob Storage.</p>
+</div>
+<div class="section" id="mlflow-tracking-server-optional">
+<span id="tracking-server"></span><h4><a class="reference external" href="tracking/server.html">MLflow Tracking Server</a> (Optional)<a class="headerlink" href="#mlflow-tracking-server-optional" title="Permalink to this headline"> </a></h4>
+<div class="toctree-wrapper compound">
+</div>
+<p>MLflow Tracking Server is a stand-alone HTTP server that provides REST APIs for accessing backend and/or artifact store.
+Tracking server also offers flexibility to configure what data to server, govern access control, versioning, and etc. Read
+<a class="reference external" href="tracking/server.html">MLflow Tracking Server documentation</a> for more details.</p>
+</div>
+</div>
+<div class="section" id="common-setups">
+<span id="id7"></span><h3>Common Setups<a class="headerlink" href="#common-setups" title="Permalink to this headline"> </a></h3>
+<div class="toctree-wrapper compound">
+</div>
+<p>By configuring these components properly, you can create an MLflow Tracking environment suitable for your team’s development workflow.
+The following diagram and table show a few common setups for the MLflow Tracking environment.</p>
+<div class="figure align-center" style="width: 100%">
+<img alt="_images/tracking-setup-overview.png" src="_images/tracking-setup-overview.png" />
+</div>
+<table class="colwidths-given wrap-table docutils align-default">
+<colgroup>
+<col style="width: 43%" />
+<col style="width: 19%" />
+<col style="width: 19%" />
+<col style="width: 19%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"></th>
+<th class="head"><p><strong>1. Localhost (default)</strong></p></th>
+<th class="head"><p><strong>2. Local Tracking with Local Database</strong></p></th>
+<th class="head"><p><strong>3. Remote Tracking with</strong> <a class="reference internal" href="#tracking-server"><span class="std std-ref">MLflow Tracking Server</span></a></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Scenario</strong></p></td>
+<td><p>Solo development</p></td>
+<td><p>Solo development</p></td>
+<td><p>Team development</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Use Case</strong></p></td>
+<td><p>By default, MLflow records metadata and artifacts for each run to a local directory, <code class="docutils literal notranslate"><span class="pre">mlruns</span></code>. This is the simplest way to get started with MLflow Tracking, without setting up any external server, database, and storage.</p></td>
+<td><p>The MLflow client can interface with a SQLAlchemy-compatible database (e.g., SQLite, PostgreSQL, MySQL) for the <a class="reference external" href="tracking/backend-stores.html">backend</a>. Saving metadata to a database allows you cleaner management of your experiment data while skipping the effort of setting up a server.</p></td>
+<td><p>MLflow Tracking Server can be configured with an artifacts HTTP proxy, passing artifact requests through the tracking server to store and retrieve artifacts without having to interact with underlying object store services. This is particularly useful for team development scenarios where you want to store artifacts and experiment metadata in a shared location with proper access control.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Tutorial</strong></p></td>
+<td><p><a class="reference external" href="getting-started/intro-quickstart/index.html">QuickStart</a></p></td>
+<td><p><a class="reference external" href="tracking/tutorials/local-database.html">Tracking Experiments using a Local Database</a></p></td>
+<td><p><a class="reference external" href="tracking/tutorials/remote-server.html">Remote Experiment Tracking with MLflow Tracking Server</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="other-configuration-with-mlflow-tracking-server">
+<span id="other-tracking-setup"></span><h3>Other Configuration with <a class="reference internal" href="#tracking-server"><span class="std std-ref">MLflow Tracking Server</span></a><a class="headerlink" href="#other-configuration-with-mlflow-tracking-server" title="Permalink to this headline"> </a></h3>
+<p>MLflow Tracking Server provides customizability for other special use cases. Please follow <a class="reference external" href="tracking/tutorials/remote-server.html">Remote Experiment Tracking with MLflow Tracking Server</a> for
+learning the basic setup and continue to the following materials for advanced configurations to meet your needs.</p>
+<div class="tracking-responsive-tabs docutils container">
+<div class="sphinx-tabs docutils container">
+<div aria-label="Tabbed content" role="tablist"><button aria-controls="panel-0-0-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-0-0-0" name="0-0" role="tab" tabindex="0">Local Tracking Server</button><button aria-controls="panel-0-0-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-1" name="0-1" role="tab" tabindex="-1">Artifacts-only Mode</button><button aria-controls="panel-0-0-2" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-2" name="0-2" role="tab" tabindex="-1">Direct Access to Artifacts</button></div><div aria-labelledby="tab-0-0-0" class="sphinx-tabs-panel" id="panel-0-0-0" name="0-0" role="tabpanel" tabindex="0"><p><div class="tracking-responsive-tab-panel">
+    <div>
+        <h4>Using MLflow Tracking Server Locally</h4>
+        <p>You can of course run MLflow Tracking Server locally. While this doesn't provide much additional benefit over directly using
+          the local files or database, might useful for testing your team development workflow locally or running your machine learning
+          code on a container environment.</p>
+    </div>
+    <img src="_static/images/tracking/tracking-setup-local-server.png"/>
+</div></p>
+</div><div aria-labelledby="tab-0-0-1" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-1" name="0-1" role="tabpanel" tabindex="0"><p><div class="tracking-responsive-tab-panel">
+    <div>
+      <h4>Running MLflow Tracking Server in Artifacts-only Mode</h4>
+      <p> MLflow Tracking Server has <code>--artifacts-only</code> option, which lets the server to serve (proxy) only artifacts
+        and not metadata. This is particularly useful when you are in a large organization or training huge models, you might have high artifact
+         transfer volumes and want to split out the traffic for serving artifacts to not impact tracking functionality. Please read
+         <a href="tracking/server.html#optionally-using-a-tracking-server-instance-exclusively-for-artifact-handling">Optionally using a Tracking Server instance exclusively for artifact handling</a> for more details on how to use this mode.
+      </p>
+    </div>
+    <img src="_static/images/tracking/tracking-setup-artifacts-only.png"/>
+</div></p>
+</div><div aria-labelledby="tab-0-0-2" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-2" name="0-2" role="tabpanel" tabindex="0"><p><div class="tracking-responsive-tab-panel">
+    <div>
+      <h4> Disable Artifact Proxying to Allow Direct Access to Artifacts</h4>
+      <p>MLflow Tracking Server, by default, serves both artifacts and only metadata. However, in some cases, you may want
+        to allow direct access to the remote artifacts storage to avoid the overhead of a proxy while preserving the functionality
+        of metadata tracking. This can be done by disabling artifact proxying by starting server with <code>--no-serve-artifacts</code> option.
+        Refer to <a href="tracking/server.html#use-tracking-server-w-o-proxying-artifacts-access">Use Tracking Server without Proxying Artifacts Access</a> for how to set this up.</p>
+    </div>
+    <img src="_static/images/tracking/tracking-setup-no-serve-artifacts.png"/>
+</div></p>
+</div></div>
+</div>
+</div>
+</div>
+<div class="section" id="faq">
+<h2>FAQ<a class="headerlink" href="#faq" title="Permalink to this headline"> </a></h2>
+<div class="section" id="can-i-launch-multiple-runs-in-parallel">
+<h3>Can I launch multiple runs in parallel?<a class="headerlink" href="#can-i-launch-multiple-runs-in-parallel" title="Permalink to this headline"> </a></h3>
+<p>Yes, MLflow supports launching multiple runs in parallel e.g. multi processing / threading. See <a class="reference internal" href="tracking/tracking-api.html#launching-multiple-runs"><span class="std std-ref">Launching Multiple Runs in One Program</span></a> for more details.</p>
+</div>
+<div class="section" id="how-can-i-organize-many-mlflow-runs-neatly">
+<h3>How can I organize many MLflow Runs neatly?<a class="headerlink" href="#how-can-i-organize-many-mlflow-runs-neatly" title="Permalink to this headline"> </a></h3>
+<p>MLflow provides a few ways to organize your runs:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="tracking/tracking-api.html#organizing-runs-in-experiments"><span class="std std-ref">Organize runs into experiments</span></a> - Experiments are logical containers for your runs. You can create an experiment using the CLI, API, or UI.</p></li>
+<li><p><a class="reference internal" href="tracking/tracking-api.html#child-runs"><span class="std std-ref">Create child runs</span></a> - You can create child runs under a single parent run to group them together. For example, you can create a child run for each fold in a cross-validation experiment.</p></li>
+<li><p><a class="reference internal" href="tracking/tracking-api.html#add-tags-to-runs"><span class="std std-ref">Add tags to runs</span></a> - You can associate arbitrary tags with each run, which allows you to filter and search runs based on tags.</p></li>
+</ul>
+</div>
+<div class="section" id="can-i-directly-access-remote-storage-without-running-the-tracking-server">
+<h3>Can I directly access remote storage without running the Tracking Server?<a class="headerlink" href="#can-i-directly-access-remote-storage-without-running-the-tracking-server" title="Permalink to this headline"> </a></h3>
+<p>Yes, while it is best practice to have the MLflow Tracking Server as a proxy for artifacts access for team development workflows, you may not need that
+if you are using it for personal projects or testing. You can achieve this by following the workaround below:</p>
+<ol class="arabic simple">
+<li><p>Set up artifacts configuration such as credentials and endpoints, just like you would for the MLflow Tracking Server. See <a class="reference internal" href="tracking/artifacts-stores.html#artifacts-store-supported-storages"><span class="std std-ref">configure artifact storage</span></a> for more details.</p></li>
+<li><p>Create an experiment with an explicit artifact location,</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">experiment_name</span> <span class="o">=</span> <span class="s2">&quot;your_experiment_name&quot;</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">create_experiment</span><span class="p">(</span><span class="n">experiment_name</span><span class="p">,</span> <span class="n">artifact_location</span><span class="o">=</span><span class="s2">&quot;s3://your-bucket&quot;</span><span class="p">)</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="n">experiment_name</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Your runs under this experiment will log artifacts to the remote storage directly.</p>
+</div>
+<div class="section" id="how-to-integrate-mlflow-tracking-with-model-registry">
+<span id="tracking-with-model-registry"></span><h3>How to integrate MLflow Tracking with <a class="reference internal" href="model-registry.html#registry"><span class="std std-ref">Model Registry</span></a>?<a class="headerlink" href="#how-to-integrate-mlflow-tracking-with-model-registry" title="Permalink to this headline"> </a></h3>
+<p>To use the Model Registry functionality with MLflow tracking, you <strong>must use database backed store</strong> such as PostgresQL and log a model using the <code class="docutils literal notranslate"><span class="pre">log_model</span></code> methods of the corresponding model flavors.
+Once a model has been logged, you can add, modify, update, or delete the model in the Model Registry through the UI or the API.
+See <a class="reference external" href="tracking/backend-stores.html">Backend Stores</a> and <a class="reference internal" href="#id7"><span class="std std-ref">Common Setups</span></a> for how to configures backend store properly for your workflow.</p>
+</div>
+<div class="section" id="how-to-include-additional-decription-texts-about-the-run">
+<h3>How to include additional decription texts about the run?<a class="headerlink" href="#how-to-include-additional-decription-texts-about-the-run" title="Permalink to this headline"> </a></h3>
+<p>A system tag <code class="docutils literal notranslate"><span class="pre">mlflow.note.content</span></code> can be used to add descriptive note about this run. While the other <a class="reference internal" href="tracking/tracking-api.html#system-tags"><span class="std std-ref">system tags</span></a> are set automatically,
+this tag is <strong>not set by default</strong> and users can override it to include additional information about the run. The content will be displayed on the run’s page under
+the Notes section.</p>
+</div>
+</div>
+</div>
+
+
+              </div>
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="deployment/deploy-model-to-kubernetes/index.html" class="btn btn-neutral" title="Deploying a model to Kubernetes" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+      
+      
+        <a href="tracking/tracking-api.html" class="btn btn-neutral" title="MLflow Tracking APIs" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+      <p class="copyright">
+          &copy; MLflow Project, a Series of LF Projects, LLC. All rights reserved.
+      </p>
+
+  </div> 
+
+</footer>
+          </div>
+        </div>
+      </section>
+    </main>
+  </page>
+
+  
+
+
+  
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+      URL_ROOT:'./',
+      VERSION:'2.9.2.dev0',
+      COLLAPSE_INDEX:false,
+      FILE_SUFFIX:'.html',
+      LINK_SUFFIX: '.html',
+      HAS_SOURCE:  true
+    };
+  </script>
+
+  
+
+  <script type="text/javascript" src="_static/js/clipboard.min.js"></script>
+  <script type="text/javascript" src="_static/js/jquery.waypoints.min.js"></script>
+
+  
+  
+  
+  <script type="text/javascript">var CLIPPY_SVG_PATH = "_static/clippy.svg";</script>
+  <script type="text/javascript" src="_static/js/custom.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.StickyNav.enable();
+    });
+
+  </script>
+  
+
+  
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        // Get the code block designator class entries
+        const allHighlights = document.querySelectorAll('.highlight');
+        // Disable copyable links for notebook cell numbering and for cell outputs
+        const highlights = Array.from(allHighlights).filter(highlight => !highlight.closest('.highlight-none') && 
+            !highlight.closest('.nboutput'));
+    
+        highlights.forEach(function(highlight) {
+            const copyIcon = document.createElement('span');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.innerHTML = '&#xf0ea;';
+
+            copyIcon.addEventListener('click', function() {
+                const code = highlight.querySelector('pre').textContent;
+                copyToClipboard(code);
+
+                // Flash effect on click
+                this.style.color = '#0194E2';
+                setTimeout(() => {
+                    this.style.color = ''; 
+                }, 100);
+
+                // Display "Code copied to clipboard" near the clicked icon
+                const message = document.createElement('span');
+                message.textContent = "Copied!";
+                message.classList.add('copy-message'); 
+
+                // Append the message to the icon
+                this.appendChild(message);
+
+                setTimeout(() => {
+                    this.removeChild(message);
+                }, 500);
+            });
+
+            highlight.appendChild(copyIcon);
+        });
+    });
+  </script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Force download for notebook-download-btn
+        const downloadButtons = document.querySelectorAll('.notebook-download-btn');
+        downloadButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                // Fetch the raw content of the notebook from GitHub
+                fetch(button.href)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = url;
+                        const filename = button.href.split('/').pop();
+                        link.download = filename; 
+
+                        document.body.appendChild(link);
+                        link.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    })
+                    .catch(err => console.error('Error fetching the notebook:', err));
+            });
+        });
+    });
+</script> 
+</body>
+</html>

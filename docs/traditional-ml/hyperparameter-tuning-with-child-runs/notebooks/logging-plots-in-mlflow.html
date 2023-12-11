@@ -1,0 +1,1682 @@
+
+  
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Logging Visualizations with MLflow &mdash; MLflow 2.9.2.dev0 documentation</title>
+  
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/traditional-ml/hyperparameter-tuning-with-child-runs/notebooks/logging-plots-in-mlflow.html">
+  
+  
+    <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
+    
+
+    
+
+  
+    
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/grids.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/mobile.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/simple-cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/tabs.css" type="text/css" />
+    
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="MLflow 2.9.2.dev0 documentation" href="../../../index.html"/>
+        <link rel="up" title="Hyperparameter tuning with MLflow and child runs - Notebooks" href="index.html"/>
+        <link rel="next" title="Understanding Parent and Child Runs in MLflow" href="/../part1-child-runs.html"/>
+        <link rel="prev" title="Leveraging Child Runs in MLflow for Hyperparameter Tuning" href="/parent-child-runs.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+<script type="text/javascript" src="../../../_static/jquery.js"></script>
+<script type="text/javascript" src="../../../_static/underscore.js"></script>
+<script type="text/javascript" src="../../../_static/doctools.js"></script>
+<script type="text/javascript" src="../../../_static/languagesections.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript" src="../../../None"></script>
+
+<body class="wy-body-for-nav" role="document">
+  
+
+  
+  <nav class="wy-nav-top header" role="navigation" aria-label="top navigation">
+    <ul>
+  <li class="menu-toggle">
+    <i data-toggle="wy-nav-top" class="wy-nav-top-menu-button db-icon db-icon-menu pull-left"></i>
+    <a href="../../../index.html" class="wy-nav-top-logo"
+      ><img src="../../../_static/MLflow-logo-final-black.png" alt="MLflow"
+    /></a>
+    <span class="version">2.9.2.dev0</span>
+  </li>
+</ul>
+  </nav>
+  <page>
+    
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side relative">
+      <div class="wy-side-scroll">
+  <div class="wy-side-nav-search">
+    
+
+    
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+    
+  </div>
+
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+    
+      <a href="../../../index.html" class="main-navigation-home"><img src="../../../_static/icons/nav-home.svg"> MLflow</a>
+    
+
+    
+      
+
+      
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../introduction/index.html">What is MLflow?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting-started/index.html">Getting Started with MLflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../new-features/index.html">New Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../llms/index.html">LLMs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../model-evaluation/index.html">Model Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deep-learning/index.html">Deep Learning</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">Traditional ML</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#native-library-support">Native Library Support</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../index.html#tutorials-and-guides">Tutorials and Guides</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../index.html">Hyperparameter Tuning with MLflow and Optuna</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="index.html">Full Notebooks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../part1-child-runs.html">The Parent-Child relationship with runs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../part2-logging-plots.html">Logging plots with MLflow</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../creating-custom-pyfunc/index.html">Building Custom Python Function Models with MLflow</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#mlflow-tracking">MLflow Tracking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#mlflow-recipes">MLflow Recipes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#mlflow-evaluate">MLflow Evaluate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#model-registry">Model Registry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#deployment">Deployment</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deployment/index.html">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tracking.html">MLflow Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../system-metrics/index.html">System Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../projects.html">MLflow Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../models.html">MLflow Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../model-registry.html">MLflow Model Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../recipes.html">MLflow Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../plugins.html">MLflow Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../auth/index.html">MLflow Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../search-runs.html">Search Runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../search-experiments.html">Search Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../python_api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../R-api.html">R API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../java_api/index.html">Java API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rest-api.html">REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docker.html">Official MLflow Docker Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../community-model-flavors.html">Community Model Flavors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials-and-examples/index.html">Tutorials and Examples</a></li>
+</ul>
+
+      
+    
+  </div>
+
+  <div role="contentinfo">
+    
+
+    <p>
+      <a id='feedbacklink' href="https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a>
+    </p>
+  </div>
+</div>
+    </nav>
+
+    <main class="wy-grid-for-nav">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+          <div class="rst-content">
+            
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Documentation</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../../index.html">Traditional ML</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../index.html">Hyperparameter Tuning with MLflow and Optuna</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="index.html">Hyperparameter tuning with MLflow and child runs - Notebooks</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+    
+      <li>Logging Visualizations with MLflow</li>
+    
+    
+    <!-- <li class="wy-breadcrumbs-aside">
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/traditional-ml/hyperparameter-tuning-with-child-runs/notebooks/logging-plots-in-mlflow.ipynb" class="fa fa-github"> Edit on GitHub</a>
+    </li> -->
+    
+  </ul>
+</div>
+            <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <div itemprop="articleBody">
+                
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">pathlib</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">stats</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pylab</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">matplotlib.pylab</span> <span class="kn">import</span> <span class="n">rcParams</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">gridspec</span> <span class="k">as</span> <span class="n">gs</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+
+<span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">Ridge</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">mean_squared_error</span><span class="p">,</span>
+    <span class="n">mean_absolute_error</span><span class="p">,</span>
+    <span class="n">r2_score</span><span class="p">,</span>
+    <span class="n">mean_squared_log_error</span><span class="p">,</span>
+    <span class="n">median_absolute_error</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="Logging-Visualizations-with-MLflow">
+<h1>Logging Visualizations with MLflow<a class="headerlink" href="#Logging-Visualizations-with-MLflow" title="Permalink to this headline"> </a></h1>
+<p>In this part of the guide, we emphasize the <strong>importance of logging visualizations with MLflow</strong>. Retaining visualizations alongside trained models enhances model interpretability, auditing, and provenance, ensuring a robust and transparent machine learning lifecycle.</p>
+<div class="section" id="What-Are-We-Doing?">
+<h2>What Are We Doing?<a class="headerlink" href="#What-Are-We-Doing?" title="Permalink to this headline"> </a></h2>
+<ul class="simple">
+<li><p><strong>Storing Visual Artifacts:</strong> We are logging various plots as visual artifacts in MLflow, ensuring that they are always accessible and aligned with the corresponding model and run data.</p></li>
+<li><p><strong>Enhancing Model Interpretability:</strong> These visualizations aid in understanding and explaining model behavior, contributing to improved model transparency and accountability.</p></li>
+</ul>
+</div>
+<div class="section" id="How-Does-It-Apply-to-MLflow?">
+<h2>How Does It Apply to MLflow?<a class="headerlink" href="#How-Does-It-Apply-to-MLflow?" title="Permalink to this headline"> </a></h2>
+<ul class="simple">
+<li><p><strong>Integrated Visualization Logging:</strong> MLflow seamlessly integrates facilities for logging and accessing visual artifacts, enhancing the ease and efficiency of handling visual context and insights.</p></li>
+<li><p><strong>Convenient Access:</strong> Logged figures are displayable within the Runs view pane in the MLflow UI, ensuring quick and easy access for analysis and review.</p></li>
+</ul>
+</div>
+<div class="section" id="Caution">
+<h2>Caution<a class="headerlink" href="#Caution" title="Permalink to this headline"> </a></h2>
+<p>While MLflow offers simplicity and convenience for logging visualizations, it’s crucial to ensure the consistency and relevance of the visual artifacts with the corresponding model data, maintaining the integrity and comprehensiveness of the model information.</p>
+</div>
+<div class="section" id="Why-Is-Consistent-Logging-Important?">
+<h2>Why Is Consistent Logging Important?<a class="headerlink" href="#Why-Is-Consistent-Logging-Important?" title="Permalink to this headline"> </a></h2>
+<ul class="simple">
+<li><p><strong>Auditing and Provenance:</strong> Consistent and comprehensive logging of visualizations is pivotal for auditing purposes, ensuring that every model is accompanied by relevant visual insights for thorough analysis and review.</p></li>
+<li><p><strong>Enhanced Model Understanding:</strong> Proper visual context enhances the understanding of model behavior, aiding in effective model evaluation, and validation.</p></li>
+</ul>
+<p>In conclusion, MLflow’s capabilities for visualization logging play an invaluable role in ensuring a comprehensive, transparent, and efficient machine learning lifecycle, reinforcing model interpretability, auditing, and provenance.</p>
+</div>
+</div>
+<div class="section" id="Generating-Synthetic-Apple-Sales-Data">
+<h1>Generating Synthetic Apple Sales Data<a class="headerlink" href="#Generating-Synthetic-Apple-Sales-Data" title="Permalink to this headline"> </a></h1>
+<p>In this next section, we dive into <strong>generating synthetic data for apple sales demand prediction</strong> using the <code class="docutils literal notranslate"><span class="pre">generate_apple_sales_data_with_promo_adjustment</span></code> function. This function simulates a variety of features relevant to apple sales, providing a rich dataset for exploration and modeling.</p>
+<div class="section" id="id1">
+<h2>What Are We Doing?<a class="headerlink" href="#id1" title="Permalink to this headline"> </a></h2>
+<ul class="simple">
+<li><p><strong>Simulating Realistic Data:</strong> Generating a dataset with features like date, average temperature, rainfall, weekend flag, and more, simulating realistic scenarios for apple sales.</p></li>
+<li><p><strong>Incorporating Various Effects:</strong> The function incorporates effects like promotional adjustments, seasonality, and competitor pricing, contributing to the ‘demand’ target variable.</p></li>
+</ul>
+</div>
+<div class="section" id="How-Does-It-Apply-to-Data-Generation?">
+<h2>How Does It Apply to Data Generation?<a class="headerlink" href="#How-Does-It-Apply-to-Data-Generation?" title="Permalink to this headline"> </a></h2>
+<ul class="simple">
+<li><p><strong>Comprehensive Dataset:</strong> The synthetic dataset provides a comprehensive set of features and interactions, ideal for exploring diverse aspects and dimensions for demand prediction.</p></li>
+<li><p><strong>Freedom and Flexibility:</strong> The synthetic nature allows for unconstrained exploration and analysis, devoid of real-world data sensitivities and constraints.</p></li>
+</ul>
+</div>
+<div class="section" id="id2">
+<h2>Caution<a class="headerlink" href="#id2" title="Permalink to this headline"> </a></h2>
+<p>While synthetic data offers numerous advantages for exploration and learning, it’s crucial to acknowledge its limitations in capturing real-world complexities and nuances.</p>
+</div>
+<div class="section" id="Why-Is-Acknowledging-Limitations-Important?">
+<h2>Why Is Acknowledging Limitations Important?<a class="headerlink" href="#Why-Is-Acknowledging-Limitations-Important?" title="Permalink to this headline"> </a></h2>
+<ul class="simple">
+<li><p><strong>Real-World Complexities:</strong> Synthetic data may not capture all the intricate patterns and anomalies present in real-world data, potentially leading to over-simplified models and insights.</p></li>
+<li><p><strong>Transferability to Real-World Scenarios:</strong> Ensuring that insights and models derived from synthetic data are transferable to real-world scenarios requires careful consideration and validation.</p></li>
+</ul>
+<p>In conclusion, the <code class="docutils literal notranslate"><span class="pre">generate_apple_sales_data_with_promo_adjustment</span></code> function offers a robust tool for generating a comprehensive synthetic dataset for apple sales demand prediction, facilitating extensive exploration, and analysis while acknowledging the limitations of synthetic data.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">generate_apple_sales_data_with_promo_adjustment</span><span class="p">(</span>
+    <span class="n">base_demand</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
+    <span class="n">n_rows</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5000</span><span class="p">,</span>
+    <span class="n">competitor_price_effect</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mf">50.0</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates a synthetic dataset for predicting apple sales demand with multiple</span>
+<span class="sd">    influencing factors.</span>
+
+<span class="sd">    This function creates a pandas DataFrame with features relevant to apple sales.</span>
+<span class="sd">    The features include date, average_temperature, rainfall, weekend flag, holiday flag,</span>
+<span class="sd">    promotional flag, price_per_kg, competitor&#39;s price, marketing intensity, stock availability,</span>
+<span class="sd">    and the previous day&#39;s demand. The target variable, &#39;demand&#39;, is generated based on a</span>
+<span class="sd">    combination of these features with some added noise.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        base_demand (int, optional): Base demand for apples. Defaults to 1000.</span>
+<span class="sd">        n_rows (int, optional): Number of rows (days) of data to generate. Defaults to 5000.</span>
+<span class="sd">        competitor_price_effect (float, optional): Effect of competitor&#39;s price being lower</span>
+<span class="sd">                                                   on our sales. Defaults to -50.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        pd.DataFrame: DataFrame with features and target variable for apple sales prediction.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; df = generate_apple_sales_data_with_promo_adjustment(base_demand=1200, n_rows=6000)</span>
+<span class="sd">        &gt;&gt;&gt; df.head()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Set seed for reproducibility</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">9999</span><span class="p">)</span>
+
+    <span class="c1"># Create date range</span>
+    <span class="n">dates</span> <span class="o">=</span> <span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_rows</span><span class="p">)]</span>
+    <span class="n">dates</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+
+    <span class="c1"># Generate features</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;date&quot;</span><span class="p">:</span> <span class="n">dates</span><span class="p">,</span>
+            <span class="s2">&quot;average_temperature&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">35</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">),</span>
+            <span class="s2">&quot;rainfall&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">exponential</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">),</span>
+            <span class="s2">&quot;weekend&quot;</span><span class="p">:</span> <span class="p">[(</span><span class="n">date</span><span class="o">.</span><span class="n">weekday</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="mi">5</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">date</span> <span class="ow">in</span> <span class="n">dates</span><span class="p">],</span>
+            <span class="s2">&quot;holiday&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">n_rows</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="p">[</span><span class="mf">0.97</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">]),</span>
+            <span class="s2">&quot;price_per_kg&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">),</span>
+            <span class="s2">&quot;month&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">date</span><span class="o">.</span><span class="n">month</span> <span class="k">for</span> <span class="n">date</span> <span class="ow">in</span> <span class="n">dates</span><span class="p">],</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Introduce inflation over time (years)</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;inflation_multiplier&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;date&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">year</span> <span class="o">-</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;date&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">year</span><span class="o">.</span><span class="n">min</span><span class="p">())</span> <span class="o">*</span> <span class="mf">0.03</span>
+
+    <span class="c1"># Incorporate seasonality due to apple harvests</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;harvest_effect&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;month&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">3</span><span class="p">)</span> <span class="o">/</span> <span class="mi">12</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span>
+        <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;month&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">9</span><span class="p">)</span> <span class="o">/</span> <span class="mi">12</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Modify the price_per_kg based on harvest effect</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;price_per_kg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;price_per_kg&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;harvest_effect&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.5</span>
+
+    <span class="c1"># Adjust promo periods to coincide with periods lagging peak harvest by 1 month</span>
+    <span class="n">peak_months</span> <span class="o">=</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>  <span class="c1"># months following the peak availability</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;promo&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;month&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">peak_months</span><span class="p">),</span>
+        <span class="mi">1</span><span class="p">,</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">n_rows</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="p">[</span><span class="mf">0.85</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">]),</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Generate target variable based on features</span>
+    <span class="n">base_price_effect</span> <span class="o">=</span> <span class="o">-</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;price_per_kg&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">50</span>
+    <span class="n">seasonality_effect</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;harvest_effect&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">50</span>
+    <span class="n">promo_effect</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;promo&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">200</span>
+
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;demand&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">base_demand</span>
+        <span class="o">+</span> <span class="n">base_price_effect</span>
+        <span class="o">+</span> <span class="n">seasonality_effect</span>
+        <span class="o">+</span> <span class="n">promo_effect</span>
+        <span class="o">+</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;weekend&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">300</span>
+        <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">)</span>
+    <span class="p">)</span> <span class="o">*</span> <span class="n">df</span><span class="p">[</span>
+        <span class="s2">&quot;inflation_multiplier&quot;</span>
+    <span class="p">]</span>  <span class="c1"># adding random noise</span>
+
+    <span class="c1"># Add previous day&#39;s demand</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;previous_days_demand&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;demand&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;previous_days_demand&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;bfill&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># fill the first row</span>
+
+    <span class="c1"># Introduce competitor pricing</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;competitor_price_per_kg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">)</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;competitor_price_effect&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;competitor_price_per_kg&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;price_per_kg&quot;</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">*</span> <span class="n">competitor_price_effect</span>
+
+    <span class="c1"># Stock availability based on past sales price (3 days lag with logarithmic decay)</span>
+    <span class="n">log_decay</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;price_per_kg&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;stock_available&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">log_decay</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Marketing intensity based on stock availability</span>
+    <span class="c1"># Identify where stock is above threshold</span>
+    <span class="n">high_stock_indices</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;stock_available&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.95</span><span class="p">]</span><span class="o">.</span><span class="n">index</span>
+
+    <span class="c1"># For each high stock day, increase marketing intensity for the next week</span>
+    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">high_stock_indices</span><span class="p">:</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx</span> <span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">7</span><span class="p">,</span> <span class="n">n_rows</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="s2">&quot;marketing_intensity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.7</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># If the marketing_intensity column already has values, this will preserve them;</span>
+    <span class="c1">#  if not, it sets default values</span>
+    <span class="n">fill_values</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;marketing_intensity&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">fill_values</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Adjust demand with new factors</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;demand&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;demand&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;competitor_price_effect&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;marketing_intensity&quot;</span><span class="p">]</span>
+
+    <span class="c1"># Drop temporary columns</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span>
+        <span class="n">columns</span><span class="o">=</span><span class="p">[</span>
+            <span class="s2">&quot;inflation_multiplier&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;harvest_effect&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;month&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;competitor_price_effect&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;stock_available&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">df</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Generating-Apple-Sales-Data">
+<h1>Generating Apple Sales Data<a class="headerlink" href="#Generating-Apple-Sales-Data" title="Permalink to this headline"> </a></h1>
+<p>In this cell, we call the <code class="docutils literal notranslate"><span class="pre">generate_apple_sales_data_with_promo_adjustment</span></code> function to generate a dataset of apple sales.</p>
+<div class="section" id="Parameters-Used:">
+<h2>Parameters Used:<a class="headerlink" href="#Parameters-Used:" title="Permalink to this headline"> </a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">base_demand</span></code>: Set to 1000, representing the baseline demand for apples.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">n_rows</span></code>: Set to 10,000, determining the number of rows or data points in the generated dataset.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">competitor_price_effect</span></code>: Set to -25.0, representing the impact on our sales when the competitor’s price is lower.</p></li>
+</ul>
+<p>By running this cell, we obtain a dataset <code class="docutils literal notranslate"><span class="pre">my_data</span></code>, which holds the synthetic apple sales data with the aforementioned configurations. This dataset will be used for further exploration and analysis in subsequent steps of this notebook.</p>
+<p>You can see the data in the cell after the generation cell.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">my_data</span> <span class="o">=</span> <span class="n">generate_apple_sales_data_with_promo_adjustment</span><span class="p">(</span>
+    <span class="n">base_demand</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">n_rows</span><span class="o">=</span><span class="mi">10_000</span><span class="p">,</span> <span class="n">competitor_price_effect</span><span class="o">=-</span><span class="mf">25.0</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">my_data</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>date</th>
+      <th>average_temperature</th>
+      <th>rainfall</th>
+      <th>weekend</th>
+      <th>holiday</th>
+      <th>price_per_kg</th>
+      <th>promo</th>
+      <th>demand</th>
+      <th>previous_days_demand</th>
+      <th>competitor_price_per_kg</th>
+      <th>marketing_intensity</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1996-05-11 13:10:40.689999</td>
+      <td>30.584727</td>
+      <td>1.831006</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1.578387</td>
+      <td>1</td>
+      <td>1301.647352</td>
+      <td>1326.324266</td>
+      <td>0.755725</td>
+      <td>0.323086</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1996-05-12 13:10:40.689999</td>
+      <td>15.465069</td>
+      <td>0.761303</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1.965125</td>
+      <td>0</td>
+      <td>1143.972638</td>
+      <td>1326.324266</td>
+      <td>0.913934</td>
+      <td>0.030371</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1996-05-13 13:10:40.689998</td>
+      <td>10.786525</td>
+      <td>1.427338</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.497623</td>
+      <td>0</td>
+      <td>890.319248</td>
+      <td>1168.942267</td>
+      <td>2.879262</td>
+      <td>0.354226</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1996-05-14 13:10:40.689997</td>
+      <td>23.648154</td>
+      <td>3.737435</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.952936</td>
+      <td>0</td>
+      <td>811.206168</td>
+      <td>889.965021</td>
+      <td>0.826015</td>
+      <td>0.953000</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1996-05-15 13:10:40.689997</td>
+      <td>13.861391</td>
+      <td>5.598549</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2.059993</td>
+      <td>0</td>
+      <td>822.279469</td>
+      <td>835.253168</td>
+      <td>1.130145</td>
+      <td>0.953000</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>9995</th>
+      <td>2023-09-22 13:10:40.682895</td>
+      <td>23.358868</td>
+      <td>7.061220</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.556829</td>
+      <td>1</td>
+      <td>1981.195884</td>
+      <td>2089.644454</td>
+      <td>0.560507</td>
+      <td>0.889971</td>
+    </tr>
+    <tr>
+      <th>9996</th>
+      <td>2023-09-23 13:10:40.682895</td>
+      <td>14.859048</td>
+      <td>0.868655</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1.632918</td>
+      <td>0</td>
+      <td>2180.698138</td>
+      <td>2005.305913</td>
+      <td>2.460766</td>
+      <td>0.884467</td>
+    </tr>
+    <tr>
+      <th>9997</th>
+      <td>2023-09-24 13:10:40.682894</td>
+      <td>17.941035</td>
+      <td>13.739986</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0.827723</td>
+      <td>1</td>
+      <td>2675.093671</td>
+      <td>2179.813671</td>
+      <td>1.321922</td>
+      <td>0.884467</td>
+    </tr>
+    <tr>
+      <th>9998</th>
+      <td>2023-09-25 13:10:40.682893</td>
+      <td>14.533862</td>
+      <td>1.610512</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.589172</td>
+      <td>0</td>
+      <td>1703.287285</td>
+      <td>2674.209204</td>
+      <td>2.604095</td>
+      <td>0.812706</td>
+    </tr>
+    <tr>
+      <th>9999</th>
+      <td>2023-09-26 13:10:40.682889</td>
+      <td>13.048549</td>
+      <td>5.287508</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.794122</td>
+      <td>1</td>
+      <td>1971.029266</td>
+      <td>1702.474579</td>
+      <td>1.261635</td>
+      <td>0.750458</td>
+    </tr>
+  </tbody>
+</table>
+<p>10000 rows × 11 columns</p>
+</div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Time-Series-Visualization-of-Demand">
+<h1>Time Series Visualization of Demand<a class="headerlink" href="#Time-Series-Visualization-of-Demand" title="Permalink to this headline"> </a></h1>
+<p>In this section, we’re creating a time series plot to visualize the demand data alongside its rolling average.</p>
+<div class="section" id="Why-is-this-Important?">
+<h2>Why is this Important?<a class="headerlink" href="#Why-is-this-Important?" title="Permalink to this headline"> </a></h2>
+<p>Visualizing time series data is crucial for identifying patterns, understanding variability, and making more informed decisions. By plotting the rolling average alongside, we can smooth out short-term fluctuations and highlight longer-term trends or cycles. This visual aid is essential for understanding the data and making more accurate and informed predictions and decisions.</p>
+</div>
+<div class="section" id="Structure-of-the-Code:">
+<h2>Structure of the Code:<a class="headerlink" href="#Structure-of-the-Code:" title="Permalink to this headline"> </a></h2>
+<ul class="simple">
+<li><p><strong>Input Verification</strong>: The code first ensures the data is a pandas DataFrame.</p></li>
+<li><p><strong>Date Conversion</strong>: It converts the ‘date’ column to a datetime format for accurate plotting.</p></li>
+<li><p><strong>Rolling Average Calculation</strong>: It calculates the rolling average of the ‘demand’ with a specified window size (<code class="docutils literal notranslate"><span class="pre">window_size</span></code>), defaulting to 7 days.</p></li>
+<li><p><strong>Plotting</strong>: It plots both the original demand data and the calculated rolling average on the same plot for comparison. The original demand data is plotted with low alpha to appear “ghostly,” ensuring the rolling average stands out.</p></li>
+<li><p><strong>Labels and Legend</strong>: Adequate labels and legends are added for clarity.</p></li>
+</ul>
+</div>
+<div class="section" id="Why-Return-a-Figure?">
+<h2>Why Return a Figure?<a class="headerlink" href="#Why-Return-a-Figure?" title="Permalink to this headline"> </a></h2>
+<p>We return the figure object (<code class="docutils literal notranslate"><span class="pre">fig</span></code>) instead of rendering it directly so that each iteration of a model training event can consume the figure as a logged artifact to MLflow. This approach allows us to persist the state of the data visualization with precisely the state of the data that was used for training. MLflow can store this figure object, enabling easy retrieval and rendering within the MLflow UI, ensuring that the visualization is always accessible and paired with the relevant model and
+data information.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_time_series_demand</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">window_size</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;seaborn&quot;</span><span class="p">,</span> <span class="n">plot_size</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">12</span><span class="p">)):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;df must be a pandas DataFrame.&quot;</span><span class="p">)</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;date&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;date&quot;</span><span class="p">])</span>
+
+    <span class="c1"># Calculate the rolling average</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;rolling_avg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;demand&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="n">window_size</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+    <span class="k">with</span> <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">):</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">plot_size</span><span class="p">)</span>
+        <span class="c1"># Plot the original time series data with low alpha (transparency)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;date&quot;</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;demand&quot;</span><span class="p">],</span> <span class="s2">&quot;b-o&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Original Demand&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.15</span><span class="p">)</span>
+        <span class="c1"># Plot the rolling average</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+            <span class="n">df</span><span class="p">[</span><span class="s2">&quot;date&quot;</span><span class="p">],</span>
+            <span class="n">df</span><span class="p">[</span><span class="s2">&quot;rolling_avg&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;r&quot;</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">window_size</span><span class="si">}</span><span class="s2">-Day Rolling Average&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Set labels and title</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Time Series Plot of Demand with </span><span class="si">{</span><span class="n">window_size</span><span class="si">}</span><span class="s2"> day Rolling Average&quot;</span><span class="p">,</span>
+            <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Date&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Demand&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+
+        <span class="c1"># Add legend to explain the lines</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fig</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Visualizing-Demand-on-Weekends-vs. Weekdays-with-Box-Plots">
+<h1>Visualizing Demand on Weekends vs. Weekdays with Box Plots<a class="headerlink" href="#Visualizing-Demand-on-Weekends-vs. Weekdays-with-Box-Plots" title="Permalink to this headline"> </a></h1>
+<p>In this section, we’re utilizing box plots to visualize the distribution of demand on weekends versus weekdays. This visualization assists in understanding the variability and central tendency of demand based on the day of the week.</p>
+<div class="section" id="id3">
+<h2>Why is this Important?<a class="headerlink" href="#id3" title="Permalink to this headline"> </a></h2>
+<p>Understanding how demand differs between weekends and weekdays is crucial for making informed decisions regarding inventory, staffing, and other operational aspects. It helps identify the periods of higher demand, allowing for better resource allocation and planning.</p>
+</div>
+<div class="section" id="id4">
+<h2>Structure of the Code:<a class="headerlink" href="#id4" title="Permalink to this headline"> </a></h2>
+<ul class="simple">
+<li><p><strong>Box Plot</strong>: The code uses Seaborn to create a box plot that shows the distribution of demand on weekends (1) and weekdays (0). The box plot provides insights into the median, quartiles, and possible outliers in the demand data for both categories.</p></li>
+<li><p><strong>Adding Individual Data Points</strong>: To provide more context, individual data points are overlayed on the box plot as a strip plot. They are jittered for better visualization and color-coded based on the day type.</p></li>
+<li><p><strong>Styling</strong>: The plot is styled for clarity, and unnecessary legends are removed to enhance readability.</p></li>
+</ul>
+</div>
+<div class="section" id="id5">
+<h2>Why Return a Figure?<a class="headerlink" href="#id5" title="Permalink to this headline"> </a></h2>
+<p>As with the time series plot, this function also returns the figure object (<code class="docutils literal notranslate"><span class="pre">fig</span></code>) instead of displaying it directly.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_box_weekend</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;seaborn&quot;</span><span class="p">,</span> <span class="n">plot_size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">)):</span>
+    <span class="k">with</span> <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">):</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">plot_size</span><span class="p">)</span>
+        <span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;weekend&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;demand&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;lightgray&quot;</span><span class="p">)</span>
+        <span class="n">sns</span><span class="o">.</span><span class="n">stripplot</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
+            <span class="n">x</span><span class="o">=</span><span class="s2">&quot;weekend&quot;</span><span class="p">,</span>
+            <span class="n">y</span><span class="o">=</span><span class="s2">&quot;demand&quot;</span><span class="p">,</span>
+            <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+            <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;weekend&quot;</span><span class="p">,</span>
+            <span class="n">palette</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;green&quot;</span><span class="p">},</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span>
+            <span class="n">jitter</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+            <span class="n">size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Box Plot of Demand on Weekends vs. Weekdays&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Weekend (0: No, 1: Yes)&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Demand&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">()</span> <span class="o">+</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_yticklabels</span><span class="p">():</span>
+            <span class="n">i</span><span class="o">.</span><span class="n">set_fontsize</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">legend_</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fig</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Exploring-the-Relationship-Between-Demand-and-Price-per-Kg">
+<h1>Exploring the Relationship Between Demand and Price per Kg<a class="headerlink" href="#Exploring-the-Relationship-Between-Demand-and-Price-per-Kg" title="Permalink to this headline"> </a></h1>
+<p>In this visualization, we’re creating a scatter plot to investigate the relationship between the <code class="docutils literal notranslate"><span class="pre">demand</span></code> and <code class="docutils literal notranslate"><span class="pre">price_per_kg</span></code>. Understanding this relationship is crucial for pricing strategy and demand forecasting.</p>
+<div class="section" id="id6">
+<h2>Why is this Important?<a class="headerlink" href="#id6" title="Permalink to this headline"> </a></h2>
+<ul class="simple">
+<li><p><strong>Insight into Pricing Strategy:</strong> This visualization helps reveal how demand varies with the price per kg, providing valuable insights for setting prices to optimize sales and revenue.</p></li>
+<li><p><strong>Understanding Demand Elasticity:</strong> It aids in understanding the elasticity of demand concerning price, helping in making informed and data-driven decisions for promotions and discounts.</p></li>
+</ul>
+</div>
+<div class="section" id="id7">
+<h2>Structure of the Code:<a class="headerlink" href="#id7" title="Permalink to this headline"> </a></h2>
+<ul class="simple">
+<li><p><strong>Scatter Plot:</strong> The code generates a scatter plot, where each point’s position is determined by the <code class="docutils literal notranslate"><span class="pre">price_per_kg</span></code> and <code class="docutils literal notranslate"><span class="pre">demand</span></code>, and the color indicates whether the day is a weekend or a weekday. This color-coding helps in quickly identifying patterns specific to weekends or weekdays.</p></li>
+<li><p><strong>Transparency and Jitter:</strong> Points are plotted with transparency (<code class="docutils literal notranslate"><span class="pre">alpha=0.15</span></code>) to handle overplotting, allowing the visualization of the density of points.</p></li>
+<li><p><strong>Regression Line:</strong> For each subgroup (weekend and weekday), a separate regression line is fitted and plotted on the same axes. These lines provide a clear visual indication of the trend of demand concerning the price per kg for each group.</p></li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_scatter_demand_price</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;seaborn&quot;</span><span class="p">,</span> <span class="n">plot_size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">)):</span>
+    <span class="k">with</span> <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">):</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">plot_size</span><span class="p">)</span>
+        <span class="c1"># Scatter plot with jitter, transparency, and color-coded based on weekend</span>
+        <span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
+            <span class="n">x</span><span class="o">=</span><span class="s2">&quot;price_per_kg&quot;</span><span class="p">,</span>
+            <span class="n">y</span><span class="o">=</span><span class="s2">&quot;demand&quot;</span><span class="p">,</span>
+            <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;weekend&quot;</span><span class="p">,</span>
+            <span class="n">palette</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;green&quot;</span><span class="p">},</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span>
+            <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="c1"># Fit a simple regression line for each subgroup</span>
+        <span class="n">sns</span><span class="o">.</span><span class="n">regplot</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;weekend&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="n">x</span><span class="o">=</span><span class="s2">&quot;price_per_kg&quot;</span><span class="p">,</span>
+            <span class="n">y</span><span class="o">=</span><span class="s2">&quot;demand&quot;</span><span class="p">,</span>
+            <span class="n">scatter</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">,</span>
+            <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">sns</span><span class="o">.</span><span class="n">regplot</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;weekend&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="n">x</span><span class="o">=</span><span class="s2">&quot;price_per_kg&quot;</span><span class="p">,</span>
+            <span class="n">y</span><span class="o">=</span><span class="s2">&quot;demand&quot;</span><span class="p">,</span>
+            <span class="n">scatter</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">,</span>
+            <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Scatter Plot of Demand vs Price per kg with Regression Line&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Price per kg&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Demand&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">()</span> <span class="o">+</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_yticklabels</span><span class="p">():</span>
+            <span class="n">i</span><span class="o">.</span><span class="n">set_fontsize</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fig</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Visualizing-Demand-Density:-Weekday-vs. Weekend">
+<h1>Visualizing Demand Density: Weekday vs. Weekend<a class="headerlink" href="#Visualizing-Demand-Density:-Weekday-vs. Weekend" title="Permalink to this headline"> </a></h1>
+<p>This visualization allows us to observe the distribution of <code class="docutils literal notranslate"><span class="pre">demand</span></code> separately for weekdays and weekends.</p>
+<div class="section" id="id8">
+<h2>Why is this Important?<a class="headerlink" href="#id8" title="Permalink to this headline"> </a></h2>
+<ul class="simple">
+<li><p><strong>Demand Distribution Insight:</strong> Understanding the distribution of demand on weekdays versus weekends can inform inventory management and staffing needs.</p></li>
+<li><p><strong>Informing Business Strategy:</strong> This insight is vital for making data-driven decisions regarding promotions, discounts, and other strategies that might be more effective on specific days.</p></li>
+</ul>
+</div>
+<div class="section" id="id9">
+<h2>Structure of the Code:<a class="headerlink" href="#id9" title="Permalink to this headline"> </a></h2>
+<ul class="simple">
+<li><p><strong>Density Plot:</strong> The code generates a density plot for <code class="docutils literal notranslate"><span class="pre">demand</span></code>, separated into weekdays and weekends.</p></li>
+<li><p><strong>Color-Coded Groups:</strong> The two groups (weekday and weekend) are color-coded (blue and green respectively), making it easy to distinguish between them.</p></li>
+<li><p><strong>Transparency and Filling:</strong> The areas under the density curves are filled with a light, transparent color (<code class="docutils literal notranslate"><span class="pre">alpha=0.15</span></code>) for easy visualization while avoiding visual clutter.</p></li>
+</ul>
+</div>
+<div class="section" id="What-are-the-Visual-Elements?">
+<h2>What are the Visual Elements?<a class="headerlink" href="#What-are-the-Visual-Elements?" title="Permalink to this headline"> </a></h2>
+<ul class="simple">
+<li><p><strong>Two Density Curves:</strong> The plot comprises two density curves, one for weekdays and another for weekends. These curves provide a clear visual representation of the distribution of demand for each group.</p></li>
+<li><p><strong>Legend:</strong> A legend is added to help identify which curve corresponds to which group (weekday or weekend).</p></li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_density_weekday_weekend</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;seaborn&quot;</span><span class="p">,</span> <span class="n">plot_size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">)):</span>
+    <span class="k">with</span> <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">):</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">plot_size</span><span class="p">)</span>
+
+        <span class="c1"># Plot density for weekdays</span>
+        <span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;weekend&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">][</span><span class="s2">&quot;demand&quot;</span><span class="p">],</span>
+            <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Weekday&quot;</span><span class="p">,</span>
+            <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+            <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Plot density for weekends</span>
+        <span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;weekend&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">][</span><span class="s2">&quot;demand&quot;</span><span class="p">],</span>
+            <span class="n">color</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Weekend&quot;</span><span class="p">,</span>
+            <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+            <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Density Plot of Demand by Weekday/Weekend&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Demand&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">()</span> <span class="o">+</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_yticklabels</span><span class="p">():</span>
+            <span class="n">i</span><span class="o">.</span><span class="n">set_fontsize</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fig</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Visualization-of-Model-Coefficients">
+<h1>Visualization of Model Coefficients<a class="headerlink" href="#Visualization-of-Model-Coefficients" title="Permalink to this headline"> </a></h1>
+<p>In this section, we’re utilizing a bar plot to visualize the coefficients of the features from the trained model.</p>
+<div class="section" id="id10">
+<h2>Why is this Important?<a class="headerlink" href="#id10" title="Permalink to this headline"> </a></h2>
+<p>Understanding the magnitude and direction of the coefficients is essential for interpreting the model. It helps in identifying the most significant features that influence the prediction. This insight is crucial for feature selection, engineering, and ultimately improving the model performance.</p>
+</div>
+<div class="section" id="id11">
+<h2>Structure of the Code:<a class="headerlink" href="#id11" title="Permalink to this headline"> </a></h2>
+<ul class="simple">
+<li><p><strong>Context Setting</strong>: The code initiates by setting the plot style to ‘seaborn’ for aesthetic enhancement.</p></li>
+<li><p><strong>Figure Initialization</strong>: It creates a figure and axes for plotting.</p></li>
+<li><p><strong>Bar Plot</strong>: It uses a horizontal bar plot (<code class="docutils literal notranslate"><span class="pre">barh</span></code>) for visualizing each feature’s coefficient. The y-axis represents the feature names, and the x-axis represents the coefficient values. This visualization makes it easy to compare the coefficients, providing insight into their relative importance and impact on the target variable.</p></li>
+<li><p><strong>Title and Labels</strong>: It sets an appropriate title (“Coefficient Plot”) and labels for the x (“Coefficient Value”) and y (“Features”) axes to ensure clarity and understandability.</p></li>
+</ul>
+<p>By visualizing the coefficients, we can gain a deeper understanding of the model, making it easier to explain the model’s predictions and make more informed decisions regarding feature importance and impact.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_coefficients</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">feature_names</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;seaborn&quot;</span><span class="p">,</span> <span class="n">plot_size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">)):</span>
+    <span class="k">with</span> <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">):</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">plot_size</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">barh</span><span class="p">(</span><span class="n">feature_names</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">coef_</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Coefficient Plot&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Coefficient Value&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Features&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fig</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Visualization-of-Residuals">
+<h1>Visualization of Residuals<a class="headerlink" href="#Visualization-of-Residuals" title="Permalink to this headline"> </a></h1>
+<p>In this section, we’re creating a plot to visualize the residuals of the model, which are the differences between the observed and predicted values.</p>
+<div class="section" id="id12">
+<h2>Why is this Important?<a class="headerlink" href="#id12" title="Permalink to this headline"> </a></h2>
+<p>A residual plot is a fundamental diagnostic tool in regression analysis used to investigate the unpredictability in the relationship between the predictor variable and the response variable. It helps in identifying non-linearity, heteroscedasticity, and outliers. This plot assists in validating the assumption that the errors are normally distributed and have constant variance, crucial for the reliability of the regression model’s predictions.</p>
+</div>
+<div class="section" id="id13">
+<h2>Structure of the Code:<a class="headerlink" href="#id13" title="Permalink to this headline"> </a></h2>
+<ul class="simple">
+<li><p><strong>Residual Calculation</strong>: The code begins by calculating the residuals as the difference between the actual (<code class="docutils literal notranslate"><span class="pre">y_test</span></code>) and predicted (<code class="docutils literal notranslate"><span class="pre">y_pred</span></code>) values.</p></li>
+<li><p><strong>Context Setting</strong>: The code sets the plot style to ‘seaborn’ for a visually appealing plot.</p></li>
+<li><p><strong>Figure Initialization</strong>: It creates a figure and axes for plotting.</p></li>
+<li><p><strong>Residual Plotting</strong>: It utilizes the <code class="docutils literal notranslate"><span class="pre">residplot</span></code> from Seaborn to create the residual plot, with a lowess (locally weighted scatterplot smoothing) line to highlight the trend in the residuals.</p></li>
+<li><p><strong>Zero Line</strong>: It adds a dashed line at zero to serve as a reference for observing the residuals. Residuals above the line indicate under-prediction, while those below indicate over-prediction.</p></li>
+<li><p><strong>Title and Labels</strong>: It sets an appropriate title (“Residual Plot”) and labels for the x (“Predicted values”) and y (“Residuals”) axes to ensure clarity and understandability.</p></li>
+</ul>
+<p>By examining the residual plot, we can make better-informed decisions on the model’s adequacy and the possible need for further refinement or additional complexity.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_residuals</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;seaborn&quot;</span><span class="p">,</span> <span class="n">plot_size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">)):</span>
+    <span class="n">residuals</span> <span class="o">=</span> <span class="n">y_test</span> <span class="o">-</span> <span class="n">y_pred</span>
+
+    <span class="k">with</span> <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">):</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">plot_size</span><span class="p">)</span>
+        <span class="n">sns</span><span class="o">.</span><span class="n">residplot</span><span class="p">(</span>
+            <span class="n">x</span><span class="o">=</span><span class="n">y_pred</span><span class="p">,</span>
+            <span class="n">y</span><span class="o">=</span><span class="n">residuals</span><span class="p">,</span>
+            <span class="n">lowess</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+            <span class="n">line_kws</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="s2">&quot;lw&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+        <span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Residual Plot&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Predicted values&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Residuals&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">()</span> <span class="o">+</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_yticklabels</span><span class="p">():</span>
+            <span class="n">label</span><span class="o">.</span><span class="n">set_fontsize</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fig</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Visualization-of-Prediction-Errors">
+<h1>Visualization of Prediction Errors<a class="headerlink" href="#Visualization-of-Prediction-Errors" title="Permalink to this headline"> </a></h1>
+<p>In this section, we’re creating a plot to visualize the prediction errors, showcasing the discrepancies between the actual and predicted values from our model.</p>
+<div class="section" id="id14">
+<h2>Why is this Important?<a class="headerlink" href="#id14" title="Permalink to this headline"> </a></h2>
+<p>Understanding the prediction errors is crucial for assessing the performance of a model. A prediction error plot provides insight into the error distribution and helps identify trends, biases, or outliers. This visualization is a critical component for model evaluation, helping in identifying areas where the model may need improvement, and ensuring it generalizes well to new data.</p>
+</div>
+<div class="section" id="id15">
+<h2>Structure of the Code:<a class="headerlink" href="#id15" title="Permalink to this headline"> </a></h2>
+<ul class="simple">
+<li><p><strong>Context Setting</strong>: The code sets the plot style to ‘seaborn’ for a clean and attractive plot.</p></li>
+<li><p><strong>Figure Initialization</strong>: It initializes a figure and axes for plotting.</p></li>
+<li><p><strong>Scatter Plot</strong>: The code plots the predicted values against the errors (actual values - predicted values). Each point on the plot represents a specific observation, and its position on the y-axis indicates the magnitude and direction of the error (above zero for under-prediction and below zero for over-prediction).</p></li>
+<li><p><strong>Zero Line</strong>: A red dashed line at y=0 is plotted as a reference, helping in easily identifying the errors. Points above this line are under-predictions, and points below are over-predictions.</p></li>
+<li><p><strong>Title and Labels</strong>: It adds a title (“Prediction Error Plot”) and labels for the x (“Predicted Values”) and y (“Errors”) axes for better clarity and understanding.</p></li>
+</ul>
+<p>By analyzing the prediction error plot, practitioners can gain valuable insights into the model’s performance, helping in the further refinement and enhancement of the model for better and more reliable predictions.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_prediction_error</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;seaborn&quot;</span><span class="p">,</span> <span class="n">plot_size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">)):</span>
+    <span class="k">with</span> <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">):</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">plot_size</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">-</span> <span class="n">y_pred</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Prediction Error Plot&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Predicted Values&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Errors&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fig</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Visualization-of-Quantile-Quantile-Plot-(QQ-Plot)">
+<h1>Visualization of Quantile-Quantile Plot (QQ Plot)<a class="headerlink" href="#Visualization-of-Quantile-Quantile-Plot-(QQ-Plot)" title="Permalink to this headline"> </a></h1>
+<p>In this section, we will generate a QQ plot to visualize the distribution of the residuals from our model predictions.</p>
+<div class="section" id="id16">
+<h2>Why is this Important?<a class="headerlink" href="#id16" title="Permalink to this headline"> </a></h2>
+<p>A QQ plot is essential for assessing if the residuals from the model follow a normal distribution, a fundamental assumption in linear regression models. If the points in the QQ plot do not follow the line closely and show a pattern, this indicates that the residuals may not be normally distributed, which could imply issues with the model such as heteroscedasticity or non-linearity.</p>
+</div>
+<div class="section" id="id17">
+<h2>Structure of the Code:<a class="headerlink" href="#id17" title="Permalink to this headline"> </a></h2>
+<ul class="simple">
+<li><p><strong>Residual Calculation</strong>: The code first calculates the residuals by subtracting the predicted values from the actual test values.</p></li>
+<li><p><strong>Context Setting</strong>: The plot style is set to ‘seaborn’ for aesthetic appeal.</p></li>
+<li><p><strong>Figure Initialization</strong>: A figure and axes are initialized for plotting.</p></li>
+<li><p><strong>QQ Plot Generation</strong>: The <code class="docutils literal notranslate"><span class="pre">stats.probplot</span></code> function is used to generate the QQ plot. It plots the quantiles of the residuals against the quantiles of a normal distribution.</p></li>
+<li><p><strong>Title Addition</strong>: A title (“QQ Plot”) is added to the plot for clarity.</p></li>
+</ul>
+<p>By closely analyzing the QQ plot, we can ensure our model’s residuals meet the normality assumption. If not, it may be beneficial to explore other model types or transformations to improve the model’s performance and reliability.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_qq</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;seaborn&quot;</span><span class="p">,</span> <span class="n">plot_size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">)):</span>
+    <span class="n">residuals</span> <span class="o">=</span> <span class="n">y_test</span> <span class="o">-</span> <span class="n">y_pred</span>
+    <span class="k">with</span> <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">):</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">plot_size</span><span class="p">)</span>
+        <span class="n">stats</span><span class="o">.</span><span class="n">probplot</span><span class="p">(</span><span class="n">residuals</span><span class="p">,</span> <span class="n">dist</span><span class="o">=</span><span class="s2">&quot;norm&quot;</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;QQ Plot&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fig</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Feature-Correlation-Matrix">
+<h1>Feature Correlation Matrix<a class="headerlink" href="#Feature-Correlation-Matrix" title="Permalink to this headline"> </a></h1>
+<p>In this section, we’re generating a <strong>feature correlation matrix</strong> to visualize the relationships between different features in the dataset.</p>
+<p><strong>NOTE:</strong> Unlike the other plots in this notebook, we’re saving a local copy of the plot to disk to show an alternative logging mechanism for arbitrary files, the <code class="docutils literal notranslate"><span class="pre">log_artifact()</span></code> API. Within the main model training and logging section below, you will see how this plot is added to the MLflow run.</p>
+<div class="section" id="id18">
+<h2>Why is this Important?<a class="headerlink" href="#id18" title="Permalink to this headline"> </a></h2>
+<p>Understanding the correlation between different features is essential for: - Identifying multicollinearity, which can affect model performance and interpretability. - Gaining insights into relationships between variables, which can inform feature engineering and selection. - Uncovering potential causality or interaction between different features, which can inform domain understanding and further analysis.</p>
+</div>
+<div class="section" id="id19">
+<h2>Structure of the Code:<a class="headerlink" href="#id19" title="Permalink to this headline"> </a></h2>
+<ul class="simple">
+<li><p><strong>Correlation Calculation</strong>: The code first calculates the correlation matrix for the provided DataFrame.</p></li>
+<li><p><strong>Masking</strong>: A mask is created for the upper triangle of the correlation matrix, as the matrix is symmetrical, and we don’t need to visualize the duplicate information.</p></li>
+<li><p><strong>Heatmap Generation</strong>: A heatmap is generated to visualize the correlation coefficients. The color gradient and annotations provide clear insights into the relationships between variables.</p></li>
+<li><p><strong>Title Addition</strong>: A title is added for clear identification of the plot.</p></li>
+</ul>
+<p>By analyzing the correlation matrix, we can make more informed decisions about feature selection and understand the relationships within our dataset better.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_correlation_matrix_and_save</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;seaborn&quot;</span><span class="p">,</span> <span class="n">plot_size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">path</span><span class="o">=</span><span class="s2">&quot;/tmp/corr_plot.png&quot;</span>
+<span class="p">):</span>
+    <span class="k">with</span> <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">):</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">plot_size</span><span class="p">)</span>
+
+        <span class="c1"># Calculate the correlation matrix</span>
+        <span class="n">corr</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">corr</span><span class="p">()</span>
+
+        <span class="c1"># Generate a mask for the upper triangle</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">triu</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">corr</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">))</span>
+
+        <span class="c1"># Draw the heatmap with the mask and correct aspect ratio</span>
+        <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span>
+            <span class="n">corr</span><span class="p">,</span>
+            <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">,</span>
+            <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;coolwarm&quot;</span><span class="p">,</span>
+            <span class="n">vmax</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+            <span class="n">center</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">square</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">linewidths</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+            <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;.2f&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Feature Correlation Matrix&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+    <span class="c1"># convert to filesystem path spec for os compatibility</span>
+    <span class="n">save_path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Detailed-Overview-of-Main-Execution-for-Model-Training-and-Visualization">
+<h1>Detailed Overview of Main Execution for Model Training and Visualization<a class="headerlink" href="#Detailed-Overview-of-Main-Execution-for-Model-Training-and-Visualization" title="Permalink to this headline"> </a></h1>
+<p>This section delves deeper into the comprehensive workflow executed for model training, prediction, error calculation, and visualization. The significance of each step and the reason for specific choices are thoroughly discussed.</p>
+<div class="section" id="The-Benefits-of-Structured-Execution">
+<h2>The Benefits of Structured Execution<a class="headerlink" href="#The-Benefits-of-Structured-Execution" title="Permalink to this headline"> </a></h2>
+<p>Executing all crucial steps of model training and evaluation in a structured manner is fundamental. It provides a framework that ensures every aspect of the modeling process is considered, offering a more reliable and robust model. This streamlined execution aids in avoiding overlooked errors or biases and guarantees that the model is evaluated on all necessary fronts.</p>
+</div>
+<div class="section" id="Importance-of-Logging-Visualizations-to-MLflow">
+<h2>Importance of Logging Visualizations to MLflow<a class="headerlink" href="#Importance-of-Logging-Visualizations-to-MLflow" title="Permalink to this headline"> </a></h2>
+<p>Logging visualizations to MLflow offers several key benefits:</p>
+<ul class="simple">
+<li><p><strong>Permanence</strong>: Unlike the ephemeral state of notebooks where cells can be run out of order leading to potential misinterpretation, logging plots to MLflow ensures that the visualizations are stored permanently with the specific run. This permanence assures that the visual context of the model training and evaluation is preserved, eliminating confusion and ensuring clarity in interpretation.</p></li>
+<li><p><strong>Provenance</strong>: By logging visualizations, the exact state and relationships in the data at the time of model training are captured. This practice is crucial for models trained a significant time ago. It offers a reliable reference point to understand the model’s behavior and the data characteristics at the time of training, ensuring that insights and interpretations remain valid and reliable over time.</p></li>
+<li><p><strong>Accessibility</strong>: Storing visualizations in MLflow makes them easily accessible to all team members or stakeholders involved. This centralized storage of visualizations enhances collaboration, allowing diverse team members to easily view, analyze, and interpret the visualizations, leading to more informed and collective decision-making.</p></li>
+</ul>
+</div>
+<div class="section" id="Detailed-Structure-of-the-Code:">
+<h2>Detailed Structure of the Code:<a class="headerlink" href="#Detailed-Structure-of-the-Code:" title="Permalink to this headline"> </a></h2>
+<ol class="arabic simple">
+<li><p><strong>Setting up MLflow</strong>:</p>
+<ul class="simple">
+<li><p>The tracking URI for MLflow is defined.</p></li>
+<li><p>An experiment named “Visualizations Demo” is set up, under which all runs and logs will be stored.</p></li>
+</ul>
+</li>
+<li><p><strong>Data Preparation</strong>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">X</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code> are defined as features and target variables, respectively.</p></li>
+<li><p>The dataset is split into training and testing sets to ensure the model’s performance is evaluated on unseen data.</p></li>
+</ul>
+</li>
+<li><p><strong>Initial Plot Generation</strong>:</p>
+<ul class="simple">
+<li><p>Initial plots including time series, box plot, scatter plot, and density plot are generated.</p></li>
+<li><p>These plots offer a preliminary insight into the data and its characteristics.</p></li>
+</ul>
+</li>
+<li><p><strong>Model Definition and Training</strong>:</p>
+<ul class="simple">
+<li><p>A Ridge regression model is defined with an <code class="docutils literal notranslate"><span class="pre">alpha</span></code> of 1.0.</p></li>
+<li><p>The model is trained on the training data, learning the relationships and patterns in the data.</p></li>
+</ul>
+</li>
+<li><p><strong>Prediction and Error Calculation</strong>:</p>
+<ul class="simple">
+<li><p>The trained model is used to make predictions on the test data.</p></li>
+<li><p>Various error metrics including MSE, RMSE, MAE, R2, MSLE, and MedAE are calculated to evaluate the model’s performance.</p></li>
+</ul>
+</li>
+<li><p><strong>Additional Plot Generation</strong>:</p>
+<ul class="simple">
+<li><p>Additional plots including residuals plot, coefficients plot, prediction error plot, and QQ plot are generated.</p></li>
+<li><p>These plots offer further insight into the model’s performance, residuals behavior, and the distribution of errors.</p></li>
+</ul>
+</li>
+<li><p><strong>Logging to MLflow</strong>:</p>
+<ul class="simple">
+<li><p>The trained model, calculated metrics, defined parameter (<code class="docutils literal notranslate"><span class="pre">alpha</span></code>), and all the generated plots are logged to MLflow.</p></li>
+<li><p>This logging ensures that all information and visualizations related to the model are stored in a centralized, accessible location.</p></li>
+</ul>
+</li>
+</ol>
+</div>
+<div class="section" id="Conclusion:">
+<h2>Conclusion:<a class="headerlink" href="#Conclusion:" title="Permalink to this headline"> </a></h2>
+<p>By executing this comprehensive and structured code, we ensure that every aspect of model training, evaluation, and interpretation is covered. The practice of logging all relevant information and visualizations to MLflow further enhances the reliability, accessibility, and interpretability of the model and its performance, contributing to more informed and reliable model deployment and utilization.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mlflow</span><span class="o">.</span><span class="n">set_tracking_uri</span><span class="p">(</span><span class="s2">&quot;http://127.0.0.1:8080&quot;</span><span class="p">)</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s2">&quot;Visualizations Demo&quot;</span><span class="p">)</span>
+
+<span class="n">X</span> <span class="o">=</span> <span class="n">my_data</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;demand&quot;</span><span class="p">,</span> <span class="s2">&quot;date&quot;</span><span class="p">])</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">my_data</span><span class="p">[</span><span class="s2">&quot;demand&quot;</span><span class="p">]</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">fig1</span> <span class="o">=</span> <span class="n">plot_time_series_demand</span><span class="p">(</span><span class="n">my_data</span><span class="p">,</span> <span class="n">window_size</span><span class="o">=</span><span class="mi">28</span><span class="p">)</span>
+<span class="n">fig2</span> <span class="o">=</span> <span class="n">plot_box_weekend</span><span class="p">(</span><span class="n">my_data</span><span class="p">)</span>
+<span class="n">fig3</span> <span class="o">=</span> <span class="n">plot_scatter_demand_price</span><span class="p">(</span><span class="n">my_data</span><span class="p">)</span>
+<span class="n">fig4</span> <span class="o">=</span> <span class="n">plot_density_weekday_weekend</span><span class="p">(</span><span class="n">my_data</span><span class="p">)</span>
+
+<span class="c1"># Execute the correlation plot, saving the plot to a local temporary directory</span>
+<span class="n">plot_correlation_matrix_and_save</span><span class="p">(</span><span class="n">my_data</span><span class="p">)</span>
+
+<span class="c1"># Define our Ridge model</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">Ridge</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+
+<span class="c1"># Train the model</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Make predictions</span>
+<span class="n">y_pred</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+<span class="c1"># Calculate error metrics</span>
+<span class="n">mse</span> <span class="o">=</span> <span class="n">mean_squared_error</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+<span class="n">rmse</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">mse</span><span class="p">)</span>
+<span class="n">mae</span> <span class="o">=</span> <span class="n">mean_absolute_error</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+<span class="n">r2</span> <span class="o">=</span> <span class="n">r2_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+<span class="n">msle</span> <span class="o">=</span> <span class="n">mean_squared_log_error</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+<span class="n">medae</span> <span class="o">=</span> <span class="n">median_absolute_error</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+
+<span class="c1"># Generate prediction-dependent plots</span>
+<span class="n">fig5</span> <span class="o">=</span> <span class="n">plot_residuals</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+<span class="n">fig6</span> <span class="o">=</span> <span class="n">plot_coefficients</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">X_test</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+<span class="n">fig7</span> <span class="o">=</span> <span class="n">plot_prediction_error</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+<span class="n">fig8</span> <span class="o">=</span> <span class="n">plot_qq</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+
+<span class="c1"># Start an MLflow run for logging metrics, parameters, the model, and our figures</span>
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">()</span> <span class="k">as</span> <span class="n">run</span><span class="p">:</span>
+    <span class="c1"># Log the model</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">sklearn</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span><span class="n">sk_model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">input_example</span><span class="o">=</span><span class="n">X_test</span><span class="p">,</span> <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Log the metrics</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_metrics</span><span class="p">(</span>
+        <span class="p">{</span><span class="s2">&quot;mse&quot;</span><span class="p">:</span> <span class="n">mse</span><span class="p">,</span> <span class="s2">&quot;rmse&quot;</span><span class="p">:</span> <span class="n">rmse</span><span class="p">,</span> <span class="s2">&quot;mae&quot;</span><span class="p">:</span> <span class="n">mae</span><span class="p">,</span> <span class="s2">&quot;r2&quot;</span><span class="p">:</span> <span class="n">r2</span><span class="p">,</span> <span class="s2">&quot;msle&quot;</span><span class="p">:</span> <span class="n">msle</span><span class="p">,</span> <span class="s2">&quot;medae&quot;</span><span class="p">:</span> <span class="n">medae</span><span class="p">}</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Log the hyperparameter</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_param</span><span class="p">(</span><span class="s2">&quot;alpha&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+
+    <span class="c1"># Log plots</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_figure</span><span class="p">(</span><span class="n">fig1</span><span class="p">,</span> <span class="s2">&quot;time_series_demand.png&quot;</span><span class="p">)</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_figure</span><span class="p">(</span><span class="n">fig2</span><span class="p">,</span> <span class="s2">&quot;box_weekend.png&quot;</span><span class="p">)</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_figure</span><span class="p">(</span><span class="n">fig3</span><span class="p">,</span> <span class="s2">&quot;scatter_demand_price.png&quot;</span><span class="p">)</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_figure</span><span class="p">(</span><span class="n">fig4</span><span class="p">,</span> <span class="s2">&quot;density_weekday_weekend.png&quot;</span><span class="p">)</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_figure</span><span class="p">(</span><span class="n">fig5</span><span class="p">,</span> <span class="s2">&quot;residuals_plot.png&quot;</span><span class="p">)</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_figure</span><span class="p">(</span><span class="n">fig6</span><span class="p">,</span> <span class="s2">&quot;coefficients_plot.png&quot;</span><span class="p">)</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_figure</span><span class="p">(</span><span class="n">fig7</span><span class="p">,</span> <span class="s2">&quot;prediction_errors.png&quot;</span><span class="p">)</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_figure</span><span class="p">(</span><span class="n">fig8</span><span class="p">,</span> <span class="s2">&quot;qq_plot.png&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Log the saved correlation matrix plot by referring to the local file system location</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_artifact</span><span class="p">(</span><span class="s2">&quot;/tmp/corr_plot.png&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2023/09/26 13:10:41 INFO mlflow.tracking.fluent: Experiment with name &#39;Visualizations Demo&#39; does not exist. Creating a new experiment.
+/Users/benjamin.wilson/miniconda3/envs/mlflow-dev-env/lib/python3.8/site-packages/mlflow/models/signature.py:333: UserWarning: Hint: Inferred schema contains integer column(s). Integer columns in Python cannot represent missing values. If your input data contains missing values at inference time, it will be encoded as floats and will cause a schema enforcement error. The best way to avoid this problem is to infer the model schema based on a realistic data sample (training dataset) that includes missing values. Alternatively, you can declare integer columns as doubles (float64) whenever these columns may have missing values. See `Handling Integers With Missing Values &lt;https://www.mlflow.org/docs/latest/models.html#handling-integers-with-missing-values&gt;`_ for more details.
+  input_schema = _infer_schema(input_ex)
+/Users/benjamin.wilson/miniconda3/envs/mlflow-dev-env/lib/python3.8/site-packages/_distutils_hack/__init__.py:30: UserWarning: Setuptools is replacing distutils.
+  warnings.warn(&#34;Setuptools is replacing distutils.&#34;)
+</pre></div></div>
+</div>
+</div>
+</div>
+
+
+              </div>
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="parent-child-runs.html" class="btn btn-neutral" title="Leveraging Child Runs in MLflow for Hyperparameter Tuning" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+      
+      
+        <a href="../part1-child-runs.html" class="btn btn-neutral" title="Understanding Parent and Child Runs in MLflow" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+      <p class="copyright">
+          &copy; MLflow Project, a Series of LF Projects, LLC. All rights reserved.
+      </p>
+
+  </div> 
+
+</footer>
+          </div>
+        </div>
+      </section>
+    </main>
+  </page>
+
+  
+
+
+  
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+      URL_ROOT:'../../../',
+      VERSION:'2.9.2.dev0',
+      COLLAPSE_INDEX:false,
+      FILE_SUFFIX:'.html',
+      LINK_SUFFIX: '.html',
+      HAS_SOURCE:  true
+    };
+  </script>
+
+  
+
+  <script type="text/javascript" src="../../../_static/js/clipboard.min.js"></script>
+  <script type="text/javascript" src="../../../_static/js/jquery.waypoints.min.js"></script>
+
+  
+  
+  
+  <script type="text/javascript">var CLIPPY_SVG_PATH = "../../../_static/clippy.svg";</script>
+  <script type="text/javascript" src="../../../_static/js/custom.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.StickyNav.enable();
+    });
+
+  </script>
+  
+
+  
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        // Get the code block designator class entries
+        const allHighlights = document.querySelectorAll('.highlight');
+        // Disable copyable links for notebook cell numbering and for cell outputs
+        const highlights = Array.from(allHighlights).filter(highlight => !highlight.closest('.highlight-none') && 
+            !highlight.closest('.nboutput'));
+    
+        highlights.forEach(function(highlight) {
+            const copyIcon = document.createElement('span');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.innerHTML = '&#xf0ea;';
+
+            copyIcon.addEventListener('click', function() {
+                const code = highlight.querySelector('pre').textContent;
+                copyToClipboard(code);
+
+                // Flash effect on click
+                this.style.color = '#0194E2';
+                setTimeout(() => {
+                    this.style.color = ''; 
+                }, 100);
+
+                // Display "Code copied to clipboard" near the clicked icon
+                const message = document.createElement('span');
+                message.textContent = "Copied!";
+                message.classList.add('copy-message'); 
+
+                // Append the message to the icon
+                this.appendChild(message);
+
+                setTimeout(() => {
+                    this.removeChild(message);
+                }, 500);
+            });
+
+            highlight.appendChild(copyIcon);
+        });
+    });
+  </script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Force download for notebook-download-btn
+        const downloadButtons = document.querySelectorAll('.notebook-download-btn');
+        downloadButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                // Fetch the raw content of the notebook from GitHub
+                fetch(button.href)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = url;
+                        const filename = button.href.split('/').pop();
+                        link.download = filename; 
+
+                        document.body.appendChild(link);
+                        link.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    })
+                    .catch(err => console.error('Error fetching the notebook:', err));
+            });
+        });
+    });
+</script> 
+</body>
+</html>

@@ -1,0 +1,2043 @@
+
+  
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>MLflow with Optuna: Hyperparameter Optimization and Tracking &mdash; MLflow 2.9.2.dev0 documentation</title>
+  
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/traditional-ml/hyperparameter-tuning-with-child-runs/notebooks/hyperparameter-tuning-with-child-runs.html">
+  
+  
+    <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
+    
+
+    
+
+  
+    
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/grids.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/mobile.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/simple-cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/tabs.css" type="text/css" />
+    
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="MLflow 2.9.2.dev0 documentation" href="../../../index.html"/>
+        <link rel="up" title="Hyperparameter tuning with MLflow and child runs - Notebooks" href="index.html"/>
+        <link rel="next" title="Leveraging Child Runs in MLflow for Hyperparameter Tuning" href="/parent-child-runs.html"/>
+        <link rel="prev" title="Hyperparameter tuning with MLflow and child runs - Notebooks" href="/index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+<script type="text/javascript" src="../../../_static/jquery.js"></script>
+<script type="text/javascript" src="../../../_static/underscore.js"></script>
+<script type="text/javascript" src="../../../_static/doctools.js"></script>
+<script type="text/javascript" src="../../../_static/languagesections.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript" src="../../../None"></script>
+
+<body class="wy-body-for-nav" role="document">
+  
+
+  
+  <nav class="wy-nav-top header" role="navigation" aria-label="top navigation">
+    <ul>
+  <li class="menu-toggle">
+    <i data-toggle="wy-nav-top" class="wy-nav-top-menu-button db-icon db-icon-menu pull-left"></i>
+    <a href="../../../index.html" class="wy-nav-top-logo"
+      ><img src="../../../_static/MLflow-logo-final-black.png" alt="MLflow"
+    /></a>
+    <span class="version">2.9.2.dev0</span>
+  </li>
+</ul>
+  </nav>
+  <page>
+    
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side relative">
+      <div class="wy-side-scroll">
+  <div class="wy-side-nav-search">
+    
+
+    
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+    
+  </div>
+
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+    
+      <a href="../../../index.html" class="main-navigation-home"><img src="../../../_static/icons/nav-home.svg"> MLflow</a>
+    
+
+    
+      
+
+      
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../introduction/index.html">What is MLflow?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting-started/index.html">Getting Started with MLflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../new-features/index.html">New Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../llms/index.html">LLMs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../model-evaluation/index.html">Model Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deep-learning/index.html">Deep Learning</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">Traditional ML</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#native-library-support">Native Library Support</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../index.html#tutorials-and-guides">Tutorials and Guides</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../index.html">Hyperparameter Tuning with MLflow and Optuna</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="index.html">Full Notebooks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../part1-child-runs.html">The Parent-Child relationship with runs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../part2-logging-plots.html">Logging plots with MLflow</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../creating-custom-pyfunc/index.html">Building Custom Python Function Models with MLflow</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#mlflow-tracking">MLflow Tracking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#mlflow-recipes">MLflow Recipes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#mlflow-evaluate">MLflow Evaluate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#model-registry">Model Registry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#deployment">Deployment</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deployment/index.html">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tracking.html">MLflow Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../system-metrics/index.html">System Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../projects.html">MLflow Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../models.html">MLflow Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../model-registry.html">MLflow Model Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../recipes.html">MLflow Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../plugins.html">MLflow Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../auth/index.html">MLflow Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../search-runs.html">Search Runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../search-experiments.html">Search Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../python_api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../R-api.html">R API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../java_api/index.html">Java API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rest-api.html">REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docker.html">Official MLflow Docker Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../community-model-flavors.html">Community Model Flavors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials-and-examples/index.html">Tutorials and Examples</a></li>
+</ul>
+
+      
+    
+  </div>
+
+  <div role="contentinfo">
+    
+
+    <p>
+      <a id='feedbacklink' href="https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a>
+    </p>
+  </div>
+</div>
+    </nav>
+
+    <main class="wy-grid-for-nav">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+          <div class="rst-content">
+            
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Documentation</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../../index.html">Traditional ML</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../index.html">Hyperparameter Tuning with MLflow and Optuna</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="index.html">Hyperparameter tuning with MLflow and child runs - Notebooks</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+    
+      <li>MLflow with Optuna: Hyperparameter Optimization and Tracking</li>
+    
+    
+    <!-- <li class="wy-breadcrumbs-aside">
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/traditional-ml/hyperparameter-tuning-with-child-runs/notebooks/hyperparameter-tuning-with-child-runs.ipynb" class="fa fa-github"> Edit on GitHub</a>
+    </li> -->
+    
+  </ul>
+</div>
+            <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <div itemprop="articleBody">
+                
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div class="section" id="MLflow-with-Optuna:-Hyperparameter-Optimization-and-Tracking">
+<h1>MLflow with Optuna: Hyperparameter Optimization and Tracking<a class="headerlink" href="#MLflow-with-Optuna:-Hyperparameter-Optimization-and-Tracking" title="Permalink to this headline"> </a></h1>
+<p>A critical part of building production-grade models is ensuring that a given model’s parameters are selected to create the best inference set possible. However, the sheer number of combinations and their resultant metrics can become overwhelming to track manually. That’s where tools like MLflow and Optuna come into play.</p>
+<div class="section" id="Objective:">
+<h2>Objective:<a class="headerlink" href="#Objective:" title="Permalink to this headline"> </a></h2>
+<p>In this notebook, you’ll learn how to integrate MLflow with Optuna for hyperparameter optimization. We’ll guide you through the process of:</p>
+<ul class="simple">
+<li><p>Setting up your environment with MLflow tracking.</p></li>
+<li><p>Generating our training and evaluation data sets.</p></li>
+<li><p>Defining a partial function that fits a machine learning model.</p></li>
+<li><p>Using Optuna for hyperparameter tuning.</p></li>
+<li><p>Leveraging child runs within MLflow to keep track of each iteration during the hyperparameter tuning process.</p></li>
+</ul>
+</div>
+<div class="section" id="Why-Optuna?">
+<h2>Why Optuna?<a class="headerlink" href="#Why-Optuna?" title="Permalink to this headline"> </a></h2>
+<p>Optuna is an open-source hyperparameter optimization framework in Python. It provides an efficient approach to searching over hyperparameters, incorporating the latest research and techniques. With its integration into MLflow, every trial can be systematically recorded.</p>
+</div>
+<div class="section" id="Child-Runs-in-MLflow:">
+<h2>Child Runs in MLflow:<a class="headerlink" href="#Child-Runs-in-MLflow:" title="Permalink to this headline"> </a></h2>
+<p>One of the core features we will be emphasizing is the concept of ‘child runs’ in MLflow. When performing hyperparameter tuning, each iteration (or trial) in Optuna can be considered a ‘child run’. This allows us to group all the runs under one primary ‘parent run’, ensuring that the MLflow UI remains organized and interpretable. Each child run will track the specific hyperparameters used and the resulting metrics, providing a consolidated view of the entire optimization process.</p>
+</div>
+<div class="section" id="What’s-Ahead?">
+<h2>What’s Ahead?<a class="headerlink" href="#What’s-Ahead?" title="Permalink to this headline"> </a></h2>
+<p><strong>Data Preparation</strong>: We’ll start by loading and preprocessing our dataset.</p>
+<p><strong>Model Definition</strong>: Defining a machine learning model that we aim to optimize.</p>
+<p><strong>Optuna Study</strong>: Setting up an Optuna study to find the best hyperparameters for our model.</p>
+<p><strong>MLflow Integration</strong>: Tracking each Optuna trial as a child run in MLflow.</p>
+<p><strong>Analysis</strong>: Reviewing the tracked results in the MLflow UI.</p>
+<p>By the end of this notebook, you’ll have hands-on experience in setting up an advanced hyperparameter tuning workflow, emphasizing best practices and clean organization using MLflow and Optuna.</p>
+<p><strong>Let’s dive in!</strong></p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">import</span> <span class="nn">math</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">optuna</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">mean_squared_error</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">import</span> <span class="nn">xgboost</span> <span class="k">as</span> <span class="nn">xgb</span>
+
+
+<span class="kn">import</span> <span class="nn">mlflow</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Configure-the-tracking-server-uri">
+<h2>Configure the tracking server uri<a class="headerlink" href="#Configure-the-tracking-server-uri" title="Permalink to this headline"> </a></h2>
+<p>This step is important to ensure that all of the calls to MLflow that we’re going to be doing within this notebook will actually be logged to our tracking server that is running locally.</p>
+<p>If you are following along with this notebook in a different environment and wish to execute the remainder of this notebook to a remote tracking server, change the following cell.</p>
+<p><strong>Databricks</strong>: <code class="docutils literal notranslate"><span class="pre">mlflow.set_tracking_uri(&quot;databricks&quot;)</span></code></p>
+<p><strong>Your hosted MLflow</strong>: <code class="docutils literal notranslate"><span class="pre">mlflow.set_tracking_uri(&quot;http://my.company.mlflow.tracking.server:&lt;port&gt;)</span></code></p>
+<div class="section" id="Your-local-tracking-server">
+<h3>Your local tracking server<a class="headerlink" href="#Your-local-tracking-server" title="Permalink to this headline"> </a></h3>
+<p>As in the introductory tutorial, we can start a local tracking server via command line as follows:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mlflow<span class="w"> </span>server<span class="w"> </span>--host<span class="w"> </span><span class="m">127</span>.0.0.1<span class="w"> </span>--port<span class="w"> </span><span class="m">8080</span>
+</pre></div>
+</div>
+<p>And the MLflow UI can be started locally via:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mlflow<span class="w"> </span>ui<span class="w"> </span>--host<span class="w"> </span><span class="m">127</span>.0.0.1<span class="w"> </span>--port<span class="w"> </span><span class="m">8090</span>
+</pre></div>
+</div>
+<p><strong>Note</strong> If you are starting a local tracking server and UI server, each of these commands must be run in separate terminals and they must be left running. Closing either terminal window will terminate the respective server.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Change this cell if you are not running a local tracking server!</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_tracking_uri</span><span class="p">(</span><span class="s2">&quot;http://localhost:8080&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Generate-our-synthetic-training-data">
+<h2>Generate our synthetic training data<a class="headerlink" href="#Generate-our-synthetic-training-data" title="Permalink to this headline"> </a></h2>
+<p>If you’ve followed along with the introductory tutorial “Logging your first model with MLflow”, then you’re familiar with the apples sales data generator that we created for that tutorial.</p>
+<p>Here, we’re expanding upon the data to create a slightly more complex dataset that should have improved correlation effects between the features and the target variable (the demand).</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">generate_apple_sales_data_with_promo_adjustment</span><span class="p">(</span>
+    <span class="n">base_demand</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
+    <span class="n">n_rows</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5000</span><span class="p">,</span>
+    <span class="n">competitor_price_effect</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mf">50.0</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates a synthetic dataset for predicting apple sales demand with multiple</span>
+<span class="sd">    influencing factors.</span>
+
+<span class="sd">    This function creates a pandas DataFrame with features relevant to apple sales.</span>
+<span class="sd">    The features include date, average_temperature, rainfall, weekend flag, holiday flag,</span>
+<span class="sd">    promotional flag, price_per_kg, competitor&#39;s price, marketing intensity, stock availability,</span>
+<span class="sd">    and the previous day&#39;s demand. The target variable, &#39;demand&#39;, is generated based on a</span>
+<span class="sd">    combination of these features with some added noise.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        base_demand (int, optional): Base demand for apples. Defaults to 1000.</span>
+<span class="sd">        n_rows (int, optional): Number of rows (days) of data to generate. Defaults to 5000.</span>
+<span class="sd">        competitor_price_effect (float, optional): Effect of competitor&#39;s price being lower</span>
+<span class="sd">                                                   on our sales. Defaults to -50.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        pd.DataFrame: DataFrame with features and target variable for apple sales prediction.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; df = generate_apple_sales_data_with_promo_adjustment(base_demand=1200, n_rows=6000)</span>
+<span class="sd">        &gt;&gt;&gt; df.head()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Set seed for reproducibility</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">9999</span><span class="p">)</span>
+
+    <span class="c1"># Create date range</span>
+    <span class="n">dates</span> <span class="o">=</span> <span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_rows</span><span class="p">)]</span>
+    <span class="n">dates</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+
+    <span class="c1"># Generate features</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;date&quot;</span><span class="p">:</span> <span class="n">dates</span><span class="p">,</span>
+            <span class="s2">&quot;average_temperature&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">35</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">),</span>
+            <span class="s2">&quot;rainfall&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">exponential</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">),</span>
+            <span class="s2">&quot;weekend&quot;</span><span class="p">:</span> <span class="p">[(</span><span class="n">date</span><span class="o">.</span><span class="n">weekday</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="mi">5</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">date</span> <span class="ow">in</span> <span class="n">dates</span><span class="p">],</span>
+            <span class="s2">&quot;holiday&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">n_rows</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="p">[</span><span class="mf">0.97</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">]),</span>
+            <span class="s2">&quot;price_per_kg&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">),</span>
+            <span class="s2">&quot;month&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">date</span><span class="o">.</span><span class="n">month</span> <span class="k">for</span> <span class="n">date</span> <span class="ow">in</span> <span class="n">dates</span><span class="p">],</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Introduce inflation over time (years)</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;inflation_multiplier&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;date&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">year</span> <span class="o">-</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;date&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">year</span><span class="o">.</span><span class="n">min</span><span class="p">())</span> <span class="o">*</span> <span class="mf">0.03</span>
+
+    <span class="c1"># Incorporate seasonality due to apple harvests</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;harvest_effect&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;month&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">3</span><span class="p">)</span> <span class="o">/</span> <span class="mi">12</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span>
+        <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;month&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">9</span><span class="p">)</span> <span class="o">/</span> <span class="mi">12</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Modify the price_per_kg based on harvest effect</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;price_per_kg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;price_per_kg&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;harvest_effect&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.5</span>
+
+    <span class="c1"># Adjust promo periods to coincide with periods lagging peak harvest by 1 month</span>
+    <span class="n">peak_months</span> <span class="o">=</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>  <span class="c1"># months following the peak availability</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;promo&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;month&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">peak_months</span><span class="p">),</span>
+        <span class="mi">1</span><span class="p">,</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">n_rows</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="p">[</span><span class="mf">0.85</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">]),</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Generate target variable based on features</span>
+    <span class="n">base_price_effect</span> <span class="o">=</span> <span class="o">-</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;price_per_kg&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">50</span>
+    <span class="n">seasonality_effect</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;harvest_effect&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">50</span>
+    <span class="n">promo_effect</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;promo&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">200</span>
+
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;demand&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">base_demand</span>
+        <span class="o">+</span> <span class="n">base_price_effect</span>
+        <span class="o">+</span> <span class="n">seasonality_effect</span>
+        <span class="o">+</span> <span class="n">promo_effect</span>
+        <span class="o">+</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;weekend&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">300</span>
+        <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">)</span>
+    <span class="p">)</span> <span class="o">*</span> <span class="n">df</span><span class="p">[</span>
+        <span class="s2">&quot;inflation_multiplier&quot;</span>
+    <span class="p">]</span>  <span class="c1"># adding random noise</span>
+
+    <span class="c1"># Add previous day&#39;s demand</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;previous_days_demand&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;demand&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;previous_days_demand&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;bfill&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># fill the first row</span>
+
+    <span class="c1"># Introduce competitor pricing</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;competitor_price_per_kg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">)</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;competitor_price_effect&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;competitor_price_per_kg&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;price_per_kg&quot;</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">*</span> <span class="n">competitor_price_effect</span>
+
+    <span class="c1"># Stock availability based on past sales price (3 days lag with logarithmic decay)</span>
+    <span class="n">log_decay</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;price_per_kg&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;stock_available&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">log_decay</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Marketing intensity based on stock availability</span>
+    <span class="c1"># Identify where stock is above threshold</span>
+    <span class="n">high_stock_indices</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;stock_available&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.95</span><span class="p">]</span><span class="o">.</span><span class="n">index</span>
+
+    <span class="c1"># For each high stock day, increase marketing intensity for the next week</span>
+    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">high_stock_indices</span><span class="p">:</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx</span> <span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">7</span><span class="p">,</span> <span class="n">n_rows</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="s2">&quot;marketing_intensity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.7</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># If the marketing_intensity column already has values, this will preserve them;</span>
+    <span class="c1">#  if not, it sets default values</span>
+    <span class="n">fill_values</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;marketing_intensity&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">fill_values</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Adjust demand with new factors</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;demand&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;demand&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;competitor_price_effect&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;marketing_intensity&quot;</span><span class="p">]</span>
+
+    <span class="c1"># Drop temporary columns</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span>
+        <span class="n">columns</span><span class="o">=</span><span class="p">[</span>
+            <span class="s2">&quot;inflation_multiplier&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;harvest_effect&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;month&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;competitor_price_effect&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;stock_available&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">df</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">generate_apple_sales_data_with_promo_adjustment</span><span class="p">(</span><span class="n">base_demand</span><span class="o">=</span><span class="mi">1_000</span><span class="p">,</span> <span class="n">n_rows</span><span class="o">=</span><span class="mi">5000</span><span class="p">)</span>
+<span class="n">df</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>date</th>
+      <th>average_temperature</th>
+      <th>rainfall</th>
+      <th>weekend</th>
+      <th>holiday</th>
+      <th>price_per_kg</th>
+      <th>promo</th>
+      <th>demand</th>
+      <th>previous_days_demand</th>
+      <th>competitor_price_per_kg</th>
+      <th>marketing_intensity</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2010-01-14 11:52:20.662955</td>
+      <td>30.584727</td>
+      <td>1.199291</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.726258</td>
+      <td>0</td>
+      <td>851.375336</td>
+      <td>851.276659</td>
+      <td>1.935346</td>
+      <td>0.098677</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2010-01-15 11:52:20.662954</td>
+      <td>15.465069</td>
+      <td>1.037626</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.576471</td>
+      <td>0</td>
+      <td>906.855943</td>
+      <td>851.276659</td>
+      <td>2.344720</td>
+      <td>0.019318</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2010-01-16 11:52:20.662954</td>
+      <td>10.786525</td>
+      <td>5.656089</td>
+      <td>1</td>
+      <td>0</td>
+      <td>2.513328</td>
+      <td>0</td>
+      <td>1108.304909</td>
+      <td>906.836626</td>
+      <td>0.998803</td>
+      <td>0.409485</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>2010-01-17 11:52:20.662953</td>
+      <td>23.648154</td>
+      <td>12.030937</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1.839225</td>
+      <td>0</td>
+      <td>1099.833810</td>
+      <td>1157.895424</td>
+      <td>0.761740</td>
+      <td>0.872803</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>2010-01-18 11:52:20.662952</td>
+      <td>13.861391</td>
+      <td>4.303812</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.531772</td>
+      <td>0</td>
+      <td>983.949061</td>
+      <td>1148.961007</td>
+      <td>2.123436</td>
+      <td>0.820779</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>4995</th>
+      <td>2023-09-18 11:52:20.659592</td>
+      <td>21.643051</td>
+      <td>3.821656</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2.391010</td>
+      <td>0</td>
+      <td>1140.210762</td>
+      <td>1563.064082</td>
+      <td>1.504432</td>
+      <td>0.756489</td>
+    </tr>
+    <tr>
+      <th>4996</th>
+      <td>2023-09-19 11:52:20.659591</td>
+      <td>13.808813</td>
+      <td>1.080603</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0.898693</td>
+      <td>0</td>
+      <td>1285.149505</td>
+      <td>1189.454273</td>
+      <td>1.343586</td>
+      <td>0.742145</td>
+    </tr>
+    <tr>
+      <th>4997</th>
+      <td>2023-09-20 11:52:20.659590</td>
+      <td>11.698227</td>
+      <td>1.911000</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2.839860</td>
+      <td>0</td>
+      <td>965.171368</td>
+      <td>1284.407359</td>
+      <td>2.771896</td>
+      <td>0.742145</td>
+    </tr>
+    <tr>
+      <th>4998</th>
+      <td>2023-09-21 11:52:20.659589</td>
+      <td>18.052081</td>
+      <td>1.000521</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.188440</td>
+      <td>0</td>
+      <td>1368.369501</td>
+      <td>1014.429223</td>
+      <td>2.564075</td>
+      <td>0.742145</td>
+    </tr>
+    <tr>
+      <th>4999</th>
+      <td>2023-09-22 11:52:20.659584</td>
+      <td>17.017294</td>
+      <td>0.650213</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2.131694</td>
+      <td>0</td>
+      <td>1261.301286</td>
+      <td>1367.627356</td>
+      <td>0.785727</td>
+      <td>0.833140</td>
+    </tr>
+  </tbody>
+</table>
+<p>5000 rows × 11 columns</p>
+</div></div>
+</div>
+</div>
+<div class="section" id="Examining-Feature-Target-Correlations">
+<h2>Examining Feature-Target Correlations<a class="headerlink" href="#Examining-Feature-Target-Correlations" title="Permalink to this headline"> </a></h2>
+<p>Before delving into the model building process, it’s essential to understand the relationships between our features and the target variable. The upcoming function will display a plot indicating the correlation coefficient for each feature in relation to the target. Here’s why this step is crucial:</p>
+<ol class="arabic simple">
+<li><p><strong>Avoiding Data Leakage</strong>: We must ensure that no feature perfectly correlates with the target (a correlation coefficient of 1.0). If such a correlation exists, it’s a sign that our dataset might be “leaking” information about the target. Using such data for hyperparameter tuning would mislead the model, as it could easily achieve a perfect score without genuinely learning the underlying patterns.</p></li>
+<li><p><strong>Ensuring Meaningful Relationships</strong>: Ideally, our features should have some degree of correlation with the target. If all features have correlation coefficients close to zero, it suggests a weak linear relationship. Although this doesn’t automatically render the features useless, it does introduce challenges:</p>
+<ul class="simple">
+<li><p><em>Predictive Power</em>: The model might struggle to make accurate predictions.</p></li>
+<li><p><em>Overfitting Risk</em>: With weak correlations, there’s a heightened risk of the model fitting to noise rather than genuine patterns, leading to overfitting.</p></li>
+<li><p><em>Complexity</em>: Demonstrating non-linear relationships or interactions between features would necessitate more intricate visualizations and evaluations.</p></li>
+</ul>
+</li>
+<li><p><strong>Auditing and Traceability</strong>: Logging this correlation visualization with our main MLflow run ensures traceability. It provides a snapshot of the data characteristics at the time of the model training, which is invaluable for auditing and replicability purposes.</p></li>
+</ol>
+<p>As we proceed, remember that while understanding correlations is a powerful tool, it’s just one piece of the puzzle. Let’s visualize these relationships to gain more insights!</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+
+<span class="k">def</span> <span class="nf">plot_correlation_with_demand</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">save_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plots the correlation of each variable in the dataframe with the &#39;demand&#39; column.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    - df (pd.DataFrame): DataFrame containing the data, including a &#39;demand&#39; column.</span>
+<span class="sd">    - save_path (str, optional): Path to save the generated plot. If not specified, plot won&#39;t be saved.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    - None (Displays the plot on a Jupyter window)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Compute correlations between all variables and &#39;demand&#39;</span>
+    <span class="n">correlations</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">corr</span><span class="p">()[</span><span class="s2">&quot;demand&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;demand&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">()</span>
+
+    <span class="c1"># Generate a color palette from red to green</span>
+    <span class="n">colors</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">diverging_palette</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">130</span><span class="p">,</span> <span class="n">as_cmap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">color_mapped</span> <span class="o">=</span> <span class="n">correlations</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span>
+
+    <span class="c1"># Set Seaborn style</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">set_style</span><span class="p">(</span>
+        <span class="s2">&quot;whitegrid&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;axes.facecolor&quot;</span><span class="p">:</span> <span class="s2">&quot;#c2c4c2&quot;</span><span class="p">,</span> <span class="s2">&quot;grid.linewidth&quot;</span><span class="p">:</span> <span class="mf">1.5</span><span class="p">}</span>
+    <span class="p">)</span>  <span class="c1"># Light grey background and thicker grid lines</span>
+
+    <span class="c1"># Create bar plot</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+    <span class="n">bars</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">barh</span><span class="p">(</span><span class="n">correlations</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">correlations</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color_mapped</span><span class="p">)</span>
+
+    <span class="c1"># Set labels and title with increased font size</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Correlation with Demand&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Correlation Coefficient&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Variable&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+    <span class="c1"># prevent matplotlib from displaying the chart every time we call this function</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+
+    <span class="c1"># Save the plot if save_path is specified</span>
+    <span class="k">if</span> <span class="n">save_path</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_path</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">fig</span>
+
+
+<span class="c1"># Test the function</span>
+<span class="n">correlation_plot</span> <span class="o">=</span> <span class="n">plot_correlation_with_demand</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">save_path</span><span class="o">=</span><span class="s2">&quot;correlation_plot.png&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;Figure size 432x288 with 0 Axes&gt;
+</pre></div></div>
+</div>
+<div class="section" id="Investigating-Feature-Correlation-with-the-Target-Variable">
+<h3>Investigating Feature Correlation with the Target Variable<a class="headerlink" href="#Investigating-Feature-Correlation-with-the-Target-Variable" title="Permalink to this headline"> </a></h3>
+<p>In the code above, we’ve intentionally disabled the automatic display of the plot generated by Matplotlib. During machine learning experimentation, it’s often not useful to display figures directly within the notebook for several reasons. Instead, we aim to associate this plot with the results of an iterative experiment run. To achieve this, we’ll save the plot to our MLflow tracking system. This provides us with a detailed record, linking the state of the dataset to the logged model, its
+parameters, and performance metrics.</p>
+<div class="section" id="Why-Not-Display-Plots-Directly-in-the-Notebook?">
+<h4>Why Not Display Plots Directly in the Notebook?<a class="headerlink" href="#Why-Not-Display-Plots-Directly-in-the-Notebook?" title="Permalink to this headline"> </a></h4>
+<p>Choosing not to display plots within the notebook is a deliberate decision, and the reasons are multiple. Some of the key points include:</p>
+<ul class="simple">
+<li><p><strong>Ephemerality of Notebooks</strong>: Notebooks are inherently transient; they are not designed to be a permanent record of your work.</p></li>
+<li><p><strong>Risk of Obsolescence</strong>: If you rerun portions of your notebook, the plot displayed could become outdated or misleading, posing a risk when interpreting results.</p></li>
+<li><p><strong>Loss of Previous State</strong>: If you happen to rerun the entire notebook, the plot will be lost. While some plugins can recover previous cell states, setting this up can be cumbersome and time-consuming.</p></li>
+</ul>
+<p>In contrast, logging the plot to MLflow ensures that we have a permanent, easily accessible record that correlates directly with other experiment data. This is invaluable for maintaining the integrity and reproducibility of your machine learning experiments.</p>
+</div>
+<div class="section" id="Displaying-the-Plot-for-This-Guide">
+<h4>Displaying the Plot for This Guide<a class="headerlink" href="#Displaying-the-Plot-for-This-Guide" title="Permalink to this headline"> </a></h4>
+<p>For the purposes of this guide, we’ll still take a moment to examine the plot. We can do this by explicitly calling the figure object we’ve returned from our function.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">correlation_plot</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<img alt="../../../_images/traditional-ml_hyperparameter-tuning-with-child-runs_notebooks_hyperparameter-tuning-with-child-runs_10_0.png" src="../../../_images/traditional-ml_hyperparameter-tuning-with-child-runs_notebooks_hyperparameter-tuning-with-child-runs_10_0.png" />
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Visualizing-Model-Residuals-for-Diagnostic-Insights">
+<h3>Visualizing Model Residuals for Diagnostic Insights<a class="headerlink" href="#Visualizing-Model-Residuals-for-Diagnostic-Insights" title="Permalink to this headline"> </a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">plot_residuals</span></code> function serves to visualize the residuals—the differences between the model’s predictions and the actual values in the validation set. Residual plots are crucial diagnostic tools in machine learning, as they can reveal patterns that suggest our model is either failing to capture some aspect of the data or that there’s a systematic issue with the model itself.</p>
+<div class="section" id="Why-Residual-Plots?">
+<h4>Why Residual Plots?<a class="headerlink" href="#Why-Residual-Plots?" title="Permalink to this headline"> </a></h4>
+<p>Residual plots offer several advantages:</p>
+<ul class="simple">
+<li><p><strong>Identifying Bias</strong>: If residuals show a trend (not centered around zero), it might indicate that your model is systematically over- or under-predicting the target variable.</p></li>
+<li><p><strong>Heteroskedasticity</strong>: Varying spread of residuals across the range of the predicted values can indicate ‘Heteroskedasticity,’ which can violate assumptions in some modeling techniques.</p></li>
+<li><p><strong>Outliers</strong>: Points far away from the zero line can be considered as outliers and might warrant further investigation.</p></li>
+</ul>
+</div>
+<div class="section" id="Auto-saving-the-Plot">
+<h4>Auto-saving the Plot<a class="headerlink" href="#Auto-saving-the-Plot" title="Permalink to this headline"> </a></h4>
+<p>Just like with the correlation plot, this function allows you to save the residual plot to a specific path. This feature aligns with our broader strategy of logging important figures to MLflow for more effective model tracking and auditing.</p>
+</div>
+<div class="section" id="Plot-Structure">
+<h4>Plot Structure<a class="headerlink" href="#Plot-Structure" title="Permalink to this headline"> </a></h4>
+<p>In the scatter plot, each point represents the residual for a specific observation in the validation set. The red horizontal line at zero serves as a reference, indicating where residuals would lie if the model’s predictions were perfect.</p>
+<p>For the sake of this guide, we will be generating this plot, but not examining it until later when we see it within the MLflow UI.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_residuals</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">dvalid</span><span class="p">,</span> <span class="n">valid_y</span><span class="p">,</span> <span class="n">save_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plots the residuals of the model predictions against the true values.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    - model: The trained XGBoost model.</span>
+<span class="sd">    - dvalid (xgb.DMatrix): The validation data in XGBoost DMatrix format.</span>
+<span class="sd">    - valid_y (pd.Series): The true values for the validation set.</span>
+<span class="sd">    - save_path (str, optional): Path to save the generated plot. If not specified, plot won&#39;t be saved.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    - None (Displays the residuals plot on a Jupyter window)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Predict using the model</span>
+    <span class="n">preds</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">dvalid</span><span class="p">)</span>
+
+    <span class="c1"># Calculate residuals</span>
+    <span class="n">residuals</span> <span class="o">=</span> <span class="n">valid_y</span> <span class="o">-</span> <span class="n">preds</span>
+
+    <span class="c1"># Set Seaborn style</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">set_style</span><span class="p">(</span><span class="s2">&quot;whitegrid&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;axes.facecolor&quot;</span><span class="p">:</span> <span class="s2">&quot;#c2c4c2&quot;</span><span class="p">,</span> <span class="s2">&quot;grid.linewidth&quot;</span><span class="p">:</span> <span class="mf">1.5</span><span class="p">})</span>
+
+    <span class="c1"># Create scatter plot</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">valid_y</span><span class="p">,</span> <span class="n">residuals</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Set labels, title and other plot properties</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Residuals vs True Values&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;True Values&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Residuals&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+    <span class="c1"># Save the plot if save_path is specified</span>
+    <span class="k">if</span> <span class="n">save_path</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_path</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>
+
+    <span class="c1"># Show the plot</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">fig</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Understanding-Feature-Importance-with-XGBoost">
+<h3>Understanding Feature Importance with XGBoost<a class="headerlink" href="#Understanding-Feature-Importance-with-XGBoost" title="Permalink to this headline"> </a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">plot_feature_importance</span></code> function is designed to visualize the importance of each feature used in our XGBoost model. Understanding feature importance can offer critical insights into the model’s decision-making process and can aid in feature selection, engineering, and interpretation.</p>
+<div class="section" id="Types-of-Feature-Importance">
+<h4>Types of Feature Importance<a class="headerlink" href="#Types-of-Feature-Importance" title="Permalink to this headline"> </a></h4>
+<p>XGBoost offers multiple ways to interpret feature importance. This function supports:</p>
+<ul class="simple">
+<li><p><strong>Weight</strong>: Number of times a feature appears in a tree across the ensemble of trees (for <code class="docutils literal notranslate"><span class="pre">gblinear</span></code> booster).</p></li>
+<li><p><strong>Gain</strong>: Average gain (or improvement to the model) of the feature when it is used in trees (for other booster types).</p></li>
+</ul>
+<p>We automatically select the appropriate importance type based on the booster used in the XGBoost model.</p>
+</div>
+<div class="section" id="Why-Feature-Importance-Matters">
+<h4>Why Feature Importance Matters<a class="headerlink" href="#Why-Feature-Importance-Matters" title="Permalink to this headline"> </a></h4>
+<p>Understanding feature importance offers several advantages:</p>
+<ul class="simple">
+<li><p><strong>Interpretability</strong>: Knowing which features are most influential helps us understand the model better.</p></li>
+<li><p><strong>Feature Selection</strong>: Unimportant features can potentially be dropped to simplify the model.</p></li>
+<li><p><strong>Domain Understanding</strong>: Aligns the model’s importance scale with domain-specific knowledge or intuition.</p></li>
+</ul>
+</div>
+<div class="section" id="Saving-and-Accessing-the-Plot">
+<h4>Saving and Accessing the Plot<a class="headerlink" href="#Saving-and-Accessing-the-Plot" title="Permalink to this headline"> </a></h4>
+<p>This function returns a Matplotlib figure object that you can further manipulate or save. Like the previous plots, it is advisable to log this plot in MLflow for an immutable record of your model’s interpretive characteristics.</p>
+</div>
+<div class="section" id="Navigating-the-Plot">
+<h4>Navigating the Plot<a class="headerlink" href="#Navigating-the-Plot" title="Permalink to this headline"> </a></h4>
+<p>In the resulting plot, each bar represents a feature used in the model. The length of the bar corresponds to the feature’s importance, as calculated by the selected importance type.</p>
+<p>We need a model to be trained in order to generate this plot. As such, we’ll be generating, but not displaying the plot when we train the model. The resulting figure will be logged to MLflow and visible within the UI.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_feature_importance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">booster</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plots feature importance for an XGBoost model.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    - model: A trained XGBoost model</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    - fig: The matplotlib figure object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+    <span class="n">importance_type</span> <span class="o">=</span> <span class="s2">&quot;weight&quot;</span> <span class="k">if</span> <span class="n">booster</span> <span class="o">==</span> <span class="s2">&quot;gblinear&quot;</span> <span class="k">else</span> <span class="s2">&quot;gain&quot;</span>
+    <span class="n">xgb</span><span class="o">.</span><span class="n">plot_importance</span><span class="p">(</span>
+        <span class="n">model</span><span class="p">,</span>
+        <span class="n">importance_type</span><span class="o">=</span><span class="n">importance_type</span><span class="p">,</span>
+        <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Feature Importance based on </span><span class="si">{</span><span class="n">importance_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">fig</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Setting-Up-the-MLflow-Experiment">
+<h2>Setting Up the MLflow Experiment<a class="headerlink" href="#Setting-Up-the-MLflow-Experiment" title="Permalink to this headline"> </a></h2>
+<p>Before we start our hyperparameter tuning process, we need to designate a specific “experiment” within MLflow to track and log our results. An experiment in MLflow is essentially a named set of runs. Each run within an experiment tracks its own parameters, metrics, tags, and artifacts.</p>
+<div class="section" id="Why-create-a-new-experiment?">
+<h3>Why create a new experiment?<a class="headerlink" href="#Why-create-a-new-experiment?" title="Permalink to this headline"> </a></h3>
+<ol class="arabic simple">
+<li><p><strong>Organization</strong>: It helps in keeping our runs organized under a specific task or project, making it easier to compare and analyze results.</p></li>
+<li><p><strong>Isolation</strong>: By isolating different tasks or projects into separate experiments, we prevent accidental overwrites or misinterpretations of results.</p></li>
+</ol>
+<p>The <code class="docutils literal notranslate"><span class="pre">get_or_create_experiment</span></code> function we’ve defined below aids in this process. It checks if an experiment with the specified name already exists. If yes, it retrieves its ID. If not, it creates a new experiment and returns its ID.</p>
+</div>
+<div class="section" id="How-will-we-use-the-experiment_id?">
+<h3>How will we use the experiment_id?<a class="headerlink" href="#How-will-we-use-the-experiment_id?" title="Permalink to this headline"> </a></h3>
+<p>The retrieved or created experiment_id becomes crucial when we initiate our hyperparameter tuning. As we start the parent run for tuning, the experiment_id ensures that the run, along with its nested child runs, gets logged under the correct experiment. It provides a structured way to navigate, compare, and analyze our tuning results within the MLflow UI.</p>
+<p>When we want to try additional parameter ranges, different parameters, or a slightly modified dataset, we can use this Experiment to log all parent runs to keep our MLflow Tracking UI clean and easy to navigate.</p>
+<p>Let’s proceed and set up our experiment!</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_or_create_experiment</span><span class="p">(</span><span class="n">experiment_name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Retrieve the ID of an existing MLflow experiment or create a new one if it doesn&#39;t exist.</span>
+
+<span class="sd">    This function checks if an experiment with the given name exists within MLflow.</span>
+<span class="sd">    If it does, the function returns its ID. If not, it creates a new experiment</span>
+<span class="sd">    with the provided name and returns its ID.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    - experiment_name (str): Name of the MLflow experiment.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    - str: ID of the existing or newly created MLflow experiment.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">experiment</span> <span class="o">:=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">get_experiment_by_name</span><span class="p">(</span><span class="n">experiment_name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">experiment</span><span class="o">.</span><span class="n">experiment_id</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">create_experiment</span><span class="p">(</span><span class="n">experiment_name</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Create-an-experiment-for-our-hyperparameter-tuning-runs">
+<h3>Create an experiment for our hyperparameter tuning runs<a class="headerlink" href="#Create-an-experiment-for-our-hyperparameter-tuning-runs" title="Permalink to this headline"> </a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">experiment_id</span> <span class="o">=</span> <span class="n">get_or_create_experiment</span><span class="p">(</span><span class="s2">&quot;Apples Demand&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>We can view the <code class="docutils literal notranslate"><span class="pre">experiment_id</span></code> that was either generated or fetched to see how this unique reference key looks. The value generated here is also visible within the MLflow UI.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">experiment_id</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&#39;908436739760555869&#39;
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Setting-Up-MLflow-and-Data-Preprocessing-for-Model-Training">
+<h3>Setting Up MLflow and Data Preprocessing for Model Training<a class="headerlink" href="#Setting-Up-MLflow-and-Data-Preprocessing-for-Model-Training" title="Permalink to this headline"> </a></h3>
+<p>This section of the code accomplishes two major tasks: initializing an MLflow experiment for usage in run tracking and preparing the dataset for model training and validation.</p>
+<div class="section" id="MLflow-Initialization">
+<h4>MLflow Initialization<a class="headerlink" href="#MLflow-Initialization" title="Permalink to this headline"> </a></h4>
+<p>We start by setting the MLflow experiment using the <code class="docutils literal notranslate"><span class="pre">set_experiment</span></code> function. The <code class="docutils literal notranslate"><span class="pre">experiment_id</span></code> serves as a unique identifier for the experiment, allowing us to segregate and manage different runs and their associated data efficiently.</p>
+</div>
+<div class="section" id="Data-Preprocessing">
+<h4>Data Preprocessing<a class="headerlink" href="#Data-Preprocessing" title="Permalink to this headline"> </a></h4>
+<p>The next steps involve preparing the dataset for model training:</p>
+<ol class="arabic simple">
+<li><p><strong>Feature Selection</strong>: We drop the columns ‘date’ and ‘demand’ from our DataFrame, retaining only the feature columns in <code class="docutils literal notranslate"><span class="pre">X</span></code>.</p></li>
+<li><p><strong>Target Variable</strong>: The ‘demand’ column is designated as our target variable <code class="docutils literal notranslate"><span class="pre">y</span></code>.</p></li>
+<li><p><strong>Data Splitting</strong>: We split the dataset into training (<code class="docutils literal notranslate"><span class="pre">train_x</span></code>, <code class="docutils literal notranslate"><span class="pre">train_y</span></code>) and validation (<code class="docutils literal notranslate"><span class="pre">valid_x</span></code>, <code class="docutils literal notranslate"><span class="pre">valid_y</span></code>) sets using a 75-25 split.</p></li>
+<li><p><strong>XGBoost Data Format</strong>: Finally, we convert the training and validation datasets into XGBoost’s DMatrix format. This optimized data structure speeds up the training process and is required for using XGBoost’s advanced functionalities.</p></li>
+</ol>
+</div>
+<div class="section" id="Why-These-Steps-Matter">
+<h4>Why These Steps Matter<a class="headerlink" href="#Why-These-Steps-Matter" title="Permalink to this headline"> </a></h4>
+<ul class="simple">
+<li><p><strong>MLflow Tracking</strong>: Initializing the MLflow experiment ensures that all subsequent model runs, metrics, and artifacts are logged under the same experiment, making it easier to compare and analyze different models. While we are using the <code class="docutils literal notranslate"><span class="pre">fluent</span> <span class="pre">API</span></code> to do this here, you can also specify the <code class="docutils literal notranslate"><span class="pre">experiment_id</span></code> within a <code class="docutils literal notranslate"><span class="pre">start_run()</span></code> context.</p></li>
+<li><p><strong>Data Preparation</strong>: Properly preparing your data ensures that the model training process will proceed without issues and that the results will be as accurate as possible.</p></li>
+</ul>
+<p>In the next steps, we’ll proceed to model training and evaluation, and all these preparation steps will come into play.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set the current active MLflow experiment</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="n">experiment_id</span><span class="o">=</span><span class="n">experiment_id</span><span class="p">)</span>
+
+<span class="c1"># Preprocess the dataset</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;date&quot;</span><span class="p">,</span> <span class="s2">&quot;demand&quot;</span><span class="p">])</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;demand&quot;</span><span class="p">]</span>
+<span class="n">train_x</span><span class="p">,</span> <span class="n">valid_x</span><span class="p">,</span> <span class="n">train_y</span><span class="p">,</span> <span class="n">valid_y</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.25</span><span class="p">)</span>
+<span class="n">dtrain</span> <span class="o">=</span> <span class="n">xgb</span><span class="o">.</span><span class="n">DMatrix</span><span class="p">(</span><span class="n">train_x</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">train_y</span><span class="p">)</span>
+<span class="n">dvalid</span> <span class="o">=</span> <span class="n">xgb</span><span class="o">.</span><span class="n">DMatrix</span><span class="p">(</span><span class="n">valid_x</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">valid_y</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Hyperparameter-Tuning-and-Model-Training-using-Optuna-and-MLflow">
+<h3>Hyperparameter Tuning and Model Training using Optuna and MLflow<a class="headerlink" href="#Hyperparameter-Tuning-and-Model-Training-using-Optuna-and-MLflow" title="Permalink to this headline"> </a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">objective</span></code> function serves as the core of our hyperparameter tuning process using Optuna. Additionally, it trains an XGBoost model using the selected hyperparameters and logs metrics and parameters to MLflow.</p>
+<div class="section" id="MLflow-Nested-Runs">
+<h4>MLflow Nested Runs<a class="headerlink" href="#MLflow-Nested-Runs" title="Permalink to this headline"> </a></h4>
+<p>The function starts a new nested run in MLflow. Nested runs are useful for organizing hyperparameter tuning experiments as they allow you to group individual runs under a parent run.</p>
+</div>
+<div class="section" id="Defining-Hyperparameters">
+<h4>Defining Hyperparameters<a class="headerlink" href="#Defining-Hyperparameters" title="Permalink to this headline"> </a></h4>
+<p>Optuna’s <code class="docutils literal notranslate"><span class="pre">trial.suggest_*</span></code> methods are used to define a range of possible values for hyperparameters. Here’s what each hyperparameter does:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">objective</span></code> and <code class="docutils literal notranslate"><span class="pre">eval_metric</span></code>: Define the loss function and evaluation metric.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">booster</span></code>: Type of boosting to be used (<code class="docutils literal notranslate"><span class="pre">gbtree</span></code>, <code class="docutils literal notranslate"><span class="pre">gblinear</span></code>, or <code class="docutils literal notranslate"><span class="pre">dart</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lambda</span></code> and <code class="docutils literal notranslate"><span class="pre">alpha</span></code>: Regularization parameters.</p></li>
+<li><p>Additional parameters like <code class="docutils literal notranslate"><span class="pre">max_depth</span></code>, <code class="docutils literal notranslate"><span class="pre">eta</span></code>, and <code class="docutils literal notranslate"><span class="pre">gamma</span></code> are specific to tree-based models (<code class="docutils literal notranslate"><span class="pre">gbtree</span></code> and <code class="docutils literal notranslate"><span class="pre">dart</span></code>).</p></li>
+</ul>
+</div>
+<div class="section" id="Model-Training">
+<h4>Model Training<a class="headerlink" href="#Model-Training" title="Permalink to this headline"> </a></h4>
+<p>An XGBoost model is trained using the chosen hyperparameters and the preprocessed training dataset (<code class="docutils literal notranslate"><span class="pre">dtrain</span></code>). Predictions are made on the validation set (<code class="docutils literal notranslate"><span class="pre">dvalid</span></code>), and the mean squared error (<code class="docutils literal notranslate"><span class="pre">mse</span></code>) is calculated.</p>
+</div>
+<div class="section" id="Logging-with-MLflow">
+<h4>Logging with MLflow<a class="headerlink" href="#Logging-with-MLflow" title="Permalink to this headline"> </a></h4>
+<p>All the selected hyperparameters and metrics (<code class="docutils literal notranslate"><span class="pre">mse</span></code> and <code class="docutils literal notranslate"><span class="pre">rmse</span></code>) are logged to MLflow for later analysis and comparison.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">mlflow.log_params</span></code>: Logs the hyperparameters.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mlflow.log_metric</span></code>: Logs the metrics.</p></li>
+</ul>
+</div>
+<div class="section" id="Why-This-Function-is-Important">
+<h4>Why This Function is Important<a class="headerlink" href="#Why-This-Function-is-Important" title="Permalink to this headline"> </a></h4>
+<ul class="simple">
+<li><p><strong>Automated Tuning</strong>: Optuna automates the process of finding the best hyperparameters.</p></li>
+<li><p><strong>Experiment Tracking</strong>: MLflow allows us to keep track of each run’s hyperparameters and performance metrics, making it easier to analyze, compare, and reproduce experiments later.</p></li>
+</ul>
+<p>In the next step, this objective function will be used by Optuna to find the optimal set of hyperparameters for our XGBoost model.</p>
+</div>
+</div>
+<div class="section" id="Housekeeping:-Streamlining-Logging-for-Optuna-Trials">
+<h3>Housekeeping: Streamlining Logging for Optuna Trials<a class="headerlink" href="#Housekeeping:-Streamlining-Logging-for-Optuna-Trials" title="Permalink to this headline"> </a></h3>
+<p>As we embark on our hyperparameter tuning journey with Optuna, it’s essential to understand that the process can generate a multitude of runs. In fact, so many that the standard output (stdout) from the default logger can quickly become inundated, producing pages upon pages of log reports.</p>
+<p>While the verbosity of the default logging configuration is undeniably valuable during the code development phase, initiating a full-scale trial can result in an overwhelming amount of information. Considering this, logging every single detail to stdout becomes less practical, especially when we have dedicated tools like MLflow to meticulously track our experiments.</p>
+<p>To strike a balance, we’ll utilize callbacks to tailor our logging behavior.</p>
+<div class="section" id="Implementing-a-Logging-Callback:">
+<h4>Implementing a Logging Callback:<a class="headerlink" href="#Implementing-a-Logging-Callback:" title="Permalink to this headline"> </a></h4>
+<p>The callback we’re about to introduce will modify the default reporting behavior. Instead of logging every trial, we’ll only receive updates when a new hyperparameter combination yields an improvement over the best metric value recorded thus far.</p>
+<p>This approach offers two salient benefits:</p>
+<ol class="arabic simple">
+<li><p><strong>Enhanced Readability</strong>: By filtering out the extensive log details and focusing only on the trials that show improvement, we can gauge the efficacy of our hyperparameter search. For instance, if we observe a diminishing frequency of ‘best result’ reports early on, it might suggest that fewer iterations would suffice to pinpoint an optimal hyperparameter set. On the other hand, a consistent rate of improvement might indicate that our feature set requires further refinement.</p></li>
+<li><p><strong>Progress Indicators</strong>: Especially pertinent for extensive trials that span hours or even days, receiving periodic updates provides assurance that the process is still in motion. These ‘heartbeat’ notifications affirm that our system is diligently at work, even if it’s not flooding stdout with every minute detail.</p></li>
+</ol>
+<p>Moreover, MLflow’s user interface (UI) complements this strategy. As each trial concludes, MLflow logs the child run, making it accessible under the umbrella of the parent run.</p>
+<p>In the ensuing code, we:</p>
+<ol class="arabic simple">
+<li><p>Adjust Optuna’s logging level to report only errors, ensuring a decluttered stdout.</p></li>
+<li><p>Define a <code class="docutils literal notranslate"><span class="pre">champion_callback</span></code> function, tailored to log only when a trial surpasses the previously recorded best metric.</p></li>
+</ol>
+<p>Let’s dive into the implementation:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># override Optuna&#39;s default logging to ERROR only</span>
+<span class="n">optuna</span><span class="o">.</span><span class="n">logging</span><span class="o">.</span><span class="n">set_verbosity</span><span class="p">(</span><span class="n">optuna</span><span class="o">.</span><span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
+
+<span class="c1"># define a logging callback that will report on only new challenger parameter configurations if a</span>
+<span class="c1"># trial has usurped the state of &#39;best conditions&#39;</span>
+
+
+<span class="k">def</span> <span class="nf">champion_callback</span><span class="p">(</span><span class="n">study</span><span class="p">,</span> <span class="n">frozen_trial</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Logging callback that will report when a new trial iteration improves upon existing</span>
+<span class="sd">    best trial values.</span>
+
+<span class="sd">    Note: This callback is not intended for use in distributed computing systems such as Spark</span>
+<span class="sd">    or Ray due to the micro-batch iterative implementation for distributing trials to a cluster&#39;s</span>
+<span class="sd">    workers or agents.</span>
+<span class="sd">    The race conditions with file system state management for distributed trials will render</span>
+<span class="sd">    inconsistent values with this callback.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">winner</span> <span class="o">=</span> <span class="n">study</span><span class="o">.</span><span class="n">user_attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;winner&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">study</span><span class="o">.</span><span class="n">best_value</span> <span class="ow">and</span> <span class="n">winner</span> <span class="o">!=</span> <span class="n">study</span><span class="o">.</span><span class="n">best_value</span><span class="p">:</span>
+        <span class="n">study</span><span class="o">.</span><span class="n">set_user_attr</span><span class="p">(</span><span class="s2">&quot;winner&quot;</span><span class="p">,</span> <span class="n">study</span><span class="o">.</span><span class="n">best_value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">winner</span><span class="p">:</span>
+            <span class="n">improvement_percent</span> <span class="o">=</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">winner</span> <span class="o">-</span> <span class="n">study</span><span class="o">.</span><span class="n">best_value</span><span class="p">)</span> <span class="o">/</span> <span class="n">study</span><span class="o">.</span><span class="n">best_value</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Trial </span><span class="si">{</span><span class="n">frozen_trial</span><span class="o">.</span><span class="n">number</span><span class="si">}</span><span class="s2"> achieved value: </span><span class="si">{</span><span class="n">frozen_trial</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2"> with &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">improvement_percent</span><span class="si">:</span><span class="s2"> .4f</span><span class="si">}</span><span class="s2">% improvement&quot;</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Initial trial </span><span class="si">{</span><span class="n">frozen_trial</span><span class="o">.</span><span class="n">number</span><span class="si">}</span><span class="s2"> achieved value: </span><span class="si">{</span><span class="n">frozen_trial</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">objective</span><span class="p">(</span><span class="n">trial</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">(</span><span class="n">nested</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="c1"># Define hyperparameters</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;objective&quot;</span><span class="p">:</span> <span class="s2">&quot;reg:squarederror&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;eval_metric&quot;</span><span class="p">:</span> <span class="s2">&quot;rmse&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;booster&quot;</span><span class="p">:</span> <span class="n">trial</span><span class="o">.</span><span class="n">suggest_categorical</span><span class="p">(</span><span class="s2">&quot;booster&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;gbtree&quot;</span><span class="p">,</span> <span class="s2">&quot;gblinear&quot;</span><span class="p">,</span> <span class="s2">&quot;dart&quot;</span><span class="p">]),</span>
+            <span class="s2">&quot;lambda&quot;</span><span class="p">:</span> <span class="n">trial</span><span class="o">.</span><span class="n">suggest_float</span><span class="p">(</span><span class="s2">&quot;lambda&quot;</span><span class="p">,</span> <span class="mf">1e-8</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="s2">&quot;alpha&quot;</span><span class="p">:</span> <span class="n">trial</span><span class="o">.</span><span class="n">suggest_float</span><span class="p">(</span><span class="s2">&quot;alpha&quot;</span><span class="p">,</span> <span class="mf">1e-8</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;booster&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;gbtree&quot;</span> <span class="ow">or</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;booster&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;dart&quot;</span><span class="p">:</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;max_depth&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">trial</span><span class="o">.</span><span class="n">suggest_int</span><span class="p">(</span><span class="s2">&quot;max_depth&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;eta&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">trial</span><span class="o">.</span><span class="n">suggest_float</span><span class="p">(</span><span class="s2">&quot;eta&quot;</span><span class="p">,</span> <span class="mf">1e-8</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;gamma&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">trial</span><span class="o">.</span><span class="n">suggest_float</span><span class="p">(</span><span class="s2">&quot;gamma&quot;</span><span class="p">,</span> <span class="mf">1e-8</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;grow_policy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">trial</span><span class="o">.</span><span class="n">suggest_categorical</span><span class="p">(</span>
+                <span class="s2">&quot;grow_policy&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;depthwise&quot;</span><span class="p">,</span> <span class="s2">&quot;lossguide&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Train XGBoost model</span>
+        <span class="n">bst</span> <span class="o">=</span> <span class="n">xgb</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">dtrain</span><span class="p">)</span>
+        <span class="n">preds</span> <span class="o">=</span> <span class="n">bst</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">dvalid</span><span class="p">)</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="n">mean_squared_error</span><span class="p">(</span><span class="n">valid_y</span><span class="p">,</span> <span class="n">preds</span><span class="p">)</span>
+
+        <span class="c1"># Log to MLflow</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_params</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_metric</span><span class="p">(</span><span class="s2">&quot;mse&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_metric</span><span class="p">(</span><span class="s2">&quot;rmse&quot;</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">error</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">error</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Orchestrating-Hyperparameter-Tuning,-Model-Training,-and-Logging-with-MLflow">
+<h3>Orchestrating Hyperparameter Tuning, Model Training, and Logging with MLflow<a class="headerlink" href="#Orchestrating-Hyperparameter-Tuning,-Model-Training,-and-Logging-with-MLflow" title="Permalink to this headline"> </a></h3>
+<p>This section of the code serves as the orchestration layer, bringing together Optuna for hyperparameter tuning and MLflow for experiment tracking.</p>
+<div class="section" id="Initiating-Parent-Run">
+<h4>Initiating Parent Run<a class="headerlink" href="#Initiating-Parent-Run" title="Permalink to this headline"> </a></h4>
+<p>We begin by starting a parent MLflow run with the name “Best Run”. All subsequent operations, including Optuna’s trials, are nested under this parent run, providing a structured way to organize our experiments.</p>
+</div>
+<div class="section" id="Hyperparameter-Tuning-with-Optuna">
+<h4>Hyperparameter Tuning with Optuna<a class="headerlink" href="#Hyperparameter-Tuning-with-Optuna" title="Permalink to this headline"> </a></h4>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">study</span> <span class="pre">=</span> <span class="pre">optuna.create_study(direction='minimize')</span></code>: We create an Optuna study object aiming to minimize our objective function.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">study.optimize(objective,</span> <span class="pre">n_trials=10)</span></code>: The <code class="docutils literal notranslate"><span class="pre">objective</span></code> function is optimized over 10 trials.</p></li>
+</ul>
+</div>
+<div class="section" id="Logging-Best-Parameters-and-Metrics">
+<h4>Logging Best Parameters and Metrics<a class="headerlink" href="#Logging-Best-Parameters-and-Metrics" title="Permalink to this headline"> </a></h4>
+<p>After Optuna finds the best hyperparameters, we log these, along with the best mean squared error (<code class="docutils literal notranslate"><span class="pre">mse</span></code>) and root mean squared error (<code class="docutils literal notranslate"><span class="pre">rmse</span></code>), to MLflow.</p>
+</div>
+<div class="section" id="Logging-Additional-Metadata">
+<h4>Logging Additional Metadata<a class="headerlink" href="#Logging-Additional-Metadata" title="Permalink to this headline"> </a></h4>
+<p>Using <code class="docutils literal notranslate"><span class="pre">mlflow.set_tags</span></code>, we log additional metadata like the project name, optimization engine, model family, and feature set version. This helps in better categorizing and understanding the context of the model run.</p>
+</div>
+<div class="section" id="Model-Training-and-Artifact-Logging">
+<h4>Model Training and Artifact Logging<a class="headerlink" href="#Model-Training-and-Artifact-Logging" title="Permalink to this headline"> </a></h4>
+<ul class="simple">
+<li><p>We train an XGBoost model using the best hyperparameters.</p></li>
+<li><p>Various plots—correlation with demand, feature importance, and residuals—are generated and logged as artifacts in MLflow.</p></li>
+</ul>
+</div>
+<div class="section" id="Model-Serialization-and-Logging">
+<h4>Model Serialization and Logging<a class="headerlink" href="#Model-Serialization-and-Logging" title="Permalink to this headline"> </a></h4>
+<p>Finally, the trained model is logged to MLflow using <code class="docutils literal notranslate"><span class="pre">mlflow.xgboost.log_model</span></code>, along with an example input and additional metadata. The model is stored in a specified artifact path and its URI is retrieved.</p>
+</div>
+<div class="section" id="Why-This-Block-is-Crucial">
+<h4>Why This Block is Crucial<a class="headerlink" href="#Why-This-Block-is-Crucial" title="Permalink to this headline"> </a></h4>
+<ul class="simple">
+<li><p><strong>End-to-End Workflow</strong>: This code block represents an end-to-end machine learning workflow, from hyperparameter tuning to model evaluation and logging.</p></li>
+<li><p><strong>Reproducibility</strong>: All details about the model, including hyperparameters, metrics, and visual diagnostics, are logged, ensuring that the experiment is fully reproducible.</p></li>
+<li><p><strong>Analysis and Comparison</strong>: With all data logged in MLflow, it becomes easier to analyze the performance of various runs and choose the best model for deployment.</p></li>
+</ul>
+<p>In the next steps, we’ll explore how to retrieve and use the logged model for inference.</p>
+</div>
+</div>
+<div class="section" id="Setting-a-Descriptive-Name-for-the-Model-Run">
+<h3>Setting a Descriptive Name for the Model Run<a class="headerlink" href="#Setting-a-Descriptive-Name-for-the-Model-Run" title="Permalink to this headline"> </a></h3>
+<p>Before proceeding with model training and hyperparameter tuning, it’s beneficial to assign a descriptive name to our MLflow run. This name serves as a human-readable identifier, making it easier to track, compare, and analyze different runs.</p>
+<div class="section" id="The-Importance-of-Naming-Runs:">
+<h4>The Importance of Naming Runs:<a class="headerlink" href="#The-Importance-of-Naming-Runs:" title="Permalink to this headline"> </a></h4>
+<ul class="simple">
+<li><p><strong>Reference by Name</strong>: While MLflow provides unique identifying keys like <code class="docutils literal notranslate"><span class="pre">run_id</span></code> for each run, having a descriptive name allows for more intuitive referencing, especially when using particular APIs and navigating the MLflow UI.</p></li>
+<li><p><strong>Clarity and Context</strong>: A well-chosen run name can provide context about the hypothesis being tested or the specific modifications made, aiding in understanding the purpose and rationale of a particular run.</p></li>
+<li><p><strong>Automatic Naming</strong>: If you don’t specify a run name, MLflow will generate a unique fun name for you. However, this might lack the context and clarity of a manually chosen name.</p></li>
+</ul>
+</div>
+<div class="section" id="Best-Practices:">
+<h4>Best Practices:<a class="headerlink" href="#Best-Practices:" title="Permalink to this headline"> </a></h4>
+<p>When naming your runs, consider the following:</p>
+<ol class="arabic simple">
+<li><p><strong>Relevance to Code Changes</strong>: The name should reflect any code or parameter modifications made for that run.</p></li>
+<li><p><strong>Iterative Runs</strong>: If you’re executing multiple runs iteratively, it’s a good idea to update the run name for each iteration to avoid confusion.</p></li>
+</ol>
+<p>In the subsequent steps, we will set a name for our parent run. Remember, if you execute the model training multiple times, consider updating the run name for clarity.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">run_name</span> <span class="o">=</span> <span class="s2">&quot;first_attempt&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initiate the parent run and call the hyperparameter tuning child run logic</span>
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">(</span><span class="n">experiment_id</span><span class="o">=</span><span class="n">experiment_id</span><span class="p">,</span> <span class="n">run_name</span><span class="o">=</span><span class="n">run_name</span><span class="p">,</span> <span class="n">nested</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="c1"># Initialize the Optuna study</span>
+    <span class="n">study</span> <span class="o">=</span> <span class="n">optuna</span><span class="o">.</span><span class="n">create_study</span><span class="p">(</span><span class="n">direction</span><span class="o">=</span><span class="s2">&quot;minimize&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Execute the hyperparameter optimization trials.</span>
+    <span class="c1"># Note the addition of the `champion_callback` inclusion to control our logging</span>
+    <span class="n">study</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">champion_callback</span><span class="p">])</span>
+
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_params</span><span class="p">(</span><span class="n">study</span><span class="o">.</span><span class="n">best_params</span><span class="p">)</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_metric</span><span class="p">(</span><span class="s2">&quot;best_mse&quot;</span><span class="p">,</span> <span class="n">study</span><span class="o">.</span><span class="n">best_value</span><span class="p">)</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_metric</span><span class="p">(</span><span class="s2">&quot;best_rmse&quot;</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">study</span><span class="o">.</span><span class="n">best_value</span><span class="p">))</span>
+
+    <span class="c1"># Log tags</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">set_tags</span><span class="p">(</span>
+        <span class="n">tags</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;project&quot;</span><span class="p">:</span> <span class="s2">&quot;Apple Demand Project&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;optimizer_engine&quot;</span><span class="p">:</span> <span class="s2">&quot;optuna&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;model_family&quot;</span><span class="p">:</span> <span class="s2">&quot;xgboost&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;feature_set_version&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Log a fit model instance</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">xgb</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">study</span><span class="o">.</span><span class="n">best_params</span><span class="p">,</span> <span class="n">dtrain</span><span class="p">)</span>
+
+    <span class="c1"># Log the correlation plot</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_figure</span><span class="p">(</span><span class="n">figure</span><span class="o">=</span><span class="n">correlation_plot</span><span class="p">,</span> <span class="n">artifact_file</span><span class="o">=</span><span class="s2">&quot;correlation_plot.png&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Log the feature importances plot</span>
+    <span class="n">importances</span> <span class="o">=</span> <span class="n">plot_feature_importance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">booster</span><span class="o">=</span><span class="n">study</span><span class="o">.</span><span class="n">best_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;booster&quot;</span><span class="p">))</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_figure</span><span class="p">(</span><span class="n">figure</span><span class="o">=</span><span class="n">importances</span><span class="p">,</span> <span class="n">artifact_file</span><span class="o">=</span><span class="s2">&quot;feature_importances.png&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Log the residuals plot</span>
+    <span class="n">residuals</span> <span class="o">=</span> <span class="n">plot_residuals</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">dvalid</span><span class="p">,</span> <span class="n">valid_y</span><span class="p">)</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_figure</span><span class="p">(</span><span class="n">figure</span><span class="o">=</span><span class="n">residuals</span><span class="p">,</span> <span class="n">artifact_file</span><span class="o">=</span><span class="s2">&quot;residuals.png&quot;</span><span class="p">)</span>
+
+    <span class="n">artifact_path</span> <span class="o">=</span> <span class="s2">&quot;model&quot;</span>
+
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">xgboost</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+        <span class="n">xgb_model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+        <span class="n">artifact_path</span><span class="o">=</span><span class="n">artifact_path</span><span class="p">,</span>
+        <span class="n">input_example</span><span class="o">=</span><span class="n">train_x</span><span class="o">.</span><span class="n">iloc</span><span class="p">[[</span><span class="mi">0</span><span class="p">]],</span>
+        <span class="n">model_format</span><span class="o">=</span><span class="s2">&quot;ubj&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;model_data_version&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Get the logged model uri so that we can load it from the artifact store</span>
+    <span class="n">model_uri</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">get_artifact_uri</span><span class="p">(</span><span class="n">artifact_path</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Initial trial 0 achieved value: 1593256.879424474
+Trial 1 achieved value: 1593250.8071099266 with  0.0004% improvement
+Trial 2 achieved value: 30990.735000917906 with  5041.0552% improvement
+Trial 5 achieved value: 22804.947010998963 with  35.8948% improvement
+Trial 7 achieved value: 18232.507769997483 with  25.0785% improvement
+Trial 10 achieved value: 15670.64645523901 with  16.3482% improvement
+Trial 11 achieved value: 15561.843005727616 with  0.6992% improvement
+Trial 21 achieved value: 15144.954353687495 with  2.7527% improvement
+Trial 23 achieved value: 14846.71981618512 with  2.0088% improvement
+Trial 55 achieved value: 14570.287261018764 with  1.8972% improvement
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/Users/benjamin.wilson/repos/mlflow-fork/mlflow/mlflow/models/signature.py:333: UserWarning: Hint: Inferred schema contains integer column(s). Integer columns in Python cannot represent missing values. If your input data contains missing values at inference time, it will be encoded as floats and will cause a schema enforcement error. The best way to avoid this problem is to infer the model schema based on a realistic data sample (training dataset) that includes missing values. Alternatively, you can declare integer columns as doubles (float64) whenever these columns may have missing values. See `Handling Integers With Missing Values &lt;https://www.mlflow.org/docs/latest/models.html#handling-integers-with-missing-values&gt;`_ for more details.
+  input_schema = _infer_schema(input_ex)
+/Users/benjamin.wilson/miniconda3/envs/mlflow-dev-env/lib/python3.8/site-packages/_distutils_hack/__init__.py:30: UserWarning: Setuptools is replacing distutils.
+  warnings.warn(&#34;Setuptools is replacing distutils.&#34;)
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Understanding-the-Artifact-URI-in-MLflow">
+<h3>Understanding the Artifact URI in MLflow<a class="headerlink" href="#Understanding-the-Artifact-URI-in-MLflow" title="Permalink to this headline"> </a></h3>
+<p>The output ‘mlflow-artifacts:/908436739760555869/c8d64ce51f754eb698a3c09239bcdcee/artifacts/model’ represents a unique Uniform Resource Identifier (URI) for the trained model artifacts within MLflow. This URI is a crucial component of MLflow’s architecture, and here’s why:</p>
+<div class="section" id="Simplified-Access-to-Model-Artifacts">
+<h4>Simplified Access to Model Artifacts<a class="headerlink" href="#Simplified-Access-to-Model-Artifacts" title="Permalink to this headline"> </a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">model_uri</span></code> abstracts away the underlying storage details, providing a consistent and straightforward way to reference model artifacts, regardless of where they are stored. Whether your artifacts are on a local filesystem, in a cloud storage bucket, or on a network mount, the URI remains a consistent reference point.</p>
+</div>
+<div class="section" id="Abstraction-of-Storage-Details">
+<h4>Abstraction of Storage Details<a class="headerlink" href="#Abstraction-of-Storage-Details" title="Permalink to this headline"> </a></h4>
+<p>MLflow is designed to be storage-agnostic. This means that while you might switch the backend storage from, say, a local directory to an Amazon S3 bucket, the way you interact with MLflow remains consistent. The URI ensures that you don’t need to know the specifics of the storage backend; you only need to reference the model’s URI.</p>
+</div>
+<div class="section" id="Associated-Information-and-Metadata">
+<h4>Associated Information and Metadata<a class="headerlink" href="#Associated-Information-and-Metadata" title="Permalink to this headline"> </a></h4>
+<p>Beyond just the model files, the URI provides access to associated metadata, the model artifact, and other logged artifacts (files and images). This ensures that you have a comprehensive set of information about the model, aiding in reproducibility, analysis, and deployment.</p>
+</div>
+<div class="section" id="In-Summary">
+<h4>In Summary<a class="headerlink" href="#In-Summary" title="Permalink to this headline"> </a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">model_uri</span></code> serves as a consistent, abstracted reference to your model and its associated data. It simplifies interactions with MLflow, ensuring that users don’t need to worry about the specifics of underlying storage mechanisms and can focus on the machine learning workflow.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_uri</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&#39;mlflow-artifacts:/908436739760555869/c28196b19e1843bca7e22f07d796e740/artifacts/model&#39;
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Loading-the-Trained-Model-with-MLflow">
+<h3>Loading the Trained Model with MLflow<a class="headerlink" href="#Loading-the-Trained-Model-with-MLflow" title="Permalink to this headline"> </a></h3>
+<p>With the line:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">loaded</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">xgboost</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_uri</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>we’re leveraging MLflow’s native model loader for XGBoost. Instead of using the generic pyfunc loader, which provides a universal Python function interface for models, we’re using the XGBoost-specific loader.</p>
+<div class="section" id="Benefits-of-Native-Loading:">
+<h4>Benefits of Native Loading:<a class="headerlink" href="#Benefits-of-Native-Loading:" title="Permalink to this headline"> </a></h4>
+<ul class="simple">
+<li><p><strong>Fidelity</strong>: Loading the model using the native loader ensures that you’re working with the exact same model object as it was during training. This means all nuances, specifics, and intricacies of the original model are preserved.</p></li>
+<li><p><strong>Functionality</strong>: With the native model object in hand, you can utilize all of its inherent methods and properties. This allows for more flexibility, especially when you need advanced features or fine-grained control during inference.</p></li>
+<li><p><strong>Performance</strong>: Using the native model object might offer performance benefits, especially when performing batch inference or deploying the model in environments optimized for the specific machine learning framework.</p></li>
+</ul>
+<p>In essence, by loading the model natively, we ensure maximum compatibility and functionality, allowing for a seamless transition from training to inference.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">loaded</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">xgboost</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_uri</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "6d4d21b624d54d0d88bdae20765636c3", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+</div>
+</div>
+<div class="section" id="Example:-Batch-Inference-Using-the-Loaded-Model">
+<h3>Example: Batch Inference Using the Loaded Model<a class="headerlink" href="#Example:-Batch-Inference-Using-the-Loaded-Model" title="Permalink to this headline"> </a></h3>
+<p>After loading the model natively, performing batch inference is straightforward.</p>
+<p>In the following cell, we’re going to perform a prediction based on the entire source feature set. Although doing an inference action on the entire training and validation dataset features is of very limited utility in a real-world application, we’ll use our generated synthetic data here to illustrate using the native model for inference.</p>
+</div>
+<div class="section" id="Performing-Batch-Inference-and-Augmenting-Data">
+<h3>Performing Batch Inference and Augmenting Data<a class="headerlink" href="#Performing-Batch-Inference-and-Augmenting-Data" title="Permalink to this headline"> </a></h3>
+<p>In this section, we’re taking our entire dataset and performing batch inference using our loaded XGBoost model. We’ll then append these predictions back into our original dataset to compare, analyze, or further process.</p>
+<div class="section" id="Steps-Explained:">
+<h4>Steps Explained:<a class="headerlink" href="#Steps-Explained:" title="Permalink to this headline"> </a></h4>
+<ol class="arabic simple">
+<li><p><strong>Creating a DMatrix</strong>: <code class="docutils literal notranslate"><span class="pre">batch_dmatrix</span> <span class="pre">=</span> <span class="pre">xgb.DMatrix(X)</span></code>: We first convert our features (<code class="docutils literal notranslate"><span class="pre">X</span></code>) into XGBoost’s optimized DMatrix format. This data structure is specifically designed for efficiency and speed in XGBoost.</p></li>
+<li><p><strong>Predictions</strong>: <code class="docutils literal notranslate"><span class="pre">inference</span> <span class="pre">=</span> <span class="pre">loaded.predict(batch_dmatrix)</span></code>: Using the previously loaded model (<code class="docutils literal notranslate"><span class="pre">loaded</span></code>), we perform batch inference on the entire dataset.</p></li>
+<li><p><strong>Creating a New DataFrame</strong>: <code class="docutils literal notranslate"><span class="pre">infer_df</span> <span class="pre">=</span> <span class="pre">df.copy()</span></code>: We create a copy of the original DataFrame to ensure that we’re not modifying our original data.</p></li>
+<li><p><strong>Appending Predictions</strong>: <code class="docutils literal notranslate"><span class="pre">infer_df[&quot;predicted_demand&quot;]</span> <span class="pre">=</span> <span class="pre">inference</span></code>: The predictions are then added as a new column, <code class="docutils literal notranslate"><span class="pre">predicted_demand</span></code>, to this DataFrame.</p></li>
+</ol>
+</div>
+<div class="section" id="id1">
+<h4>Best Practices:<a class="headerlink" href="#id1" title="Permalink to this headline"> </a></h4>
+<ul class="simple">
+<li><p><strong>Always Copy Data</strong>: When augmenting or modifying datasets, it’s generally a good idea to work with a copy. This ensures that the original data remains unchanged, preserving data integrity.</p></li>
+<li><p><strong>Batch Inference</strong>: When predicting on large datasets, using batch inference (as opposed to individual predictions) can offer significant speed improvements.</p></li>
+<li><p><strong>DMatrix Conversion</strong>: While converting to DMatrix might seem like an extra step, it’s crucial for performance when working with XGBoost. It ensures that predictions are made as quickly as possible.</p></li>
+</ul>
+<p>In the subsequent steps, we can further analyze the differences between the actual demand and our model’s predicted demand, potentially visualizing the results or calculating performance metrics.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">batch_dmatrix</span> <span class="o">=</span> <span class="n">xgb</span><span class="o">.</span><span class="n">DMatrix</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+<span class="n">inference</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">batch_dmatrix</span><span class="p">)</span>
+
+<span class="n">infer_df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+<span class="n">infer_df</span><span class="p">[</span><span class="s2">&quot;predicted_demand&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">inference</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Visualizing-the-Augmented-DataFrame">
+<h3>Visualizing the Augmented DataFrame<a class="headerlink" href="#Visualizing-the-Augmented-DataFrame" title="Permalink to this headline"> </a></h3>
+<p>Below, we display the <code class="docutils literal notranslate"><span class="pre">infer_df</span></code> DataFrame. This augmented dataset now includes both the actual demand (<code class="docutils literal notranslate"><span class="pre">demand</span></code>) and the model’s predictions (<code class="docutils literal notranslate"><span class="pre">predicted_demand</span></code>). By examining this table, we can get a quick sense of how well our model’s predictions align with the actual demand values.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">infer_df</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>date</th>
+      <th>average_temperature</th>
+      <th>rainfall</th>
+      <th>weekend</th>
+      <th>holiday</th>
+      <th>price_per_kg</th>
+      <th>promo</th>
+      <th>demand</th>
+      <th>previous_days_demand</th>
+      <th>competitor_price_per_kg</th>
+      <th>marketing_intensity</th>
+      <th>predicted_demand</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2010-01-14 11:52:20.662955</td>
+      <td>30.584727</td>
+      <td>1.199291</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.726258</td>
+      <td>0</td>
+      <td>851.375336</td>
+      <td>851.276659</td>
+      <td>1.935346</td>
+      <td>0.098677</td>
+      <td>953.708496</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2010-01-15 11:52:20.662954</td>
+      <td>15.465069</td>
+      <td>1.037626</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.576471</td>
+      <td>0</td>
+      <td>906.855943</td>
+      <td>851.276659</td>
+      <td>2.344720</td>
+      <td>0.019318</td>
+      <td>1013.409973</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2010-01-16 11:52:20.662954</td>
+      <td>10.786525</td>
+      <td>5.656089</td>
+      <td>1</td>
+      <td>0</td>
+      <td>2.513328</td>
+      <td>0</td>
+      <td>1108.304909</td>
+      <td>906.836626</td>
+      <td>0.998803</td>
+      <td>0.409485</td>
+      <td>1152.382446</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>2010-01-17 11:52:20.662953</td>
+      <td>23.648154</td>
+      <td>12.030937</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1.839225</td>
+      <td>0</td>
+      <td>1099.833810</td>
+      <td>1157.895424</td>
+      <td>0.761740</td>
+      <td>0.872803</td>
+      <td>1352.879272</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>2010-01-18 11:52:20.662952</td>
+      <td>13.861391</td>
+      <td>4.303812</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.531772</td>
+      <td>0</td>
+      <td>983.949061</td>
+      <td>1148.961007</td>
+      <td>2.123436</td>
+      <td>0.820779</td>
+      <td>1121.233032</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>4995</th>
+      <td>2023-09-18 11:52:20.659592</td>
+      <td>21.643051</td>
+      <td>3.821656</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2.391010</td>
+      <td>0</td>
+      <td>1140.210762</td>
+      <td>1563.064082</td>
+      <td>1.504432</td>
+      <td>0.756489</td>
+      <td>1070.676636</td>
+    </tr>
+    <tr>
+      <th>4996</th>
+      <td>2023-09-19 11:52:20.659591</td>
+      <td>13.808813</td>
+      <td>1.080603</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0.898693</td>
+      <td>0</td>
+      <td>1285.149505</td>
+      <td>1189.454273</td>
+      <td>1.343586</td>
+      <td>0.742145</td>
+      <td>1156.580688</td>
+    </tr>
+    <tr>
+      <th>4997</th>
+      <td>2023-09-20 11:52:20.659590</td>
+      <td>11.698227</td>
+      <td>1.911000</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2.839860</td>
+      <td>0</td>
+      <td>965.171368</td>
+      <td>1284.407359</td>
+      <td>2.771896</td>
+      <td>0.742145</td>
+      <td>1086.527710</td>
+    </tr>
+    <tr>
+      <th>4998</th>
+      <td>2023-09-21 11:52:20.659589</td>
+      <td>18.052081</td>
+      <td>1.000521</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.188440</td>
+      <td>0</td>
+      <td>1368.369501</td>
+      <td>1014.429223</td>
+      <td>2.564075</td>
+      <td>0.742145</td>
+      <td>1085.064087</td>
+    </tr>
+    <tr>
+      <th>4999</th>
+      <td>2023-09-22 11:52:20.659584</td>
+      <td>17.017294</td>
+      <td>0.650213</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2.131694</td>
+      <td>0</td>
+      <td>1261.301286</td>
+      <td>1367.627356</td>
+      <td>0.785727</td>
+      <td>0.833140</td>
+      <td>1047.954102</td>
+    </tr>
+  </tbody>
+</table>
+<p>5000 rows × 12 columns</p>
+</div></div>
+</div>
+</div>
+<div class="section" id="Wrapping-Up:-Reflecting-on-Our-Comprehensive-Machine-Learning-Workflow">
+<h3>Wrapping Up: Reflecting on Our Comprehensive Machine Learning Workflow<a class="headerlink" href="#Wrapping-Up:-Reflecting-on-Our-Comprehensive-Machine-Learning-Workflow" title="Permalink to this headline"> </a></h3>
+<p>Throughout this guide, we embarked on a detailed exploration of an end-to-end machine learning workflow. We began with data preprocessing, delved deeply into hyperparameter tuning with Optuna, leveraged MLflow for structured experiment tracking, and concluded with batch inference.</p>
+<div class="section" id="Key-Takeaways:">
+<h4>Key Takeaways:<a class="headerlink" href="#Key-Takeaways:" title="Permalink to this headline"> </a></h4>
+<ul class="simple">
+<li><p><strong>Hyperparameter Tuning with Optuna</strong>: We harnessed the power of Optuna to systematically search for the best hyperparameters for our XGBoost model, aiming to optimize its performance.</p></li>
+<li><p><strong>Structured Experiment Tracking with MLflow</strong>: MLflow’s capabilities shone through as we logged experiments, metrics, parameters, and artifacts. We also explored the benefits of nested child runs, allowing us to logically group and structure our experiment iterations.</p></li>
+<li><p><strong>Model Interpretation</strong>: Various plots and metrics equipped us with insights into our model’s behavior. We learned to appreciate its strengths and identify potential areas for refinement.</p></li>
+<li><p><strong>Batch Inference</strong>: The nuances of batch predictions on extensive datasets were explored, alongside methods to seamlessly integrate these predictions back into our primary data.</p></li>
+<li><p><strong>Logging Visual Artifacts</strong>: A significant portion of our journey emphasized the importance of logging visual artifacts, like plots, to MLflow. These visuals serve as invaluable references, capturing the state of the model, its performance, and any alterations to the feature set that might sway the model’s performance metrics.</p></li>
+</ul>
+<p>By the end of this guide, you should possess a robust understanding of a well-structured machine learning workflow. This foundation not only empowers you to craft effective models but also ensures that each step, from data wrangling to predictions, is transparent, reproducible, and efficient.</p>
+<p>We’re grateful you accompanied us on this comprehensive journey. The practices and insights gleaned will undoubtedly be pivotal in all your future machine learning endeavors!</p>
+</div>
+</div>
+</div>
+</div>
+
+
+              </div>
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="index.html" class="btn btn-neutral" title="Hyperparameter tuning with MLflow and child runs - Notebooks" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+      
+      
+        <a href="parent-child-runs.html" class="btn btn-neutral" title="Leveraging Child Runs in MLflow for Hyperparameter Tuning" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+      <p class="copyright">
+          &copy; MLflow Project, a Series of LF Projects, LLC. All rights reserved.
+      </p>
+
+  </div> 
+
+</footer>
+          </div>
+        </div>
+      </section>
+    </main>
+  </page>
+
+  
+
+
+  
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+      URL_ROOT:'../../../',
+      VERSION:'2.9.2.dev0',
+      COLLAPSE_INDEX:false,
+      FILE_SUFFIX:'.html',
+      LINK_SUFFIX: '.html',
+      HAS_SOURCE:  true
+    };
+  </script>
+
+  
+
+  <script type="text/javascript" src="../../../_static/js/clipboard.min.js"></script>
+  <script type="text/javascript" src="../../../_static/js/jquery.waypoints.min.js"></script>
+
+  
+  
+  
+  <script type="text/javascript">var CLIPPY_SVG_PATH = "../../../_static/clippy.svg";</script>
+  <script type="text/javascript" src="../../../_static/js/custom.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.StickyNav.enable();
+    });
+
+  </script>
+  
+
+  
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        // Get the code block designator class entries
+        const allHighlights = document.querySelectorAll('.highlight');
+        // Disable copyable links for notebook cell numbering and for cell outputs
+        const highlights = Array.from(allHighlights).filter(highlight => !highlight.closest('.highlight-none') && 
+            !highlight.closest('.nboutput'));
+    
+        highlights.forEach(function(highlight) {
+            const copyIcon = document.createElement('span');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.innerHTML = '&#xf0ea;';
+
+            copyIcon.addEventListener('click', function() {
+                const code = highlight.querySelector('pre').textContent;
+                copyToClipboard(code);
+
+                // Flash effect on click
+                this.style.color = '#0194E2';
+                setTimeout(() => {
+                    this.style.color = ''; 
+                }, 100);
+
+                // Display "Code copied to clipboard" near the clicked icon
+                const message = document.createElement('span');
+                message.textContent = "Copied!";
+                message.classList.add('copy-message'); 
+
+                // Append the message to the icon
+                this.appendChild(message);
+
+                setTimeout(() => {
+                    this.removeChild(message);
+                }, 500);
+            });
+
+            highlight.appendChild(copyIcon);
+        });
+    });
+  </script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Force download for notebook-download-btn
+        const downloadButtons = document.querySelectorAll('.notebook-download-btn');
+        downloadButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                // Fetch the raw content of the notebook from GitHub
+                fetch(button.href)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = url;
+                        const filename = button.href.split('/').pop();
+                        link.download = filename; 
+
+                        document.body.appendChild(link);
+                        link.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    })
+                    .catch(err => console.error('Error fetching the notebook:', err));
+            });
+        });
+    });
+</script> 
+</body>
+</html>
