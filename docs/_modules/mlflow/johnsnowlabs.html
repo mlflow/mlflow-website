@@ -300,6 +300,8 @@
 
 <span class="n">FLAVOR_NAME</span> <span class="o">=</span> <span class="s2">&quot;johnsnowlabs&quot;</span>
 <span class="n">_JOHNSNOWLABS_ENV_JSON_LICENSE_KEY</span> <span class="o">=</span> <span class="s2">&quot;JOHNSNOWLABS_LICENSE_JSON&quot;</span>
+<span class="n">_JOHNSNOWLABS_ENV_HEALTHCARE_SECRET</span> <span class="o">=</span> <span class="s2">&quot;HEALTHCARE_SECRET&quot;</span>
+<span class="n">_JOHNSNOWLABS_ENV_VISUAL_SECRET</span> <span class="o">=</span> <span class="s2">&quot;VISUAL_SECRET&quot;</span>
 <span class="n">_JOHNSNOWLABS_MODEL_PATH_SUB</span> <span class="o">=</span> <span class="s2">&quot;jsl-model&quot;</span>
 <span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -328,16 +330,44 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">johnsnowlabs</span> <span class="kn">import</span> <span class="n">settings</span>
 
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="n">_JOHNSNOWLABS_ENV_HEALTHCARE_SECRET</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span>
+        <span class="ow">and</span> <span class="n">_JOHNSNOWLABS_ENV_VISUAL_SECRET</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span>
+    <span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;You need to set either </span><span class="si">{</span><span class="n">_JOHNSNOWLABS_ENV_HEALTHCARE_SECRET</span><span class="si">}</span><span class="s2"> &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;or </span><span class="si">{</span><span class="n">_JOHNSNOWLABS_ENV_VISUAL_SECRET</span><span class="si">}</span><span class="s2"> environment variable. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Please contact John Snow Labs to get one.&quot;</span>
+        <span class="p">)</span>
+
     <span class="n">_SPARK_NLP_JSL_WHEEL_URI</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;https://pypi.johnsnowlabs.com/</span><span class="si">{secret}</span><span class="s2">/spark-nlp-jsl/spark_nlp_jsl-&quot;</span>
         <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">settings</span><span class="o">.</span><span class="n">raw_version_medical</span><span class="si">}</span><span class="s2">-py3-none-any.whl&quot;</span>
     <span class="p">)</span>
 
-    <span class="k">return</span> <span class="p">[</span>
+    <span class="n">_SPARK_NLP_VISUAL_WHEEL_URI</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;https://pypi.johnsnowlabs.com/</span><span class="si">{secret}</span><span class="s2">/spark-ocr/&quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;spark_ocr-</span><span class="si">{</span><span class="n">settings</span><span class="o">.</span><span class="n">raw_version_ocr</span><span class="si">}</span><span class="s2">-py3-none-any.whl&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">deps</span> <span class="o">=</span> <span class="p">[</span>
         <span class="sa">f</span><span class="s2">&quot;johnsnowlabs_for_databricks==</span><span class="si">{</span><span class="n">settings</span><span class="o">.</span><span class="n">raw_version_jsl_lib</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
         <span class="n">_get_pinned_requirement</span><span class="p">(</span><span class="s2">&quot;pyspark&quot;</span><span class="p">),</span>
-        <span class="n">_SPARK_NLP_JSL_WHEEL_URI</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">secret</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;SECRET&quot;</span><span class="p">]),</span>
-    <span class="p">]</span></div>
+    <span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">_JOHNSNOWLABS_ENV_HEALTHCARE_SECRET</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+        <span class="n">_SPARK_NLP_JSL_WHEEL_URI</span> <span class="o">=</span> <span class="n">_SPARK_NLP_JSL_WHEEL_URI</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">secret</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">_JOHNSNOWLABS_ENV_HEALTHCARE_SECRET</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">deps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_SPARK_NLP_JSL_WHEEL_URI</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">_JOHNSNOWLABS_ENV_VISUAL_SECRET</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+        <span class="n">_SPARK_NLP_VISUAL_WHEEL_URI</span> <span class="o">=</span> <span class="n">_SPARK_NLP_VISUAL_WHEEL_URI</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">secret</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">_JOHNSNOWLABS_ENV_VISUAL_SECRET</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">deps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_SPARK_NLP_VISUAL_WHEEL_URI</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">deps</span></div>
 
 
 <div class="viewcode-block" id="get_default_conda_env"><a class="viewcode-back" href="../../python_api/mlflow.johnsnowlabs.html#mlflow.johnsnowlabs.get_default_conda_env">[docs]</a><span class="nd">@experimental</span>
@@ -635,11 +665,16 @@
     <span class="n">deps_data_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">dst_dir</span><span class="p">)</span> <span class="o">/</span> <span class="n">_JOHNSNOWLABS_MODEL_PATH_SUB</span> <span class="o">/</span> <span class="s2">&quot;jars.jsl&quot;</span>
     <span class="n">deps_data_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="n">suite</span> <span class="o">=</span> <span class="n">get_install_suite_from_jsl_home</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">suite</span> <span class="o">=</span> <span class="n">get_install_suite_from_jsl_home</span><span class="p">(</span>
+        <span class="kc">False</span><span class="p">,</span>
+        <span class="n">visual</span><span class="o">=</span><span class="n">_JOHNSNOWLABS_ENV_VISUAL_SECRET</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="k">if</span> <span class="n">suite</span><span class="o">.</span><span class="n">hc</span><span class="o">.</span><span class="n">get_java_path</span><span class="p">():</span>
         <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="n">suite</span><span class="o">.</span><span class="n">hc</span><span class="o">.</span><span class="n">get_java_path</span><span class="p">(),</span> <span class="n">deps_data_path</span> <span class="o">/</span> <span class="s2">&quot;hc_jar.jar&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">suite</span><span class="o">.</span><span class="n">nlp</span><span class="o">.</span><span class="n">get_java_path</span><span class="p">():</span>
         <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="n">suite</span><span class="o">.</span><span class="n">nlp</span><span class="o">.</span><span class="n">get_java_path</span><span class="p">(),</span> <span class="n">deps_data_path</span> <span class="o">/</span> <span class="s2">&quot;os_jar.jar&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">suite</span><span class="o">.</span><span class="n">ocr</span><span class="o">.</span><span class="n">get_java_path</span><span class="p">():</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="n">suite</span><span class="o">.</span><span class="n">ocr</span><span class="o">.</span><span class="n">get_java_path</span><span class="p">(),</span> <span class="n">deps_data_path</span> <span class="o">/</span> <span class="s2">&quot;visual_nlp.jar&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">store_license</span><span class="p">:</span>
         <span class="c1"># Read the secrets from env vars and write to license.json</span>
@@ -921,7 +956,8 @@
 <span class="sd">    :return:</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">_PyFuncModelWrapper</span><span class="p">(</span>
-        <span class="n">_load_model</span><span class="p">(</span><span class="n">model_uri</span><span class="o">=</span><span class="n">path</span><span class="p">),</span> <span class="n">spark</span> <span class="k">if</span> <span class="n">spark</span> <span class="k">else</span> <span class="n">_get_or_create_sparksession</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">_load_model</span><span class="p">(</span><span class="n">model_uri</span><span class="o">=</span><span class="n">path</span><span class="p">),</span>
+        <span class="n">spark</span> <span class="ow">or</span> <span class="n">_get_or_create_sparksession</span><span class="p">(</span><span class="n">path</span><span class="p">),</span>
     <span class="p">)</span>
 
 
