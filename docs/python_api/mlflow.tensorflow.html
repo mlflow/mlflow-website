@@ -698,6 +698,84 @@ release without warning.</p>
 </dl>
 </dd></dl>
 
+<dl class="py class">
+<dt id="mlflow.tensorflow.MLflowCallback">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">mlflow.tensorflow.</span></code><code class="sig-name descname"><span class="pre">MLflowCallback</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">run</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_every_epoch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_every_n_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mlflow/tensorflow/callback.html#MLflowCallback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.tensorflow.MLflowCallback" title="Permalink to this definition"> </a></dt>
+<dd><p>Callback for logging Tensorflow training metrics to MLflow.</p>
+<p>This callback logs model information at training start, and logs training metrics every epoch or
+every n steps (defined by the user) to MLflow.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>run</strong> – an <cite>mlflow.entities.run.Run</cite> instance, the MLflow run.</p></li>
+<li><p><strong>log_every_epoch</strong> – bool, If True, log metrics every epoch. If False, log metrics every n
+steps.</p></li>
+<li><p><strong>log_every_n_steps</strong> – int, log metrics every n steps. If None, log metrics every epoch.
+Must be <cite>None</cite> if <cite>log_every_epoch=True</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id3" title="Permalink to this code"> </a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tensorflow</span> <span class="kn">import</span> <span class="n">keras</span>
+<span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># Prepare data for a 2-class classification.</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">([</span><span class="mi">8</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<span class="n">label</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">8</span><span class="p">))</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">keras</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="n">keras</span><span class="o">.</span><span class="n">Input</span><span class="p">([</span><span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">3</span><span class="p">]),</span>
+        <span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Flatten</span><span class="p">(),</span>
+        <span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+
+<span class="n">model</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+    <span class="n">loss</span><span class="o">=</span><span class="n">keras</span><span class="o">.</span><span class="n">losses</span><span class="o">.</span><span class="n">SparseCategoricalCrossentropy</span><span class="p">(</span><span class="n">from_logits</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+    <span class="n">optimizer</span><span class="o">=</span><span class="n">keras</span><span class="o">.</span><span class="n">optimizers</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="mf">0.001</span><span class="p">),</span>
+    <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="n">keras</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">SparseCategoricalAccuracy</span><span class="p">()],</span>
+<span class="p">)</span>
+
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">()</span> <span class="k">as</span> <span class="n">run</span><span class="p">:</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+        <span class="n">data</span><span class="p">,</span>
+        <span class="n">label</span><span class="p">,</span>
+        <span class="n">batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+        <span class="n">epochs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">MLflowCallback</span><span class="p">(</span><span class="n">run</span><span class="p">)],</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<dl class="py method">
+<dt id="mlflow.tensorflow.MLflowCallback.on_batch_end">
+<code class="sig-name descname"><span class="pre">on_batch_end</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mlflow/tensorflow/callback.html#MLflowCallback.on_batch_end"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.tensorflow.MLflowCallback.on_batch_end" title="Permalink to this definition"> </a></dt>
+<dd><p>Log metrics at the end of each batch with user specified frequency.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mlflow.tensorflow.MLflowCallback.on_epoch_end">
+<code class="sig-name descname"><span class="pre">on_epoch_end</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epoch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mlflow/tensorflow/callback.html#MLflowCallback.on_epoch_end"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.tensorflow.MLflowCallback.on_epoch_end" title="Permalink to this definition"> </a></dt>
+<dd><p>Log metrics at the end of each epoch.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mlflow.tensorflow.MLflowCallback.on_test_end">
+<code class="sig-name descname"><span class="pre">on_test_end</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mlflow/tensorflow/callback.html#MLflowCallback.on_test_end"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.tensorflow.MLflowCallback.on_test_end" title="Permalink to this definition"> </a></dt>
+<dd><p>Log validation metrics at validation end.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mlflow.tensorflow.MLflowCallback.on_train_begin">
+<code class="sig-name descname"><span class="pre">on_train_begin</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mlflow/tensorflow/callback.html#MLflowCallback.on_train_begin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.tensorflow.MLflowCallback.on_train_begin" title="Permalink to this definition"> </a></dt>
+<dd><p>Log model architecture and optimizer configuration when training begins.</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 
 
