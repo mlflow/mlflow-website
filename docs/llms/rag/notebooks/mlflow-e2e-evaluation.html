@@ -1,0 +1,1213 @@
+
+  
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>LLM RAG Evaluation with MLflow Example Notebook &mdash; MLflow 2.9.2.dev0 documentation</title>
+  
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/llms/rag/notebooks/mlflow-e2e-evaluation.html">
+  
+  
+    <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
+    
+
+    
+
+  
+    
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/grids.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/mobile.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/simple-cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/tabs.css" type="text/css" />
+    
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="MLflow 2.9.2.dev0 documentation" href="../../../index.html"/>
+        <link rel="up" title="RAG Tutorials" href="index.html"/>
+        <link rel="next" title="Question Generation For Retrieval Evaluation" href="/question-generation-retrieval-evaluation.html"/>
+        <link rel="prev" title="RAG Tutorials" href="/index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+<script type="text/javascript" src="../../../_static/jquery.js"></script>
+<script type="text/javascript" src="../../../_static/underscore.js"></script>
+<script type="text/javascript" src="../../../_static/doctools.js"></script>
+<script type="text/javascript" src="../../../_static/languagesections.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript" src="../../../None"></script>
+
+<body class="wy-body-for-nav" role="document">
+  
+
+  
+  <nav class="wy-nav-top header" role="navigation" aria-label="top navigation">
+    <ul>
+  <li class="menu-toggle">
+    <i data-toggle="wy-nav-top" class="wy-nav-top-menu-button db-icon db-icon-menu pull-left"></i>
+    <a href="../../../index.html" class="wy-nav-top-logo"
+      ><img src="../../../_static/MLflow-logo-final-black.png" alt="MLflow"
+    /></a>
+    <span class="version">2.9.2.dev0</span>
+  </li>
+</ul>
+  </nav>
+  <page>
+    
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side relative">
+      <div class="wy-side-scroll">
+  <div class="wy-side-nav-search">
+    
+
+    
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+    
+  </div>
+
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+    
+      <a href="../../../index.html" class="main-navigation-home"><img src="../../../_static/icons/nav-home.svg"> MLflow</a>
+    
+
+    
+      
+
+      
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../introduction/index.html">What is MLflow?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting-started/index.html">Getting Started with MLflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../new-features/index.html">New Features</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">LLMs</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#id1">MLflow Deployments Server for LLMs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#id3">LLM Evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#id4">Prompt Engineering UI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#native-mlflow-flavors-for-llms">Native MLflow Flavors for LLMs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#id5">LLM Tracking in MLflow</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../index.html#tutorials-and-use-case-guides-for-llms-in-mlflow">Tutorials and Use Case Guides for LLMs in MLflow</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../index.html">Retrieval Augmented Generation (RAG)</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../index.html#benefits-of-rag">Benefits of RAG</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../index.html#understanding-the-power-of-rag">Understanding the Power of RAG</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../index.html#explore-rag-tutorials">Explore RAG Tutorials</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../custom-pyfunc-for-llms/index.html">Deploying Advanced LLMs with Custom PyFuncs in MLflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../llm-evaluate/notebooks/index.html">LLM Evaluation Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../gateway/index.html">MLflow AI Gateway (Experimental)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../model-evaluation/index.html">Model Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deep-learning/index.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../traditional-ml/index.html">Traditional ML</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deployment/index.html">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tracking.html">MLflow Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../system-metrics/index.html">System Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../projects.html">MLflow Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../models.html">MLflow Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../model-registry.html">MLflow Model Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../recipes.html">MLflow Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../plugins.html">MLflow Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../auth/index.html">MLflow Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../search-runs.html">Search Runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../search-experiments.html">Search Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../python_api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../R-api.html">R API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../java_api/index.html">Java API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rest-api.html">REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docker.html">Official MLflow Docker Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../community-model-flavors.html">Community Model Flavors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials-and-examples/index.html">Tutorials and Examples</a></li>
+</ul>
+
+      
+    
+  </div>
+
+  <div role="contentinfo">
+    
+
+    <p>
+      <a id='feedbacklink' href="https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a>
+    </p>
+  </div>
+</div>
+    </nav>
+
+    <main class="wy-grid-for-nav">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+          <div class="rst-content">
+            
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Documentation</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../../index.html">LLMs</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../index.html">Retrieval Augmented Generation (RAG)</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="index.html">RAG Tutorials</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+    
+      <li>LLM RAG Evaluation with MLflow Example Notebook</li>
+    
+    
+    <!-- <li class="wy-breadcrumbs-aside">
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/llms/rag/notebooks/mlflow-e2e-evaluation.ipynb" class="fa fa-github"> Edit on GitHub</a>
+    </li> -->
+    
+  </ul>
+</div>
+            <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <div itemprop="articleBody">
+                
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div class="section" id="LLM-RAG-Evaluation-with-MLflow-Example-Notebook">
+<h1>LLM RAG Evaluation with MLflow Example Notebook<a class="headerlink" href="#LLM-RAG-Evaluation-with-MLflow-Example-Notebook" title="Permalink to this headline"> </a></h1>
+<p>Welcome to this comprehensive tutorial on evaluating Retrieval-Augmented Generation (RAG) systems using MLflow. This tutorial is designed to guide you through the intricacies of assessing various RAG systems, focusing on how they can be effectively integrated and evaluated in a real-world context. Whether you are a data scientist, a machine learning engineer, or simply an enthusiast in the field of AI, this tutorial offers valuable insights and practical knowledge.</p>
+<div class="section" id="What-You-Will-Learn:">
+<h2>What You Will Learn:<a class="headerlink" href="#What-You-Will-Learn:" title="Permalink to this headline"> </a></h2>
+<ol class="arabic simple">
+<li><p><strong>Setting Up the Environment</strong>:</p>
+<ul class="simple">
+<li><p>Learn how to set up your development environment with all the necessary tools and libraries, including MLflow, OpenAI, ChromaDB, LangChain, and more. This section ensures you have everything you need to start working with RAG systems.</p></li>
+</ul>
+</li>
+<li><p><strong>Understanding RAG Systems</strong>:</p>
+<ul class="simple">
+<li><p>Delve into the concept of Retrieval-Augmented Generation and its significance in modern AI applications. Understand how RAG systems leverage both retrieval and generation capabilities to provide accurate and contextually relevant responses.</p></li>
+</ul>
+</li>
+<li><p><strong>Securely Managing API Keys with Databricks Secrets</strong>:</p>
+<ul class="simple">
+<li><p>Explore the best practices for securely managing API keys using Databricks Secrets. This part is crucial for ensuring the security and integrity of your application.</p></li>
+</ul>
+</li>
+<li><p><strong>Deploying and Testing RAG Systems with MLflow</strong>:</p>
+<ul class="simple">
+<li><p>Learn how to create, deploy, and test RAG systems using MLflow. This includes setting up endpoints, deploying models, and querying them to see their responses in action.</p></li>
+</ul>
+</li>
+<li><p><strong>Evaluating Performance with MLflow</strong>:</p>
+<ul class="simple">
+<li><p>Dive into evaluating the RAG systems using MLflow’s evaluation tools. Understand how to use metrics like relevance and latency to assess the performance of your RAG system.</p></li>
+</ul>
+</li>
+<li><p><strong>Experimenting with Chunking Strategies</strong>:</p>
+<ul class="simple">
+<li><p>Experiment with different text chunking strategies to optimize the performance of RAG systems. Understand how the size of text chunks affects retrieval accuracy and system responsiveness.</p></li>
+</ul>
+</li>
+<li><p><strong>Creating and Using Evaluation Datasets</strong>:</p>
+<ul class="simple">
+<li><p>Learn how to create and utilize evaluation datasets (Golden Datasets) to effectively assess the performance of your RAG system.</p></li>
+</ul>
+</li>
+<li><p><strong>Combining Retrieval and Generation for Question Answering</strong>:</p>
+<ul class="simple">
+<li><p>Gain insights into how retrieval and generation components work together in a RAG system to answer questions based on a given context or documentation.</p></li>
+</ul>
+</li>
+</ol>
+<p>By the end of this tutorial, you will have a thorough understanding of how to evaluate and optimize RAG systems using MLflow. You will be equipped with the knowledge to deploy, test, and refine RAG systems, making them suitable for various practical applications. This tutorial is your stepping stone into the world of advanced AI model evaluation and deployment.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">pip</span> install mlflow&gt;=2.8.1
+<span class="o">%</span><span class="k">pip</span> install openai
+<span class="o">%</span><span class="k">pip</span> install chromadb==0.4.15
+<span class="o">%</span><span class="k">pip</span> install langchain==0.0.348
+<span class="o">%</span><span class="k">pip</span> install tiktoken
+<span class="o">%</span><span class="k">pip</span> install &#39;mlflow[genai]&#39;
+<span class="o">%</span><span class="k">pip</span> install databricks-sdk --upgrade
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dbutils</span><span class="o">.</span><span class="n">library</span><span class="o">.</span><span class="n">restartPython</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ast</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+
+<span class="kn">import</span> <span class="nn">chromadb</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">import</span> <span class="nn">mlflow.deployments</span>
+<span class="kn">from</span> <span class="nn">mlflow.deployments</span> <span class="kn">import</span> <span class="n">set_deployments_target</span>
+<span class="kn">from</span> <span class="nn">mlflow.metrics.genai.metric_definitions</span> <span class="kn">import</span> <span class="n">relevance</span>
+
+<span class="kn">from</span> <span class="nn">langchain.chains</span> <span class="kn">import</span> <span class="n">RetrievalQA</span>
+<span class="kn">from</span> <span class="nn">langchain.document_loaders</span> <span class="kn">import</span> <span class="n">WebBaseLoader</span>
+<span class="kn">from</span> <span class="nn">langchain.llms</span> <span class="kn">import</span> <span class="n">Databricks</span>
+<span class="kn">from</span> <span class="nn">langchain.embeddings.databricks</span> <span class="kn">import</span> <span class="n">DatabricksEmbeddings</span>
+<span class="kn">from</span> <span class="nn">langchain.text_splitter</span> <span class="kn">import</span> <span class="n">CharacterTextSplitter</span>
+<span class="kn">from</span> <span class="nn">langchain.vectorstores</span> <span class="kn">import</span> <span class="n">Chroma</span>
+<span class="kn">from</span> <span class="nn">langchain.embeddings.sentence_transformer</span> <span class="kn">import</span> <span class="n">SentenceTransformerEmbeddings</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># check mlflow version</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">__version__</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&#39;2.9.1&#39;
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># check chroma version</span>
+<span class="n">chromadb</span><span class="o">.</span><span class="n">__version__</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&#39;0.4.18&#39;
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Set-up-Databricks-Workspace-Secrets">
+<h2>Set-up Databricks Workspace Secrets<a class="headerlink" href="#Set-up-Databricks-Workspace-Secrets" title="Permalink to this headline"> </a></h2>
+<p>In order to use the secrets that are defined within this notebook, ensure that they are set via following the <a class="reference external" href="https://docs.databricks.com/en/security/secrets/secrets.html">guide to Databricks Secrets here</a>. It is highly recommended to utilize the <a class="reference external" href="https://docs.databricks.com/en/dev-tools/cli/index.html">Databricks CLI</a> to set secrets within your workspace for a secure experience.</p>
+<p>In order to safely store and access your API KEY for Azure OpenAI, ensure that you are setting the following when registering your secret:</p>
+<ul class="simple">
+<li><p><strong>KEY_NAME</strong>: The name that you will be setting for your Azure OpenAI Key</p></li>
+<li><p><strong>SCOPE_NAME</strong>: The referenced scope that your secret will reside in, within Databricks Secrets</p></li>
+<li><p><strong>OPENAI_API_KEY</strong>: Your Azure OpenAI Key</p></li>
+</ul>
+<p>As an example, you would set these keys through a terminal as follows:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>databricks<span class="w"> </span>secrets<span class="w"> </span>put-secret<span class="w"> </span><span class="s2">&quot;&lt;SCOPE_NAME&gt;&quot;</span><span class="w"> </span><span class="s2">&quot;&lt;KEY_NAME&gt;&quot;</span><span class="w"> </span>--string-value<span class="w"> </span><span class="s2">&quot;&lt;OPENAI_API_KEY&gt;&quot;</span>
+</pre></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set your Scope and Key Names that you used when registering your API KEY from the Databricks CLI</span>
+<span class="c1"># Do not put your OpenAI API Key in the notebook!</span>
+<span class="n">SCOPE_NAME</span> <span class="o">=</span> <span class="o">...</span>
+<span class="n">KEY_NAME</span> <span class="o">=</span> <span class="o">...</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;OPENAI_API_KEY&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dbutils</span><span class="o">.</span><span class="n">secrets</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="n">SCOPE_NAME</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">KEY_NAME</span><span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;OPENAI_API_TYPE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;azure&quot;</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;OPENAI_API_VERSION&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;2023-05-15&quot;</span>
+<span class="c1"># Ensure that you set the name of your OPEN_API_BASE value to the name of your OpenAI instance on Azure</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;OPENAI_API_BASE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;https://&lt;NAME_OF_YOUR_INSTANCE&gt;.openai.azure.com/&quot;</span>  <span class="c1"># replace this!</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;OPENAI_DEPLOYMENT_NAME&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;gpt-35-turbo&quot;</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;OPENAI_ENGINE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;gpt-35-turbo&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Create-and-Test-Endpoint-on-MLflow-for-OpenAI">
+<h2>Create and Test Endpoint on MLflow for OpenAI<a class="headerlink" href="#Create-and-Test-Endpoint-on-MLflow-for-OpenAI" title="Permalink to this headline"> </a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">client</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">deployments</span><span class="o">.</span><span class="n">get_deploy_client</span><span class="p">(</span><span class="s2">&quot;databricks&quot;</span><span class="p">)</span>
+
+<span class="n">endpoint_name</span> <span class="o">=</span> <span class="s2">&quot;&lt;your-endpoint-name&gt;&quot;</span>  <span class="c1"># replace this!</span>
+<span class="n">client</span><span class="o">.</span><span class="n">create_endpoint</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="n">endpoint_name</span><span class="p">,</span>
+    <span class="n">config</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;served_entities&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;test-gpt&quot;</span><span class="p">,</span>  <span class="c1"># Provide a unique identifying name for your deployments endpoint</span>
+                <span class="s2">&quot;external_model&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;gpt-3.5-turbo&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;provider&quot;</span><span class="p">:</span> <span class="s2">&quot;openai&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;task&quot;</span><span class="p">:</span> <span class="s2">&quot;llm/v1/completions&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;openai_config&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;openai_api_type&quot;</span><span class="p">:</span> <span class="s2">&quot;azure&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;openai_api_key&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;OPENAI_API_KEY&quot;</span><span class="p">),</span>
+                        <span class="s2">&quot;openai_api_base&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;OPENAI_API_BASE&quot;</span><span class="p">),</span>
+                        <span class="s2">&quot;openai_deployment_name&quot;</span><span class="p">:</span> <span class="s2">&quot;gpt-35-turbo&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;openai_api_version&quot;</span><span class="p">:</span> <span class="s2">&quot;2023-05-15&quot;</span><span class="p">,</span>
+                    <span class="p">},</span>
+                <span class="p">},</span>
+            <span class="p">}</span>
+        <span class="p">],</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span>
+    <span class="n">client</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span>
+        <span class="n">endpoint</span><span class="o">=</span><span class="n">endpoint_name</span><span class="p">,</span>
+        <span class="n">inputs</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;prompt&quot;</span><span class="p">:</span> <span class="s2">&quot;How is Pi calculated? Be very concise.&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;max_tokens&quot;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Create-RAG-POC-with-LangChain-and-log-with-MLflow">
+<h2>Create RAG POC with LangChain and log with MLflow<a class="headerlink" href="#Create-RAG-POC-with-LangChain-and-log-with-MLflow" title="Permalink to this headline"> </a></h2>
+<p>Use Langchain and Chroma to create a RAG system that answers questions based on the MLflow documentation.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">loader</span> <span class="o">=</span> <span class="n">WebBaseLoader</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="s2">&quot;https://mlflow.org/docs/latest/index.html&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;https://mlflow.org/docs/latest/tracking/autolog.html&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;https://mlflow.org/docs/latest/getting-started/tracking-server-overview/index.html&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;https://mlflow.org/docs/latest/python_api/mlflow.deployments.html&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+
+<span class="n">documents</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<span class="n">CHUNK_SIZE</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">text_splitter</span> <span class="o">=</span> <span class="n">CharacterTextSplitter</span><span class="p">(</span><span class="n">chunk_size</span><span class="o">=</span><span class="n">CHUNK_SIZE</span><span class="p">,</span> <span class="n">chunk_overlap</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">texts</span> <span class="o">=</span> <span class="n">text_splitter</span><span class="o">.</span><span class="n">split_documents</span><span class="p">(</span><span class="n">documents</span><span class="p">)</span>
+
+<span class="n">llm</span> <span class="o">=</span> <span class="n">Databricks</span><span class="p">(</span>
+    <span class="n">endpoint_name</span><span class="o">=</span><span class="s2">&quot;&lt;your-endpoint-name&gt;&quot;</span><span class="p">,</span>  <span class="c1"># replace this!</span>
+    <span class="n">extra_params</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="s2">&quot;top_p&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="s2">&quot;max_tokens&quot;</span><span class="p">:</span> <span class="mi">500</span><span class="p">,</span>
+    <span class="p">},</span>  <span class="c1"># parameters used in AI Playground</span>
+<span class="p">)</span>
+
+
+<span class="c1"># create the embedding function using Databricks Foundation Model APIs</span>
+<span class="n">embedding_function</span> <span class="o">=</span> <span class="n">DatabricksEmbeddings</span><span class="p">(</span><span class="n">endpoint</span><span class="o">=</span><span class="s2">&quot;databricks-bge-large-en&quot;</span><span class="p">)</span>
+<span class="n">docsearch</span> <span class="o">=</span> <span class="n">Chroma</span><span class="o">.</span><span class="n">from_documents</span><span class="p">(</span><span class="n">texts</span><span class="p">,</span> <span class="n">embedding_function</span><span class="p">)</span>
+
+<span class="n">qa</span> <span class="o">=</span> <span class="n">RetrievalQA</span><span class="o">.</span><span class="n">from_chain_type</span><span class="p">(</span>
+    <span class="n">llm</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span>
+    <span class="n">chain_type</span><span class="o">=</span><span class="s2">&quot;stuff&quot;</span><span class="p">,</span>
+    <span class="n">retriever</span><span class="o">=</span><span class="n">docsearch</span><span class="o">.</span><span class="n">as_retriever</span><span class="p">(</span><span class="n">fetch_k</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+    <span class="n">return_source_documents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Evaluate-the-Vector-Database-and-Retrieval-using-mlflow.evaluate()">
+<h2>Evaluate the Vector Database and Retrieval using <code class="docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code><a class="headerlink" href="#Evaluate-the-Vector-Database-and-Retrieval-using-mlflow.evaluate()" title="Permalink to this headline"> </a></h2>
+<div class="section" id="Create-an-eval-dataset-(Golden-Dataset)">
+<h3>Create an eval dataset (Golden Dataset)<a class="headerlink" href="#Create-an-eval-dataset-(Golden-Dataset)" title="Permalink to this headline"> </a></h3>
+<p>We can <a class="reference external" href="https://mlflow.org/docs/latest/llms/rag/notebooks/question-generation-retrieval-evaluation.html">leveraging the power of an LLM to generate synthetic data for testing</a>, offering a creative and efficient alternative. To our readers and customers, we emphasize the importance of crafting a dataset that mirrors the expected inputs and outputs of your RAG application. It’s a journey worth taking for the incredible insights you’ll gain!</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">EVALUATION_DATASET_PATH</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/mlflow/mlflow/master/examples/llms/RAG/static_evaluation_dataset.csv&quot;</span>
+
+<span class="n">synthetic_eval_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">EVALUATION_DATASET_PATH</span><span class="p">)</span>
+
+<span class="c1"># Load the static evaluation dataset from disk and deserialize the source and retrieved doc ids</span>
+<span class="n">synthetic_eval_data</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">synthetic_eval_data</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">)</span>
+<span class="n">synthetic_eval_data</span><span class="p">[</span><span class="s2">&quot;retrieved_doc_ids&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">synthetic_eval_data</span><span class="p">[</span><span class="s2">&quot;retrieved_doc_ids&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+    <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">display</span><span class="p">(</span><span class="n">synthetic_eval_data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Evaluating-the-Embedding-Model-with-MLflow">
+<h2>Evaluating the Embedding Model with MLflow<a class="headerlink" href="#Evaluating-the-Embedding-Model-with-MLflow" title="Permalink to this headline"> </a></h2>
+<p>In this part of the tutorial, we focus on evaluating the embedding model’s performance in the context of a retrieval system. The process involves a series of steps to assess how effectively the model can retrieve relevant documents based on given questions.</p>
+<div class="section" id="Creating-Evaluation-Data">
+<h3>Creating Evaluation Data<a class="headerlink" href="#Creating-Evaluation-Data" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p>We start by defining a set of questions and their corresponding source URLs. This <code class="docutils literal notranslate"><span class="pre">eval_data</span></code> DataFrame acts as our evaluation dataset, allowing us to test the model’s ability to link questions to the correct source documents.</p></li>
+</ul>
+</div>
+<div class="section" id="The-evaluate_embedding-Function">
+<h3>The <code class="docutils literal notranslate"><span class="pre">evaluate_embedding</span></code> Function<a class="headerlink" href="#The-evaluate_embedding-Function" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">evaluate_embedding</span></code> function is designed to assess the performance of a given embedding function.</p></li>
+<li><p><strong>Chunking Strategy</strong>: The function begins by splitting a list of documents into chunks using a <code class="docutils literal notranslate"><span class="pre">CharacterTextSplitter</span></code>. The size of these chunks is crucial, as it can influence the retrieval accuracy.</p></li>
+<li><p><strong>Retriever Initialization</strong>: We then use <code class="docutils literal notranslate"><span class="pre">Chroma.from_documents</span></code> to create a retriever with the specified embedding function. This retriever is responsible for finding documents relevant to a given query.</p></li>
+<li><p><strong>Retrieval Process</strong>: The function defines a <code class="docutils literal notranslate"><span class="pre">retriever_model_function</span></code> that applies the retriever to each question in the evaluation dataset. It retrieves document IDs that the model finds most relevant for each question.</p></li>
+</ul>
+</div>
+<div class="section" id="MLflow-Evaluation">
+<h3>MLflow Evaluation<a class="headerlink" href="#MLflow-Evaluation" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p>With <code class="docutils literal notranslate"><span class="pre">mlflow.start_run()</span></code>, we initiate an evaluation run. <code class="docutils literal notranslate"><span class="pre">mlflow.evaluate</span></code> is then called to evaluate our retriever model function against the evaluation dataset.</p></li>
+<li><p>We use the default evaluator with specified targets to assess the model’s performance.</p></li>
+<li><p>The results of this evaluation, stored in <code class="docutils literal notranslate"><span class="pre">eval_results_of_retriever_df_bge</span></code>, are displayed, providing insights into the effectiveness of the embedding model in document retrieval.</p></li>
+</ul>
+</div>
+<div class="section" id="Further-Evaluation-with-Metrics">
+<h3>Further Evaluation with Metrics<a class="headerlink" href="#Further-Evaluation-with-Metrics" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p>Additionally, we perform a more detailed evaluation using various metrics like precision, recall, and NDCG at different ‘k’ values. These metrics offer a deeper understanding of the model’s retrieval accuracy and ranking effectiveness.</p></li>
+</ul>
+<p>This evaluation step is integral to understanding the strengths and weaknesses of our embedding model in a real-world RAG system. By analyzing these results, we can make informed decisions about model adjustments or optimizations to improve overall system performance.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">eval_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;question&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;What is MLflow?&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;What is Databricks?&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;How to serve a model on Databricks?&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;How to enable MLflow Autologging for my workspace by default?&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">[</span><span class="s2">&quot;https://mlflow.org/docs/latest/index.html&quot;</span><span class="p">],</span>
+            <span class="p">[</span><span class="s2">&quot;https://mlflow.org/docs/latest/getting-started/tracking-server-overview/index.html&quot;</span><span class="p">],</span>
+            <span class="p">[</span><span class="s2">&quot;https://mlflow.org/docs/latest/python_api/mlflow.deployments.html&quot;</span><span class="p">],</span>
+            <span class="p">[</span><span class="s2">&quot;https://mlflow.org/docs/latest/tracking/autolog.html&quot;</span><span class="p">],</span>
+        <span class="p">],</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">evaluate_embedding</span><span class="p">(</span><span class="n">embedding_function</span><span class="p">):</span>
+    <span class="n">CHUNK_SIZE</span> <span class="o">=</span> <span class="mi">1000</span>
+    <span class="n">list_of_documents</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+    <span class="n">text_splitter</span> <span class="o">=</span> <span class="n">CharacterTextSplitter</span><span class="p">(</span><span class="n">chunk_size</span><span class="o">=</span><span class="n">CHUNK_SIZE</span><span class="p">,</span> <span class="n">chunk_overlap</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">docs</span> <span class="o">=</span> <span class="n">text_splitter</span><span class="o">.</span><span class="n">split_documents</span><span class="p">(</span><span class="n">list_of_documents</span><span class="p">)</span>
+    <span class="n">retriever</span> <span class="o">=</span> <span class="n">Chroma</span><span class="o">.</span><span class="n">from_documents</span><span class="p">(</span><span class="n">docs</span><span class="p">,</span> <span class="n">embedding_function</span><span class="p">)</span><span class="o">.</span><span class="n">as_retriever</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">retrieve_doc_ids</span><span class="p">(</span><span class="n">question</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="n">docs</span> <span class="o">=</span> <span class="n">retriever</span><span class="o">.</span><span class="n">get_relevant_documents</span><span class="p">(</span><span class="n">question</span><span class="p">)</span>
+        <span class="n">doc_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">doc</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">docs</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">doc_ids</span>
+
+    <span class="k">def</span> <span class="nf">retriever_model_function</span><span class="p">(</span><span class="n">question_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">question_df</span><span class="p">[</span><span class="s2">&quot;question&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">retrieve_doc_ids</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">()</span> <span class="k">as</span> <span class="n">run</span><span class="p">:</span>
+        <span class="n">evaluate_results</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="n">retriever_model_function</span><span class="p">,</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">eval_data</span><span class="p">,</span>
+            <span class="n">model_type</span><span class="o">=</span><span class="s2">&quot;retriever&quot;</span><span class="p">,</span>
+            <span class="n">targets</span><span class="o">=</span><span class="s2">&quot;source&quot;</span><span class="p">,</span>
+            <span class="n">evaluators</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">evaluate_results</span>
+
+
+<span class="n">result1</span> <span class="o">=</span> <span class="n">evaluate_embedding</span><span class="p">(</span><span class="n">DatabricksEmbeddings</span><span class="p">(</span><span class="n">endpoint</span><span class="o">=</span><span class="s2">&quot;databricks-bge-large-en&quot;</span><span class="p">))</span>
+<span class="c1"># To validate the results of a different model, comment out the above line and uncomment the below line:</span>
+<span class="c1"># result2 = evaluate_embedding(SentenceTransformerEmbeddings(model_name=&quot;all-MiniLM-L6-v2&quot;))</span>
+
+<span class="n">eval_results_of_retriever_df_bge</span> <span class="o">=</span> <span class="n">result1</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="s2">&quot;eval_results_table&quot;</span><span class="p">]</span>
+<span class="c1"># To validate the results of a different model, comment out the above line and uncomment the below line:</span>
+<span class="c1"># eval_results_of_retriever_df_MiniLM = result2.tables[&quot;eval_results_table&quot;]</span>
+<span class="n">display</span><span class="p">(</span><span class="n">eval_results_of_retriever_df_bge</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Evaluate-different-Top-K-strategy-with-MLflow">
+<h2>Evaluate different Top K strategy with MLflow<a class="headerlink" href="#Evaluate-different-Top-K-strategy-with-MLflow" title="Permalink to this headline"> </a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">()</span> <span class="k">as</span> <span class="n">run</span><span class="p">:</span>
+    <span class="n">evaluate_results</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">eval_results_of_retriever_df_bge</span><span class="p">,</span>
+        <span class="n">targets</span><span class="o">=</span><span class="s2">&quot;source&quot;</span><span class="p">,</span>
+        <span class="n">predictions</span><span class="o">=</span><span class="s2">&quot;outputs&quot;</span><span class="p">,</span>
+        <span class="n">evaluators</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+        <span class="n">extra_metrics</span><span class="o">=</span><span class="p">[</span>
+            <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">precision_at_k</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+            <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">precision_at_k</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
+            <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">precision_at_k</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>
+            <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">recall_at_k</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+            <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">recall_at_k</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
+            <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">recall_at_k</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>
+            <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">ndcg_at_k</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+            <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">ndcg_at_k</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
+            <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">ndcg_at_k</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>
+        <span class="p">],</span>
+    <span class="p">)</span>
+
+<span class="n">display</span><span class="p">(</span><span class="n">evaluate_results</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="s2">&quot;eval_results_table&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Evaluate-the-Chunking-Strategy-with-MLflow">
+<h2>Evaluate the Chunking Strategy with MLflow<a class="headerlink" href="#Evaluate-the-Chunking-Strategy-with-MLflow" title="Permalink to this headline"> </a></h2>
+<p>In the realm of RAG systems, the strategy for dividing text into chunks plays a pivotal role in both retrieval effectiveness and the overall system performance. Let’s delve into why and how we evaluate different chunking strategies:</p>
+<div class="section" id="Importance-of-Chunking:">
+<h3>Importance of Chunking:<a class="headerlink" href="#Importance-of-Chunking:" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Influences Retrieval Accuracy</strong>: The way text is chunked can significantly affect the retrieval component of RAG systems. Smaller chunks may lead to more focused and relevant document retrieval, while larger chunks might capture broader context.</p></li>
+<li><p><strong>Impacts System’s Responsiveness</strong>: The size of text chunks also influences the speed of document retrieval and processing. Smaller chunks can be processed more quickly but may require the system to evaluate more chunks overall.</p></li>
+</ul>
+</div>
+<div class="section" id="Evaluating-Different-Chunk-Sizes:">
+<h3>Evaluating Different Chunk Sizes:<a class="headerlink" href="#Evaluating-Different-Chunk-Sizes:" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Purpose</strong>: By evaluating different chunk sizes, we aim to find an optimal balance between retrieval accuracy and processing efficiency. This involves experimenting with various chunk sizes to see how they impact the system’s performance.</p></li>
+<li><p><strong>Method</strong>: We create text chunks of different sizes (e.g., 1000 characters, 2000 characters) and then evaluate how each chunking strategy affects the RAG system. Key aspects to observe include the relevance of retrieved documents and the system’s latency.</p></li>
+</ul>
+<p>In this example below, we’re using the default evaluation suite to provide a comprehensive adjudication of the quality of the responses to retrieved document contents to determine what the impact to the quality of the returned references are, allowing us to explore and tune the chunk size in order to arrive at a configuration that best handles our suite of test questions.</p>
+<p>Note that the embedding model has changed in this next code block. Above, we were using <code class="docutils literal notranslate"><span class="pre">DatabricksEmbeddings(endpoint=&quot;databricks-bge-large-en&quot;)</span></code>, while now we’re evaluating the performance of <code class="docutils literal notranslate"><span class="pre">SentenceTransformerEmbeddings(model_name=&quot;all-MiniLM-L6-v2&quot;)</span></code></p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">evaluate_chunk_size</span><span class="p">(</span><span class="n">chunk_size</span><span class="p">):</span>
+    <span class="n">list_of_documents</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+    <span class="n">text_splitter</span> <span class="o">=</span> <span class="n">CharacterTextSplitter</span><span class="p">(</span><span class="n">chunk_size</span><span class="o">=</span><span class="n">chunk_size</span><span class="p">,</span> <span class="n">chunk_overlap</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">docs</span> <span class="o">=</span> <span class="n">text_splitter</span><span class="o">.</span><span class="n">split_documents</span><span class="p">(</span><span class="n">list_of_documents</span><span class="p">)</span>
+    <span class="n">embedding_function</span> <span class="o">=</span> <span class="n">SentenceTransformerEmbeddings</span><span class="p">(</span><span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;all-MiniLM-L6-v2&quot;</span><span class="p">)</span>
+    <span class="n">retriever</span> <span class="o">=</span> <span class="n">Chroma</span><span class="o">.</span><span class="n">from_documents</span><span class="p">(</span><span class="n">docs</span><span class="p">,</span> <span class="n">embedding_function</span><span class="p">)</span><span class="o">.</span><span class="n">as_retriever</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">retrieve_doc_ids</span><span class="p">(</span><span class="n">question</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="n">docs</span> <span class="o">=</span> <span class="n">retriever</span><span class="o">.</span><span class="n">get_relevant_documents</span><span class="p">(</span><span class="n">question</span><span class="p">)</span>
+        <span class="n">doc_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">doc</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">docs</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">doc_ids</span>
+
+    <span class="k">def</span> <span class="nf">retriever_model_function</span><span class="p">(</span><span class="n">question_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">question_df</span><span class="p">[</span><span class="s2">&quot;question&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">retrieve_doc_ids</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">()</span> <span class="k">as</span> <span class="n">run</span><span class="p">:</span>
+        <span class="n">evaluate_results</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="n">retriever_model_function</span><span class="p">,</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">eval_data</span><span class="p">,</span>
+            <span class="n">model_type</span><span class="o">=</span><span class="s2">&quot;retriever&quot;</span><span class="p">,</span>
+            <span class="n">targets</span><span class="o">=</span><span class="s2">&quot;source&quot;</span><span class="p">,</span>
+            <span class="n">evaluators</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">evaluate_results</span>
+
+
+<span class="n">result1</span> <span class="o">=</span> <span class="n">evaluate_chunk_size</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+<span class="n">result2</span> <span class="o">=</span> <span class="n">evaluate_chunk_size</span><span class="p">(</span><span class="mi">2000</span><span class="p">)</span>
+
+
+<span class="n">display</span><span class="p">(</span><span class="n">result1</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="s2">&quot;eval_results_table&quot;</span><span class="p">])</span>
+<span class="n">display</span><span class="p">(</span><span class="n">result2</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="s2">&quot;eval_results_table&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Evaluate-the-RAG-system-using-mlflow.evaluate()">
+<h2>Evaluate the RAG system using <code class="docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code><a class="headerlink" href="#Evaluate-the-RAG-system-using-mlflow.evaluate()" title="Permalink to this headline"> </a></h2>
+<p>In this section, we’ll delve into evaluating the Retrieval-Augmented Generation (RAG) systems using <code class="docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code>. This evaluation is crucial for assessing the effectiveness and efficiency of RAG systems in question-answering contexts. We focus on two key metrics: <code class="docutils literal notranslate"><span class="pre">relevance_metric</span></code> and <code class="docutils literal notranslate"><span class="pre">latency</span></code>.</p>
+<div class="section" id="Relevance-Metric:">
+<h3>Relevance Metric:<a class="headerlink" href="#Relevance-Metric:" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>What It Measures</strong>: The <code class="docutils literal notranslate"><span class="pre">relevance_metric</span></code> quantifies how relevant the RAG system’s answers are to the input questions. This metric is critical for understanding the accuracy and contextual appropriateness of the system’s responses.</p></li>
+<li><p><strong>Why It’s Important</strong>: In question-answering systems, relevance is paramount. The ability of a RAG system to provide accurate and contextually correct answers determines its utility and effectiveness in real-world applications, such as information retrieval and customer support.</p></li>
+<li><p><strong>Tutorial Context</strong>: Within our tutorial, we utilize the <code class="docutils literal notranslate"><span class="pre">relevance_metric</span></code> to evaluate the quality of answers provided by the RAG system. It serves as a quantitative measure of the system’s content accuracy, reflecting its capability to generate useful and precise responses.</p></li>
+</ul>
+</div>
+<div class="section" id="Latency:">
+<h3>Latency:<a class="headerlink" href="#Latency:" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>What It Measures</strong>: The <code class="docutils literal notranslate"><span class="pre">latency</span></code> metric captures the response time of the RAG system. It measures the duration taken by the system to generate an answer after receiving a query.</p></li>
+<li><p><strong>Why It’s Important</strong>: Response time is a critical factor in user experience. In interactive systems, lower latency leads to a more efficient and satisfying user experience. High latency, conversely, can be detrimental to user satisfaction.</p></li>
+<li><p><strong>Tutorial Context</strong>: In this tutorial, we assess the system’s efficiency in terms of response time through the <code class="docutils literal notranslate"><span class="pre">latency</span></code> metric. This evaluation is vital for understanding the system’s performance in a production environment, where timely responses are as important as their accuracy.</p></li>
+</ul>
+<p>To start with evaluating, we’ll create a simple function that runs each input through the RAG chain</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="n">input_df</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">input_df</span><span class="p">[</span><span class="s2">&quot;questions&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">qa</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Create-an-evaluation-dataset-(Golden-Dataset)">
+<h2>Create an evaluation dataset (Golden Dataset)<a class="headerlink" href="#Create-an-evaluation-dataset-(Golden-Dataset)" title="Permalink to this headline"> </a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">eval_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;questions&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;What is MLflow?&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;What is Databricks?&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;How to serve a model on Databricks?&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;How to enable MLflow Autologging for my workspace by default?&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">eval_df</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Evaluate-using-LLM-as-a-Judge-and-Basic-Metrics">
+<h2>Evaluate using LLM as a Judge and Basic Metrics<a class="headerlink" href="#Evaluate-using-LLM-as-a-Judge-and-Basic-Metrics" title="Permalink to this headline"> </a></h2>
+<p>In this concluding section of the tutorial, we perform a final evaluation of our RAG system using MLflow’s powerful evaluation tools. This evaluation is crucial for assessing the performance and efficiency of the question-answering model.</p>
+<div class="section" id="Key-Steps-in-the-Evaluation:">
+<h3>Key Steps in the Evaluation:<a class="headerlink" href="#Key-Steps-in-the-Evaluation:" title="Permalink to this headline"> </a></h3>
+<ol class="arabic simple">
+<li><p><strong>Setting the Deployment Target</strong>:</p>
+<ul class="simple">
+<li><p>The deployment target is set to Databricks, enabling us to retrieve all endpoints in the Databricks Workspace. This is essential for accessing our deployed models.</p></li>
+</ul>
+</li>
+<li><p><strong>Relevance Metric Setup</strong>:</p>
+<ul class="simple">
+<li><p>We initialize the <code class="docutils literal notranslate"><span class="pre">relevance</span></code> metric using a model hosted on Databricks. This metric assesses how relevant the answers generated by our RAG system are in response to the input questions.</p></li>
+</ul>
+</li>
+<li><p><strong>Running the Evaluation</strong>:</p>
+<ul class="simple">
+<li><p>An MLflow run is initiated, and <code class="docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code> is called to evaluate our RAG model against the prepared evaluation dataset.</p></li>
+<li><p>The model is evaluated as a “question-answering” system using default evaluators.</p></li>
+<li><p>Additional metrics, including the <code class="docutils literal notranslate"><span class="pre">relevance_metric</span></code> and <code class="docutils literal notranslate"><span class="pre">latency</span></code>, are specified. These metrics provide insights into the relevance of the answers and the response time of the model.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">evaluator_config</span></code> maps the input questions and context, ensuring the correct evaluation of the RAG system.</p></li>
+</ul>
+</li>
+<li><p><strong>Results and Metrics Display</strong>:</p>
+<ul class="simple">
+<li><p>The results of the evaluation, including key metrics, are displayed in a table format, providing a clear and structured view of the model’s performance based on relevance and latency.</p></li>
+</ul>
+</li>
+</ol>
+<p>This comprehensive evaluation step is vital for understanding the effectiveness and efficiency of our RAG system. By assessing both the relevance of the answers and the latency of the responses, we gain a holistic view of the model’s performance, guiding any further optimization or deployment decisions.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">set_deployments_target</span><span class="p">(</span><span class="s2">&quot;databricks&quot;</span><span class="p">)</span>  <span class="c1"># To retrieve all endpoint in your Databricks Workspace</span>
+
+<span class="n">relevance_metric</span> <span class="o">=</span> <span class="n">relevance</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;endpoints:/databricks-llama-2-70b-chat&quot;</span>
+<span class="p">)</span>  <span class="c1"># You can also use any model you have hosted on Databricks, models from the Marketplace or models in the Foundation model API</span>
+
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+        <span class="n">model</span><span class="p">,</span>
+        <span class="n">eval_df</span><span class="p">,</span>
+        <span class="n">model_type</span><span class="o">=</span><span class="s2">&quot;question-answering&quot;</span><span class="p">,</span>
+        <span class="n">evaluators</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+        <span class="n">predictions</span><span class="o">=</span><span class="s2">&quot;result&quot;</span><span class="p">,</span>
+        <span class="n">extra_metrics</span><span class="o">=</span><span class="p">[</span><span class="n">relevance_metric</span><span class="p">,</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">latency</span><span class="p">()],</span>
+        <span class="n">evaluator_config</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;col_mapping&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;inputs&quot;</span><span class="p">:</span> <span class="s2">&quot;questions&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;context&quot;</span><span class="p">:</span> <span class="s2">&quot;source_documents&quot;</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">metrics</span><span class="p">)</span>
+
+<span class="n">display</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="s2">&quot;eval_results_table&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+              </div>
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="index.html" class="btn btn-neutral" title="RAG Tutorials" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+      
+      
+        <a href="question-generation-retrieval-evaluation.html" class="btn btn-neutral" title="Question Generation For Retrieval Evaluation" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+      <p class="copyright">
+          &copy; MLflow Project, a Series of LF Projects, LLC. All rights reserved.
+      </p>
+
+  </div> 
+
+</footer>
+          </div>
+        </div>
+      </section>
+    </main>
+  </page>
+
+  
+
+
+  
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+      URL_ROOT:'../../../',
+      VERSION:'2.9.2.dev0',
+      COLLAPSE_INDEX:false,
+      FILE_SUFFIX:'.html',
+      LINK_SUFFIX: '.html',
+      HAS_SOURCE:  true
+    };
+  </script>
+
+  
+
+  <script type="text/javascript" src="../../../_static/js/clipboard.min.js"></script>
+  <script type="text/javascript" src="../../../_static/js/jquery.waypoints.min.js"></script>
+
+  
+  
+  
+  <script type="text/javascript">var CLIPPY_SVG_PATH = "../../../_static/clippy.svg";</script>
+  <script type="text/javascript" src="../../../_static/js/custom.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.StickyNav.enable();
+    });
+
+  </script>
+  
+
+  
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        // Get the code block designator class entries
+        const allHighlights = document.querySelectorAll('.highlight');
+        // Disable copyable links for notebook cell numbering and for cell outputs
+        const highlights = Array.from(allHighlights).filter(highlight => !highlight.closest('.highlight-none') && 
+            !highlight.closest('.nboutput'));
+    
+        highlights.forEach(function(highlight) {
+            const copyIcon = document.createElement('span');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.innerHTML = '&#xf0ea;';
+
+            copyIcon.addEventListener('click', function() {
+                const code = highlight.querySelector('pre').textContent;
+                copyToClipboard(code);
+
+                // Flash effect on click
+                this.style.color = '#0194E2';
+                setTimeout(() => {
+                    this.style.color = ''; 
+                }, 100);
+
+                // Display "Code copied to clipboard" near the clicked icon
+                const message = document.createElement('span');
+                message.textContent = "Copied!";
+                message.classList.add('copy-message'); 
+
+                // Append the message to the icon
+                this.appendChild(message);
+
+                setTimeout(() => {
+                    this.removeChild(message);
+                }, 500);
+            });
+
+            highlight.appendChild(copyIcon);
+        });
+    });
+  </script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Force download for notebook-download-btn
+        const downloadButtons = document.querySelectorAll('.notebook-download-btn');
+        downloadButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                // Fetch the raw content of the notebook from GitHub
+                fetch(button.href)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = url;
+                        const filename = button.href.split('/').pop();
+                        link.download = filename; 
+
+                        document.body.appendChild(link);
+                        link.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    })
+                    .catch(err => console.error('Error fetching the notebook:', err));
+            });
+        });
+    });
+</script> 
+</body>
+</html>
