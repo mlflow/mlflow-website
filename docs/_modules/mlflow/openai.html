@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mlflow.openai &mdash; MLflow 2.9.2.dev0 documentation</title>
+  <title>mlflow.openai &mdash; MLflow 2.9.3.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -47,7 +47,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="MLflow 2.9.2.dev0 documentation" href="../../index.html"/>
+    <link rel="top" title="MLflow 2.9.3.dev0 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
@@ -73,7 +73,7 @@
     <a href="../../index.html" class="wy-nav-top-logo"
       ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.9.2.dev0</span>
+    <span class="version">2.9.3.dev0</span>
   </li>
 </ul>
   </nav>
@@ -224,9 +224,8 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
 <span class="kn">from</span> <span class="nn">string</span> <span class="kn">import</span> <span class="n">Formatter</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span>
 
 <span class="kn">import</span> <span class="nn">yaml</span>
 
@@ -237,13 +236,6 @@
 <span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">Model</span><span class="p">,</span> <span class="n">ModelInputExample</span><span class="p">,</span> <span class="n">ModelSignature</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.model</span> <span class="kn">import</span> <span class="n">MLMODEL_FILE_NAME</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.utils</span> <span class="kn">import</span> <span class="n">_save_example</span>
-<span class="kn">from</span> <span class="nn">mlflow.openai.utils</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">REQUEST_URL_CHAT</span><span class="p">,</span>
-    <span class="n">REQUEST_URL_COMPLETIONS</span><span class="p">,</span>
-    <span class="n">REQUEST_URL_EMBEDDINGS</span><span class="p">,</span>
-    <span class="n">_OAITokenHolder</span><span class="p">,</span>
-    <span class="n">_validate_model_params</span><span class="p">,</span>
-<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.protos.databricks_pb2</span> <span class="kn">import</span> <span class="n">INVALID_PARAMETER_VALUE</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracking._model_registry</span> <span class="kn">import</span> <span class="n">DEFAULT_AWAIT_MAX_SLEEP_SECONDS</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracking.artifact_utils</span> <span class="kn">import</span> <span class="n">_download_artifact_from_uri</span>
@@ -272,6 +264,15 @@
     <span class="n">_validate_and_copy_code_paths</span><span class="p">,</span>
     <span class="n">_validate_and_prepare_target_save_path</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span> <span class="nn">mlflow.utils.openai_utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">REQUEST_URL_CHAT</span><span class="p">,</span>
+    <span class="n">REQUEST_URL_COMPLETIONS</span><span class="p">,</span>
+    <span class="n">REQUEST_URL_EMBEDDINGS</span><span class="p">,</span>
+    <span class="n">_OAITokenHolder</span><span class="p">,</span>
+    <span class="n">_OpenAIApiConfig</span><span class="p">,</span>
+    <span class="n">_OpenAIEnvVar</span><span class="p">,</span>
+    <span class="n">_validate_model_params</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.requirements_utils</span> <span class="kn">import</span> <span class="n">_get_pinned_requirement</span>
 
 <span class="n">FLAVOR_NAME</span> <span class="o">=</span> <span class="s2">&quot;openai&quot;</span>
@@ -279,17 +280,6 @@
 <span class="n">_PYFUNC_SUPPORTED_TASKS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;chat.completions&quot;</span><span class="p">,</span> <span class="s2">&quot;embeddings&quot;</span><span class="p">,</span> <span class="s2">&quot;completions&quot;</span><span class="p">)</span>
 
 <span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
-
-
-<span class="k">class</span> <span class="nc">_OpenAIApiConfig</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
-    <span class="n">api_type</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="n">max_requests_per_minute</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="n">max_tokens_per_minute</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="n">api_version</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-    <span class="n">api_base</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">engine</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-    <span class="n">deployment_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="get_default_pip_requirements"><a class="viewcode-back" href="../../python_api/openai/index.html#mlflow.openai.get_default_pip_requirements">[docs]</a><span class="nd">@experimental</span>
@@ -418,33 +408,6 @@
     <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
         <span class="c1"># openai &lt; 0.27.5 doesn&#39;t have a __version__ attribute</span>
         <span class="k">return</span> <span class="n">openai</span><span class="o">.</span><span class="n">version</span><span class="o">.</span><span class="n">VERSION</span>
-
-
-<span class="c1"># See https://github.com/openai/openai-python/blob/cf03fe16a92cd01f2a8867537399c12e183ba58e/openai/__init__.py#L30-L38</span>
-<span class="c1"># for the list of environment variables that openai-python uses</span>
-<span class="k">class</span> <span class="nc">_OpenAIEnvVar</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
-    <span class="n">OPENAI_API_TYPE</span> <span class="o">=</span> <span class="s2">&quot;OPENAI_API_TYPE&quot;</span>
-    <span class="n">OPENAI_API_BASE</span> <span class="o">=</span> <span class="s2">&quot;OPENAI_API_BASE&quot;</span>
-    <span class="n">OPENAI_API_KEY</span> <span class="o">=</span> <span class="s2">&quot;OPENAI_API_KEY&quot;</span>
-    <span class="n">OPENAI_API_KEY_PATH</span> <span class="o">=</span> <span class="s2">&quot;OPENAI_API_KEY_PATH&quot;</span>
-    <span class="n">OPENAI_API_VERSION</span> <span class="o">=</span> <span class="s2">&quot;OPENAI_API_VERSION&quot;</span>
-    <span class="n">OPENAI_ORGANIZATION</span> <span class="o">=</span> <span class="s2">&quot;OPENAI_ORGANIZATION&quot;</span>
-    <span class="n">OPENAI_ENGINE</span> <span class="o">=</span> <span class="s2">&quot;OPENAI_ENGINE&quot;</span>
-    <span class="c1"># use deployment_name instead of deployment_id to be</span>
-    <span class="c1"># consistent with gateway</span>
-    <span class="n">OPENAI_DEPLOYMENT_NAME</span> <span class="o">=</span> <span class="s2">&quot;OPENAI_DEPLOYMENT_NAME&quot;</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">secret_key</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">read_environ</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="n">env_vars</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">_OpenAIEnvVar</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">value</span> <span class="o">:=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">value</span><span class="p">):</span>
-                <span class="n">env_vars</span><span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">value</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
-        <span class="k">return</span> <span class="n">env_vars</span>
 
 
 <span class="k">def</span> <span class="nf">_log_secrets_yaml</span><span class="p">(</span><span class="n">local_model_dir</span><span class="p">,</span> <span class="n">scope</span><span class="p">):</span>
@@ -1049,7 +1012,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            Model predictions.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">mlflow.openai.utils</span> <span class="kn">import</span> <span class="n">_mock_openai_request</span>
+        <span class="kn">from</span> <span class="nn">mlflow.utils.openai_utils</span> <span class="kn">import</span> <span class="n">_mock_openai_request</span>
 
         <span class="k">with</span> <span class="n">_mock_openai_request</span><span class="p">():</span>
             <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
@@ -1121,7 +1084,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../',
-      VERSION:'2.9.2.dev0',
+      VERSION:'2.9.3.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

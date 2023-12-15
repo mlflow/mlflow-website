@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>MLflow Models &mdash; MLflow 2.9.2.dev0 documentation</title>
+  <title>MLflow Models &mdash; MLflow 2.9.3.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -47,7 +47,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="MLflow 2.9.2.dev0 documentation" href="index.html"/>
+    <link rel="top" title="MLflow 2.9.3.dev0 documentation" href="index.html"/>
         <link rel="next" title="MLflow Model Registry" href="/model-registry.html"/>
         <link rel="prev" title="MLflow Projects" href="/projects.html"/> 
 
@@ -73,7 +73,7 @@
     <a href="index.html" class="wy-nav-top-logo"
       ><img src="_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.9.2.dev0</span>
+    <span class="version">2.9.3.dev0</span>
   </li>
 </ul>
   </nav>
@@ -211,10 +211,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#pmdarima-pmdarima">Pmdarima (<code class="docutils literal notranslate"><span class="pre">pmdarima</span></code>)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#openai-openai-experimental">OpenAI (<code class="docutils literal notranslate"><span class="pre">openai</span></code>) (Experimental)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#using-the-azure-openai-service">Using the Azure OpenAI Service</a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="#openai-openai-experimental">OpenAI (<code class="docutils literal notranslate"><span class="pre">openai</span></code>) (Experimental)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#langchain-langchain-experimental">LangChain (<code class="docutils literal notranslate"><span class="pre">langchain</span></code>) (Experimental)</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#logging-retrievalqa-chains">Logging RetrievalQA Chains</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#logging-a-retriever-and-evaluate-it-individually">Logging a retriever and evaluate it individually</a></li>
@@ -2854,311 +2851,7 @@ a recognized signature type.</p>
 </div>
 <div class="section" id="openai-openai-experimental">
 <h3><a class="toc-backref" href="#id60">OpenAI (<code class="docutils literal notranslate"><span class="pre">openai</span></code>) (Experimental)</a><a class="headerlink" href="#openai-openai-experimental" title="Permalink to this headline"> </a></h3>
-<div class="admonition attention">
-<p class="admonition-title">Attention</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">openai</span></code> flavor is in active development and is marked as Experimental. Public APIs may change and new features are
-subject to be added as additional functionality is brought to the flavor.</p>
-</div>
-<p>The <code class="docutils literal notranslate"><span class="pre">openi</span></code> model flavor enables logging of <a class="reference external" href="https://github.com/openai/openai-python">OpenAI models</a> in MLflow format via
-the <a class="reference internal" href="python_api/openai/index.html#mlflow.openai.save_model" title="mlflow.openai.save_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.openai.save_model()</span></code></a> and <a class="reference internal" href="python_api/openai/index.html#mlflow.openai.log_model" title="mlflow.openai.log_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.openai.log_model()</span></code></a> functions. Use of these
-functions also adds the <code class="docutils literal notranslate"><span class="pre">python_function</span></code> flavor to the MLflow Models that they produce, allowing the model to be
-interpreted as a generic Python function for inference via <a class="reference internal" href="python_api/mlflow.pyfunc.html#mlflow.pyfunc.load_model" title="mlflow.pyfunc.load_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.pyfunc.load_model()</span></code></a>.
-You can also use the <a class="reference internal" href="python_api/openai/index.html#mlflow.openai.load_model" title="mlflow.openai.load_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.openai.load_model()</span></code></a> function to load a saved or logged MLflow
-Model with the <code class="docutils literal notranslate"><span class="pre">openai</span></code> flavor as a dictionary of the model’s attributes.</p>
-<p>Example using the OpenAI service directly:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-
-<span class="kn">import</span> <span class="nn">openai</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-
-<span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">from</span> <span class="nn">mlflow.models.signature</span> <span class="kn">import</span> <span class="n">ModelSignature</span>
-<span class="kn">from</span> <span class="nn">mlflow.types.schema</span> <span class="kn">import</span> <span class="n">ColSpec</span><span class="p">,</span> <span class="n">ParamSchema</span><span class="p">,</span> <span class="n">ParamSpec</span><span class="p">,</span> <span class="n">Schema</span>
-
-<span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;mlflow&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
-
-<span class="c1"># Uncomment the following lines to run this script without using a real OpenAI API key.</span>
-<span class="c1"># os.environ[&quot;MLFLOW_TESTING&quot;] = &quot;true&quot;</span>
-<span class="c1"># os.environ[&quot;OPENAI_API_KEY&quot;] = &quot;test&quot;</span>
-
-<span class="k">assert</span> <span class="s2">&quot;OPENAI_API_KEY&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">,</span> <span class="s2">&quot;Please set the OPENAI_API_KEY environment variable.&quot;</span>
-
-
-<span class="nb">print</span><span class="p">(</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd"># ******************************************************************************</span>
-<span class="sd"># Single variable</span>
-<span class="sd"># ******************************************************************************</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="p">)</span>
-<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
-    <span class="n">model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">openai</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
-        <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-3.5-turbo&quot;</span><span class="p">,</span>
-        <span class="n">task</span><span class="o">=</span><span class="n">openai</span><span class="o">.</span><span class="n">ChatCompletion</span><span class="p">,</span>
-        <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
-        <span class="n">messages</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;Tell me a joke about </span><span class="si">{animal}</span><span class="s2">.&quot;</span><span class="p">}],</span>
-    <span class="p">)</span>
-
-
-<span class="n">model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
-<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-    <span class="p">{</span>
-        <span class="s2">&quot;animal&quot;</span><span class="p">:</span> <span class="p">[</span>
-            <span class="s2">&quot;cats&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;dogs&quot;</span><span class="p">,</span>
-        <span class="p">]</span>
-    <span class="p">}</span>
-<span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
-
-<span class="n">list_of_dicts</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">{</span><span class="s2">&quot;animal&quot;</span><span class="p">:</span> <span class="s2">&quot;cats&quot;</span><span class="p">},</span>
-    <span class="p">{</span><span class="s2">&quot;animal&quot;</span><span class="p">:</span> <span class="s2">&quot;dogs&quot;</span><span class="p">},</span>
-<span class="p">]</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">list_of_dicts</span><span class="p">))</span>
-
-<span class="n">list_of_strings</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;cats&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;dogs&quot;</span><span class="p">,</span>
-<span class="p">]</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">list_of_strings</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd"># ******************************************************************************</span>
-<span class="sd"># Multiple variables</span>
-<span class="sd"># ******************************************************************************</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="p">)</span>
-<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
-    <span class="n">model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">openai</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
-        <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-3.5-turbo&quot;</span><span class="p">,</span>
-        <span class="n">task</span><span class="o">=</span><span class="n">openai</span><span class="o">.</span><span class="n">ChatCompletion</span><span class="p">,</span>
-        <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
-        <span class="n">messages</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;Tell me a </span><span class="si">{adjective}</span><span class="s2"> joke about </span><span class="si">{animal}</span><span class="s2">.&quot;</span><span class="p">}],</span>
-    <span class="p">)</span>
-
-
-<span class="n">model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
-<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-    <span class="p">{</span>
-        <span class="s2">&quot;adjective&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;funny&quot;</span><span class="p">,</span> <span class="s2">&quot;scary&quot;</span><span class="p">],</span>
-        <span class="s2">&quot;animal&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;cats&quot;</span><span class="p">,</span> <span class="s2">&quot;dogs&quot;</span><span class="p">],</span>
-    <span class="p">}</span>
-<span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
-
-
-<span class="n">list_of_dicts</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">{</span><span class="s2">&quot;adjective&quot;</span><span class="p">:</span> <span class="s2">&quot;funny&quot;</span><span class="p">,</span> <span class="s2">&quot;animal&quot;</span><span class="p">:</span> <span class="s2">&quot;cats&quot;</span><span class="p">},</span>
-    <span class="p">{</span><span class="s2">&quot;adjective&quot;</span><span class="p">:</span> <span class="s2">&quot;scary&quot;</span><span class="p">,</span> <span class="s2">&quot;animal&quot;</span><span class="p">:</span> <span class="s2">&quot;dogs&quot;</span><span class="p">},</span>
-<span class="p">]</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">list_of_dicts</span><span class="p">))</span>
-
-<span class="nb">print</span><span class="p">(</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd"># ******************************************************************************</span>
-<span class="sd"># Multiple prompts</span>
-<span class="sd"># ******************************************************************************</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="p">)</span>
-<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
-    <span class="n">model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">openai</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
-        <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-3.5-turbo&quot;</span><span class="p">,</span>
-        <span class="n">task</span><span class="o">=</span><span class="n">openai</span><span class="o">.</span><span class="n">ChatCompletion</span><span class="p">,</span>
-        <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
-        <span class="n">messages</span><span class="o">=</span><span class="p">[</span>
-            <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;You are </span><span class="si">{person}</span><span class="s2">&quot;</span><span class="p">},</span>
-            <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;Let me hear your thoughts on </span><span class="si">{topic}</span><span class="s2">&quot;</span><span class="p">},</span>
-        <span class="p">],</span>
-    <span class="p">)</span>
-
-
-<span class="n">model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
-<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-    <span class="p">{</span>
-        <span class="s2">&quot;person&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Elon Musk&quot;</span><span class="p">,</span> <span class="s2">&quot;Jeff Bezos&quot;</span><span class="p">],</span>
-        <span class="s2">&quot;topic&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;AI&quot;</span><span class="p">,</span> <span class="s2">&quot;ML&quot;</span><span class="p">],</span>
-    <span class="p">}</span>
-<span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
-
-<span class="n">list_of_dicts</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">{</span><span class="s2">&quot;person&quot;</span><span class="p">:</span> <span class="s2">&quot;Elon Musk&quot;</span><span class="p">,</span> <span class="s2">&quot;topic&quot;</span><span class="p">:</span> <span class="s2">&quot;AI&quot;</span><span class="p">},</span>
-    <span class="p">{</span><span class="s2">&quot;person&quot;</span><span class="p">:</span> <span class="s2">&quot;Jeff Bezos&quot;</span><span class="p">,</span> <span class="s2">&quot;topic&quot;</span><span class="p">:</span> <span class="s2">&quot;ML&quot;</span><span class="p">},</span>
-<span class="p">]</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">list_of_dicts</span><span class="p">))</span>
-
-
-<span class="nb">print</span><span class="p">(</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd"># ******************************************************************************</span>
-<span class="sd"># No input variables</span>
-<span class="sd"># ******************************************************************************</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="p">)</span>
-<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
-    <span class="n">model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">openai</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
-        <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-3.5-turbo&quot;</span><span class="p">,</span>
-        <span class="n">task</span><span class="o">=</span><span class="n">openai</span><span class="o">.</span><span class="n">ChatCompletion</span><span class="p">,</span>
-        <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
-        <span class="n">messages</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;You are Elon Musk&quot;</span><span class="p">}],</span>
-    <span class="p">)</span>
-
-<span class="n">model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
-<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-    <span class="p">{</span>
-        <span class="s2">&quot;question&quot;</span><span class="p">:</span> <span class="p">[</span>
-            <span class="s2">&quot;Let me hear your thoughts on AI&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Let me hear your thoughts on ML&quot;</span><span class="p">,</span>
-        <span class="p">],</span>
-    <span class="p">}</span>
-<span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
-
-<span class="n">list_of_dicts</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">{</span><span class="s2">&quot;question&quot;</span><span class="p">:</span> <span class="s2">&quot;Let me hear your thoughts on AI&quot;</span><span class="p">},</span>
-    <span class="p">{</span><span class="s2">&quot;question&quot;</span><span class="p">:</span> <span class="s2">&quot;Let me hear your thoughts on ML&quot;</span><span class="p">},</span>
-<span class="p">]</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">list_of_dicts</span><span class="p">))</span>
-
-<span class="n">list_of_strings</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;Let me hear your thoughts on AI&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;Let me hear your thoughts on ML&quot;</span><span class="p">,</span>
-<span class="p">]</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">list_of_strings</span><span class="p">))</span>
-
-
-<span class="nb">print</span><span class="p">(</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd"># ******************************************************************************</span>
-<span class="sd"># Inference parameters with chat completions</span>
-<span class="sd"># ******************************************************************************</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="p">)</span>
-<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
-    <span class="n">model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">openai</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
-        <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-3.5-turbo&quot;</span><span class="p">,</span>
-        <span class="n">task</span><span class="o">=</span><span class="n">openai</span><span class="o">.</span><span class="n">ChatCompletion</span><span class="p">,</span>
-        <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
-        <span class="n">messages</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;Tell me a joke about </span><span class="si">{animal}</span><span class="s2">.&quot;</span><span class="p">}],</span>
-        <span class="n">signature</span><span class="o">=</span><span class="n">ModelSignature</span><span class="p">(</span>
-            <span class="n">inputs</span><span class="o">=</span><span class="n">Schema</span><span class="p">([</span><span class="n">ColSpec</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">)]),</span>
-            <span class="n">outputs</span><span class="o">=</span><span class="n">Schema</span><span class="p">([</span><span class="n">ColSpec</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">)]),</span>
-            <span class="n">params</span><span class="o">=</span><span class="n">ParamSchema</span><span class="p">(</span>
-                <span class="p">[</span>
-                    <span class="n">ParamSpec</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;temperature&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float&quot;</span><span class="p">),</span>
-                <span class="p">]</span>
-            <span class="p">),</span>
-        <span class="p">),</span>
-    <span class="p">)</span>
-
-
-<span class="n">model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
-<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-    <span class="p">{</span>
-        <span class="s2">&quot;animal&quot;</span><span class="p">:</span> <span class="p">[</span>
-            <span class="s2">&quot;cats&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;dogs&quot;</span><span class="p">,</span>
-        <span class="p">]</span>
-    <span class="p">}</span>
-<span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}))</span>
-</pre></div>
-</div>
-<div class="section" id="using-the-azure-openai-service">
-<h4>Using the Azure OpenAI Service<a class="headerlink" href="#using-the-azure-openai-service" title="Permalink to this headline"> </a></h4>
-<p>The <code class="docutils literal notranslate"><span class="pre">openai</span></code> flavor supports logging models that use the <a class="reference external" href="https://azure.microsoft.com/en-us/products/ai-services/openai-service">Azure OpenAI Service</a>.
-There are a few notable differences between the Azure OpenAI Service and the OpenAI Service that need to be considered when logging models that target Azure endpoints.</p>
-<p>In order to successfully log a model that targets the Azure OpenAI Service, you must set the following environment variables to ensure that the saved model will have
-the correct authentication information when it is loaded:</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The following environment variables contain <strong>highly sensitive access keys</strong>. Ensure that you do not commit these values to source control or declare them in an interactive
-environment. Environment variables should be set from within your terminal via an <code class="docutils literal notranslate"><span class="pre">export</span></code> command, an addition to your user profile configurations (i.e., .bashrc or .zshrc),
-or set through your IDE’s environment variable configuration. Please do not leak your credentials.</p>
-</div>
-<ul class="simple">
-<li><p><strong>OPENAI_API_KEY</strong>: The API key for the Azure OpenAI Service. This can be found in the Azure Portal under the “Keys and Endpoint” section of the “Keys and Endpoint” tab. You can use either <code class="docutils literal notranslate"><span class="pre">KEY1</span></code> or <code class="docutils literal notranslate"><span class="pre">KEY2</span></code>.</p></li>
-<li><p><strong>OPENAI_API_BASE</strong>: The base endpoint for your Azure OpenAI resource (e.g., <code class="docutils literal notranslate"><span class="pre">https://&lt;your-service-name&gt;.openai.azure.com/</span></code>). Within the Azure OpenAI documentation and guides, this key is referred to as <code class="docutils literal notranslate"><span class="pre">AZURE_OPENAI_ENDPOINT</span></code> or simply <code class="docutils literal notranslate"><span class="pre">ENDPOINT</span></code>.</p></li>
-<li><p><strong>OPENAI_API_VERSION</strong>: The API version to use for the Azure OpenAI Service. More information can be found in the <a class="reference external" href="https://learn.microsoft.com/en-us/azure/ai-services/openai/reference">Azure OpenAI documentation</a>, including up-to-date lists of supported versions.</p></li>
-<li><p><strong>OPENAI_API_TYPE</strong>: If using Azure OpenAI endpoints, this value should be set to <code class="docutils literal notranslate"><span class="pre">&quot;azure&quot;</span></code>.</p></li>
-<li><p><strong>DEPLOYMENT_ID</strong>: The deployment name that you chose when you deployed the model in Azure. To learn more, visit the <a class="reference external" href="https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/create-resource?pivots=web-portal">Azure OpenAI deployment documentation</a>.</p></li>
-</ul>
-<p>Example using the Azure OpenAI Service:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-
-<span class="kn">import</span> <span class="nn">openai</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-
-<span class="kn">import</span> <span class="nn">mlflow</span>
-
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Set environment variables for Azure OpenAI service</span>
-<span class="sd">export OPENAI_API_KEY=&quot;&lt;AZURE OPENAI KEY&gt;&quot;</span>
-<span class="sd"># OPENAI_API_BASE should be the endpoint of your Azure OpenAI resource</span>
-<span class="sd"># e.g. https://&lt;service-name&gt;.openai.azure.com/</span>
-<span class="sd">export OPENAI_API_BASE=&quot;&lt;AZURE OPENAI BASE&gt;&quot;</span>
-<span class="sd"># OPENAI_API_VERSION e.g. 2023-05-15</span>
-<span class="sd">export OPENAI_API_VERSION=&quot;&lt;AZURE OPENAI API VERSION&gt;&quot;</span>
-<span class="sd">export OPENAI_API_TYPE=&quot;azure&quot;</span>
-<span class="sd">export DEPLOYMENT_ID=&quot;&lt;AZURE OPENAI DEPLOYMENT ID OR NAME&gt;&quot;</span>
-<span class="sd">&quot;&quot;&quot;</span>
-
-<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
-    <span class="n">model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">openai</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
-        <span class="c1"># Your Azure OpenAI model e.g. gpt-3.5-turbo</span>
-        <span class="n">model</span><span class="o">=</span><span class="s2">&quot;&lt;YOUR AZURE OPENAI MODEL&gt;&quot;</span><span class="p">,</span>
-        <span class="n">task</span><span class="o">=</span><span class="n">openai</span><span class="o">.</span><span class="n">ChatCompletion</span><span class="p">,</span>
-        <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
-        <span class="n">messages</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;Tell me a joke about </span><span class="si">{animal}</span><span class="s2">.&quot;</span><span class="p">}],</span>
-        <span class="n">deployment_id</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;DEPLOYMENT_ID&quot;</span><span class="p">],</span>
-    <span class="p">)</span>
-
-<span class="c1"># Load native OpenAI model</span>
-<span class="n">native_model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">openai</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
-<span class="n">completion</span> <span class="o">=</span> <span class="n">openai</span><span class="o">.</span><span class="n">ChatCompletion</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-    <span class="n">deployment_id</span><span class="o">=</span><span class="n">native_model</span><span class="p">[</span><span class="s2">&quot;deployment_id&quot;</span><span class="p">],</span>
-    <span class="n">messages</span><span class="o">=</span><span class="n">native_model</span><span class="p">[</span><span class="s2">&quot;messages&quot;</span><span class="p">],</span>
-<span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">completion</span><span class="p">[</span><span class="s2">&quot;choices&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;message&quot;</span><span class="p">][</span><span class="s2">&quot;content&quot;</span><span class="p">])</span>
-
-
-<span class="c1"># Load as Pyfunc model</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
-<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-    <span class="p">{</span>
-        <span class="s2">&quot;animal&quot;</span><span class="p">:</span> <span class="p">[</span>
-            <span class="s2">&quot;cats&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;dogs&quot;</span><span class="p">,</span>
-        <span class="p">]</span>
-    <span class="p">}</span>
-<span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
-
-<span class="n">list_of_dicts</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">{</span><span class="s2">&quot;animal&quot;</span><span class="p">:</span> <span class="s2">&quot;cats&quot;</span><span class="p">},</span>
-    <span class="p">{</span><span class="s2">&quot;animal&quot;</span><span class="p">:</span> <span class="s2">&quot;dogs&quot;</span><span class="p">},</span>
-<span class="p">]</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">list_of_dicts</span><span class="p">))</span>
-
-<span class="n">list_of_strings</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;cats&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;dogs&quot;</span><span class="p">,</span>
-<span class="p">]</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">list_of_strings</span><span class="p">))</span>
-
-<span class="n">list_of_strings</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;Let me hear your thoughts on AI&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;Let me hear your thoughts on ML&quot;</span><span class="p">,</span>
-<span class="p">]</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">list_of_strings</span><span class="p">))</span>
-</pre></div>
-</div>
-</div>
+<p>The full guide, including tutorials and detailed documentation for using the <code class="docutils literal notranslate"><span class="pre">openai</span></code> flavor <a class="reference external" href="llms/openai/index.html">can be viewed here</a>.</p>
 </div>
 <div class="section" id="langchain-langchain-experimental">
 <h3><a class="toc-backref" href="#id61">LangChain (<code class="docutils literal notranslate"><span class="pre">langchain</span></code>) (Experimental)</a><a class="headerlink" href="#langchain-langchain-experimental" title="Permalink to this headline"> </a></h3>
@@ -5948,7 +5641,7 @@ maintained by the MLflow community.</p>
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'./',
-      VERSION:'2.9.2.dev0',
+      VERSION:'2.9.3.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',
