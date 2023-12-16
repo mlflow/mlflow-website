@@ -9,11 +9,11 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Searching Experiments &mdash; MLflow 2.9.3.dev0 documentation</title>
+  <title>How to Run Tutorials &mdash; MLflow 2.9.3.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-  <link rel="canonical" href="https://mlflow.org/docs/latest/getting-started/logging-first-model/step4-experiment-search.html">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/getting-started/running-notebooks/index.html">
   
   
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
@@ -49,8 +49,8 @@
         <link rel="search" title="Search" href="../../search.html"/>
     <link rel="top" title="MLflow 2.9.3.dev0 documentation" href="../../index.html"/>
         <link rel="up" title="Getting Started with MLflow" href="../index.html"/>
-        <link rel="next" title="Create a dataset about apples" href="/step5-synthetic-data.html"/>
-        <link rel="prev" title="Creating Experiments" href="/step3-create-experiment.html"/> 
+        <link rel="next" title="MLflow Tracking Quickstart" href="/../intro-quickstart/index.html"/>
+        <link rel="prev" title="Getting Started with MLflow" href="/../index.html"/> 
 
   
   <script src="../../_static/js/modernizr.min.js"></script>
@@ -113,22 +113,17 @@
         <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../introduction/index.html">What is MLflow?</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Getting Started with MLflow</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../index.html#guidance-on-running-tutorials">Guidance on Running Tutorials</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#guidance-on-running-tutorials">Guidance on Running Tutorials</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">How to Run Tutorials</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#databricks">Databricks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#self-managed-mlflow">Self-managed MLflow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#local-tracking-server">Local Tracking Server</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../index.html#id1">5-minute Quickstart - MLflow Tracking</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="../index.html#id2">Logging your first MLflow Model</a><ul class="current">
-<li class="toctree-l3 current"><a class="reference internal" href="../index.html#guide-sections">Guide sections</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="index.html">Tutorial Overview</a></li>
-<li class="toctree-l4"><a class="reference internal" href="step1-tracking-server.html">Starting the MLflow Tracking Server</a></li>
-<li class="toctree-l4"><a class="reference internal" href="step2-mlflow-client.html">Using the MLflow Client API</a></li>
-<li class="toctree-l4"><a class="reference internal" href="step3-create-experiment.html">Creating Experiments</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">Searching Experiments</a></li>
-<li class="toctree-l4"><a class="reference internal" href="step5-synthetic-data.html">Create a dataset about apples</a></li>
-<li class="toctree-l4"><a class="reference internal" href="step6-logging-a-run.html">Logging our first runs with MLflow</a></li>
-<li class="toctree-l4"><a class="reference internal" href="notebooks/index.html">Logging Your First MLflow Model Notebook</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#id2">Logging your first MLflow Model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../index.html#id3">15 minute Quickstart - Autologging in MLflow</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../index.html#id4">15 minute Quickstart - Comparing Runs and Deploying your Best Model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../index.html#id5">5 Minute Tracking Server Overview</a></li>
@@ -196,11 +191,11 @@
         <li><a href="../index.html">Getting Started with MLflow</a> <span class="db-icon db-icon-chevron-right"></span></li>
     
     
-      <li>Searching Experiments</li>
+      <li>How to Run Tutorials</li>
     
     
     <!-- <li class="wy-breadcrumbs-aside">
-      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/getting-started/logging-first-model/step4-experiment-search.rst" class="fa fa-github"> Edit on GitHub</a>
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/getting-started/running-notebooks/index.rst" class="fa fa-github"> Edit on GitHub</a>
     </li> -->
     
   </ul>
@@ -208,85 +203,102 @@
             <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
               <div itemprop="articleBody">
                 
-  <div class="section" id="searching-experiments">
-<h1>Searching Experiments<a class="headerlink" href="#searching-experiments" title="Permalink to this headline"> </a></h1>
-<p>In the last section, we created our first MLflow Experiment, providing custom tags so that we can find
-co-related Experiments that are part of a larger project.</p>
-<p>In this brief section, we’re going to see how to perform those searches with the MLflow Client API.</p>
-<p>Before we perform the search, let’s take a look at our <code class="docutils literal notranslate"><span class="pre">Apple_Models</span></code> experiment in the UI.</p>
-<div class="section" id="seeing-our-new-experiment-in-the-ui">
-<h2>Seeing our new Experiment in the UI<a class="headerlink" href="#seeing-our-new-experiment-in-the-ui" title="Permalink to this headline"> </a></h2>
-<p>As before, we’re going to connect to our running MLflow Tracking server to view the MLflow UI. If you’ve closed the browser
-window that was running it, simply navigate to <code class="docutils literal notranslate"><span class="pre">http://127.0.0.1:8080</span></code> in a new browser window.</p>
+  <div class="section" id="how-to-run-tutorials">
+<h1>How to Run Tutorials<a class="headerlink" href="#how-to-run-tutorials" title="Permalink to this headline"> </a></h1>
+<p>This brief guide will walk you through some options that you have to run these tutorials and have a Tracking Server that is available to log the results to (as well
+as offering options for the MLflow UI).</p>
+<p>The listing of topics in this guide are in ascending order of complexity, so if you’re looking for the quickest and easiest way to get started, please
+evaluate the first option.</p>
+<div class="section" id="databricks">
+<h2>Databricks<a class="headerlink" href="#databricks" title="Permalink to this headline"> </a></h2>
+<p>The easiest way to get started with MLflow is to use the managed MLflow service provided by Databricks. There are two separate options here, one that is
+most expedient if you’re a Databricks customer, and another that is available to anyone, <strong>free of charge</strong>.</p>
+<div class="section" id="databricks-customers">
+<h3>Databricks Customers<a class="headerlink" href="#databricks-customers" title="Permalink to this headline"> </a></h3>
+<p>If you’re already a customer of Databricks, you can use the MLflow service that is available as part of your Databricks workspace.
+MLflow on Databricks is a fully managed service with additional functionality for enterprise customers, providing a scalable and secure managed deployment
+of MLflow. Note that the MLflow APIs from within Databricks are the same as the open source version, so you can use the same code to run on Databricks or on
+your own infrastructure.</p>
+<p>To learn how to get started using MLflow from within your Databricks account, please see the respective links below for your cloud provider:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://learn.microsoft.com/en-gb/azure/databricks/mlflow/">Azure Databricks</a></p></li>
+<li><p><a class="reference external" href="https://docs.databricks.com/en/mlflow/index.html">Databricks on AWS</a></p></li>
+<li><p><a class="reference external" href="https://docs.gcp.databricks.com/en/mlflow/index.html">Databricks on GCP</a></p></li>
+</ul>
+</div>
+<div class="section" id="databricks-community-edition">
+<h3>Databricks Community Edition<a class="headerlink" href="#databricks-community-edition" title="Permalink to this headline"> </a></h3>
+<p>The Databricks Community Edition (CE) is a fully managed, Databricks-hosted version of the Databricks platform. While many of the enterprise features of the
+Databricks platform are unavailble on CE, the vast majority of MLflow functionality is supported (with the notable exception that you cannot create serving
+endpoints on CE, so deployment of models is not supported).</p>
+<p>To get started with Databricks CE, please visit the <a class="reference external" href="https://docs.databricks.com/en/getting-started/community-edition.html">Databricks Community Edition page</a>
+and follow the instructions outlined there. It takes about 5 minutes to get started, and you’ll have a (mostly) fully functional Databricks Workspace that you
+can use to log your tutorial experiments, runs, and artifacts to.</p>
+<p>Once you log in to the Community Edition, you will see a landing page like this:</p>
 <div class="figure align-center" id="id1">
-<a class="reference internal image-reference" href="../../_images/first-experiment-ui.gif"><img alt="View our new experiment in the UI" src="../../_images/first-experiment-ui.gif" style="width: 1024px;" /></a>
-<p class="caption"><span class="caption-text">The “Apple_Models” Experiment in the MLflow UI</span><a class="headerlink" href="#id1" title="Permalink to this image"> </a></p>
+<a class="reference internal image-reference" href="../../_images/community-edition-main.png"><img alt="Databricks CE Landing Page" src="../../_images/community-edition-main.png" style="width: 100%;" /></a>
+<p class="caption"><span class="caption-text">Databricks CE Landing Page</span><a class="headerlink" href="#id1" title="Permalink to this image"> </a></p>
 </div>
-<div class="section" id="important-components-to-be-aware-of-in-the-ui">
-<h3>Important components to be aware of in the UI<a class="headerlink" href="#important-components-to-be-aware-of-in-the-ui" title="Permalink to this headline"> </a></h3>
-<p>There are some important elements in the UI to be aware of at this point, before we start adding more exciting things like runs to
-our new experiment. Note the annotated elements on the figure below. It will be useful to know that these bits of data are there later on.</p>
+<p>In order to get to the MLflow UI, you can navigate to it by clicking on the “Experiments” link on the left-hand side (denoted by the laboratory beaker icon).
+When you get to the MLflow UI on CE for the first time, you’ll see this:</p>
 <div class="figure align-center" id="id2">
-<a class="reference internal image-reference" href="../../_images/experiment-page-elements.svg"><img alt="Important Data on the Experiment View Page" src="../../_images/experiment-page-elements.svg" width="1024px" /></a>
-<p class="caption"><span class="caption-text">Key elements of the Experiments view page</span><a class="headerlink" href="#id2" title="Permalink to this image"> </a></p>
+<a class="reference internal image-reference" href="../../_images/mlflow-ui-in-ce.png"><img alt="Databricks CE MLflow UI" src="../../_images/mlflow-ui-in-ce.png" style="width: 100%;" /></a>
+<p class="caption"><span class="caption-text">Databricks CE MLflow UI</span><a class="headerlink" href="#id2" title="Permalink to this image"> </a></p>
 </div>
-</div>
-</div>
-<div class="section" id="searching-based-on-tags">
-<h2>Searching based on tags<a class="headerlink" href="#searching-based-on-tags" title="Permalink to this headline"> </a></h2>
-<p>Now that we’ve seen the experiment and understand which of the tags that we specified during the creation of the experiment
-are visible within the UI and which are not, we’re going to explore the reason for defining those tags as we
-apply searches against the tracking server to find experiments whose custom tags values match our query terms.</p>
-<p>One of the more versatile uses of setting <code class="docutils literal notranslate"><span class="pre">tags</span></code> within Experiments is to enable searching for
-related Experiments based on a common tag. The filtering capabilities within the <code class="docutils literal notranslate"><span class="pre">search_experiments</span></code> API
-can be seen below, where we are searching for experiments whose custom <code class="docutils literal notranslate"><span class="pre">project_name</span></code> tag exactly matches
-<code class="docutils literal notranslate"><span class="pre">grocery-forecasting</span></code>.</p>
-<p>Note that the format that is used for the search filtering has some nuance to it. For named entities (for instance,
-here, the <code class="docutils literal notranslate"><span class="pre">tags</span></code> term in the beginning of the filter string), keys can be directly used. However, to reference custom
-tags, note the particular syntax used. The custom tag names are wrapped with back ticks (`) and our matching search
-condition is wrapped in single quotes.</p>
-<div class="code-section docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Use search_experiments() to search on the project_name tag key</span>
+<div class="section" id="decisions-about-where-to-run-your-notebook">
+<h4>Decisions about where to run your Notebook<a class="headerlink" href="#decisions-about-where-to-run-your-notebook" title="Permalink to this headline"> </a></h4>
+<p>With a Databricks managed instance of MLflow, you have two options for running the tutorial notebooks:</p>
+<details>
+    <summary><b>Expand to learn about Importing Notebooks directly into CE</b></summary>
+    <br/>
+    <p>Once you're at the main page of CE, you can import any of the notebooks within this tutorial by navigating to the "Workspace" tab on the left.</p>
+    <p>Click that link to expand the file navigation pane. From there, navigate to Users/&lt;you&gt; and you can right click to bring up the "Import" option.</p>
+    <p>The below image shows what the import dialog should look like if you're going to directly import a notebook from the MLflow documentation website:</p>
 
-<span class="n">apples_experiment</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">search_experiments</span><span class="p">(</span>
-    <span class="n">filter_string</span><span class="o">=</span><span class="s2">&quot;tags.`project_name` = &#39;grocery-forecasting&#39;&quot;</span>
+    <figure>
+        <img src="../../_static/images/tutorials/introductory/import-notebook-into-ce.png" alt="Databricks CE import Notebook from MLflow docs website" width="100%" style="display:block; margin-left:auto; margin-right:auto;">
+    </figure>
+
+    <p>At this point, you can simply just run the tutorial. <br/> Any calls to MLflow for creating experiments, initiating runs, logging metadata, and saving artifacts will be fully managed for you and your logging history will appear within the MLflow UI.</p>
+
+</details>
+<br/>
+<details>
+    <summary><b>Expand to learn about Running Notebooks locally and using CE as a remote tracking server</b></summary>
+    <br/>
+    <p>In order to stay within the comfortable confines of your local machine and still have the use of the managed MLflow Tracking Server, you can simply add a call to <code>mlflow.login()</code> to your notebook. This will generate a prompt for you to enter your <strong>username</strong> and <strong>password</strong> that were defined when creating your account on CE. </p>
+    <p><strong>Note:</strong> your username will be the <strong>email address</strong> that you used when signing up.</p>
+    <pre><code class="language-python">
+    import mlflow
+
+    mlflow.login()
+    </code></pre>
+    <p>After the login process is done, you will simply have to set your MLflow Tracking URI to the instance that you just logged in to.<br/> It's made fairly easy for you:</p>
+    <pre><code class="language-python">
+    mlflow.set_tracking_uri("databricks")
+    </code></pre>
+</details>
+<br/><p>At this point, you’re ready to go! You can run any of the tutorials locally and they will log to the managed MLflow Tracking Server.</p>
+</div>
+</div>
+</div>
+<div class="section" id="self-managed-mlflow">
+<h2>Self-managed MLflow<a class="headerlink" href="#self-managed-mlflow" title="Permalink to this headline"> </a></h2>
+<p>If you have your own managed MLflow server that you’d like to use, you can simply set the MLflow Tracking URI to point to your server.
+If there are additional configurations or access restrictions for connecting, please contact the group that manages your MLflow deployment for more information.</p>
+<p>To set the MLflow Tracking URI directly (assuming that you don’t have additional security validation set up), all you need to do is, from within a notebook:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mlflow</span><span class="o">.</span><span class="n">set_tracking_uri</span><span class="p">(</span>
+    <span class="s2">&quot;http://&lt;your-mlflow-server&gt;:&lt;the port number that is configured to accept traffic&gt;&quot;</span>
 <span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="n">apples_experiment</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
 </pre></div>
 </div>
 </div>
-<div class="literal-block-wrapper docutils container" id="id3">
-<div class="code-block-caption"><span class="caption-text">The metadata associated with a created Experiment</span><a class="headerlink" href="#id3" title="Permalink to this code"> </a></div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&lt;Experiment:<span class="w"> </span><span class="nv">artifact_location</span><span class="o">=</span><span class="s1">&#39;mlflow-artifacts:/926031323154788454&#39;</span>,
-<span class="w">             </span><span class="nv">creation_time</span><span class="o">=</span><span class="m">1694018173427</span>,
-<span class="w">             </span><span class="nv">experiment_id</span><span class="o">=</span><span class="s1">&#39;926031323154788454&#39;</span>,
-<span class="w">             </span><span class="nv">last_update_time</span><span class="o">=</span><span class="m">1694018173427</span>,
-<span class="w">             </span><span class="nv">lifecycle_stage</span><span class="o">=</span><span class="s1">&#39;active&#39;</span>,
-<span class="w">             </span><span class="nv">name</span><span class="o">=</span><span class="s1">&#39;Apple_Models&#39;</span>,
-<span class="w">             </span><span class="nv">tags</span><span class="o">={</span>
-<span class="w">                </span><span class="s1">&#39;mlflow.note.content&#39;</span>:<span class="w"> </span><span class="s1">&#39;This is the grocery forecasting project. This &#39;</span>
-<span class="w">                        </span><span class="s1">&#39;experiment contains the produce models for apples.&#39;</span>,
-<span class="w">                </span><span class="s1">&#39;project_name&#39;</span>:<span class="w"> </span><span class="s1">&#39;grocery-forecasting&#39;</span>,
-<span class="w">                </span><span class="s1">&#39;project_quarter&#39;</span>:<span class="w"> </span><span class="s1">&#39;Q3-2023&#39;</span>,
-<span class="w">                </span><span class="s1">&#39;team&#39;</span>:<span class="w"> </span><span class="s1">&#39;stores-ml&#39;</span><span class="o">}</span>
-&gt;
-</pre></div>
-</div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The returned results above are formatted for legibility. This return type is an <code class="docutils literal notranslate"><span class="pre">Experiment</span></code> object, not a <code class="docutils literal notranslate"><span class="pre">dict</span></code>.</p>
-</div>
-</div>
-<div class="section" id="executing-the-search">
-<h2>Executing the Search<a class="headerlink" href="#executing-the-search" title="Permalink to this headline"> </a></h2>
-<div class="figure align-center" id="id4">
-<a class="reference internal image-reference" href="../../_images/creating-experiment.gif"><img alt="Creating a new Experiment" src="../../_images/creating-experiment.gif" style="width: 1024px;" /></a>
-<p class="caption"><span class="caption-text">Creating a new Experiment and searching based on an Experiment tag</span><a class="headerlink" href="#id4" title="Permalink to this image"> </a></p>
-</div>
-<p>In the next section, we’ll begin to use this experiment to log training data to runs that are associated with this experiment, introducing
-another aspect of both the MLflow APIs (the fluent API) and another part of the MLflow UI (the run information page).</p>
+<div class="section" id="local-tracking-server">
+<h2>Local Tracking Server<a class="headerlink" href="#local-tracking-server" title="Permalink to this headline"> </a></h2>
+<ul class="simple">
+<li><p>Learn how to run an MLflow Tracking Server locally by following the <a class="reference external" href="../tracking-server-overview/index.html#method-1-start-your-own-mlflow-server">quickstart tutorial here</a>.</p></li>
+<li><p>Learn more about the MLflow Tracking Server by reading the <a class="reference external" href="../tracking-server-overview/index.html">Tracking Server Overview</a> and <a class="reference external" href="../../tracking/server.html">how to deploy a tracking server</a> guides.</p></li>
+</ul>
 </div>
 </div>
 
@@ -297,10 +309,10 @@ another aspect of both the MLflow APIs (the fluent API) and another part of the 
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="step3-create-experiment.html" class="btn btn-neutral" title="Creating Experiments" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+        <a href="../index.html" class="btn btn-neutral" title="Getting Started with MLflow" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
       
       
-        <a href="step5-synthetic-data.html" class="btn btn-neutral" title="Create a dataset about apples" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+        <a href="../intro-quickstart/index.html" class="btn btn-neutral" title="MLflow Tracking Quickstart" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
       
     </div>
   

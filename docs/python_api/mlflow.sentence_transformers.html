@@ -320,8 +320,33 @@ path will be created.</p></li>
 <p>Log a <code class="docutils literal notranslate"><span class="pre">sentence_transformers</span></code> model as an MLflow artifact for the current run.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>model</strong> – A trained <code class="docutils literal notranslate"><span class="pre">sentence-transformers</span></code> model.</p>
+</dd>
+</dl>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># An example of using log_model for a sentence-transformers model and architecture:</span>
+
+<span class="kn">from</span> <span class="nn">sentence_transformers</span> <span class="kn">import</span> <span class="n">SentenceTransformer</span>
+<span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">SentenceTransformer</span><span class="p">(</span><span class="s2">&quot;all-MiniLM-L6-v2&quot;</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="s2">&quot;MLflow is awesome!&quot;</span>
+<span class="n">signature</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">infer_signature</span><span class="p">(</span>
+    <span class="n">model_input</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+    <span class="n">model_output</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">data</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">sentence_transformers</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+        <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;sbert_model&quot;</span><span class="p">,</span>
+        <span class="n">signature</span><span class="o">=</span><span class="n">signature</span><span class="p">,</span>
+        <span class="n">input_example</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>model</strong> – A trained <code class="docutils literal notranslate"><span class="pre">sentence-transformers</span></code> model.</p></li>
 <li><p><strong>artifact_path</strong> – Local path destination for the serialized model to be saved.</p></li>
 <li><p><strong>inference_config</strong> – A dict of valid overrides that can be applied to a <code class="docutils literal notranslate"><span class="pre">sentence-transformer</span></code> model instance
 during inference.
