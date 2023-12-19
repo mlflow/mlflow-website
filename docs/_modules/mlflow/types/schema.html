@@ -192,6 +192,8 @@
 <span class="kn">import</span> <span class="nn">importlib.util</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
 <span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">TypedDict</span><span class="p">,</span> <span class="n">Union</span>
 
@@ -199,6 +201,9 @@
 
 <span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.annotations</span> <span class="kn">import</span> <span class="n">experimental</span>
+
+<span class="n">ARRAY_TYPE</span> <span class="o">=</span> <span class="s2">&quot;array&quot;</span>
+<span class="n">OBJECT_TYPE</span> <span class="o">=</span> <span class="s2">&quot;object&quot;</span>
 
 
 <div class="viewcode-block" id="DataType"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.DataType">[docs]</a><span class="k">class</span> <span class="nc">DataType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
@@ -300,6 +305,10 @@
             <span class="n">types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_spark</span><span class="p">())</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;datetime&quot;</span><span class="p">:</span>
             <span class="n">types</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">,</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="p">])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;binary&quot;</span><span class="p">:</span>
+            <span class="c1"># This is to support identifying bytearrays as binary data</span>
+            <span class="c1"># for pandas DataFrame schema inference</span>
+            <span class="n">types</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="nb">bytearray</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">types</span>
 
     <span class="nd">@classmethod</span>
@@ -311,6 +320,390 @@
         <span class="k">return</span> <span class="nb">next</span><span class="p">((</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_member_map_</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span> <span class="o">==</span> <span class="n">np_type</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span></div>
 
 
+<span class="nd">@experimental</span>
+<span class="k">class</span> <span class="nc">Property</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Specification used to represent a json-convertible object property.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">dtype</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">DataType</span><span class="p">,</span> <span class="s2">&quot;Array&quot;</span><span class="p">,</span> <span class="s2">&quot;Object&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+        <span class="n">required</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param name: The name of the property</span>
+<span class="sd">        :param dtype: The data type of the property</span>
+<span class="sd">        :param required: Whether this property is required</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Expected name to be a string, got type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">[</span><span class="n">dtype</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">dtype</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Unsupported type &#39;</span><span class="si">{</span><span class="n">dtype</span><span class="si">}</span><span class="s2">&#39;, expected instance of DataType, Array, Object or &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;one of </span><span class="si">{</span><span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">name</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">DataType</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="p">(</span><span class="n">DataType</span><span class="p">,</span> <span class="n">Array</span><span class="p">,</span> <span class="n">Object</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                <span class="s2">&quot;Expected mlflow.types.schema.Datatype, mlflow.types.schema.Array, &quot;</span>
+                <span class="s2">&quot;mlflow.types.schema.Object or str for the &#39;dtype&#39; &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;argument, but got </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_required</span> <span class="o">=</span> <span class="n">required</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The property name.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">dtype</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">DataType</span><span class="p">,</span> <span class="s2">&quot;Array&quot;</span><span class="p">,</span> <span class="s2">&quot;Object&quot;</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The property data type.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">required</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Whether this property is required&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_required</span>
+
+    <span class="nd">@required</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">required</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_required</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Property</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">name</span>
+                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">dtype</span>
+                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">required</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">required</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="fm">__lt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">&lt;</span> <span class="n">other</span><span class="o">.</span><span class="n">name</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">required</span> <span class="o">=</span> <span class="s2">&quot;required&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">required</span> <span class="k">else</span> <span class="s2">&quot;optional&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="si">!r}</span><span class="s2"> (</span><span class="si">{</span><span class="n">required</span><span class="si">}</span><span class="s2">)&quot;</span>
+
+    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">name</span><span class="p">}</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">DataType</span><span class="p">)</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;required&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">required</span>
+        <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">d</span><span class="p">}</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_json_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Deserialize from a json loaded dictionary.</span>
+<span class="sd">        The dictionary is expected to contain only one key as `name`, and</span>
+<span class="sd">        the value should be a dictionary containing `type` and</span>
+<span class="sd">        optional `required` keys.</span>
+<span class="sd">        Example: {&quot;property_name&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;required&quot;: True}}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Expected Property JSON to contain a single key as name, got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span><span class="si">}</span><span class="s2"> keys.&quot;</span>
+            <span class="p">)</span>
+        <span class="n">name</span><span class="p">,</span> <span class="n">dic</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">popitem</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">}</span> <span class="o">&lt;=</span> <span class="nb">set</span><span class="p">(</span><span class="n">dic</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Missing keys in Property `</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">`. Expected to find key `type`&quot;</span><span class="p">)</span>
+        <span class="n">required</span> <span class="o">=</span> <span class="n">dic</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;required&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="n">dic</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">dtype</span> <span class="o">==</span> <span class="n">ARRAY_TYPE</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">Array</span><span class="o">.</span><span class="n">from_json_dict</span><span class="p">(</span><span class="o">**</span><span class="n">dic</span><span class="p">),</span> <span class="n">required</span><span class="o">=</span><span class="n">required</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dtype</span> <span class="o">==</span> <span class="n">OBJECT_TYPE</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">Object</span><span class="o">.</span><span class="n">from_json_dict</span><span class="p">(</span><span class="o">**</span><span class="n">dic</span><span class="p">),</span> <span class="n">required</span><span class="o">=</span><span class="n">required</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="n">required</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_merge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prop</span><span class="p">:</span> <span class="s2">&quot;Property&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Property&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if current property is compatible with another property and return</span>
+<span class="sd">        the updated property.</span>
+<span class="sd">        When two properties have the same name, we need to check if their dtypes</span>
+<span class="sd">        are compatible or not.</span>
+<span class="sd">        An example of two compatible properties:</span>
+
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                prop1 = Property(</span>
+<span class="sd">                    name=&quot;a&quot;,</span>
+<span class="sd">                    dtype=Object(</span>
+<span class="sd">                        properties=[Property(name=&quot;a&quot;, dtype=DataType.string, required=False)]</span>
+<span class="sd">                    ),</span>
+<span class="sd">                )</span>
+<span class="sd">                prop2 = Property(</span>
+<span class="sd">                    name=&quot;a&quot;,</span>
+<span class="sd">                    dtype=Object(</span>
+<span class="sd">                        properties=[</span>
+<span class="sd">                            Property(name=&quot;a&quot;, dtype=DataType.string),</span>
+<span class="sd">                            Property(name=&quot;b&quot;, dtype=DataType.double),</span>
+<span class="sd">                        ]</span>
+<span class="sd">                    ),</span>
+<span class="sd">                )</span>
+<span class="sd">                merged_prop = prop1._merge(prop2)</span>
+<span class="sd">                assert merged_prop == Property(</span>
+<span class="sd">                    name=&quot;a&quot;,</span>
+<span class="sd">                    dtype=Object(</span>
+<span class="sd">                        properties=[</span>
+<span class="sd">                            Property(name=&quot;a&quot;, dtype=DataType.string, required=False),</span>
+<span class="sd">                            Property(name=&quot;b&quot;, dtype=DataType.double, required=False),</span>
+<span class="sd">                        ]</span>
+<span class="sd">                    ),</span>
+<span class="sd">                )</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prop</span><span class="p">,</span> <span class="n">Property</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Can&#39;t merge property with non-property type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">prop</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="n">prop</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="s2">&quot;Can&#39;t merge properties with different names&quot;</span><span class="p">)</span>
+        <span class="n">required</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">required</span> <span class="ow">and</span> <span class="n">prop</span><span class="o">.</span><span class="n">required</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">DataType</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prop</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">DataType</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">prop</span><span class="o">.</span><span class="n">dtype</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">Property</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="n">required</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Properties are incompatible for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">prop</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">Object</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prop</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">Object</span><span class="p">):</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">_merge</span><span class="p">(</span><span class="n">prop</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">Property</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">obj</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="n">required</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">Array</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prop</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">Array</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">prop</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">dtype</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">Property</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="n">required</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">Object</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prop</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">Object</span><span class="p">):</span>
+                <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">_merge</span><span class="p">(</span><span class="n">prop</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">Property</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">Array</span><span class="p">(</span><span class="n">obj</span><span class="p">),</span> <span class="n">required</span><span class="o">=</span><span class="n">required</span><span class="p">)</span>
+
+        <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="s2">&quot;Properties are incompatible&quot;</span><span class="p">)</span>
+
+
+<span class="nd">@experimental</span>
+<span class="k">class</span> <span class="nc">Object</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Specification used to represent a json-convertible object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">properties</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Property</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_properties</span><span class="p">(</span><span class="n">properties</span><span class="p">)</span>
+        <span class="c1"># Sort by name to make sure the order is stable</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_properties</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">properties</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_check_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">properties</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">properties</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Expected properties to be a list, got type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">properties</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">properties</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
+                <span class="s2">&quot;Creating Object with empty properties is not allowed.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">Property</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">properties</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
+                <span class="s2">&quot;Expected values to be instance of Property&quot;</span>
+            <span class="p">)</span>
+        <span class="c1"># check duplicated property names</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">prop</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">prop</span> <span class="ow">in</span> <span class="n">properties</span><span class="p">]</span>
+        <span class="n">duplicates</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span> <span class="k">if</span> <span class="n">names</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">}</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">duplicates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Found duplicated property names: </span><span class="si">{</span><span class="n">duplicates</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">properties</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Property</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The list of object properties&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_properties</span>
+
+    <span class="nd">@properties</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">properties</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Property</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_properties</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_properties</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Object</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">properties</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">joined</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">repr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">))</span>
+        <span class="k">return</span> <span class="s2">&quot;{&quot;</span> <span class="o">+</span> <span class="n">joined</span> <span class="o">+</span> <span class="s2">&quot;}&quot;</span>
+
+    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">properties</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">name</span><span class="p">:</span> <span class="n">value</span> <span class="k">for</span> <span class="n">prop</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">prop</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">OBJECT_TYPE</span><span class="p">,</span>
+            <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="n">properties</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_json_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Deserialize from a json loaded dictionary.</span>
+<span class="sd">        The dictionary is expected to contain `type` and</span>
+<span class="sd">        `properties` keys.</span>
+<span class="sd">        Example: {&quot;type&quot;: &quot;object&quot;, &quot;properties&quot;: {&quot;property_name&quot;: {&quot;type&quot;: &quot;string&quot;}}}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">{</span><span class="s2">&quot;properties&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">}</span> <span class="o">&lt;=</span> <span class="nb">set</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                <span class="s2">&quot;Missing keys in Object JSON. Expected to find keys `properties` and `type`&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">OBJECT_TYPE</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="s2">&quot;Type mismatch, Object expects `object` as the type&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">],</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">any</span><span class="p">(</span>
+            <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prop</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">for</span> <span class="n">prop</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="s2">&quot;Expected properties to be a dictionary of Property JSON&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">Property</span><span class="o">.</span><span class="n">from_json_dict</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">prop</span><span class="p">})</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">prop</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_merge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="s2">&quot;Object&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Object&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if the current object is compatible with another object and return</span>
+<span class="sd">        the updated object.</span>
+<span class="sd">        When we infer the signature from a list of objects, it is possible</span>
+<span class="sd">        that one object has more properties than the other. In this case,</span>
+<span class="sd">        we should mark those optional properties as required=False.</span>
+<span class="sd">        For properties with the same name, we should check the compatibility</span>
+<span class="sd">        of two properties and update.</span>
+<span class="sd">        An example of two compatible objects:</span>
+
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                obj1 = Object(</span>
+<span class="sd">                    properties=[</span>
+<span class="sd">                        Property(name=&quot;a&quot;, dtype=DataType.string),</span>
+<span class="sd">                        Property(name=&quot;b&quot;, dtype=DataType.double),</span>
+<span class="sd">                    ]</span>
+<span class="sd">                )</span>
+<span class="sd">                obj2 = Object(</span>
+<span class="sd">                    properties=[</span>
+<span class="sd">                        Property(name=&quot;a&quot;, dtype=DataType.string),</span>
+<span class="sd">                        Property(name=&quot;c&quot;, dtype=DataType.boolean),</span>
+<span class="sd">                    ]</span>
+<span class="sd">                )</span>
+<span class="sd">                updated_obj = obj1._merge(obj2)</span>
+<span class="sd">                assert updated_obj == Object(</span>
+<span class="sd">                    properties=[</span>
+<span class="sd">                        Property(name=&quot;a&quot;, dtype=DataType.string),</span>
+<span class="sd">                        Property(name=&quot;b&quot;, dtype=DataType.double, required=False),</span>
+<span class="sd">                        Property(name=&quot;c&quot;, dtype=DataType.boolean, required=False),</span>
+<span class="sd">                    ]</span>
+<span class="sd">                )</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">Object</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Can&#39;t merge object with non-object type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span> <span class="o">==</span> <span class="n">obj</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">prop_dict1</span> <span class="o">=</span> <span class="p">{</span><span class="n">prop</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">prop</span> <span class="k">for</span> <span class="n">prop</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">}</span>
+        <span class="n">prop_dict2</span> <span class="o">=</span> <span class="p">{</span><span class="n">prop</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">prop</span> <span class="k">for</span> <span class="n">prop</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">properties</span><span class="p">}</span>
+        <span class="n">updated_properties</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># For each property in the first element, if it doesn&#39;t appear</span>
+        <span class="c1"># later, we update required=False</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">prop_dict1</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">-</span> <span class="n">prop_dict2</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">updated_properties</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Property</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">prop_dict1</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+        <span class="c1"># For common keys, property type should be the same</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">prop_dict1</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">prop_dict2</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">updated_properties</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prop_dict1</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">_merge</span><span class="p">(</span><span class="n">prop_dict2</span><span class="p">[</span><span class="n">k</span><span class="p">]))</span>
+        <span class="c1"># For each property appears in the second elements, if it doesn&#39;t</span>
+        <span class="c1"># exist, we update and set required=False</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">prop_dict2</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">-</span> <span class="n">prop_dict1</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">updated_properties</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Property</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">prop_dict2</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">Object</span><span class="p">(</span><span class="n">properties</span><span class="o">=</span><span class="n">updated_properties</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">Array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Specification used to represent a json-convertible array.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">dtype</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;Array&quot;</span><span class="p">,</span> <span class="n">DataType</span><span class="p">,</span> <span class="n">Object</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">[</span><span class="n">dtype</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">dtype</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Unsupported type &#39;</span><span class="si">{</span><span class="n">dtype</span><span class="si">}</span><span class="s2">&#39;, expected instance of DataType, Array, Object or &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;one of </span><span class="si">{</span><span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">name</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">DataType</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="p">(</span><span class="n">Array</span><span class="p">,</span> <span class="n">DataType</span><span class="p">,</span> <span class="n">Object</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                <span class="s2">&quot;Expected mlflow.types.schema.Array, mlflow.types.schema.Datatype, &quot;</span>
+                <span class="s2">&quot;mlflow.types.schema.Object or str for the &#39;dtype&#39; argument, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;but got &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+            <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">dtype</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;Array&quot;</span><span class="p">,</span> <span class="n">DataType</span><span class="p">,</span> <span class="n">Object</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The array data type.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Array</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">dtype</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">name</span><span class="p">}</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">DataType</span><span class="p">)</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">ARRAY_TYPE</span><span class="p">,</span> <span class="s2">&quot;items&quot;</span><span class="p">:</span> <span class="n">items</span><span class="p">}</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_json_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Deserialize from a json loaded dictionary.</span>
+<span class="sd">        The dictionary is expected to contain `type` and</span>
+<span class="sd">        `items` keys.</span>
+<span class="sd">        Example: {&quot;type&quot;: &quot;array&quot;, &quot;items&quot;: &quot;string&quot;}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">{</span><span class="s2">&quot;items&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">}</span> <span class="o">&lt;=</span> <span class="nb">set</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                <span class="s2">&quot;Missing keys in Array JSON. Expected to find keys `items` and `type`&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">ARRAY_TYPE</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="s2">&quot;Type mismatch, Array expects `array` as the type&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;items&quot;</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="s2">&quot;Expected items to be a dictionary of Object JSON&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">}</span> <span class="o">&lt;=</span> <span class="nb">set</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;items&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="s2">&quot;Missing keys in Array&#39;s items JSON. Expected to find key `type`&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;items&quot;</span><span class="p">][</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">OBJECT_TYPE</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">Object</span><span class="o">.</span><span class="n">from_json_dict</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;items&quot;</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;items&quot;</span><span class="p">][</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">ARRAY_TYPE</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">Array</span><span class="o">.</span><span class="n">from_json_dict</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;items&quot;</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;items&quot;</span><span class="p">][</span><span class="s2">&quot;type&quot;</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Array(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="si">!r}</span><span class="s2">)&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_merge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arr</span><span class="p">:</span> <span class="s2">&quot;Array&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Array&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">Array</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Can&#39;t merge array with non-array type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span> <span class="o">==</span> <span class="n">arr</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">DataType</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">Array</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Array types are incompatible for </span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2"> with dtype=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2"> and &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">arr</span><span class="si">}</span><span class="s2"> with dtype=</span><span class="si">{</span><span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="p">(</span><span class="n">Array</span><span class="p">,</span> <span class="n">Object</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="n">Array</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">_merge</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span>
+
+
 <div class="viewcode-block" id="ColSpec"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.ColSpec">[docs]</a><span class="k">class</span> <span class="nc">ColSpec</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Specification of name and type of a single column in a dataset.</span>
@@ -318,12 +711,28 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="nb">type</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">DataType</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>  <span class="c1"># pylint: disable=redefined-builtin</span>
+        <span class="nb">type</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">DataType</span><span class="p">,</span> <span class="n">Array</span><span class="p">,</span> <span class="n">Object</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>  <span class="c1"># pylint: disable=redefined-builtin</span>
         <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">optional</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">optional</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">required</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># TODO: update to required=True after deprecating optional</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_optional</span> <span class="o">=</span> <span class="n">optional</span>
+
+        <span class="k">if</span> <span class="n">optional</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">required</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                    <span class="s2">&quot;Only one of `optional` and `required` can be specified. &quot;</span>
+                    <span class="s2">&quot;`optional` is deprecated, please use `required` instead.&quot;</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="s2">&quot;`optional` is deprecated and will be removed in a future version &quot;</span>
+                    <span class="s2">&quot;of MLflow. Use `required` instead.&quot;</span><span class="p">,</span>
+                    <span class="n">category</span><span class="o">=</span><span class="ne">FutureWarning</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_required</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">optional</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_required</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">required</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">required</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">[</span><span class="nb">type</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="nb">type</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
@@ -331,14 +740,15 @@
                 <span class="sa">f</span><span class="s2">&quot;Unsupported type &#39;</span><span class="si">{</span><span class="nb">type</span><span class="si">}</span><span class="s2">&#39;, expected instance of DataType or &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;one of </span><span class="si">{</span><span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">name</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">DataType</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">DataType</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="p">(</span><span class="n">DataType</span><span class="p">,</span> <span class="n">Array</span><span class="p">,</span> <span class="n">Object</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="s2">&quot;Expected mlflow.models.signature.Datatype or str for the &#39;type&#39; &quot;</span>
+                <span class="s2">&quot;Expected mlflow.types.schema.Datatype, mlflow.types.schema.Array, &quot;</span>
+                <span class="s2">&quot;mlflow.types.schema.Object or str for the &#39;type&#39; &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;argument, but got </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataType</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">DataType</span><span class="p">,</span> <span class="n">Array</span><span class="p">,</span> <span class="n">Object</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The column data type.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span>
 
@@ -350,32 +760,63 @@
     <span class="nd">@experimental</span>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">optional</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Whether this column is optional.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_optional</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Whether this column is optional.</span>
+
+<span class="sd">        .. Warning:: Deprecated. `optional` is deprecated in favor of `required`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_required</span>
+
+    <span class="nd">@experimental</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">required</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Whether this column is required.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_required</span>
 
     <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-        <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">name</span><span class="p">}</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">name</span><span class="p">}</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">DataType</span><span class="p">)</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">d</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optional</span><span class="p">:</span>
-            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;optional&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">optional</span>
+        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;required&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">required</span>
         <span class="k">return</span> <span class="n">d</span>
 
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">ColSpec</span><span class="p">):</span>
             <span class="n">names_eq</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">other</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">name</span>
-            <span class="k">return</span> <span class="n">names_eq</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">type</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">optional</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">optional</span>
+            <span class="k">return</span> <span class="n">names_eq</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">type</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">required</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">required</span>
         <span class="k">return</span> <span class="kc">False</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">required</span> <span class="o">=</span> <span class="s2">&quot;required&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">required</span> <span class="k">else</span> <span class="s2">&quot;optional&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{name}</span><span class="s2">: </span><span class="si">{type}{optional}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">name</span><span class="o">=</span><span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
-                <span class="nb">type</span><span class="o">=</span><span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">),</span>
-                <span class="n">optional</span><span class="o">=</span><span class="s2">&quot; (optional)&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optional</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-            <span class="p">)</span></div>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="si">!r}</span><span class="s2"> (</span><span class="si">{</span><span class="n">required</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2">: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="si">!r}</span><span class="s2"> (</span><span class="si">{</span><span class="n">required</span><span class="si">}</span><span class="s2">)&quot;</span>
+
+<div class="viewcode-block" id="ColSpec.from_json_dict"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.ColSpec.from_json_dict">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_json_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Deserialize from a json loaded dictionary.</span>
+<span class="sd">        The dictionary is expected to contain `type` and</span>
+<span class="sd">        optional `name` and `required` keys.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">}</span> <span class="o">&lt;=</span> <span class="nb">set</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="s2">&quot;Missing keys in ColSpec JSON. Expected to find key `type`&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">ARRAY_TYPE</span><span class="p">,</span> <span class="n">OBJECT_TYPE</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">optional</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;optional&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">required</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;required&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">ARRAY_TYPE</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Array</span><span class="o">.</span><span class="n">from_json_dict</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">),</span> <span class="n">optional</span><span class="o">=</span><span class="n">optional</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="n">required</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">OBJECT_TYPE</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                <span class="nb">type</span><span class="o">=</span><span class="n">Object</span><span class="o">.</span><span class="n">from_json_dict</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
+                <span class="n">optional</span><span class="o">=</span><span class="n">optional</span><span class="p">,</span>
+                <span class="n">required</span><span class="o">=</span><span class="n">required</span><span class="p">,</span>
+            <span class="p">)</span></div></div>
 
 
 <span class="k">class</span> <span class="nc">TensorInfo</span><span class="p">:</span>
@@ -472,9 +913,9 @@
 
     <span class="nd">@experimental</span>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">optional</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Whether this tensor is optional.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">def</span> <span class="nf">required</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Whether this tensor is required.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="kc">True</span>
 
     <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -556,7 +997,7 @@
                 <span class="s2">&quot;Creating Schema with multiple unnamed TensorSpecs is not supported. &quot;</span>
                 <span class="s2">&quot;Please provide names for each TensorSpec.&quot;</span>
             <span class="p">)</span>
-        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">optional</span> <span class="ow">is</span> <span class="kc">True</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">required</span> <span class="ow">is</span> <span class="kc">False</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
                 <span class="s2">&quot;Creating Schema with unnamed optional inputs is not supported. &quot;</span>
                 <span class="s2">&quot;Please name all inputs or make all inputs required.&quot;</span>
@@ -584,38 +1025,52 @@
 
 <div class="viewcode-block" id="Schema.required_input_names"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.Schema.required_input_names">[docs]</a>    <span class="k">def</span> <span class="nf">required_input_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get list of required data names or range of indices if schema has no names.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">name</span> <span class="ow">or</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">optional</span><span class="p">]</span></div>
+        <span class="k">return</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">name</span> <span class="ow">or</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">required</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="Schema.optional_input_names"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.Schema.optional_input_names">[docs]</a>    <span class="nd">@experimental</span>
     <span class="k">def</span> <span class="nf">optional_input_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get list of optional data names or range of indices if schema has no names.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">name</span> <span class="ow">or</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">optional</span><span class="p">]</span></div>
+        <span class="k">return</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">name</span> <span class="ow">or</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">required</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="Schema.has_input_names"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.Schema.has_input_names">[docs]</a>    <span class="k">def</span> <span class="nf">has_input_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return true iff this schema declares names, false otherwise.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="Schema.input_types"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.Schema.input_types">[docs]</a>    <span class="k">def</span> <span class="nf">input_types</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">DataType</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">]]:</span>
+<div class="viewcode-block" id="Schema.input_types"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.Schema.input_types">[docs]</a>    <span class="k">def</span> <span class="nf">input_types</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">DataType</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">Array</span><span class="p">,</span> <span class="n">Object</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get types for each column in the schema.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">type</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="Schema.input_types_dict"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.Schema.input_types_dict">[docs]</a>    <span class="k">def</span> <span class="nf">input_types_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="n">DataType</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">]]:</span>
+<div class="viewcode-block" id="Schema.input_types_dict"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.Schema.input_types_dict">[docs]</a>    <span class="k">def</span> <span class="nf">input_types_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="n">DataType</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">Array</span><span class="p">,</span> <span class="n">Object</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Maps column names to types, iff this schema declares names.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_input_names</span><span class="p">():</span>
             <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="s2">&quot;Cannot get input types as a dict for schema without names.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">{</span><span class="n">x</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">type</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">}</span></div>
 
+<div class="viewcode-block" id="Schema.input_dict"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.Schema.input_dict">[docs]</a>    <span class="k">def</span> <span class="nf">input_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="n">ColSpec</span><span class="p">,</span> <span class="n">TensorSpec</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Maps column names to inputs, iff this schema declares names.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_input_names</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="s2">&quot;Cannot get input dict for schema without names.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">x</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">}</span></div>
+
 <div class="viewcode-block" id="Schema.numpy_types"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.Schema.numpy_types">[docs]</a>    <span class="k">def</span> <span class="nf">numpy_types</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convenience shortcut to get the datatypes as numpy types.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_tensor_spec</span><span class="p">():</span>
             <span class="k">return</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">type</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">]</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">]</span></div>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">DataType</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">]</span>
+        <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+            <span class="s2">&quot;Failed to get numpy types as some of the inputs types are not DataType.&quot;</span>
+        <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Schema.pandas_types"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.Schema.pandas_types">[docs]</a>    <span class="k">def</span> <span class="nf">pandas_types</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convenience shortcut to get the datatypes as pandas types. Unsupported by TensorSpec.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_tensor_spec</span><span class="p">():</span>
             <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="s2">&quot;TensorSpec only supports numpy types, use numpy_types() instead&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">]</span></div>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">DataType</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">]</span>
+        <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+            <span class="s2">&quot;Failed to get pandas types as some of the inputs types are not DataType.&quot;</span>
+        <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Schema.as_spark_schema"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.Schema.as_spark_schema">[docs]</a>    <span class="k">def</span> <span class="nf">as_spark_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert to Spark schema. If this schema is a single unnamed column, it is converted</span>
@@ -631,7 +1086,9 @@
 
         <span class="k">return</span> <span class="n">StructType</span><span class="p">(</span>
             <span class="p">[</span>
-                <span class="n">StructField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">col</span><span class="o">.</span><span class="n">name</span> <span class="ow">or</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">dataType</span><span class="o">=</span><span class="n">col</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">to_spark</span><span class="p">())</span>
+                <span class="n">StructField</span><span class="p">(</span>
+                    <span class="n">name</span><span class="o">=</span><span class="n">col</span><span class="o">.</span><span class="n">name</span> <span class="ow">or</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">dataType</span><span class="o">=</span><span class="n">col</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">to_spark</span><span class="p">(),</span> <span class="n">nullable</span><span class="o">=</span><span class="ow">not</span> <span class="n">col</span><span class="o">.</span><span class="n">required</span>
+                <span class="p">)</span>
                 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">)</span>
             <span class="p">]</span>
         <span class="p">)</span></div>
@@ -649,7 +1106,11 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Deserialize from a json string.&quot;&quot;&quot;</span>
 
         <span class="k">def</span> <span class="nf">read_input</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">TensorSpec</span><span class="o">.</span><span class="n">from_json_dict</span><span class="p">(</span><span class="o">**</span><span class="n">x</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;tensor&quot;</span> <span class="k">else</span> <span class="n">ColSpec</span><span class="p">(</span><span class="o">**</span><span class="n">x</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="n">TensorSpec</span><span class="o">.</span><span class="n">from_json_dict</span><span class="p">(</span><span class="o">**</span><span class="n">x</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;tensor&quot;</span>
+                <span class="k">else</span> <span class="n">ColSpec</span><span class="o">.</span><span class="n">from_json_dict</span><span class="p">(</span><span class="o">**</span><span class="n">x</span><span class="p">)</span>
+            <span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">cls</span><span class="p">([</span><span class="n">read_input</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">json_str</span><span class="p">)])</span></div>
 

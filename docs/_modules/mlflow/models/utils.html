@@ -189,7 +189,8 @@
               <div itemprop="articleBody">
                 
   <h1>Source code for mlflow.models.utils</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">decimal</span>
+<span></span><span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">dt</span>
+<span class="kn">import</span> <span class="nn">decimal</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
@@ -203,7 +204,12 @@
 <span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">Model</span>
 <span class="kn">from</span> <span class="nn">mlflow.store.artifact.utils.models</span> <span class="kn">import</span> <span class="n">get_model_name_and_version</span>
 <span class="kn">from</span> <span class="nn">mlflow.types</span> <span class="kn">import</span> <span class="n">DataType</span><span class="p">,</span> <span class="n">ParamSchema</span><span class="p">,</span> <span class="n">ParamSpec</span><span class="p">,</span> <span class="n">Schema</span><span class="p">,</span> <span class="n">TensorSpec</span>
-<span class="kn">from</span> <span class="nn">mlflow.types.utils</span> <span class="kn">import</span> <span class="n">TensorsNotSupportedException</span><span class="p">,</span> <span class="n">_infer_param_schema</span><span class="p">,</span> <span class="n">clean_tensor_type</span>
+<span class="kn">from</span> <span class="nn">mlflow.types.schema</span> <span class="kn">import</span> <span class="n">Array</span><span class="p">,</span> <span class="n">Object</span><span class="p">,</span> <span class="n">Property</span>
+<span class="kn">from</span> <span class="nn">mlflow.types.utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">TensorsNotSupportedException</span><span class="p">,</span>
+    <span class="n">_infer_param_schema</span><span class="p">,</span>
+    <span class="n">clean_tensor_type</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.annotations</span> <span class="kn">import</span> <span class="n">experimental</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.proto_json_utils</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">NumpyEncoder</span><span class="p">,</span>
@@ -228,7 +234,19 @@
 <span class="p">]</span>
 
 <span class="n">PyFuncInput</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span>
-    <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="s2">&quot;csc_matrix&quot;</span><span class="p">,</span> <span class="s2">&quot;csr_matrix&quot;</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="nb">str</span>
+    <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="s2">&quot;csc_matrix&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;csr_matrix&quot;</span><span class="p">,</span>
+    <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
+    <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="p">,</span>
+    <span class="nb">bool</span><span class="p">,</span>
+    <span class="nb">bytes</span><span class="p">,</span>
+    <span class="nb">float</span><span class="p">,</span>
+    <span class="nb">int</span><span class="p">,</span>
+    <span class="nb">str</span><span class="p">,</span>
 <span class="p">]</span>
 <span class="n">PyFuncOutput</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
 
@@ -247,7 +265,7 @@
 <span class="sd">    example contains jsonable elements (see storage format section below).</span>
 
 <span class="sd">    NOTE: If the example is 1 dimensional (e.g. dictionary of str -&gt; scalar, or a list of scalars),</span>
-<span class="sd">    the assumption is that it is a single row of data (rather than a single column).</span>
+<span class="sd">    the assumption is that it is a single column of data.</span>
 
 <span class="sd">    Metadata:</span>
 
@@ -327,28 +345,26 @@
 
         <span class="k">def</span> <span class="nf">_coerce_to_pandas_df</span><span class="p">(</span><span class="n">input_ex</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_ex</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-                <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">_is_scalar</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">input_ex</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
-                    <span class="n">input_ex</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">input_ex</span><span class="p">])</span>
-                <span class="k">elif</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">input_ex</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
-                    <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">input_ex</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">_is_scalar</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">value</span><span class="p">):</span>
-                            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                                <span class="s2">&quot;List values within dictionaries must be of scalar type.&quot;</span>
-                            <span class="p">)</span>
-                    <span class="n">input_ex</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">input_ex</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                        <span class="s2">&quot;Data in the dictionary must be scalar or of type numpy.ndarray&quot;</span>
+                <span class="c1"># We need to be compatible with infer_schema&#39;s behavior, where</span>
+                <span class="c1"># it infers each value&#39;s type directly.</span>
+                <span class="k">if</span> <span class="nb">all</span><span class="p">(</span>
+                    <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="n">_is_scalar</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">x</span><span class="p">))</span>
+                    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">input_ex</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+                <span class="p">):</span>
+                    <span class="c1"># e.g.</span>
+                    <span class="c1"># data = {&quot;a&quot;: &quot;a&quot;, &quot;b&quot;: [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]}</span>
+                    <span class="c1"># &gt;&gt;&gt; pd.DataFrame([data])</span>
+                    <span class="c1">#    a          b</span>
+                    <span class="c1"># 0  a  [a, b, c]</span>
+                    <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                        <span class="s2">&quot;We convert input dictionaries to pandas DataFrames such that &quot;</span>
+                        <span class="s2">&quot;each key represents a column, collectively constituting a &quot;</span>
+                        <span class="s2">&quot;single row of data. If you would like to save data as &quot;</span>
+                        <span class="s2">&quot;multiple rows, please convert your data to a pandas &quot;</span>
+                        <span class="s2">&quot;DataFrame before passing to input_example.&quot;</span>
                     <span class="p">)</span>
-            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_ex</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">input_ex</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                        <span class="k">raise</span> <span class="n">TensorsNotSupportedException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Row &#39;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&#39; has shape </span><span class="si">{</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">_is_scalar</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">input_ex</span><span class="p">):</span>
-                    <span class="n">input_ex</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">input_ex</span><span class="p">],</span> <span class="n">columns</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">input_ex</span><span class="p">)))</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">input_ex</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">input_ex</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_ex</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)):</span>
+                <span class="n">input_ex</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">input_ex</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">input_ex</span><span class="p">):</span>
                 <span class="n">input_ex</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">input_ex</span><span class="p">])</span>
             <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_ex</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
                 <span class="k">try</span><span class="p">:</span>
@@ -408,6 +424,35 @@
                     <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">example_type</span><span class="p">,</span>
                 <span class="p">}</span>
             <span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_example</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">input_example</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">TensorsNotSupportedException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Row &#39;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&#39; has shape </span><span class="si">{</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">_is_scalar</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">input_example</span><span class="p">):</span>
+                <span class="c1"># We should not convert data for langchain flavors</span>
+                <span class="c1"># List[scalar] is a typical langchain model input type</span>
+                <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="s2">&quot;Lists of scalar values are not converted to a pandas DataFrame. &quot;</span>
+                    <span class="s2">&quot;If you expect to use pandas DataFrames for inference, please &quot;</span>
+                    <span class="s2">&quot;construct a DataFrame and pass it to input_example instead.&quot;</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_inference_data</span> <span class="o">=</span> <span class="n">input_example</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;inputs&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inference_data</span><span class="p">}</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                    <span class="p">{</span>
+                        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;ndarray&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;tf-serving&quot;</span><span class="p">,</span>
+                    <span class="p">}</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_inference_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">input_example</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">_handle_dataframe_input</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_inference_data</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                    <span class="p">{</span>
+                        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;dataframe&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;pandas_orient&quot;</span><span class="p">:</span> <span class="s2">&quot;split&quot;</span><span class="p">,</span>
+                    <span class="p">}</span>
+                <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_inference_data</span> <span class="o">=</span> <span class="n">_coerce_to_pandas_df</span><span class="p">(</span><span class="n">input_example</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inference_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -420,8 +465,7 @@
                     <span class="s2">&quot;- scipy.sparse.csc_matrix</span><span class="se">\n</span><span class="s2">&quot;</span>
                     <span class="s2">&quot;- dict</span><span class="se">\n</span><span class="s2">&quot;</span>
                     <span class="s2">&quot;- list</span><span class="se">\n</span><span class="s2">&quot;</span>
-                    <span class="s2">&quot;- str</span><span class="se">\n</span><span class="s2">&quot;</span>
-                    <span class="s2">&quot;- bytes</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="s2">&quot;- scalars</span><span class="se">\n</span><span class="s2">&quot;</span>
                     <span class="sa">f</span><span class="s2">&quot;but got &#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">input_example</span><span class="p">)</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">_handle_dataframe_input</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_inference_data</span><span class="p">)</span>
@@ -754,31 +798,49 @@
     <span class="n">input_types</span> <span class="o">=</span> <span class="n">input_schema</span><span class="o">.</span><span class="n">input_types</span><span class="p">()</span>
     <span class="n">new_pf_input</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">input_names</span><span class="p">):</span>
-        <span class="n">new_pf_input</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">_enforce_mlflow_datatype</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">pf_input</span><span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="n">input_types</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_types</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">DataType</span><span class="p">):</span>
+            <span class="n">new_pf_input</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">_enforce_mlflow_datatype</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">pf_input</span><span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="n">input_types</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="c1"># If the input_type is objects/arrays, we assume pf_input must be a pandas DataFrame.</span>
+        <span class="c1"># Otherwise, the schema is not valid.</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_types</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">Object</span><span class="p">):</span>
+            <span class="n">new_pf_input</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">_enforce_object</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">input_types</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">pf_input</span><span class="p">[</span><span class="n">x</span><span class="p">]],</span> <span class="n">name</span><span class="o">=</span><span class="n">x</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_types</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">Array</span><span class="p">):</span>
+            <span class="n">new_pf_input</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">_enforce_array</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">input_types</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">arr</span> <span class="ow">in</span> <span class="n">pf_input</span><span class="p">[</span><span class="n">x</span><span class="p">]],</span> <span class="n">name</span><span class="o">=</span><span class="n">x</span>
+            <span class="p">)</span>
     <span class="k">return</span> <span class="n">new_pf_input</span>
 
 
 <span class="k">def</span> <span class="nf">_enforce_named_col_schema</span><span class="p">(</span><span class="n">pf_input</span><span class="p">:</span> <span class="n">PyFuncInput</span><span class="p">,</span> <span class="n">input_schema</span><span class="p">:</span> <span class="n">Schema</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Enforce the input columns conform to the model&#39;s column-based signature.&quot;&quot;&quot;</span>
-    <span class="n">required_input_names</span> <span class="o">=</span> <span class="n">input_schema</span><span class="o">.</span><span class="n">required_input_names</span><span class="p">()</span>
-    <span class="n">input_types</span> <span class="o">=</span> <span class="n">input_schema</span><span class="o">.</span><span class="n">input_types_dict</span><span class="p">()</span>
-
+    <span class="n">input_names</span> <span class="o">=</span> <span class="n">input_schema</span><span class="o">.</span><span class="n">input_names</span><span class="p">()</span>
+    <span class="n">input_dict</span> <span class="o">=</span> <span class="n">input_schema</span><span class="o">.</span><span class="n">input_dict</span><span class="p">()</span>
     <span class="n">new_pf_input</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">required_input_names</span><span class="p">:</span>
-        <span class="n">new_pf_input</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">_enforce_mlflow_datatype</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">pf_input</span><span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="n">input_types</span><span class="p">[</span><span class="n">x</span><span class="p">])</span>
-
-    <span class="c1"># Upstream validation means that if we&#39;re here, pf_input can only be a</span>
-    <span class="c1"># pandas dataframe or a dict.</span>
-    <span class="n">optional_input_names</span> <span class="o">=</span> <span class="n">input_schema</span><span class="o">.</span><span class="n">optional_input_names</span><span class="p">()</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pf_input</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
-        <span class="n">supplied_optional_inputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">pf_input</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">optional_input_names</span><span class="p">]</span>
-    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pf_input</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-        <span class="n">supplied_optional_inputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">pf_input</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">optional_input_names</span><span class="p">]</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">supplied_optional_inputs</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="c1"># Iterate over supplied optional inputs rather than all optional inputs.</span>
-    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">supplied_optional_inputs</span><span class="p">:</span>
-        <span class="n">new_pf_input</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">_enforce_mlflow_datatype</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">pf_input</span><span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="n">input_types</span><span class="p">[</span><span class="n">x</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">input_names</span><span class="p">:</span>
+        <span class="n">input_type</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">type</span>
+        <span class="n">required</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">required</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">pf_input</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">required</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;The input column &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; is required by the model &quot;</span>
+                    <span class="s2">&quot;signature but missing from the input data.&quot;</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">continue</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_type</span><span class="p">,</span> <span class="n">DataType</span><span class="p">):</span>
+            <span class="n">new_pf_input</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">_enforce_mlflow_datatype</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">pf_input</span><span class="p">[</span><span class="n">name</span><span class="p">],</span> <span class="n">input_type</span><span class="p">)</span>
+        <span class="c1"># If the input_type is objects/arrays, we assume pf_input must be a pandas DataFrame.</span>
+        <span class="c1"># Otherwise, the schema is not valid.</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_type</span><span class="p">,</span> <span class="n">Object</span><span class="p">):</span>
+            <span class="n">new_pf_input</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">_enforce_object</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">input_type</span><span class="p">,</span> <span class="n">required</span><span class="p">)</span> <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">pf_input</span><span class="p">[</span><span class="n">name</span><span class="p">]],</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_type</span><span class="p">,</span> <span class="n">Array</span><span class="p">):</span>
+            <span class="n">new_pf_input</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">_enforce_array</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">input_type</span><span class="p">,</span> <span class="n">required</span><span class="p">)</span> <span class="k">for</span> <span class="n">arr</span> <span class="ow">in</span> <span class="n">pf_input</span><span class="p">[</span><span class="n">name</span><span class="p">]],</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span>
+            <span class="p">)</span>
     <span class="k">return</span> <span class="n">new_pf_input</span>
 
 
@@ -942,65 +1004,72 @@
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pf_input</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
         <span class="n">pf_input</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">pf_input</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">input_schema</span><span class="o">.</span><span class="n">is_tensor_spec</span><span class="p">():</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pf_input</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)):</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pf_input</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">))</span> <span class="ow">or</span> <span class="p">(</span>
-                    <span class="nb">isinstance</span><span class="p">(</span><span class="n">pf_input</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">_is_scalar</span><span class="p">,</span> <span class="n">pf_input</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
-                <span class="p">):</span>
-                    <span class="n">pf_input</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">pf_input</span><span class="p">])</span>
-                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pf_input</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span>
-                    <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">value</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">str_</span>
-                    <span class="c1"># size &amp; shape constraint makes some data batch inference result not</span>
-                    <span class="c1"># consistent with serving result.</span>
-                    <span class="ow">and</span> <span class="n">value</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">value</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">()</span>
-                    <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">pf_input</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
-                <span class="p">):</span>
+        <span class="c1"># convert single DataType to pandas DataFrame</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">pf_input</span><span class="p">):</span>
+            <span class="n">pf_input</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">pf_input</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pf_input</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="c1"># keys are column names</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span>
+                <span class="nb">isinstance</span><span class="p">(</span><span class="n">col_spec</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="p">(</span><span class="n">Array</span><span class="p">,</span> <span class="n">Object</span><span class="p">))</span> <span class="k">for</span> <span class="n">col_spec</span> <span class="ow">in</span> <span class="n">input_schema</span><span class="o">.</span><span class="n">inputs</span>
+            <span class="p">)</span> <span class="ow">or</span> <span class="nb">all</span><span class="p">(</span>
+                <span class="n">_is_scalar</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">value</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">pf_input</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+            <span class="p">):</span>
+                <span class="n">pf_input</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">pf_input</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
                     <span class="c1"># This check is specifically to handle the serving structural cast for</span>
                     <span class="c1"># certain inputs for the transformers implementation. Due to the fact that</span>
                     <span class="c1"># specific Pipeline types in transformers support passing input data</span>
                     <span class="c1"># of the form Dict[str, str] in which the value is a scalar string, model</span>
                     <span class="c1"># serving will cast this entry as a numpy array with shape () and size 1.</span>
-                    <span class="c1"># This is seen as a scalar input when attempting to create a Pandas DataFrame</span>
-                    <span class="c1"># from such a numpy structure and requires the array to be encapsulated in a</span>
-                    <span class="c1"># list in order to prevent a ValueError exception for requiring an index</span>
-                    <span class="c1"># if passing in all scalar values thrown by Pandas.</span>
-                    <span class="n">pf_input</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">pf_input</span><span class="p">])</span>
-                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pf_input</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span>
-                    <span class="n">_is_scalar</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-                    <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">value</span><span class="p">))</span>
-                    <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">pf_input</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
-                <span class="p">):</span>
-                    <span class="n">pf_input</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">pf_input</span><span class="p">])</span>
-                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pf_input</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span>
-                    <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">value</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">pf_input</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
-                <span class="p">):</span>
-                    <span class="c1"># Pandas DataFrames can&#39;t be constructed with embedded multi-dimensional</span>
-                    <span class="c1"># numpy arrays. Accordingly, we convert any multi-dimensional numpy</span>
-                    <span class="c1"># arrays to lists before constructing a DataFrame. This is safe because ColSpec</span>
-                    <span class="c1"># model signatures do not support array columns, so subsequent validation logic</span>
-                    <span class="c1"># will result in a clear &quot;incompatible input types&quot; exception. This is</span>
-                    <span class="c1"># preferable to a pandas DataFrame construction error</span>
-                    <span class="n">pf_input</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-                        <span class="p">{</span>
-                            <span class="n">key</span><span class="p">:</span> <span class="p">(</span>
-                                <span class="n">value</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-                                <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">value</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>
-                                <span class="k">else</span> <span class="n">value</span>
-                            <span class="p">)</span>
-                            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">pf_input</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-                        <span class="p">}</span>
+                    <span class="c1"># This is seen as a scalar input when attempting to create a Pandas</span>
+                    <span class="c1"># DataFrame from such a numpy structure and requires the array to be</span>
+                    <span class="c1"># encapsulated in a list in order to prevent a ValueError exception for</span>
+                    <span class="c1"># requiring an index if passing in all scalar values thrown by Pandas.</span>
+                    <span class="k">if</span> <span class="nb">all</span><span class="p">(</span>
+                        <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
+                        <span class="ow">and</span> <span class="n">value</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">str_</span>
+                        <span class="ow">and</span> <span class="n">value</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">1</span>
+                        <span class="ow">and</span> <span class="n">value</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">()</span>
+                        <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">pf_input</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+                    <span class="p">):</span>
+                        <span class="n">pf_input</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">pf_input</span><span class="p">])</span>
+                    <span class="k">elif</span> <span class="nb">any</span><span class="p">(</span>
+                        <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">value</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">1</span>
+                        <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">pf_input</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+                    <span class="p">):</span>
+                        <span class="c1"># Pandas DataFrames can&#39;t be constructed with embedded multi-dimensional</span>
+                        <span class="c1"># numpy arrays. Accordingly, we convert any multi-dimensional numpy</span>
+                        <span class="c1"># arrays to lists before constructing a DataFrame. This is safe because</span>
+                        <span class="c1"># ColSpec model signatures do not support array columns, so subsequent</span>
+                        <span class="c1"># validation logic will result in a clear &quot;incompatible input types&quot;</span>
+                        <span class="c1"># exception. This is preferable to a pandas DataFrame construction error</span>
+                        <span class="n">pf_input</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                            <span class="p">{</span>
+                                <span class="n">key</span><span class="p">:</span> <span class="p">(</span>
+                                    <span class="n">value</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                                    <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">value</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>
+                                    <span class="k">else</span> <span class="n">value</span>
+                                <span class="p">)</span>
+                                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">pf_input</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                            <span class="p">}</span>
+                        <span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">pf_input</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">pf_input</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                        <span class="s2">&quot;This model contains a column-based signature, which suggests a DataFrame&quot;</span>
+                        <span class="s2">&quot; input. There was an error casting the input data to a DataFrame:&quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
                     <span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">pf_input</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">pf_input</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
-                    <span class="s2">&quot;This model contains a column-based signature, which suggests a DataFrame&quot;</span>
-                    <span class="s2">&quot; input. There was an error casting the input data to a DataFrame:&quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pf_input</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)):</span>
+            <span class="n">pf_input</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">pf_input</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pf_input</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Expected input to be DataFrame or list. Found: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">pf_input</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Expected input to be DataFrame. Found: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">pf_input</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">input_schema</span><span class="o">.</span><span class="n">has_input_names</span><span class="p">():</span>
@@ -1045,6 +1114,94 @@
         <span class="k">return</span> <span class="n">_enforce_named_col_schema</span><span class="p">(</span><span class="n">pf_input</span><span class="p">,</span> <span class="n">input_schema</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">_enforce_unnamed_col_schema</span><span class="p">(</span><span class="n">pf_input</span><span class="p">,</span> <span class="n">input_schema</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_enforce_datatype</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DataType</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">DataType</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected dtype to be DataType, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected data to be scalar, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="c1"># Reuse logic in _enforce_mlflow_datatype for type conversion</span>
+    <span class="n">pd_series</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">pd_series</span> <span class="o">=</span> <span class="n">_enforce_mlflow_datatype</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">pd_series</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">MlflowException</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Failed to enforce schema of data `</span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">` with dtype `</span><span class="si">{</span><span class="n">dtype</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">`&quot;</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">pd_series</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">_enforce_array</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">arr</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">required</span> <span class="ow">and</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected data to be list or numpy array, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">DataType</span><span class="p">):</span>
+        <span class="n">data_enforced</span> <span class="o">=</span> <span class="p">[</span><span class="n">_enforce_datatype</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">Object</span><span class="p">):</span>
+        <span class="n">data_enforced</span> <span class="o">=</span> <span class="p">[</span><span class="n">_enforce_object</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">Array</span><span class="p">):</span>
+        <span class="n">data_enforced</span> <span class="o">=</span> <span class="p">[</span><span class="n">_enforce_array</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Failed to enforce schema of data `</span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">` with dtype `</span><span class="si">{</span><span class="n">arr</span><span class="si">}</span><span class="s2">`. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Invalid schema, `</span><span class="si">{</span><span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">` is not supported type for Array element.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Keep input data type</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="n">data_enforced</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data_enforced</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">data_enforced</span>
+
+
+<span class="k">def</span> <span class="nf">_enforce_property</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="nb">property</span><span class="p">:</span> <span class="n">Property</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">property</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">DataType</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_enforce_datatype</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">property</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">property</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">Array</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_enforce_array</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">property</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">property</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">Object</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_enforce_object</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">property</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Failed to enforce schema of data `</span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">` with dtype `</span><span class="si">{</span><span class="nb">property</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">`&quot;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_enforce_object</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Object</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">required</span> <span class="ow">and</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Failed to enforce schema of &#39;</span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">&#39; with type &#39;</span><span class="si">{</span><span class="n">obj</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Expected data to be dictionary, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">Object</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Failed to enforce schema of &#39;</span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">&#39; with type &#39;</span><span class="si">{</span><span class="n">obj</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Expected obj to be Object, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="n">properties</span> <span class="o">=</span> <span class="p">{</span><span class="n">prop</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">prop</span> <span class="k">for</span> <span class="n">prop</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">properties</span><span class="p">}</span>
+    <span class="n">required_props</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">prop</span> <span class="ow">in</span> <span class="n">properties</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">prop</span><span class="o">.</span><span class="n">required</span><span class="p">}</span>
+    <span class="n">missing_props</span> <span class="o">=</span> <span class="n">required_props</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="k">if</span> <span class="n">missing_props</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Missing required properties: </span><span class="si">{</span><span class="n">missing_props</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">invalid_props</span> <span class="o">:=</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">-</span> <span class="n">properties</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+            <span class="s2">&quot;Invalid properties not defined in the schema found: &quot;</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">invalid_props</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">_enforce_property</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">properties</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+        <span class="k">except</span> <span class="n">MlflowException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Failed to enforce schema for key `</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">`. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Expected type </span><span class="si">{</span><span class="n">properties</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()[</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;received type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+    <span class="k">return</span> <span class="n">data</span>
 
 
 <div class="viewcode-block" id="validate_schema"><a class="viewcode-back" href="../../../python_api/mlflow.models.html#mlflow.models.validate_schema">[docs]</a><span class="k">def</span> <span class="nf">validate_schema</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">PyFuncInput</span><span class="p">,</span> <span class="n">expected_schema</span><span class="p">:</span> <span class="n">Schema</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>

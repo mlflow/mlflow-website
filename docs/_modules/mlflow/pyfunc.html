@@ -655,7 +655,15 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">input_schema</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get_input_schema</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">input_schema</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">_enforce_schema</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">input_schema</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">_enforce_schema</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">input_schema</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="c1"># Include error in message for backwards compatibility</span>
+                <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Failed to enforce schema of data &#39;</span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">&#39; &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;with schema &#39;</span><span class="si">{</span><span class="n">input_schema</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
 
         <span class="n">params</span> <span class="o">=</span> <span class="n">_validate_params</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">)</span>
 
@@ -1179,9 +1187,24 @@
 
 <span class="k">def</span> <span class="nf">_parse_spark_datatype</span><span class="p">(</span><span class="n">datatype</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
     <span class="kn">from</span> <span class="nn">pyspark.sql.functions</span> <span class="kn">import</span> <span class="n">udf</span>
+    <span class="kn">from</span> <span class="nn">pyspark.sql.session</span> <span class="kn">import</span> <span class="n">SparkSession</span>
 
     <span class="n">return_type</span> <span class="o">=</span> <span class="s2">&quot;boolean&quot;</span> <span class="k">if</span> <span class="n">datatype</span> <span class="o">==</span> <span class="s2">&quot;bool&quot;</span> <span class="k">else</span> <span class="n">datatype</span>
-    <span class="k">return</span> <span class="n">udf</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="n">returnType</span><span class="o">=</span><span class="n">return_type</span><span class="p">)</span><span class="o">.</span><span class="n">returnType</span>
+    <span class="n">parsed_datatype</span> <span class="o">=</span> <span class="n">udf</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="n">returnType</span><span class="o">=</span><span class="n">return_type</span><span class="p">)</span><span class="o">.</span><span class="n">returnType</span>
+
+    <span class="k">if</span> <span class="n">parsed_datatype</span><span class="o">.</span><span class="n">typeName</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;unparseddata&quot;</span><span class="p">:</span>
+        <span class="c1"># For spark 3.5.x, `udf(lambda x: x, returnType=return_type).returnType`</span>
+        <span class="c1"># returns UnparsedDataType, which is not compatible with signature inference.</span>
+        <span class="c1"># Note: SparkSession.active only exists for spark &gt;= 3.5.0</span>
+        <span class="n">schema</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">SparkSession</span><span class="o">.</span><span class="n">active</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">udf</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="n">returnType</span><span class="o">=</span><span class="n">return_type</span><span class="p">)(</span><span class="s2">&quot;id&quot;</span><span class="p">))</span>
+            <span class="o">.</span><span class="n">schema</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">schema</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">dataType</span>
+
+    <span class="k">return</span> <span class="n">parsed_datatype</span>
 
 
 <span class="k">def</span> <span class="nf">_is_none_or_nan</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
@@ -1556,18 +1579,10 @@
 
     <span class="k">def</span> <span class="nf">_predict_row_batch</span><span class="p">(</span><span class="n">predict_fn</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
         <span class="n">input_schema</span> <span class="o">=</span> <span class="n">model_metadata</span><span class="o">.</span><span class="n">get_input_schema</span><span class="p">()</span>
-        <span class="n">pdf</span> <span class="o">=</span> <span class="kc">None</span>
-
-        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
-                        <span class="s2">&quot;If passing a StructType column, there should be only one &quot;</span>
-                        <span class="sa">f</span><span class="s2">&quot;input column, but got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
-                    <span class="p">)</span>
-                <span class="n">pdf</span> <span class="o">=</span> <span class="n">x</span>
-        <span class="k">if</span> <span class="n">pdf</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">args</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+            <span class="n">pdf</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">input_schema</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">))]</span>
             <span class="k">else</span><span class="p">:</span>
@@ -1582,7 +1597,16 @@
                         <span class="s2">&quot; (Since the columns were passed unnamed they are expected to be in&quot;</span>
                         <span class="s2">&quot; the order specified by the schema).&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">),</span> <span class="n">names</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
                     <span class="p">)</span>
-            <span class="n">pdf</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="n">names</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span> <span class="n">x</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">args</span><span class="p">)},</span> <span class="n">columns</span><span class="o">=</span><span class="n">names</span><span class="p">)</span>
+            <span class="n">pdf</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                <span class="n">data</span><span class="o">=</span><span class="p">{</span>
+                    <span class="n">names</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span> <span class="n">arg</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span>
+                    <span class="c1"># pandas_udf receives a StructType column as a pandas DataFrame.</span>
+                    <span class="c1"># We need to convert it back to a dict of pandas Series.</span>
+                    <span class="k">else</span> <span class="n">arg</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">arg</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+                <span class="p">},</span>
+                <span class="n">columns</span><span class="o">=</span><span class="n">names</span><span class="p">,</span>
+            <span class="p">)</span>
 
         <span class="n">result</span> <span class="o">=</span> <span class="n">predict_fn</span><span class="p">(</span><span class="n">pdf</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
 
@@ -1605,7 +1629,7 @@
             <span class="k">return</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">result_values</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
-            <span class="n">result</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">result</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">result</span><span class="p">])</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="k">else</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result_type</span><span class="p">,</span> <span class="n">SparkStructType</span><span class="p">):</span>
             <span class="n">result_dict</span> <span class="o">=</span> <span class="p">{}</span>
