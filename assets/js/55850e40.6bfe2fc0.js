@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkwebsite=self.webpackChunkwebsite||[]).push([[2116],{2029:e=>{e.exports=JSON.parse('{"label":"gateway","permalink":"/mlflow-site-refresh/blog/tags/gateway","allTagsPath":"/mlflow-site-refresh/blog/tags","count":1,"unlisted":false}')}}]);
