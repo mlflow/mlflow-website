@@ -1,0 +1,1029 @@
+
+  
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Advanced Tutorial: Embeddings Support with OpenAI in MLflow &mdash; MLflow 2.9.3.dev0 documentation</title>
+  
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/llms/openai/notebooks/openai-embeddings-generation.html">
+  
+  
+    <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
+    
+
+    
+
+  
+    
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/grids.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/mobile.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/simple-cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/tabs.css" type="text/css" />
+    
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="MLflow 2.9.3.dev0 documentation" href="../../../index.html"/>
+        <link rel="up" title="MLflow OpenAI Flavor" href="../index.html"/>
+        <link rel="next" title="OpenAI within MLflow" href="/../guide/index.html"/>
+        <link rel="prev" title="Building a Code Assistant with OpenAI &amp; MLflow" href="/openai-code-helper.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+<script type="text/javascript" src="../../../_static/jquery.js"></script>
+<script type="text/javascript" src="../../../_static/underscore.js"></script>
+<script type="text/javascript" src="../../../_static/doctools.js"></script>
+<script type="text/javascript" src="../../../_static/languagesections.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript" src="../../../None"></script>
+
+<body class="wy-body-for-nav" role="document">
+  
+
+  
+  <nav class="wy-nav-top header" role="navigation" aria-label="top navigation">
+    <ul>
+  <li class="menu-toggle">
+    <i data-toggle="wy-nav-top" class="wy-nav-top-menu-button db-icon db-icon-menu pull-left"></i>
+    <a href="../../../index.html" class="wy-nav-top-logo"
+      ><img src="../../../_static/MLflow-logo-final-black.png" alt="MLflow"
+    /></a>
+    <span class="version">2.9.3.dev0</span>
+  </li>
+</ul>
+  </nav>
+  <page>
+    
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side relative">
+      <div class="wy-side-scroll">
+  <div class="wy-side-nav-search">
+    
+
+    
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+    
+  </div>
+
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+    
+      <a href="../../../index.html" class="main-navigation-home"><img src="../../../_static/icons/nav-home.svg"> MLflow</a>
+    
+
+    
+      
+
+      
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../introduction/index.html">What is MLflow?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting-started/index.html">Getting Started with MLflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../new-features/index.html">New Features</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">LLMs</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#id1">MLflow Deployments Server for LLMs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#id3">LLM Evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#id4">Prompt Engineering UI</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../index.html#native-mlflow-flavors-for-llms">Native MLflow Flavors for LLMs</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../../index.html#benefits-of-mlflow-s-native-flavors-for-llms">Benefits of MLflow’s Native Flavors for LLMs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../index.html#explore-the-native-llm-flavors">Explore the Native LLM Flavors</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../../index.html#native-integration-guides-and-tutorials">Native Integration Guides and Tutorials</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../../transformers/index.html">MLflow Transformers Flavor</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../index.html">MLflow OpenAI Flavor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../sentence-transformers/index.html">MLflow Sentence-Transformers Flavor</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../index.html#native-integration-examples">Native Integration Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#id5">LLM Tracking in MLflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#tutorials-and-use-case-guides-for-llms-in-mlflow">Tutorials and Use Case Guides for LLMs in MLflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../model-evaluation/index.html">Model Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deep-learning/index.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../traditional-ml/index.html">Traditional ML</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deployment/index.html">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tracking.html">MLflow Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../system-metrics/index.html">System Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../projects.html">MLflow Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../models.html">MLflow Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../model-registry.html">MLflow Model Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../recipes.html">MLflow Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../plugins.html">MLflow Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../auth/index.html">MLflow Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../search-runs.html">Search Runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../search-experiments.html">Search Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../python_api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../R-api.html">R API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../java_api/index.html">Java API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rest-api.html">REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docker.html">Official MLflow Docker Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../community-model-flavors.html">Community Model Flavors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials-and-examples/index.html">Tutorials and Examples</a></li>
+</ul>
+
+      
+    
+  </div>
+
+  <div role="contentinfo">
+    
+
+    <p>
+      <a id='feedbacklink' href="https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a>
+    </p>
+  </div>
+</div>
+    </nav>
+
+    <main class="wy-grid-for-nav">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+          <div class="rst-content">
+            
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Documentation</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../../index.html">LLMs</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../index.html">MLflow OpenAI Flavor</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+    
+      <li>Advanced Tutorial: Embeddings Support with OpenAI in MLflow</li>
+    
+    
+    <!-- <li class="wy-breadcrumbs-aside">
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/llms/openai/notebooks/openai-embeddings-generation.ipynb" class="fa fa-github"> Edit on GitHub</a>
+    </li> -->
+    
+  </ul>
+</div>
+            <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <div itemprop="articleBody">
+                
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div class="section" id="Advanced-Tutorial:-Embeddings-Support-with-OpenAI-in-MLflow">
+<h1>Advanced Tutorial: Embeddings Support with OpenAI in MLflow<a class="headerlink" href="#Advanced-Tutorial:-Embeddings-Support-with-OpenAI-in-MLflow" title="Permalink to this headline"> </a></h1>
+<p>Welcome to this advanced guide on implementing OpenAI embeddings within the MLflow framework. This tutorial delves into the configuration and utilization of OpenAI’s powerful embeddings, a key component in modern machine learning models.</p>
+<div class="section" id="Understanding-Embeddings">
+<h2>Understanding Embeddings<a class="headerlink" href="#Understanding-Embeddings" title="Permalink to this headline"> </a></h2>
+<p>Embeddings are a form of representation learning where words, phrases, or even entire documents are converted into vectors in a high-dimensional space. These vectors capture semantic meaning, enabling models to understand and process language more effectively. Embeddings are extensively used in natural language processing (NLP) for tasks like text classification, sentiment analysis, and language translation.</p>
+</div>
+<div class="section" id="How-Embeddings-Work">
+<h2>How Embeddings Work<a class="headerlink" href="#How-Embeddings-Work" title="Permalink to this headline"> </a></h2>
+<p>Embeddings work by mapping textual data to vectors such that the distance and direction between vectors represent relationships between the words or phrases. For example, in a well-trained embedding space, synonyms are located closer together, while unrelated terms are farther apart. This spatial arrangement allows algorithms to recognize context and semantics, enhancing their ability to interpret and respond to natural language.</p>
+</div>
+<div class="section" id="In-This-Tutorial">
+<h2>In This Tutorial<a class="headerlink" href="#In-This-Tutorial" title="Permalink to this headline"> </a></h2>
+<ul class="simple">
+<li><p><strong>Embedding Endpoint Configuration</strong>: Setting up and utilizing OpenAI’s embedding endpoints in MLflow.</p></li>
+<li><p><strong>Real-world Application</strong>: Practical example of comparing the text content of various web pages to one another to determine the amount of similarity in their contextually-specific content.</p></li>
+<li><p><strong>Efficiency and Precision Enhancements</strong>: Techniques for improving model performance using OpenAI embeddings.</p></li>
+</ul>
+<p>By the end of this tutorial, you’ll have a thorough understanding of how to integrate and leverage OpenAI embeddings in your MLflow projects, harnessing the power of advanced NLP techniques. You’ll also see a real-world application of using text embeddings of documents to compare their similarity. This use case is particularly useful for web content development as a critical task when performing search engine optimization (SEO) to ensure that site page contents are not too similar to one another
+(which could result in a downgrade in page rankings).</p>
+</div>
+<div class="section" id="Required-packages">
+<h2>Required packages<a class="headerlink" href="#Required-packages" title="Permalink to this headline"> </a></h2>
+<p>In order to run this tutorial, you will need to install <code class="docutils literal notranslate"><span class="pre">beautifulsoup4</span></code> from PyPI.</p>
+<p>Let’s dive into the world of embeddings and explore their transformative impact on machine learning models!</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="c1"># Disable a few less-than-useful UserWarnings from setuptools and pydantic</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">UserWarning</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">openai</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics.pairwise</span> <span class="kn">import</span> <span class="n">cosine_similarity</span><span class="p">,</span> <span class="n">euclidean_distances</span>
+
+<span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">from</span> <span class="nn">mlflow.models.signature</span> <span class="kn">import</span> <span class="n">ModelSignature</span>
+<span class="kn">from</span> <span class="nn">mlflow.types.schema</span> <span class="kn">import</span> <span class="n">ColSpec</span><span class="p">,</span> <span class="n">ParamSchema</span><span class="p">,</span> <span class="n">ParamSpec</span><span class="p">,</span> <span class="n">Schema</span><span class="p">,</span> <span class="n">TensorSpec</span>
+
+<span class="k">assert</span> <span class="s2">&quot;OPENAI_API_KEY&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">,</span> <span class="s2">&quot; OPENAI_API_KEY environment variable must be set&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Integrating-OpenAI-Model-with-MLflow-for-Document-Similarity">
+<h2>Integrating OpenAI Model with MLflow for Document Similarity<a class="headerlink" href="#Integrating-OpenAI-Model-with-MLflow-for-Document-Similarity" title="Permalink to this headline"> </a></h2>
+<p>In this tutorial segment, we demonstrate the process of setting up and utilizing an OpenAI embedding model within MLflow for document similarity tasks.</p>
+<div class="section" id="Key-Steps">
+<h3>Key Steps<a class="headerlink" href="#Key-Steps" title="Permalink to this headline"> </a></h3>
+<ol class="arabic simple">
+<li><p><strong>Setting an MLflow Experiment</strong>: We begin by setting the experiment context in MLflow, specifically for document similarity, using <code class="docutils literal notranslate"><span class="pre">mlflow.set_experiment(&quot;Documentation</span> <span class="pre">Similarity&quot;)</span></code>.</p></li>
+<li><p><strong>Logging the Model in MLflow</strong>: We initiate an MLflow run and log metadata and access configuration parameters to communicate with a specific OpenAI endpoint. The OpenAI endpoint that we’ve chosen here points to the model “text-embedding-ada-002”, chosen for its robust embedding capabilities. During this step, we detail these access configurations, the embedding task, input/output schemas, and parameters like batch size.</p></li>
+<li><p><strong>Loading the Logged Model for Use</strong>: After logging the MLflow model, we proceed to load it using MLflow’s <code class="docutils literal notranslate"><span class="pre">pyfunc</span></code> module. This is a critical step for applying the model to perform document similarity tasks within the MLflow ecosystem.</p></li>
+</ol>
+<p>These steps are essential for integrating access to OpenAI’s embedding model into MLflow, facilitating advanced NLP operations like document similarity analysis.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s2">&quot;Documenatation Similarity&quot;</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="n">model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">openai</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">=</span><span class="s2">&quot;text-embedding-ada-002&quot;</span><span class="p">,</span>
+        <span class="n">task</span><span class="o">=</span><span class="n">openai</span><span class="o">.</span><span class="n">Embedding</span><span class="p">,</span>
+        <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
+        <span class="n">signature</span><span class="o">=</span><span class="n">ModelSignature</span><span class="p">(</span>
+            <span class="n">inputs</span><span class="o">=</span><span class="n">Schema</span><span class="p">([</span><span class="n">ColSpec</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">)]),</span>
+            <span class="n">outputs</span><span class="o">=</span><span class="n">Schema</span><span class="p">([</span><span class="n">TensorSpec</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;float64&quot;</span><span class="p">),</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,))]),</span>
+            <span class="n">params</span><span class="o">=</span><span class="n">ParamSchema</span><span class="p">([</span><span class="n">ParamSpec</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;batch_size&quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;long&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1024</span><span class="p">)]),</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+
+<span class="c1"># Load the model in pyfunc format</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Webpage-Text-Extraction-for-Embedding-Analysis">
+<h2>Webpage Text Extraction for Embedding Analysis<a class="headerlink" href="#Webpage-Text-Extraction-for-Embedding-Analysis" title="Permalink to this headline"> </a></h2>
+<p>This section of the tutorial introduces functions designed to extract and prepare text from webpages, a crucial step before applying embedding models for analysis.</p>
+<div class="section" id="Overview-of-Functions">
+<h3>Overview of Functions<a class="headerlink" href="#Overview-of-Functions" title="Permalink to this headline"> </a></h3>
+<ol class="arabic">
+<li><p><strong>insert_space_after_tags</strong>:</p>
+<ul class="simple">
+<li><p>Adds a space after specific HTML tags in a BeautifulSoup object for better text readability.</p></li>
+</ul>
+</li>
+<li><p><strong>extract_text_from_url</strong>:</p>
+<ul>
+<li><p>Extracts text from a specified webpage section using its URL and a target ID. Filters and organizes the text from tags like ,</p>
+<li><p>, and</p>
+<p><p>, excluding certain irrelevant sections.</p>
+</li>
+</ul>
+</li>
+</ol>
+<p>These functions are integral to preprocessing web content, ensuring that the text fed into the embedding model is clean, relevant, and well-structured.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">insert_space_after_tags</span><span class="p">(</span><span class="n">soup</span><span class="p">,</span> <span class="n">tags</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Insert a space after each tag specified in the provided BeautifulSoup object.</span>
+
+<span class="sd">    :param soup: BeautifulSoup object representing the parsed HTML.</span>
+<span class="sd">    :param tags: List of tag names (as strings) after which space should be inserted.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">tag_name</span> <span class="ow">in</span> <span class="n">tags</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">soup</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="n">tag_name</span><span class="p">):</span>
+            <span class="n">tag</span><span class="o">.</span><span class="n">insert_after</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">extract_text_from_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extract and return text content from a specific section of a webpage.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>  <span class="c1"># Raises HTTPError for bad requests (4XX, 5XX)</span>
+    <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">RequestException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Request failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="s2">&quot;html.parser&quot;</span><span class="p">)</span>
+    <span class="n">target_div</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;section&quot;</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="nb">id</span><span class="p">})</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">target_div</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;Target element not found.&quot;</span>
+
+    <span class="n">insert_space_after_tags</span><span class="p">(</span><span class="n">target_div</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;strong&quot;</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">])</span>
+
+    <span class="n">content_tags</span> <span class="o">=</span> <span class="n">target_div</span><span class="o">.</span><span class="n">find_all</span><span class="p">([</span><span class="s2">&quot;h1&quot;</span><span class="p">,</span> <span class="s2">&quot;h2&quot;</span><span class="p">,</span> <span class="s2">&quot;h3&quot;</span><span class="p">,</span> <span class="s2">&quot;h4&quot;</span><span class="p">,</span> <span class="s2">&quot;h5&quot;</span><span class="p">,</span> <span class="s2">&quot;h6&quot;</span><span class="p">,</span> <span class="s2">&quot;li&quot;</span><span class="p">,</span> <span class="s2">&quot;p&quot;</span><span class="p">])</span>
+    <span class="n">filtered_tags</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">tag</span>
+        <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">content_tags</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">tag</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;li&quot;</span> <span class="ow">and</span> <span class="n">tag</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;p&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">tag</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;reference external&quot;</span><span class="p">))</span>
+            <span class="ow">or</span> <span class="p">(</span><span class="n">tag</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;p&quot;</span> <span class="ow">and</span> <span class="n">tag</span><span class="o">.</span><span class="n">find_parent</span><span class="p">(</span><span class="s2">&quot;ul&quot;</span><span class="p">))</span>
+            <span class="ow">or</span> <span class="p">(</span><span class="n">tag</span><span class="o">.</span><span class="n">get_text</span><span class="p">(</span><span class="n">strip</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;note&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">]</span>
+
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tag</span><span class="o">.</span><span class="n">get_text</span><span class="p">(</span><span class="n">separator</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">strip</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">filtered_tags</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Detailed-Workflow:">
+<h3>Detailed Workflow:<a class="headerlink" href="#Detailed-Workflow:" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p>The function <code class="docutils literal notranslate"><span class="pre">extract_text_from_url</span></code> first fetches the webpage content using the <code class="docutils literal notranslate"><span class="pre">requests</span></code> library.</p></li>
+<li><p>It then parses the HTML content using BeautifulSoup.</p></li>
+<li><p>Specific HTML tags are targeted for text extraction, ensuring that the content is relevant and well-structured for embedding analysis.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">insert_space_after_tags</span></code> function is called within <code class="docutils literal notranslate"><span class="pre">extract_text_from_url</span></code> to improve text readability post-extraction.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="Measuring-Similarity-and-Distance-Between-Embeddings">
+<h2>Measuring Similarity and Distance Between Embeddings<a class="headerlink" href="#Measuring-Similarity-and-Distance-Between-Embeddings" title="Permalink to this headline"> </a></h2>
+<p>In this next part of the tutorial, we utilize two functions from <code class="docutils literal notranslate"><span class="pre">sklearn</span></code> to measure the similarity and distance between document embeddings, essential for evaluating and comparing text-based machine learning models.</p>
+<div class="section" id="Function-Overviews">
+<h3>Function Overviews<a class="headerlink" href="#Function-Overviews" title="Permalink to this headline"> </a></h3>
+<ol class="arabic simple">
+<li><p><strong>cosine_similarity</strong>:</p>
+<ul class="simple">
+<li><p><strong>Purpose</strong>: Calculates the cosine similarity between two embedding vectors.</p></li>
+<li><p><strong>How It Works</strong>: This function computes similarity by finding the cosine of the angle between the two vectors, a common method for assessing how similar two documents are in terms of their content.</p></li>
+<li><p><strong>Relevance</strong>: Very useful in NLP, especially for tasks like document retrieval and clustering, where the goal is to find documents with similar content.</p></li>
+</ul>
+</li>
+<li><p><strong>euclidean_distances</strong>:</p>
+<ul class="simple">
+<li><p><strong>Purpose</strong>: Computes the Euclidean distance between two embedding vectors.</p></li>
+<li><p><strong>Functionality</strong>: Similar to <code class="docutils literal notranslate"><span class="pre">cosine_similarity</span></code> this function calculates the Euclidean distance, which is the “straight line” distance between the two points in the embedding space. This measure is useful for understanding how different two documents are.</p></li>
+<li><p><strong>Relevance within NLP</strong>: Offers a more intuitive physical distance metric, useful for tasks like document classification and anomaly detection.</p></li>
+</ul>
+</li>
+</ol>
+<p>These functions are crucial for analyzing and comparing the outputs of embedding models, providing insights into the relationships between different text data in terms of similarity and distinction.</p>
+</div>
+</div>
+<div class="section" id="Comparing-Webpages-Using-Embeddings">
+<h2>Comparing Webpages Using Embeddings<a class="headerlink" href="#Comparing-Webpages-Using-Embeddings" title="Permalink to this headline"> </a></h2>
+<p>This section of the tutorial introduces a function, <code class="docutils literal notranslate"><span class="pre">compare_pages</span></code>, designed to compare the content of two webpages using embedding models. This function is key for understanding how similar or different two given webpages are in terms of their textual content.</p>
+<div class="section" id="Function-Overview">
+<h3>Function Overview<a class="headerlink" href="#Function-Overview" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Function Name</strong>: <code class="docutils literal notranslate"><span class="pre">compare_pages</span></code></p></li>
+<li><p><strong>Purpose</strong>: Compares two webpages and returns a similarity score based on their content.</p></li>
+<li><p><strong>Parameters</strong>:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">url1</span></code> and <code class="docutils literal notranslate"><span class="pre">url2</span></code>: URLs of the webpages to be compared.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">id1</span></code> and <code class="docutils literal notranslate"><span class="pre">id2</span></code>: Target IDs for the main text content divs on each page.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="How-It-Works">
+<h3>How It Works<a class="headerlink" href="#How-It-Works" title="Permalink to this headline"> </a></h3>
+<ol class="arabic simple">
+<li><p><strong>Text Extraction</strong>: The function starts by extracting text from the specified sections of each webpage using the <code class="docutils literal notranslate"><span class="pre">extract_text_from_url</span></code> function.</p></li>
+<li><p><strong>Embedding Prediction</strong>: It then uses the previously loaded OpenAI model to generate embeddings for the extracted texts.</p></li>
+<li><p><strong>Similarity and Distance Measurement</strong>: The function calculates both the cosine similarity and Euclidean distance between the two embeddings. These metrics provide a quantifiable measure of how similar or dissimilar the webpage contents are.</p></li>
+<li><p><strong>Result</strong>: Returns a tuple containing the cosine similarity score and the Euclidean distance. If text extraction fails, it returns an error message.</p></li>
+</ol>
+</div>
+<div class="section" id="Practical-Application">
+<h3>Practical Application<a class="headerlink" href="#Practical-Application" title="Permalink to this headline"> </a></h3>
+<p>This function is particularly useful in scenarios where comparing the content of different webpages is necessary, such as in content curation, plagiarism detection, or similarity analysis for SEO purposes.</p>
+<p>By leveraging the power of embeddings and similarity metrics, <code class="docutils literal notranslate"><span class="pre">compare_pages</span></code> provides a robust method for quantitatively assessing webpage content similarities and differences.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">compare_pages</span><span class="p">(</span><span class="n">url1</span><span class="p">,</span> <span class="n">url2</span><span class="p">,</span> <span class="n">id1</span><span class="p">,</span> <span class="n">id2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compare two webpages and return the similarity score.</span>
+
+<span class="sd">    :param url1: URL of the first webpage.</span>
+<span class="sd">    :param url2: URL of the second webpage.</span>
+<span class="sd">    :param id1: The target id for the div containing the main text content of the first page</span>
+<span class="sd">    :param id2: The target id for the div containing the main text content of the second page</span>
+<span class="sd">    :return: A tuple of floats representing the similarity score for cosine similarity and euclidean distance.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">text1</span> <span class="o">=</span> <span class="n">extract_text_from_url</span><span class="p">(</span><span class="n">url1</span><span class="p">,</span> <span class="n">id1</span><span class="p">)</span>
+    <span class="n">text2</span> <span class="o">=</span> <span class="n">extract_text_from_url</span><span class="p">(</span><span class="n">url2</span><span class="p">,</span> <span class="n">id2</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">text1</span> <span class="ow">and</span> <span class="n">text2</span><span class="p">:</span>
+        <span class="n">embedding1</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">([</span><span class="n">text1</span><span class="p">])</span>
+        <span class="n">embedding2</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">([</span><span class="n">text2</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">cosine_similarity</span><span class="p">(</span><span class="n">embedding1</span><span class="p">,</span> <span class="n">embedding2</span><span class="p">),</span>
+            <span class="n">euclidean_distances</span><span class="p">(</span><span class="n">embedding1</span><span class="p">,</span> <span class="n">embedding2</span><span class="p">),</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;Failed to retrieve content.&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Similarity-Analysis-Between-MLflow-Documentation-Pages">
+<h2>Similarity Analysis Between MLflow Documentation Pages<a class="headerlink" href="#Similarity-Analysis-Between-MLflow-Documentation-Pages" title="Permalink to this headline"> </a></h2>
+<p>In this tutorial segment, we demonstrate the practical application of the <code class="docutils literal notranslate"><span class="pre">compare_pages</span></code> function by comparing two specific pages from the MLflow documentation. Our goal is to assess how similar the content of the main Large Language Models (LLMs) page is to the LLM Evaluation page within the 2.8.1 release of MLflow.</p>
+<div class="section" id="Process-Overview">
+<h3>Process Overview<a class="headerlink" href="#Process-Overview" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Target Webpages</strong>:</p>
+<ul>
+<li><p>The main LLMs page: <a class="reference external" href="https://www.mlflow.org/docs/2.8.1/llms/index.html">LLMs page for MLflow 2.8.1 release</a></p></li>
+<li><p>The LLM Evaluation page: <a class="reference external" href="https://www.mlflow.org/docs/2.8.1/llms/llm-evaluate/index.html">LLM Evaluation for MLflow 2.8.1</a></p></li>
+</ul>
+</li>
+<li><p><strong>Content IDs</strong>: We use ‘llms’ for the main LLMs page and ‘mlflow-llm-evaluate’ for the LLM Evaluation page to target specific content sections.</p></li>
+<li><p><strong>Comparison Execution</strong>: The <code class="docutils literal notranslate"><span class="pre">compare_pages</span></code> function is called with these URLs and content IDs to perform the analysis.</p></li>
+</ul>
+</div>
+<div class="section" id="Results">
+<h3>Results<a class="headerlink" href="#Results" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Cosine Similarity and Euclidean Distance</strong>: The function returns two key metrics:</p>
+<ul>
+<li><p>Cosine Similarity: Measures the cosine of the angle between the embedding vectors of the two pages. A higher value indicates greater similarity.</p></li>
+<li><p>Euclidean Distance: Represents the ‘straight-line’ distance between the two points in the embedding space, with lower values indicating closer similarity.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="Interpretation">
+<h3>Interpretation<a class="headerlink" href="#Interpretation" title="Permalink to this headline"> </a></h3>
+<p>The results show a high degree of cosine similarity (0.8792), suggesting that the content of the two pages is quite similar in terms of context and topics covered. The Euclidean distance of 0.4914, while relatively low, offers a complementary perspective, indicating some level of distinctiveness in the content.</p>
+</div>
+<div class="section" id="Conclusion">
+<h3>Conclusion<a class="headerlink" href="#Conclusion" title="Permalink to this headline"> </a></h3>
+<p>This analysis highlights the effectiveness of using embeddings and similarity metrics for comparing webpage content. In practical terms, it helps in understanding the overlap and differences in documentation, aiding in content optimization, redundancy reduction, and ensuring comprehensive coverage of topics.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get the similarity between the main LLMs page in the MLflow Docs and the LLM Evaluation page for the 2.8.1 release of MLflow</span>
+
+<span class="n">llm_cosine</span><span class="p">,</span> <span class="n">llm_euclid</span> <span class="o">=</span> <span class="n">compare_pages</span><span class="p">(</span>
+    <span class="n">url1</span><span class="o">=</span><span class="s2">&quot;https://www.mlflow.org/docs/2.8.1/llms/index.html&quot;</span><span class="p">,</span>
+    <span class="n">url2</span><span class="o">=</span><span class="s2">&quot;https://www.mlflow.org/docs/2.8.1/llms/llm-evaluate/index.html&quot;</span><span class="p">,</span>
+    <span class="n">id1</span><span class="o">=</span><span class="s2">&quot;llms&quot;</span><span class="p">,</span>
+    <span class="n">id2</span><span class="o">=</span><span class="s2">&quot;mlflow-llm-evaluate&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s2">&quot;The cosine similarity between the LLMs page and the LLM Evaluation page is: </span><span class="si">{</span><span class="n">llm_cosine</span><span class="si">}</span><span class="s2"> and the euclidean distance is: </span><span class="si">{</span><span class="n">llm_euclid</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+The cosine similarity between the LLMs page and the LLM Evaluation page is: [[0.879243]] and the euclidean distance is: [[0.49144073]]
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Brief-Overview-of-Similarity-Between-MLflow-LLMs-and-Plugins-Pages">
+<h2>Brief Overview of Similarity Between MLflow LLMs and Plugins Pages<a class="headerlink" href="#Brief-Overview-of-Similarity-Between-MLflow-LLMs-and-Plugins-Pages" title="Permalink to this headline"> </a></h2>
+<p>This section demonstrates a quick similarity analysis between the MLflow Large Language Models (LLMs) page and the Plugins page from the 2.8.1 release.</p>
+<div class="section" id="Analysis-Execution">
+<h3>Analysis Execution<a class="headerlink" href="#Analysis-Execution" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Pages Compared</strong>:</p>
+<ul>
+<li><p>LLMs page: <a class="reference external" href="https://www.mlflow.org/docs/2.8.1/llms/index.html">LLMs page for MLflow 2.8.1 release</a></p></li>
+<li><p>Plugins page: <a class="reference external" href="https://www.mlflow.org/docs/2.8.1/plugins.html">Plugins page for MLflow 2.8.1 release</a></p></li>
+</ul>
+</li>
+<li><p><strong>IDs Used</strong>: ‘llms’ for the LLMs page and ‘mflow-plugins’ for the Plugins page.</p></li>
+<li><p><strong>Function</strong>: <code class="docutils literal notranslate"><span class="pre">compare_pages</span></code> is utilized for the comparison.</p></li>
+</ul>
+</div>
+<div class="section" id="id1">
+<h3>Results<a class="headerlink" href="#id1" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Cosine Similarity</strong>: 0.6806, indicating moderate similarity in content.</p></li>
+<li><p><strong>Euclidean Distance</strong>: 0.7992, suggesting a noticeable difference in the context and topics covered by the two pages.</p></li>
+</ul>
+<p>The results reflect a moderate level of similarity between the LLMs and Plugins pages, with a significant degree of distinctiveness in their content. This analysis is useful for understanding the relationship and content overlap between different sections of the MLflow documentation.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get the similarity between the main LLMs page in the MLflow Docs and the Plugins page for the 2.8.1 release of MLflow</span>
+
+<span class="n">plugins_cosine</span><span class="p">,</span> <span class="n">plugins_euclid</span> <span class="o">=</span> <span class="n">compare_pages</span><span class="p">(</span>
+    <span class="n">url1</span><span class="o">=</span><span class="s2">&quot;https://www.mlflow.org/docs/2.8.1/llms/index.html&quot;</span><span class="p">,</span>
+    <span class="n">url2</span><span class="o">=</span><span class="s2">&quot;https://www.mlflow.org/docs/2.8.1/plugins.html&quot;</span><span class="p">,</span>
+    <span class="n">id1</span><span class="o">=</span><span class="s2">&quot;llms&quot;</span><span class="p">,</span>
+    <span class="n">id2</span><span class="o">=</span><span class="s2">&quot;mflow-plugins&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s2">&quot;The cosine similarity between the LLMs page and the MLflow Projects page is: </span><span class="si">{</span><span class="n">plugins_cosine</span><span class="si">}</span><span class="s2"> and the euclidean distance is: </span><span class="si">{</span><span class="n">plugins_euclid</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+The cosine similarity between the LLMs page and the MLflow Projects page is: [[0.68062298]] and the euclidean distance is: [[0.79922088]]
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Tutorial-Recap:-Leveraging-OpenAI-Embeddings-in-MLflow">
+<h2>Tutorial Recap: Leveraging OpenAI Embeddings in MLflow<a class="headerlink" href="#Tutorial-Recap:-Leveraging-OpenAI-Embeddings-in-MLflow" title="Permalink to this headline"> </a></h2>
+<p>As we conclude this tutorial, let’s recap the key concepts and techniques we’ve explored regarding the use of OpenAI embeddings within the MLflow framework.</p>
+<div class="section" id="Key-Takeaways">
+<h3>Key Takeaways<a class="headerlink" href="#Key-Takeaways" title="Permalink to this headline"> </a></h3>
+<ol class="arabic simple">
+<li><p><strong>Integrating OpenAI Models in MLflow</strong>:</p>
+<ul class="simple">
+<li><p>We learned how to log and load OpenAI’s “text-embedding-ada-002” model within MLflow, an essential step for utilizing these embeddings in machine learning workflows.</p></li>
+</ul>
+</li>
+<li><p><strong>Text Extraction and Preprocessing</strong>:</p>
+<ul class="simple">
+<li><p>The tutorial introduced methods for extracting and preprocessing text from webpages, ensuring the data is clean and structured for embedding analysis.</p></li>
+</ul>
+</li>
+<li><p><strong>Calculating Similarity and Distance</strong>:</p>
+<ul class="simple">
+<li><p>We delved into functions for measuring cosine similarity and Euclidean distance between document embeddings, vital for comparing textual content.</p></li>
+</ul>
+</li>
+<li><p><strong>Real-World Application: Webpage Content Comparison</strong>:</p>
+<ul class="simple">
+<li><p>Practical application of these concepts was demonstrated through the comparison of different MLflow documentation pages. We analyzed the similarity and differences in their content using the embeddings generated by the OpenAI model.</p></li>
+</ul>
+</li>
+<li><p><strong>Interpreting Results</strong>:</p>
+<ul class="simple">
+<li><p>The tutorial provided insights into interpreting the results of similarity and distance metrics, highlighting their relevance in understanding content relationships.</p></li>
+</ul>
+</li>
+</ol>
+</div>
+<div class="section" id="id2">
+<h3>Conclusion<a class="headerlink" href="#id2" title="Permalink to this headline"> </a></h3>
+<p>This advanced tutorial aimed to enhance your skills in applying OpenAI embeddings in MLflow, focusing on real-world applications like document similarity analysis. By integrating these powerful NLP tools, we’ve showcased how to extract more value and insights from textual data, a crucial aspect of modern machine learning projects.</p>
+<p>We hope this guide has been informative and instrumental in advancing your understanding and application of OpenAI embeddings within the MLflow framework.</p>
+</div>
+</div>
+<div class="section" id="What’s-Next?">
+<h2>What’s Next?<a class="headerlink" href="#What’s-Next?" title="Permalink to this headline"> </a></h2>
+<p>To continue your learning journey, see the additional <a class="reference external" href="https://www.mlflow.org/docs/latest/llms/openai/index.html#advanced-tutorials">advanced tutorials for MLflow’s OpenAI flavor</a>.</p>
+</div>
+</div>
+
+
+              </div>
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="openai-code-helper.html" class="btn btn-neutral" title="Building a Code Assistant with OpenAI &amp; MLflow" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+      
+      
+        <a href="../guide/index.html" class="btn btn-neutral" title="OpenAI within MLflow" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+      <p class="copyright">
+          &copy; MLflow Project, a Series of LF Projects, LLC. All rights reserved.
+      </p>
+
+  </div> 
+
+</footer>
+          </div>
+        </div>
+      </section>
+    </main>
+  </page>
+
+  
+
+
+  
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+      URL_ROOT:'../../../',
+      VERSION:'2.9.3.dev0',
+      COLLAPSE_INDEX:false,
+      FILE_SUFFIX:'.html',
+      LINK_SUFFIX: '.html',
+      HAS_SOURCE:  true
+    };
+  </script>
+
+  
+
+  <script type="text/javascript" src="../../../_static/js/clipboard.min.js"></script>
+  <script type="text/javascript" src="../../../_static/js/jquery.waypoints.min.js"></script>
+
+  
+  
+  
+  <script type="text/javascript">var CLIPPY_SVG_PATH = "../../../_static/clippy.svg";</script>
+  <script type="text/javascript" src="../../../_static/js/custom.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.StickyNav.enable();
+    });
+
+  </script>
+  
+
+  
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        // Get the code block designator class entries
+        const allHighlights = document.querySelectorAll('.highlight');
+        // Disable copyable links for notebook cell numbering and for cell outputs
+        const highlights = Array.from(allHighlights).filter(highlight => !highlight.closest('.highlight-none') && 
+            !highlight.closest('.nboutput'));
+    
+        highlights.forEach(function(highlight) {
+            const copyIcon = document.createElement('span');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.innerHTML = '&#xf0ea;';
+
+            copyIcon.addEventListener('click', function() {
+                const code = highlight.querySelector('pre').textContent;
+                copyToClipboard(code);
+
+                // Flash effect on click
+                this.style.color = '#0194E2';
+                setTimeout(() => {
+                    this.style.color = ''; 
+                }, 100);
+
+                // Display "Code copied to clipboard" near the clicked icon
+                const message = document.createElement('span');
+                message.textContent = "Copied!";
+                message.classList.add('copy-message'); 
+
+                // Append the message to the icon
+                this.appendChild(message);
+
+                setTimeout(() => {
+                    this.removeChild(message);
+                }, 500);
+            });
+
+            highlight.appendChild(copyIcon);
+        });
+    });
+  </script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Force download for notebook-download-btn
+        const downloadButtons = document.querySelectorAll('.notebook-download-btn');
+        downloadButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                // Fetch the raw content of the notebook from GitHub
+                fetch(button.href)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = url;
+                        const filename = button.href.split('/').pop();
+                        link.download = filename; 
+
+                        document.body.appendChild(link);
+                        link.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    })
+                    .catch(err => console.error('Error fetching the notebook:', err));
+            });
+        });
+    });
+</script> 
+</body>
+</html>

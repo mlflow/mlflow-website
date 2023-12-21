@@ -1,0 +1,1580 @@
+
+  
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Building a Code Assistant with OpenAI &amp; MLflow &mdash; MLflow 2.9.3.dev0 documentation</title>
+  
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/llms/openai/notebooks/openai-code-helper.html">
+  
+  
+    <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
+    
+
+    
+
+  
+    
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/grids.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/mobile.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/simple-cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/tabs.css" type="text/css" />
+    
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="MLflow 2.9.3.dev0 documentation" href="../../../index.html"/>
+        <link rel="up" title="MLflow OpenAI Flavor" href="../index.html"/>
+        <link rel="next" title="Advanced Tutorial: Embeddings Support with OpenAI in MLflow" href="/openai-embeddings-generation.html"/>
+        <link rel="prev" title="Introduction: Advancing Communication with GPT-4 and MLflow" href="/openai-chat-completions.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+<script type="text/javascript" src="../../../_static/jquery.js"></script>
+<script type="text/javascript" src="../../../_static/underscore.js"></script>
+<script type="text/javascript" src="../../../_static/doctools.js"></script>
+<script type="text/javascript" src="../../../_static/languagesections.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript" src="../../../None"></script>
+
+<body class="wy-body-for-nav" role="document">
+  
+
+  
+  <nav class="wy-nav-top header" role="navigation" aria-label="top navigation">
+    <ul>
+  <li class="menu-toggle">
+    <i data-toggle="wy-nav-top" class="wy-nav-top-menu-button db-icon db-icon-menu pull-left"></i>
+    <a href="../../../index.html" class="wy-nav-top-logo"
+      ><img src="../../../_static/MLflow-logo-final-black.png" alt="MLflow"
+    /></a>
+    <span class="version">2.9.3.dev0</span>
+  </li>
+</ul>
+  </nav>
+  <page>
+    
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side relative">
+      <div class="wy-side-scroll">
+  <div class="wy-side-nav-search">
+    
+
+    
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+    
+  </div>
+
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+    
+      <a href="../../../index.html" class="main-navigation-home"><img src="../../../_static/icons/nav-home.svg"> MLflow</a>
+    
+
+    
+      
+
+      
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../introduction/index.html">What is MLflow?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting-started/index.html">Getting Started with MLflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../new-features/index.html">New Features</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">LLMs</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#id1">MLflow Deployments Server for LLMs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#id3">LLM Evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#id4">Prompt Engineering UI</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../index.html#native-mlflow-flavors-for-llms">Native MLflow Flavors for LLMs</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../../index.html#benefits-of-mlflow-s-native-flavors-for-llms">Benefits of MLflow’s Native Flavors for LLMs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../index.html#explore-the-native-llm-flavors">Explore the Native LLM Flavors</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../../index.html#native-integration-guides-and-tutorials">Native Integration Guides and Tutorials</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../../transformers/index.html">MLflow Transformers Flavor</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../index.html">MLflow OpenAI Flavor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../sentence-transformers/index.html">MLflow Sentence-Transformers Flavor</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../index.html#native-integration-examples">Native Integration Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#id5">LLM Tracking in MLflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#tutorials-and-use-case-guides-for-llms-in-mlflow">Tutorials and Use Case Guides for LLMs in MLflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../model-evaluation/index.html">Model Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deep-learning/index.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../traditional-ml/index.html">Traditional ML</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deployment/index.html">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tracking.html">MLflow Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../system-metrics/index.html">System Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../projects.html">MLflow Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../models.html">MLflow Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../model-registry.html">MLflow Model Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../recipes.html">MLflow Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../plugins.html">MLflow Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../auth/index.html">MLflow Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../search-runs.html">Search Runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../search-experiments.html">Search Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../python_api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../R-api.html">R API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../java_api/index.html">Java API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rest-api.html">REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docker.html">Official MLflow Docker Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../community-model-flavors.html">Community Model Flavors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials-and-examples/index.html">Tutorials and Examples</a></li>
+</ul>
+
+      
+    
+  </div>
+
+  <div role="contentinfo">
+    
+
+    <p>
+      <a id='feedbacklink' href="https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a>
+    </p>
+  </div>
+</div>
+    </nav>
+
+    <main class="wy-grid-for-nav">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+          <div class="rst-content">
+            
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Documentation</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../../index.html">LLMs</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../index.html">MLflow OpenAI Flavor</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+    
+      <li>Building a Code Assistant with OpenAI &amp; MLflow</li>
+    
+    
+    <!-- <li class="wy-breadcrumbs-aside">
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/llms/openai/notebooks/openai-code-helper.ipynb" class="fa fa-github"> Edit on GitHub</a>
+    </li> -->
+    
+  </ul>
+</div>
+            <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <div itemprop="articleBody">
+                
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div class="section" id="Building-a-Code-Assistant-with-OpenAI-&amp;-MLflow">
+<h1>Building a Code Assistant with OpenAI &amp; MLflow<a class="headerlink" href="#Building-a-Code-Assistant-with-OpenAI-&-MLflow" title="Permalink to this headline"> </a></h1>
+<div class="section" id="Overview">
+<h2>Overview<a class="headerlink" href="#Overview" title="Permalink to this headline"> </a></h2>
+<p>Welcome to this comprehensive tutorial, where you’ll embark on a fascinating journey through the integration of OpenAI’s powerful language models with MLflow, where we’ll be building an actually useful tool that can, with the simple addition of a decorator to any function that we declare, get immediate feedback within an interactive environment on code under active development.</p>
+</div>
+<div class="section" id="Learning-Objectives">
+<h2>Learning Objectives<a class="headerlink" href="#Learning-Objectives" title="Permalink to this headline"> </a></h2>
+<p>By the end of this tutorial, you will:</p>
+<ol class="arabic simple">
+<li><p><strong>Master OpenAI’s GPT-4 for Code Assistance</strong>: Understand how to leverage OpenAI’s GPT-4 model for providing real-time coding assistance. Learn to harness its capabilities for generating code suggestions, explanations, and improving overall coding efficiency.</p></li>
+<li><p><strong>Utilize MLflow for Enhanced Model Tracking</strong>: Delve into MLflow’s powerful tracking systems to manage machine learning experiments. Learn how to adapt a <code class="docutils literal notranslate"><span class="pre">pyfunc</span> <span class="pre">model</span></code> from within MLflow to control how the output of an LLM is displayed from within an interactive coding environment.</p></li>
+<li><p><strong>Seamlessly Combine OpenAI and MLflow</strong>: Discover the practical steps to integrate OpenAI’s AI capabilities with MLflow’s tracking and management systems. This integration exemplifies how combining these tools can streamline the development and deployment of intelligent applications.</p></li>
+<li><p><strong>Develop and Deploy a Custom Python Code Assistant</strong>: Gain hands-on experience in creating a Python-based code assistant using OpenAI’s model. Then, actually see it in action as it is used within a Jupyter Notebook environment to give helpful assistance during development.</p></li>
+<li><p><strong>Improve Code Quality with AI-driven Insights</strong>: Apply AI-powered analysis to review and enhance your code. Learn how an AI assistant can provide real-time feedback on code quality, suggest improvements, and help maintain high coding standards.</p></li>
+<li><p><strong>Explore Advanced Python Features for Robust Development</strong>: Understand advanced Python features like decorators and functional programming. These are crucial for building efficient, scalable, and maintainable software solutions, especially when integrating AI capabilities.</p></li>
+</ol>
+</div>
+<div class="section" id="Key-Concepts-Covered">
+<h2>Key Concepts Covered<a class="headerlink" href="#Key-Concepts-Covered" title="Permalink to this headline"> </a></h2>
+<ol class="arabic simple">
+<li><p><strong>MLflow’s Model Management</strong>: Explore MLflow’s features for tracking experiments, packaging code into reproducible runs, and managing and deploying models.</p></li>
+<li><p><strong>Custom Python Model</strong>: Learn how to use MLflow’s built-in customization for defining a generic Python function that will allow you to craft your own processing logic while interfacing with OpenAI to perform alternative handling to the LLM’s output.</p></li>
+<li><p><strong>Python Decorators and Functional Programming</strong>: Learn about advanced Python concepts like decorators and functional programming for efficient code evaluation and enhancement.</p></li>
+</ol>
+</div>
+<div class="section" id="Why-Use-MLflow-for-this?">
+<h2>Why Use MLflow for this?<a class="headerlink" href="#Why-Use-MLflow-for-this?" title="Permalink to this headline"> </a></h2>
+<p>MLflow emerges as a pivotal element in this tutorial, making our use case not only feasible but also highly efficient. It offers a secure and seamless interface with OpenAI’s advanced language models. In this tutorial, we’ll explore how MLflow greatly simplifies the process of storing specific instructional prompts for OpenAI, and enhances the user experience by adding readable formatting to the returned text.</p>
+<p>The flexibility and scalability of MLflow make it a robust choice for integrating with various tools, particularly in interactive coding environments like Jupyter Notebooks. We’ll witness firsthand how MLflow facilitates rapid experimentation and iteration, allowing us to create a functional tool with minimal effort. This tool will not just assist in development but will also elevate the overall coding and model management experience. By leveraging MLflow’s comprehensive features, we’ll navigate
+through a seamless end-to-end workflow, from setting up intricate models to executing complex tasks efficiently.</p>
+</div>
+<div class="section" id="Important-Cost-Considerations-for-GPT-4-Usage">
+<h2>Important Cost Considerations for GPT-4 Usage<a class="headerlink" href="#Important-Cost-Considerations-for-GPT-4-Usage" title="Permalink to this headline"> </a></h2>
+<div class="section" id="High(er)-Cost-of-GPT-4">
+<h3>High(er) Cost of GPT-4<a class="headerlink" href="#High(er)-Cost-of-GPT-4" title="Permalink to this headline"> </a></h3>
+<p>It’s crucial to note that <strong>using GPT-4, as opposed to GPT-3.5, can incur higher costs</strong>. GPT-4’s advanced capabilities and enhanced performance come with a price premium, making it a more expensive option compared to earlier models like GPT-3.5.</p>
+</div>
+<div class="section" id="Why-Choose-GPT-4-in-This-Tutorial">
+<h3>Why Choose GPT-4 in This Tutorial<a class="headerlink" href="#Why-Choose-GPT-4-in-This-Tutorial" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Enhanced Capabilities</strong>: We opt for GPT-4 in this tutorial primarily due to its superior capabilities, especially in areas such as code refactoring and detecting issues in code implementations.</p></li>
+<li><p><strong>Demonstration Purposes</strong>: The use of GPT-4 here serves as a demonstration to showcase the cutting-edge advancements in language model technology and its applications in complex tasks.</p></li>
+</ul>
+</div>
+<div class="section" id="Consider-Alternatives-for-Cost-Effectiveness">
+<h3>Consider Alternatives for Cost-Effectiveness<a class="headerlink" href="#Consider-Alternatives-for-Cost-Effectiveness" title="Permalink to this headline"> </a></h3>
+<p>For projects where cost is a significant concern, or where the advanced features of GPT-4 are not essential, <strong>consider using GPT-3.5 or other more cost-effective alternatives</strong>. These models still offer robust performance for a wide range of applications but at a lower cost.</p>
+</div>
+<div class="section" id="Budgeting-for-GPT-4">
+<h3>Budgeting for GPT-4<a class="headerlink" href="#Budgeting-for-GPT-4" title="Permalink to this headline"> </a></h3>
+<p>If you choose to proceed with GPT-4, it is recommended to: - <strong>Monitor Usage Closely</strong>: Keep track of your API usage to manage costs effectively. - <strong>Budget Accordingly</strong>: Allocate sufficient resources to cover the higher costs associated with GPT-4.</p>
+<p>By being mindful of these cost considerations, you can make informed decisions about which OpenAI model best suits your project’s needs and budget.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="c1"># Disable a few less-than-useful UserWarnings from setuptools and pydantic</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">UserWarning</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">HTML</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">textwrap</span>
+
+<span class="kn">import</span> <span class="nn">openai</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">from</span> <span class="nn">mlflow.models.signature</span> <span class="kn">import</span> <span class="n">ModelSignature</span>
+<span class="kn">from</span> <span class="nn">mlflow.pyfunc</span> <span class="kn">import</span> <span class="n">PythonModel</span>
+<span class="kn">from</span> <span class="nn">mlflow.types.schema</span> <span class="kn">import</span> <span class="n">ColSpec</span><span class="p">,</span> <span class="n">ParamSchema</span><span class="p">,</span> <span class="n">ParamSpec</span><span class="p">,</span> <span class="n">Schema</span>
+
+
+<span class="c1"># Run a quick validation that we have an entry for the OPEN_API_KEY within environment variables</span>
+<span class="k">assert</span> <span class="s2">&quot;OPENAI_API_KEY&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">,</span> <span class="s2">&quot;OPENAI_API_KEY environment variable must be set&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Initializing-the-MLflow-Client">
+<h2>Initializing the MLflow Client<a class="headerlink" href="#Initializing-the-MLflow-Client" title="Permalink to this headline"> </a></h2>
+<p>Depending on where you are running this notebook, your configuration may vary for how you initialize the MLflow Client. If you are uncertain about how to configure and use an MLflow Tracking server or what options are available (The easiest is to use the free managed service within <a class="reference external" href="https://community.cloud.databricks.com/">Databricks Community Edition</a>), you can see <a class="reference external" href="https://www.mlflow.org/docs/latest/getting-started/running-notebooks/index.html">the guide to running notebooks here</a> for
+more information on setting the tracking server uri and configuring access to either managed or self-managed MLflow tracking servers.</p>
+</div>
+<div class="section" id="Setting-the-MLflow-Experiment">
+<h2>Setting the MLflow Experiment<a class="headerlink" href="#Setting-the-MLflow-Experiment" title="Permalink to this headline"> </a></h2>
+<p>In this section of the tutorial, we use MLflow’s <code class="docutils literal notranslate"><span class="pre">set_experiment</span></code> function to define an experiment named “Code Helper”. This step is essential in MLflow’s workflow for several reasons:</p>
+<ol class="arabic simple">
+<li><p><strong>Unique Identification</strong>: A unique and distinct experiment name like “Code Helper” is crucial for easy identification and segregation of the runs pertaining to this specific project, especially when working on multiple projects or experiments simultaneously.</p></li>
+<li><p><strong>Simplified Tracking</strong>: Naming the experiment enables effortless tracking of all the runs and models associated with it, maintaining a clear history of model development, parameters, metrics, and results.</p></li>
+<li><p><strong>Ease of Access in MLflow UI</strong>: A distinct experiment name ensures quick location and access to our experiment’s runs and models within the MLflow UI, facilitating analysis, comparison of different runs, and sharing findings.</p></li>
+<li><p><strong>Facilitates Better Organization</strong>: As projects grow in complexity, having a well-named experiment aids in better organization and management of the machine learning lifecycle, making it easier to navigate through different stages of the experiment.</p></li>
+</ol>
+<p>The use of a unique experiment name like “Code Helper” lays the foundation for efficient model management and tracking, a critical aspect of any machine learning workflow, especially in dynamic and collaborative environments.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s2">&quot;Code Helper&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;Experiment: artifact_location=&#39;file:///Users/benjamin.wilson/repos/mlflow-fork/mlflow/docs/source/llms/openai/notebooks/mlruns/703316263508654123&#39;, creation_time=1701891935339, experiment_id=&#39;703316263508654123&#39;, last_update_time=1701891935339, lifecycle_stage=&#39;active&#39;, name=&#39;Code Helper&#39;, tags={}&gt;
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Defining-the-Instruction-Set-for-the-AI-Model">
+<h2>Defining the Instruction Set for the AI Model<a class="headerlink" href="#Defining-the-Instruction-Set-for-the-AI-Model" title="Permalink to this headline"> </a></h2>
+<p>In this part of the tutorial, we define a specific set of instructions to guide the behavior of our AI model. This is achieved through the <code class="docutils literal notranslate"><span class="pre">instruction</span></code> array, which outlines the roles and expected interactions between the system (AI model) and the user. Here’s a breakdown of its components:</p>
+<ol class="arabic simple">
+<li><p><strong>System Role</strong>: The first element of the array defines the role of the AI model as a ‘system’. It describes the model as a ‘helpful expert Software Engineer’ whose purpose is to assist in code analysis and provide educational support. The AI model is expected to:</p>
+<ul class="simple">
+<li><p>Offer clear explanations of the code’s intent.</p></li>
+<li><p>Assess the code’s correctness and readability.</p></li>
+<li><p>Suggest improvements while focusing on simplicity, maintainability, and adherence to best coding practices.</p></li>
+</ul>
+</li>
+<li><p><strong>User Role</strong>: The second element represents the ‘user’ role. This part is where the user (in this case, the person learning from the tutorial) interacts with the AI model by submitting code for review. The user is expected to:</p>
+<ul class="simple">
+<li><p>Provide code snippets for evaluation.</p></li>
+<li><p>Seek feedback and suggestions for code improvement from the AI model.</p></li>
+</ul>
+</li>
+</ol>
+<p>This instruction set is crucial for creating an interactive learning experience. It guides the AI model in providing targeted, constructive feedback, making it an invaluable tool for understanding coding practices and enhancing coding skills.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">instruction</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="p">(</span>
+            <span class="s2">&quot;As an AI specializing in code review, your task is to analyze and critique the submitted code. For each code snippet, provide a detailed review that includes: &quot;</span>
+            <span class="s2">&quot;1. Identification of any errors or bugs. &quot;</span>
+            <span class="s2">&quot;2. Suggestions for optimizing code efficiency and structure. &quot;</span>
+            <span class="s2">&quot;3. Recommendations for enhancing code readability and maintainability. &quot;</span>
+            <span class="s2">&quot;4. Best practice advice relevant to the code’s language and functionality. &quot;</span>
+            <span class="s2">&quot;Your feedback should help the user improve their coding skills and understand best practices in software development.&quot;</span>
+        <span class="p">),</span>
+    <span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;Review my code and suggest improvements: </span><span class="si">{code}</span><span class="s2">&quot;</span><span class="p">},</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Defining-and-Utilizing-the-Model-Signature-in-MLflow">
+<h2>Defining and Utilizing the Model Signature in MLflow<a class="headerlink" href="#Defining-and-Utilizing-the-Model-Signature-in-MLflow" title="Permalink to this headline"> </a></h2>
+<p>In this part of the tutorial, we define a <code class="docutils literal notranslate"><span class="pre">ModelSignature</span></code> for our OpenAI model, which is a crucial step in both saving the base model and later in our custom Python Model implementation. Here’s an overview of the process:</p>
+<ol class="arabic simple">
+<li><p><strong>Model Signature Definition</strong>:</p>
+<ul class="simple">
+<li><p>We create a <code class="docutils literal notranslate"><span class="pre">ModelSignature</span></code> object that specifies the input, output, and parameters of our model.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">inputs</span></code> and <code class="docutils literal notranslate"><span class="pre">outputs</span></code> are defined as schemas with a single string column, indicating that our model will be processing string type data.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">params</span></code> schema includes two parameters: <code class="docutils literal notranslate"><span class="pre">max_tokens</span></code> and <code class="docutils literal notranslate"><span class="pre">temperature</span></code>, each with a default value and data type defined.</p></li>
+</ul>
+</li>
+</ol>
+<blockquote>
+<div><p><strong>Note</strong> We’re explicitly defining the model signature here for purposes of demonstration. The schema will be automatically inferred if you do not specify one and will be set based on the <code class="docutils literal notranslate"><span class="pre">task</span></code> that is defined when logging or saving the model.</p>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p><strong>Logging the Base OpenAI Model</strong>:</p>
+<ul class="simple">
+<li><p>Using <code class="docutils literal notranslate"><span class="pre">mlflow.openai.log_model</span></code>, we log the base OpenAI model (<code class="docutils literal notranslate"><span class="pre">gpt-4</span></code>) along with the <code class="docutils literal notranslate"><span class="pre">instruction</span></code> set we defined earlier.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">signature</span></code> we defined is also passed in this step, ensuring that the model is saved with the correct specifications for inputs, outputs, and parameters.</p></li>
+</ul>
+</li>
+</ol>
+<p>This dual-purpose signature is vital as it ensures consistency in how the model processes data both in its base form and when it’s later wrapped in a custom Python Model. This approach streamlines the workflow and maintains uniformity across different stages of model implementation and deployment.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define the model signature that will be used for both the base model and the eventual custom pyfunc implementation later.</span>
+<span class="n">signature</span> <span class="o">=</span> <span class="n">ModelSignature</span><span class="p">(</span>
+    <span class="n">inputs</span><span class="o">=</span><span class="n">Schema</span><span class="p">([</span><span class="n">ColSpec</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">)]),</span>
+    <span class="n">outputs</span><span class="o">=</span><span class="n">Schema</span><span class="p">([</span><span class="n">ColSpec</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">)]),</span>
+    <span class="n">params</span><span class="o">=</span><span class="n">ParamSchema</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="n">ParamSpec</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;max_tokens&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;long&quot;</span><span class="p">),</span>
+            <span class="n">ParamSpec</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;temperature&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float&quot;</span><span class="p">),</span>
+        <span class="p">]</span>
+    <span class="p">),</span>
+<span class="p">)</span>
+
+<span class="c1"># Log the base OpenAI model with the included instruction set (prompt)</span>
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="n">model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">openai</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-4&quot;</span><span class="p">,</span>
+        <span class="n">task</span><span class="o">=</span><span class="n">openai</span><span class="o">.</span><span class="n">ChatCompletion</span><span class="p">,</span>
+        <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;base_model&quot;</span><span class="p">,</span>
+        <span class="n">messages</span><span class="o">=</span><span class="n">instruction</span><span class="p">,</span>
+        <span class="n">signature</span><span class="o">=</span><span class="n">signature</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Our-logged-model-in-the-MLflow-UI">
+<h2>Our logged model in the MLflow UI<a class="headerlink" href="#Our-logged-model-in-the-MLflow-UI" title="Permalink to this headline"> </a></h2>
+<p>After logging the model, you can open up the MLflow UI and see the components that have been logged. Notice that the configuration for our model, including the model type (gpt-4), the endpoint API type (task) is recorded (chat.completions), and the prompt have all been logged.</p>
+<p><img alt="openai-ui" src="https://i.imgur.com/72EGEG8.png" /></p>
+</div>
+<div class="section" id="Enhancing-User-Experience-with-Custom-Pyfunc-Implementation">
+<h2>Enhancing User Experience with Custom Pyfunc Implementation<a class="headerlink" href="#Enhancing-User-Experience-with-Custom-Pyfunc-Implementation" title="Permalink to this headline"> </a></h2>
+<p>In this section, we introduce a custom Python Model, <code class="docutils literal notranslate"><span class="pre">CodeHelper</span></code>, which significantly improves the user experience when interacting with the OpenAI model in an interactive development environment like Jupyter Notebook. The <code class="docutils literal notranslate"><span class="pre">CodeHelper</span></code> class is designed to format the output from the OpenAI model, making it more readable and visually appealing, similar to a chat interface. Here’s how it works:</p>
+<ol class="arabic simple">
+<li><p><strong>Initialization and Model Loading</strong>:</p>
+<ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">CodeHelper</span></code> class inherits from <code class="docutils literal notranslate"><span class="pre">PythonModel</span></code>.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">load_context</span></code> method is used to load the OpenAI model, which is saved as <code class="docutils literal notranslate"><span class="pre">self.model</span></code>. This model is loaded from the <code class="docutils literal notranslate"><span class="pre">context.artifacts</span></code>, ensuring that the appropriate model is used for predictions.</p></li>
+</ul>
+</li>
+<li><p><strong>Response Formatting</strong>:</p>
+<ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">_format_response</span></code> method is crucial for enhancing the output format.</p></li>
+<li><p>It processes each item in the response, handling text and code blocks differently.</p></li>
+<li><p>Text lines outside of code blocks are wrapped to a width of 80 characters for better readability.</p></li>
+<li><p>Lines within code blocks (marked by <code class="docutils literal notranslate"><span class="pre">`</span></code>``) are not wrapped, preserving the code structure.</p></li>
+<li><p>This formatting creates an output that resembles a chat interface, making the interaction more intuitive and user-friendly.</p></li>
+</ul>
+</li>
+<li><p><strong>Making Predictions</strong>:</p>
+<ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">predict</span></code> method is where the model’s prediction occurs.</p></li>
+<li><p>It calls the loaded OpenAI model to get the raw response for the given input.</p></li>
+<li><p>The raw response is then passed to the <code class="docutils literal notranslate"><span class="pre">_format_response</span></code> method for formatting.</p></li>
+<li><p>The formatted response is returned, providing a clear and easy-to-read output.</p></li>
+</ul>
+</li>
+</ol>
+<p>By implementing this custom <code class="docutils literal notranslate"><span class="pre">pyfunc</span></code>, we enhance the user’s interaction with the AI code helper. It not only makes the output easier to understand but also presents it in a familiar format, akin to messaging, which is especially beneficial in interactive coding environments.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Custom pyfunc implementation that applies text and code formatting to the output results from the OpenAI model</span>
+<span class="k">class</span> <span class="nc">CodeHelper</span><span class="p">(</span><span class="n">PythonModel</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">load_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">artifacts</span><span class="p">[</span><span class="s2">&quot;model_path&quot;</span><span class="p">])</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_format_response</span><span class="p">(</span><span class="n">response</span><span class="p">):</span>
+        <span class="n">formatted_output</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">in_code_block</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">response</span><span class="p">:</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+                <span class="c1"># Check for the start/end of a code block</span>
+                <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;```&quot;</span><span class="p">):</span>
+                    <span class="n">in_code_block</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">in_code_block</span>
+                    <span class="n">formatted_output</span> <span class="o">+=</span> <span class="n">line</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="k">continue</span>
+
+                <span class="k">if</span> <span class="n">in_code_block</span><span class="p">:</span>
+                    <span class="c1"># Don&#39;t wrap lines inside code blocks</span>
+                    <span class="n">formatted_output</span> <span class="o">+=</span> <span class="n">line</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Wrap lines outside of code blocks</span>
+                    <span class="n">wrapped_lines</span> <span class="o">=</span> <span class="n">textwrap</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">80</span><span class="p">)</span>
+                    <span class="n">formatted_output</span> <span class="o">+=</span> <span class="n">wrapped_lines</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+        <span class="k">return</span> <span class="n">formatted_output</span>
+
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">model_input</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="c1"># Call the loaded OpenAI model instance to get the raw response</span>
+        <span class="n">raw_response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">model_input</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+
+        <span class="c1"># Return the formatted response so that it is easier to read</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_format_response</span><span class="p">(</span><span class="n">raw_response</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Saving-the-Custom-Python-Model-with-MLflow">
+<h2>Saving the Custom Python Model with MLflow<a class="headerlink" href="#Saving-the-Custom-Python-Model-with-MLflow" title="Permalink to this headline"> </a></h2>
+<p>This part of the tutorial demonstrates how to save the custom Python model, <code class="docutils literal notranslate"><span class="pre">CodeHelper</span></code>, using MLflow. The process involves specifying the model’s location and additional information to ensure it is properly stored and can be retrieved for future use. Here’s an overview:</p>
+<ol class="arabic simple">
+<li><p><strong>Defining Artifacts</strong>:</p>
+<ul class="simple">
+<li><p>An <code class="docutils literal notranslate"><span class="pre">artifacts</span></code> dictionary is created with a key <code class="docutils literal notranslate"><span class="pre">&quot;model_path&quot;</span></code> pointing to the location of the base OpenAI model. This step is important to link our custom model with the necessary base model files. We retrieve the location of the logged openai model from earlier by accessing the <code class="docutils literal notranslate"><span class="pre">model_uri</span></code> property from the return of the <code class="docutils literal notranslate"><span class="pre">log_model()</span></code> function.</p></li>
+</ul>
+</li>
+<li><p><strong>Saving the Model</strong>:</p>
+<ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">mlflow.pyfunc.save_model</span></code> function is used to save the <code class="docutils literal notranslate"><span class="pre">CodeHelper</span></code> model.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">path</span></code>: Specifies the location (<code class="docutils literal notranslate"><span class="pre">final_model_path</span></code>) where the model will be saved.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">python_model</span></code>: An instance of the <code class="docutils literal notranslate"><span class="pre">CodeHelper</span></code> class is provided, indicating the model to be saved.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">input_example</span></code>: An example input (<code class="docutils literal notranslate"><span class="pre">[&quot;x</span> <span class="pre">=</span> <span class="pre">1&quot;]</span></code>) is given, which is useful for understanding the model’s expected input format.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">signature</span></code>: The previously defined <code class="docutils literal notranslate"><span class="pre">ModelSignature</span></code> is passed, ensuring consistency in how the model processes data.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">artifacts</span></code>: The <code class="docutils literal notranslate"><span class="pre">artifacts</span></code> dictionary is included to associate the base OpenAI model with our custom model.</p></li>
+</ul>
+</li>
+</ol>
+<p>This step is crucial for encapsulating the entire functionality of our <code class="docutils literal notranslate"><span class="pre">CodeHelper</span></code> model in a format that MLflow can manage and track. It allows for easy deployment and versioning of the model, facilitating its use in various applications and environments.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define the location of the base model that we&#39;ll be using within our custom pyfunc implementation</span>
+<span class="n">artifacts</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;model_path&quot;</span><span class="p">:</span> <span class="n">model_info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">}</span>
+
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="n">helper_model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+        <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;code_helper&quot;</span><span class="p">,</span>
+        <span class="n">python_model</span><span class="o">=</span><span class="n">CodeHelper</span><span class="p">(),</span>
+        <span class="n">input_example</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;x = 1&quot;</span><span class="p">],</span>
+        <span class="n">signature</span><span class="o">=</span><span class="n">signature</span><span class="p">,</span>
+        <span class="n">artifacts</span><span class="o">=</span><span class="n">artifacts</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "86d0f13d76c246e78946dbab8281ae9f", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+</div>
+<div class="section" id="Load-our-saved-Custom-Python-Model">
+<h2>Load our saved Custom Python Model<a class="headerlink" href="#Load-our-saved-Custom-Python-Model" title="Permalink to this headline"> </a></h2>
+<p>In this next section, we load the model that we just saved so that we can use it!</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">loaded_helper</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">helper_model</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Comparing-Two-Approaches-for-Code-Review-with-MLflow-Models">
+<h2>Comparing Two Approaches for Code Review with MLflow Models<a class="headerlink" href="#Comparing-Two-Approaches-for-Code-Review-with-MLflow-Models" title="Permalink to this headline"> </a></h2>
+<p>In this tutorial, we’ll explore two different approaches to utilizing MLflow models for reviewing and providing feedback on code. These approaches offer varying levels of complexity and integration, catering to different use cases and preferences.</p>
+<div class="section" id="Approach-1:-The-Simple-review-Function">
+<h3>Approach 1: The Simple <code class="docutils literal notranslate"><span class="pre">review</span></code> Function<a class="headerlink" href="#Approach-1:-The-Simple-review-Function" title="Permalink to this headline"> </a></h3>
+<p>Our first approach is a straightforward <code class="docutils literal notranslate"><span class="pre">review</span></code> function. This method is less intrusive and does not modify the original function’s behavior. It’s ideal for scenarios where you want to manually trigger a review of the function’s code and don’t need to see the output result of the function to have context of the LLM’s analysis.</p>
+<ul class="simple">
+<li><p><strong>How it works</strong>: The <code class="docutils literal notranslate"><span class="pre">review</span></code> function takes a function and an MLflow model as arguments. It then uses the model to evaluate the source code of the given function.</p></li>
+<li><p><strong>Manual Invocation</strong>: You need to explicitly call <code class="docutils literal notranslate"><span class="pre">review(my_func)</span></code> to review <code class="docutils literal notranslate"><span class="pre">my_func</span></code>. This approach is manual and does not automatically integrate with function calls.</p></li>
+<li><p><strong>Simplicity</strong>: This method is simpler and more direct, making it suitable for one-off evaluations or for use cases where automatic review is not required.</p></li>
+</ul>
+</div>
+<div class="section" id="Approach-2:-The-Advanced-code_inspector-Decorator">
+<h3>Approach 2: The Advanced <code class="docutils literal notranslate"><span class="pre">code_inspector</span></code> Decorator<a class="headerlink" href="#Approach-2:-The-Advanced-code_inspector-Decorator" title="Permalink to this headline"> </a></h3>
+<p>The second approach is an advanced decorator, <code class="docutils literal notranslate"><span class="pre">code_inspector</span></code>, which integrates more deeply by automatically reviewing the function and allowing the function’s evaluation to execute. This can be helpful for more complex functions where the output result, in conjunction with the evaluation from the code helper, can allow for a deeper understanding of any observed logical flaws.</p>
+<ul class="simple">
+<li><p><strong>Automatic Evaluation</strong>: When applied as a decorator, <code class="docutils literal notranslate"><span class="pre">code_inspector</span></code> evaluates the function’s code automatically on each call.</p></li>
+<li><p><strong>Error Handling</strong>: Includes robust error handling within the evaluation process.</p></li>
+<li><p><strong>Function Modification</strong>: This method modifies the function’s behavior, incorporating an automatic review process.</p></li>
+</ul>
+</div>
+<div class="section" id="Introduction-to-the-review-Function">
+<h3>Introduction to the <code class="docutils literal notranslate"><span class="pre">review</span></code> Function<a class="headerlink" href="#Introduction-to-the-review-Function" title="Permalink to this headline"> </a></h3>
+<p>We’ll start by examining the <code class="docutils literal notranslate"><span class="pre">review</span></code> function. This function will be defined in the next cell of our Jupyter notebook. Here’s a quick overview of what the <code class="docutils literal notranslate"><span class="pre">review</span></code> function does:</p>
+<ul class="simple">
+<li><p><strong>Inputs</strong>: It takes a function and an MLflow model as inputs.</p></li>
+<li><p><strong>Functionality</strong>: Extracts the source code of the input function and uses the MLflow model to provide feedback on it.</p></li>
+<li><p><strong>Error Handling</strong>: Enhanced with error handling to manage exceptions gracefully.</p></li>
+</ul>
+<p>In the following Jupyter notebook cell, you’ll see the implementation of the <code class="docutils literal notranslate"><span class="pre">review</span></code> function, demonstrating its simplicity and effectiveness in evaluating code.</p>
+<hr class="docutils" />
+<p>After exploring the <code class="docutils literal notranslate"><span class="pre">review</span></code> function, we will delve into the more complex <code class="docutils literal notranslate"><span class="pre">code_inspector</span></code> decorator to understand its automatic evaluation process and error handling mechanisms.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">review</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function to review the source code of a given function using a specified MLflow model.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    func (function): The function to review.</span>
+<span class="sd">    model (MLflow pyfunc model): The MLflow pyfunc model used for evaluation.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    The model&#39;s prediction or an error message.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Extracting the source code of the function</span>
+        <span class="n">source_code</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getsource</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+
+        <span class="c1"># Using the model to predict/evaluate the source code</span>
+        <span class="n">prediction</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">([</span><span class="n">source_code</span><span class="p">])</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="c1"># Handling any exceptions that occur and returning an error message</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Error during model prediction or source code inspection: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Explanation-and-Review-of-process_data-Function">
+<h2>Explanation and Review of <code class="docutils literal notranslate"><span class="pre">process_data</span></code> Function<a class="headerlink" href="#Explanation-and-Review-of-process_data-Function" title="Permalink to this headline"> </a></h2>
+<div class="section" id="Function-Overview">
+<h3>Function Overview<a class="headerlink" href="#Function-Overview" title="Permalink to this headline"> </a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">process_data</span></code> function aims to process a list by identifying unique elements and counting duplicates. However, the implementation has several inefficiencies and readability issues.</p>
+</div>
+<div class="section" id="Suggested-Revised-Code">
+<h3>Suggested Revised Code<a class="headerlink" href="#Suggested-Revised-Code" title="Permalink to this headline"> </a></h3>
+<p>The output from GPT-4’s analysis provides clear and concise feedback, precisely as the prompt instructed it to. With the MLflow integration of this application, the simplicity of using the tool is evident, allowing us to get high-quality guidance during the development process with as little as a single, simple function call.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">process_data</span><span class="p">(</span><span class="n">lst</span><span class="p">):</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lst</span><span class="p">)):</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">lst</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">lst</span><span class="p">)):</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="n">lst</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">a</span> <span class="o">==</span> <span class="n">b</span><span class="p">:</span>
+                <span class="n">s</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">q</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+    <span class="n">rslt</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">lst</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">q</span><span class="p">]</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">rslt</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">k</span><span class="p">:</span>
+            <span class="n">k</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="n">final_data</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">final_data</span><span class="p">,</span> <span class="n">s</span>
+
+
+<span class="n">review</span><span class="p">(</span><span class="n">process_data</span><span class="p">,</span> <span class="n">loaded_helper</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Your code seems to be trying to find the count of duplicate elements in a list
+and return a sorted list of unique elements in descending order along with the
+count of duplicates. Here are some suggestions to improve your code:
+
+1. **Errors or Bugs**: There are no syntax errors in your code, but the logic is
+flawed. The variable `s` is supposed to count the number of duplicate elements,
+but it only counts the number of times an element is equal to another element in
+the list, which is not the same thing. Also, the way you&#39;re trying to get unique
+elements is inefficient and can lead to incorrect results.
+
+2. **Optimizing Code Efficiency and Structure**: You can use Python&#39;s built-in
+`set` and `list` data structures to simplify your code and make it more
+efficient. A `set` in Python is an unordered collection of unique elements. You
+can convert your list to a set to remove duplicates, and then convert it back to
+a list. The length of the original list minus the length of the list with
+duplicates removed will give you the number of duplicate elements.
+
+3. **Enhancing Code Readability and Maintainability**: Use meaningful variable
+names to make your code easier to understand. Also, add comments to explain what
+each part of your code does.
+
+4. **Best Practice Advice**: It&#39;s a good practice to write a docstring at the
+beginning of your function to explain what it does.
+
+Here&#39;s a revised version of your code incorporating these suggestions:
+
+```python
+def process_data(lst):
+    &#34;&#34;&#34;
+    This function takes a list as input, removes duplicate elements, sorts the remaining elements in descending order,
+    and counts the number of duplicate elements in the original list.
+    It returns a tuple containing the sorted list of unique elements and the count of duplicate elements.
+    &#34;&#34;&#34;
+    # Convert the list to a set to remove duplicates, then convert it back to a list
+    unique_elements = list(set(lst))
+
+    # Sort the list of unique elements in descending order
+    sorted_unique_elements = sorted(unique_elements, reverse=True)
+
+    # Count the number of duplicate elements
+    duplicate_count = len(lst) - len(unique_elements)
+
+    return sorted_unique_elements, duplicate_count
+```
+This version of the code is simpler, more efficient, and easier to understand.
+It also correctly counts the number of duplicate elements in the list.
+
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="The-code_inspector-Decorator-Function">
+<h2>The <code class="docutils literal notranslate"><span class="pre">code_inspector</span></code> Decorator Function<a class="headerlink" href="#The-code_inspector-Decorator-Function" title="Permalink to this headline"> </a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">code_inspector</span></code> function is a Python decorator designed to augment functions with automatic code review capabilities using an MLflow pyfunc model. This decorator enhances the functionality of functions, allowing them to be automatically reviewed for code quality and correctness using an MLflow pyfunc model, thereby enriching the development and learning experience. As compared to the above implementation for the <code class="docutils literal notranslate"><span class="pre">review()</span></code> function, this approach will allow the function to be executed
+when called, enhancing the contextual information when paired with the automated code review.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+
+
+<span class="k">def</span> <span class="nf">code_inspector</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Decorator for automatic code review using an MLflow pyfunc model.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        model: The MLflow pyfunc model for code evaluation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">decorator_check_my_function</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+        <span class="c1"># Decorator that wraps around the given function</span>
+        <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># Extracting the source code of the decorated function</span>
+                <span class="n">parsed_func</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getsource</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+
+                <span class="c1"># Using the MLflow model to evaluate the extracted source code</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">([</span><span class="n">parsed_func</span><span class="p">])</span>
+
+                <span class="c1"># Printing the response for code review feedback</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="c1"># Handling exceptions during model prediction or source code extraction</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error during model prediction or formatting:&quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+
+            <span class="c1"># Executing and returning the original function&#39;s output</span>
+            <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">wrapper</span>
+
+    <span class="k">return</span> <span class="n">decorator_check_my_function</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="First-Usage-Trial:-The-summing_function-with-code_inspector">
+<h2>First Usage Trial: The <code class="docutils literal notranslate"><span class="pre">summing_function</span></code> with <code class="docutils literal notranslate"><span class="pre">code_inspector</span></code><a class="headerlink" href="#First-Usage-Trial:-The-summing_function-with-code_inspector" title="Permalink to this headline"> </a></h2>
+<p>We apply the <code class="docutils literal notranslate"><span class="pre">code_inspector</span></code> decorator to a function named <code class="docutils literal notranslate"><span class="pre">summing_function</span></code>. This function is designed to calculate the sum of sums for a given range. Here’s an insight into its functionality and the enhancement brought by <code class="docutils literal notranslate"><span class="pre">code_inspector</span></code>:</p>
+<ol class="arabic simple">
+<li><p><strong>Function Overview</strong>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">summing_function</span></code> calculates the cumulative sum of numbers up to <code class="docutils literal notranslate"><span class="pre">n</span></code>. It does so by iterating over a range and summing the intermediate sums at each step.</p></li>
+<li><p>A dictionary, <code class="docutils literal notranslate"><span class="pre">intermediate_sums</span></code>, is used to store these sums, which are then aggregated to find the final sum.</p></li>
+</ul>
+</li>
+<li><p><strong>Using ``code_inspector``</strong>:</p>
+<ul class="simple">
+<li><p>The function is decorated with <code class="docutils literal notranslate"><span class="pre">code_inspector(loaded_helper)</span></code>. This means that each time <code class="docutils literal notranslate"><span class="pre">summing_function</span></code> is called, the MLflow model loaded as <code class="docutils literal notranslate"><span class="pre">loaded_helper</span></code> analyzes its code.</p></li>
+<li><p>The decorator provides real-time feedback on the code, assessing aspects like quality, efficiency, and best practices.</p></li>
+</ul>
+</li>
+<li><p><strong>Educational Benefit</strong>:</p>
+<ul class="simple">
+<li><p>This setup is ideal for learning, allowing users to receive instant, actionable feedback on their code.</p></li>
+<li><p>It offers a practical way to understand the logic behind the function and learn coding optimizations and improvements.</p></li>
+</ul>
+</li>
+</ol>
+<p>By integrating <code class="docutils literal notranslate"><span class="pre">code_inspector</span></code> with <code class="docutils literal notranslate"><span class="pre">summing_function</span></code>, the tutorial demonstrates an interactive approach to enhancing coding skills, with immediate feedback aiding in understanding and improvement.</p>
+<p>Before proceeding to see the response from GPT-4, can you identify all of the issues in this code (there are more than a few)?</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nd">@code_inspector</span><span class="p">(</span><span class="n">loaded_helper</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">summing_function</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="n">sum_result</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">intermediate_sums</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">intermediate_sums</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)])</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">intermediate_sums</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+                <span class="n">sum_result</span> <span class="o">=</span> <span class="n">intermediate_sums</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+    <span class="n">final_sum</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">intermediate_sums</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">intermediate_sums</span> <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">==</span> <span class="n">n</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">final_sum</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Execution-and-Analysis-of-summing_function(1000)">
+<h2>Execution and Analysis of <code class="docutils literal notranslate"><span class="pre">summing_function(1000)</span></code><a class="headerlink" href="#Execution-and-Analysis-of-summing_function(1000)" title="Permalink to this headline"> </a></h2>
+<p>When we execute <code class="docutils literal notranslate"><span class="pre">summing_function(1000)</span></code>, several key processes take place, utilizing our custom MLflow model through the <code class="docutils literal notranslate"><span class="pre">code_inspector</span></code> decorator. Here’s what happens:</p>
+<ol class="arabic simple">
+<li><p><strong>Decorator Activation</strong>:</p>
+<ul class="simple">
+<li><p>On calling <code class="docutils literal notranslate"><span class="pre">summing_function(1000)</span></code>, the <code class="docutils literal notranslate"><span class="pre">code_inspector</span></code> decorator is the first to activate. This decorator is designed to use the <code class="docutils literal notranslate"><span class="pre">loaded_helper</span></code> model to analyze the decorated function.</p></li>
+</ul>
+</li>
+<li><p><strong>Model Analyzes the Function Code</strong>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">code_inspector</span></code> retrieves the source code of <code class="docutils literal notranslate"><span class="pre">summing_function</span></code> using the <code class="docutils literal notranslate"><span class="pre">inspect</span></code> module.</p></li>
+<li><p>This source code is then passed to the <code class="docutils literal notranslate"><span class="pre">loaded_helper</span></code> model, which performs an analysis based on its training and provided instructions. The model predicts feedback on code quality, efficiency, and best practices.</p></li>
+</ul>
+</li>
+<li><p><strong>Feedback Presentation</strong>:</p>
+<ul class="simple">
+<li><p>The feedback generated by the model is printed out. This feedback might include suggestions for code optimization, identification of potential errors, or general advice on coding practices.</p></li>
+<li><p>This step provides an educational insight into the code quality before the function executes its logic.</p></li>
+</ul>
+</li>
+<li><p><strong>Function Execution</strong>:</p>
+<ul class="simple">
+<li><p>After the feedback is displayed, the <code class="docutils literal notranslate"><span class="pre">summing_function</span></code> proceeds to execute with the input <code class="docutils literal notranslate"><span class="pre">1000</span></code>.</p></li>
+<li><p>The function calculates the cumulative sum of numbers up to 1000, but due to its inefficient implementation, this process may be slower and more resource-intensive than necessary.</p></li>
+</ul>
+</li>
+<li><p><strong>Return of Result</strong>:</p>
+<ul class="simple">
+<li><p>The function returns the final computed sum, which is the result of the summing logic implemented within it.</p></li>
+</ul>
+</li>
+</ol>
+<p>This demonstration highlights how the <code class="docutils literal notranslate"><span class="pre">code_inspector</span></code> decorator, combined with our custom MLflow model, provides a unique, real-time code analysis and feedback mechanism, enhancing the learning and development experience in an interactive environment.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">summing_function</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Here&#39;s a detailed review of your code:
+
+1. Errors or bugs: There are no syntax errors in your code, but there is a
+logical error. The summing_function is supposed to calculate the sum of numbers
+from 1 to n, but it&#39;s doing more than that. It&#39;s calculating the sum of numbers
+from 1 to i for each i in the range 1 to n, storing these sums in a dictionary,
+and then summing these sums again. This is unnecessary and inefficient.
+
+2. Optimizing code efficiency and structure: The function can be simplified
+significantly. The sum of numbers from 1 to n can be calculated directly using
+the formula n*(n+1)/2. This eliminates the need for the loop and the dictionary,
+making the function much more efficient.
+
+3. Enhancing code readability and maintainability: The code can be made more
+readable by simplifying it and removing unnecessary parts. The use of the
+dictionary and the conversion of numbers to strings and back to numbers is
+confusing and unnecessary.
+
+4. Best practice advice: In Python, it&#39;s best to keep things simple and
+readable. Avoid unnecessary complexity and use built-in functions and operators
+where possible. Also, avoid unnecessary type conversions.
+
+Here&#39;s a simplified version of your function:
+
+```python
+def summing_function(n):
+    return n * (n + 1) // 2
+```
+
+This function does exactly the same thing as your original function, but it&#39;s
+much simpler, more efficient, and more readable.
+
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+500500
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Analysis-of-one_liner-Function">
+<h2>Analysis of <code class="docutils literal notranslate"><span class="pre">one_liner</span></code> Function<a class="headerlink" href="#Analysis-of-one_liner-Function" title="Permalink to this headline"> </a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">one_liner</span></code> function, decorated with <code class="docutils literal notranslate"><span class="pre">code_inspector</span></code>, demonstrates an interesting approach but has several issues:</p>
+<ol class="arabic simple">
+<li><p><strong>Complexity</strong>: The function uses nested lambda expressions to calculate the factorial of <code class="docutils literal notranslate"><span class="pre">n</span></code>. While compact, this approach is overly complex and hard to read, making the code less maintainable and understandable.</p></li>
+<li><p><strong>Readability</strong>: Good coding practice emphasizes readability, which is compromised here due to the one-liner approach. Such code can be challenging to debug and understand, especially for those unfamiliar with the specific coding style.</p></li>
+<li><p><strong>Best Practices</strong>: While demonstrating Python’s capabilities for writing concise code, this example strays from common best practices, particularly in terms of clarity and simplicity.</p></li>
+</ol>
+<p>When reviewed by the <code class="docutils literal notranslate"><span class="pre">code_inspector</span></code> model, these issues are likely to be highlighted, emphasizing the importance of balancing clever coding with readability and maintainability.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nd">@code_inspector</span><span class="p">(</span><span class="n">loaded_helper</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">one_liner</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="p">(</span><span class="k">lambda</span> <span class="n">f</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="n">f</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">n</span><span class="p">))(</span><span class="k">lambda</span> <span class="n">f</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="n">n</span> <span class="o">*</span> <span class="n">f</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">n</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+        <span class="k">else</span> <span class="s2">&quot;Invalid input&quot;</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">one_liner</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+The code you&#39;ve provided is a one-liner function that calculates the factorial
+of a given number `n`. It uses a lambda function to recursively calculate the
+factorial. Here&#39;s a review of your code:
+
+1. Errors or bugs: There are no syntax errors or bugs in your code. It correctly
+checks if the input is a non-negative integer and calculates the factorial. If
+the input is not a non-negative integer, it returns &#34;Invalid input&#34;.
+
+2. Optimizing code efficiency and structure: The code is already quite efficient
+as it uses recursion to calculate the factorial. However, the structure of the
+code is quite complex due to the use of a lambda function for recursion. This
+can make the code difficult to understand and maintain.
+
+3. Enhancing code readability and maintainability: The code could be made more
+readable by breaking it down into multiple lines and adding comments to explain
+what each part of the code does. The use of a lambda function for recursion
+makes the code more difficult to understand than necessary. A more
+straightforward recursive function could be used instead.
+
+4. Best practice advice: In Python, it&#39;s generally recommended to use clear and
+simple code over complex one-liners. This is because clear code is easier to
+read, understand, and maintain. While one-liners can be fun and clever, they can
+also be difficult to understand and debug.
+
+Here&#39;s a revised version of your code that&#39;s easier to understand:
+
+```python
+def factorial(n):
+    # Check if the input is a non-negative integer
+    if not isinstance(n, int) or n &lt; 0:
+        return &#34;Invalid input&#34;
+
+    # Base case: factorial of 0 is 1
+    if n == 0:
+        return 1
+
+    # Recursive case: n! = n * (n-1)!
+    return n * factorial(n - 1)
+```
+
+This version of the code does the same thing as your original code, but it&#39;s
+much easier to understand because it uses a straightforward recursive function
+instead of a lambda function.
+
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+3628800
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Reviewing-find_phone_numbers-Function">
+<h2>Reviewing <code class="docutils literal notranslate"><span class="pre">find_phone_numbers</span></code> Function<a class="headerlink" href="#Reviewing-find_phone_numbers-Function" title="Permalink to this headline"> </a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">find_phone_numbers</span></code> function, enhanced with the <code class="docutils literal notranslate"><span class="pre">code_inspector</span></code>, is designed to extract phone numbers from a given text but contains a few notable issues and expected behaviors:</p>
+<ol class="arabic simple">
+<li><p><strong>Typographical Error</strong>: The function incorrectly uses <code class="docutils literal notranslate"><span class="pre">re.complie</span></code> instead of <code class="docutils literal notranslate"><span class="pre">re.compile</span></code>, leading to a runtime exception.</p></li>
+<li><p><strong>Pattern Matching Inaccuracy</strong>: The regular expression pattern <code class="docutils literal notranslate"><span class="pre">&quot;(\d{3})-\d{3}-\d{4}&quot;</span></code>, while formatted for typical phone numbers, can result in errors if a phone number does not appear in the string.</p></li>
+<li><p><strong>Lack of Error Handling</strong>: Directly accessing the first element in <code class="docutils literal notranslate"><span class="pre">phone_numbers</span></code> without checking if the list is empty can lead to an <code class="docutils literal notranslate"><span class="pre">IndexError</span></code>.</p></li>
+<li><p><strong>Import Statement Position</strong>: The <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">re</span></code> statement is inside the function, which is unconventional. Imports are typically placed at the top of a script for clarity.</p></li>
+<li><p><strong>Analysis and Exception Handling</strong>:</p>
+<ul class="simple">
+<li><p>Due to how we crafted our custom MLflow model in <code class="docutils literal notranslate"><span class="pre">code_inspector</span></code>, the function’s issues will be analyzed and feedback will be returned before the function’s logic is executed.</p></li>
+<li><p>After this analysis, the execution of the function will likely result in an exception (due to the typographical error), demonstrating the importance of careful code review and testing.</p></li>
+</ul>
+</li>
+</ol>
+<p>The <code class="docutils literal notranslate"><span class="pre">code_inspector</span></code> model’s review will highlight these coding missteps, emphasizing the value of proper syntax, pattern accuracy, and error handling in Python programming.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nd">@code_inspector</span><span class="p">(</span><span class="n">loaded_helper</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">find_phone_numbers</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="n">pattern</span> <span class="o">=</span> <span class="s2">&quot;(\d</span><span class="si">{3}</span><span class="s2">)-\d</span><span class="si">{3}</span><span class="s2">-\d</span><span class="si">{4}</span><span class="s2">&quot;</span>
+
+    <span class="kn">import</span> <span class="nn">re</span>
+
+    <span class="n">compiled_pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">complie</span><span class="p">(</span><span class="n">pattern</span><span class="p">)</span>
+
+    <span class="n">phone_numbers</span> <span class="o">=</span> <span class="n">compiled_pattern</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+    <span class="n">first_number</span> <span class="o">=</span> <span class="n">phone_numbers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;First found phone number: </span><span class="si">{</span><span class="n">first_number</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">phone_numbers</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">find_phone_numbers</span><span class="p">(</span><span class="s2">&quot;Give us a call at 888-867-5309&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Here&#39;s a detailed review of your code:
+
+1. Errors or Bugs:
+   - There&#39;s a typo in the `re.compile` function. You&#39;ve written `re.complie`
+instead of `re.compile`.
+
+2. Suggestions for Optimizing Code Efficiency and Structure:
+   - The import statement `import re` is inside the function. It&#39;s a good
+practice to keep all import statements at the top of the file. This makes it
+easier to see what modules are being used in the script.
+   - The function will throw an error if no phone numbers are found in the text
+because you&#39;re trying to access the first element of `phone_numbers` without
+checking if it exists. You should add a check to see if any phone numbers were
+found before trying to access the first one.
+
+3. Recommendations for Enhancing Code Readability and Maintainability:
+   - The function name `find_phone_numbers` is clear and descriptive, which is
+good. However, the variable `pattern` could be more descriptive. Consider
+renaming it to `phone_number_pattern` or something similar.
+   - You should add docstrings to your function to describe what it does, what
+its parameters are, and what it returns.
+
+4. Best Practice Advice:
+   - Use exception handling to catch potential errors and make your program more
+robust.
+   - Avoid using print statements in functions that are meant to return a value.
+If you want to debug, consider using logging instead.
+
+Here&#39;s how you could improve your code:
+
+```python
+import re
+
+def find_phone_numbers(text):
+    &#34;&#34;&#34;
+    This function finds all phone numbers in the given text.
+
+    Parameters:
+    text (str): The text to search for phone numbers.
+
+    Returns:
+    list: A list of all found phone numbers.
+    &#34;&#34;&#34;
+    phone_number_pattern = &#34;(\d{3})-\d{3}-\d{4}&#34;
+    compiled_pattern = re.compile(phone_number_pattern)
+
+    phone_numbers = compiled_pattern.findall(text)
+
+    if phone_numbers:
+        print(f&#34;First found phone number: {phone_numbers[0]}&#34;)
+
+    return phone_numbers
+```
+
+Remember, the print statement is not recommended in production code. It&#39;s there
+for the sake of this example.
+
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">AttributeError</span>                            Traceback (most recent call last)
+<span class="ansi-green-fg">/var/folders/cd/n8n0rm2x53l_s0xv_j_xklb00000gp/T/ipykernel_38633/78508464.py</span> in <span class="ansi-cyan-fg">&lt;cell line: 1&gt;</span><span class="ansi-blue-fg">()</span>
+<span class="ansi-green-fg">----&gt; 1</span><span class="ansi-red-fg"> </span>find_phone_numbers<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">&#34;Give us a call at 888-867-5309&#34;</span><span class="ansi-blue-fg">)</span>
+
+<span class="ansi-green-fg">/var/folders/cd/n8n0rm2x53l_s0xv_j_xklb00000gp/T/ipykernel_38633/2021999358.py</span> in <span class="ansi-cyan-fg">wrapper</span><span class="ansi-blue-fg">(*args, **kwargs)</span>
+<span class="ansi-green-intense-fg ansi-bold">     18</span>             <span class="ansi-green-fg">except</span> Exception <span class="ansi-green-fg">as</span> e<span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">     19</span>                 print<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">&#34;Error during model prediction or formatting:&#34;</span><span class="ansi-blue-fg">,</span> e<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">---&gt; 20</span><span class="ansi-red-fg">             </span><span class="ansi-green-fg">return</span> func<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">*</span>args<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">**</span>kwargs<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     21</span>
+<span class="ansi-green-intense-fg ansi-bold">     22</span>         <span class="ansi-green-fg">return</span> wrapper
+
+<span class="ansi-green-fg">/var/folders/cd/n8n0rm2x53l_s0xv_j_xklb00000gp/T/ipykernel_38633/773713950.py</span> in <span class="ansi-cyan-fg">find_phone_numbers</span><span class="ansi-blue-fg">(text)</span>
+<span class="ansi-green-intense-fg ansi-bold">      5</span>     <span class="ansi-green-fg">import</span> re
+<span class="ansi-green-intense-fg ansi-bold">      6</span>
+<span class="ansi-green-fg">----&gt; 7</span><span class="ansi-red-fg">     </span>compiled_pattern <span class="ansi-blue-fg">=</span> re<span class="ansi-blue-fg">.</span>complie<span class="ansi-blue-fg">(</span>pattern<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">      8</span>
+<span class="ansi-green-intense-fg ansi-bold">      9</span>     phone_numbers <span class="ansi-blue-fg">=</span> compiled_pattern<span class="ansi-blue-fg">.</span>findall<span class="ansi-blue-fg">(</span>text<span class="ansi-blue-fg">)</span>
+
+<span class="ansi-red-fg">AttributeError</span>: module &#39;re&#39; has no attribute &#39;complie&#39;
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Conclusion:-Harnessing-the-Power-of-MLflow-in-AI-Assisted-Development">
+<h2>Conclusion: Harnessing the Power of MLflow in AI-Assisted Development<a class="headerlink" href="#Conclusion:-Harnessing-the-Power-of-MLflow-in-AI-Assisted-Development" title="Permalink to this headline"> </a></h2>
+<p>As we conclude this tutorial, we have traversed through the integration of OpenAI’s language models with the robust capabilities of MLflow, creating a powerful toolkit for AI-assisted software development. Here’s a recap of our journey and the key takeaways:</p>
+<ol class="arabic simple">
+<li><p><strong>Integrating OpenAI with MLflow</strong>:</p>
+<ul class="simple">
+<li><p>We explored how to seamlessly integrate OpenAI’s advanced language models within the MLflow framework. This integration highlighted the potential of combining AI intelligence with robust model management.</p></li>
+</ul>
+</li>
+<li><p><strong>Implementing a Custom Python Model</strong>:</p>
+<ul class="simple">
+<li><p>Our journey included creating a custom <code class="docutils literal notranslate"><span class="pre">CodeHelper</span></code> model, which showcased MLflow’s flexibility in handling custom Python functions. This model significantly enhanced the user experience by formatting AI responses into a more readable format.</p></li>
+</ul>
+</li>
+<li><p><strong>Real-Time Code Analysis and Feedback</strong>:</p>
+<ul class="simple">
+<li><p>By employing the <code class="docutils literal notranslate"><span class="pre">code_inspector</span></code> decorator, we demonstrated MLflow’s utility in providing real-time, insightful feedback on code quality and efficiency, fostering a learning environment that guides towards best coding practices.</p></li>
+</ul>
+</li>
+<li><p><strong>Handling Complex Code Analysis</strong>:</p>
+<ul class="simple">
+<li><p>The tutorial presented complex code examples, revealing how MLflow, combined with OpenAI, can handle intricate code analysis, offering suggestions and identifying potential issues.</p></li>
+</ul>
+</li>
+<li><p><strong>Learning from Interactive Feedback</strong>:</p>
+<ul class="simple">
+<li><p>The interactive feedback loop, enabled by our MLflow model, illustrated a practical approach to learning and improving coding skills, making this toolset particularly valuable for educational and development purposes.</p></li>
+</ul>
+</li>
+<li><p><strong>Flexibility and Scalability of MLflow</strong>:</p>
+<ul class="simple">
+<li><p>Throughout the tutorial, MLflow’s flexibility and scalability were evident. Whether it’s managing simple Python functions or integrating state-of-the-art AI models, MLflow proved to be an invaluable asset in streamlining the model management process.</p></li>
+</ul>
+</li>
+</ol>
+<p>In summary, this tutorial not only provided insights into effective coding practices but also underscored the versatility of MLflow in enhancing AI-assisted software development. It stands as a testament to how machine learning tools and models can be innovatively applied to improve code quality, efficiency, and the overall development experience.</p>
+</div>
+<div class="section" id="What’s-Next?">
+<h2>What’s Next?<a class="headerlink" href="#What’s-Next?" title="Permalink to this headline"> </a></h2>
+<p>To continue your learning journey, see the additional <a class="reference external" href="https://www.mlflow.org/docs/latest/llms/openai/index.html#advanced-tutorials">advanced tutorials for MLflow’s OpenAI flavor</a>.</p>
+</div>
+</div>
+
+
+              </div>
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="openai-chat-completions.html" class="btn btn-neutral" title="Introduction: Advancing Communication with GPT-4 and MLflow" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+      
+      
+        <a href="openai-embeddings-generation.html" class="btn btn-neutral" title="Advanced Tutorial: Embeddings Support with OpenAI in MLflow" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+      <p class="copyright">
+          &copy; MLflow Project, a Series of LF Projects, LLC. All rights reserved.
+      </p>
+
+  </div> 
+
+</footer>
+          </div>
+        </div>
+      </section>
+    </main>
+  </page>
+
+  
+
+
+  
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+      URL_ROOT:'../../../',
+      VERSION:'2.9.3.dev0',
+      COLLAPSE_INDEX:false,
+      FILE_SUFFIX:'.html',
+      LINK_SUFFIX: '.html',
+      HAS_SOURCE:  true
+    };
+  </script>
+
+  
+
+  <script type="text/javascript" src="../../../_static/js/clipboard.min.js"></script>
+  <script type="text/javascript" src="../../../_static/js/jquery.waypoints.min.js"></script>
+
+  
+  
+  
+  <script type="text/javascript">var CLIPPY_SVG_PATH = "../../../_static/clippy.svg";</script>
+  <script type="text/javascript" src="../../../_static/js/custom.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.StickyNav.enable();
+    });
+
+  </script>
+  
+
+  
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        // Get the code block designator class entries
+        const allHighlights = document.querySelectorAll('.highlight');
+        // Disable copyable links for notebook cell numbering and for cell outputs
+        const highlights = Array.from(allHighlights).filter(highlight => !highlight.closest('.highlight-none') && 
+            !highlight.closest('.nboutput'));
+    
+        highlights.forEach(function(highlight) {
+            const copyIcon = document.createElement('span');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.innerHTML = '&#xf0ea;';
+
+            copyIcon.addEventListener('click', function() {
+                const code = highlight.querySelector('pre').textContent;
+                copyToClipboard(code);
+
+                // Flash effect on click
+                this.style.color = '#0194E2';
+                setTimeout(() => {
+                    this.style.color = ''; 
+                }, 100);
+
+                // Display "Code copied to clipboard" near the clicked icon
+                const message = document.createElement('span');
+                message.textContent = "Copied!";
+                message.classList.add('copy-message'); 
+
+                // Append the message to the icon
+                this.appendChild(message);
+
+                setTimeout(() => {
+                    this.removeChild(message);
+                }, 500);
+            });
+
+            highlight.appendChild(copyIcon);
+        });
+    });
+  </script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Force download for notebook-download-btn
+        const downloadButtons = document.querySelectorAll('.notebook-download-btn');
+        downloadButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                // Fetch the raw content of the notebook from GitHub
+                fetch(button.href)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = url;
+                        const filename = button.href.split('/').pop();
+                        link.download = filename; 
+
+                        document.body.appendChild(link);
+                        link.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    })
+                    .catch(err => console.error('Error fetching the notebook:', err));
+            });
+        });
+    });
+</script> 
+</body>
+</html>

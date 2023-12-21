@@ -247,7 +247,6 @@
 <span class="kn">import</span> <span class="nn">mlflow</span>
 <span class="kn">from</span> <span class="nn">mlflow</span> <span class="kn">import</span> <span class="n">mleap</span><span class="p">,</span> <span class="n">pyfunc</span>
 <span class="kn">from</span> <span class="nn">mlflow.environment_variables</span> <span class="kn">import</span> <span class="n">MLFLOW_DFS_TMP</span>
-<span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
 <span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">Model</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.model</span> <span class="kn">import</span> <span class="n">MLMODEL_FILE_NAME</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.signature</span> <span class="kn">import</span> <span class="n">ModelSignature</span>
@@ -507,19 +506,6 @@
     <span class="n">run_id</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">tracking</span><span class="o">.</span><span class="n">fluent</span><span class="o">.</span><span class="n">_get_or_start_run</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">run_id</span>
     <span class="n">run_root_artifact_uri</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">get_artifact_uri</span><span class="p">()</span>
     <span class="n">remote_model_path</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="k">if</span> <span class="n">_should_use_mlflowdbfs</span><span class="p">(</span><span class="n">run_root_artifact_uri</span><span class="p">):</span>
-        <span class="n">remote_model_path</span> <span class="o">=</span> <span class="n">append_to_uri_path</span><span class="p">(</span>
-            <span class="n">run_root_artifact_uri</span><span class="p">,</span> <span class="n">artifact_path</span><span class="p">,</span> <span class="n">_JOHNSNOWLABS_MODEL_PATH_SUB</span>
-        <span class="p">)</span>
-        <span class="n">mlflowdbfs_path</span> <span class="o">=</span> <span class="n">_mlflowdbfs_path</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">artifact_path</span><span class="p">)</span>
-        <span class="k">with</span> <span class="n">databricks_utils</span><span class="o">.</span><span class="n">MlflowCredentialContext</span><span class="p">(</span>
-            <span class="n">get_databricks_profile_uri_from_artifact_uri</span><span class="p">(</span><span class="n">run_root_artifact_uri</span><span class="p">)</span>
-        <span class="p">):</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">_unpack_and_save_model</span><span class="p">(</span><span class="n">spark_model</span><span class="p">,</span> <span class="n">mlflowdbfs_path</span><span class="p">)</span>
-
-            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="s2">&quot;failed to save johnsnowlabs model via mlflowdbfs&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
 
     <span class="c1"># If the artifact URI is a local filesystem path, defer to Model.log() to persist the model,</span>
     <span class="c1"># since Spark may not be able to write directly to the driver&#39;s filesystem. For example,</span>
@@ -527,7 +513,7 @@
     <span class="c1"># be incorrect on multi-node clusters.</span>
     <span class="c1"># If the artifact URI is not a local filesystem path we attempt to write directly to the</span>
     <span class="c1"># artifact repo via Spark. If this fails, we defer to Model.log().</span>
-    <span class="k">elif</span> <span class="n">is_local_uri</span><span class="p">(</span><span class="n">run_root_artifact_uri</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">_maybe_save_model</span><span class="p">(</span>
+    <span class="k">if</span> <span class="n">is_local_uri</span><span class="p">(</span><span class="n">run_root_artifact_uri</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">_maybe_save_model</span><span class="p">(</span>
         <span class="n">spark_model</span><span class="p">,</span>
         <span class="n">append_to_uri_path</span><span class="p">(</span><span class="n">run_root_artifact_uri</span><span class="p">,</span> <span class="n">artifact_path</span><span class="p">),</span>
     <span class="p">):</span>
