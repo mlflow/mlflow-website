@@ -737,6 +737,11 @@
             <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
                 <span class="s2">&quot;Failed to convert column </span><span class="si">{name}</span><span class="s2"> from type </span><span class="si">{values.dtype}</span><span class="s2"> to </span><span class="si">{t}</span><span class="s2">.&quot;</span>
             <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+
+    <span class="k">if</span> <span class="n">t</span> <span class="o">==</span> <span class="n">DataType</span><span class="o">.</span><span class="n">boolean</span> <span class="ow">and</span> <span class="n">values</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="nb">object</span><span class="p">:</span>
+        <span class="c1"># Should not convert type otherwise it converts None to boolean False</span>
+        <span class="k">return</span> <span class="n">values</span>
+
     <span class="k">if</span> <span class="n">t</span> <span class="o">==</span> <span class="n">DataType</span><span class="o">.</span><span class="n">double</span> <span class="ow">and</span> <span class="n">values</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">:</span>
         <span class="c1"># NB: Pyspark Decimal column get converted to decimal.Decimal when converted to pandas</span>
         <span class="c1"># DataFrame. In order to support decimal data training from spark data frame, we add this</span>

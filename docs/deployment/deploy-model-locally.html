@@ -1,0 +1,594 @@
+
+  
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Deploy MLflow Model as a Local Inference Server &mdash; MLflow 2.9.3.dev0 documentation</title>
+  
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/deployment/deploy-model-locally.html">
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    
+
+    
+
+  
+    
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/cards.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/grids.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/mobile.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/simple-cards.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/tabs.css" type="text/css" />
+    
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="MLflow 2.9.3.dev0 documentation" href="../index.html"/>
+        <link rel="up" title="Deployment" href="index.html"/>
+        <link rel="next" title="Deploy MLflow Model to Amazon SageMaker" href="/deploy-model-to-sagemaker.html"/>
+        <link rel="prev" title="Deployment" href="/index.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+<script type="text/javascript" src="../_static/jquery.js"></script>
+<script type="text/javascript" src="../_static/underscore.js"></script>
+<script type="text/javascript" src="../_static/doctools.js"></script>
+<script type="text/javascript" src="../_static/tabs.js"></script>
+<script type="text/javascript" src="../_static/languagesections.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+
+<body class="wy-body-for-nav" role="document">
+  
+
+  
+  <nav class="wy-nav-top header" role="navigation" aria-label="top navigation">
+    <ul>
+  <li class="menu-toggle">
+    <i data-toggle="wy-nav-top" class="wy-nav-top-menu-button db-icon db-icon-menu pull-left"></i>
+    <a href="../index.html" class="wy-nav-top-logo"
+      ><img src="../_static/MLflow-logo-final-black.png" alt="MLflow"
+    /></a>
+    <span class="version">2.9.3.dev0</span>
+  </li>
+</ul>
+  </nav>
+  <page>
+    
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side relative">
+      <div class="wy-side-scroll">
+  <div class="wy-side-nav-search">
+    
+
+    
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+    
+  </div>
+
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+    
+      <a href="../index.html" class="main-navigation-home"><img src="../_static/icons/nav-home.svg"> MLflow</a>
+    
+
+    
+      
+
+      
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../introduction/index.html">What is MLflow?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/index.html">Getting Started with MLflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../new-features/index.html">New Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../llms/index.html">LLMs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../model-evaluation/index.html">Model Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deep-learning/index.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../traditional-ml/index.html">Traditional ML</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Deployment</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index.html#concepts">Concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#how-it-works">How it works</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#supported-deployment-targets">Supported Deployment Targets</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Deploy MLflow Model as a Local Inference Server</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#deploying-inference-server">Deploying Inference Server</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#inference-server-specification">Inference Server Specification</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#serving-frameworks">Serving Frameworks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#running-batch-inference">Running Batch Inference</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#troubleshooting">Troubleshooting</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="deploy-model-to-sagemaker.html">Deploy MLflow Model to Amazon SageMaker</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deploy-model-to-kubernetes/index.html">Deploy MLflow Model to Kubernetes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#api-references">API References</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#faq">FAQ</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tracking.html">MLflow Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system-metrics/index.html">System Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../projects.html">MLflow Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.html">MLflow Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../model-registry.html">MLflow Model Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../recipes.html">MLflow Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plugins.html">MLflow Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auth/index.html">MLflow Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../search-runs.html">Search Runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../search-experiments.html">Search Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python_api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../R-api.html">R API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../java_api/index.html">Java API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rest-api.html">REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docker.html">Official MLflow Docker Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../community-model-flavors.html">Community Model Flavors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials-and-examples/index.html">Tutorials and Examples</a></li>
+</ul>
+
+      
+    
+  </div>
+
+  <div role="contentinfo">
+    
+
+    <p>
+      <a id='feedbacklink' href="https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a>
+    </p>
+  </div>
+</div>
+    </nav>
+
+    <main class="wy-grid-for-nav">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+          <div class="rst-content">
+            
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Documentation</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="index.html">Deployment</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+    
+      <li>Deploy MLflow Model as a Local Inference Server</li>
+    
+    
+    <!-- <li class="wy-breadcrumbs-aside">
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/deployment/deploy-model-locally.rst" class="fa fa-github"> Edit on GitHub</a>
+    </li> -->
+    
+  </ul>
+</div>
+            <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <div itemprop="articleBody">
+                
+  <div class="section" id="deploy-mlflow-model-as-a-local-inference-server">
+<span id="local-model-deployment"></span><h1>Deploy MLflow Model as a Local Inference Server<a class="headerlink" href="#deploy-mlflow-model-as-a-local-inference-server" title="Permalink to this headline"> </a></h1>
+<p>MLflow allows you to deploy your model as a locally using just a single command.
+This approach is ideal for lightweight applications or for testing your model locally before moving it to a staging or production environment.</p>
+<p>If you are new to MLflow model deployment, please read the guide on <a class="reference external" href="index.html">MLflow Deployment</a> first to understand the basic concepts of MLflow models and deployments.</p>
+<div class="section" id="deploying-inference-server">
+<h2>Deploying Inference Server<a class="headerlink" href="#deploying-inference-server" title="Permalink to this headline"> </a></h2>
+<p>Before deploying, you must have an MLflow Model. If you don’t have one, you can create a sample scikit-learn model by following the <a class="reference external" href="../getting-started/index.html">MLflow Tracking Quickstart</a>.
+Remember to note down the model URI, such as <code class="docutils literal notranslate"><span class="pre">runs:/&lt;run_id&gt;/&lt;artifact_path&gt;</span></code> (or <code class="docutils literal notranslate"><span class="pre">models:/&lt;model_name&gt;/&lt;model_version&gt;</span></code> if you registered the model in the <a class="reference external" href="../model-registry.html">MLflow Model Registry</a>).</p>
+<p>Once you have the model ready, deploying to a local server is straightforward. Use the <a class="reference external" href="../cli.html#mlflow-models-serve">mlflow models serve</a> command for a one-step deployment.
+This command starts a local server that listens on the specified port and serves your model.</p>
+<div class="sphinx-tabs docutils container">
+<div aria-label="Tabbed content" role="tablist"><button aria-controls="panel-0-QmFzaA==" aria-selected="true" class="sphinx-tabs-tab code-tab group-tab" id="tab-0-QmFzaA==" name="QmFzaA==" role="tab" tabindex="0">Bash</button><button aria-controls="panel-0-UHl0aG9u" aria-selected="false" class="sphinx-tabs-tab code-tab group-tab" id="tab-0-UHl0aG9u" name="UHl0aG9u" role="tab" tabindex="-1">Python</button></div><div aria-labelledby="tab-0-QmFzaA==" class="sphinx-tabs-panel code-tab group-tab" id="panel-0-QmFzaA==" name="QmFzaA==" role="tabpanel" tabindex="0"><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mlflow<span class="w"> </span>models<span class="w"> </span>serve<span class="w"> </span>-m<span class="w"> </span>runs:/&lt;run_id&gt;/model<span class="w"> </span>-p<span class="w"> </span><span class="m">5000</span>
+</pre></div>
+</div>
+</div><div aria-labelledby="tab-0-UHl0aG9u" class="sphinx-tabs-panel code-tab group-tab" hidden="true" id="panel-0-UHl0aG9u" name="UHl0aG9u" role="tabpanel" tabindex="0"><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="s2">&quot;runs:/&lt;run_id&gt;/model&quot;</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">serve</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="mi">5000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div></div>
+<p>You can then send a test request to the server as follows:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>http://127.0.0.1:5000/invocations<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type:application/json;&quot;</span><span class="w">  </span>--data<span class="w"> </span><span class="s1">&#39;{&quot;inputs&quot;: [[1, 2], [3, 4], [5, 6]]}&#39;</span>
+</pre></div>
+</div>
+<p>Several command line options are available to customize the server’s behavior. For instance, the <code class="docutils literal notranslate"><span class="pre">--env-manager</span></code> option allows you to
+choose a specific environment manager, like Anaconda, to create the virtual environment. The <cite>mlflow models</cite> module also provides
+additional useful commands, such as building a Docker image or generating a Dockerfile. For comprehensive details, please refer
+to the <a class="reference external" href="../cli.html#mlflow-models">MLflow CLI Reference</a>.</p>
+</div>
+<div class="section" id="inference-server-specification">
+<span id="local-inference-server-spec"></span><h2>Inference Server Specification<a class="headerlink" href="#inference-server-specification" title="Permalink to this headline"> </a></h2>
+<div class="section" id="endpoints">
+<h3>Endpoints<a class="headerlink" href="#endpoints" title="Permalink to this headline"> </a></h3>
+<p>The inference server provides 4 endpoints:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">/invocations</span></code>: An inference endpoint that accepts POST requests with input data and returns predictions.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/ping</span></code>: Used for health checks.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/health</span></code>: Same as /ping</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/version</span></code>: Returns the MLflow version.</p></li>
+</ul>
+</div>
+<div class="section" id="accepted-input-formats">
+<h3>Accepted Input Formats<a class="headerlink" href="#accepted-input-formats" title="Permalink to this headline"> </a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">/invocations</span></code> endpoint accepts CSV or JSON inputs. The input format must be specified in the
+<code class="docutils literal notranslate"><span class="pre">Content-Type</span></code> header as either <code class="docutils literal notranslate"><span class="pre">application/json</span></code> or <code class="docutils literal notranslate"><span class="pre">application/csv</span></code>.</p>
+<div class="section" id="csv-input">
+<h4>CSV Input<a class="headerlink" href="#csv-input" title="Permalink to this headline"> </a></h4>
+<p>CSV input must be a valid pandas.DataFrame CSV representation. For example:</p>
+<p><code class="docutils literal notranslate"><span class="pre">curl</span> <span class="pre">http://127.0.0.1:5000/invocations</span> <span class="pre">-H</span> <span class="pre">'Content-Type:</span> <span class="pre">application/csv'</span> <span class="pre">--data</span> <span class="pre">'1,2,3,4'</span></code></p>
+</div>
+<div class="section" id="json-input">
+<h4>JSON Input<a class="headerlink" href="#json-input" title="Permalink to this headline"> </a></h4>
+<p>JSON input must be a dictionary with exactly one of the following fields, further specifying the input data’s type and encoding:</p>
+<table class="colwidths-given wrap-table docutils align-default">
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 40%" />
+<col style="width: 40%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Example</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dataframe_split</span></code></p></td>
+<td><p>Pandas DataFrames in the <code class="docutils literal notranslate"><span class="pre">split</span></code> orientation.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">{&quot;dataframe_split&quot;:</span> <span class="pre">pandas_df.to_dict(orient='split')}</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">dataframe_records</span></code></p></td>
+<td><p>Pandas DataFrame in the <code class="docutils literal notranslate"><span class="pre">records</span></code> orientation. <strong>We do not recommend using this format because it is not guaranteed to preserve column ordering.</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">{&quot;dataframe_records&quot;:</span> <span class="pre">pandas_df.to_dict(orient='records')}</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">instances</span></code></p></td>
+<td><p>Tensor input formatted as described in <a class="reference external" href="https://www.tensorflow.org/tfx/serving/api_rest#request_format_2">TF Serving’s API docs</a> where the provided inputs will be cast to Numpy arrays.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">{&quot;instances&quot;:</span> <span class="pre">[1.0,</span> <span class="pre">2.0,</span> <span class="pre">5.0]}</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">inputs</span></code></p></td>
+<td><p>Same as <code class="docutils literal notranslate"><span class="pre">instances</span></code> but with a different key.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">{&quot;inputs&quot;:</span> <span class="pre">[[&quot;I&quot;,</span> <span class="pre">&quot;have&quot;,</span> <span class="pre">&quot;a&quot;,</span>&#160; <span class="pre">&quot;pen&quot;],</span> <span class="pre">[&quot;I&quot;</span> <span class="pre">&quot;have&quot;,</span> <span class="pre">&quot;an&quot;,</span> <span class="pre">&quot;apple&quot;]]}</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>The JSON input can also include an optional <code class="docutils literal notranslate"><span class="pre">params</span></code> field for passing additional parameters.
+Valid parameter types are <code class="docutils literal notranslate"><span class="pre">Union[DataType,</span> <span class="pre">List[DataType],</span> <span class="pre">None]</span></code>, where DataType is
+<a class="reference internal" href="../python_api/mlflow.types.html#mlflow.types.DataType" title="mlflow.types.DataType"><code class="xref py py-class docutils literal notranslate"><span class="pre">MLflow</span> <span class="pre">data</span> <span class="pre">types</span></code></a>. To pass parameters,
+a valid <a class="reference internal" href="../models.html#model-signature"><span class="std std-ref">Model Signature</span></a> with <code class="docutils literal notranslate"><span class="pre">params</span></code> must be defined.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>http://127.0.0.1:5000/invocations<span class="w"> </span>-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span>-d<span class="w"> </span><span class="s1">&#39;{</span>
+<span class="s1">    &quot;inputs&quot;: {&quot;question&quot;: [&quot;What color is it?&quot;],</span>
+<span class="s1">               &quot;context&quot;: [&quot;Some people said it was green but I know that it is pink.&quot;]},</span>
+<span class="s1">    &quot;params&quot;: {&quot;max_answer_len&quot;: 10}</span>
+<span class="s1">}&#39;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Since JSON discards type information, MLflow will cast the JSON input to the input type specified
+in the model’s schema if available. If your model is sensitive to input types, it is recommended that
+a schema is provided for the model to ensure that type mismatch errors do not occur at inference time.
+In particular, Deep Learning models are typically strict about input types and will need a model schema in order
+for the model to score correctly. For complex data types, see <a class="reference internal" href="#encoding-complex-data"><span class="std std-ref">Encoding complex data</span></a> below.</p>
+</div>
+</div>
+<div class="section" id="encoding-complex-data">
+<span id="id1"></span><h4>Encoding complex data<a class="headerlink" href="#encoding-complex-data" title="Permalink to this headline"> </a></h4>
+<p>Complex data types, such as dates or binary, do not have a native JSON representation. If you include a model
+signature, MLflow can automatically decode supported data types from JSON. The following data type conversions
+are supported:</p>
+<ul class="simple">
+<li><p>binary: data is expected to be base64 encoded, MLflow will automatically base64 decode.</p></li>
+<li><p>datetime: data is expected to be encoded as a string according to
+<a class="reference external" href="https://www.iso.org/iso-8601-date-and-time-format.html">ISO 8601 specification</a>.
+MLflow will parse this into the appropriate datetime representation on the given platform.</p></li>
+</ul>
+<p>Example requests:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># record-oriented DataFrame input with binary column &quot;b&quot;</span>
+curl<span class="w"> </span>http://127.0.0.1:5000/invocations<span class="w"> </span>-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span>-d<span class="w"> </span><span class="s1">&#39;[</span>
+<span class="s1">    {&quot;a&quot;: 0, &quot;b&quot;: &quot;dGVzdCBiaW5hcnkgZGF0YSAw&quot;},</span>
+<span class="s1">    {&quot;a&quot;: 1, &quot;b&quot;: &quot;dGVzdCBiaW5hcnkgZGF0YSAx&quot;},</span>
+<span class="s1">    {&quot;a&quot;: 2, &quot;b&quot;: &quot;dGVzdCBiaW5hcnkgZGF0YSAy&quot;}</span>
+<span class="s1">]&#39;</span>
+
+<span class="c1"># record-oriented DataFrame input with datetime column &quot;b&quot;</span>
+curl<span class="w"> </span>http://127.0.0.1:5000/invocations<span class="w"> </span>-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span>-d<span class="w"> </span><span class="s1">&#39;[</span>
+<span class="s1">    {&quot;a&quot;: 0, &quot;b&quot;: &quot;2020-01-01T00:00:00Z&quot;},</span>
+<span class="s1">    {&quot;a&quot;: 1, &quot;b&quot;: &quot;2020-02-01T12:34:56Z&quot;},</span>
+<span class="s1">    {&quot;a&quot;: 2, &quot;b&quot;: &quot;2021-03-01T00:00:00Z&quot;}</span>
+<span class="s1">]&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="serving-frameworks">
+<span id="id2"></span><h2>Serving Frameworks<a class="headerlink" href="#serving-frameworks" title="Permalink to this headline"> </a></h2>
+<p>By default, MLflow uses <a class="reference external" href="https://flask.palletsprojects.com/en/1.1.x/">Flask</a>, a lightweight WSGI web application framework for Python, to serve the
+inference endpoint. However, Flask is mainly designed for a lightweight application and might not be suitable for production use cases at scale.
+To address this gap, MLflow integrates with <a class="reference external" href="https://mlserver.readthedocs.io/en/latest/">MLServer</a> as an alternative serving engine. MLServer achieves
+higher performance and scalability by leveraging asynchronous request/response paradigm and workload offloading. Also MLServer is used as the core Python
+inference server in Kubernetes-native frameworks like <a class="reference external" href="https://docs.seldon.io/projects/seldon-core/en/latest/">Seldon Core</a> and
+<a class="reference external" href="https://kserve.github.io/website/">KServe (formerly known as KFServing)</a>, hence which provides advanced features such as canary deployment and
+auto scaling out of the box.</p>
+<table class="colwidths-given wrap-table docutils align-default">
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 40%" />
+<col style="width: 40%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"></th>
+<th class="head"><p><div>
+    <img src="../_static/images/logos/flask-logo.png" width="60%" style="display: block; margin: auto;">
+</div></p></th>
+<th class="head"><p><div>
+    <img src="../_static/images/logos/seldon-mlserver-logo.png" width="70%" style="display: block; margin: auto;">
+</div></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Use Case</strong></p></td>
+<td><p>Lightweight purpose including local testing.</p></td>
+<td><p>High-scale production environment.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Set Up</strong></p></td>
+<td><p>Flask is installed by default with MLflow.</p></td>
+<td><p>Needs to be installed separately.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Performance</strong></p></td>
+<td><p>Suitable for lightweight applications but not optimized for high performance, as being a WSGI application.
+WSGI is based on synchronous request/response paradigm, which is not ideal for ML workloads because of the
+blocking nature. ML prediction typically involves heavy computation and can take a long time to complete,
+hence blocking the server while the request is being processed is not ideal.
+While Flask can be augmented with asynchronous frameworks such as <a class="reference external" href="https://www.uvicorn.org/">Uvicorn</a>,
+MLflow does not support them out of the box and simply uses Flask’s default synchronous behavior.</p></td>
+<td><p>Designed for high-performance ML workloads, often delivering better throughput and efficiency. MLServer
+support asynchronous request/response paradigm, by offloading ML inference workload to a separate worker
+pool (processes), so that the server can continue to accept new requests while the inference is being processed.
+Please refer to the <a class="reference external" href="https://mlserver.readthedocs.io/en/latest/user-guide/parallel-inference.html">MLServer Parallel Inference</a>
+for more details on how they achieve this. Additionally, MLServer supports <a class="reference external" href="https://mlserver.readthedocs.io/en/latest/user-guide/adaptive-batching.html">Adaptive Bacthing</a>
+that transparently batch requests together to improve throughput and efficiency.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Scalability</strong></p></td>
+<td><p>Not inherently scalable with the same reason as performance.</p></td>
+<td><p>Additionally to the support for parallel inference as mentioned above, MLServer is used as the core
+inference server in Kubernetes-native frameworks such as <a class="reference external" href="https://docs.seldon.io/projects/seldon-core/en/latest/">Seldon Core</a>
+and <a class="reference external" href="https://kserve.github.io/website/">KServe</a> (formerly known as KFServing). By deploying <a class="reference external" href="deploy-model-to-kubernetes/index.html">MLflow models
+to Kubernetes with MLServer</a>, you can leverage the advanced features of these frameworks
+such as autoscaling to achieve high scalability.</p></td>
+</tr>
+</tbody>
+</table>
+<p>MLServer exposes the same scoring API through the <code class="docutils literal notranslate"><span class="pre">/invocations</span></code> endpoint.
+To deploy with MLServer, first install additional dependencies with <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">mlflow[extras]</span></code>,
+then execute the deployment command with the <code class="docutils literal notranslate"><span class="pre">--enable-mlserver</span></code> option. For example,</p>
+<div class="sphinx-tabs docutils container">
+<div aria-label="Tabbed content" role="tablist"><button aria-controls="panel-1-QmFzaA==" aria-selected="true" class="sphinx-tabs-tab code-tab group-tab" id="tab-1-QmFzaA==" name="QmFzaA==" role="tab" tabindex="0">Bash</button><button aria-controls="panel-1-UHl0aG9u" aria-selected="false" class="sphinx-tabs-tab code-tab group-tab" id="tab-1-UHl0aG9u" name="UHl0aG9u" role="tab" tabindex="-1">Python</button></div><div aria-labelledby="tab-1-QmFzaA==" class="sphinx-tabs-panel code-tab group-tab" id="panel-1-QmFzaA==" name="QmFzaA==" role="tabpanel" tabindex="0"><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mlflow<span class="w"> </span>models<span class="w"> </span>serve<span class="w"> </span>-m<span class="w"> </span>runs:/&lt;run_id&gt;/model<span class="w"> </span>-p<span class="w"> </span><span class="m">5000</span><span class="w"> </span>--enable-mlserver
+</pre></div>
+</div>
+</div><div aria-labelledby="tab-1-UHl0aG9u" class="sphinx-tabs-panel code-tab group-tab" hidden="true" id="panel-1-UHl0aG9u" name="UHl0aG9u" role="tabpanel" tabindex="0"><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="s2">&quot;runs:/&lt;run_id&gt;/model&quot;</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">serve</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">enable_mlserver</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div></div>
+<p>To read more about the integration between MLflow and MLServer, please check the <a class="reference external" href="https://mlserver.readthedocs.io/en/latest/examples/mlflow/README.html">end-to-end example</a> in the MLServer documentation.
+You can also find guides to deploy MLflow models to a Kubernetes cluster using MLServer in <a class="reference external" href="deploy-model-to-kubernetes/index.html">Deploying a model to Kubernetes</a>.</p>
+</div>
+<div class="section" id="running-batch-inference">
+<h2>Running Batch Inference<a class="headerlink" href="#running-batch-inference" title="Permalink to this headline"> </a></h2>
+<p>Instead of running an online inference endpoint, you can execute a single batch inference job on local files using
+the <a class="reference external" href="../cli.html#mlflow-models-predict">mlflow models predict</a> command. The following command runs the model
+prediction on <code class="docutils literal notranslate"><span class="pre">input.csv</span></code> and outputs the results to <code class="docutils literal notranslate"><span class="pre">output.csv</span></code>.</p>
+<div class="sphinx-tabs docutils container">
+<div aria-label="Tabbed content" role="tablist"><button aria-controls="panel-2-QmFzaA==" aria-selected="true" class="sphinx-tabs-tab code-tab group-tab" id="tab-2-QmFzaA==" name="QmFzaA==" role="tab" tabindex="0">Bash</button><button aria-controls="panel-2-UHl0aG9u" aria-selected="false" class="sphinx-tabs-tab code-tab group-tab" id="tab-2-UHl0aG9u" name="UHl0aG9u" role="tab" tabindex="-1">Python</button></div><div aria-labelledby="tab-2-QmFzaA==" class="sphinx-tabs-panel code-tab group-tab" id="panel-2-QmFzaA==" name="QmFzaA==" role="tabpanel" tabindex="0"><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mlflow<span class="w"> </span>models<span class="w"> </span>predict<span class="w"> </span>-m<span class="w"> </span>runs:/&lt;run_id&gt;/model<span class="w"> </span>-i<span class="w"> </span>input.csv<span class="w"> </span>-o<span class="w"> </span>output.csv
+</pre></div>
+</div>
+</div><div aria-labelledby="tab-2-UHl0aG9u" class="sphinx-tabs-panel code-tab group-tab" hidden="true" id="panel-2-UHl0aG9u" name="UHl0aG9u" role="tabpanel" tabindex="0"><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="s2">&quot;runs:/&lt;run_id&gt;/model&quot;</span><span class="p">)</span>
+<span class="n">predictions</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;input.csv&quot;</span><span class="p">))</span>
+<span class="n">predictions</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&quot;output.csv&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div></div>
+</div>
+<div class="section" id="troubleshooting">
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this headline"> </a></h2>
+</div>
+</div>
+
+
+              </div>
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="index.html" class="btn btn-neutral" title="Deployment" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+      
+      
+        <a href="deploy-model-to-sagemaker.html" class="btn btn-neutral" title="Deploy MLflow Model to Amazon SageMaker" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+      <p class="copyright">
+          &copy; MLflow Project, a Series of LF Projects, LLC. All rights reserved.
+      </p>
+
+  </div> 
+
+</footer>
+          </div>
+        </div>
+      </section>
+    </main>
+  </page>
+
+  
+
+
+  
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+      URL_ROOT:'../',
+      VERSION:'2.9.3.dev0',
+      COLLAPSE_INDEX:false,
+      FILE_SUFFIX:'.html',
+      LINK_SUFFIX: '.html',
+      HAS_SOURCE:  true
+    };
+  </script>
+
+  
+
+  <script type="text/javascript" src="../_static/js/clipboard.min.js"></script>
+  <script type="text/javascript" src="../_static/js/jquery.waypoints.min.js"></script>
+
+  
+  
+  
+  <script type="text/javascript">var CLIPPY_SVG_PATH = "../_static/clippy.svg";</script>
+  <script type="text/javascript" src="../_static/js/custom.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.StickyNav.enable();
+    });
+
+  </script>
+  
+
+  
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        // Get the code block designator class entries
+        const allHighlights = document.querySelectorAll('.highlight');
+        // Disable copyable links for notebook cell numbering and for cell outputs
+        const highlights = Array.from(allHighlights).filter(highlight => !highlight.closest('.highlight-none') && 
+            !highlight.closest('.nboutput'));
+    
+        highlights.forEach(function(highlight) {
+            const copyIcon = document.createElement('span');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.innerHTML = '&#xf0ea;';
+
+            copyIcon.addEventListener('click', function() {
+                const code = highlight.querySelector('pre').textContent;
+                copyToClipboard(code);
+
+                // Flash effect on click
+                this.style.color = '#0194E2';
+                setTimeout(() => {
+                    this.style.color = ''; 
+                }, 100);
+
+                // Display "Code copied to clipboard" near the clicked icon
+                const message = document.createElement('span');
+                message.textContent = "Copied!";
+                message.classList.add('copy-message'); 
+
+                // Append the message to the icon
+                this.appendChild(message);
+
+                setTimeout(() => {
+                    this.removeChild(message);
+                }, 500);
+            });
+
+            highlight.appendChild(copyIcon);
+        });
+    });
+  </script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Force download for notebook-download-btn
+        const downloadButtons = document.querySelectorAll('.notebook-download-btn');
+        downloadButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                // Fetch the raw content of the notebook from GitHub
+                fetch(button.href)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = url;
+                        const filename = button.href.split('/').pop();
+                        link.download = filename; 
+
+                        document.body.appendChild(link);
+                        link.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    })
+                    .catch(err => console.error('Error fetching the notebook:', err));
+            });
+        });
+    });
+</script> 
+</body>
+</html>

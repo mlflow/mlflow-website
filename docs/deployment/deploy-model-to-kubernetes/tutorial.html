@@ -1,0 +1,753 @@
+
+  
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Develop ML model with MLflow and deploy to Kubernetes &mdash; MLflow 2.9.3.dev0 documentation</title>
+  
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/deployment/deploy-model-to-kubernetes/tutorial.html">
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    
+
+    
+
+  
+    
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/grids.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/mobile.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/simple-cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/tabs.css" type="text/css" />
+    
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="MLflow 2.9.3.dev0 documentation" href="../../index.html"/>
+        <link rel="up" title="Deploy MLflow Model to Kubernetes" href="index.html"/>
+        <link rel="next" title="MLflow Tracking" href="/../../tracking.html"/>
+        <link rel="prev" title="Deploy MLflow Model to Kubernetes" href="/index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+<script type="text/javascript" src="../../_static/jquery.js"></script>
+<script type="text/javascript" src="../../_static/underscore.js"></script>
+<script type="text/javascript" src="../../_static/doctools.js"></script>
+<script type="text/javascript" src="../../_static/tabs.js"></script>
+<script type="text/javascript" src="../../_static/languagesections.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+
+<body class="wy-body-for-nav" role="document">
+  
+
+  
+  <nav class="wy-nav-top header" role="navigation" aria-label="top navigation">
+    <ul>
+  <li class="menu-toggle">
+    <i data-toggle="wy-nav-top" class="wy-nav-top-menu-button db-icon db-icon-menu pull-left"></i>
+    <a href="../../index.html" class="wy-nav-top-logo"
+      ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
+    /></a>
+    <span class="version">2.9.3.dev0</span>
+  </li>
+</ul>
+  </nav>
+  <page>
+    
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side relative">
+      <div class="wy-side-scroll">
+  <div class="wy-side-nav-search">
+    
+
+    
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+    
+  </div>
+
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+    
+      <a href="../../index.html" class="main-navigation-home"><img src="../../_static/icons/nav-home.svg"> MLflow</a>
+    
+
+    
+      
+
+      
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../introduction/index.html">What is MLflow?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started/index.html">Getting Started with MLflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../new-features/index.html">New Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../llms/index.html">LLMs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../model-evaluation/index.html">Model Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../deep-learning/index.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../traditional-ml/index.html">Traditional ML</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Deployment</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#concepts">Concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#how-it-works">How it works</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#supported-deployment-targets">Supported Deployment Targets</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../deploy-model-locally.html">Deploy MLflow Model as a Local Inference Server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../deploy-model-to-sagemaker.html">Deploy MLflow Model to Amazon SageMaker</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="index.html">Deploy MLflow Model to Kubernetes</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="index.html#using-mlserver-as-the-inference-server">Using MLServer as the Inference Server</a></li>
+<li class="toctree-l4"><a class="reference internal" href="index.html#deployment-steps">Deployment Steps</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="index.html#tutorial">Tutorial</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#api-references">API References</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#faq">FAQ</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../tracking.html">MLflow Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../system-metrics/index.html">System Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../projects.html">MLflow Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../models.html">MLflow Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../model-registry.html">MLflow Model Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../recipes.html">MLflow Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plugins.html">MLflow Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auth/index.html">MLflow Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../search-runs.html">Search Runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../search-experiments.html">Search Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../python_api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../R-api.html">R API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../java_api/index.html">Java API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rest-api.html">REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../docker.html">Official MLflow Docker Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../community-model-flavors.html">Community Model Flavors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials-and-examples/index.html">Tutorials and Examples</a></li>
+</ul>
+
+      
+    
+  </div>
+
+  <div role="contentinfo">
+    
+
+    <p>
+      <a id='feedbacklink' href="https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a>
+    </p>
+  </div>
+</div>
+    </nav>
+
+    <main class="wy-grid-for-nav">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+          <div class="rst-content">
+            
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Documentation</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../index.html">Deployment</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="index.html">Deploy MLflow Model to Kubernetes</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+    
+      <li>Develop ML model with MLflow and deploy to Kubernetes</li>
+    
+    
+    <!-- <li class="wy-breadcrumbs-aside">
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/deployment/deploy-model-to-kubernetes/tutorial.rst" class="fa fa-github"> Edit on GitHub</a>
+    </li> -->
+    
+  </ul>
+</div>
+            <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <div itemprop="articleBody">
+                
+  <div class="section" id="develop-ml-model-with-mlflow-and-deploy-to-kubernetes">
+<h1>Develop ML model with MLflow and deploy to Kubernetes<a class="headerlink" href="#develop-ml-model-with-mlflow-and-deploy-to-kubernetes" title="Permalink to this headline"> </a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This tutorial assumes that you have access to a Kubernetes cluster. However, you can also complete this tutorial on your local machine
+by using local cluster emulation tools such as <a class="reference external" href="https://kind.sigs.k8s.io/docs/user/quick-start">Kind</a> or <a class="reference external" href="https://minikube.sigs.k8s.io/docs/start/">Minikube</a>.</p>
+</div>
+<p>This guide demonstrates how to use MLflow end-to-end for:</p>
+<ul class="simple">
+<li><p>Training a linear regression model with <a class="reference external" href="../../../tracking.html">MLflow Tracking</a>.</p></li>
+<li><p>Conducting hyper-parameter tuning to find the best model.</p></li>
+<li><p>Packaging the model weights and dependencies as an <a class="reference external" href="../../../models.html">MLflow Model</a>.</p></li>
+<li><p>Testing model serving locally with <a class="reference external" href="https://mlserver.readthedocs.io/en/latest/">mlserver</a> using the <a class="reference external" href="../../../cli.html#mlflow-models-serve">mlflow models serve</a> command.</p></li>
+<li><p>Deploying the model to a Kubernetes cluster using <a class="reference external" href="https://kserve.github.io/website/">KServe</a> with MLflow.</p></li>
+</ul>
+<p>We will cover an end-to-end model development process including model training and testing within this tutorial.
+If you already have a model and simply want to learn how to deploy it to Kubernetes, you can skip to <a class="reference internal" href="#step-6-test-model-serving-locally"><span class="std std-ref">Step 6 - Test Model Serving Locally</span></a></p>
+<div class="section" id="introduction-scalable-model-serving-with-kserve-and-mlserver">
+<h2>Introduction: Scalable Model Serving with KServe and MLServer<a class="headerlink" href="#introduction-scalable-model-serving-with-kserve-and-mlserver" title="Permalink to this headline"> </a></h2>
+<p>MLflow provides an easy-to-use interface for deploying models within a Flask-based inference server. You can deploy the same inference
+server to a Kubernetes cluster by containerizing it using the <code class="docutils literal notranslate"><span class="pre">mlflow</span> <span class="pre">models</span> <span class="pre">build-docker</span></code> command. However, this approach may not be scalable
+and could be unsuitable for production use cases. Flask is not designed for high performance and scale (<a class="reference internal" href="../deploy-model-locally.html#serving-frameworks"><span class="std std-ref">why?</span></a>), and also
+manually managing multiple instances of inference servers is backbreaking.</p>
+<p>Fortunately, MLflow offers a solution for this. MLflow provides an alternative inference engine that is better suited for larger-scale inference deployments with its support for <a class="reference external" href="https://mlserver.readthedocs.io/en/latest/">MLServer</a>,
+which enables one-step deployment to popular serverless model serving frameworks on Kubernetes, such as <a class="reference external" href="https://kserve.github.io/website/">KServe</a>, and
+<a class="reference external" href="https://docs.seldon.io/projects/seldon-core/en/latest/">Seldon Core</a>.</p>
+<div class="section" id="what-is-kserve">
+<h3>What is KServe?<a class="headerlink" href="#what-is-kserve" title="Permalink to this headline"> </a></h3>
+<p><a class="reference external" href="https://kserve.github.io/website/">KServe</a>, formally known as KFServing, provides performant, scalable, and highly-abstracted interfaces for common machine learning frameworks like Tensorflow, XGBoost, scikit-learn, and Pytorch.
+It offers advanced features that aid in operating large-scale machine learning systems, such as <strong>autoscaling</strong>, <strong>canary rollout</strong>, <strong>A/B testing</strong>, <strong>monitoring</strong>,
+<strong>explability</strong>, and more, leveraging the Kubernetes ecosystem, including <a class="reference external" href="https://knative.dev/">KNative</a> and <a class="reference external" href="https://istio.io/">Istio</a>.</p>
+</div>
+<div class="section" id="benefits-of-using-mlflow-with-kserve">
+<h3>Benefits of using MLflow with KServe<a class="headerlink" href="#benefits-of-using-mlflow-with-kserve" title="Permalink to this headline"> </a></h3>
+<p>While KServe enables highly scalable and production-ready model serving, deplying your model there might require some effort.
+MLflow simplifies the process of deploying models to a Kubernetes cluster with KServe and MLServer. Additionally, it offers seamless <strong>end-to-end model management</strong>
+as a single place to manage the entire ML lifecycle. This includes <a class="reference external" href="../../../tracking.html">experiment tracking</a>, <a class="reference external" href="../../../models.html">model packaging</a>,
+<a class="reference external" href="../../../model-registry.html">versioning</a>, <a class="reference external" href="../../../model-evaluation/index.html">evaluation</a>, and <a class="reference external" href="../../index.html">deployment</a>, which we will cover in this tutorial.</p>
+</div>
+</div>
+<div class="section" id="step-1-installing-mlflow-and-additional-dependencies">
+<h2>Step 1: Installing MLflow and Additional Dependencies<a class="headerlink" href="#step-1-installing-mlflow-and-additional-dependencies" title="Permalink to this headline"> </a></h2>
+<p>First, please install mlflow to your local machine using the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>mlflow<span class="o">[</span>extras<span class="o">]</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">[extras]</span></code> will install additional dependencies required for this tutorial including <a class="reference external" href="https://mlserver.readthedocs.io/en/latest/">mlserver</a> and
+<a class="reference external" href="https://scikit-learn.org/stable/">scikit-learn</a>. Note that scikit-learn is not required for deployment, just for training the example model used in this tutorial.</p>
+<p>You can check if MLflow is installed correctly by running:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mlflow<span class="w"> </span>--version
+</pre></div>
+</div>
+</div>
+<div class="section" id="step-2-setting-up-a-kubernetes-cluster">
+<h2>Step 2: Setting Up a Kubernetes Cluster<a class="headerlink" href="#step-2-setting-up-a-kubernetes-cluster" title="Permalink to this headline"> </a></h2>
+<div class="sphinx-tabs docutils container">
+<div aria-label="Tabbed content" role="tablist"><button aria-controls="panel-0-0-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-0-0-0" name="0-0" role="tab" tabindex="0">Kubernetes Cluster</button><button aria-controls="panel-0-0-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-1" name="0-1" role="tab" tabindex="-1">Local Machine Emulation</button></div><div aria-labelledby="tab-0-0-0" class="sphinx-tabs-panel" id="panel-0-0-0" name="0-0" role="tabpanel" tabindex="0"><p>If you already have access to a Kubernetes cluster, you can install KServe to your cluster by following <a class="reference external" href="https://github.com/kserve/kserve#hammer_and_wrench-installation">the official instructions</a>.</p>
+</div><div aria-labelledby="tab-0-0-1" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-1" name="0-1" role="tabpanel" tabindex="0"><p>You can follow <a class="reference external" href="https://kserve.github.io/website/latest/get_started/">KServe QuickStart</a> to set up a local cluster with <a class="reference external" href="https://kind.sigs.k8s.io/docs/user/quick-start">Kind</a>
+and install KServe on it.</p>
+</div></div>
+<p>Now that you have a Kubernetes cluster running as a deployment target, let’s move on to creating the MLflow Model to deploy.</p>
+</div>
+<div class="section" id="step-3-training-the-model">
+<h2>Step 3: Training the Model<a class="headerlink" href="#step-3-training-the-model" title="Permalink to this headline"> </a></h2>
+<p>In this tutorial, we will train and deploy a simple regression model that predicts the quality of wine.</p>
+<p>Let’s start from training a model with the default hyperparameters. Execute the following code in a notebook or as a Python script.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For the sake of convenience, we use the <a class="reference external" href="../../../python_api/mlflow.sklearn.html#mlflow.sklearn.autolog">mlflow.sklearn.autolog()</a> function.
+This function allows MLflow to automatically log the appropriate set of model parameters and metrics during training. To learn more about the auto-logging feature
+or how to log manually instead, see the <a class="reference external" href="../../../tracking.html">MLflow Tracking documentation</a>.</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">metrics</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">ElasticNet</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+
+
+<span class="k">def</span> <span class="nf">eval_metrics</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">actual</span><span class="p">):</span>
+    <span class="n">rmse</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">metrics</span><span class="o">.</span><span class="n">mean_squared_error</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">pred</span><span class="p">))</span>
+    <span class="n">mae</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">mean_absolute_error</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">pred</span><span class="p">)</span>
+    <span class="n">r2</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">r2_score</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">pred</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">rmse</span><span class="p">,</span> <span class="n">mae</span><span class="p">,</span> <span class="n">r2</span>
+
+
+<span class="c1"># Set th experiment name</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s2">&quot;wine-quality&quot;</span><span class="p">)</span>
+
+<span class="c1"># Enable auto-logging to MLflow</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">sklearn</span><span class="o">.</span><span class="n">autolog</span><span class="p">()</span>
+
+<span class="c1"># Load wine quality dataset</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">load_wine</span><span class="p">(</span><span class="n">return_X_y</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.25</span><span class="p">)</span>
+
+<span class="c1"># Start a run and train a model</span>
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">(</span><span class="n">run_name</span><span class="o">=</span><span class="s2">&quot;default-params&quot;</span><span class="p">):</span>
+    <span class="n">lr</span> <span class="o">=</span> <span class="n">ElasticNet</span><span class="p">()</span>
+    <span class="n">lr</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+    <span class="n">y_pred</span> <span class="o">=</span> <span class="n">lr</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+    <span class="n">metrics</span> <span class="o">=</span> <span class="n">eval_metrics</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now you have trained a model, let’s check if the parameters and metrics are logged correctly, via the MLflow UI.
+You can start the MLflow UI by running the following command in your terminal:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mlflow<span class="w"> </span>ui<span class="w"> </span>--port<span class="w"> </span><span class="m">5000</span>
+</pre></div>
+</div>
+<p>Then visit <a class="reference external" href="http://localhost:5000">http://localhost:5000</a> to open the UI.</p>
+<div class="figure align-center" style="width: 80%">
+<img alt="../../_images/tracking-ui-default.png" src="../../_images/tracking-ui-default.png" />
+</div>
+<p>Please open the experient named “wine-quality” on the left, then click the run named “default-params” in the table.
+For this case, you should see parameters including <code class="docutils literal notranslate"><span class="pre">alpha</span></code> and <code class="docutils literal notranslate"><span class="pre">l1_ratio</span></code> and metrics like <code class="docutils literal notranslate"><span class="pre">training_score</span></code> and <code class="docutils literal notranslate"><span class="pre">mean_absolute_error_X_test</span></code>.</p>
+</div>
+<div class="section" id="step-4-running-hyperparameter-tuning">
+<h2>Step 4: Running Hyperparameter Tuning<a class="headerlink" href="#step-4-running-hyperparameter-tuning" title="Permalink to this headline"> </a></h2>
+<p>Now that we have established a baseline model, let’s attempt to improve its performance by tuning the hyperparameters.
+We will conduct a random search to identify the optimal combination of <code class="docutils literal notranslate"><span class="pre">alpha</span></code> and <code class="docutils literal notranslate"><span class="pre">l1_ratio</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">uniform</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">RandomizedSearchCV</span>
+
+<span class="n">lr</span> <span class="o">=</span> <span class="n">ElasticNet</span><span class="p">()</span>
+
+<span class="c1"># Define distribution to pick parameter values from</span>
+<span class="n">distributions</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="n">uniform</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">10</span><span class="p">),</span>  <span class="c1"># sample alpha uniformly from [-5.0, 5.0]</span>
+    <span class="n">l1_ratio</span><span class="o">=</span><span class="n">uniform</span><span class="p">(),</span>  <span class="c1"># sample l1_ratio uniformlyfrom [0, 1.0]</span>
+<span class="p">)</span>
+
+<span class="c1"># Initialize random search instance</span>
+<span class="n">clf</span> <span class="o">=</span> <span class="n">RandomizedSearchCV</span><span class="p">(</span>
+    <span class="n">estimator</span><span class="o">=</span><span class="n">lr</span><span class="p">,</span>
+    <span class="n">param_distributions</span><span class="o">=</span><span class="n">distributions</span><span class="p">,</span>
+    <span class="c1"># Optimize for mean absolute error</span>
+    <span class="n">scoring</span><span class="o">=</span><span class="s2">&quot;neg_mean_absolute_error&quot;</span><span class="p">,</span>
+    <span class="c1"># Use 5-fold cross validation</span>
+    <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="c1"># Try 100 samples. Note that MLflow only logs the top 5 runs.</span>
+    <span class="n">n_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Start a parent run</span>
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">(</span><span class="n">run_name</span><span class="o">=</span><span class="s2">&quot;hyperparameter-tuning&quot;</span><span class="p">):</span>
+    <span class="n">search</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+    <span class="c1"># Evaluate the best model on test dataset</span>
+    <span class="n">y_pred</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">best_estimator_</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+    <span class="n">rmse</span><span class="p">,</span> <span class="n">mae</span><span class="p">,</span> <span class="n">r2</span> <span class="o">=</span> <span class="n">eval_metrics</span><span class="p">(</span><span class="n">clf</span><span class="o">.</span><span class="n">best_estimator_</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_metrics</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;mean_squared_error_X_test&quot;</span><span class="p">:</span> <span class="n">rmse</span><span class="p">,</span>
+            <span class="s2">&quot;mean_absolute_error_X_test&quot;</span><span class="p">:</span> <span class="n">mae</span><span class="p">,</span>
+            <span class="s2">&quot;r2_score_X_test&quot;</span><span class="p">:</span> <span class="n">r2</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<p>When you reopen the MLflow UI, you should notice that the run “hyperparameter-tuning” contains 5 child runs. MLflow utilizes parent-child relationship, which is particularly
+useful for grouping a set of runs, such as those in hyper parameter tuning. Here the auto-logging is enabled and MLflow automatically create child runs for the top 5 runs
+based on the <code class="docutils literal notranslate"><span class="pre">scoring</span></code> metric, which is negative mean absolute error in this example. You can also create parent and child runs manually, please refer to <a class="reference internal" href="../../tracking/tracking-api.html#child-runs"><span class="std std-ref">Create Child Runs</span></a>
+for more details.</p>
+<div class="figure align-center" style="width: 80%">
+<img alt="../../_images/hyper-parameter-tuning-ui.png" src="../../_images/hyper-parameter-tuning-ui.png" />
+</div>
+<p>To compare the results and identify the best model, you can utilize the visualization feature in the MLflow UI.</p>
+<ol class="arabic simple">
+<li><p>Select the first job (“default-params”) and the parent job for hyperparameter tuning (“hyperparameter-turning”).</p></li>
+<li><p>Click on the “Chart” tab to visualize the metrics in a chart.</p></li>
+<li><p>By default, a few bar charts for a predefined set of metrics are displayed.</p></li>
+<li><p>You can add different chart, such as a scatter plot, to compare multiple metrics. For example, we can see the best model from hyperparameter tuning outperforms the default parameter model, in the mean squared error on the test dataset:</p></li>
+</ol>
+<p>You can check the best combination of hyperparameters by looking at the parent run “hyperparameter-tuning”.
+In this example, the best model was <code class="docutils literal notranslate"><span class="pre">alpha=0.11714084185001972</span></code> and <code class="docutils literal notranslate"><span class="pre">l1_ratio=0.3599780644783639</span></code> (you may see different results).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To learn more about hyperparameter tuning with MLflow, please refer to <a class="reference external" href="../../../traditional-ml/hyperparameter-tuning-with-child-runs/index.html">Hyperparameter Tuning with MLflow and Optuna</a>.</p>
+</div>
+</div>
+<div class="section" id="step-5-packaging-the-model-and-dependencies">
+<h2>Step 5: Packaging the Model and Dependencies<a class="headerlink" href="#step-5-packaging-the-model-and-dependencies" title="Permalink to this headline"> </a></h2>
+<p>Since we are using autologging, MLflow automatically logs the <a class="reference external" href="../../../models.html">Model</a> for each run. This process conveniently packages the model weight
+and dependencies in a ready-to-deploy format.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In practice, it is also recommended to use <a class="reference external" href="../../../model-registry.html">MLflow Model Registry</a> for registering and managing your models.</p>
+</div>
+<p>Let’s take a brief look at how this format appears. You can view the logged model through the <code class="docutils literal notranslate"><span class="pre">Artifacts</span></code> tab on the Run detail page.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>model
+├── MLmodel
+├── model.pkl
+├── conda.yaml
+├── python_env.yaml
+└── requirements.txt
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">model.pkl</span></code> is the file containing the serialized model weight. <code class="docutils literal notranslate"><span class="pre">MLmodel</span></code> includes general metadata that instructs MLflow on how to load the model.
+The other files specify the dependencies required to run the model.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you opt for manual logging, you will need to log the model explicitly using the <a class="reference internal" href="../../python_api/mlflow.sklearn.html#mlflow.sklearn.log_model" title="mlflow.sklearn.log_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.sklearn.log_model</span></code></a>
+function, as shown below:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mlflow</span><span class="o">.</span><span class="n">sklearn</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span><span class="n">lr</span><span class="p">,</span> <span class="s2">&quot;model&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="step-6-testing-model-serving-locally">
+<span id="step-6-test-model-serving-locally"></span><h2>Step 6: Testing Model Serving Locally<a class="headerlink" href="#step-6-testing-model-serving-locally" title="Permalink to this headline"> </a></h2>
+<p>Before deploying the model, let’s first test that the model can be served locally. As outlined in the
+<a class="reference external" href="../deploy-model-locally.html">Deploy MLflow Model Locally</a>, you can run a local inferecen server with just a single command.
+Remember to use the <code class="docutils literal notranslate"><span class="pre">enable-mlserver</span></code> flag, which instructs MLflow to use MLServer as the inference server. This ensures the model runs in the
+same manner as it would in Kubernetes.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mlflow<span class="w"> </span>models<span class="w"> </span>serve<span class="w"> </span>-m<span class="w"> </span>runs:/&lt;run_id_for_your_best_run&gt;/model<span class="w"> </span>-p<span class="w"> </span><span class="m">1234</span><span class="w"> </span>--enable-mlserver
+</pre></div>
+</div>
+<p>This command starts a local server listening on port 1234. You can send a request to the server using <code class="docutils literal notranslate"><span class="pre">curl</span></code> command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type:application/json&quot;</span><span class="w"> </span>--data<span class="w"> </span><span class="s1">&#39;{&quot;inputs&quot;: [[14.23, 1.71, 2.43, 15.6, 127.0, 2.8, 3.06, 0.28, 2.29, 5.64, 1.04, 3.92, 1065.0]]&#39;</span><span class="w"> </span>http://127.0.0.1:1234/invocations
+
+<span class="o">{</span><span class="s2">&quot;predictions&quot;</span>:<span class="w"> </span><span class="o">[</span>-0.03416275504140387<span class="o">]}</span>
+</pre></div>
+</div>
+<p>For more information about the request format and response formats, refer to <a class="reference internal" href="../deploy-model-locally.html#local-inference-server-spec"><span class="std std-ref">Inference Server Specification</span></a>.</p>
+</div>
+<div class="section" id="step-7-deploying-the-model-to-kserve">
+<h2>Step 7: Deploying the Model to KServe<a class="headerlink" href="#step-7-deploying-the-model-to-kserve" title="Permalink to this headline"> </a></h2>
+<p>Finally, we are all set to deploy the model to the Kubernetes cluster.</p>
+<div class="section" id="create-namespace">
+<h3>Create Namespace<a class="headerlink" href="#create-namespace" title="Permalink to this headline"> </a></h3>
+<p>First, create a test namespace for deploying KServe resources and your model:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>kubectl<span class="w"> </span>create<span class="w"> </span>namespace<span class="w"> </span>mlflow-kserve-test
+</pre></div>
+</div>
+</div>
+<div class="section" id="create-deployment-configuration">
+<h3>Create Deployment Configuration<a class="headerlink" href="#create-deployment-configuration" title="Permalink to this headline"> </a></h3>
+<p>Create a YAML file describing the model deployment to KServe.</p>
+<p>There are two ways to specify the model for deployment in KServe configuration file:</p>
+<ol class="arabic simple">
+<li><p>Build a Docker image with the model and specify the image URI.</p></li>
+<li><p>Specify the model URI directly (this only works if your model is stored in remote storage).</p></li>
+</ol>
+<p>Please open the tabs below for details on each approach.</p>
+<div class="sphinx-tabs docutils container">
+<div aria-label="Tabbed content" role="tablist"><button aria-controls="panel-1-1-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-1-1-0" name="1-0" role="tab" tabindex="0">Using Docker Image</button><button aria-controls="panel-1-1-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-1-1-1" name="1-1" role="tab" tabindex="-1">Using Model URI</button></div><div aria-labelledby="tab-1-1-0" class="sphinx-tabs-panel" id="panel-1-1-0" name="1-0" role="tabpanel" tabindex="0"><h4>Register Docker Account</h4><p>Since KServe cannot resolve a locally built Docker image, you need to push the image to a Docker registry.
+For this tutorial, we’ll push the image to <a class="reference external" href="https://hub.docker.com/">Docker Hub</a>, but you can use any other Docker registry,
+such as <a class="reference external" href="https://aws.amazon.com/ecr/">Amazon ECR</a> or a private registry.</p>
+<p>If you don’t have a Docker Hub account yet, create one at <a class="reference external" href="https://hub.docker.com/signup">https://hub.docker.com/signup</a>.</p>
+<h4>Build a Docker Image</h4><p>Build a ready-to-deploy Docker image with the <code class="docutils literal notranslate"><span class="pre">mlflow</span> <span class="pre">models</span> <span class="pre">build-docker</span></code> command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mlflow<span class="w"> </span>models<span class="w"> </span>build-docker<span class="w"> </span>-m<span class="w"> </span>runs:/&lt;run_id_for_your_best_run&gt;/model<span class="w"> </span>-n<span class="w"> </span>&lt;your_dockerhub_user_name&gt;/mlflow-wine-classifier<span class="w"> </span>--enable-mlserver
+</pre></div>
+</div>
+<p>This command builds a Docker image with the model and dependencies, tagging it as <code class="docutils literal notranslate"><span class="pre">mlflow-wine-classifier:latest</span></code>.</p>
+<h4>Push the Docker Image</h4><p>After building the image, push it to Docker Hub (or to another registry using the appropriate command):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>push<span class="w"> </span>&lt;your_dockerhub_user_name&gt;/mlflow-wine-classifier
+</pre></div>
+</div>
+<h4>Write Deployment Configuration</h4><p>Then create a YAML file like this:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;serving.kserve.io/v1beta1&quot;</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;InferenceService&quot;</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mlflow-wine-classifier&quot;</span>
+<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mlflow-kserve-test&quot;</span>
+<span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">predictor</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">containers</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mlflow-wine-classifier&quot;</span>
+<span class="w">        </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;&lt;your_docker_user_name&gt;/mlflow-wine-classifier&quot;</span>
+<span class="w">        </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">containerPort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8080</span>
+<span class="w">            </span><span class="nt">protocol</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">TCP</span>
+<span class="w">        </span><span class="nt">env</span><span class="p">:</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PROTOCOL</span>
+<span class="w">            </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;v2&quot;</span>
+</pre></div>
+</div>
+</div><div aria-labelledby="tab-1-1-1" class="sphinx-tabs-panel" hidden="true" id="panel-1-1-1" name="1-1" role="tabpanel" tabindex="0"><h4>Get Remote Model URI</h4><p>KServe configuration allows direct specification of the model URI. However, it doesn’t resolve MLflow-specific URI schemas like <code class="docutils literal notranslate"><span class="pre">runs:/</span></code> and <code class="docutils literal notranslate"><span class="pre">model:/</span></code>,
+nor local file URIs like <code class="docutils literal notranslate"><span class="pre">file:///</span></code>. We need to specify the model URI in a remote storage URI format e.g. <code class="docutils literal notranslate"><span class="pre">s3://xxx</span></code> or <code class="docutils literal notranslate"><span class="pre">gs://xxx</span></code>.
+By default, MLflow stores the model in the local file system, so you need to configure MLflow to store the model in remote storage.
+Please refer to <a class="reference external" href="../../../tracking.html#artifact-stores">Artifact Store</a> for setup instructions.</p>
+<p>After configuring the artifact store, load and re-log the best model to the new artifact store, or repeat the model training steps.</p>
+<h4>Create Deployment Configuration</h4><p>With the remote model URI, create a YAML file:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;serving.kserve.io/v1beta1&quot;</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;InferenceService&quot;</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mlflow-wine-classifier&quot;</span>
+<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mlflow-kserve-test&quot;</span>
+<span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">predictor</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">model</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">modelFormat</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mlflow</span>
+<span class="w">      </span><span class="nt">protocolVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v2</span>
+<span class="w">      </span><span class="nt">storageUri</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;&lt;your_model_uri&gt;&quot;</span>
+</pre></div>
+</div>
+</div></div>
+</div>
+<div class="section" id="deploy-inference-service">
+<h3>Deploy Inference Service<a class="headerlink" href="#deploy-inference-service" title="Permalink to this headline"> </a></h3>
+<p>Run the following <code class="docutils literal notranslate"><span class="pre">kubectl</span></code> command to deploy a new <code class="docutils literal notranslate"><span class="pre">InferenceService</span></code> to your Kubernetes cluster:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>YOUR_CONFIG_FILE.yaml
+
+inferenceservice.serving.kserve.io/mlflow-wine-classifier<span class="w"> </span>created
+</pre></div>
+</div>
+<p>You can check the status of the deployment by running:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>inferenceservice<span class="w"> </span>mlflow-wine-classifier
+
+NAME<span class="w">                     </span>URL<span class="w">                                                     </span>READY<span class="w">   </span>PREV<span class="w">   </span>LATEST<span class="w">   </span>PREVROLLEDOUTREVISION<span class="w">   </span>LATESTREADYREVISION
+mlflow-wine-classifier<span class="w">   </span>http://mlflow-wine-classifier.mlflow-kserve-test.local<span class="w">   </span>True<span class="w">             </span><span class="m">100</span><span class="w">                    </span>mlflow-wine-classifier-100
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It may take a few minutes for the deployment status to be ready. For detailed deployment status and logs,
+run <code class="docutils literal notranslate"><span class="pre">kubectl</span> <span class="pre">get</span> <span class="pre">inferenceservice</span> <span class="pre">mlflow-wine-classifier</span> <span class="pre">-oyaml</span></code>.</p>
+</div>
+</div>
+<div class="section" id="test-the-deployment">
+<h3>Test the Deployment<a class="headerlink" href="#test-the-deployment" title="Permalink to this headline"> </a></h3>
+<p>Once the deployment is ready, you can send a test request to the server.</p>
+<p>First, create a JSON file with test data and save it as <code class="docutils literal notranslate"><span class="pre">test-input.json</span></code>. Ensure the request data is formatted for the <a class="reference external" href="https://kserve.github.io/website/latest/modelserving/inference_api/#inference-request-json-object">V2 Inference Protocol</a>,
+because we created the model with <code class="docutils literal notranslate"><span class="pre">protocolVersion:</span> <span class="pre">v2</span></code>. The request should look like this:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;inputs&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;input&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;shape&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">13</span><span class="p">],</span>
+<span class="w">        </span><span class="nt">&quot;datatype&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;FP32&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mf">14.23</span><span class="p">,</span><span class="w"> </span><span class="mf">1.71</span><span class="p">,</span><span class="w"> </span><span class="mf">2.43</span><span class="p">,</span><span class="w"> </span><span class="mf">15.6</span><span class="p">,</span><span class="w"> </span><span class="mf">127.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.8</span><span class="p">,</span><span class="w"> </span><span class="mf">3.06</span><span class="p">,</span><span class="w"> </span><span class="mf">0.28</span><span class="p">,</span><span class="w"> </span><span class="mf">2.29</span><span class="p">,</span><span class="w"> </span><span class="mf">5.64</span><span class="p">,</span><span class="w"> </span><span class="mf">1.04</span><span class="p">,</span><span class="w"> </span><span class="mf">3.92</span><span class="p">,</span><span class="w"> </span><span class="mf">1065.0</span><span class="p">]</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Then send the request to your inference service:</p>
+<div class="sphinx-tabs docutils container">
+<div aria-label="Tabbed content" role="tablist"><button aria-controls="panel-2-2-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-2-2-0" name="2-0" role="tab" tabindex="0">Kubernetes Cluster</button><button aria-controls="panel-2-2-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-2-2-1" name="2-1" role="tab" tabindex="-1">Local Machine Emulation</button></div><div aria-labelledby="tab-2-2-0" class="sphinx-tabs-panel" id="panel-2-2-0" name="2-0" role="tabpanel" tabindex="0"><p>Assuming your cluster is exposed via LoadBalancer, follow <a class="reference external" href="https://kserve.github.io/website/0.10/get_started/first_isvc/#4-determine-the-ingress-ip-and-ports">these instructions</a> to find the Ingress IP and port.
+Then send a test request using <code class="docutils literal notranslate"><span class="pre">curl</span></code> command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nv">SERVICE_HOSTNAME</span><span class="o">=</span><span class="k">$(</span>kubectl<span class="w"> </span>get<span class="w"> </span>inferenceservice<span class="w"> </span>mlflow-wine-classifier<span class="w"> </span>-n<span class="w"> </span>mlflow-kserve-test<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.status.url}&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>cut<span class="w"> </span>-d<span class="w"> </span><span class="s2">&quot;/&quot;</span><span class="w"> </span>-f<span class="w"> </span><span class="m">3</span><span class="k">)</span>
+$<span class="w"> </span>curl<span class="w"> </span>-v<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Host: </span><span class="si">${</span><span class="nv">SERVICE_HOSTNAME</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span>@./test-input.json<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>http://<span class="si">${</span><span class="nv">INGRESS_HOST</span><span class="si">}</span>:<span class="si">${</span><span class="nv">INGRESS_PORT</span><span class="si">}</span>/v2/models/mlflow-wine-classifier/infer
+</pre></div>
+</div>
+</div><div aria-labelledby="tab-2-2-1" class="sphinx-tabs-panel" hidden="true" id="panel-2-2-1" name="2-1" role="tabpanel" tabindex="0"><p>Typically, Kubernetes clusters expose services via LoadBalancer, but a local cluster created by <code class="docutils literal notranslate"><span class="pre">kind</span></code> doesn’t have one.
+In this case, you can access the inference service via port-forwarding.</p>
+<p>Open a new terminal and run the following command to forward the port:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nv">INGRESS_GATEWAY_SERVICE</span><span class="o">=</span><span class="k">$(</span>kubectl<span class="w"> </span>get<span class="w"> </span>svc<span class="w"> </span>-n<span class="w"> </span>istio-system<span class="w"> </span>--selector<span class="o">=</span><span class="s2">&quot;app=istio-ingressgateway&quot;</span><span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.items[0].metadata.name}&#39;</span><span class="k">)</span>
+$<span class="w"> </span>kubectl<span class="w"> </span>port-forward<span class="w"> </span>-n<span class="w"> </span>istio-system<span class="w"> </span>svc/<span class="si">${</span><span class="nv">INGRESS_GATEWAY_SERVICE</span><span class="si">}</span><span class="w"> </span><span class="m">8080</span>:80
+
+Forwaring<span class="w"> </span>from<span class="w"> </span><span class="m">127</span>.0.0.1:8080<span class="w"> </span>-&gt;<span class="w"> </span><span class="m">8080</span>
+Forwarding<span class="w"> </span>from<span class="w"> </span><span class="o">[</span>::1<span class="o">]</span>:8080<span class="w"> </span>-&gt;<span class="w"> </span><span class="m">8080</span>
+</pre></div>
+</div>
+<p>Then, in the original terminal, send a test request to the server:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nv">SERVICE_HOSTNAME</span><span class="o">=</span><span class="k">$(</span>kubectl<span class="w"> </span>get<span class="w"> </span>inferenceservice<span class="w"> </span>mlflow-wine-classifier<span class="w"> </span>-n<span class="w"> </span>mlflow-kserve-test<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.status.url}&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>cut<span class="w"> </span>-d<span class="w"> </span><span class="s2">&quot;/&quot;</span><span class="w"> </span>-f<span class="w"> </span><span class="m">3</span><span class="k">)</span>
+$<span class="w"> </span>curl<span class="w"> </span>-v<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Host: </span><span class="si">${</span><span class="nv">SERVICE_HOSTNAME</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span>@./test-input.json<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>http://localhost:8080/v2/models/mlflow-wine-classifier/infer
+</pre></div>
+</div>
+</div></div>
+</div>
+</div>
+<div class="section" id="troubleshooting">
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this headline"> </a></h2>
+<p>If you have any trouble during deployment, please consult with the <a class="reference external" href="https://kserve.github.io/website/">KServe official documentation</a>
+and their <a class="reference external" href="https://kserve.github.io/website/0.10/modelserving/v1beta1/mlflow/v2/">MLflow Deployment Guide</a>.</p>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline"> </a></h2>
+<p>Congratulations on completing the guide! In this tutorial, you have learned how to use MLflow for training a model, running hyperparameter tuning,
+and deploying the model to Kubernetes cluster.</p>
+<p><strong>Further readings</strong>:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="../../../tracking.html">MLflow Tracking</a> - Explore more about MLflow Tracking and various ways to manage experiments and models, such as team collaboration.</p></li>
+<li><p><a class="reference external" href="../../../model-registry.html">MLflow Model Registry</a> - Discover more about MLflow Model Registry for managing model versions and stages in a centralized model store.</p></li>
+<li><p><a class="reference external" href="../../index.html">MLflow Deployment</a> - Learn more about MLflow deployment and different deployment targets.</p></li>
+<li><p><a class="reference external" href="https://kserve.github.io/website/">KServe official documentation</a> - Dive deeper into KServe and its advanced features, including autoscaling, canary rollout, A/B testing, monitoring, explability, etc.</p></li>
+<li><p><a class="reference external" href="https://docs.seldon.io/projects/seldon-core/en/latest/">Seldon Core official documentation</a> - Learn about Seldon Core, an alternative serverless model serving framework we support for Kubernetes.</p></li>
+</ul>
+</div>
+</div>
+
+
+              </div>
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="index.html" class="btn btn-neutral" title="Deploy MLflow Model to Kubernetes" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+      
+      
+        <a href="../../tracking.html" class="btn btn-neutral" title="MLflow Tracking" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+      <p class="copyright">
+          &copy; MLflow Project, a Series of LF Projects, LLC. All rights reserved.
+      </p>
+
+  </div> 
+
+</footer>
+          </div>
+        </div>
+      </section>
+    </main>
+  </page>
+
+  
+
+
+  
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+      URL_ROOT:'../../',
+      VERSION:'2.9.3.dev0',
+      COLLAPSE_INDEX:false,
+      FILE_SUFFIX:'.html',
+      LINK_SUFFIX: '.html',
+      HAS_SOURCE:  true
+    };
+  </script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/clipboard.min.js"></script>
+  <script type="text/javascript" src="../../_static/js/jquery.waypoints.min.js"></script>
+
+  
+  
+  
+  <script type="text/javascript">var CLIPPY_SVG_PATH = "../../_static/clippy.svg";</script>
+  <script type="text/javascript" src="../../_static/js/custom.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.StickyNav.enable();
+    });
+
+  </script>
+  
+
+  
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        // Get the code block designator class entries
+        const allHighlights = document.querySelectorAll('.highlight');
+        // Disable copyable links for notebook cell numbering and for cell outputs
+        const highlights = Array.from(allHighlights).filter(highlight => !highlight.closest('.highlight-none') && 
+            !highlight.closest('.nboutput'));
+    
+        highlights.forEach(function(highlight) {
+            const copyIcon = document.createElement('span');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.innerHTML = '&#xf0ea;';
+
+            copyIcon.addEventListener('click', function() {
+                const code = highlight.querySelector('pre').textContent;
+                copyToClipboard(code);
+
+                // Flash effect on click
+                this.style.color = '#0194E2';
+                setTimeout(() => {
+                    this.style.color = ''; 
+                }, 100);
+
+                // Display "Code copied to clipboard" near the clicked icon
+                const message = document.createElement('span');
+                message.textContent = "Copied!";
+                message.classList.add('copy-message'); 
+
+                // Append the message to the icon
+                this.appendChild(message);
+
+                setTimeout(() => {
+                    this.removeChild(message);
+                }, 500);
+            });
+
+            highlight.appendChild(copyIcon);
+        });
+    });
+  </script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Force download for notebook-download-btn
+        const downloadButtons = document.querySelectorAll('.notebook-download-btn');
+        downloadButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                // Fetch the raw content of the notebook from GitHub
+                fetch(button.href)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = url;
+                        const filename = button.href.split('/').pop();
+                        link.download = filename; 
+
+                        document.body.appendChild(link);
+                        link.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    })
+                    .catch(err => console.error('Error fetching the notebook:', err));
+            });
+        });
+    });
+</script> 
+</body>
+</html>

@@ -48,7 +48,7 @@
               href="../genindex.html"/>
         <link rel="search" title="Search" href="../search.html"/>
     <link rel="top" title="MLflow 2.9.3.dev0 documentation" href="../index.html"/>
-        <link rel="next" title="Deploying a model to Kubernetes" href="/deploy-model-to-kubernetes/index.html"/>
+        <link rel="next" title="Deploy MLflow Model as a Local Inference Server" href="/deploy-model-locally.html"/>
         <link rel="prev" title="Customizing a Model’s predict method" href="/../traditional-ml/creating-custom-pyfunc/notebooks/override-predict.html"/> 
 
   
@@ -118,13 +118,25 @@
 <li class="toctree-l1"><a class="reference internal" href="../deep-learning/index.html">Deep Learning</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../traditional-ml/index.html">Traditional ML</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Deployment</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#the-power-of-mlflow-in-model-serving">The Power of MLflow in Model Serving</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#deployment-avenues">Deployment Avenues</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#tutorials-and-guides">Tutorials and Guides</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="deploy-model-to-kubernetes/index.html">Deploying a model to Kubernetes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#concepts">Concepts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">MLflow Model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#container">Container</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#deployment-target">Deployment Target</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#conclusion">Conclusion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-it-works">How it works</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#supported-deployment-targets">Supported Deployment Targets</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deploy-model-locally.html">Deploy MLflow Model as a Local Inference Server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deploy-model-to-sagemaker.html">Deploy MLflow Model to Amazon SageMaker</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deploy-model-to-kubernetes/index.html">Deploy MLflow Model to Kubernetes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#api-references">API References</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#command-line-interface">Command Line Interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#python-apis">Python APIs</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#faq">FAQ</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../tracking.html">MLflow Tracking</a></li>
@@ -195,60 +207,150 @@
                 
   <div class="section" id="deployment">
 <h1>Deployment<a class="headerlink" href="#deployment" title="Permalink to this headline"> </a></h1>
-<p>In the modern age of machine learning, deploying models effectively and consistently plays a pivotal role. The capability to serve predictions
-at scale, manage dependencies, and ensure reproducibility is paramount for businesses to derive actionable insights from their ML models.
-Whether it’s for real-time predictions, batch processing, or interactive analyses, a robust model serving framework is essential.</p>
-<p>MLflow offers a comprehensive suite tailored for seamless model deployment. With its focus on ease of use, consistency, and adaptability,
-MLflow simplifies the model serving process, ensuring models are not just artifacts but actionable tools for decision-making.</p>
-<div class="section" id="the-power-of-mlflow-in-model-serving">
-<h2>The Power of MLflow in Model Serving<a class="headerlink" href="#the-power-of-mlflow-in-model-serving" title="Permalink to this headline"> </a></h2>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>This page describes the toolset for deploying your in-house MLflow Model. For information on the <strong>LLM Deployment Server</strong> (formerly known as AI Gateway), please refer to <a class="reference external" href="../llms/deployments/index.html">MLflow Deployment Server</a>.</p>
+</div>
+<p>After training your machine learning model and ensuring its performance, the next step is deploying it to a production environment.
+This process can be complex, but MLflow simplifies it by offering an easy toolset for deploying your ML models to various targets, including local environments, cloud services, and Kubernetes clusters.</p>
+<div class="figure align-center" style="width: 90%">
+<img alt="../_images/mlflow-deployment-overview.png" src="../_images/mlflow-deployment-overview.png" />
+</div>
+<p>By using MLflow deployment toolset, you can enjoy the following benefits:</p>
 <ul class="simple">
+<li><p><strong>Effortless Deployment</strong>: MLflow provides a simple interface for deploying models to various targets, eliminating the need to write boilorplate code.</p></li>
 <li><p><strong>Dependency and Environment Management</strong>: MLflow ensures that the deployment environment mirrors the training environment, capturing all dependencies. This guarantees that models run consistently, regardless of where they’re deployed.</p></li>
 <li><p><strong>Packaging Models and Code</strong>: With MLflow, not just the model, but any supplementary code and configurations are packaged along with the deployment container. This ensures that the model can be executed seamlessly without any missing components.</p></li>
+<li><p><strong>Avoid Vendor Lock-in</strong>: MLflow provides a standard format for packaging models and unified APIs for deployment. You can easily switch between deployment targets without having to rewrite your code.</p></li>
 </ul>
+<div class="section" id="concepts">
+<h2>Concepts<a class="headerlink" href="#concepts" title="Permalink to this headline"> </a></h2>
+<div class="section" id="id1">
+<h3><a class="reference external" href="../models.html">MLflow Model</a><a class="headerlink" href="#id1" title="Permalink to this headline"> </a></h3>
+<p><a class="reference external" href="../models.html">MLflow Model</a> is a standard format that packages a machine learning model with its metadata, such as dependencies and inference schema.
+You typically create a model as a result of training execution using the <a class="reference external" href="../tracking.html">MLflow Tracking APIs</a>, for instance, <a class="reference internal" href="../python_api/mlflow.pyfunc.html#mlflow.pyfunc.log_model" title="mlflow.pyfunc.log_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.pyfunc.log_model()</span></code></a>.
+Alternatively, models can be registered and retrieved via the <a class="reference external" href="../model-registry.html">MLflow Model Registry</a>.
+To use MLflow deployment, you must first create a model.</p>
 </div>
-<div class="section" id="deployment-avenues">
-<h2>Deployment Avenues<a class="headerlink" href="#deployment-avenues" title="Permalink to this headline"> </a></h2>
-<p>MLflow offers multiple ways to deploy your models based on your needs:</p>
-<ol class="arabic">
-<li><p><a class="reference external" href="../models.html#local-model-deployment">Local Flask Server</a>: Quickly deploy your model in a containerized local environment. This server runs a model container with the dependencies defined during model saving.</p></li>
-<li><p><a class="reference external" href="../models.html#serving-with-mlserver">Local Flask Server with MLServer</a>: Easily deploy a containerized model along with MLServer and KServe. This powerful alternative to a base Flask server leverages all of the benefits of Seldon’s framework to enhance your inference capabilities.</p></li>
-<li><p><strong>Remote Container Serving</strong>: Once a model container has been defined and built, it can be deployed to a remote serving environment. This is especially useful for cloud deployments where providers offer elastic container execution capabilities.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><a class="reference external" href="../models.html#deploy-a-python-function-model-on-microsoft-azure-ml">AzureML</a></p></li>
-<li><p><a class="reference external" href="../models.html#deploy-a-python-function-model-on-amazon-sagemaker">AWS Sagemaker</a></p></li>
-</ul>
-</div></blockquote>
-</li>
-<li><p><strong>Kubernetes</strong>: For those invested in the Kubernetes ecosystem, MLflow supports model deployment to Kubernetes clusters, ensuring scalability and resilience.</p></li>
-<li><p><strong>Databricks Model Serving</strong>: Directly deploy models in a Databricks environment, taking advantage of Databricks’ performance optimizations and integrations.</p></li>
-</ol>
+<div class="section" id="container">
+<h3>Container<a class="headerlink" href="#container" title="Permalink to this headline"> </a></h3>
+<p>Container plays a critical role for simplifying and standardizing the model deployment process. MLflow uses Docker containers to package models with their dependencies,
+enabling deployment to various destinations without environment compatibility issues.
+If you’re new to Docker, you can learn more at <a class="reference external" href="https://www.docker.com/resources/what-container//">“What is a Container”</a>.</p>
 </div>
-<div class="section" id="tutorials-and-guides">
-<h2>Tutorials and Guides<a class="headerlink" href="#tutorials-and-guides" title="Permalink to this headline"> </a></h2>
+<div class="section" id="deployment-target">
+<h3>Deployment Target<a class="headerlink" href="#deployment-target" title="Permalink to this headline"> </a></h3>
+<p>Deployment target refers to the destination environment for your model. MLflow supports various targets, including local environments, cloud services (AWS, Azure), Kubernetes clusters, and others.</p>
+</div>
+</div>
+<div class="section" id="how-it-works">
+<h2>How it works<a class="headerlink" href="#how-it-works" title="Permalink to this headline"> </a></h2>
+<p>An <a class="reference external" href="../models.html">MLflow Model</a> already packages your model and its dependencies, hence MLflow can create either a virtual environment (for local deployment)
+or a Docker container image containing everything needed to run your model. Subsequently, MLflow launches an inference server with REST endpoints using
+frameworks like <a class="reference external" href="https://flask.palletsprojects.com/en/1.1.x/">Flask</a>, preparing it for deployment to various destinations to handle inference requests.
+Detailed information about the server and endpoints is available in <a class="reference internal" href="deploy-model-locally.html#local-inference-server-spec"><span class="std std-ref">Inference Server Specification</span></a>.</p>
+<p>MLflow provides <a class="reference internal" href="#deployment-cli"><span class="std std-ref">CLI commands</span></a> and <a class="reference internal" href="#deployment-python-api"><span class="std std-ref">Python APIs</span></a> to facilitate the deployment process.
+The required commands differ based on the deployment target, so please continue reading to the next section for more details about your specific target.</p>
+</div>
+<div class="section" id="supported-deployment-targets">
+<h2>Supported Deployment Targets<a class="headerlink" href="#supported-deployment-targets" title="Permalink to this headline"> </a></h2>
+<p>MLflow offers support for a variety of deployment targets. For detailed information and tutorials on each, please follow the respective links below.</p>
+<div class="toctree-wrapper compound">
+</div>
 <section>
     <article class="simple-grid">
         <div class="simple-card">
-            <a href="deploy-model-to-kubernetes/index.html">
-                <div class="header">
-                    Deploying a Model to Kubernetes with MLflow
+            <a href="deploy-model-locally.html">
+                <div class="header-with-image">
+                    Deploying a Model Locally
                 </div>
                 <p>
-                    Explore an end-to-end guide on using MLflow to train a linear regression model, package it, and deploy it to a Kubernetes cluster.
-                    Understand how MLflow simplifies the entire process, from training to serving.
+                   Deploying a model locally as an inference server is straightforward with MLflow, requiring just a single command <code>mlflow models serve</code>.
+                </p>
+            </a>
+        </div>
+        <div class="simple-card">
+            <a href="deploy-model-to-sagemaker.html">
+                <div class="header-with-image">
+                    <img src="../_static/images/logos/amazon-sagemaker-logo.png" alt="Amazon SageMaker Logo" />
+                </div>
+                <p>
+                    Amazon SageMaker is a fully managed service for scaling ML inference containers.
+                    MLflow simplifies the deployment process with easy-to-use commands, eliminating the need to write container definitions.
+                </p>
+            </a>
+        </div>
+        <div class="simple-card">
+            <a href="https://learn.microsoft.com/en-us/azure/machine-learning/how-to-deploy-mlflow-models">
+                <div class="header-with-image">
+                    <img src="../_static/images/logos/azure-ml-logo.png" alt="AzureML Logo" style="width: 90%"/>
+                </div>
+                <p>
+                    MLflow integrates seamlessly with Azure ML. You can deploy MLflow Model to the Azure ML managed online/batch endpoints,
+                    or to Azure Container Instances (ACI) / Azure Kubernetes Service (AKS).
+                </p>
+            </a>
+        </div>
+        <div class="simple-card">
+            <a href="https://docs.databricks.com/en/mlflow/models.html">
+                <div class="header-with-image">
+                    <img src="../_static/images/logos/databricks-logo.png" alt="Databricks Logo" style="width: 90%"/>
+                </div>
+                <p>
+                    Databricks Model Serving offers a fully managed service for serving MLflow models at scale,
+                    with added benefits of performance optimizations and monitoring capabilities.
+                </p>
+            </a>
+        </div>
+        <div class="simple-card">
+            <a href="deploy-model-to-kubernetes/index.html">
+                <div class="header-with-image">
+                    <img src="../_static/images/logos/kubernetes-logo.png" alt="Kubernetes Logo" style="width: 90%"/>
+                </div>
+                <p>
+                   MLflow Deployment integrates with Kubernetes-native ML serving frameworks
+                   such as Seldon Core and KServe (formerly KFServing).
+                 </p>
+            </a>
+        </div>
+        <div class="simple-card">
+            <a href="../plugins.html#deployment-plugins">
+                <div class="header-with-image">
+                    Community Supported Targets
+                </div>
+                <p>
+                    MLflow also supports more deployment targets such as Ray Serve, Redis AI, Torch Serve, Oracle Cloud Infrastructure (OCI), through community-supported plugins.
                 </p>
             </a>
         </div>
     </article>
-</section><div class="toctree-wrapper compound">
+</section></div>
+<div class="section" id="api-references">
+<h2>API References<a class="headerlink" href="#api-references" title="Permalink to this headline"> </a></h2>
+<div class="section" id="command-line-interface">
+<span id="deployment-cli"></span><h3>Command Line Interface<a class="headerlink" href="#command-line-interface" title="Permalink to this headline"> </a></h3>
+<p>Deployment-related commands are primarily categorized under two modules:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="../cli.html#mlflow-models">mlflow models</a> - typically used for local deployment.</p></li>
+<li><p><a class="reference external" href="../cli.html#mlflow-deployments">mlflow deployments</a> - typically used for deploying to custom targets.</p></li>
+</ul>
+<p>Note that these categories are not strictly separated and may overlap. Furthermore, certain targets require
+custom modules or plugins, for example, <a class="reference external" href="../cli.html#mlflow-sagemaker">mlflow sagemaker</a> is used for Amazon
+SageMaker deployments, and the <a class="reference external" href="https://pypi.org/project/azureml-mlflow/">azureml-mlflow</a> library is required for Azure ML.</p>
+<p>Therefore, it is advisable to consult the specific documentation for your chosen target to identify the appropriate commands.</p>
+</div>
+<div class="section" id="python-apis">
+<span id="deployment-python-api"></span><h3>Python APIs<a class="headerlink" href="#python-apis" title="Permalink to this headline"> </a></h3>
+<p>Almost all functionalities available in MLflow deployment can also be accessed via Python APIs. For more details, refer to the following API references:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="../python_api/mlflow.models.html">mlflow.models</a></p></li>
+<li><p><a class="reference external" href="../python_api/mlflow.deployments.html">mlflow.deployments</a></p></li>
+<li><p><a class="reference external" href="../python_api/mlflow.sagemaker.html">mlflow.sagemaker</a></p></li>
+</ul>
 </div>
 </div>
-<div class="section" id="conclusion">
-<h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline"> </a></h2>
-<p>Model serving is an intricate process, and MLflow is designed to make it as intuitive and reliable as possible. With its myriad deployment options
-and focus on consistency, MLflow ensures that models are ready for action, be it in a local environment, the cloud, or on a large-scale Kubernetes
-cluster. Dive into the provided tutorials, explore the functionalities, and streamline your model deployment journey with MLflow.</p>
+<div class="section" id="faq">
+<h2>FAQ<a class="headerlink" href="#faq" title="Permalink to this headline"> </a></h2>
 </div>
 </div>
 
@@ -262,7 +364,7 @@ cluster. Dive into the provided tutorials, explore the functionalities, and stre
         <a href="../traditional-ml/creating-custom-pyfunc/notebooks/override-predict.html" class="btn btn-neutral" title="Customizing a Model’s predict method" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
       
       
-        <a href="deploy-model-to-kubernetes/index.html" class="btn btn-neutral" title="Deploying a model to Kubernetes" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+        <a href="deploy-model-locally.html" class="btn btn-neutral" title="Deploy MLflow Model as a Local Inference Server" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
       
     </div>
   

@@ -1,0 +1,464 @@
+
+  
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Deploy MLflow Model to Amazon SageMaker &mdash; MLflow 2.9.3.dev0 documentation</title>
+  
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/deployment/deploy-model-to-sagemaker.html">
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    
+
+    
+
+  
+    
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/cards.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/grids.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/mobile.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/simple-cards.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/tabs.css" type="text/css" />
+    
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="MLflow 2.9.3.dev0 documentation" href="../index.html"/>
+        <link rel="up" title="Deployment" href="index.html"/>
+        <link rel="next" title="Deploy MLflow Model to Kubernetes" href="/deploy-model-to-kubernetes/index.html"/>
+        <link rel="prev" title="Deploy MLflow Model as a Local Inference Server" href="/deploy-model-locally.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+<script type="text/javascript" src="../_static/jquery.js"></script>
+<script type="text/javascript" src="../_static/underscore.js"></script>
+<script type="text/javascript" src="../_static/doctools.js"></script>
+<script type="text/javascript" src="../_static/languagesections.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+
+<body class="wy-body-for-nav" role="document">
+  
+
+  
+  <nav class="wy-nav-top header" role="navigation" aria-label="top navigation">
+    <ul>
+  <li class="menu-toggle">
+    <i data-toggle="wy-nav-top" class="wy-nav-top-menu-button db-icon db-icon-menu pull-left"></i>
+    <a href="../index.html" class="wy-nav-top-logo"
+      ><img src="../_static/MLflow-logo-final-black.png" alt="MLflow"
+    /></a>
+    <span class="version">2.9.3.dev0</span>
+  </li>
+</ul>
+  </nav>
+  <page>
+    
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side relative">
+      <div class="wy-side-scroll">
+  <div class="wy-side-nav-search">
+    
+
+    
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+    
+  </div>
+
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+    
+      <a href="../index.html" class="main-navigation-home"><img src="../_static/icons/nav-home.svg"> MLflow</a>
+    
+
+    
+      
+
+      
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../introduction/index.html">What is MLflow?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/index.html">Getting Started with MLflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../new-features/index.html">New Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../llms/index.html">LLMs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../model-evaluation/index.html">Model Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deep-learning/index.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../traditional-ml/index.html">Traditional ML</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Deployment</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index.html#concepts">Concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#how-it-works">How it works</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#supported-deployment-targets">Supported Deployment Targets</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="deploy-model-locally.html">Deploy MLflow Model as a Local Inference Server</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Deploy MLflow Model to Amazon SageMaker</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#how-it-works">How it works</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#deploying-model-to-sagemaker-endpoint">Deploying Model to SageMaker Endpoint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#api-reference">API Reference</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#useful-links">Useful Links</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#troubleshooting">Troubleshooting</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="deploy-model-to-kubernetes/index.html">Deploy MLflow Model to Kubernetes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#api-references">API References</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#faq">FAQ</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tracking.html">MLflow Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system-metrics/index.html">System Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../projects.html">MLflow Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.html">MLflow Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../model-registry.html">MLflow Model Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../recipes.html">MLflow Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plugins.html">MLflow Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auth/index.html">MLflow Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../search-runs.html">Search Runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../search-experiments.html">Search Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python_api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../R-api.html">R API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../java_api/index.html">Java API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rest-api.html">REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docker.html">Official MLflow Docker Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../community-model-flavors.html">Community Model Flavors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials-and-examples/index.html">Tutorials and Examples</a></li>
+</ul>
+
+      
+    
+  </div>
+
+  <div role="contentinfo">
+    
+
+    <p>
+      <a id='feedbacklink' href="https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a>
+    </p>
+  </div>
+</div>
+    </nav>
+
+    <main class="wy-grid-for-nav">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+          <div class="rst-content">
+            
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Documentation</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="index.html">Deployment</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+    
+      <li>Deploy MLflow Model to Amazon SageMaker</li>
+    
+    
+    <!-- <li class="wy-breadcrumbs-aside">
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/deployment/deploy-model-to-sagemaker.rst" class="fa fa-github"> Edit on GitHub</a>
+    </li> -->
+    
+  </ul>
+</div>
+            <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <div itemprop="articleBody">
+                
+  <div class="section" id="deploy-mlflow-model-to-amazon-sagemaker">
+<span id="sagemaker-deployment"></span><h1>Deploy MLflow Model to Amazon SageMaker<a class="headerlink" href="#deploy-mlflow-model-to-amazon-sagemaker" title="Permalink to this headline"> </a></h1>
+<p>Amazon SageMaker is a fully managed service designed for scaling ML inference containers.
+MLflow simplifies the deployment process by offering easy-to-use commands without the need for writing container definitions.</p>
+<p>If you are new to MLflow model deployment, please read <a class="reference external" href="index.html">MLflow Deployment</a> first to understand the basic concepts of MLflow models and deployments.</p>
+<div class="section" id="how-it-works">
+<h2>How it works<a class="headerlink" href="#how-it-works" title="Permalink to this headline"> </a></h2>
+<p>SageMaker features a capability called <a class="reference external" href="https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor-byoc-containers.html">Bring Your Own Container (BYOC)</a>,
+which allows you to run custom Docker containers on the inference endpoint. These containers must meet specific requirements, such as running a web server
+that exposes certain REST endpoints, having a designated container entrypoint, setting environment variables, etc. Writing a Dockerfile and serving script
+that meets these requirements can be a tedious task.</p>
+<p>MLflow automates the process by building a Docker image from the MLflow Model on your behalf. Subsequently, it pushed the image to Elastic Container Registry (ECR)
+and creates a SageMaker endpoint using this image. It also uploads the model artifact to an S3 bucket and configures the endpoint to download the model from there.</p>
+<p>The container provides the same REST endpoints as a local inference server. For instance, the <code class="docutils literal notranslate"><span class="pre">/invocations</span></code> endpoint accepts CSV and JSON input data and returns
+prediction results. For more details on the endpoints, refer to <a class="reference internal" href="deploy-model-locally.html#local-inference-server-spec"><span class="std std-ref">Local Inference Server</span></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In addition to the general <code class="docutils literal notranslate"><span class="pre">pyfunc</span></code> deployment (default), SageMaker deployment also supports the <code class="docutils literal notranslate"><span class="pre">mleap</span></code> flavor. For this deployment flavor,
+the endpoint only accepts JSON-serialized pandas DataFrames in the <code class="docutils literal notranslate"><span class="pre">split</span></code> orientation, like <code class="docutils literal notranslate"><span class="pre">data</span> <span class="pre">=</span> <span class="pre">pandas_df.to_json(orient='split')</span></code>.
+This format is specified using a <code class="docutils literal notranslate"><span class="pre">Content-Type</span></code> request header value of <code class="docutils literal notranslate"><span class="pre">application/json</span></code>.</p>
+</div>
+</div>
+<div class="section" id="deploying-model-to-sagemaker-endpoint">
+<h2>Deploying Model to SageMaker Endpoint<a class="headerlink" href="#deploying-model-to-sagemaker-endpoint" title="Permalink to this headline"> </a></h2>
+<p>This section outlines the process of deploying a model to SageMaker using the MLflow CLI. For Python API references and tutorials, see the <a class="reference internal" href="#deployment-sagemaker-references"><span class="std std-ref">Useful links</span></a> section.</p>
+<div class="section" id="step-0-preparation">
+<h3>Step 0: Preparation<a class="headerlink" href="#step-0-preparation" title="Permalink to this headline"> </a></h3>
+<div class="section" id="install-tools">
+<h4>Install Tools<a class="headerlink" href="#install-tools" title="Permalink to this headline"> </a></h4>
+<p>Ensure the installation of the following tools if not already done:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://pypi.org/project/mlflow/">mlflow</a></p></li>
+<li><p><a class="reference external" href="https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html">awscli</a></p></li>
+<li><p><a class="reference external" href="https://docs.docker.com/get-docker/">docker</a></p></li>
+</ul>
+</div>
+<div class="section" id="permissions-setup">
+<h4>Permissions Setup<a class="headerlink" href="#permissions-setup" title="Permalink to this headline"> </a></h4>
+<p>Set up AWS accounts and permissions correctly. You need an IAM role with permissions to create a SageMaker endpoint, access an S3 bucket, and use the ECR repository.
+This role should also be assumable by the user performing the deployment. Learn more about this setup at <a class="reference external" href="https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-role.html">Use an IAM role in the AWS CLI</a>.</p>
+</div>
+<div class="section" id="create-an-mlflow-model">
+<h4>Create an MLflow Model<a class="headerlink" href="#create-an-mlflow-model" title="Permalink to this headline"> </a></h4>
+<p>Before deploying, you must have an MLflow Model. If you don’t have one, you can create a sample scikit-learn model by following the <a class="reference external" href="../getting-started/index.html">MLflow Tracking Quickstart</a>.
+Remember to note down the model URI, such as <code class="docutils literal notranslate"><span class="pre">runs:/&lt;run_id&gt;/&lt;artifact_path&gt;</span></code> (or <code class="docutils literal notranslate"><span class="pre">models:/&lt;model_name&gt;/&lt;model_version&gt;</span></code> if you registered the model in the <a class="reference external" href="../model-registry.html">MLflow Model Registry</a>).</p>
+</div>
+</div>
+<div class="section" id="step-1-test-your-model-locally">
+<h3>Step 1: Test your model locally<a class="headerlink" href="#step-1-test-your-model-locally" title="Permalink to this headline"> </a></h3>
+<p>It’s recommended to test your model locally before deploying it to a production environment.
+The <a class="reference internal" href="../python_api/mlflow.sagemaker.html#mlflow.sagemaker.run_local" title="mlflow.sagemaker.run_local"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow</span> <span class="pre">deployments</span> <span class="pre">run-local</span></code></a> command deploys the model in a Docker container
+with an identical image and environment configuration, making it ideal for pre-deployment testing.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mlflow<span class="w"> </span>deployments<span class="w"> </span>run-local<span class="w"> </span>-t<span class="w"> </span>sagemaker<span class="w"> </span>-m<span class="w"> </span>runs:/&lt;run_id&gt;/model<span class="w"> </span>-p<span class="w"> </span><span class="m">5000</span>
+</pre></div>
+</div>
+<p>You can then test the model by sending a POST request to the endpoint:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type:application/json; format=pandas-split&quot;</span><span class="w"> </span>--data<span class="w"> </span><span class="s1">&#39;{&quot;columns&quot;:[&quot;a&quot;,&quot;b&quot;],&quot;data&quot;:[[1,2]]}&#39;</span><span class="w"> </span>http://localhost:5000/invocations
+</pre></div>
+</div>
+</div>
+<div class="section" id="step-2-build-a-docker-image-and-push-to-ecr">
+<h3>Step 2: Build a Docker Image and Push to ECR<a class="headerlink" href="#step-2-build-a-docker-image-and-push-to-ecr" title="Permalink to this headline"> </a></h3>
+<p>The <a class="reference external" href="../cli.html#mlflow-sagemaker-build-and-push-container">mlflow sagemaker build-and-push-container</a>
+command builds a Docker image compatible with SageMaker and uploads it to ECR.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mlflow<span class="w"> </span>sagemaker<span class="w"> </span>build-and-push-container<span class="w">  </span>-m<span class="w"> </span>runs:/&lt;run_id&gt;/model
+</pre></div>
+</div>
+<p>Alternatively, you can create a custom Docker image using the <a class="reference external" href="../docker.html">official MLflow Docker image</a> and manually push it to ECR.</p>
+</div>
+<div class="section" id="step-3-deploy-to-sagemaker-endpoint">
+<h3>Step 3: Deploy to SageMaker Endpoint<a class="headerlink" href="#step-3-deploy-to-sagemaker-endpoint" title="Permalink to this headline"> </a></h3>
+<p>The <a class="reference internal" href="../python_api/mlflow.sagemaker.html#mlflow.sagemaker.SageMakerDeploymentClient.create_deployment" title="mlflow.sagemaker.SageMakerDeploymentClient.create_deployment"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow</span> <span class="pre">deployments</span> <span class="pre">create</span></code></a> command
+deploys the model to an Amazon SageMaker endpoint. MLflow uploads the Python Function model to S3 and automatically
+initiates an Amazon SageMaker endpoint serving the model.</p>
+<p>Various command-line options are available to customize the deployment, such as instance type, count, IAM role, etc.
+Refer to the <a class="reference external" href="../cli.html#mlflow-sagemaker">CLI reference</a> for a complete list of options.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ mlflow deployments create -t sagemaker -m runs:/&lt;run_id&gt;/model \
+    -C region_name=&lt;your-region&gt; \
+    -C instance-type=ml.m4.xlarge \
+    -C instance-count=1 \
+    -C env=&#39;{&quot;DISABLE_NGINX&quot;: &quot;true&quot;}&#39;&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="api-reference">
+<h2>API Reference<a class="headerlink" href="#api-reference" title="Permalink to this headline"> </a></h2>
+<p>You have two options for deploying a model to SageMaker: using the CLI or the Python API.</p>
+<ul class="simple">
+<li><p><a class="reference external" href="../cli.html#mlflow-sagemaker">CLI Reference</a></p></li>
+<li><p><a class="reference external" href="../python_api/mlflow.sagemaker.html">Python API Documentation</a></p></li>
+</ul>
+</div>
+<div class="section" id="useful-links">
+<span id="deployment-sagemaker-references"></span><h2>Useful Links<a class="headerlink" href="#useful-links" title="Permalink to this headline"> </a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://docs.databricks.com/en/_extras/notebooks/source/mlflow/mlflow-quick-start-deployment-aws.html">MLflow Quickstart Part 2: Serving Models Using Amazon SageMaker</a> - This step-by-step tutorial demonstrates how to deploy a model to SageMaker using MLflow Python APIs from a Databricks notebook.</p></li>
+<li><p><a class="reference external" href="https://aws.amazon.com/blogs/machine-learning/managing-your-machine-learning-lifecycle-with-mlflow-and-amazon-sagemaker/">Managing Your Machine Learning Lifecycle with MLflow and Amazon SageMaker</a> - This comprehensive tutorial covers integrating the entire MLflow lifecycle with SageMaker, from model training to deployment.</p></li>
+</ul>
+</div>
+<div class="section" id="troubleshooting">
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this headline"> </a></h2>
+</div>
+</div>
+
+
+              </div>
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="deploy-model-locally.html" class="btn btn-neutral" title="Deploy MLflow Model as a Local Inference Server" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+      
+      
+        <a href="deploy-model-to-kubernetes/index.html" class="btn btn-neutral" title="Deploy MLflow Model to Kubernetes" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+      <p class="copyright">
+          &copy; MLflow Project, a Series of LF Projects, LLC. All rights reserved.
+      </p>
+
+  </div> 
+
+</footer>
+          </div>
+        </div>
+      </section>
+    </main>
+  </page>
+
+  
+
+
+  
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+      URL_ROOT:'../',
+      VERSION:'2.9.3.dev0',
+      COLLAPSE_INDEX:false,
+      FILE_SUFFIX:'.html',
+      LINK_SUFFIX: '.html',
+      HAS_SOURCE:  true
+    };
+  </script>
+
+  
+
+  <script type="text/javascript" src="../_static/js/clipboard.min.js"></script>
+  <script type="text/javascript" src="../_static/js/jquery.waypoints.min.js"></script>
+
+  
+  
+  
+  <script type="text/javascript">var CLIPPY_SVG_PATH = "../_static/clippy.svg";</script>
+  <script type="text/javascript" src="../_static/js/custom.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.StickyNav.enable();
+    });
+
+  </script>
+  
+
+  
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        // Get the code block designator class entries
+        const allHighlights = document.querySelectorAll('.highlight');
+        // Disable copyable links for notebook cell numbering and for cell outputs
+        const highlights = Array.from(allHighlights).filter(highlight => !highlight.closest('.highlight-none') && 
+            !highlight.closest('.nboutput'));
+    
+        highlights.forEach(function(highlight) {
+            const copyIcon = document.createElement('span');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.innerHTML = '&#xf0ea;';
+
+            copyIcon.addEventListener('click', function() {
+                const code = highlight.querySelector('pre').textContent;
+                copyToClipboard(code);
+
+                // Flash effect on click
+                this.style.color = '#0194E2';
+                setTimeout(() => {
+                    this.style.color = ''; 
+                }, 100);
+
+                // Display "Code copied to clipboard" near the clicked icon
+                const message = document.createElement('span');
+                message.textContent = "Copied!";
+                message.classList.add('copy-message'); 
+
+                // Append the message to the icon
+                this.appendChild(message);
+
+                setTimeout(() => {
+                    this.removeChild(message);
+                }, 500);
+            });
+
+            highlight.appendChild(copyIcon);
+        });
+    });
+  </script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Force download for notebook-download-btn
+        const downloadButtons = document.querySelectorAll('.notebook-download-btn');
+        downloadButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                // Fetch the raw content of the notebook from GitHub
+                fetch(button.href)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = url;
+                        const filename = button.href.split('/').pop();
+                        link.download = filename; 
+
+                        document.body.appendChild(link);
+                        link.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    })
+                    .catch(err => console.error('Error fetching the notebook:', err));
+            });
+        });
+    });
+</script> 
+</body>
+</html>
