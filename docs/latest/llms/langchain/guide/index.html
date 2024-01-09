@@ -1,0 +1,758 @@
+
+  
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>LangChain within MLflow (Experimental) &mdash; MLflow 2.9.3.dev0 documentation</title>
+  
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/llms/langchain/guide/index.html">
+  
+  
+    <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
+    
+
+    
+
+  
+    
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/grids.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/mobile.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/simple-cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/tabs.css" type="text/css" />
+    
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="MLflow 2.9.3.dev0 documentation" href="../../../index.html"/>
+        <link rel="up" title="MLflow LangChain Flavor" href="../index.html"/>
+        <link rel="next" title="MLflow’s LLM Tracking Capabilities" href="/../../llm-tracking/index.html"/>
+        <link rel="prev" title="Introduction to RAG with MLflow and LangChain" href="/../notebooks/langchain-retriever.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+<script type="text/javascript" src="../../../_static/jquery.js"></script>
+<script type="text/javascript" src="../../../_static/underscore.js"></script>
+<script type="text/javascript" src="../../../_static/doctools.js"></script>
+<script type="text/javascript" src="../../../_static/languagesections.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+
+<body class="wy-body-for-nav" role="document">
+  
+
+  
+  <nav class="wy-nav-top header" role="navigation" aria-label="top navigation">
+    <ul>
+  <li class="menu-toggle">
+    <i data-toggle="wy-nav-top" class="wy-nav-top-menu-button db-icon db-icon-menu pull-left"></i>
+    <a href="../../../index.html" class="wy-nav-top-logo"
+      ><img src="../../../_static/MLflow-logo-final-black.png" alt="MLflow"
+    /></a>
+    <span class="version">2.9.3.dev0</span>
+  </li>
+</ul>
+  </nav>
+  <page>
+    
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side relative">
+      <div class="wy-side-scroll">
+  <div class="wy-side-nav-search">
+    
+
+    
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+    
+  </div>
+
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+    
+      <a href="../../../index.html" class="main-navigation-home"><img src="../../../_static/icons/nav-home.svg"> MLflow</a>
+    
+
+    
+      
+
+      
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../introduction/index.html">What is MLflow?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting-started/index.html">Getting Started with MLflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../new-features/index.html">New Features</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">LLMs</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#id1">MLflow Deployments Server for LLMs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#id3">LLM Evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#id4">Prompt Engineering UI</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../index.html#native-mlflow-flavors-for-llms">Native MLflow Flavors for LLMs</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../../index.html#benefits-of-mlflow-s-native-flavors-for-llms">Benefits of MLflow’s Native Flavors for LLMs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../index.html#explore-the-native-llm-flavors">Explore the Native LLM Flavors</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../../index.html#native-integration-guides-and-tutorials">Native Integration Guides and Tutorials</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../../transformers/index.html">MLflow Transformers Flavor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../openai/index.html">MLflow OpenAI Flavor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../sentence-transformers/index.html">MLflow Sentence-Transformers Flavor</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../index.html">MLflow LangChain Flavor</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#id5">LLM Tracking in MLflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#tutorials-and-use-case-guides-for-llms-in-mlflow">Tutorials and Use Case Guides for LLMs in MLflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../model-evaluation/index.html">Model Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deep-learning/index.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../traditional-ml/index.html">Traditional ML</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deployment/index.html">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tracking.html">MLflow Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../system-metrics/index.html">System Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../projects.html">MLflow Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../models.html">MLflow Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../model-registry.html">MLflow Model Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../recipes.html">MLflow Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../plugins.html">MLflow Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../auth/index.html">MLflow Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../search-runs.html">Search Runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../search-experiments.html">Search Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../python_api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../R-api.html">R API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../java_api/index.html">Java API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rest-api.html">REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docker.html">Official MLflow Docker Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../community-model-flavors.html">Community Model Flavors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials-and-examples/index.html">Tutorials and Examples</a></li>
+</ul>
+
+      
+    
+  </div>
+
+  <div role="contentinfo">
+    
+
+    <p>
+      <a id='feedbacklink' href="https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a>
+    </p>
+  </div>
+</div>
+    </nav>
+
+    <main class="wy-grid-for-nav">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+          <div class="rst-content">
+            
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Documentation</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../../index.html">LLMs</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../index.html">MLflow LangChain Flavor</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+    
+      <li>LangChain within MLflow (Experimental)</li>
+    
+    
+    <!-- <li class="wy-breadcrumbs-aside">
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/llms/langchain/guide/index.rst" class="fa fa-github"> Edit on GitHub</a>
+    </li> -->
+    
+  </ul>
+</div>
+            <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <div itemprop="articleBody">
+                
+  <div class="section" id="langchain-within-mlflow-experimental">
+<h1>LangChain within MLflow (Experimental)<a class="headerlink" href="#langchain-within-mlflow-experimental" title="Permalink to this headline"> </a></h1>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">langchain</span></code> flavor is currently under active development and is marked as Experimental. Public APIs are evolving, and new features are being added to enhance its functionality.</p>
+</div>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline"> </a></h2>
+<p><a class="reference external" href="https://www.langchain.com/">LangChain</a> is a Python framework for creating applications powered by language models. It offers unique features for developing context-aware
+applications that utilize language models for reasoning and generating responses. This integration with MLflow streamlines the development and
+deployment of complex NLP applications.</p>
+</div>
+<div class="section" id="langchain-s-technical-essence">
+<h2>LangChain’s Technical Essence<a class="headerlink" href="#langchain-s-technical-essence" title="Permalink to this headline"> </a></h2>
+<ul class="simple">
+<li><p><strong>Context-Aware Applications</strong>: LangChain specializes in connecting language models to various sources of context, enabling them to produce more relevant and accurate outputs.</p></li>
+<li><p><strong>Reasoning Capabilities</strong>: It uses the power of language models to reason about the given context and take appropriate actions based on it.</p></li>
+<li><p><strong>Flexible Chain Composition</strong>: The LangChain Expression Language (LCEL) allows for easy construction of complex chains from basic components, supporting functionalities like streaming, parallelism, and logging.</p></li>
+</ul>
+</div>
+<div class="section" id="building-chains-with-langchain">
+<h2>Building Chains with LangChain<a class="headerlink" href="#building-chains-with-langchain" title="Permalink to this headline"> </a></h2>
+<ul class="simple">
+<li><p><strong>Basic Components</strong>: LangChain facilitates chaining together components like prompt templates, models, and output parsers to create complex workflows.</p></li>
+<li><p><strong>Example - Joke Generator</strong>:
+- A basic chain can take a topic and generate a joke using a combination of a prompt template, a ChatOpenAI model, and an output parser.
+- The components are chained using the <cite>|</cite> operator, similar to a Unix pipe, allowing the output of one component to feed into the next.</p></li>
+<li><p><strong>Advanced Use Cases</strong>:
+- LangChain also supports more complex setups, like Retrieval-Augmented Generation (RAG) chains, which can add context when responding to questions.</p></li>
+</ul>
+</div>
+<div class="section" id="integration-with-mlflow">
+<h2>Integration with MLflow<a class="headerlink" href="#integration-with-mlflow" title="Permalink to this headline"> </a></h2>
+<ul class="simple">
+<li><p><strong>Simplified Logging and Loading</strong>: MLflow’s <cite>langchain</cite> flavor provides functions like <cite>log_model()</cite> and <cite>load_model()</cite>, enabling easy logging and retrieval of LangChain models within the MLflow ecosystem.</p></li>
+<li><p><strong>Simplified Deployment</strong>: LangChain models logged in MLflow can be interpreted as generic Python functions, simplifying their deployment and use in diverse applications. With dependency management incorporated directly into your logged model, you can deploy your application knowing that the environment that you used to train the model is what will be used to serve it.</p></li>
+<li><p><strong>Versatile Model Interaction</strong>: The integration allows developers to leverage LangChain’s unique features in conjunction with MLflow’s robust model tracking and management capabilities.</p></li>
+</ul>
+<p>The <code class="docutils literal notranslate"><span class="pre">langchain</span></code> model flavor enables logging of <a class="reference external" href="https://github.com/hwchase17/langchain">LangChain models</a> in MLflow format via
+the <a class="reference internal" href="../../../python_api/mlflow.langchain.html#mlflow.langchain.save_model" title="mlflow.langchain.save_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.langchain.save_model()</span></code></a> and <a class="reference internal" href="../../../python_api/mlflow.langchain.html#mlflow.langchain.log_model" title="mlflow.langchain.log_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.langchain.log_model()</span></code></a> functions. Use of these
+functions also adds the <code class="docutils literal notranslate"><span class="pre">python_function</span></code> flavor to the MLflow Models that they produce, allowing the model to be
+interpreted as a generic Python function for inference via <a class="reference internal" href="../../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.load_model" title="mlflow.pyfunc.load_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.pyfunc.load_model()</span></code></a>.</p>
+<p>You can also use the <a class="reference internal" href="../../../python_api/mlflow.langchain.html#mlflow.langchain.load_model" title="mlflow.langchain.load_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.langchain.load_model()</span></code></a> function to load a saved or logged MLflow
+Model with the <code class="docutils literal notranslate"><span class="pre">langchain</span></code> flavor as a dictionary of the model’s attributes.</p>
+<div class="section" id="basic-example-logging-a-langchain-llmchain-in-mlflow">
+<h3>Basic Example: Logging a LangChain <code class="docutils literal notranslate"><span class="pre">LLMChain</span></code> in MLflow<a class="headerlink" href="#basic-example-logging-a-langchain-llmchain-in-mlflow" title="Permalink to this headline"> </a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">langchain.chains</span> <span class="kn">import</span> <span class="n">LLMChain</span>
+<span class="kn">from</span> <span class="nn">langchain.llms</span> <span class="kn">import</span> <span class="n">OpenAI</span>
+<span class="kn">from</span> <span class="nn">langchain.prompts</span> <span class="kn">import</span> <span class="n">PromptTemplate</span>
+
+<span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="c1"># Ensure the OpenAI API key is set in the environment</span>
+<span class="k">assert</span> <span class="s2">&quot;OPENAI_API_KEY&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">,</span> <span class="s2">&quot;Please set the OPENAI_API_KEY environment variable.&quot;</span>
+
+<span class="c1"># Initialize the OpenAI model and the prompt template</span>
+<span class="n">llm</span> <span class="o">=</span> <span class="n">OpenAI</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
+<span class="n">prompt</span> <span class="o">=</span> <span class="n">PromptTemplate</span><span class="p">(</span>
+    <span class="n">input_variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;product&quot;</span><span class="p">],</span>
+    <span class="n">template</span><span class="o">=</span><span class="s2">&quot;What is a good name for a company that makes </span><span class="si">{product}</span><span class="s2">?&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Create the LLMChain with the specified model and prompt</span>
+<span class="n">chain</span> <span class="o">=</span> <span class="n">LLMChain</span><span class="p">(</span><span class="n">llm</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span> <span class="n">prompt</span><span class="o">=</span><span class="n">prompt</span><span class="p">)</span>
+
+<span class="c1"># Log the LangChain LLMChain in an MLflow run</span>
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="n">logged_model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">langchain</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span><span class="n">chain</span><span class="p">,</span> <span class="s2">&quot;langchain_model&quot;</span><span class="p">)</span>
+
+<span class="c1"># Load the logged model using MLflow&#39;s Python function flavor</span>
+<span class="n">loaded_model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">logged_model</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
+
+<span class="c1"># Predict using the loaded model</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">loaded_model</span><span class="o">.</span><span class="n">predict</span><span class="p">([{</span><span class="s2">&quot;product&quot;</span><span class="p">:</span> <span class="s2">&quot;colorful socks&quot;</span><span class="p">}]))</span>
+</pre></div>
+</div>
+<p>The output of the example is shown below:</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">Output</span><a class="headerlink" href="#id1" title="Permalink to this code"> </a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Colorful Cozy Creations.&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="what-the-simple-llmchain-example-showcases">
+<h4>What the Simple LLMChain Example Showcases<a class="headerlink" href="#what-the-simple-llmchain-example-showcases" title="Permalink to this headline"> </a></h4>
+<ul class="simple">
+<li><p><strong>Integration Flexibility</strong>: The example highlights how LangChain’s LLMChain, consisting of an OpenAI model and a custom prompt template, can be easily logged in MLflow.</p></li>
+<li><p><strong>Simplified Model Management</strong>: Through MLflow’s <cite>langchain</cite> flavor, the chain is logged, enabling version control, tracking, and easy retrieval.</p></li>
+<li><p><strong>Ease of Deployment</strong>: The logged LangChain model is loaded using MLflow’s <cite>pyfunc</cite> module, illustrating the straightforward deployment process for LangChain models within MLflow.</p></li>
+<li><p><strong>Practical Application</strong>: The final prediction step demonstrates the model’s functionality in a real-world scenario, generating a company name based on a given product.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="logging-a-langchain-agent-with-mlflow">
+<h3>Logging a LangChain Agent with MLflow<a class="headerlink" href="#logging-a-langchain-agent-with-mlflow" title="Permalink to this headline"> </a></h3>
+<div class="section" id="what-is-an-agent">
+<h4>What is an Agent?<a class="headerlink" href="#what-is-an-agent" title="Permalink to this headline"> </a></h4>
+<p>Agents in LangChain leverage language models to dynamically determine and execute a sequence of actions, contrasting with the hardcoded sequences in chains.
+To learn more about Agents and see additional examples within LangChain, you can <a class="reference external" href="https://python.langchain.com/docs/modules/agents/">read the LangChain docs on Agents</a>.</p>
+</div>
+<div class="section" id="key-components-of-agents">
+<h4>Key Components of Agents<a class="headerlink" href="#key-components-of-agents" title="Permalink to this headline"> </a></h4>
+<div class="section" id="agent">
+<h5>Agent<a class="headerlink" href="#agent" title="Permalink to this headline"> </a></h5>
+<ul class="simple">
+<li><p>The core chain driving decision-making, utilizing a language model and a prompt.</p></li>
+<li><p>Receives inputs like tool descriptions, user objectives, and previously executed steps.</p></li>
+<li><p>Outputs the next action set (AgentActions) or the final response (AgentFinish).</p></li>
+</ul>
+</div>
+<div class="section" id="tools">
+<h5>Tools<a class="headerlink" href="#tools" title="Permalink to this headline"> </a></h5>
+<ul class="simple">
+<li><p>Functions invoked by agents to fulfill tasks.</p></li>
+<li><p>Essential to provide appropriate tools and accurately describe them for effective use.</p></li>
+</ul>
+</div>
+<div class="section" id="toolkits">
+<h5>Toolkits<a class="headerlink" href="#toolkits" title="Permalink to this headline"> </a></h5>
+<ul class="simple">
+<li><p>Collections of tools tailored for specific tasks.</p></li>
+<li><p>LangChain offers a range of built-in toolkits and supports custom toolkit creation.</p></li>
+</ul>
+</div>
+<div class="section" id="agentexecutor">
+<h5>AgentExecutor<a class="headerlink" href="#agentexecutor" title="Permalink to this headline"> </a></h5>
+<ul class="simple">
+<li><p>The runtime environment executing agent decisions.</p></li>
+<li><p>Handles complexities such as tool errors and agent output parsing.</p></li>
+<li><p>Ensures comprehensive logging and observability.</p></li>
+</ul>
+</div>
+<div class="section" id="additional-agent-runtimes">
+<h5>Additional Agent Runtimes<a class="headerlink" href="#additional-agent-runtimes" title="Permalink to this headline"> </a></h5>
+<ul class="simple">
+<li><p>Beyond AgentExecutor, LangChain supports experimental runtimes like Plan-and-execute Agent, Baby AGI, and Auto GPT.</p></li>
+<li><p>Custom runtime logic creation is also facilitated.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="an-example-of-logging-an-langchain-agent">
+<h4>An Example of Logging an LangChain Agent<a class="headerlink" href="#an-example-of-logging-an-langchain-agent" title="Permalink to this headline"> </a></h4>
+<p>This example illustrates the process of logging a LangChain Agent in MLflow, highlighting the integration of LangChain’s complex agent functionalities with MLflow’s robust model management.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">langchain.agents</span> <span class="kn">import</span> <span class="n">AgentType</span><span class="p">,</span> <span class="n">initialize_agent</span><span class="p">,</span> <span class="n">load_tools</span>
+<span class="kn">from</span> <span class="nn">langchain.llms</span> <span class="kn">import</span> <span class="n">OpenAI</span>
+
+<span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="c1"># Note: Ensure that the package &#39;google-search-results&#39; is installed via pypi to run this example</span>
+<span class="c1"># and that you have a accounts with SerpAPI and OpenAI to use their APIs.</span>
+
+<span class="c1"># Ensuring necessary API keys are set</span>
+<span class="k">assert</span> <span class="s2">&quot;OPENAI_API_KEY&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">,</span> <span class="s2">&quot;Please set the OPENAI_API_KEY environment variable.&quot;</span>
+<span class="k">assert</span> <span class="s2">&quot;SERPAPI_API_KEY&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">,</span> <span class="s2">&quot;Please set the SERPAPI_API_KEY environment variable.&quot;</span>
+
+<span class="c1"># Load the language model for agent control</span>
+<span class="n">llm</span> <span class="o">=</span> <span class="n">OpenAI</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Next, let&#39;s load some tools to use. Note that the `llm-math` tool uses an LLM, so we need to pass that in.</span>
+<span class="n">tools</span> <span class="o">=</span> <span class="n">load_tools</span><span class="p">([</span><span class="s2">&quot;serpapi&quot;</span><span class="p">,</span> <span class="s2">&quot;llm-math&quot;</span><span class="p">],</span> <span class="n">llm</span><span class="o">=</span><span class="n">llm</span><span class="p">)</span>
+
+<span class="c1"># Finally, let&#39;s initialize an agent with the tools, the language model, and the type of agent we want to use.</span>
+<span class="n">agent</span> <span class="o">=</span> <span class="n">initialize_agent</span><span class="p">(</span><span class="n">tools</span><span class="p">,</span> <span class="n">llm</span><span class="p">,</span> <span class="n">agent</span><span class="o">=</span><span class="n">AgentType</span><span class="o">.</span><span class="n">ZERO_SHOT_REACT_DESCRIPTION</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Log the agent in an MLflow run</span>
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="n">logged_model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">langchain</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span><span class="n">agent</span><span class="p">,</span> <span class="s2">&quot;langchain_model&quot;</span><span class="p">)</span>
+
+<span class="c1"># Load the logged agent model for prediction</span>
+<span class="n">loaded_model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">logged_model</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
+
+<span class="c1"># Generate an inference result using the loaded model</span>
+<span class="n">question</span> <span class="o">=</span> <span class="s2">&quot;What was the high temperature in SF yesterday in Fahrenheit? What is that number raised to the .023 power?&quot;</span>
+
+<span class="n">answer</span> <span class="o">=</span> <span class="n">loaded_model</span><span class="o">.</span><span class="n">predict</span><span class="p">([{</span><span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="n">question</span><span class="p">}])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">answer</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The output of the example above is shown below:</p>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">Output</span><a class="headerlink" href="#id2" title="Permalink to this code"> </a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;1.1044000282035853&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="what-the-simple-agent-example-showcases">
+<h4>What the Simple Agent Example Showcases<a class="headerlink" href="#what-the-simple-agent-example-showcases" title="Permalink to this headline"> </a></h4>
+<ul class="simple">
+<li><p><strong>Complex Agent Logging</strong>: Demonstrates how LangChain’s sophisticated agent, which utilizes multiple tools and a language model, can be logged in MLflow.</p></li>
+<li><p><strong>Integration of Advanced Tools</strong>: Showcases the use of additional tools like ‘serpapi’ and ‘llm-math’ with a LangChain agent, emphasizing the framework’s capability to integrate complex functionalities.</p></li>
+<li><p><strong>Agent Initialization and Usage</strong>: Details the initialization process of a LangChain agent with specific tools and model settings, and how it can be used to perform complex queries.</p></li>
+<li><p><strong>Efficient Model Management and Deployment</strong>: Illustrates the ease with which complex LangChain agents can be managed and deployed using MLflow, from logging to prediction.</p></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section" id="enhanced-management-of-retrievalqa-chains-with-mlflow">
+<h2>Enhanced Management of RetrievalQA Chains with MLflow<a class="headerlink" href="#enhanced-management-of-retrievalqa-chains-with-mlflow" title="Permalink to this headline"> </a></h2>
+<p>LangChain’s integration with MLflow introduces a more efficient way to manage and utilize the <code class="docutils literal notranslate"><span class="pre">RetrievalQA</span></code> chains, a key aspect of LangChain’s capabilities.
+These chains adeptly combine data retrieval with question-answering processes, leveraging the strength of language models.</p>
+<div class="section" id="key-insights-into-retrievalqa-chains">
+<h3>Key Insights into RetrievalQA Chains<a class="headerlink" href="#key-insights-into-retrievalqa-chains" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>RetrievalQA Chain Functionality</strong>: These chains represent a sophisticated LangChain feature where information retrieval is seamlessly blended with language
+model-based question answering. They excel in scenarios requiring the language
+model to consult specific data or documents for accurate responses.</p></li>
+<li><p><strong>Role of the Retrieval Object</strong>: At the core of RetrievalQA chains lies the retriever object, tasked with sourcing relevant documents or data in response
+to queries.</p></li>
+</ul>
+</div>
+<div class="section" id="detailed-overview-of-the-rag-process">
+<h3>Detailed Overview of the RAG Process<a class="headerlink" href="#detailed-overview-of-the-rag-process" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Document Loaders</strong>: Facilitate loading documents from a diverse array of sources, boasting over 100 loaders and integrations.</p></li>
+<li><p><strong>Document Transformers</strong>: Prepare documents for retrieval by transforming and segmenting them into manageable parts.</p></li>
+<li><p><strong>Text Embedding Models</strong>: Generate semantic embeddings of texts, enhancing the relevance and efficiency of data retrieval.</p></li>
+<li><p><strong>Vector Stores</strong>: Specialized databases that store and facilitate the search of text embeddings.</p></li>
+<li><p><strong>Retrievers</strong>: Employ various retrieval techniques, ranging from simple semantic searches to more sophisticated methods like the Parent Document Retriever and
+Ensemble Retriever.</p></li>
+</ul>
+</div>
+<div class="section" id="clarifying-vector-database-management-with-mlflow">
+<h3>Clarifying Vector Database Management with MLflow<a class="headerlink" href="#clarifying-vector-database-management-with-mlflow" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Traditional LangChain Serialization</strong>: LangChain typically requires manual management for the serialization of retriever objects, including handling of the vector database.</p></li>
+<li><p><strong>MLflow’s Simplification</strong>: The <code class="docutils literal notranslate"><span class="pre">langchain</span></code> flavor in MLflow substantially simplifies this process. It automates serialization, managing the contents of
+the <code class="docutils literal notranslate"><span class="pre">persist_dir</span></code> and the pickling of the <code class="docutils literal notranslate"><span class="pre">loader_fn</span></code> function.</p></li>
+</ul>
+</div>
+<div class="section" id="key-mlflow-components-and-vectordb-logging">
+<h3>Key MLflow Components and VectorDB Logging<a class="headerlink" href="#key-mlflow-components-and-vectordb-logging" title="Permalink to this headline"> </a></h3>
+<ol class="arabic simple">
+<li><p><strong>persist_dir</strong>: The directory where the retriever object, including the vector database, is stored.</p></li>
+<li><p><strong>loader_fn</strong>: The function for loading the retriever object from its storage location.</p></li>
+</ol>
+</div>
+<div class="section" id="important-considerations">
+<h3>Important Considerations<a class="headerlink" href="#important-considerations" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>VectorDB Logging</strong>: MLflow, through its <code class="docutils literal notranslate"><span class="pre">langchain</span></code> flavor, does manage the vector database as part of the retriever object. However, the vector
+database itself is not explicitly logged as a separate entity in MLflow.</p></li>
+<li><p><strong>Runtime VectorDB Maintenance</strong>: It’s essential to maintain consistency in the vector database between the training and runtime environments.
+While MLflow manages the serialization of the retriever object, ensuring that the same vector database is accessible during runtime remains crucial
+for consistent performance.</p></li>
+</ul>
+</div>
+<div class="section" id="an-example-of-logging-a-langchain-retrievalqa-chain">
+<h3>An Example of logging a LangChain RetrievalQA Chain<a class="headerlink" href="#an-example-of-logging-a-langchain-retrievalqa-chain" title="Permalink to this headline"> </a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+
+<span class="kn">from</span> <span class="nn">langchain.chains</span> <span class="kn">import</span> <span class="n">RetrievalQA</span>
+<span class="kn">from</span> <span class="nn">langchain.document_loaders</span> <span class="kn">import</span> <span class="n">TextLoader</span>
+<span class="kn">from</span> <span class="nn">langchain.embeddings.openai</span> <span class="kn">import</span> <span class="n">OpenAIEmbeddings</span>
+<span class="kn">from</span> <span class="nn">langchain.llms</span> <span class="kn">import</span> <span class="n">OpenAI</span>
+<span class="kn">from</span> <span class="nn">langchain.text_splitter</span> <span class="kn">import</span> <span class="n">CharacterTextSplitter</span>
+<span class="kn">from</span> <span class="nn">langchain.vectorstores</span> <span class="kn">import</span> <span class="n">FAISS</span>
+
+<span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="k">assert</span> <span class="s2">&quot;OPENAI_API_KEY&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">,</span> <span class="s2">&quot;Please set the OPENAI_API_KEY environment variable.&quot;</span>
+
+<span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">temp_dir</span><span class="p">:</span>
+    <span class="n">persist_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">,</span> <span class="s2">&quot;faiss_index&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Create the vector db, persist the db to a local fs folder</span>
+    <span class="n">loader</span> <span class="o">=</span> <span class="n">TextLoader</span><span class="p">(</span><span class="s2">&quot;tests/langchain/state_of_the_union.txt&quot;</span><span class="p">)</span>
+    <span class="n">documents</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+    <span class="n">text_splitter</span> <span class="o">=</span> <span class="n">CharacterTextSplitter</span><span class="p">(</span><span class="n">chunk_size</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">chunk_overlap</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">docs</span> <span class="o">=</span> <span class="n">text_splitter</span><span class="o">.</span><span class="n">split_documents</span><span class="p">(</span><span class="n">documents</span><span class="p">)</span>
+    <span class="n">embeddings</span> <span class="o">=</span> <span class="n">OpenAIEmbeddings</span><span class="p">()</span>
+    <span class="n">db</span> <span class="o">=</span> <span class="n">FAISS</span><span class="o">.</span><span class="n">from_documents</span><span class="p">(</span><span class="n">docs</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">)</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">save_local</span><span class="p">(</span><span class="n">persist_dir</span><span class="p">)</span>
+
+    <span class="c1"># Create the RetrievalQA chain</span>
+    <span class="n">retrievalQA</span> <span class="o">=</span> <span class="n">RetrievalQA</span><span class="o">.</span><span class="n">from_llm</span><span class="p">(</span><span class="n">llm</span><span class="o">=</span><span class="n">OpenAI</span><span class="p">(),</span> <span class="n">retriever</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">as_retriever</span><span class="p">())</span>
+
+    <span class="c1"># Log the retrievalQA chain</span>
+    <span class="k">def</span> <span class="nf">load_retriever</span><span class="p">(</span><span class="n">persist_directory</span><span class="p">):</span>
+        <span class="n">embeddings</span> <span class="o">=</span> <span class="n">OpenAIEmbeddings</span><span class="p">()</span>
+        <span class="n">vectorstore</span> <span class="o">=</span> <span class="n">FAISS</span><span class="o">.</span><span class="n">load_local</span><span class="p">(</span><span class="n">persist_directory</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">vectorstore</span><span class="o">.</span><span class="n">as_retriever</span><span class="p">()</span>
+
+    <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">()</span> <span class="k">as</span> <span class="n">run</span><span class="p">:</span>
+        <span class="n">logged_model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">langchain</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+            <span class="n">retrievalQA</span><span class="p">,</span>
+            <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;retrieval_qa&quot;</span><span class="p">,</span>
+            <span class="n">loader_fn</span><span class="o">=</span><span class="n">load_retriever</span><span class="p">,</span>
+            <span class="n">persist_dir</span><span class="o">=</span><span class="n">persist_dir</span><span class="p">,</span>
+        <span class="p">)</span>
+
+<span class="c1"># Load the retrievalQA chain</span>
+<span class="n">loaded_model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">logged_model</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">loaded_model</span><span class="o">.</span><span class="n">predict</span><span class="p">([{</span><span class="s2">&quot;query&quot;</span><span class="p">:</span> <span class="s2">&quot;What did the president say about Ketanji Brown Jackson&quot;</span><span class="p">}]))</span>
+</pre></div>
+</div>
+<p>The output of the example above is shown below:</p>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">Output (truncated)</span><a class="headerlink" href="#id3" title="Permalink to this code"> </a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot; The president said...&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="logging-and-evaluating-a-langchain-retriever-in-mlflow">
+<span id="log-retriever-chain"></span><h3>Logging and Evaluating a LangChain Retriever in MLflow<a class="headerlink" href="#logging-and-evaluating-a-langchain-retriever-in-mlflow" title="Permalink to this headline"> </a></h3>
+<p>The <cite>langchain</cite> flavor in MLflow extends its functionalities to include the logging and individual evaluation of retriever objects. This capability is particularly valuable for assessing the quality of documents retrieved by a retriever without needing to process them through a large language model (LLM).</p>
+<div class="section" id="purpose-of-logging-individual-retrievers">
+<h4>Purpose of Logging Individual Retrievers<a class="headerlink" href="#purpose-of-logging-individual-retrievers" title="Permalink to this headline"> </a></h4>
+<ul class="simple">
+<li><p><strong>Independent Evaluation</strong>: Allows for the assessment of a retriever’s performance in fetching relevant documents, independent of their subsequent use in LLMs.</p></li>
+<li><p><strong>Quality Assurance</strong>: Facilitates the evaluation of the retriever’s effectiveness in sourcing accurate and contextually appropriate documents.</p></li>
+</ul>
+</div>
+<div class="section" id="requirements-for-logging-retrievers-in-mlflow">
+<h4>Requirements for Logging Retrievers in MLflow<a class="headerlink" href="#requirements-for-logging-retrievers-in-mlflow" title="Permalink to this headline"> </a></h4>
+<ul class="simple">
+<li><p><strong>persist_dir</strong>: Specifies where the retriever object is stored.</p></li>
+<li><p><strong>loader_fn</strong>: Details the function used to load the retriever object from its storage location.</p></li>
+<li><p>These requirements align with those for logging RetrievalQA chains, ensuring consistency in the process.</p></li>
+</ul>
+</div>
+<div class="section" id="an-example-of-logging-a-langchain-retriever">
+<h4>An example of logging a LangChain Retriever<a class="headerlink" href="#an-example-of-logging-a-langchain-retriever" title="Permalink to this headline"> </a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+
+<span class="kn">from</span> <span class="nn">langchain.document_loaders</span> <span class="kn">import</span> <span class="n">TextLoader</span>
+<span class="kn">from</span> <span class="nn">langchain.embeddings.openai</span> <span class="kn">import</span> <span class="n">OpenAIEmbeddings</span>
+<span class="kn">from</span> <span class="nn">langchain.text_splitter</span> <span class="kn">import</span> <span class="n">CharacterTextSplitter</span>
+<span class="kn">from</span> <span class="nn">langchain.vectorstores</span> <span class="kn">import</span> <span class="n">FAISS</span>
+
+<span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="k">assert</span> <span class="s2">&quot;OPENAI_API_KEY&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">,</span> <span class="s2">&quot;Please set the OPENAI_API_KEY environment variable.&quot;</span>
+
+<span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">temp_dir</span><span class="p">:</span>
+    <span class="n">persist_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">,</span> <span class="s2">&quot;faiss_index&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Create the vector database and persist it to a local filesystem folder</span>
+    <span class="n">loader</span> <span class="o">=</span> <span class="n">TextLoader</span><span class="p">(</span><span class="s2">&quot;tests/langchain/state_of_the_union.txt&quot;</span><span class="p">)</span>
+    <span class="n">documents</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+    <span class="n">text_splitter</span> <span class="o">=</span> <span class="n">CharacterTextSplitter</span><span class="p">(</span><span class="n">chunk_size</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">chunk_overlap</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">docs</span> <span class="o">=</span> <span class="n">text_splitter</span><span class="o">.</span><span class="n">split_documents</span><span class="p">(</span><span class="n">documents</span><span class="p">)</span>
+    <span class="n">embeddings</span> <span class="o">=</span> <span class="n">OpenAIEmbeddings</span><span class="p">()</span>
+    <span class="n">db</span> <span class="o">=</span> <span class="n">FAISS</span><span class="o">.</span><span class="n">from_documents</span><span class="p">(</span><span class="n">docs</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">)</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">save_local</span><span class="p">(</span><span class="n">persist_dir</span><span class="p">)</span>
+
+    <span class="c1"># Define a loader function to recall the retriever from the persisted vectorstore</span>
+    <span class="k">def</span> <span class="nf">load_retriever</span><span class="p">(</span><span class="n">persist_directory</span><span class="p">):</span>
+        <span class="n">embeddings</span> <span class="o">=</span> <span class="n">OpenAIEmbeddings</span><span class="p">()</span>
+        <span class="n">vectorstore</span> <span class="o">=</span> <span class="n">FAISS</span><span class="o">.</span><span class="n">load_local</span><span class="p">(</span><span class="n">persist_directory</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">vectorstore</span><span class="o">.</span><span class="n">as_retriever</span><span class="p">()</span>
+
+    <span class="c1"># Log the retriever with the loader function</span>
+    <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">()</span> <span class="k">as</span> <span class="n">run</span><span class="p">:</span>
+        <span class="n">logged_model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">langchain</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">as_retriever</span><span class="p">(),</span>
+            <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;retriever&quot;</span><span class="p">,</span>
+            <span class="n">loader_fn</span><span class="o">=</span><span class="n">load_retriever</span><span class="p">,</span>
+            <span class="n">persist_dir</span><span class="o">=</span><span class="n">persist_dir</span><span class="p">,</span>
+        <span class="p">)</span>
+
+<span class="c1"># Load the retriever chain</span>
+<span class="n">loaded_model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">logged_model</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">loaded_model</span><span class="o">.</span><span class="n">predict</span><span class="p">([{</span><span class="s2">&quot;query&quot;</span><span class="p">:</span> <span class="s2">&quot;What did the president say about Ketanji Brown Jackson&quot;</span><span class="p">}]))</span>
+</pre></div>
+</div>
+<p>The output of the example above is shown below:</p>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">Output (truncated)</span><a class="headerlink" href="#id4" title="Permalink to this code"> </a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+    <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;page_content&quot;</span><span class="p">:</span> <span class="s2">&quot;Tonight. I call...&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;/state.txt&quot;</span><span class="p">},</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;page_content&quot;</span><span class="p">:</span> <span class="s2">&quot;A former top...&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;/state.txt&quot;</span><span class="p">},</span>
+        <span class="p">},</span>
+    <span class="p">]</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+              </div>
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../notebooks/langchain-retriever.html" class="btn btn-neutral" title="Introduction to RAG with MLflow and LangChain" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+      
+      
+        <a href="../../llm-tracking/index.html" class="btn btn-neutral" title="MLflow’s LLM Tracking Capabilities" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+      <p class="copyright">
+          &copy; MLflow Project, a Series of LF Projects, LLC. All rights reserved.
+      </p>
+
+  </div> 
+
+</footer>
+          </div>
+        </div>
+      </section>
+    </main>
+  </page>
+
+  
+
+
+  
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+      URL_ROOT:'../../../',
+      VERSION:'2.9.3.dev0',
+      COLLAPSE_INDEX:false,
+      FILE_SUFFIX:'.html',
+      LINK_SUFFIX: '.html',
+      HAS_SOURCE:  true
+    };
+  </script>
+
+  
+
+  <script type="text/javascript" src="../../../_static/js/clipboard.min.js"></script>
+  <script type="text/javascript" src="../../../_static/js/jquery.waypoints.min.js"></script>
+
+  
+  
+  
+  <script type="text/javascript">var CLIPPY_SVG_PATH = "../../../_static/clippy.svg";</script>
+  <script type="text/javascript" src="../../../_static/js/custom.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.StickyNav.enable();
+    });
+
+  </script>
+  
+
+  
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        // Get the code block designator class entries
+        const allHighlights = document.querySelectorAll('.highlight');
+        // Disable copyable links for notebook cell numbering and for cell outputs
+        const highlights = Array.from(allHighlights).filter(highlight => !highlight.closest('.highlight-none') && 
+            !highlight.closest('.nboutput'));
+    
+        highlights.forEach(function(highlight) {
+            const copyIcon = document.createElement('span');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.innerHTML = '&#xf0ea;';
+
+            copyIcon.addEventListener('click', function() {
+                const code = highlight.querySelector('pre').textContent;
+                copyToClipboard(code);
+
+                // Flash effect on click
+                this.style.color = '#0194E2';
+                setTimeout(() => {
+                    this.style.color = ''; 
+                }, 100);
+
+                // Display "Code copied to clipboard" near the clicked icon
+                const message = document.createElement('span');
+                message.textContent = "Copied!";
+                message.classList.add('copy-message'); 
+
+                // Append the message to the icon
+                this.appendChild(message);
+
+                setTimeout(() => {
+                    this.removeChild(message);
+                }, 500);
+            });
+
+            highlight.appendChild(copyIcon);
+        });
+    });
+  </script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Force download for notebook-download-btn
+        const downloadButtons = document.querySelectorAll('.notebook-download-btn');
+        downloadButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                // Fetch the raw content of the notebook from GitHub
+                fetch(button.href)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = url;
+                        const filename = button.href.split('/').pop();
+                        link.download = filename; 
+
+                        document.body.appendChild(link);
+                        link.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    })
+                    .catch(err => console.error('Error fetching the notebook:', err));
+            });
+        });
+    });
+</script> 
+</body>
+</html>

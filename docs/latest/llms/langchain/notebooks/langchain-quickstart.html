@@ -1,0 +1,971 @@
+
+  
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Introduction to Using LangChain with MLflow &mdash; MLflow 2.9.3.dev0 documentation</title>
+  
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/llms/langchain/notebooks/langchain-quickstart.html">
+  
+  
+    <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
+    
+
+    
+
+  
+    
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/grids.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/mobile.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/simple-cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/tabs.css" type="text/css" />
+    
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="MLflow 2.9.3.dev0 documentation" href="../../../index.html"/>
+        <link rel="up" title="MLflow LangChain Flavor" href="../index.html"/>
+        <link rel="next" title="Using LangChain Agents with MLflow" href="/langchain-agent.html"/>
+        <link rel="prev" title="MLflow LangChain Flavor" href="/../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+<script type="text/javascript" src="../../../_static/jquery.js"></script>
+<script type="text/javascript" src="../../../_static/underscore.js"></script>
+<script type="text/javascript" src="../../../_static/doctools.js"></script>
+<script type="text/javascript" src="../../../_static/languagesections.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript" src="../../../None"></script>
+
+<body class="wy-body-for-nav" role="document">
+  
+
+  
+  <nav class="wy-nav-top header" role="navigation" aria-label="top navigation">
+    <ul>
+  <li class="menu-toggle">
+    <i data-toggle="wy-nav-top" class="wy-nav-top-menu-button db-icon db-icon-menu pull-left"></i>
+    <a href="../../../index.html" class="wy-nav-top-logo"
+      ><img src="../../../_static/MLflow-logo-final-black.png" alt="MLflow"
+    /></a>
+    <span class="version">2.9.3.dev0</span>
+  </li>
+</ul>
+  </nav>
+  <page>
+    
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side relative">
+      <div class="wy-side-scroll">
+  <div class="wy-side-nav-search">
+    
+
+    
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+    
+  </div>
+
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+    
+      <a href="../../../index.html" class="main-navigation-home"><img src="../../../_static/icons/nav-home.svg"> MLflow</a>
+    
+
+    
+      
+
+      
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../introduction/index.html">What is MLflow?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting-started/index.html">Getting Started with MLflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../new-features/index.html">New Features</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">LLMs</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#id1">MLflow Deployments Server for LLMs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#id3">LLM Evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#id4">Prompt Engineering UI</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../index.html#native-mlflow-flavors-for-llms">Native MLflow Flavors for LLMs</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../../index.html#benefits-of-mlflow-s-native-flavors-for-llms">Benefits of MLflow’s Native Flavors for LLMs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../index.html#explore-the-native-llm-flavors">Explore the Native LLM Flavors</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../../index.html#native-integration-guides-and-tutorials">Native Integration Guides and Tutorials</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../../transformers/index.html">MLflow Transformers Flavor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../openai/index.html">MLflow OpenAI Flavor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../sentence-transformers/index.html">MLflow Sentence-Transformers Flavor</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../index.html">MLflow LangChain Flavor</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#id5">LLM Tracking in MLflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#tutorials-and-use-case-guides-for-llms-in-mlflow">Tutorials and Use Case Guides for LLMs in MLflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../model-evaluation/index.html">Model Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deep-learning/index.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../traditional-ml/index.html">Traditional ML</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deployment/index.html">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tracking.html">MLflow Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../system-metrics/index.html">System Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../projects.html">MLflow Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../models.html">MLflow Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../model-registry.html">MLflow Model Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../recipes.html">MLflow Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../plugins.html">MLflow Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../auth/index.html">MLflow Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../search-runs.html">Search Runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../search-experiments.html">Search Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../python_api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../R-api.html">R API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../java_api/index.html">Java API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rest-api.html">REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docker.html">Official MLflow Docker Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../community-model-flavors.html">Community Model Flavors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials-and-examples/index.html">Tutorials and Examples</a></li>
+</ul>
+
+      
+    
+  </div>
+
+  <div role="contentinfo">
+    
+
+    <p>
+      <a id='feedbacklink' href="https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a>
+    </p>
+  </div>
+</div>
+    </nav>
+
+    <main class="wy-grid-for-nav">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+          <div class="rst-content">
+            
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Documentation</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../../index.html">LLMs</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../index.html">MLflow LangChain Flavor</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+    
+      <li>Introduction to Using LangChain with MLflow</li>
+    
+    
+    <!-- <li class="wy-breadcrumbs-aside">
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/llms/langchain/notebooks/langchain-quickstart.ipynb" class="fa fa-github"> Edit on GitHub</a>
+    </li> -->
+    
+  </ul>
+</div>
+            <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <div itemprop="articleBody">
+                
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div class="section" id="Introduction-to-Using-LangChain-with-MLflow">
+<h1>Introduction to Using LangChain with MLflow<a class="headerlink" href="#Introduction-to-Using-LangChain-with-MLflow" title="Permalink to this headline"> </a></h1>
+<p>Welcome to this interactive tutorial designed to introduce you to <a class="reference external" href="https://python.langchain.com/docs/get_started/introduction">LangChain</a> and its integration with MLflow. This tutorial is structured as a notebook to provide a hands-on, practical learning experience with the simplest and most core features of LangChain.</p>
+<div class="section" id="What-You-Will-Learn">
+<h2>What You Will Learn<a class="headerlink" href="#What-You-Will-Learn" title="Permalink to this headline"> </a></h2>
+<ul class="simple">
+<li><p><strong>Understanding LangChain</strong>: Get to know the basics of LangChain and how it is used in developing applications powered by language models.</p></li>
+<li><p><strong>Chains in LangChain</strong>: Explore the concept of <code class="docutils literal notranslate"><span class="pre">chains</span></code> in LangChain, which are sequences of actions or operations orchestrated to perform complex tasks.</p></li>
+<li><p><strong>Integration with MLflow</strong>: Learn how LangChain integrates with MLflow, a platform for managing the machine learning lifecycle, including logging, tracking, and deploying models.</p></li>
+<li><p><strong>Practical Application</strong>: Apply your knowledge to build a LangChain chain that acts like a sous chef, focusing on the preparation steps of a recipe.</p></li>
+</ul>
+</div>
+<div class="section" id="Background-on-LangChain">
+<h2>Background on LangChain<a class="headerlink" href="#Background-on-LangChain" title="Permalink to this headline"> </a></h2>
+<p>LangChain is a Python-based framework that simplifies the development of applications using language models. It is designed to enhance context-awareness and reasoning in applications, allowing for more sophisticated and interactive functionalities.</p>
+</div>
+<div class="section" id="What-is-a-Chain?">
+<h2>What is a Chain?<a class="headerlink" href="#What-is-a-Chain?" title="Permalink to this headline"> </a></h2>
+<ul class="simple">
+<li><p><strong>Chain Definition</strong>: In LangChain, a <code class="docutils literal notranslate"><span class="pre">chain</span></code> refers to a series of interconnected components or steps designed to accomplish a specific task.</p></li>
+<li><p><strong>Chain Example</strong>: In our tutorial, we’ll create a chain that simulates a sous chef’s role in preparing ingredients and tools for a recipe.</p></li>
+</ul>
+</div>
+<div class="section" id="Tutorial-Overview">
+<h2>Tutorial Overview<a class="headerlink" href="#Tutorial-Overview" title="Permalink to this headline"> </a></h2>
+<p>In this tutorial, you will:</p>
+<ol class="arabic simple">
+<li><p><strong>Set Up LangChain and MLflow</strong>: Initialize and configure both LangChain and MLflow.</p></li>
+<li><p><strong>Create a Sous Chef Chain</strong>: Develop a LangChain chain that lists ingredients, describes preparation techniques, organizes ingredient staging, and details cooking implements preparation for a given recipe.</p></li>
+<li><p><strong>Log and Load the Model</strong>: Utilize MLflow to log the chain model and then load it for prediction.</p></li>
+<li><p><strong>Run a Prediction</strong>: Execute the chain to see how it would prepare a restaurant dish for a specific number of customers.</p></li>
+</ol>
+<p>By the end of this tutorial, you will have a solid foundation in using LangChain with MLflow and an understanding of how to construct and manage chains for practical applications.</p>
+<p>Let’s dive in and explore the world of LangChain and MLflow!</p>
+</div>
+<div class="section" id="Prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#Prerequisites" title="Permalink to this headline"> </a></h2>
+<p>In order to get started with this tutorial, we’re going to need a few things first.</p>
+<ol class="arabic simple">
+<li><p>An OpenAI API Account. You can <a class="reference external" href="https://platform.openai.com/login?launch">sign up here</a> to get access in order to start programatically accessing one of the leading highly sophisticated LLM services on the planet.</p></li>
+<li><p>An OpenAI API Key. You can access this once you’ve created an account by navigating <a class="reference external" href="https://platform.openai.com/api-keys">to the API keys page</a>.</p></li>
+<li><p>The OpenAI SDK. It’s <a class="reference external" href="https://pypi.org/project/openai/">available on PyPI</a> here. For this tutorial, we’re going to be using version 0.28.1 (the last release prior to the 1.0 release).</p></li>
+<li><p>The LangChain package. You can <a class="reference external" href="https://pypi.org/project/langchain/">find it here on PyPI</a>.</p></li>
+</ol>
+<p>To install the dependent packages simply run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s1">&#39;openai&lt;1&#39;</span><span class="w"> </span>tiktoken<span class="w"> </span>langchain<span class="w"> </span>mlflow
+</pre></div>
+</div>
+</div>
+<div class="section" id="API-Key-Security-Overview">
+<h2>API Key Security Overview<a class="headerlink" href="#API-Key-Security-Overview" title="Permalink to this headline"> </a></h2>
+<p>API keys, especially for SaaS Large Language Models (LLMs), are as sensitive as financial information due to their connection to billing.</p>
+<p>If you’re interested in learning more about an alternative MLflow solution that securely manages your access keys, <a class="reference external" href="https://www.mlflow.org/docs/latest/llms/deployments/index.html">read about the deployments server here</a>.</p>
+<div class="section" id="Essential-Practices:">
+<h3>Essential Practices:<a class="headerlink" href="#Essential-Practices:" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Confidentiality</strong>: Always keep API keys private.</p></li>
+<li><p><strong>Secure Storage</strong>: Prefer environment variables or secure services.</p></li>
+<li><p><strong>Frequent Rotation</strong>: Regularly update keys to avoid unauthorized access.</p></li>
+</ul>
+</div>
+<div class="section" id="Configuring-API-Keys">
+<h3>Configuring API Keys<a class="headerlink" href="#Configuring-API-Keys" title="Permalink to this headline"> </a></h3>
+<p>For secure usage, set API keys as environment variables.</p>
+<p><strong>macOS/Linux</strong>: Refer to <a class="reference external" href="https://support.apple.com/en-gb/guide/terminal/apd382cc5fa-4f58-4449-b20a-41c53c006f8f/mac">Apple’s guide on using environment variables in Terminal</a> for detailed instructions.</p>
+<p><strong>Windows</strong>: Follow the steps outlined in <a class="reference external" href="https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_environment_variables?view=powershell-7.4">Microsoft’s documentation on environment variables</a>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">langchain.chains</span> <span class="kn">import</span> <span class="n">LLMChain</span>
+<span class="kn">from</span> <span class="nn">langchain.llms</span> <span class="kn">import</span> <span class="n">OpenAI</span>
+<span class="kn">from</span> <span class="nn">langchain.prompts</span> <span class="kn">import</span> <span class="n">PromptTemplate</span>
+
+<span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="k">assert</span> <span class="s2">&quot;OPENAI_API_KEY&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">,</span> <span class="s2">&quot;Please set the OPENAI_API_KEY environment variable.&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/Users/benjamin.wilson/miniconda3/envs/mlflow-dev-env/lib/python3.8/site-packages/pydantic/_internal/_fields.py:128: UserWarning: Field &#34;model_server_url&#34; has conflict with protected namespace &#34;model_&#34;.
+
+You may be able to resolve this warning by setting `model_config[&#39;protected_namespaces&#39;] = ()`.
+  warnings.warn(
+/Users/benjamin.wilson/miniconda3/envs/mlflow-dev-env/lib/python3.8/site-packages/pydantic/_internal/_config.py:317: UserWarning: Valid config keys have changed in V2:
+* &#39;schema_extra&#39; has been renamed to &#39;json_schema_extra&#39;
+  warnings.warn(message, UserWarning)
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Configuring-the-OpenAI-Completions-Model-in-LangChain">
+<h2>Configuring the OpenAI Completions Model in LangChain<a class="headerlink" href="#Configuring-the-OpenAI-Completions-Model-in-LangChain" title="Permalink to this headline"> </a></h2>
+<p>In this section of the tutorial, we have configured the OpenAI model with specific parameters suitable for generating language completions. We’re using a Completions model, not ChatCompletions, which means each request is independent, and the entire prompt needs to be included every time to generate a response.</p>
+<div class="section" id="Understanding-the-Completions-Model">
+<h3>Understanding the Completions Model<a class="headerlink" href="#Understanding-the-Completions-Model" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Completions Model</strong>: This model does not maintain contextual information across requests. It’s ideal for tasks where each request is standalone and doesn’t depend on past interactions. Offers flexibility for a variety of non-conversational applications.</p></li>
+<li><p><strong>No Contextual Memory</strong>: The lack of memory of previous interactions means the model is best suited for one-off requests or scenarios where continuity of the conversation is not required.</p></li>
+<li><p><strong>Comparisons with the ChatCompletions Model Type</strong>: Tailored for conversational AI, maintaining context across multiple exchanges for a continuous conversation. Suitable for chatbots or applications where dialogue history is crucial.</p></li>
+</ul>
+<p>In this tutorial, we use the Completions model for its simplicity and effectiveness in handling individual, independent requests, aligning with our tutorial’s focus on preparation steps before cooking.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">llm</span> <span class="o">=</span> <span class="n">OpenAI</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">max_tokens</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Explanation-of-the-Template-Instruction-for-Sous-Chef-Simulation">
+<h2>Explanation of the Template Instruction for Sous Chef Simulation<a class="headerlink" href="#Explanation-of-the-Template-Instruction-for-Sous-Chef-Simulation" title="Permalink to this headline"> </a></h2>
+<p>In this part of the tutorial, we have crafted a detailed prompt template that simulates the role of a fine dining sous chef. This template is designed to guide the LangChain model in preparing for a dish, focusing exclusively on the <a class="reference external" href="https://en.wikipedia.org/wiki/Mise_en_place">mise-en-place</a> process.</p>
+<div class="section" id="Breakdown-of-the-Template-Instruction">
+<h3>Breakdown of the Template Instruction<a class="headerlink" href="#Breakdown-of-the-Template-Instruction" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Sous Chef Roleplay</strong>: The prompt places the language model in the role of a sous chef, emphasizing meticulous preparation.</p></li>
+<li><p><strong>Task Outline</strong>:</p>
+<ol class="arabic simple">
+<li><p><strong>List the Ingredients</strong>: Instructs the model to itemize all necessary ingredients for a given dish.</p></li>
+<li><p><strong>Preparation Techniques</strong>: Asks the model to describe necessary techniques for ingredient preparation, such as cutting and processing.</p></li>
+<li><p><strong>Ingredient Staging</strong>: Requires the model to provide detailed staging instructions for each ingredient, considering the sequence and timing of use.</p></li>
+<li><p><strong>Cooking Implements Preparation</strong>: Guides the model to list and prepare all cooking tools required for the dish’s preparation phase.</p></li>
+</ol>
+</li>
+<li><p><strong>Scope Limitation</strong>: The template is explicitly designed to stop at the preparation stage, avoiding the actual cooking process. It focuses on setting up everything needed for the chef to begin cooking.</p></li>
+<li><p><strong>Dynamic Inputs</strong>: The template is adaptable to different recipes and customer counts, as indicated by placeholders <code class="docutils literal notranslate"><span class="pre">{recipe}</span></code> and <code class="docutils literal notranslate"><span class="pre">{customer_count}</span></code>.</p></li>
+</ul>
+<p>This template instruction is a key component of the tutorial, demonstrating how to leverage LangChain declaring instructive prompts with parametrized features geared toward single-purpose completions-style applications.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">template_instruction</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;Imagine you are a fine dining sous chef. Your task is to meticulously prepare for a dish, focusing on the mise-en-place process.&quot;</span>
+    <span class="s2">&quot;Given a recipe, your responsibilities are: &quot;</span>
+    <span class="s2">&quot;1. List the Ingredients: Carefully itemize all ingredients required for the dish, ensuring every element is accounted for. &quot;</span>
+    <span class="s2">&quot;2. Preparation Techniques: Describe the techniques and operations needed for preparing each ingredient. This includes cutting, &quot;</span>
+    <span class="s2">&quot;processing, or any other form of preparation. Focus on the art of mise-en-place, ensuring everything is perfectly set up before cooking begins.&quot;</span>
+    <span class="s2">&quot;3. Ingredient Staging: Provide detailed instructions on how to stage and arrange each ingredient. Explain where each item should be placed for &quot;</span>
+    <span class="s2">&quot;efficient access during the cooking process. Consider the timing and sequence of use for each ingredient. &quot;</span>
+    <span class="s2">&quot;4. Cooking Implements Preparation: Enumerate all the cooking tools and implements needed for each phase of the dish&#39;s preparation. &quot;</span>
+    <span class="s2">&quot;Detail any specific preparation these tools might need before the actual cooking starts and describe what pots, pans, dishes, and &quot;</span>
+    <span class="s2">&quot;other tools will be needed for the final preparation.&quot;</span>
+    <span class="s2">&quot;Remember, your guidance stops at the preparation stage. Do not delve into the actual cooking process of the dish. &quot;</span>
+    <span class="s2">&quot;Your goal is to set the stage flawlessly for the chef to execute the cooking seamlessly.&quot;</span>
+    <span class="s2">&quot;The recipe you are given is for: </span><span class="si">{recipe}</span><span class="s2"> for </span><span class="si">{customer_count}</span><span class="s2"> people. &quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Constructing-the-LangChain-Chain">
+<h2>Constructing the LangChain Chain<a class="headerlink" href="#Constructing-the-LangChain-Chain" title="Permalink to this headline"> </a></h2>
+<p>We start by setting up a <code class="docutils literal notranslate"><span class="pre">PromptTemplate</span></code> in LangChain, tailored to our sous chef scenario. The template is designed to dynamically accept inputs like the recipe name and customer count. Then, we initialize an <code class="docutils literal notranslate"><span class="pre">LLMChain</span></code> by combining our OpenAI language model with the prompt template, creating a chain that can simulate the sous chef’s preparation process.</p>
+</div>
+<div class="section" id="Logging-the-Chain-in-MLflow">
+<h2>Logging the Chain in MLflow<a class="headerlink" href="#Logging-the-Chain-in-MLflow" title="Permalink to this headline"> </a></h2>
+<p>With the chain ready, we proceed to log it in MLflow. This is done within an MLflow run, which not only logs the chain model under a specified name but also tracks various details about the model. The logging process ensures that all aspects of the chain are recorded, allowing for efficient version control and future retrieval.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">prompt</span> <span class="o">=</span> <span class="n">PromptTemplate</span><span class="p">(</span>
+    <span class="n">input_variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;recipe&quot;</span><span class="p">,</span> <span class="s2">&quot;customer_count&quot;</span><span class="p">],</span>
+    <span class="n">template</span><span class="o">=</span><span class="n">template_instruction</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">chain</span> <span class="o">=</span> <span class="n">LLMChain</span><span class="p">(</span><span class="n">llm</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span> <span class="n">prompt</span><span class="o">=</span><span class="n">prompt</span><span class="p">)</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s2">&quot;Cooking Assistant&quot;</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="n">model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">langchain</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span><span class="n">chain</span><span class="p">,</span> <span class="s2">&quot;langchain_model&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/Users/benjamin.wilson/miniconda3/envs/mlflow-dev-env/lib/python3.8/site-packages/_distutils_hack/__init__.py:30: UserWarning: Setuptools is replacing distutils.
+  warnings.warn(&#34;Setuptools is replacing distutils.&#34;)
+</pre></div></div>
+</div>
+<p>If we navigate to the MLflow UI, we’ll see our logged LangChain model.</p>
+<p><img alt="Our LangChain Model in the MLflow UI" src="https://i.imgur.com/CeCeyp2.png" /></p>
+</div>
+<div class="section" id="Loading-the-Model-and-Predicting-with-MLflow">
+<h2>Loading the Model and Predicting with MLflow<a class="headerlink" href="#Loading-the-Model-and-Predicting-with-MLflow" title="Permalink to this headline"> </a></h2>
+<p>In this part of our tutorial, we demonstrate the practical application of the logged LangChain model using MLflow. We load the model and run a prediction for a specific dish, showcasing the model’s ability to assist in culinary preparation.</p>
+<div class="section" id="Model-Loading-and-Execution">
+<h3>Model Loading and Execution<a class="headerlink" href="#Model-Loading-and-Execution" title="Permalink to this headline"> </a></h3>
+<p>After logging our LangChain chain with MLflow, we proceed to load the model using MLflow’s <code class="docutils literal notranslate"><span class="pre">pyfunc.load_model</span></code> function. This step is crucial as it brings our previously logged model into an executable state.</p>
+<p>We then input a specific recipe along with the customer count into our model. In this case, we use the recipe for “boeuf bourginon” and specify that it’s for 12 customers. The model, acting as a sous chef, processes this information and generates detailed preparation instructions.</p>
+</div>
+<div class="section" id="Output-from-the-Model">
+<h3>Output from the Model<a class="headerlink" href="#Output-from-the-Model" title="Permalink to this headline"> </a></h3>
+<p>The model’s output provides a comprehensive guide on preparing “boeuf bourginon,” covering several critical aspects:</p>
+<ul class="simple">
+<li><p><strong>Ingredients List</strong>: A detailed enumeration of all necessary ingredients, quantified and tailored for the specified number of customers.</p></li>
+<li><p><strong>Preparation Techniques</strong>: Step-by-step instructions on how to prepare each ingredient, following the principles of mise-en-place.</p></li>
+<li><p><strong>Ingredient Staging</strong>: Guidance on how to organize and stage the ingredients, ensuring efficient access and use during the cooking process.</p></li>
+<li><p><strong>Cooking Implements Preparation</strong>: Instructions on preparing the necessary cooking tools and implements, from pots and pans to bowls and colanders.</p></li>
+</ul>
+<p>This example demonstrates the power and utility of combining LangChain and MLflow in a practical scenario. It highlights how such an integration can effectively translate complex requirements into actionable steps, aiding in tasks that require precision and careful planning.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">loaded_model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
+
+<span class="n">dish1</span> <span class="o">=</span> <span class="n">loaded_model</span><span class="o">.</span><span class="n">predict</span><span class="p">({</span><span class="s2">&quot;recipe&quot;</span><span class="p">:</span> <span class="s2">&quot;boeuf bourginon&quot;</span><span class="p">,</span> <span class="s2">&quot;customer_count&quot;</span><span class="p">:</span> <span class="s2">&quot;4&quot;</span><span class="p">})</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">dish1</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+
+Ingredients:
+- 4 lbs beef chuck, cut into 1-inch cubes
+- 2 tablespoons olive oil
+- 2 tablespoons butter
+- 2 large onions, diced
+- 4 cloves garlic, minced
+- 2 carrots, diced
+- 2 celery stalks, diced
+- 2 tablespoons tomato paste
+- 2 cups red wine
+- 2 cups beef broth
+- 2 bay leaves
+- 2 sprigs fresh thyme
+- 2 tablespoons fresh parsley, chopped
+- Salt and pepper, to taste
+
+Preparation Techniques:
+- Cut the beef chuck into 1-inch cubes.
+- Dice the onions, carrots, and celery stalks.
+- Mince the garlic.
+- Chop the parsley.
+
+Ingredient Staging:
+- Place the cubed beef chuck in a bowl and set aside.
+- Place the diced onions, carrots, and celery stalks in a separate bowl and set aside.
+- Place the minced garlic and chopped parsley in a small bowl and set aside.
+
+Cooking Implements Preparation:
+- Heat a large Dutch oven over medium-high heat.
+- Add the olive oil and butter to the Dutch oven and heat until the butter is melted.
+- Place the cubed beef chuck in the Dutch oven and cook until browned on all sides.
+- Remove the beef from the Dutch oven and set aside.
+- Add the diced onions, carrots, and celery stalks to the Dutch oven and cook until softened.
+- Add the minced garlic and tomato paste and cook for an additional minute.
+- Add the red wine and beef broth to the Dutch oven and bring to a simmer.
+- Add the bay leaves and thyme sprigs to the Dutch oven.
+- Return the beef to the Dutch oven and stir to combine.
+- Reduce the heat to low and simmer for 1-2 hours, or until the beef is tender.
+- Remove the bay leaves and thyme sprigs from the Dutch oven.
+- Stir in the chopped parsley and season with salt and pepper, to taste.
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dish2</span> <span class="o">=</span> <span class="n">loaded_model</span><span class="o">.</span><span class="n">predict</span><span class="p">({</span><span class="s2">&quot;recipe&quot;</span><span class="p">:</span> <span class="s2">&quot;Okonomiyaki&quot;</span><span class="p">,</span> <span class="s2">&quot;customer_count&quot;</span><span class="p">:</span> <span class="s2">&quot;12&quot;</span><span class="p">})</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">dish2</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+
+Ingredients:
+- 12 cups of all-purpose flour
+- 12 eggs
+- 2 cups of dashi
+- 2 cups of water
+- 2 cups of shredded cabbage
+- 2 cups of grated yamaimo
+- 2 cups of grated nagaimo
+- 2 cups of grated daikon
+- 2 cups of grated carrot
+- 2 cups of chopped green onion
+- 2 cups of chopped beni shoga
+- 2 cups of aonori
+- 2 cups of katsuobushi
+- 2 cups of okonomiyaki sauce
+- 2 cups of mayonnaise
+- Vegetable oil
+
+Preparation Techniques:
+- Measure out all ingredients and place them in separate bowls.
+- Sift the flour into a large bowl.
+- Beat the eggs in a separate bowl.
+- Combine the dashi and water in a bowl and mix until combined.
+- Shred the cabbage and place in a bowl.
+- Grate the yamaimo, nagaimo, daikon, and carrot and place in separate bowls.
+- Chop the green onion and beni shoga and place in separate bowls.
+- Place the aonori, katsuobushi, okonomiyaki sauce, and mayonnaise in separate bowls.
+
+Ingredient Staging:
+- Place the flour, eggs, dashi and water mixture, cabbage, yamaimo, nagaimo, daikon, carrot, green onion, beni shoga, aonori, katsuobushi, okonomiyaki sauce, and mayonnaise in separate bowls on the counter.
+- Place the vegetable oil in a separate bowl on the counter.
+
+Cooking Implements Preparation:
+- Place a large bowl on the counter.
+- Place a large skillet on the stove.
+- Place a spatula and a ladle on the counter.
+- Place a large plate on the counter.
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Conclusion">
+<h2>Conclusion<a class="headerlink" href="#Conclusion" title="Permalink to this headline"> </a></h2>
+<p>In the final step of our tutorial, we execute another prediction using our LangChain model. This time, we explore the preparation for “Okonomiyaki,” a Japanese dish, for 12 customers. This demonstrates the model’s adaptability and versatility across various cuisines.</p>
+<div class="section" id="Additional-Prediction-with-the-Loaded-Model">
+<h3>Additional Prediction with the Loaded Model<a class="headerlink" href="#Additional-Prediction-with-the-Loaded-Model" title="Permalink to this headline"> </a></h3>
+<p>The model processes the input for “Okonomiyaki” and outputs detailed preparation steps. This includes listing the ingredients, explaining the preparation techniques, guiding ingredient staging, and detailing the required cooking implements, showcasing the model’s capability to handle diverse recipes with precision.</p>
+</div>
+<div class="section" id="What-We’ve-Learned">
+<h3>What We’ve Learned<a class="headerlink" href="#What-We’ve-Learned" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Model Versatility</strong>: The tutorial highlighted the LangChain framework for assembling component parts of a basic LLM application, chaining a specific instructional prompt to a Completions-style LLM.</p></li>
+<li><p><strong>MLflow’s Role in Model Management</strong>: The integration of LangChain with MLflow demonstrated effective model lifecycle management, from creation and logging to prediction execution.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="Closing-Thoughts">
+<h2>Closing Thoughts<a class="headerlink" href="#Closing-Thoughts" title="Permalink to this headline"> </a></h2>
+<p>This tutorial offered an insightful journey through creating, managing, and utilizing a LangChain model with MLflow for culinary preparation. It showcased the practical applications and adaptability of LangChain in complex scenarios. We hope this experience has provided valuable knowledge and encourages you to further explore and innovate using LangChain and MLflow in your projects. Happy coding!</p>
+</div>
+<div class="section" id="What’s-next?">
+<h2>What’s next?<a class="headerlink" href="#What’s-next?" title="Permalink to this headline"> </a></h2>
+<p>To continue learning about the capabilities of MLflow and LangChain in more complex examples, we encourage you to continue your learning with <a class="reference external" href="https://www.mlflow.org/docs/latest/llms/langchain/index.html#advanced-tutorials">the additional LangChain tutorials</a>.</p>
+</div>
+</div>
+
+
+              </div>
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../index.html" class="btn btn-neutral" title="MLflow LangChain Flavor" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+      
+      
+        <a href="langchain-agent.html" class="btn btn-neutral" title="Using LangChain Agents with MLflow" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+      <p class="copyright">
+          &copy; MLflow Project, a Series of LF Projects, LLC. All rights reserved.
+      </p>
+
+  </div> 
+
+</footer>
+          </div>
+        </div>
+      </section>
+    </main>
+  </page>
+
+  
+
+
+  
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+      URL_ROOT:'../../../',
+      VERSION:'2.9.3.dev0',
+      COLLAPSE_INDEX:false,
+      FILE_SUFFIX:'.html',
+      LINK_SUFFIX: '.html',
+      HAS_SOURCE:  true
+    };
+  </script>
+
+  
+
+  <script type="text/javascript" src="../../../_static/js/clipboard.min.js"></script>
+  <script type="text/javascript" src="../../../_static/js/jquery.waypoints.min.js"></script>
+
+  
+  
+  
+  <script type="text/javascript">var CLIPPY_SVG_PATH = "../../../_static/clippy.svg";</script>
+  <script type="text/javascript" src="../../../_static/js/custom.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.StickyNav.enable();
+    });
+
+  </script>
+  
+
+  
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        // Get the code block designator class entries
+        const allHighlights = document.querySelectorAll('.highlight');
+        // Disable copyable links for notebook cell numbering and for cell outputs
+        const highlights = Array.from(allHighlights).filter(highlight => !highlight.closest('.highlight-none') && 
+            !highlight.closest('.nboutput'));
+    
+        highlights.forEach(function(highlight) {
+            const copyIcon = document.createElement('span');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.innerHTML = '&#xf0ea;';
+
+            copyIcon.addEventListener('click', function() {
+                const code = highlight.querySelector('pre').textContent;
+                copyToClipboard(code);
+
+                // Flash effect on click
+                this.style.color = '#0194E2';
+                setTimeout(() => {
+                    this.style.color = ''; 
+                }, 100);
+
+                // Display "Code copied to clipboard" near the clicked icon
+                const message = document.createElement('span');
+                message.textContent = "Copied!";
+                message.classList.add('copy-message'); 
+
+                // Append the message to the icon
+                this.appendChild(message);
+
+                setTimeout(() => {
+                    this.removeChild(message);
+                }, 500);
+            });
+
+            highlight.appendChild(copyIcon);
+        });
+    });
+  </script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Force download for notebook-download-btn
+        const downloadButtons = document.querySelectorAll('.notebook-download-btn');
+        downloadButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                // Fetch the raw content of the notebook from GitHub
+                fetch(button.href)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = url;
+                        const filename = button.href.split('/').pop();
+                        link.download = filename; 
+
+                        document.body.appendChild(link);
+                        link.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    })
+                    .catch(err => console.error('Error fetching the notebook:', err));
+            });
+        });
+    });
+</script> 
+</body>
+</html>

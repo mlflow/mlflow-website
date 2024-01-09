@@ -192,6 +192,7 @@
 <span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
+<span class="kn">from</span> <span class="nn">mlflow.metrics.genai.prompt_template</span> <span class="kn">import</span> <span class="n">PromptTemplate</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.annotations</span> <span class="kn">import</span> <span class="n">experimental</span>
 
 
@@ -249,10 +250,10 @@
 <span class="sd">            &quot;its purpose, and its developer. It could be more concise for a 5-score.&quot;</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="nb">input</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">output</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">score</span><span class="p">:</span> <span class="nb">float</span>
     <span class="n">justification</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="nb">input</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">grading_context</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">_format_grading_context</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -264,24 +265,32 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">grading_context</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="n">grading_context</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s2">&quot;&quot;</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">grading_context</span> <span class="ow">is</span> <span class="kc">None</span>
-            <span class="k">else</span> <span class="s2">&quot;Additional information used by the model:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_format_grading_context</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="p">)</span>
-
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">Example Input:</span>
-<span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">input</span><span class="si">}</span>
-
-<span class="s2">Example Output:</span>
-<span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="si">}</span>
-
-<span class="si">{</span><span class="n">grading_context</span><span class="si">}</span>
-
-<span class="s2">Example score: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="si">}</span>
-<span class="s2">Example justification: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">justification</span><span class="si">}</span>
-<span class="s2">        &quot;&quot;&quot;</span></div>
+        <span class="k">return</span> <span class="n">PromptTemplate</span><span class="p">(</span>
+            <span class="p">[</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Example Input:</span>
+<span class="sd">{input}</span>
+<span class="sd">&quot;&quot;&quot;</span><span class="p">,</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Example Output:</span>
+<span class="sd">{output}</span>
+<span class="sd">&quot;&quot;&quot;</span><span class="p">,</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Additional information used by the model:</span>
+<span class="sd">{grading_context}</span>
+<span class="sd">&quot;&quot;&quot;</span><span class="p">,</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Example score: {score}</span>
+<span class="sd">Example justification: {justification}</span>
+<span class="sd">        &quot;&quot;&quot;</span><span class="p">,</span>
+            <span class="p">]</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="nb">input</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">input</span><span class="p">,</span>
+            <span class="n">output</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">,</span>
+            <span class="n">grading_context</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_format_grading_context</span><span class="p">(),</span>
+            <span class="n">score</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="p">,</span>
+            <span class="n">justification</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">justification</span><span class="p">,</span>
+        <span class="p">)</span></div>
 </pre></div>
 
               </div>

@@ -278,6 +278,7 @@
     <span class="n">version</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">_get_latest_metric_version</span><span class="p">(),</span>
     <span class="n">model</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">_get_default_model</span><span class="p">(),</span>
     <span class="n">grading_context_columns</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">[],</span>  <span class="c1"># noqa: B006</span>
+    <span class="n">include_input</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">parameters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">aggregations</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;variance&quot;</span><span class="p">,</span> <span class="s2">&quot;p90&quot;</span><span class="p">],</span>  <span class="c1"># noqa: B006</span>
     <span class="n">greater_is_better</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -303,6 +304,7 @@
 <span class="sd">        ``grading_context_columns`` are used by the LLM as a judge as additional information to</span>
 <span class="sd">        compute the metric. The columns are extracted from the input dataset or output predictions</span>
 <span class="sd">        based on ``col_mapping`` in the ``evaluator_config`` passed to :py:func:`mlflow.evaluate()`.</span>
+<span class="sd">    :param include_input: (Optional) Whether to include the input when computing the metric.</span>
 <span class="sd">    :param parameters: (Optional) Parameters for the LLM used to compute the metric. By default, we</span>
 <span class="sd">        set the temperature to 0.0, max_tokens to 200, and top_p to 1.0. We recommend</span>
 <span class="sd">        setting the temperature to 0.0 for the LLM used as a judge to ensure consistent results.</span>
@@ -396,6 +398,14 @@
                 <span class="sa">f</span><span class="s2">&quot; Required grading context columns: </span><span class="si">{</span><span class="n">grading_context_columns</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
             <span class="p">)</span>
 
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">include_input</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">EvaluationExample</span><span class="p">(</span>
+                <span class="n">output</span><span class="o">=</span><span class="n">example</span><span class="o">.</span><span class="n">output</span><span class="p">,</span>
+                <span class="n">score</span><span class="o">=</span><span class="n">example</span><span class="o">.</span><span class="n">score</span><span class="p">,</span>
+                <span class="n">justification</span><span class="o">=</span><span class="n">example</span><span class="o">.</span><span class="n">justification</span><span class="p">,</span>
+                <span class="n">grading_context</span><span class="o">=</span><span class="n">example</span><span class="o">.</span><span class="n">grading_context</span><span class="p">,</span>
+            <span class="p">)</span>
+
         <span class="k">return</span> <span class="n">example</span>
 
     <span class="k">if</span> <span class="n">examples</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -471,7 +481,9 @@
                 <span class="p">)</span>
             <span class="n">grading_payloads</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="n">evaluation_context</span><span class="p">[</span><span class="s2">&quot;eval_prompt&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="nb">input</span><span class="o">=</span><span class="nb">input</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">output</span><span class="p">,</span> <span class="n">grading_context_columns</span><span class="o">=</span><span class="n">arg_string</span>
+                    <span class="nb">input</span><span class="o">=</span><span class="p">(</span><span class="nb">input</span> <span class="k">if</span> <span class="n">include_input</span> <span class="k">else</span> <span class="kc">None</span><span class="p">),</span>
+                    <span class="n">output</span><span class="o">=</span><span class="n">output</span><span class="p">,</span>
+                    <span class="n">grading_context_columns</span><span class="o">=</span><span class="n">arg_string</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="p">)</span>
 

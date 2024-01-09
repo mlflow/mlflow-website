@@ -1,0 +1,1017 @@
+
+  
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Using LangChain Agents with MLflow &mdash; MLflow 2.9.3.dev0 documentation</title>
+  
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/llms/langchain/notebooks/langchain-agent.html">
+  
+  
+    <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
+    
+
+    
+
+  
+    
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/grids.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/mobile.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/simple-cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/tabs.css" type="text/css" />
+    
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="MLflow 2.9.3.dev0 documentation" href="../../../index.html"/>
+        <link rel="up" title="MLflow LangChain Flavor" href="../index.html"/>
+        <link rel="next" title="Introduction to RAG with MLflow and LangChain" href="/langchain-retriever.html"/>
+        <link rel="prev" title="Introduction to Using LangChain with MLflow" href="/langchain-quickstart.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+<script type="text/javascript" src="../../../_static/jquery.js"></script>
+<script type="text/javascript" src="../../../_static/underscore.js"></script>
+<script type="text/javascript" src="../../../_static/doctools.js"></script>
+<script type="text/javascript" src="../../../_static/languagesections.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript" src="../../../None"></script>
+
+<body class="wy-body-for-nav" role="document">
+  
+
+  
+  <nav class="wy-nav-top header" role="navigation" aria-label="top navigation">
+    <ul>
+  <li class="menu-toggle">
+    <i data-toggle="wy-nav-top" class="wy-nav-top-menu-button db-icon db-icon-menu pull-left"></i>
+    <a href="../../../index.html" class="wy-nav-top-logo"
+      ><img src="../../../_static/MLflow-logo-final-black.png" alt="MLflow"
+    /></a>
+    <span class="version">2.9.3.dev0</span>
+  </li>
+</ul>
+  </nav>
+  <page>
+    
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side relative">
+      <div class="wy-side-scroll">
+  <div class="wy-side-nav-search">
+    
+
+    
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+    
+  </div>
+
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+    
+      <a href="../../../index.html" class="main-navigation-home"><img src="../../../_static/icons/nav-home.svg"> MLflow</a>
+    
+
+    
+      
+
+      
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../introduction/index.html">What is MLflow?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting-started/index.html">Getting Started with MLflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../new-features/index.html">New Features</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">LLMs</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#id1">MLflow Deployments Server for LLMs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#id3">LLM Evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#id4">Prompt Engineering UI</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../index.html#native-mlflow-flavors-for-llms">Native MLflow Flavors for LLMs</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../../index.html#benefits-of-mlflow-s-native-flavors-for-llms">Benefits of MLflow’s Native Flavors for LLMs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../index.html#explore-the-native-llm-flavors">Explore the Native LLM Flavors</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../../index.html#native-integration-guides-and-tutorials">Native Integration Guides and Tutorials</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../../transformers/index.html">MLflow Transformers Flavor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../openai/index.html">MLflow OpenAI Flavor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../sentence-transformers/index.html">MLflow Sentence-Transformers Flavor</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../index.html">MLflow LangChain Flavor</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#id5">LLM Tracking in MLflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#tutorials-and-use-case-guides-for-llms-in-mlflow">Tutorials and Use Case Guides for LLMs in MLflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../model-evaluation/index.html">Model Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deep-learning/index.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../traditional-ml/index.html">Traditional ML</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deployment/index.html">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tracking.html">MLflow Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../system-metrics/index.html">System Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../projects.html">MLflow Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../models.html">MLflow Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../model-registry.html">MLflow Model Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../recipes.html">MLflow Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../plugins.html">MLflow Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../auth/index.html">MLflow Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../search-runs.html">Search Runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../search-experiments.html">Search Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../python_api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../R-api.html">R API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../java_api/index.html">Java API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rest-api.html">REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docker.html">Official MLflow Docker Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../community-model-flavors.html">Community Model Flavors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials-and-examples/index.html">Tutorials and Examples</a></li>
+</ul>
+
+      
+    
+  </div>
+
+  <div role="contentinfo">
+    
+
+    <p>
+      <a id='feedbacklink' href="https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a>
+    </p>
+  </div>
+</div>
+    </nav>
+
+    <main class="wy-grid-for-nav">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+          <div class="rst-content">
+            
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Documentation</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../../index.html">LLMs</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../index.html">MLflow LangChain Flavor</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+    
+      <li>Using LangChain Agents with MLflow</li>
+    
+    
+    <!-- <li class="wy-breadcrumbs-aside">
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/llms/langchain/notebooks/langchain-agent.ipynb" class="fa fa-github"> Edit on GitHub</a>
+    </li> -->
+    
+  </ul>
+</div>
+            <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <div itemprop="articleBody">
+                
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div class="section" id="Using-LangChain-Agents-with-MLflow">
+<h1>Using LangChain Agents with MLflow<a class="headerlink" href="#Using-LangChain-Agents-with-MLflow" title="Permalink to this headline"> </a></h1>
+<p>Welcome to an engaging and educational tutorial designed to dive deep into the world of LangChain agents and their integration with MLflow. This notebook-based tutorial is tailored to offer a practical and comprehensive understanding of LangChain agents and their practical applications with a modest dose of absurdity.</p>
+<div class="section" id="What-This-Tutorial-Covers">
+<h2>What This Tutorial Covers<a class="headerlink" href="#What-This-Tutorial-Covers" title="Permalink to this headline"> </a></h2>
+<ul class="simple">
+<li><p><strong>Understanding LangChain Agents</strong>: Gain insights into what LangChain agents are and how they function in complex decision-making scenarios.</p></li>
+<li><p><strong>Introduction to MLflow Integration</strong>: Explore how LangChain integrates with MLflow, a powerful tool for the lifecycle management of machine learning models.</p></li>
+</ul>
+</div>
+<div class="section" id="Background-on-LangChain-and-Agents">
+<h2>Background on LangChain and Agents<a class="headerlink" href="#Background-on-LangChain-and-Agents" title="Permalink to this headline"> </a></h2>
+<ul class="simple">
+<li><p><strong>LangChain Overview</strong>: LangChain is a Python framework designed to simplify the creation and deployment of applications powered by language models, particularly in tasks requiring contextual understanding and decision-making.</p></li>
+<li><p><strong>Agents in LangChain</strong>: Agents are dynamic components within LangChain that use language models to decide on sequences of actions based on given objectives and available tools. Unlike static workflows, agents can adapt their responses and strategies based on the evolving context.</p></li>
+</ul>
+</div>
+<div class="section" id="Integration-with-MLflow">
+<h2>Integration with MLflow<a class="headerlink" href="#Integration-with-MLflow" title="Permalink to this headline"> </a></h2>
+<ul class="simple">
+<li><p><strong>MLflow’s Role</strong>: In this tutorial, MLflow plays a crucial role in logging, tracking, and deploying the LangChain agent. You’ll learn how to effectively use MLflow to manage the lifecycle of your LangChain agent, ensuring a streamlined process from development to deployment.</p></li>
+</ul>
+</div>
+<div class="section" id="Tutorial-Overview">
+<h2>Tutorial Overview<a class="headerlink" href="#Tutorial-Overview" title="Permalink to this headline"> </a></h2>
+<p>In this tutorial, we will:</p>
+<ol class="arabic simple">
+<li><p><strong>Initialize a LangChain Agent</strong>: Set up an agent with specific tools and a language model, ready to tackle our chosen task.</p></li>
+<li><p><strong>Log and Load the Agent Model with MLflow</strong>: Demonstrate the process of logging the agent in MLflow and then loading it for execution.</p></li>
+<li><p><strong>Run a Real-World Prediction</strong>: Use the agent to determine how much snow would result from the latest year’s rainfall in Raleigh, NC, and conceptualize the size of a snowman that could be built with it.</p></li>
+</ol>
+<p>By the end of this tutorial, you will have a solid grasp of LangChain agents and MLflow’s capabilities in enhancing these agents’ development and deployment.</p>
+<p>Let’s embark on this exciting journey into the realm of LangChain agents and MLflow!</p>
+</div>
+<div class="section" id="Prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#Prerequisites" title="Permalink to this headline"> </a></h2>
+<p>In our LangChain Agents tutorial, we leverage an important dependency known as <code class="docutils literal notranslate"><span class="pre">SerpAPI</span></code>. This tool is pivotal in providing our LangChain agent with API access to various search engines, crucial for retrieving real-time data from the web.</p>
+<div class="section" id="Installing-SerpAPI">
+<h3>Installing SerpAPI<a class="headerlink" href="#Installing-SerpAPI" title="Permalink to this headline"> </a></h3>
+<p>To use SerpAPI, you’ll need to install it via pip. It’s a straightforward process, and the package is named <code class="docutils literal notranslate"><span class="pre">google-search-results</span></code>. Once installed, you can create an account at <a class="reference external" href="https://serpapi.com/">SerpAPI’s Official Website</a> and retrieve an API Key. In order to use this integration with LangChain, you can simply load the toolset via <code class="docutils literal notranslate"><span class="pre">load_tools([&quot;serpapi&quot;])</span></code> to allow the LangChain agent access to the Google Search APIs.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>google-search-results
+</pre></div>
+</div>
+<p>As we move forward in the tutorial, we will explore how to effectively use SerpAPI to empower our LangChain agent.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">langchain.agents</span> <span class="kn">import</span> <span class="n">AgentType</span><span class="p">,</span> <span class="n">initialize_agent</span><span class="p">,</span> <span class="n">load_tools</span>
+<span class="kn">from</span> <span class="nn">langchain.llms</span> <span class="kn">import</span> <span class="n">OpenAI</span>
+
+<span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">infer_signature</span>
+
+<span class="k">assert</span> <span class="s2">&quot;OPENAI_API_KEY&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">,</span> <span class="s2">&quot;Please set the OPENAI_API_KEY environment variable.&quot;</span>
+<span class="k">assert</span> <span class="s2">&quot;SERPAPI_API_KEY&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">,</span> <span class="s2">&quot;Please set the SERPAPI_API_KEY environment variable.&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Setting-Up-the-LangChain-Agent-with-Tools-and-OpenAI-LLM">
+<h2>Setting Up the LangChain Agent with Tools and OpenAI LLM<a class="headerlink" href="#Setting-Up-the-LangChain-Agent-with-Tools-and-OpenAI-LLM" title="Permalink to this headline"> </a></h2>
+<p>In this part of the tutorial, we delve into the initialization of a LangChain agent, a key step in building our application. This process involves configuring the language model and defining the tools that the agent will utilize to perform its tasks.</p>
+<div class="section" id="Language-Model-Configuration">
+<h3>Language Model Configuration<a class="headerlink" href="#Language-Model-Configuration" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>OpenAI LLM</strong>: We initialize the OpenAI language model (<code class="docutils literal notranslate"><span class="pre">llm</span></code>) with a specific temperature setting. The temperature parameter controls the randomness of the language model’s responses, with a lower value leading to more predictable and conservative outputs.</p></li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># NOTE: The LangChain OpenAI wrapper uses `text-davinci-003` as the default model type as of version 0.0.331</span>
+<span class="n">llm</span> <span class="o">=</span> <span class="n">OpenAI</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="s2">&quot;text-davinci-003&quot;</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Defining-Tools-for-the-Agent">
+<h3>Defining Tools for the Agent<a class="headerlink" href="#Defining-Tools-for-the-Agent" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Tool Selection</strong>: The agent is equipped with two primary tools – a web search engine interface (<code class="docutils literal notranslate"><span class="pre">serpapi</span></code>) and a math execution engine (<code class="docutils literal notranslate"><span class="pre">llm-math</span></code>). These tools are crucial for enabling the agent to retrieve information from the web and perform mathematical computations, respectively.</p></li>
+<li><p><strong>Tool Loading</strong>: The <code class="docutils literal notranslate"><span class="pre">load_tools</span></code> function is used to load these tools and associate them with our language model. This integration ensures that the agent has the necessary capabilities to handle complex queries that involve both data retrieval and quantitative analysis.</p></li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define the two tools that the agent will use: a web search engine interface and a math execution engine.</span>
+<span class="n">tools</span> <span class="o">=</span> <span class="n">load_tools</span><span class="p">([</span><span class="s2">&quot;serpapi&quot;</span><span class="p">,</span> <span class="s2">&quot;llm-math&quot;</span><span class="p">],</span> <span class="n">llm</span><span class="o">=</span><span class="n">llm</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Agent-Initialization">
+<h3>Agent Initialization<a class="headerlink" href="#Agent-Initialization" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Agent Type</strong>: We create the agent using the <code class="docutils literal notranslate"><span class="pre">initialize_agent</span></code> function and specify the type of agent as <code class="docutils literal notranslate"><span class="pre">ZERO_SHOT_REACT_DESCRIPTION</span></code>. This particular type of agent is designed to react and provide descriptions based on zero-shot learning, meaning it can understand and respond to tasks without prior specific training on them.</p></li>
+<li><p><strong>Verbose Mode</strong>: The agent is initialized in verbose mode, which allows us to see detailed logs of its decision-making process. This feature is particularly useful for understanding how the agent interprets and responds to different inputs.</p></li>
+</ul>
+<p>Through this setup, we have laid the foundation for an intelligent LangChain agent capable of handling a variety of tasks by leveraging the power of language models and specific functional tools. As we progress, we will see this agent in action, demonstrating its potential in practical applications.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create the agent</span>
+<span class="n">agent</span> <span class="o">=</span> <span class="n">initialize_agent</span><span class="p">(</span><span class="n">tools</span><span class="p">,</span> <span class="n">llm</span><span class="p">,</span> <span class="n">agent</span><span class="o">=</span><span class="n">AgentType</span><span class="o">.</span><span class="n">ZERO_SHOT_REACT_DESCRIPTION</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Logging-and-Loading-the-LangChain-Agent-Using-MLflow">
+<h2>Logging and Loading the LangChain Agent Using MLflow<a class="headerlink" href="#Logging-and-Loading-the-LangChain-Agent-Using-MLflow" title="Permalink to this headline"> </a></h2>
+<p>In this crucial phase of our tutorial, we focus on the integration of the LangChain agent with MLflow. This process involves logging the agent model in MLflow and subsequently loading it for use.</p>
+<div class="section" id="Logging-the-Agent-in-MLflow">
+<h3>Logging the Agent in MLflow<a class="headerlink" href="#Logging-the-Agent-in-MLflow" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Starting an MLflow Run</strong>: We initiate an MLflow run, a key step in MLflow’s tracking system, which is used to organize and manage model development activities.</p></li>
+<li><p><strong>Model Logging</strong>: The agent is logged into MLflow using the <code class="docutils literal notranslate"><span class="pre">mlflow.langchain.log_model</span></code> function. This function not only saves the agent model but also tags it with a specified name, in our case, “search-calculation”.</p></li>
+</ul>
+</div>
+<div class="section" id="Loading-the-Model-for-Use">
+<h3>Loading the Model for Use<a class="headerlink" href="#Loading-the-Model-for-Use" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Model Retrieval</strong>: Post logging, we load the model using MLflow’s <code class="docutils literal notranslate"><span class="pre">pyfunc.load_model</span></code> function. This step is essential for activating the agent model, making it ready for executing predictions or tasks.</p></li>
+<li><p><strong>Model URI</strong>: The <code class="docutils literal notranslate"><span class="pre">model_info.model_uri</span></code> provides the unique identifier for the logged model, ensuring that we are loading the correct version of the agent model for our application.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="Prepartion-for-Logging">
+<h2>Prepartion for Logging<a class="headerlink" href="#Prepartion-for-Logging" title="Permalink to this headline"> </a></h2>
+<p>A good practice to follow, prior to logging a model, is to validate the model’s input and output signature. This can be used to explicitly define the expected signature during model logging to ensure that inference with the model is validated properly.</p>
+<p>We can define the signature by passing in an example input to our model and generating a signature inference based on these values.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">input_example</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="s2">&quot;How many apples can fit inside a standard 8 cubic meter cement mixer truck&#39;s drum?&quot;</span>
+<span class="p">}</span>
+
+<span class="n">prediction</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">input_example</span><span class="p">)</span>
+
+<span class="n">signature</span> <span class="o">=</span> <span class="n">infer_signature</span><span class="p">(</span><span class="n">input_example</span><span class="p">,</span> <span class="n">prediction</span><span class="p">)</span>
+
+<span class="n">signature</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+
+<span class="ansi-bold">&gt; Entering new AgentExecutor chain...</span>
+<span class="ansi-green-intense-fg ansi-bold"> I need to know the size of an apple and the size of the drum
+Action: Search
+Action Input: &#34;size of an apple&#34;</span>
+Observation: <span class="ansi-cyan-intense-fg ansi-bold">Commercial growers aim to produce an apple that is 7 to 8.5 cm (2+3⁄4 to 3+1⁄4 in) in diameter, due to market preference. Some consumers, especially in Japan, prefer a larger apple, while apples less than 5.5 cm (2+1⁄4 in) are generally used for juicing and have little fresh market value.</span>
+Thought:<span class="ansi-green-intense-fg ansi-bold"> I need to know the size of a cement mixer truck&#39;s drum
+Action: Search
+Action Input: &#34;size of a cement mixer truck&#39;s drum&#34;</span>
+Observation: <span class="ansi-cyan-intense-fg ansi-bold">Truck mixers are the most common mode of PCC transport. They consist of a truck-mounted drum that rotates on an inclined axis. A typical mixing truck (Figures 1 and 2) uses a 6.9 – 9.2 m3 (9 – 12 yd3) mixing drum, the size being limited due to gross vehicle weight of the loaded truck.</span>
+Thought:<span class="ansi-green-intense-fg ansi-bold"> I now know the size of an apple and the size of the drum
+Action: Calculator
+Action Input: 8 cubic meters divided by 0.0077 cubic meters</span>
+Observation: <span class="ansi-yellow-intense-fg ansi-bold">Answer: 1038.9610389610389</span>
+Thought:<span class="ansi-green-intense-fg ansi-bold"> I now know the final answer
+Final Answer: Approximately 1039 apples can fit inside a standard 8 cubic meter cement mixer truck&#39;s drum.</span>
+
+<span class="ansi-bold">&gt; Finished chain.</span>
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+inputs:
+  [&#39;input&#39;: string]
+outputs:
+  [string]
+params:
+  None
+</pre></div></div>
+</div>
+<p>While the math is off by about an order of magnitude, we do have our input and output signature, which we will use when logging the model.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s2">&quot;Google Agent&quot;</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="n">model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">langchain</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+        <span class="n">lc_model</span><span class="o">=</span><span class="n">agent</span><span class="p">,</span>
+        <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;search-calculation&quot;</span><span class="p">,</span>
+        <span class="n">input_example</span><span class="o">=</span><span class="n">input_example</span><span class="p">,</span>
+        <span class="n">signature</span><span class="o">=</span><span class="n">signature</span><span class="p">,</span>
+        <span class="n">extra_pip_requirements</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;google-search-results==2.4.2&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+
+<span class="c1"># Load our agent model for use</span>
+<span class="n">loaded_model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2024/01/04 21:54:50 INFO mlflow.tracking.fluent: Experiment with name &#39;Google Agent&#39; does not exist. Creating a new experiment.
+</pre></div></div>
+</div>
+<p>If we open up the MLflow UI, we can see our model with our signature and our input example that we defined.</p>
+<p><img alt="Google Agent in the MLflow UI" src="https://i.imgur.com/NdOObEf.png" /></p>
+</div>
+<div class="section" id="LangChain-Agent-Prediction-and-Result-Analysis">
+<h2>LangChain Agent Prediction and Result Analysis<a class="headerlink" href="#LangChain-Agent-Prediction-and-Result-Analysis" title="Permalink to this headline"> </a></h2>
+<p>In this segment of the tutorial, we utilize our loaded LangChain agent model to make a prediction. The agent is tasked with determining the volume of snow resulting from rainfall in Raleigh, NC, and conceptualizing the size of a snowman that could be built from this snow.</p>
+<div class="section" id="Agent-Prediction-Task">
+<h3>Agent Prediction Task<a class="headerlink" href="#Agent-Prediction-Task" title="Permalink to this headline"> </a></h3>
+<p>The agent receives a complex query that involves several steps: - Determining the most recent year’s rainfall in Raleigh, NC. - Converting this rainfall amount into snow, using a depth conversion ratio of snow to rain. - Calculating the total volume of snow for 1 acre of land. - Estimating the size of a snowman that could be made from this volume of snow.</p>
+</div>
+<div class="section" id="Result-Analysis">
+<h3>Result Analysis<a class="headerlink" href="#Result-Analysis" title="Permalink to this headline"> </a></h3>
+<p>The agent’s output demonstrates its ability to: - Navigate through complex queries involving multiple steps. - Integrate search and calculation tools to derive accurate and relevant information. - Translate quantitative data into a practical and imaginative scenario.</p>
+</div>
+<div class="section" id="Conclusion-of-Agent’s-Task">
+<h3>Conclusion of Agent’s Task<a class="headerlink" href="#Conclusion-of-Agent’s-Task" title="Permalink to this headline"> </a></h3>
+<p>The agent successfully completes its task by providing a comprehensive answer, showcasing the practical utility of LangChain agents in processing and synthesizing information to answer multifaceted queries. This example illustrates the power of integrating advanced language models with specialized tools to solve real-world problems in creative and informative ways.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">agent_response</span> <span class="o">=</span> <span class="n">loaded_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="s2">&quot;How much rain has fallen in Raleigh, NC for the most recent year? &quot;</span>
+            <span class="s2">&quot;If that rain fell as snow, which has a depth conversion of snow to rain of 10 to 1, what is the total &quot;</span>
+            <span class="s2">&quot;volume of snow in cubic feet for 1 acre of land?&quot;</span>
+            <span class="s2">&quot;How big of a snowman could I make if I used all of that snow?&quot;</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+
+<span class="ansi-bold">&gt; Entering new AgentExecutor chain...</span>
+<span class="ansi-green-intense-fg ansi-bold"> I need to find out the amount of rain that has fallen in Raleigh, NC and then convert that to snow.
+Action: Search
+Action Input: &#34;Rainfall in Raleigh, NC&#34;</span>
+Observation: <span class="ansi-cyan-intense-fg ansi-bold">{&#39;type&#39;: &#39;weather_result&#39;, &#39;temperature&#39;: &#39;37&#39;, &#39;unit&#39;: &#39;Fahrenheit&#39;, &#39;precipitation&#39;: &#39;0%&#39;, &#39;humidity&#39;: &#39;42%&#39;, &#39;wind&#39;: &#39;11 mph&#39;, &#39;location&#39;: &#39;Raleigh, NC&#39;, &#39;date&#39;: &#39;Tuesday 10:00 AM&#39;, &#39;weather&#39;: &#39;Sunny&#39;}</span>
+Thought:<span class="ansi-green-intense-fg ansi-bold"> I need to find out the amount of rain that has fallen in Raleigh, NC for the most recent year.
+Action: Search
+Action Input: &#34;Rainfall in Raleigh, NC for the most recent year&#34;</span>
+Observation: <span class="ansi-cyan-intense-fg ansi-bold">[&#39;Get 6-month, year-to-date and 12-month cumulative rainfall totals vs ... 4 NC counties are under alert, including Cumberland and Johnston counties. RDU Rainfall ...&#39;, &#39;Weather in Raleigh for each year since 2010 including average high and low temperatures, total snowfall and precipitation.&#39;, &#39;The bottom portion of the graph indicates the precipitation for the year to date. The yellow line (and green area below it) represents the normal year to date ...&#39;, &#39;North Carolina Cumulative Rainfall Map with. National Weather Service Radar Overlay ; RAINGAGE AT WALNUT CR BUCK JONES RD AT RALEIGH, NC, 0, 0 ; RAINGAGE AT FIRE ...&#39;, &#39;Year Selection. 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009, 2008, 2007, 2006, 2005, 2004, 2003, 2002, 2001, 2000 ...&#39;, &#39;Year Selection. 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 ... Precipitation (past 24 hours from 05:51:00), 0.00, 5.60, -. Dew ...&#39;, &#39;Raleigh, NC past weather data including previous temperature, barometric pressure, humidity, dew point, rain total, and wind conditions.&#39;, &#39;According to NOAA records, the most precipitation that Raleigh, North Carolina has ever received in a single calendar year is 64.2 inches which occurred in ...&#39;, &#39;Typically, Raleigh averages 41.5 inches of liquid precipitation by the end of the year, while Seattle sees about 34.4 inches. Report a ...&#39;, &#39;Raleigh gets some kind of precipitation, on average, 108 days per year. Precipitation is rain, snow, sleet, or hail that falls to the ground. In order for ...&#39;]</span>
+Thought:<span class="ansi-green-intense-fg ansi-bold"> I need to calculate the total volume of snow in cubic feet for 1 acre of land.
+Action: Calculator
+Action Input: 64.2 inches of rain * 10 (snow to rain conversion) * 43560 (square feet in an acre)</span>
+Observation: <span class="ansi-yellow-intense-fg ansi-bold">Answer: 27965520.0</span>
+Thought:<span class="ansi-green-intense-fg ansi-bold"> I now know the final answer.
+Final Answer: 27965520.0 cubic feet of snow for 1 acre of land. This amount of snow could make a very large snowman.</span>
+
+<span class="ansi-bold">&gt; Finished chain.</span>
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">agent_response</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+27965520.0 cubic feet of snow for 1 acre of land. This amount of snow could make a very large snowman.
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Calculating-the-Number-of-Standard-Snowmen-with-LangChain-Agent">
+<h2>Calculating the Number of Standard Snowmen with LangChain Agent<a class="headerlink" href="#Calculating-the-Number-of-Standard-Snowmen-with-LangChain-Agent" title="Permalink to this headline"> </a></h2>
+<p>In this section, we utilize the loaded LangChain agent model to compute the number of standard snowmen that can be made from a given volume of snow. This calculation is an extension of our previous query, demonstrating the agent’s ability to engage in sequential reasoning and complex calculations.</p>
+<div class="section" id="Agent’s-Calculation-Task">
+<h3>Agent’s Calculation Task<a class="headerlink" href="#Agent’s-Calculation-Task" title="Permalink to this headline"> </a></h3>
+<p>The agent is tasked with a new query: - To determine how many standard snowmen could be made from 27,965,520 cubic feet of snow.</p>
+</div>
+<div class="section" id="Verbose-Mode-Output-and-Analysis">
+<h3>Verbose Mode Output and Analysis<a class="headerlink" href="#Verbose-Mode-Output-and-Analysis" title="Permalink to this headline"> </a></h3>
+<p>With verbose mode active, we observe the agent’s step-by-step approach:</p>
+<ul class="simple">
+<li><p><strong>Initial Query Understanding</strong>: The agent recognizes the need to determine the volume of a standard snowman.</p></li>
+<li><p><strong>Search for Standard Snowman Volume</strong>: It performs a web search to find the volume of a standard snowman.</p></li>
+<li><p><strong>Observation and Calculation</strong>: The agent finds relevant data and calculates the volume of a standard snowman based on given dimensions.</p></li>
+<li><p><strong>Final Answer</strong>: After obtaining the volume of a single snowman, the agent divides the total snow volume by the volume of one snowman to find the total number of snowmen that can be made.</p></li>
+</ul>
+</div>
+<div class="section" id="Agent’s-Output">
+<h3>Agent’s Output<a class="headerlink" href="#Agent’s-Output" title="Permalink to this headline"> </a></h3>
+<p>The agent concludes that approximately 327,072.8 standard snowmen could be made from the given volume of snow. This result showcases the agent’s capability to: - Conduct targeted searches and extract pertinent information from various sources. - Perform mathematical calculations and apply them to practical scenarios. - Provide comprehensive and quantitatively accurate responses to multi-faceted queries.</p>
+</div>
+<div class="section" id="Conclusion-of-the-Agent’s-Task">
+<h3>Conclusion of the Agent’s Task<a class="headerlink" href="#Conclusion-of-the-Agent’s-Task" title="Permalink to this headline"> </a></h3>
+<p>This exercise illustrates the advanced analytical and problem-solving skills of LangChain agents. It highlights the agent’s proficiency in combining search and calculation tools to derive meaningful answers, emphasizing the practical applications of such agents in real-world scenarios.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">calculated_response</span> <span class="o">=</span> <span class="n">loaded_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span>
+    <span class="p">[{</span><span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="s2">&quot;How many standard snowmen could I make with 27965520 cubic feet of snow?&quot;</span><span class="p">}]</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+
+<span class="ansi-bold">&gt; Entering new AgentExecutor chain...</span>
+<span class="ansi-green-intense-fg ansi-bold"> I need to figure out the volume of a standard snowman
+Action: Search
+Action Input: &#34;volume of a standard snowman&#34;</span>
+Observation: <span class="ansi-cyan-intense-fg ansi-bold">[&#39;The perfect snowman calculator uses math &amp; science rules to help you design the snowman of your dreams!&#39;, &#39;The volume of a sphere is (4/3)πr3, so the total volume of the snowman is (4/3)π(1.75)3 + (4/3)π(1.9)3 + (4/3)π(2)3 ≈ 84.7 cubic feet.&#39;, &#34;A snowman base 2 meters in diameter would result in a sphere of packed snow amounting to ~3 cubic meters, or roughly 3 tons. Which doesn&#39;t count ...&#34;, &#39;The calculations assumed that a “typical snowman” could be modeled by a cylinder with a volume of 40 cubic feet, and that a snowflake could ...&#39;, &#39;What is the total volume of snow used to make the snowman if the head is 12 inches wide, the middle is 16 inches wide and the bottom is 18 ...&#39;, &#39;It snowed in England, and so, I built a snowman :) I built him; measured him and calculated how much snow was used to make him.&#39;, &#39;The challenge is to see which team can create the snowman with the largest estimated volume. ... Standards. Log in. to see state-specific standards (only ...&#39;, &#39;Dr. Anna Szczepanek created the &#34;Snowman Calculator&#34; which lets you put in a few things about your current snowy situation -- how much snow fell ...&#39;, &#39;Dimensions: 5 x 5.625 x 9.5 ; Volume: 12 oz ; How to Order:.&#39;, &#39;The volume of a given shape implies the amount of substance it contains in 3-Dimension. Thus, the volume of the snowman is approximately 23 m³ ...&#39;]</span>
+Thought:<span class="ansi-green-intense-fg ansi-bold"> I need to calculate the volume of a standard snowman
+Action: Calculator
+Action Input: (4/3)π(1.75)3 + (4/3)π(1.9)3 + (4/3)π(2)3</span>
+Observation: <span class="ansi-yellow-intense-fg ansi-bold">Answer: 84.69053115669803</span>
+Thought:<span class="ansi-green-intense-fg ansi-bold"> I now know the final answer
+Final Answer: 327072.8 snowmen</span>
+
+<span class="ansi-bold">&gt; Finished chain.</span>
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">calculated_response</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+327072.8 snowmen
+</pre></div></div>
+</div>
+<p>That’s a lot of snowmen.</p>
+<p><img alt="snowmen" src="https://i.imgur.com/Bzdub6n.png" /></p>
+<p>Or, as the LLM put it, “This amount of snow could make <strong>a very large snowman</strong>.”</p>
+<p><img alt="snowman" src="https://i.imgur.com/HiktkRQ.png" /></p>
+<p>Indeed.</p>
+<blockquote>
+<div><p><strong>Note:</strong> Images created with the use of <a class="reference external" href="https://openai.com/dall-e-3">DALL·E 3</a></p>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="Concluding-Our-LangChain-Agents-and-MLflow-Tutorial">
+<h2>Concluding Our LangChain Agents and MLflow Tutorial<a class="headerlink" href="#Concluding-Our-LangChain-Agents-and-MLflow-Tutorial" title="Permalink to this headline"> </a></h2>
+<p>As we wrap up this fun tutorial, let’s take a moment to reflect on the fascinating journey we’ve embarked on with LangChain agents and MLflow. We ventured through the realms of advanced language model applications, culminating in a whimsical yet insightful exploration of snowmen creation – a topic every child (and child-at-heart) has pondered!</p>
+<div class="section" id="Key-Takeaways-from-the-Tutorial">
+<h3>Key Takeaways from the Tutorial<a class="headerlink" href="#Key-Takeaways-from-the-Tutorial" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Versatility of LangChain Agents</strong>: We’ve seen firsthand how LangChain agents can navigate complex tasks, from gathering real-time data to performing intricate calculations. Their ability to process and synthesize information from diverse sources is nothing short of impressive.</p></li>
+<li><p><strong>Power of MLflow in Model Management</strong>: MLflow has proven to be an invaluable asset in our journey. Its capabilities in tracking, logging, and deploying LangChain models have streamlined our workflow, making the management of complex machine learning processes more accessible and efficient.</p></li>
+<li><p><strong>Seamless Integration</strong>: The integration of LangChain with MLflow has demonstrated how two powerful tools can come together to create a robust framework for developing and deploying AI-driven applications.</p></li>
+</ul>
+</div>
+<div class="section" id="Wrapping-Up-with-a-Smile">
+<h3>Wrapping Up with a Smile<a class="headerlink" href="#Wrapping-Up-with-a-Smile" title="Permalink to this headline"> </a></h3>
+<p>As we conclude, remember that the world of LangChain agents and MLflow is as vast as it is fascinating. Whether you’re calculating snowmen, predicting weather patterns, or performing LLM-assisted competitive market analysis, the opportunities are boundless when it comes to creating powerful and complex agents.</p>
+<p>Thank you for joining us on this unique educational adventure. We hope it has sparked your curiosity and inspired you to delve deeper into the capabilities of LangChain and MLflow. Here’s to many more fun and informative explorations in the world of machine learning!</p>
+<p>Happy coding, and may your snowmen always be perfectly calculated!</p>
+</div>
+</div>
+<div class="section" id="What’s-next?">
+<h2>What’s next?<a class="headerlink" href="#What’s-next?" title="Permalink to this headline"> </a></h2>
+<p>If you’d like to learn more about how MLflow and LangChain integrate, see the other <a class="reference external" href="https://www.mlflow.org/docs/latest/llms/langchain/index.html#advanced-tutorials">advanced tutorials for MLflow’s LangChain flavor</a>.</p>
+</div>
+</div>
+
+
+              </div>
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="langchain-quickstart.html" class="btn btn-neutral" title="Introduction to Using LangChain with MLflow" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+      
+      
+        <a href="langchain-retriever.html" class="btn btn-neutral" title="Introduction to RAG with MLflow and LangChain" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+      <p class="copyright">
+          &copy; MLflow Project, a Series of LF Projects, LLC. All rights reserved.
+      </p>
+
+  </div> 
+
+</footer>
+          </div>
+        </div>
+      </section>
+    </main>
+  </page>
+
+  
+
+
+  
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+      URL_ROOT:'../../../',
+      VERSION:'2.9.3.dev0',
+      COLLAPSE_INDEX:false,
+      FILE_SUFFIX:'.html',
+      LINK_SUFFIX: '.html',
+      HAS_SOURCE:  true
+    };
+  </script>
+
+  
+
+  <script type="text/javascript" src="../../../_static/js/clipboard.min.js"></script>
+  <script type="text/javascript" src="../../../_static/js/jquery.waypoints.min.js"></script>
+
+  
+  
+  
+  <script type="text/javascript">var CLIPPY_SVG_PATH = "../../../_static/clippy.svg";</script>
+  <script type="text/javascript" src="../../../_static/js/custom.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.StickyNav.enable();
+    });
+
+  </script>
+  
+
+  
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        // Get the code block designator class entries
+        const allHighlights = document.querySelectorAll('.highlight');
+        // Disable copyable links for notebook cell numbering and for cell outputs
+        const highlights = Array.from(allHighlights).filter(highlight => !highlight.closest('.highlight-none') && 
+            !highlight.closest('.nboutput'));
+    
+        highlights.forEach(function(highlight) {
+            const copyIcon = document.createElement('span');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.innerHTML = '&#xf0ea;';
+
+            copyIcon.addEventListener('click', function() {
+                const code = highlight.querySelector('pre').textContent;
+                copyToClipboard(code);
+
+                // Flash effect on click
+                this.style.color = '#0194E2';
+                setTimeout(() => {
+                    this.style.color = ''; 
+                }, 100);
+
+                // Display "Code copied to clipboard" near the clicked icon
+                const message = document.createElement('span');
+                message.textContent = "Copied!";
+                message.classList.add('copy-message'); 
+
+                // Append the message to the icon
+                this.appendChild(message);
+
+                setTimeout(() => {
+                    this.removeChild(message);
+                }, 500);
+            });
+
+            highlight.appendChild(copyIcon);
+        });
+    });
+  </script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Force download for notebook-download-btn
+        const downloadButtons = document.querySelectorAll('.notebook-download-btn');
+        downloadButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                // Fetch the raw content of the notebook from GitHub
+                fetch(button.href)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = url;
+                        const filename = button.href.split('/').pop();
+                        link.download = filename; 
+
+                        document.body.appendChild(link);
+                        link.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    })
+                    .catch(err => console.error('Error fetching the notebook:', err));
+            });
+        });
+    });
+</script> 
+</body>
+</html>
