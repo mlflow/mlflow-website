@@ -58,7 +58,6 @@
 <script type="text/javascript" src="../_static/jquery.js"></script>
 <script type="text/javascript" src="../_static/underscore.js"></script>
 <script type="text/javascript" src="../_static/doctools.js"></script>
-<script type="text/javascript" src="../_static/tabs.js"></script>
 <script type="text/javascript" src="../_static/languagesections.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
@@ -137,21 +136,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#python-apis">Python APIs</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#faq">FAQ</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#how-to-test-my-model-before-deploying-to-the-production-environment">How to test my model before deploying to the production environment?</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#testing-offline-prediction-with-a-virtual-environment">Testing offline prediction with a virtual environment</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#testing-online-inference-endpoint-with-a-virtual-environment">Testing online inference endpoint with a virtual environment</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#testing-online-inference-endpoint-with-a-docker-container">Testing online inference endpoint with a Docker container</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#how-to-fix-dependency-errors-when-serving-my-model">How to fix dependency errors when serving my model?</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#check-the-missing-dependencies">1. Check the missing dependencies</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#try-adding-the-dependencies-using-the-mlflow-models-predict-api">2. Try adding the dependencies using the <cite>mlflow models predict</cite> API</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#update-the-model-metadata">3. Update the model metadata</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="#faq">FAQ</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../tracking.html">MLflow Tracking</a></li>
@@ -366,134 +351,8 @@ SageMaker deployments, and the <a class="reference external" href="https://pypi.
 </div>
 <div class="section" id="faq">
 <h2>FAQ<a class="headerlink" href="#faq" title="Permalink to this headline"> </a></h2>
-<div class="section" id="how-to-test-my-model-before-deploying-to-the-production-environment">
-<h3>How to test my model before deploying to the production environment?<a class="headerlink" href="#how-to-test-my-model-before-deploying-to-the-production-environment" title="Permalink to this headline"> </a></h3>
-<p>Testing your model before deployment is a critical step to ensure production readiness.
-MLflow provides a few ways to test your model locally, either in a virtual environment or a Docker container.</p>
-<div class="section" id="testing-offline-prediction-with-a-virtual-environment">
-<h4>Testing offline prediction with a virtual environment<a class="headerlink" href="#testing-offline-prediction-with-a-virtual-environment" title="Permalink to this headline"> </a></h4>
-<p>You can use <cite>mlflow models predict</cite> API via CLI or Python to making test predictions with your model.
-This wiil load your model from the model URI, create a virtual environment with the model dependencies (defined in MLflow Model),
-and run offline predictions with the model.
-Please refer to <a class="reference internal" href="../python_api/mlflow.models.html#mlflow.models.predict" title="mlflow.models.predict"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.models.predict()</span></code></a> or <a class="reference external" href="../cli.html#mlflow-models">CLI reference</a> for more detailed usage for the <cite>predict</cite> API.</p>
-<div class="sphinx-tabs docutils container">
-<div aria-label="Tabbed content" role="tablist"><button aria-controls="panel-0-QmFzaA==" aria-selected="true" class="sphinx-tabs-tab code-tab group-tab" id="tab-0-QmFzaA==" name="QmFzaA==" role="tab" tabindex="0">Bash</button><button aria-controls="panel-0-UHl0aG9u" aria-selected="false" class="sphinx-tabs-tab code-tab group-tab" id="tab-0-UHl0aG9u" name="UHl0aG9u" role="tab" tabindex="-1">Python</button></div><div aria-labelledby="tab-0-QmFzaA==" class="sphinx-tabs-panel code-tab group-tab" id="panel-0-QmFzaA==" name="QmFzaA==" role="tabpanel" tabindex="0"><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mlflow<span class="w"> </span>models<span class="w"> </span>predict<span class="w"> </span>-m<span class="w"> </span>runs:/&lt;run_id&gt;/model-i<span class="w"> </span>&lt;input_path&gt;
-</pre></div>
-</div>
-</div><div aria-labelledby="tab-0-UHl0aG9u" class="sphinx-tabs-panel code-tab group-tab" hidden="true" id="panel-0-UHl0aG9u" name="UHl0aG9u" role="tabpanel" tabindex="0"><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
-
-<span class="n">mlflow</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span>
-    <span class="n">model_uri</span><span class="o">=</span><span class="s2">&quot;runs:/&lt;run_id&gt;/model&quot;</span><span class="p">,</span>
-    <span class="n">input_data</span><span class="o">=&lt;</span><span class="n">input_data</span><span class="o">&gt;</span><span class="p">,</span>
-<span class="p">)</span>
-</pre></div>
-</div>
-</div></div>
-<p>Using the <cite>predict</cite> API is convenient for testing your model and inference environment quickly.
-However, it is not a perfect simulation of the serving because it does not start the online inference server.</p>
-</div>
-<div class="section" id="testing-online-inference-endpoint-with-a-virtual-environment">
-<h4>Testing online inference endpoint with a virtual environment<a class="headerlink" href="#testing-online-inference-endpoint-with-a-virtual-environment" title="Permalink to this headline"> </a></h4>
-<p>If you want to test your model with actually running the online inference server, you can use MLflow <cite>serve</cite> API.
-This will create a virtual environment with your model and dependencies, similarly to the <cite>predict</cite> API, but will start the inference server
-and expose the REST endpoints. Then you can send a test request and validate the response.
-Please refer to <a class="reference external" href="../cli.html#mlflow-models">CLI reference</a> for more detailed usage for the <cite>serve</cite> API.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mlflow<span class="w"> </span>models<span class="w"> </span>serve<span class="w"> </span>-m<span class="w"> </span>runs:/&lt;run_id&gt;/model<span class="w"> </span>-p<span class="w"> </span>&lt;port&gt;
-
-<span class="c1"># In another terminal</span>
-curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--data<span class="w"> </span><span class="s1">&#39;{&quot;inputs&quot;: [[1, 2], [3, 4]]}&#39;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>http://localhost:&lt;port&gt;/invocations
-</pre></div>
-</div>
-<p>While this is reliable way to test your model before deployment, one caveat is that virtual environment doesn’t absorb the OS level differences
-between your machine and the production environment. For example, if you are using MacOS as a local dev machine but your deployment target is
-running on Linux, you may encounter some issues that are not reproducible in the virtual environment.</p>
-<p>In this case, you can use Docker container to test your model. While it doesn’t provide full OS level isolation unlike virtual machine e.g. we
-can’t run Windows container on Linux machine, Docker covers some popular test scenario such as running different versions of Linux or simulating
-Linux environment on Mac/Windows.</p>
-</div>
-<div class="section" id="testing-online-inference-endpoint-with-a-docker-container">
-<h4>Testing online inference endpoint with a Docker container<a class="headerlink" href="#testing-online-inference-endpoint-with-a-docker-container" title="Permalink to this headline"> </a></h4>
-<p>MLflow <cite>build-docker</cite> API for CLI and Python, which builds an Ubuntu-based Docker image for serving your mdoel.
-The image will contain your model and dependencies and has an entrypoint to start the inference server. Similarly to the <cite>serve</cite> API,
-you can send a test request and validate the response.
-Please refer to <a class="reference external" href="../cli.html#mlflow-models">CLI reference</a> for more detailed usage for the <cite>build-docker</cite> API.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mlflow<span class="w"> </span>models<span class="w"> </span>build-docker<span class="w"> </span>-m<span class="w"> </span>runs:/&lt;run_id&gt;/model<span class="w"> </span>-n<span class="w"> </span>&lt;image_name&gt;
-
-docker<span class="w"> </span>run<span class="w"> </span>-p<span class="w"> </span>&lt;port&gt;:8080<span class="w"> </span>&lt;image_name&gt;
-
-<span class="c1"># In another terminal</span>
-curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--data<span class="w"> </span><span class="s1">&#39;{&quot;inputs&quot;: [[1, 2], [3, 4]]}&#39;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>http://localhost:&lt;port&gt;/invocations
-</pre></div>
-</div>
-</div>
-</div>
-<div class="section" id="how-to-fix-dependency-errors-when-serving-my-model">
-<h3>How to fix dependency errors when serving my model?<a class="headerlink" href="#how-to-fix-dependency-errors-when-serving-my-model" title="Permalink to this headline"> </a></h3>
-<p>One common issue during model deployment is dependency issue. When logging/saving your model, MLflow tries to infer the
-model dependencies and save them as part of the MLflow Model metadata. However, this inference is not always accurate and may
-miss some dependencies. This can cause errors when serving your model, such as “ModuleNotFoundError” or “ImportError”. Here
-is the steps to fix missing dependencies error.</p>
-<div class="section" id="check-the-missing-dependencies">
-<h4>1. Check the missing dependencies<a class="headerlink" href="#check-the-missing-dependencies" title="Permalink to this headline"> </a></h4>
-<p>The missing dependencies are listed in the error message. For example, if you see the following error message:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ModuleNotFoundError:<span class="w"> </span>No<span class="w"> </span>module<span class="w"> </span>named<span class="w"> </span><span class="s1">&#39;cv2&#39;</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="try-adding-the-dependencies-using-the-mlflow-models-predict-api">
-<h4>2. Try adding the dependencies using the <cite>mlflow models predict</cite> API<a class="headerlink" href="#try-adding-the-dependencies-using-the-mlflow-models-predict-api" title="Permalink to this headline"> </a></h4>
-<p>Now that you know the missing dependencies, you can create a new model version with the correct dependencies.
-However, creating a new model for trying new dependencies might be a bit tedious, particularly because you may need to
-iterate multiple times to find the correct solution. Instead, you can use the <cite>predict</cite> API to test your change without
-actually mutating the model.</p>
-<p>To do so, use the <cite>pip-requirements-override</cite> option to specify pip dependencies like <cite>opencv-python==4.8.0</cite>.</p>
-<div class="sphinx-tabs docutils container">
-<div aria-label="Tabbed content" role="tablist"><button aria-controls="panel-1-QmFzaA==" aria-selected="true" class="sphinx-tabs-tab code-tab group-tab" id="tab-1-QmFzaA==" name="QmFzaA==" role="tab" tabindex="0">Bash</button><button aria-controls="panel-1-UHl0aG9u" aria-selected="false" class="sphinx-tabs-tab code-tab group-tab" id="tab-1-UHl0aG9u" name="UHl0aG9u" role="tab" tabindex="-1">Python</button></div><div aria-labelledby="tab-1-QmFzaA==" class="sphinx-tabs-panel code-tab group-tab" id="panel-1-QmFzaA==" name="QmFzaA==" role="tabpanel" tabindex="0"><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mlflow<span class="w"> </span>models<span class="w"> </span>predict<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>-m<span class="w"> </span>runs:/&lt;run_id&gt;/model<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>-i<span class="w"> </span>&lt;input_path&gt;<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--pip-requirements-override<span class="w"> </span>opencv-python<span class="o">==</span><span class="m">4</span>.8.0
-</pre></div>
-</div>
-</div><div aria-labelledby="tab-1-UHl0aG9u" class="sphinx-tabs-panel code-tab group-tab" hidden="true" id="panel-1-UHl0aG9u" name="UHl0aG9u" role="tabpanel" tabindex="0"><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
-
-<span class="n">mlflow</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span>
-    <span class="n">model_uri</span><span class="o">=</span><span class="s2">&quot;runs:/&lt;run_id&gt;/model&quot;</span><span class="p">,</span>
-    <span class="n">input_data</span><span class="o">=&lt;</span><span class="n">input_data</span><span class="o">&gt;</span><span class="p">,</span>
-    <span class="n">pip_requirements</span><span class="o">=</span><span class="s2">&quot;opencv-python==4.8.0&quot;</span><span class="p">,</span>
-<span class="p">)</span>
-</pre></div>
-</div>
-</div></div>
-<p>The specified dependencies will be installed to the virtual environment in addition to (or instead of) the dependencies
-defined in the model metadata. Since this doesn’t mutate the model, you can iterate quickly and safely to find the correct dependencies.</p>
-</div>
-<div class="section" id="update-the-model-metadata">
-<h4>3. Update the model metadata<a class="headerlink" href="#update-the-model-metadata" title="Permalink to this headline"> </a></h4>
-<p>Once you find the correct dependencies, you can create a new model with the correct dependencies.
-To do so, specify <cite>extra_pip_requirements</cite> option when logging the model.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
-
-<span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
-    <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
-    <span class="n">python_model</span><span class="o">=</span><span class="n">python_model</span><span class="p">,</span>
-    <span class="c1"># If you want to define all dependencies from scratch, use `pip_requirements` option.</span>
-    <span class="c1"># Both options also accept a path to a pip requirements file e.g. requirements.txt.</span>
-    <span class="n">extra_pip_requirements</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;opencv-python==4.8.0&quot;</span><span class="p">],</span>
-<span class="p">)</span>
-</pre></div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Alternatively, you can manually edit the model metadata stored in the artifact storage. For example, <cite>&lt;path-to-model&gt;/requirements.txt</cite>
-defines pip dependencies to be installed for serving your model (or <cite>&lt;path-to-model&gt;/conda.yaml</cite> if you use conda as a package manager).
-However, this approach is not recommended because this is error-prone and also you need to do this for every model version.</p>
-</div>
-</div>
-</div>
+<p>If you encounter any dependency issues during model deployment, please refer to <a class="reference internal" href="../model/dependencies.html#model-dependencies-troubleshooting"><span class="std std-ref">Model Dependencies FAQ</span></a>
+for guidance on how to troubleshoot and validate fixes.</p>
 </div>
 </div>
 
