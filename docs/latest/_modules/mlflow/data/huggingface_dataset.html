@@ -228,13 +228,14 @@
         <span class="n">digest</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param ds: A Hugging Face dataset. Must be an instance of `datasets.Dataset`.</span>
-<span class="sd">                   Other types, such as :py:class:`datasets.DatasetDict`, are not supported.</span>
-<span class="sd">        :param source: The source of the Hugging Face dataset.</span>
-<span class="sd">        :param name: The name of the dataset. E.g. &quot;wiki_train&quot;. If unspecified, a name is</span>
-<span class="sd">                     automatically generated.</span>
-<span class="sd">        :param digest: The digest (hash, fingerprint) of the dataset. If unspecified, a digest</span>
-<span class="sd">                       is automatically computed.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            ds: A Hugging Face dataset. Must be an instance of `datasets.Dataset`.</span>
+<span class="sd">                Other types, such as :py:class:`datasets.DatasetDict`, are not supported.</span>
+<span class="sd">            source: The source of the Hugging Face dataset.</span>
+<span class="sd">            name: The name of the dataset. E.g. &quot;wiki_train&quot;. If unspecified, a name is</span>
+<span class="sd">                automatically generated.</span>
+<span class="sd">            digest: The digest (hash, fingerprint) of the dataset. If unspecified, a digest</span>
+<span class="sd">                is automatically computed.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">targets</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">targets</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">column_names</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
@@ -261,12 +262,15 @@
 
     <span class="k">def</span> <span class="nf">_to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param base_dict: A string dictionary of base information about the</span>
-<span class="sd">                          dataset, including: name, digest, source, and source</span>
-<span class="sd">                          type.</span>
-<span class="sd">        :return: A string dictionary containing the following fields: name,</span>
-<span class="sd">                 digest, source, source type, schema (optional), profile</span>
-<span class="sd">                 (optional).</span>
+<span class="sd">        Args:</span>
+<span class="sd">            base_dict: A string dictionary of base information about the</span>
+<span class="sd">                dataset, including: name, digest, source, and source</span>
+<span class="sd">                type.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A string dictionary containing the following fields: name,</span>
+<span class="sd">            digest, source, source type, schema (optional), profile</span>
+<span class="sd">            (optional).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="o">**</span><span class="n">base_dict</span><span class="p">,</span>
@@ -278,10 +282,11 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ds</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;datasets.Dataset&quot;</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        The Hugging Face ``datasets.Dataset`` instance.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The Hugging Face ``datasets.Dataset`` instance.</span>
 
-<span class="sd">        :return: The Hugging Face ``datasets.Dataset`` instance.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            The Hugging Face ``datasets.Dataset`` instance.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ds</span>
 
@@ -291,17 +296,17 @@
 <span class="sd">        The name of the Hugging Face dataset column containing targets (labels) for supervised</span>
 <span class="sd">        learning.</span>
 
-<span class="sd">        :return: The string name of the Hugging Face dataset column containing targets.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            The string name of the Hugging Face dataset column containing targets.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_targets</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">source</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HuggingFaceDatasetSource</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Hugging Face dataset source information.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Hugging Face dataset source information.</span>
 
-<span class="sd">        :return: A :py:class:`mlflow.data.huggingface_dataset_source.HuggingFaceDatasetSource`</span>
-<span class="sd">                 instance.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            A :py:class:`mlflow.data.huggingface_dataset_source.HuggingFaceDatasetSource`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_source</span>
 
@@ -375,10 +380,12 @@
     <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">digest</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HuggingFaceDataset</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a `mlflow.data.huggingface_dataset.HuggingFaceDataset` from a Hugging Face dataset.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a `mlflow.data.huggingface_dataset.HuggingFaceDataset` from a Hugging Face dataset.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        ds: A Hugging Face dataset. Must be an instance of `datasets.Dataset`. Other types, such as</span>
+<span class="sd">        ds:</span>
+<span class="sd">            A Hugging Face dataset. Must be an instance of `datasets.Dataset`. Other types, such as</span>
 <span class="sd">            `datasets.DatasetDict`, are not supported.</span>
 <span class="sd">        path: The path of the Hugging Face dataset used to construct the source. This is the same</span>
 <span class="sd">            argument as `path` in `datasets.load_dataset()` function. To be able to reload the</span>

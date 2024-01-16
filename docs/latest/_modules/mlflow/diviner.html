@@ -262,17 +262,19 @@
 
 <div class="viewcode-block" id="get_default_pip_requirements"><a class="viewcode-back" href="../../python_api/mlflow.diviner.html#mlflow.diviner.get_default_pip_requirements">[docs]</a><span class="k">def</span> <span class="nf">get_default_pip_requirements</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    :return: A list of default pip requirements for MLflow Models produced with the ``Diviner``</span>
-<span class="sd">             flavor. Calls to :py:func:`save_model()` and :py:func:`log_model()` produce a pip</span>
-<span class="sd">             environment that, at a minimum, contains these requirements.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        A list of default pip requirements for MLflow Models produced with the ``Diviner``</span>
+<span class="sd">        flavor. Calls to :py:func:`save_model()` and :py:func:`log_model()` produce a pip</span>
+<span class="sd">        environment that, at a minimum, contains these requirements.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="p">[</span><span class="n">_get_pinned_requirement</span><span class="p">(</span><span class="s2">&quot;diviner&quot;</span><span class="p">)]</span></div>
 
 
 <div class="viewcode-block" id="get_default_conda_env"><a class="viewcode-back" href="../../python_api/mlflow.diviner.html#mlflow.diviner.get_default_conda_env">[docs]</a><span class="k">def</span> <span class="nf">get_default_conda_env</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    :return: The default Conda environment for MLflow Models produced with the ``Diviner`` flavor</span>
-<span class="sd">             that is produced by calls to :py:func:`save_model()` and :py:func:`log_model()`.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        The default Conda environment for MLflow Models produced with the ``Diviner`` flavor</span>
+<span class="sd">        that is produced by calls to :py:func:`save_model()` and :py:func:`log_model()`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">_mlflow_conda_env</span><span class="p">(</span><span class="n">additional_pip_deps</span><span class="o">=</span><span class="n">get_default_pip_requirements</span><span class="p">())</span></div>
 
@@ -291,52 +293,51 @@
     <span class="n">metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Save a ``Diviner`` model object to a path on the local file system.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Save a ``Diviner`` model object to a path on the local file system.</span>
 
-<span class="sd">    :param diviner_model: ``Diviner`` model that has been ``fit`` on a grouped temporal</span>
-<span class="sd">                          ``DataFrame``.</span>
-<span class="sd">    :param path: Local path destination for the serialized model is to be saved.</span>
-<span class="sd">    :param conda_env: {{ conda_env }}</span>
-<span class="sd">    :param code_paths: A list of local filesystem paths to Python file dependencies (or directories</span>
-<span class="sd">                       containing file dependencies). These files are *prepended* to the system</span>
-<span class="sd">                       path when the model is loaded.</span>
-<span class="sd">    :param mlflow_model: :py:mod:`mlflow.models.Model` the flavor that this model is being added to.</span>
-<span class="sd">    :param signature: :py:class:`Model Signature &lt;mlflow.models.ModelSignature&gt;` describes model</span>
-<span class="sd">                      input and output :py:class:`Schema &lt;mlflow.types.Schema&gt;`. The model</span>
-<span class="sd">                      signature can be :py:func:`inferred &lt;mlflow.models.infer_signature&gt;`</span>
-<span class="sd">                      from datasets with valid model input (e.g. the training dataset with target</span>
-<span class="sd">                      column omitted) and valid model output (e.g. model predictions generated on</span>
-<span class="sd">                      the training dataset), for example:</span>
+<span class="sd">    Args:</span>
+<span class="sd">        diviner_model: ``Diviner`` model that has been ``fit`` on a grouped temporal</span>
+<span class="sd">            ``DataFrame``.</span>
+<span class="sd">        path: Local path destination for the serialized model is to be saved.</span>
+<span class="sd">        conda_env: {{ conda_env }}</span>
+<span class="sd">        code_paths: A list of local filesystem paths to Python file dependencies (or directories</span>
+<span class="sd">            containing file dependencies). These files are *prepended* to the system</span>
+<span class="sd">            path when the model is loaded.</span>
+<span class="sd">        mlflow_model: :py:mod:`mlflow.models.Model` the flavor that this model is being added to.</span>
+<span class="sd">        signature: :py:class:`Model Signature &lt;mlflow.models.ModelSignature&gt;` describes model</span>
+<span class="sd">            input and output :py:class:`Schema &lt;mlflow.types.Schema&gt;`. The model</span>
+<span class="sd">            signature can be :py:func:`inferred &lt;mlflow.models.infer_signature&gt;`</span>
+<span class="sd">            from datasets with valid model input (e.g. the training dataset with target</span>
+<span class="sd">            column omitted) and valid model output (e.g. model predictions generated on</span>
+<span class="sd">            the training dataset), for example:</span>
 
-<span class="sd">                      .. code-block:: python</span>
+<span class="sd">            .. code-block:: python</span>
 
-<span class="sd">                        from mlflow.models import infer_signature</span>
+<span class="sd">                from mlflow.models import infer_signature</span>
 
-<span class="sd">                        model = diviner.GroupedProphet().fit(data, (&quot;region&quot;, &quot;state&quot;))</span>
-<span class="sd">                        predictions = model.predict(prediction_config)</span>
-<span class="sd">                        signature = infer_signature(data, predictions)</span>
+<span class="sd">                model = diviner.GroupedProphet().fit(data, (&quot;region&quot;, &quot;state&quot;))</span>
+<span class="sd">                predictions = model.predict(prediction_config)</span>
+<span class="sd">                signature = infer_signature(data, predictions)</span>
 
-<span class="sd">    :param input_example: {{ input_example }}</span>
-<span class="sd">    :param pip_requirements: {{ pip_requirements }}</span>
-<span class="sd">    :param extra_pip_requirements: {{ extra_pip_requirements }}</span>
-<span class="sd">    :param metadata: Custom metadata dictionary passed to the model and stored in the MLmodel file.</span>
+<span class="sd">        input_example: {{ input_example }}</span>
+<span class="sd">        pip_requirements: {{ pip_requirements }}</span>
+<span class="sd">        extra_pip_requirements: {{ extra_pip_requirements }}</span>
+<span class="sd">        metadata: Custom metadata dictionary passed to the model and stored in the MLmodel file.</span>
 
-<span class="sd">                     .. Note:: Experimental: This parameter may change or be removed in a future</span>
-<span class="sd">                                             release without warning.</span>
+<span class="sd">            .. Note:: Experimental: This parameter may change or be removed in a future</span>
+<span class="sd">                release without warning.</span>
 
-<span class="sd">    :param kwargs: Optional configurations for Spark DataFrame storage iff the model has</span>
-<span class="sd">                   been fit in Spark.</span>
+<span class="sd">        kwargs: Optional configurations for Spark DataFrame storage iff the model has</span>
+<span class="sd">            been fit in Spark.</span>
+<span class="sd">            Current supported options:</span>
+<span class="sd">            - `partition_by` for setting a (or several) partition columns as a list of \</span>
+<span class="sd">            column names. Must be a list of strings of grouping key column(s).</span>
+<span class="sd">            - `partition_count` for setting the number of part files to write from a \</span>
+<span class="sd">            repartition per `partition_by` group. The default part file count is 200.</span>
+<span class="sd">            - `dfs_tmpdir` for specifying the DFS temporary location where the model will \</span>
+<span class="sd">            be stored while copying from a local file system to a Spark-supported &quot;dbfs:/&quot; \</span>
+<span class="sd">            scheme.</span>
 
-<span class="sd">                   Current supported options:</span>
-
-<span class="sd">                   - `partition_by` for setting a (or several) partition columns as a list of \</span>
-<span class="sd">                   column names. Must be a list of strings of grouping key column(s).</span>
-<span class="sd">                   - `partition_count` for setting the number of part files to write from a \</span>
-<span class="sd">                   repartition per `partition_by` group. The default part file count is 200.</span>
-<span class="sd">                   - `dfs_tmpdir` for specifying the DFS temporary location where the model will \</span>
-<span class="sd">                   be stored while copying from a local file system to a Spark-supported &quot;dbfs:/&quot; \</span>
-<span class="sd">                   scheme.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">import</span> <span class="nn">diviner</span>
 
@@ -466,29 +467,30 @@
 
 
 <div class="viewcode-block" id="load_model"><a class="viewcode-back" href="../../python_api/mlflow.diviner.html#mlflow.diviner.load_model">[docs]</a><span class="k">def</span> <span class="nf">load_model</span><span class="p">(</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">dst_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Load a ``Diviner`` object from a local file or a run.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load a ``Diviner`` object from a local file or a run.</span>
 
-<span class="sd">    :param model_uri: The location, in URI format, of the MLflow model. For example:</span>
+<span class="sd">    Args:</span>
+<span class="sd">        model_uri: The location, in URI format, of the MLflow model. For example:</span>
 
-<span class="sd">                      - ``/Users/me/path/to/local/model``</span>
-<span class="sd">                      - ``relative/path/to/local/model``</span>
-<span class="sd">                      - ``s3://my_bucket/path/to/model``</span>
-<span class="sd">                      - ``runs:/&lt;mlflow_run_id&gt;/run-relative/path/to/model``</span>
-<span class="sd">                      - ``mlflow-artifacts:/path/to/model``</span>
+<span class="sd">            - ``/Users/me/path/to/local/model``</span>
+<span class="sd">            - ``relative/path/to/local/model``</span>
+<span class="sd">            - ``s3://my_bucket/path/to/model``</span>
+<span class="sd">            - ``runs:/&lt;mlflow_run_id&gt;/run-relative/path/to/model``</span>
+<span class="sd">            - ``mlflow-artifacts:/path/to/model``</span>
 
-<span class="sd">                      For more information about supported URI schemes, see</span>
-<span class="sd">                      `Referencing Artifacts &lt;https://www.mlflow.org/docs/latest/tracking.html#</span>
-<span class="sd">                      artifact-locations&gt;`_.</span>
-<span class="sd">    :param dst_path: The local filesystem path to which to download the model artifact.</span>
-<span class="sd">                     This directory must already exist if provided. If unspecified, a local output</span>
-<span class="sd">                     path will be created.</span>
-<span class="sd">    :param kwargs: Optional configuration options for loading of a Diviner model. For models</span>
-<span class="sd">                   that have been fit and saved using Spark, if a specific DFS temporary directory</span>
-<span class="sd">                   is desired for loading of Diviner models, use the keyword argument</span>
-<span class="sd">                   `&quot;dfs_tmpdir&quot;` to define the loading temporary path for the model during loading.</span>
+<span class="sd">            For more information about supported URI schemes, see</span>
+<span class="sd">            `Referencing Artifacts &lt;https://www.mlflow.org/docs/latest/tracking.html#</span>
+<span class="sd">            artifact-locations&gt;`_.</span>
+<span class="sd">        dst_path: The local filesystem path to which to download the model artifact.</span>
+<span class="sd">            This directory must already exist if provided. If unspecified, a local output</span>
+<span class="sd">            path will be created.</span>
+<span class="sd">        kwargs: Optional configuration options for loading of a Diviner model. For models</span>
+<span class="sd">            that have been fit and saved using Spark, if a specific DFS temporary directory</span>
+<span class="sd">            is desired for loading of Diviner models, use the keyword argument</span>
+<span class="sd">            `&quot;dfs_tmpdir&quot;` to define the loading temporary path for the model during loading.</span>
 
-<span class="sd">    :return: A ``Diviner`` model instance</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        A ``Diviner`` model instance.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">model_uri</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">model_uri</span><span class="p">)</span>
 
@@ -553,67 +555,69 @@
     <span class="n">metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Log a ``Diviner`` object as an MLflow artifact for the current run.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Log a ``Diviner`` object as an MLflow artifact for the current run.</span>
 
-<span class="sd">    :param diviner_model: ``Diviner`` model that has been ``fit`` on a grouped temporal</span>
-<span class="sd">                          ``DataFrame``.</span>
-<span class="sd">    :param artifact_path: Run-relative artifact path to save the model instance to.</span>
-<span class="sd">    :param conda_env: {{ conda_env }}</span>
-<span class="sd">    :param code_paths: A list of local filesystem paths to Python file dependencies (or directories</span>
-<span class="sd">                       containing file dependencies). These files are *prepended* to the system</span>
-<span class="sd">                       path when the model is loaded.</span>
-<span class="sd">    :param registered_model_name: This argument may change or be removed in a</span>
-<span class="sd">                                  future release without warning. If given, create a model</span>
-<span class="sd">                                  version under ``registered_model_name``, also creating a</span>
-<span class="sd">                                  registered model if one with the given name does not exist.</span>
-<span class="sd">    :param signature: :py:class:`Model Signature &lt;mlflow.models.ModelSignature&gt;` describes model</span>
-<span class="sd">                      input and output :py:class:`Schema &lt;mlflow.types.Schema&gt;`. The model</span>
-<span class="sd">                      signature can be :py:func:`inferred &lt;mlflow.models.infer_signature&gt;`</span>
-<span class="sd">                      from datasets with valid model input (e.g. the training dataset with target</span>
-<span class="sd">                      column omitted) and valid model output (e.g. model predictions generated on</span>
-<span class="sd">                      the training dataset), for example:</span>
+<span class="sd">    Args:</span>
+<span class="sd">        diviner_model: ``Diviner`` model that has been ``fit`` on a grouped temporal ``DataFrame``.</span>
+<span class="sd">        artifact_path: Run-relative artifact path to save the model instance to.</span>
+<span class="sd">        conda_env: {{ conda_env }}</span>
+<span class="sd">        code_paths: A list of local filesystem paths to Python file dependencies (or directories</span>
+<span class="sd">            containing file dependencies). These files are *prepended* to the system</span>
+<span class="sd">            path when the model is loaded.</span>
+<span class="sd">        registered_model_name: This argument may change or be removed in a</span>
+<span class="sd">            future release without warning. If given, create a model</span>
+<span class="sd">            version under ``registered_model_name``, also creating a</span>
+<span class="sd">            registered model if one with the given name does not exist.</span>
+<span class="sd">        signature: :py:class:`Model Signature &lt;mlflow.models.ModelSignature&gt;` describes model</span>
+<span class="sd">            input and output :py:class:`Schema &lt;mlflow.types.Schema&gt;`. The model</span>
+<span class="sd">            signature can be :py:func:`inferred &lt;mlflow.models.infer_signature&gt;`</span>
+<span class="sd">            from datasets with valid model input (e.g. the training dataset with target</span>
+<span class="sd">            column omitted) and valid model output (e.g. model predictions generated on</span>
+<span class="sd">            the training dataset), for example:</span>
 
-<span class="sd">                      .. code-block:: python</span>
+<span class="sd">            .. code-block:: python</span>
+<span class="sd">              :caption: Example</span>
 
-<span class="sd">                        from mlflow.models import infer_signature</span>
+<span class="sd">              from mlflow.models import infer_signature</span>
 
-<span class="sd">                        auto_arima_obj = AutoARIMA(out_of_sample_size=60, maxiter=100)</span>
-<span class="sd">                        base_auto_arima = GroupedPmdarima(model_template=auto_arima_obj).fit(</span>
-<span class="sd">                            df=training_data,</span>
-<span class="sd">                            group_key_columns=(&quot;region&quot;, &quot;state&quot;),</span>
-<span class="sd">                            y_col=&quot;y&quot;,</span>
-<span class="sd">                            datetime_col=&quot;ds&quot;,</span>
-<span class="sd">                            silence_warnings=True,</span>
-<span class="sd">                        )</span>
-<span class="sd">                        predictions = model.predict(n_periods=30, alpha=0.05, return_conf_int=True)</span>
-<span class="sd">                        signature = infer_signature(data, predictions)</span>
+<span class="sd">              auto_arima_obj = AutoARIMA(out_of_sample_size=60, maxiter=100)</span>
+<span class="sd">              base_auto_arima = GroupedPmdarima(model_template=auto_arima_obj).fit(</span>
+<span class="sd">                  df=training_data,</span>
+<span class="sd">                  group_key_columns=(&quot;region&quot;, &quot;state&quot;),</span>
+<span class="sd">                  y_col=&quot;y&quot;,</span>
+<span class="sd">                  datetime_col=&quot;ds&quot;,</span>
+<span class="sd">                  silence_warnings=True,</span>
+<span class="sd">              )</span>
+<span class="sd">              predictions = model.predict(n_periods=30, alpha=0.05, return_conf_int=True)</span>
+<span class="sd">              signature = infer_signature(data, predictions)</span>
 
-<span class="sd">    :param input_example: {{ input_example }}</span>
-<span class="sd">    :param await_registration_for: Number of seconds to wait for the model version</span>
-<span class="sd">                                   to finish being created and is in ``READY`` status.</span>
-<span class="sd">                                   By default, the function waits for five minutes.</span>
-<span class="sd">                                   Specify 0 or None to skip waiting.</span>
-<span class="sd">    :param pip_requirements: {{ pip_requirements }}</span>
-<span class="sd">    :param extra_pip_requirements: {{ extra_pip_requirements }}</span>
-<span class="sd">    :param metadata: Custom metadata dictionary passed to the model and stored in the MLmodel file.</span>
+<span class="sd">        input_example: {{ input_example }}</span>
+<span class="sd">        await_registration_for: Number of seconds to wait for the model version</span>
+<span class="sd">            to finish being created and is in ``READY`` status.</span>
+<span class="sd">            By default, the function waits for five minutes.</span>
+<span class="sd">            Specify 0 or None to skip waiting.</span>
+<span class="sd">        pip_requirements: {{ pip_requirements }}</span>
+<span class="sd">        extra_pip_requirements: {{ extra_pip_requirements }}</span>
+<span class="sd">        metadata: Custom metadata dictionary passed to the model and stored in the MLmodel file.</span>
 
-<span class="sd">                     .. Note:: Experimental: This parameter may change or be removed in a future</span>
-<span class="sd">                                             release without warning.</span>
-<span class="sd">    :param kwargs: Additional arguments for :py:class:`mlflow.models.model.Model`</span>
-<span class="sd">                   Additionally, for models that have been fit in Spark, the following supported</span>
-<span class="sd">                   configuration options are available to set.</span>
-<span class="sd">                   Current supported options:</span>
+<span class="sd">            .. Note:: Experimental: This parameter may change or be removed in a future</span>
+<span class="sd">                release without warning.</span>
 
-<span class="sd">                   - `partition_by` for setting a (or several) partition columns as a list of \</span>
-<span class="sd">                   column names. Must be a list of strings of grouping key column(s).</span>
-<span class="sd">                   - `partition_count` for setting the number of part files to write from a \</span>
-<span class="sd">                   repartition per `partition_by` group. The default part file count is 200.</span>
-<span class="sd">                   - `dfs_tmpdir` for specifying the DFS temporary location where the model will \</span>
-<span class="sd">                   be stored while copying from a local file system to a Spark-supported &quot;dbfs:/&quot; \</span>
-<span class="sd">                   scheme.</span>
-<span class="sd">    :return: A :py:class:`ModelInfo &lt;mlflow.models.model.ModelInfo&gt;` instance that contains the</span>
-<span class="sd">             metadata of the logged model.</span>
+<span class="sd">        kwargs: Additional arguments for :py:class:`mlflow.models.model.Model`</span>
+<span class="sd">            Additionally, for models that have been fit in Spark, the following supported</span>
+<span class="sd">            configuration options are available to set.</span>
+<span class="sd">            Current supported options:</span>
+<span class="sd">            - `partition_by` for setting a (or several) partition columns as a list of \</span>
+<span class="sd">            column names. Must be a list of strings of grouping key column(s).</span>
+<span class="sd">            - `partition_count` for setting the number of part files to write from a \</span>
+<span class="sd">            repartition per `partition_by` group. The default part file count is 200.</span>
+<span class="sd">            - `dfs_tmpdir` for specifying the DFS temporary location where the model will \</span>
+<span class="sd">            be stored while copying from a local file system to a Spark-supported &quot;dbfs:/&quot; \</span>
+<span class="sd">            scheme.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A :py:class:`ModelInfo &lt;mlflow.models.model.ModelInfo&gt;` instance that contains the</span>
+<span class="sd">        metadata of the logged model.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">return</span> <span class="n">Model</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
@@ -640,8 +644,7 @@
     <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">dataframe</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>  <span class="c1"># pylint: disable=unused-argument</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        A method that allows a pyfunc implementation of this flavor to generate forecasted values</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;A method that allows a pyfunc implementation of this flavor to generate forecasted values</span>
 <span class="sd">        from the end of a trained Diviner model&#39;s training series per group.</span>
 
 <span class="sd">        The implementation here encapsulates a config-based switch of method calling. In short:</span>
@@ -658,27 +661,29 @@
 <span class="sd">             this is the ``.forecast()`` method, while for ``GroupedPmdarima``, this is the</span>
 <span class="sd">             ``.predict()`` method.</span>
 
-<span class="sd">        :param dataframe: A ``pandas.DataFrame`` that contains the required configuration for the</span>
-<span class="sd">                          appropriate ``Diviner`` type.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            dataframe: A ``pandas.DataFrame`` that contains the required configuration for the</span>
+<span class="sd">                appropriate ``Diviner`` type.</span>
 
-<span class="sd">                          For example, for ``GroupedProphet.forecast()``:</span>
+<span class="sd">                For example, for ``GroupedProphet.forecast()``:</span>
 
-<span class="sd">                          - horizon : int</span>
-<span class="sd">                          - frequency: str</span>
+<span class="sd">                - horizon : int</span>
+<span class="sd">                - frequency: str</span>
 
-<span class="sd">                          predict_conf = pd.DataFrame({&quot;horizon&quot;: 30, &quot;frequency&quot;: &quot;D&quot;}, index=[0])</span>
-<span class="sd">                          forecast = pyfunc.load_pyfunc(model_uri=model_path).predict(predict_conf)</span>
+<span class="sd">                predict_conf = pd.DataFrame({&quot;horizon&quot;: 30, &quot;frequency&quot;: &quot;D&quot;}, index=[0])</span>
+<span class="sd">                forecast = pyfunc.load_pyfunc(model_uri=model_path).predict(predict_conf)</span>
 
-<span class="sd">                          Will generate 30 days of forecasted values for each group that the model</span>
-<span class="sd">                          was trained on.</span>
-<span class="sd">        :param params: Additional parameters to pass to the model for inference.</span>
+<span class="sd">                Will generate 30 days of forecasted values for each group that the model</span>
+<span class="sd">                was trained on.</span>
+<span class="sd">            params: Additional parameters to pass to the model for inference.</span>
 
-<span class="sd">                       .. Note:: Experimental: This parameter may change or be removed in a future</span>
-<span class="sd">                                               release without warning.</span>
+<span class="sd">                .. Note:: Experimental: This parameter may change or be removed in a future</span>
+<span class="sd">                    release without warning.</span>
 
-<span class="sd">        :return: A Pandas DataFrame containing the forecasted values for each group key that was</span>
-<span class="sd">                 either trained or declared as a subset with a ``groups`` entry in the ``dataframe``</span>
-<span class="sd">                 configuration argument.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            A Pandas DataFrame containing the forecasted values for each group key that was</span>
+<span class="sd">            either trained or declared as a subset with a ``groups`` entry in the ``dataframe``</span>
+<span class="sd">            configuration argument.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="kn">from</span> <span class="nn">diviner</span> <span class="kn">import</span> <span class="n">GroupedPmdarima</span><span class="p">,</span> <span class="n">GroupedProphet</span>
