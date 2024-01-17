@@ -204,8 +204,12 @@
 <span class="sd">    This function creates an instance of MlflowGatewayClient and uses it to fetch a route by its</span>
 <span class="sd">    name from the Gateway service.</span>
 
-<span class="sd">    :param name: The name of the route to fetch.</span>
-<span class="sd">    :return: An instance of the Route class representing the fetched route.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        name: The name of the route to fetch.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        An instance of the Route class representing the fetched route.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">MlflowGatewayClient</span><span class="p">()</span><span class="o">.</span><span class="n">get_route</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
 
@@ -218,7 +222,9 @@
 <span class="sd">    This function creates an instance of MlflowGatewayClient and uses it to fetch a list of routes</span>
 <span class="sd">    from the Gateway service.</span>
 
-<span class="sd">    :return: A list of Route instances.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        A list of Route instances.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">pagination_wrapper_func</span><span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">next_page_token</span><span class="p">):</span>
@@ -244,26 +250,26 @@
 <span class="sd">        route configuration is handled via updates to the route configuration YAML file that</span>
 <span class="sd">        is specified during Gateway server start.</span>
 
-<span class="sd">    :param name: The name of the route. This parameter is required for all routes.</span>
-<span class="sd">    :param route_type: The type of the route (e.g., &#39;llm/v1/chat&#39;, &#39;llm/v1/completions&#39;,</span>
-<span class="sd">                       &#39;llm/v1/embeddings&#39;). This parameter is required for routes that are</span>
-<span class="sd">                       not managed by Databricks (the provider isn&#39;t &#39;databricks&#39;).</span>
-<span class="sd">    :param model: A dictionary representing the model details to be associated with the route.</span>
-<span class="sd">                  This parameter is required for all routes. This dictionary should define:</span>
+<span class="sd">    Args:</span>
+<span class="sd">        name: The name of the route. This parameter is required for all routes.</span>
+<span class="sd">        route_type: The type of the route (e.g., &#39;llm/v1/chat&#39;, &#39;llm/v1/completions&#39;,</span>
+<span class="sd">            &#39;llm/v1/embeddings&#39;). This parameter is required for routes that are</span>
+<span class="sd">            not managed by Databricks (the provider isn&#39;t &#39;databricks&#39;).</span>
+<span class="sd">        model: A dictionary representing the model details to be associated with the route.</span>
+<span class="sd">            This parameter is required for all routes. This dictionary should define:</span>
+<span class="sd">            - The model name (e.g., &quot;gpt-3.5-turbo&quot;)</span>
+<span class="sd">            - The provider (e.g., &quot;openai&quot;, &quot;anthropic&quot;)</span>
+<span class="sd">            - The configuration for the model used in the route</span>
 
-<span class="sd">                  - The model name (e.g., &quot;gpt-3.5-turbo&quot;)</span>
-<span class="sd">                  - The provider (e.g., &quot;openai&quot;, &quot;anthropic&quot;)</span>
-<span class="sd">                  - The configuration for the model used in the route</span>
-
-<span class="sd">    :return: A serialized representation of the `Route` data structure,</span>
-<span class="sd">             providing information about the name, type, and model details for the</span>
-<span class="sd">             newly created route endpoint.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        A serialized representation of the `Route` data structure,</span>
+<span class="sd">        providing information about the name, type, and model details for the</span>
+<span class="sd">        newly created route endpoint.</span>
 
 <span class="sd">    .. note::</span>
 
 <span class="sd">        See the official Databricks documentation for MLflow Gateway for examples of supported</span>
 <span class="sd">        model configurations and how to dynamically create new routes within Databricks.</span>
-
 
 <span class="sd">    Example usage from within Databricks:</span>
 
@@ -286,7 +292,6 @@
 <span class="sd">                },</span>
 <span class="sd">            },</span>
 <span class="sd">        )</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">MlflowGatewayClient</span><span class="p">()</span><span class="o">.</span><span class="n">create_route</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">route_type</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span></div>
 
@@ -302,7 +307,8 @@
 <span class="sd">        route deletion is handled by removing the corresponding entry from the route</span>
 <span class="sd">        configuration YAML file that is specified during Gateway server start.</span>
 
-<span class="sd">    :param name: The name of the route to delete.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        name: The name of the route to delete.</span>
 
 <span class="sd">    Example usage from within Databricks:</span>
 
@@ -313,7 +319,6 @@
 <span class="sd">        set_gateway_uri(gateway_uri=&quot;databricks&quot;)</span>
 
 <span class="sd">        delete_route(&quot;my-new-route&quot;)</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">MlflowGatewayClient</span><span class="p">()</span><span class="o">.</span><span class="n">delete_route</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
 
@@ -327,8 +332,9 @@
 
 <span class="sd">        This API is **only available** when running within Databricks.</span>
 
-<span class="sd">    :param route: The name of the route to set limits on.</span>
-<span class="sd">    :param limits: Limits to set on the route.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        route: The name of the route to set limits on.</span>
+<span class="sd">        limits: Limits to set on the route.</span>
 
 <span class="sd">    Example usage from within Databricks:</span>
 
@@ -339,7 +345,6 @@
 <span class="sd">        set_gateway_uri(gateway_uri=&quot;databricks&quot;)</span>
 
 <span class="sd">        set_limits(&quot;my-new-route&quot;, [{&quot;key&quot;: &quot;user&quot;, &quot;renewal_period&quot;: &quot;minute&quot;, &quot;calls&quot;: 50}])</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">MlflowGatewayClient</span><span class="p">()</span><span class="o">.</span><span class="n">set_limits</span><span class="p">(</span><span class="n">route</span><span class="o">=</span><span class="n">route</span><span class="p">,</span> <span class="n">limits</span><span class="o">=</span><span class="n">limits</span><span class="p">)</span></div>
 
@@ -353,7 +358,8 @@
 
 <span class="sd">        This API is **only available** when connected to a Databricks-hosted AI Gateway.</span>
 
-<span class="sd">    :param route: The name of the route to get limits of.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        route: The name of the route to get limits of.</span>
 
 <span class="sd">    Example usage from within Databricks:</span>
 
@@ -364,7 +370,6 @@
 <span class="sd">        set_gateway_uri(gateway_uri=&quot;databricks&quot;)</span>
 
 <span class="sd">        get_limits(&quot;my-new-route&quot;)</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">MlflowGatewayClient</span><span class="p">()</span><span class="o">.</span><span class="n">get_limits</span><span class="p">(</span><span class="n">route</span><span class="o">=</span><span class="n">route</span><span class="p">)</span></div>
 
@@ -376,11 +381,14 @@
 <span class="sd">    This function will interface with a configured route name (examples below) and return the</span>
 <span class="sd">    response from the provider in a standardized format.</span>
 
-<span class="sd">    :param route: The name of the configured route. Route names can be obtained by running</span>
-<span class="sd">                  `mlflow.gateway.search_routes()`</span>
-<span class="sd">    :param data: The request payload to be submitted to the route. The exact configuration of</span>
-<span class="sd">                 the expected structure varies based on the route configuration.</span>
-<span class="sd">    :return: The response from the configured route endpoint provider in a standardized format.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        route: The name of the configured route. Route names can be obtained by running</span>
+<span class="sd">            `mlflow.gateway.search_routes()`</span>
+<span class="sd">        data: The request payload to be submitted to the route. The exact configuration of</span>
+<span class="sd">            the expected structure varies based on the route configuration.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The response from the configured route endpoint provider in a standardized format.</span>
 
 <span class="sd">    Chat example:</span>
 
@@ -431,7 +439,6 @@
 <span class="sd">                &quot;max_tokens&quot;: 1000,</span>
 <span class="sd">            },</span>
 <span class="sd">        )</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">MlflowGatewayClient</span><span class="p">()</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">route</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span></div>
 </pre></div>

@@ -272,15 +272,17 @@ is specified during Gateway server start.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – The name of the route. This parameter is required for all routes.</p></li>
 <li><p><strong>route_type</strong> – The type of the route (e.g., ‘llm/v1/chat’, ‘llm/v1/completions’,
-‘llm/v1/embeddings’). This parameter is required for routes that are
-not managed by Databricks (the provider isn’t ‘databricks’).</p></li>
+‘llm/v1/embeddings’). This parameter is required for routes that are not managed by
+Databricks (the provider isn’t ‘databricks’).</p></li>
 <li><p><strong>model</strong> – <p>A dictionary representing the model details to be associated with the route.
 This parameter is required for all routes. This dictionary should define:</p>
-<ul>
+<blockquote>
+<div><ul>
 <li><p>The model name (e.g., “gpt-3.5-turbo”)</p></li>
 <li><p>The provider (e.g., “openai”, “anthropic”)</p></li>
 <li><p>The configuration for the model used in the route</p></li>
 </ul>
+</div></blockquote>
 </p></li>
 </ul>
 </dd>
@@ -427,14 +429,8 @@ and provider) for the requested route endpoint.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>route</strong> – The name of the route to submit the query to.</p></li>
-<li><p><strong>data</strong> – The data to send in the query. A dictionary representing the per-route
-specific structure required for a given provider.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The route’s response as a dictionary, standardized to the route type.</p>
-</dd>
-</dl>
+<li><p><strong>data</strong> – <p>The data to send in the query. A dictionary representing the per-route
+specific structure required for a given provider.</p>
 <p>For chat, the structure should be:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.gateway</span> <span class="kn">import</span> <span class="n">MlflowGatewayClient</span>
 
@@ -442,7 +438,11 @@ specific structure required for a given provider.</p></li>
 
 <span class="n">response</span> <span class="o">=</span> <span class="n">gateway_client</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
     <span class="s2">&quot;my-chat-route&quot;</span><span class="p">,</span>
-    <span class="p">{</span><span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;Tell me a joke about rabbits&quot;</span><span class="p">},</span> <span class="o">...</span><span class="p">]},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;Tell me a joke about rabbits&quot;</span><span class="p">},</span>
+        <span class="p">]</span>
+    <span class="p">},</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -467,9 +467,9 @@ specific structure required for a given provider.</p></li>
 <span class="p">)</span>
 </pre></div>
 </div>
-<p>Additional parameters that are valid for a given provider and route configuration can be
-included with the request as shown below, using an openai completions route request as
-an example:</p>
+<p>Additional parameters that are valid for a given provider and route configuration
+can be included with the request as shown below, using an openai completions route
+request as an example:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.gateway</span> <span class="kn">import</span> <span class="n">MlflowGatewayClient</span>
 
 <span class="n">gateway_client</span> <span class="o">=</span> <span class="n">MlflowGatewayClient</span><span class="p">(</span><span class="s2">&quot;http://my.gateway:8888&quot;</span><span class="p">)</span>
@@ -484,6 +484,13 @@ an example:</p>
 <span class="p">)</span>
 </pre></div>
 </div>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The route’s response as a dictionary, standardized to the route type.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -523,19 +530,12 @@ and model details of each active route endpoint.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>route</strong> – The name of the route to set limits on.</p></li>
-<li><p><strong>limits</strong> – <p>Limits (Array of dictionary) to set on the route. Each limit is defined by a
-dictionary representing the limit details to be associated with the route.
-This dictionary should define:</p>
-<ul>
-<li><p>renewal_period: a string representing the length of the window
-to enforce limit on (only supports “minute” for now).</p></li>
-<li><p>calls: a non-negative integer representing the number of calls
-allowed per renewal_period (e.g., 10, 0, 55).</p></li>
-<li><p>key: an optional string represents per route limit or per user
-limit (“user” for per user limit, “route” for per route limit, if not
-supplied, default to per route limit).</p></li>
-</ul>
-</p></li>
+<li><p><strong>limits</strong> – Limits (Array of dictionary) to set on the route. Each limit is defined by a
+dictionary representing the limit details to be associated with the route. This
+dictionary should define:
+- renewal_period: a string representing the length of the window to enforce limit on (only supports “minute” for now). # pylint: disable=line-too-long
+- calls: a non-negative integer representing the number of calls allowed per  renewal_period (e.g., 10, 0, 55). # pylint: disable=line-too-long
+- key: an optional string represents per route limit or per user limit (“user” for per user limit, “route” for per route limit, if not supplied, default to per route limit). # pylint: disable=line-too-long</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -578,14 +578,11 @@ is specified during Gateway server start.</p>
 <li><p><strong>route_type</strong> – The type of the route (e.g., ‘llm/v1/chat’, ‘llm/v1/completions’,
 ‘llm/v1/embeddings’). This parameter is required for routes that are
 not managed by Databricks (the provider isn’t ‘databricks’).</p></li>
-<li><p><strong>model</strong> – <p>A dictionary representing the model details to be associated with the route.
-This parameter is required for all routes. This dictionary should define:</p>
-<ul>
-<li><p>The model name (e.g., “gpt-3.5-turbo”)</p></li>
-<li><p>The provider (e.g., “openai”, “anthropic”)</p></li>
-<li><p>The configuration for the model used in the route</p></li>
-</ul>
-</p></li>
+<li><p><strong>model</strong> – A dictionary representing the model details to be associated with the route.
+This parameter is required for all routes. This dictionary should define:
+- The model name (e.g., “gpt-3.5-turbo”)
+- The provider (e.g., “openai”, “anthropic”)
+- The configuration for the model used in the route</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -796,17 +793,22 @@ from the Gateway service.</p>
 <dl class="py function">
 <dt id="mlflow.gateway.set_gateway_uri">
 <code class="sig-prename descclassname"><span class="pre">mlflow.gateway.</span></code><code class="sig-name descname"><span class="pre">set_gateway_uri</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gateway_uri</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mlflow/gateway/utils.html#set_gateway_uri"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.gateway.set_gateway_uri" title="Permalink to this definition"> </a></dt>
-<dd><div class="admonition warning">
+<dd><blockquote>
+<div><div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>MLflow AI gateway is deprecated and has been replaced by the deployments API for generative AI. See <a class="reference external" href="https://mlflow.org/docs/latest/llms/gateway/migration.html">https://mlflow.org/docs/latest/llms/gateway/migration.html</a> for migration.</p>
 </div>
-<p>Sets the uri of a configured and running MLflow AI Gateway server in a global context.
-Providing a valid uri and calling this function is required in order to use the MLflow
+</div></blockquote>
+<dl>
+<dt>Sets the uri of a configured and running MLflow AI Gateway server in a global context.</dt><dd><p>Providing a valid uri and calling this function is required in order to use the MLflow
 AI Gateway fluent APIs.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>gateway_uri</strong> – The full uri of a running MLflow AI Gateway server or, if running on
-Databricks, “databricks”.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>gateway_uri: The full uri of a running MLflow AI Gateway server or, if running on</dt><dd><p>Databricks, “databricks”.</p>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -871,15 +873,17 @@ is specified during Gateway server start.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – The name of the route. This parameter is required for all routes.</p></li>
 <li><p><strong>route_type</strong> – The type of the route (e.g., ‘llm/v1/chat’, ‘llm/v1/completions’,
-‘llm/v1/embeddings’). This parameter is required for routes that are
-not managed by Databricks (the provider isn’t ‘databricks’).</p></li>
+‘llm/v1/embeddings’). This parameter is required for routes that are not managed by
+Databricks (the provider isn’t ‘databricks’).</p></li>
 <li><p><strong>model</strong> – <p>A dictionary representing the model details to be associated with the route.
 This parameter is required for all routes. This dictionary should define:</p>
-<ul>
+<blockquote>
+<div><ul>
 <li><p>The model name (e.g., “gpt-3.5-turbo”)</p></li>
 <li><p>The provider (e.g., “openai”, “anthropic”)</p></li>
 <li><p>The configuration for the model used in the route</p></li>
 </ul>
+</div></blockquote>
 </p></li>
 </ul>
 </dd>
@@ -1026,14 +1030,8 @@ and provider) for the requested route endpoint.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>route</strong> – The name of the route to submit the query to.</p></li>
-<li><p><strong>data</strong> – The data to send in the query. A dictionary representing the per-route
-specific structure required for a given provider.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The route’s response as a dictionary, standardized to the route type.</p>
-</dd>
-</dl>
+<li><p><strong>data</strong> – <p>The data to send in the query. A dictionary representing the per-route
+specific structure required for a given provider.</p>
 <p>For chat, the structure should be:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.gateway</span> <span class="kn">import</span> <span class="n">MlflowGatewayClient</span>
 
@@ -1041,7 +1039,11 @@ specific structure required for a given provider.</p></li>
 
 <span class="n">response</span> <span class="o">=</span> <span class="n">gateway_client</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
     <span class="s2">&quot;my-chat-route&quot;</span><span class="p">,</span>
-    <span class="p">{</span><span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;Tell me a joke about rabbits&quot;</span><span class="p">},</span> <span class="o">...</span><span class="p">]},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;Tell me a joke about rabbits&quot;</span><span class="p">},</span>
+        <span class="p">]</span>
+    <span class="p">},</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -1066,9 +1068,9 @@ specific structure required for a given provider.</p></li>
 <span class="p">)</span>
 </pre></div>
 </div>
-<p>Additional parameters that are valid for a given provider and route configuration can be
-included with the request as shown below, using an openai completions route request as
-an example:</p>
+<p>Additional parameters that are valid for a given provider and route configuration
+can be included with the request as shown below, using an openai completions route
+request as an example:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.gateway</span> <span class="kn">import</span> <span class="n">MlflowGatewayClient</span>
 
 <span class="n">gateway_client</span> <span class="o">=</span> <span class="n">MlflowGatewayClient</span><span class="p">(</span><span class="s2">&quot;http://my.gateway:8888&quot;</span><span class="p">)</span>
@@ -1083,6 +1085,13 @@ an example:</p>
 <span class="p">)</span>
 </pre></div>
 </div>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The route’s response as a dictionary, standardized to the route type.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -1122,19 +1131,12 @@ and model details of each active route endpoint.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>route</strong> – The name of the route to set limits on.</p></li>
-<li><p><strong>limits</strong> – <p>Limits (Array of dictionary) to set on the route. Each limit is defined by a
-dictionary representing the limit details to be associated with the route.
-This dictionary should define:</p>
-<ul>
-<li><p>renewal_period: a string representing the length of the window
-to enforce limit on (only supports “minute” for now).</p></li>
-<li><p>calls: a non-negative integer representing the number of calls
-allowed per renewal_period (e.g., 10, 0, 55).</p></li>
-<li><p>key: an optional string represents per route limit or per user
-limit (“user” for per user limit, “route” for per route limit, if not
-supplied, default to per route limit).</p></li>
-</ul>
-</p></li>
+<li><p><strong>limits</strong> – Limits (Array of dictionary) to set on the route. Each limit is defined by a
+dictionary representing the limit details to be associated with the route. This
+dictionary should define:
+- renewal_period: a string representing the length of the window to enforce limit on (only supports “minute” for now). # pylint: disable=line-too-long
+- calls: a non-negative integer representing the number of calls allowed per  renewal_period (e.g., 10, 0, 55). # pylint: disable=line-too-long
+- key: an optional string represents per route limit or per user limit (“user” for per user limit, “route” for per route limit, if not supplied, default to per route limit). # pylint: disable=line-too-long</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>

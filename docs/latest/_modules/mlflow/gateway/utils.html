@@ -337,13 +337,13 @@
 
 <div class="viewcode-block" id="set_gateway_uri"><a class="viewcode-back" href="../../../python_api/mlflow.gateway.html#mlflow.gateway.set_gateway_uri">[docs]</a><span class="nd">@gateway_deprecated</span>
 <span class="k">def</span> <span class="nf">set_gateway_uri</span><span class="p">(</span><span class="n">gateway_uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Sets the uri of a configured and running MLflow AI Gateway server in a global context.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sets the uri of a configured and running MLflow AI Gateway server in a global context.</span>
 <span class="sd">    Providing a valid uri and calling this function is required in order to use the MLflow</span>
 <span class="sd">    AI Gateway fluent APIs.</span>
 
-<span class="sd">    :param gateway_uri: The full uri of a running MLflow AI Gateway server or, if running on</span>
-<span class="sd">                        Databricks, &quot;databricks&quot;.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        gateway_uri: The full uri of a running MLflow AI Gateway server or, if running on</span>
+<span class="sd">            Databricks, &quot;databricks&quot;.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_valid_uri</span><span class="p">(</span><span class="n">gateway_uri</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
@@ -376,11 +376,14 @@
 
 
 <span class="k">def</span> <span class="nf">assemble_uri_path</span><span class="p">(</span><span class="n">paths</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Assemble a correct URI path from a list of path parts.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Assemble a correct URI path from a list of path parts.</span>
 
-<span class="sd">    :param paths: A list of strings representing parts of a URI path.</span>
-<span class="sd">    :return: A string representing the complete assembled URI path.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        paths: A list of strings representing parts of a URI path.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A string representing the complete assembled URI path.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">stripped_paths</span> <span class="o">=</span> <span class="p">[</span><span class="n">path</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span> <span class="k">if</span> <span class="n">path</span><span class="p">]</span>
     <span class="k">return</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">posixpath</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="o">*</span><span class="n">stripped_paths</span><span class="p">)</span> <span class="k">if</span> <span class="n">stripped_paths</span> <span class="k">else</span> <span class="s2">&quot;/&quot;</span>
@@ -392,12 +395,15 @@
 <span class="sd">    with Databricks) or requires the assembly of a fully qualified url by appending the</span>
 <span class="sd">    Route return route_url to the base url of the AI Gateway server.</span>
 
-<span class="sd">    :param base_url: The base URL. Should include the scheme and domain, e.g.,</span>
-<span class="sd">                     ``http://127.0.0.1:6000``.</span>
-<span class="sd">    :param route: The route to be appended to the base URL, e.g., ``/api/2.0/gateway/routes/`` or,</span>
-<span class="sd">                  in the case of Databricks, the fully qualified url.</span>
-<span class="sd">    :return: The complete URL, either directly returned or formed and returned by joining the</span>
-<span class="sd">             base URL and the route path.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        base_url: The base URL. Should include the scheme and domain, e.g.,</span>
+<span class="sd">            ``http://127.0.0.1:6000``.</span>
+<span class="sd">        route: The route to be appended to the base URL, e.g., ``/api/2.0/gateway/routes/`` or,</span>
+<span class="sd">            in the case of Databricks, the fully qualified url.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The complete URL, either directly returned or formed and returned by joining the</span>
+<span class="sd">        base URL and the route path.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">route</span> <span class="k">if</span> <span class="n">_is_valid_uri</span><span class="p">(</span><span class="n">route</span><span class="p">)</span> <span class="k">else</span> <span class="n">append_to_uri_path</span><span class="p">(</span><span class="n">base_url</span><span class="p">,</span> <span class="n">route</span><span class="p">)</span>
 

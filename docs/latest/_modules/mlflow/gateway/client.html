@@ -256,7 +256,8 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the current value for the URI of the MLflow Gateway.</span>
 
-<span class="sd">        :return: The gateway URI.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            The gateway URI.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gateway_uri</span>
 
@@ -264,10 +265,14 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Call a specific endpoint on the Gateway API.</span>
 
-<span class="sd">        :param method: The HTTP method to use.</span>
-<span class="sd">        :param route: The API route to call.</span>
-<span class="sd">        :param json_body: Optional JSON body to include in the request.</span>
-<span class="sd">        :return: The server&#39;s response.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            method: The HTTP method to use.</span>
+<span class="sd">            route: The API route to call.</span>
+<span class="sd">            json_body: Optional JSON body to include in the request.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The server&#39;s response.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">json_body</span><span class="p">:</span>
             <span class="n">json_body</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">json_body</span><span class="p">)</span>
@@ -297,10 +302,14 @@
 <span class="sd">        are only those that have been configured through the MLflow Gateway Server configuration</span>
 <span class="sd">        file (set during server start or through server update commands).</span>
 
-<span class="sd">        :param name: The name of the route.</span>
-<span class="sd">        :return: The returned data structure is a serialized representation of the `Route` data</span>
+<span class="sd">        Args:</span>
+<span class="sd">            name: The name of the route.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The returned data structure is a serialized representation of the `Route` data</span>
 <span class="sd">            structure, giving information about the name, type, and model details (model name</span>
 <span class="sd">            and provider) for the requested route endpoint.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">route</span> <span class="o">=</span> <span class="n">assemble_uri_path</span><span class="p">([</span><span class="n">MLFLOW_GATEWAY_CRUD_ROUTE_BASE</span><span class="p">,</span> <span class="n">name</span><span class="p">])</span>
         <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_call_endpoint</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="n">route</span><span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
@@ -313,11 +322,15 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Search for routes in the Gateway.</span>
 
-<span class="sd">        :param page_token: Token specifying the next page of results. It should be obtained from</span>
-<span class="sd">                           a prior ``search_routes()`` call.</span>
-<span class="sd">        :return: Returns a list of all configured and initialized `Route` data for the MLflow</span>
+<span class="sd">        Args:</span>
+<span class="sd">            page_token: Token specifying the next page of results. It should be obtained from</span>
+<span class="sd">                a prior ``search_routes()`` call.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Returns a list of all configured and initialized `Route` data for the MLflow</span>
 <span class="sd">            Gateway Server. The return will be a list of dictionaries that detail the name, type,</span>
 <span class="sd">            and model details of each active route endpoint.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">request_parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;page_token&quot;</span><span class="p">:</span> <span class="n">page_token</span><span class="p">}</span> <span class="k">if</span> <span class="n">page_token</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
         <span class="n">response_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_call_endpoint</span><span class="p">(</span>
@@ -351,28 +364,30 @@
 <span class="sd">            route configuration is handled via updates to the route configuration YAML file that</span>
 <span class="sd">            is specified during Gateway server start.</span>
 
-<span class="sd">        :param name: The name of the route. This parameter is required for all routes.</span>
-<span class="sd">        :param route_type: The type of the route (e.g., &#39;llm/v1/chat&#39;, &#39;llm/v1/completions&#39;,</span>
-<span class="sd">                           &#39;llm/v1/embeddings&#39;). This parameter is required for routes that are</span>
-<span class="sd">                           not managed by Databricks (the provider isn&#39;t &#39;databricks&#39;).</span>
-<span class="sd">        :param model: A dictionary representing the model details to be associated with the route.</span>
-<span class="sd">                      This parameter is required for all routes. This dictionary should define:</span>
+<span class="sd">        Args:</span>
+<span class="sd">            name: The name of the route. This parameter is required for all routes.</span>
+<span class="sd">            route_type: The type of the route (e.g., &#39;llm/v1/chat&#39;, &#39;llm/v1/completions&#39;,</span>
+<span class="sd">                &#39;llm/v1/embeddings&#39;). This parameter is required for routes that are not managed by</span>
+<span class="sd">                Databricks (the provider isn&#39;t &#39;databricks&#39;).</span>
+<span class="sd">            model: A dictionary representing the model details to be associated with the route.</span>
+<span class="sd">                This parameter is required for all routes. This dictionary should define:</span>
 
-<span class="sd">                      - The model name (e.g., &quot;gpt-3.5-turbo&quot;)</span>
-<span class="sd">                      - The provider (e.g., &quot;openai&quot;, &quot;anthropic&quot;)</span>
-<span class="sd">                      - The configuration for the model used in the route</span>
+<span class="sd">                    - The model name (e.g., &quot;gpt-3.5-turbo&quot;)</span>
+<span class="sd">                    - The provider (e.g., &quot;openai&quot;, &quot;anthropic&quot;)</span>
+<span class="sd">                    - The configuration for the model used in the route</span>
 
-<span class="sd">        :return: A serialized representation of the `Route` data structure,</span>
-<span class="sd">                 providing information about the name, type, and model details for the</span>
-<span class="sd">                 newly created route endpoint.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            A serialized representation of the `Route` data structure,</span>
+<span class="sd">            providing information about the name, type, and model details for the</span>
+<span class="sd">            newly created route endpoint.</span>
 
-<span class="sd">        :raises mlflow.MlflowException: If the function is not running within Databricks.</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            mlflow.MlflowException: If the function is not running within Databricks.</span>
 
 <span class="sd">        .. note::</span>
 
 <span class="sd">            See the official Databricks documentation for MLflow Gateway for examples of supported</span>
 <span class="sd">            model configurations and how to dynamically create new routes within Databricks.</span>
-
 
 <span class="sd">        Example usage from within Databricks:</span>
 
@@ -395,7 +410,6 @@
 <span class="sd">                    },</span>
 <span class="sd">                },</span>
 <span class="sd">            )</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_databricks_host</span><span class="p">():</span>
             <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
@@ -426,9 +440,11 @@
 <span class="sd">            route deletion is handled by removing the corresponding entry from the route</span>
 <span class="sd">            configuration YAML file that is specified during Gateway server start.</span>
 
-<span class="sd">        :param name: The name of the route to delete.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            name: The name of the route to delete.</span>
 
-<span class="sd">        :raises mlflow.MlflowException: If the function is not running within Databricks.</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            mlflow.MlflowException: If the function is not running within Databricks.</span>
 
 <span class="sd">        Example usage from within Databricks:</span>
 
@@ -438,7 +454,6 @@
 
 <span class="sd">            gateway_client = MlflowGatewayClient(&quot;databricks&quot;)</span>
 <span class="sd">            gateway_client.delete_route(&quot;my-existing-route&quot;)</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_databricks_host</span><span class="p">():</span>
             <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
@@ -456,67 +471,74 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Submit a query to a configured provider route.</span>
 
-<span class="sd">        :param route: The name of the route to submit the query to.</span>
-<span class="sd">        :param data: The data to send in the query. A dictionary representing the per-route</span>
-<span class="sd">            specific structure required for a given provider.</span>
-<span class="sd">        :return: The route&#39;s response as a dictionary, standardized to the route type.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            route: The name of the route to submit the query to.</span>
+<span class="sd">            data: The data to send in the query. A dictionary representing the per-route</span>
+<span class="sd">                specific structure required for a given provider.</span>
 
-<span class="sd">        For chat, the structure should be:</span>
+<span class="sd">                For chat, the structure should be:</span>
 
-<span class="sd">        .. code-block:: python</span>
+<span class="sd">                .. code-block:: python</span>
 
-<span class="sd">            from mlflow.gateway import MlflowGatewayClient</span>
+<span class="sd">                    from mlflow.gateway import MlflowGatewayClient</span>
 
-<span class="sd">            gateway_client = MlflowGatewayClient(&quot;http://my.gateway:8888&quot;)</span>
+<span class="sd">                    gateway_client = MlflowGatewayClient(&quot;http://my.gateway:8888&quot;)</span>
 
-<span class="sd">            response = gateway_client.query(</span>
-<span class="sd">                &quot;my-chat-route&quot;,</span>
-<span class="sd">                {&quot;messages&quot;: [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Tell me a joke about rabbits&quot;}, ...]},</span>
-<span class="sd">            )</span>
+<span class="sd">                    response = gateway_client.query(</span>
+<span class="sd">                        &quot;my-chat-route&quot;,</span>
+<span class="sd">                        {</span>
+<span class="sd">                            &quot;messages&quot;: [</span>
+<span class="sd">                                {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Tell me a joke about rabbits&quot;},</span>
+<span class="sd">                            ]</span>
+<span class="sd">                        },</span>
+<span class="sd">                    )</span>
 
-<span class="sd">        For completions, the structure should be:</span>
+<span class="sd">                For completions, the structure should be:</span>
 
-<span class="sd">        .. code-block:: python</span>
+<span class="sd">                .. code-block:: python</span>
 
-<span class="sd">            from mlflow.gateway import MlflowGatewayClient</span>
+<span class="sd">                    from mlflow.gateway import MlflowGatewayClient</span>
 
-<span class="sd">            gateway_client = MlflowGatewayClient(&quot;http://my.gateway:8888&quot;)</span>
+<span class="sd">                    gateway_client = MlflowGatewayClient(&quot;http://my.gateway:8888&quot;)</span>
 
-<span class="sd">            response = gateway_client.query(</span>
-<span class="sd">                &quot;my-completions-route&quot;, {&quot;prompt&quot;: &quot;It&#39;s one small step for&quot;}</span>
-<span class="sd">            )</span>
+<span class="sd">                    response = gateway_client.query(</span>
+<span class="sd">                        &quot;my-completions-route&quot;, {&quot;prompt&quot;: &quot;It&#39;s one small step for&quot;}</span>
+<span class="sd">                    )</span>
 
-<span class="sd">        For embeddings, the structure should be:</span>
+<span class="sd">                For embeddings, the structure should be:</span>
 
-<span class="sd">        .. code-block:: python</span>
+<span class="sd">                .. code-block:: python</span>
 
-<span class="sd">            from mlflow.gateway import MlflowGatewayClient</span>
+<span class="sd">                    from mlflow.gateway import MlflowGatewayClient</span>
 
-<span class="sd">            gateway_client = MlflowGatewayClient(&quot;http://my.gateway:8888&quot;)</span>
+<span class="sd">                    gateway_client = MlflowGatewayClient(&quot;http://my.gateway:8888&quot;)</span>
 
-<span class="sd">            response = gateway_client.query(</span>
-<span class="sd">                &quot;my-embeddings-route&quot;,</span>
-<span class="sd">                {&quot;text&quot;: [&quot;It was the best of times&quot;, &quot;It was the worst of times&quot;]},</span>
-<span class="sd">            )</span>
+<span class="sd">                    response = gateway_client.query(</span>
+<span class="sd">                        &quot;my-embeddings-route&quot;,</span>
+<span class="sd">                        {&quot;text&quot;: [&quot;It was the best of times&quot;, &quot;It was the worst of times&quot;]},</span>
+<span class="sd">                    )</span>
 
-<span class="sd">        Additional parameters that are valid for a given provider and route configuration can be</span>
-<span class="sd">        included with the request as shown below, using an openai completions route request as</span>
-<span class="sd">        an example:</span>
+<span class="sd">                Additional parameters that are valid for a given provider and route configuration</span>
+<span class="sd">                can be included with the request as shown below, using an openai completions route</span>
+<span class="sd">                request as an example:</span>
 
-<span class="sd">        .. code-block:: python</span>
+<span class="sd">                .. code-block:: python</span>
 
-<span class="sd">            from mlflow.gateway import MlflowGatewayClient</span>
+<span class="sd">                    from mlflow.gateway import MlflowGatewayClient</span>
 
-<span class="sd">            gateway_client = MlflowGatewayClient(&quot;http://my.gateway:8888&quot;)</span>
+<span class="sd">                    gateway_client = MlflowGatewayClient(&quot;http://my.gateway:8888&quot;)</span>
 
-<span class="sd">            response = gateway_client.query(</span>
-<span class="sd">                &quot;my-completions-route&quot;,</span>
-<span class="sd">                {</span>
-<span class="sd">                    &quot;prompt&quot;: &quot;Give me an example of a properly formatted pytest unit test&quot;,</span>
-<span class="sd">                    &quot;temperature&quot;: 0.3,</span>
-<span class="sd">                    &quot;max_tokens&quot;: 500,</span>
-<span class="sd">                },</span>
-<span class="sd">            )</span>
+<span class="sd">                    response = gateway_client.query(</span>
+<span class="sd">                        &quot;my-completions-route&quot;,</span>
+<span class="sd">                        {</span>
+<span class="sd">                            &quot;prompt&quot;: &quot;Give me an example of a properly formatted pytest unit test&quot;,</span>
+<span class="sd">                            &quot;temperature&quot;: 0.3,</span>
+<span class="sd">                            &quot;max_tokens&quot;: 500,</span>
+<span class="sd">                        },</span>
+<span class="sd">                    )</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The route&#39;s response as a dictionary, standardized to the route type.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -549,20 +571,17 @@
 
 <span class="sd">            This API is **only available** when running within Databricks.</span>
 
-<span class="sd">        :param route: The name of the route to set limits on.</span>
-<span class="sd">        :param limits: Limits (Array of dictionary) to set on the route. Each limit is defined by a</span>
-<span class="sd">                       dictionary representing the limit details to be associated with the route.</span>
-<span class="sd">                       This dictionary should define:</span>
+<span class="sd">        Args:</span>
+<span class="sd">            route: The name of the route to set limits on.</span>
+<span class="sd">            limits: Limits (Array of dictionary) to set on the route. Each limit is defined by a</span>
+<span class="sd">                dictionary representing the limit details to be associated with the route. This</span>
+<span class="sd">                dictionary should define:</span>
+<span class="sd">                - renewal_period: a string representing the length of the window to enforce limit on (only supports &quot;minute&quot; for now). # pylint: disable=line-too-long</span>
+<span class="sd">                - calls: a non-negative integer representing the number of calls allowed per  renewal_period (e.g., 10, 0, 55). # pylint: disable=line-too-long</span>
+<span class="sd">                - key: an optional string represents per route limit or per user limit (&quot;user&quot; for per user limit, &quot;route&quot; for per route limit, if not supplied, default to per route limit). # pylint: disable=line-too-long</span>
 
-<span class="sd">                       - renewal_period: a string representing the length of the window</span>
-<span class="sd">                         to enforce limit on (only supports &quot;minute&quot; for now).</span>
-<span class="sd">                       - calls: a non-negative integer representing the number of calls</span>
-<span class="sd">                         allowed per renewal_period (e.g., 10, 0, 55).</span>
-<span class="sd">                       - key: an optional string represents per route limit or per user</span>
-<span class="sd">                         limit (&quot;user&quot; for per user limit, &quot;route&quot; for per route limit, if not</span>
-<span class="sd">                         supplied, default to per route limit).</span>
-
-<span class="sd">        :return: The returned data structure is a serialized representation of the `Limit`</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            The returned data structure is a serialized representation of the `Limit`</span>
 <span class="sd">            data structure, giving information about the renewal_period, key, and calls.</span>
 
 <span class="sd">        Example usage:</span>
@@ -596,9 +615,11 @@
 
 <span class="sd">            This API is **only available** when connected to a Databricks-hosted AI Gateway.</span>
 
-<span class="sd">        :param route: The name of the route to get limits of.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            route: The name of the route to get limits of.</span>
 
-<span class="sd">        :return: The returned data structure is a serialized representation of the `Limit` data</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            The returned data structure is a serialized representation of the `Limit` data</span>
 <span class="sd">            structure, giving information about the renewal_period, key, and calls.</span>
 
 <span class="sd">        Example usage:</span>
@@ -610,7 +631,6 @@
 <span class="sd">            gateway_client = MlflowGatewayClient(&quot;databricks&quot;)</span>
 
 <span class="sd">            gateway_client.get_limits(&quot;my-new-route&quot;)</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">route</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="s2">&quot;A non-empty string is required for the route.&quot;</span><span class="p">,</span> <span class="n">BAD_REQUEST</span><span class="p">)</span>
