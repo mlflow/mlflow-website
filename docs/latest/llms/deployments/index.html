@@ -1355,10 +1355,7 @@ embeddings.</p></td>
 <li><p><code class="docutils literal notranslate"><span class="pre">top_k</span></code> (supported by MosaicML, Anthropic, PaLM, Cohere)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">frequency_penalty</span></code> (supported by OpenAI, Cohere, AI21 Labs)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">presence_penalty</span></code> (supported by OpenAI, Cohere, AI21 Labs)</p></li>
-</ul>
-<p>The following parameters are not allowed:</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">stream</span></code> is not supported. Setting this parameter on any provider will not work currently.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">stream</span></code> (supported by OpenAI)</p></li>
 </ul>
 <p>Below is an example of submitting a query request to an MLflow Deployments Server endpoint using additional parameters:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.deployments</span> <span class="kn">import</span> <span class="n">get_deploy_client</span>
@@ -1400,6 +1397,48 @@ embeddings.</p></td>
     <span class="p">},</span>
 <span class="p">}</span>
 </pre></div>
+</div>
+<div class="section" id="streaming">
+<h4>Streaming<a class="headerlink" href="#streaming" title="Permalink to this headline"> </a></h4>
+<p>Some providers support streaming responses. Streaming responses are useful when you want to
+receive responses as they are generated, rather than waiting for the entire response to be
+generated before receiving it. Streaming responses are supported by the following providers:</p>
+<ul class="simple">
+<li><p>OpenAI</p></li>
+</ul>
+<p>To enable streaming responses, set the <code class="docutils literal notranslate"><span class="pre">stream</span></code> parameter to <code class="docutils literal notranslate"><span class="pre">true</span></code> in your request. For example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://my.deployments:8888/endpoints/chat/invocations<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;messages&quot;: [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;hello&quot;}], &quot;stream&quot;: true}&#39;</span>
+</pre></div>
+</div>
+<p>The results of the query follow the <a class="reference external" href="https://platform.openai.com/docs/api-reference/chat/streaming">OpenAI schema</a>.</p>
+<div class="section" id="id9">
+<h5>Chat<a class="headerlink" href="#id9" title="Permalink to this headline"> </a></h5>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>data: {&quot;choices&quot;: [{&quot;delta&quot;: {&quot;content&quot;: null, &quot;role&quot;: &quot;assistant&quot;}, &quot;finish_reason&quot;: null, &quot;index&quot;: 0}], &quot;created&quot;: 1701161926, &quot;id&quot;: &quot;chatcmpl-8PoDWSiVE8MHNsUZF2awkW5gNGYs3&quot;, &quot;model&quot;: &quot;gpt-35-turbo&quot;, &quot;object&quot;: &quot;chat.completion.chunk&quot;}
+
+data: {&quot;choices&quot;: [{&quot;delta&quot;: {&quot;content&quot;: &quot;Hello&quot;, &quot;role&quot;: null}, &quot;finish_reason&quot;: null, &quot;index&quot;: 0}], &quot;created&quot;: 1701161926, &quot;id&quot;: &quot;chatcmpl-8PoDWSiVE8MHNsUZF2awkW5gNGYs3&quot;, &quot;model&quot;: &quot;gpt-35-turbo&quot;, &quot;object&quot;: &quot;chat.completion.chunk&quot;}
+
+data: {&quot;choices&quot;: [{&quot;delta&quot;: {&quot;content&quot;: &quot; there&quot;, &quot;role&quot;: null}, &quot;finish_reason&quot;: null, &quot;index&quot;: 0}], &quot;created&quot;: 1701161926, &quot;id&quot;: &quot;chatcmpl-8PoDWSiVE8MHNsUZF2awkW5gNGYs3&quot;, &quot;model&quot;: &quot;gpt-35-turbo&quot;, &quot;object&quot;: &quot;chat.completion.chunk&quot;}
+
+data: {&quot;choices&quot;: [{&quot;delta&quot;: {&quot;content&quot;: null, &quot;role&quot;: null}, &quot;finish_reason&quot;: &quot;stop&quot;, &quot;index&quot;: 0}], &quot;created&quot;: 1701161926, &quot;id&quot;: &quot;chatcmpl-8PoDWSiVE8MHNsUZF2awkW5gNGYs3&quot;, &quot;model&quot;: &quot;gpt-35-turbo&quot;, &quot;object&quot;: &quot;chat.completion.chunk&quot;}
+</pre></div>
+</div>
+</div>
+<div class="section" id="id10">
+<h5>Completions<a class="headerlink" href="#id10" title="Permalink to this headline"> </a></h5>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>data: {&quot;choices&quot;: [{&quot;delta&quot;: {&quot;role&quot;: null, &quot;content&quot;: null}, &quot;finish_reason&quot;: null, &quot;index&quot;: 0}], &quot;created&quot;: 1701161629, &quot;id&quot;: &quot;chatcmpl-8Po8jVXzljc245k1Ah4UsAcm2zxQ2&quot;, &quot;model&quot;: &quot;gpt-35-turbo&quot;, &quot;object&quot;: &quot;text_completion_chunk&quot;}
+
+data: {&quot;choices&quot;: [{&quot;delta&quot;: {&quot;role&quot;: null, &quot;content&quot;: &quot;If&quot;}, &quot;finish_reason&quot;: null, &quot;index&quot;: 0}], &quot;created&quot;: 1701161629, &quot;id&quot;: &quot;chatcmpl-8Po8jVXzljc245k1Ah4UsAcm2zxQ2&quot;, &quot;model&quot;: &quot;gpt-35-turbo&quot;, &quot;object&quot;: &quot;text_completion_chunk&quot;}
+
+data: {&quot;choices&quot;: [{&quot;delta&quot;: {&quot;role&quot;: null, &quot;content&quot;: &quot; an&quot;}, &quot;finish_reason&quot;: null, &quot;index&quot;: 0}], &quot;created&quot;: 1701161629, &quot;id&quot;: &quot;chatcmpl-8Po8jVXzljc245k1Ah4UsAcm2zxQ2&quot;, &quot;model&quot;: &quot;gpt-35-turbo&quot;, &quot;object&quot;: &quot;text_completion_chunk&quot;}
+
+data: {&quot;choices&quot;: [{&quot;delta&quot;: {&quot;role&quot;: null, &quot;content&quot;: &quot; asteroid&quot;}, &quot;finish_reason&quot;: null, &quot;index&quot;: 0}], &quot;created&quot;: 1701161629, &quot;id&quot;: &quot;chatcmpl-8Po8jVXzljc245k1Ah4UsAcm2zxQ2&quot;, &quot;model&quot;: &quot;gpt-35-turbo&quot;, &quot;object&quot;: &quot;text_completion_chunk&quot;}
+
+data: {&quot;choices&quot;: [{&quot;delta&quot;: {&quot;role&quot;: null, &quot;content&quot;: null}, &quot;finish_reason&quot;: &quot;length&quot;, &quot;index&quot;: 0}], &quot;created&quot;: 1701161629, &quot;id&quot;: &quot;chatcmpl-8Po8jVXzljc245k1Ah4UsAcm2zxQ2&quot;, &quot;model&quot;: &quot;gpt-35-turbo&quot;, &quot;object&quot;: &quot;text_completion_chunk&quot;}
+</pre></div>
+</div>
+</div>
 </div>
 </div>
 <div class="section" id="fastapi-documentation-docs">
@@ -1455,8 +1494,8 @@ The data structure you send in the query depends on the endpoint.</p>
 <h4>LangChain Integration<a class="headerlink" href="#langchain-integration" title="Permalink to this headline"> </a></h4>
 <p><a class="reference external" href="https://github.com/langchain-ai/langchain">LangChain</a> supports <a class="reference external" href="https://python.langchain.com/docs/ecosystem/integrations/providers/mlflow">an integration for MLflow Deployments</a>.
 This integration enable users to use prompt engineering, retrieval augmented generation, and other techniques with LLMs in the deployments server.</p>
-<div class="literal-block-wrapper docutils container" id="id9">
-<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id9" title="Permalink to this code"> </a></div>
+<div class="literal-block-wrapper docutils container" id="id11">
+<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id11" title="Permalink to this code"> </a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
 <span class="kn">from</span> <span class="nn">langchain</span> <span class="kn">import</span> <span class="n">LLMChain</span><span class="p">,</span> <span class="n">PromptTemplate</span>
 <span class="kn">from</span> <span class="nn">langchain.llms</span> <span class="kn">import</span> <span class="n">Mlflow</span>
