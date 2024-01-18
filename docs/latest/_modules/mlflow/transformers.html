@@ -199,6 +199,7 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">pathlib</span>
 <span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">string</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">lru_cache</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
@@ -228,7 +229,11 @@
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.model</span> <span class="kn">import</span> <span class="n">MLMODEL_FILE_NAME</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.utils</span> <span class="kn">import</span> <span class="n">_contains_params</span><span class="p">,</span> <span class="n">_save_example</span>
-<span class="kn">from</span> <span class="nn">mlflow.protos.databricks_pb2</span> <span class="kn">import</span> <span class="n">BAD_REQUEST</span><span class="p">,</span> <span class="n">INVALID_PARAMETER_VALUE</span>
+<span class="kn">from</span> <span class="nn">mlflow.protos.databricks_pb2</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">BAD_REQUEST</span><span class="p">,</span>
+    <span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
+    <span class="n">RESOURCE_DOES_NOT_EXIST</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracking._model_registry</span> <span class="kn">import</span> <span class="n">DEFAULT_AWAIT_MAX_SLEEP_SECONDS</span>
 <span class="kn">from</span> <span class="nn">mlflow.types.schema</span> <span class="kn">import</span> <span class="n">ColSpec</span><span class="p">,</span> <span class="n">Schema</span><span class="p">,</span> <span class="n">TensorSpec</span>
 <span class="kn">from</span> <span class="nn">mlflow.types.utils</span> <span class="kn">import</span> <span class="n">_validate_input_dictionary_contains_only_strings_and_lists_of_strings</span>
@@ -284,6 +289,7 @@
 <span class="n">_PIPELINE_MODEL_TYPE_KEY</span> <span class="o">=</span> <span class="s2">&quot;pipeline_model_type&quot;</span>
 <span class="n">_PROCESSOR_KEY</span> <span class="o">=</span> <span class="s2">&quot;processor&quot;</span>
 <span class="n">_PROCESSOR_TYPE_KEY</span> <span class="o">=</span> <span class="s2">&quot;processor_type&quot;</span>
+<span class="n">_PROMPT_TEMPLATE_KEY</span> <span class="o">=</span> <span class="s2">&quot;prompt_template&quot;</span>
 <span class="n">_SUPPORTED_RETURN_TYPES</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;pipeline&quot;</span><span class="p">,</span> <span class="s2">&quot;components&quot;</span><span class="p">}</span>
 <span class="c1"># The default device id for CPU is -1 and GPU IDs are ordinal starting at 0, as documented here:</span>
 <span class="c1"># https://huggingface.co/transformers/v4.7.0/main_classes/pipelines.html</span>
@@ -301,6 +307,20 @@
     <span class="n">_IMAGE_PROCESSOR_KEY</span><span class="p">,</span>
     <span class="n">_TORCH_DTYPE_KEY</span><span class="p">,</span>
 <span class="p">}</span>
+
+<span class="n">_SUPPORTED_PROMPT_TEMPLATING_TASK_TYPES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;feature-extraction&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;fill-mask&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;summarization&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;text2text-generation&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;text-generation&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">_PROMPT_TEMPLATE_RETURN_FULL_TEXT_INFO</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;text-generation pipelines saved with prompt templates have the `return_full_text` &quot;</span>
+    <span class="s2">&quot;pipeline kwarg set to False by default. To override this behavior, provide a &quot;</span>
+    <span class="s2">&quot;`model_config` dict with `return_full_text` set to `True` when saving the model.&quot;</span>
+<span class="p">)</span>
 
 <span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -430,6 +450,7 @@
     <span class="n">metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">model_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">example_no_conversion</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">prompt_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>  <span class="c1"># pylint: disable=unused-argument</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -605,6 +626,7 @@
 <span class="sd">            .. Note:: Experimental: This parameter may change or be removed in a future</span>
 <span class="sd">                                    release without warning.</span>
 <span class="sd">        example_no_conversion: {{ example_no_conversion }}</span>
+<span class="sd">        prompt_template: {{ prompt_template }}</span>
 <span class="sd">        kwargs: Optional additional configurations for transformers serialization.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -653,6 +675,19 @@
         <span class="n">_save_example</span><span class="p">(</span><span class="n">mlflow_model</span><span class="p">,</span> <span class="n">input_example</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="n">example_no_conversion</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">metadata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">mlflow_model</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">metadata</span>
+    <span class="k">if</span> <span class="n">prompt_template</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># prevent saving prompt templates for unsupported pipeline types</span>
+        <span class="k">if</span> <span class="n">built_pipeline</span><span class="o">.</span><span class="n">task</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_SUPPORTED_PROMPT_TEMPLATING_TASK_TYPES</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Prompt templating is not supported for the `</span><span class="si">{</span><span class="n">built_pipeline</span><span class="o">.</span><span class="n">task</span><span class="si">}</span><span class="s2">` task type. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Supported task types are: </span><span class="si">{</span><span class="n">_SUPPORTED_PROMPT_TEMPLATING_TASK_TYPES</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">_validate_prompt_template</span><span class="p">(</span><span class="n">prompt_template</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mlflow_model</span><span class="o">.</span><span class="n">metadata</span><span class="p">:</span>
+            <span class="n">mlflow_model</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="n">_PROMPT_TEMPLATE_KEY</span><span class="p">]</span> <span class="o">=</span> <span class="n">prompt_template</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">mlflow_model</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="p">{</span><span class="n">_PROMPT_TEMPLATE_KEY</span><span class="p">:</span> <span class="n">prompt_template</span><span class="p">}</span>
 
     <span class="n">flavor_conf</span> <span class="o">=</span> <span class="n">_generate_base_flavor_configuration</span><span class="p">(</span><span class="n">built_pipeline</span><span class="p">,</span> <span class="n">resolved_task</span><span class="p">)</span>
 
@@ -704,6 +739,16 @@
             <span class="n">mlflow_model</span><span class="o">.</span><span class="n">signature</span> <span class="o">=</span> <span class="n">_get_default_pipeline_signature</span><span class="p">(</span>
                 <span class="n">built_pipeline</span><span class="p">,</span> <span class="n">input_example</span><span class="p">,</span> <span class="n">model_config</span> <span class="ow">or</span> <span class="n">inference_config</span>
             <span class="p">)</span>
+
+        <span class="c1"># if pipeline is text-generation and a prompt template is specified,</span>
+        <span class="c1"># provide the return_full_text=False config by default to avoid confusing</span>
+        <span class="c1"># extra text for end-users</span>
+        <span class="k">if</span> <span class="n">prompt_template</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">built_pipeline</span><span class="o">.</span><span class="n">task</span> <span class="o">==</span> <span class="s2">&quot;text-generation&quot;</span><span class="p">:</span>
+            <span class="n">return_full_text_key</span> <span class="o">=</span> <span class="s2">&quot;return_full_text&quot;</span>
+            <span class="n">model_config</span> <span class="o">=</span> <span class="n">model_config</span> <span class="ow">or</span> <span class="p">{}</span>
+            <span class="k">if</span> <span class="n">return_full_text_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">model_config</span><span class="p">:</span>
+                <span class="n">model_config</span><span class="p">[</span><span class="n">return_full_text_key</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">_PROMPT_TEMPLATE_RETURN_FULL_TEXT_INFO</span><span class="p">)</span>
 
         <span class="n">pyfunc</span><span class="o">.</span><span class="n">add_to_model</span><span class="p">(</span>
             <span class="n">mlflow_model</span><span class="p">,</span>
@@ -782,6 +827,7 @@
     <span class="n">metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">model_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">example_no_conversion</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">prompt_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -965,6 +1011,7 @@
 <span class="sd">            .. Note:: Experimental: This parameter may change or be removed in a future</span>
 <span class="sd">                                    release without warning.</span>
 <span class="sd">        example_no_conversion: {{ example_no_conversion }}</span>
+<span class="sd">        prompt_template: {{ prompt_template }}</span>
 <span class="sd">        kwargs: Additional arguments for :py:class:`mlflow.models.model.Model`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">Model</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
@@ -986,6 +1033,7 @@
         <span class="n">extra_pip_requirements</span><span class="o">=</span><span class="n">extra_pip_requirements</span><span class="p">,</span>
         <span class="n">model_config</span><span class="o">=</span><span class="n">model_config</span><span class="p">,</span>
         <span class="n">example_no_conversion</span><span class="o">=</span><span class="n">example_no_conversion</span><span class="p">,</span>
+        <span class="n">prompt_template</span><span class="o">=</span><span class="n">prompt_template</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span></div>
 
@@ -1821,10 +1869,13 @@
     <span class="n">local_path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
     <span class="n">flavor_configuration</span> <span class="o">=</span> <span class="n">_get_flavor_configuration</span><span class="p">(</span><span class="n">local_path</span><span class="p">,</span> <span class="n">FLAVOR_NAME</span><span class="p">)</span>
     <span class="n">model_config</span> <span class="o">=</span> <span class="n">_get_model_config</span><span class="p">(</span><span class="n">local_path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">_COMPONENTS_BINARY_KEY</span><span class="p">),</span> <span class="n">model_config</span><span class="p">)</span>
+    <span class="n">prompt_template</span> <span class="o">=</span> <span class="n">_get_prompt_template</span><span class="p">(</span><span class="n">local_path</span><span class="p">)</span>
+
     <span class="k">return</span> <span class="n">_TransformersWrapper</span><span class="p">(</span>
         <span class="n">_load_model</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">local_path</span><span class="p">),</span> <span class="n">flavor_configuration</span><span class="p">,</span> <span class="s2">&quot;pipeline&quot;</span><span class="p">),</span>
         <span class="n">flavor_configuration</span><span class="p">,</span>
         <span class="n">model_config</span><span class="p">,</span>
+        <span class="n">prompt_template</span><span class="p">,</span>
     <span class="p">)</span>
 
 
@@ -1861,10 +1912,11 @@
 
 
 <span class="k">class</span> <span class="nc">_TransformersWrapper</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">,</span> <span class="n">flavor_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">,</span> <span class="n">flavor_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prompt_template</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">pipeline</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">flavor_config</span> <span class="o">=</span> <span class="n">flavor_config</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_config</span> <span class="o">=</span> <span class="n">model_config</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prompt_template</span> <span class="o">=</span> <span class="n">prompt_template</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_conversation</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1"># NB: Current special-case custom pipeline types that have not been added to</span>
         <span class="c1"># the native-supported transformers package but require custom parsing:</span>
@@ -2003,18 +2055,22 @@
             <span class="n">output_key</span> <span class="o">=</span> <span class="s2">&quot;translation_text&quot;</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">transformers</span><span class="o">.</span><span class="n">SummarizationPipeline</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_validate_str_or_list_str</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_format_prompt_template</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
             <span class="n">output_key</span> <span class="o">=</span> <span class="s2">&quot;summary_text&quot;</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">transformers</span><span class="o">.</span><span class="n">Text2TextGenerationPipeline</span><span class="p">):</span>
             <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_text2text_input</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_format_prompt_template</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
             <span class="n">output_key</span> <span class="o">=</span> <span class="s2">&quot;generated_text&quot;</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">transformers</span><span class="o">.</span><span class="n">TextGenerationPipeline</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_validate_str_or_list_str</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_format_prompt_template</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
             <span class="n">output_key</span> <span class="o">=</span> <span class="s2">&quot;generated_text&quot;</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">transformers</span><span class="o">.</span><span class="n">QuestionAnsweringPipeline</span><span class="p">):</span>
             <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_question_answer_input</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
             <span class="n">output_key</span> <span class="o">=</span> <span class="s2">&quot;answer&quot;</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">transformers</span><span class="o">.</span><span class="n">FillMaskPipeline</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_validate_str_or_list_str</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_format_prompt_template</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
             <span class="n">output_key</span> <span class="o">=</span> <span class="s2">&quot;token_str&quot;</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">transformers</span><span class="o">.</span><span class="n">TextClassificationPipeline</span><span class="p">):</span>
             <span class="n">output_key</span> <span class="o">=</span> <span class="s2">&quot;label&quot;</span>
@@ -2032,6 +2088,7 @@
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">transformers</span><span class="o">.</span><span class="n">FeatureExtractionPipeline</span><span class="p">):</span>
             <span class="n">output_key</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_feature_extraction_input</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_format_prompt_template</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">transformers</span><span class="o">.</span><span class="n">ConversationalPipeline</span><span class="p">):</span>
             <span class="n">output_key</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_conversation</span><span class="p">:</span>
@@ -2416,8 +2473,9 @@
                 <span class="n">data_out</span> <span class="o">=</span> <span class="n">data_out</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">data_in</span><span class="p">)</span> <span class="p">:]</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span>
                 <span class="k">if</span> <span class="n">data_out</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;A:&quot;</span><span class="p">):</span>
                     <span class="n">data_out</span> <span class="o">=</span> <span class="n">data_out</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span>
-                <span class="c1"># If the user has indicated to remove newlines and extra spaces from the generated</span>
-                <span class="c1"># text, replace them with a single space.</span>
+
+            <span class="c1"># If the user has indicated to remove newlines and extra spaces from the generated</span>
+            <span class="c1"># text, replace them with a single space.</span>
             <span class="k">if</span> <span class="n">collapse_whitespace</span><span class="p">:</span>
                 <span class="n">data_out</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\s+&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">data_out</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
             <span class="k">return</span> <span class="n">data_out</span>
@@ -2969,6 +3027,34 @@
                 <span class="n">error_code</span><span class="o">=</span><span class="n">BAD_REQUEST</span><span class="p">,</span>
             <span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">_format_prompt_template</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Wraps the input data in the specified prompt template. If no template is</span>
+<span class="sd">        specified, or if the pipeline is an unsupported type, or if the input type</span>
+<span class="sd">        is not a string or list of strings, then the input data is returned unchanged.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt_template</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">input_data</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">task</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_SUPPORTED_PROMPT_TEMPLATING_TASK_TYPES</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;_format_prompt_template called on an unexpected pipeline type. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Expected one of: </span><span class="si">{</span><span class="n">_SUPPORTED_PROMPT_TEMPLATING_TASK_TYPES</span><span class="si">}</span><span class="s2">. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Received: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">task</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">prompt</span><span class="o">=</span><span class="n">input_data</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="c1"># if every item is a string, then apply formatting to every item</span>
+            <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">input_data</span><span class="p">):</span>
+                <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">prompt</span><span class="o">=</span><span class="n">data</span><span class="p">)</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">input_data</span><span class="p">]</span>
+
+        <span class="c1"># throw for unsupported types</span>
+        <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
+            <span class="s2">&quot;Prompt templating is only supported for data of type str or List[str]. &quot;</span>
+        <span class="p">)</span>
+
 
 <div class="viewcode-block" id="autolog"><a class="viewcode-back" href="../../python_api/mlflow.transformers.html#mlflow.transformers.autolog">[docs]</a><span class="nd">@experimental</span>
 <span class="nd">@autologging_integration</span><span class="p">(</span><span class="n">FLAVOR_NAME</span><span class="p">)</span>
@@ -3020,6 +3106,43 @@
         <span class="k">for</span> <span class="n">clazz</span> <span class="ow">in</span> <span class="n">classes</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="n">methods</span><span class="p">:</span>
                 <span class="n">safe_patch</span><span class="p">(</span><span class="n">FLAVOR_NAME</span><span class="p">,</span> <span class="n">clazz</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">train</span><span class="p">),</span> <span class="n">manage_run</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_get_prompt_template</span><span class="p">(</span><span class="n">model_path</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">model_path</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;Could not find an &quot;</span><span class="si">{</span><span class="n">MLMODEL_FILE_NAME</span><span class="si">}</span><span class="s1">&quot; configuration file at &quot;</span><span class="si">{</span><span class="n">model_path</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">,</span>
+            <span class="n">RESOURCE_DOES_NOT_EXIST</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="n">model_conf</span> <span class="o">=</span> <span class="n">Model</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">model_path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">model_conf</span><span class="o">.</span><span class="n">metadata</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">model_conf</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">_PROMPT_TEMPLATE_KEY</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="kc">None</span>
+
+
+<span class="k">def</span> <span class="nf">_validate_prompt_template</span><span class="p">(</span><span class="n">prompt_template</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">prompt_template</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prompt_template</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Argument `prompt_template` must be a string, received </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">prompt_template</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="n">format_args</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">tup</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">tup</span> <span class="ow">in</span> <span class="n">string</span><span class="o">.</span><span class="n">Formatter</span><span class="p">()</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">prompt_template</span><span class="p">)</span> <span class="k">if</span> <span class="n">tup</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="p">]</span>
+
+    <span class="c1"># expect there to only be one format arg, and for that arg to be &quot;prompt&quot;</span>
+    <span class="k">if</span> <span class="n">format_args</span> <span class="o">!=</span> <span class="p">[</span><span class="s2">&quot;prompt&quot;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
+            <span class="s2">&quot;Argument `prompt_template` must be a string with a single format arg, &#39;prompt&#39;. &quot;</span>
+            <span class="s2">&quot;For example: &#39;Answer the following question in a friendly tone. Q: </span><span class="si">{prompt}</span><span class="s2">. A:&#39;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Received </span><span class="si">{</span><span class="n">prompt_template</span><span class="si">}</span><span class="s2">. &quot;</span>
+        <span class="p">)</span>
 </pre></div>
 
               </div>
