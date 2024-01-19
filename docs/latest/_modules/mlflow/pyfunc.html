@@ -781,7 +781,10 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Inspects the model&#39;s dependencies and prints a warning if the current Python environment</span>
 <span class="sd">    doesn&#39;t satisfy them.</span>
+
+<span class="sd">    :param model_path: The local path to the model</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_DATABRICKS_FEATURE_LOOKUP</span> <span class="o">=</span> <span class="s2">&quot;databricks-feature-lookup&quot;</span>
     <span class="n">req_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="n">_REQUIREMENTS_FILE_NAME</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">req_file_path</span><span class="p">):</span>
         <span class="k">return</span>
@@ -792,6 +795,9 @@
             <span class="n">req_line</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">req_str</span>
             <span class="n">mismatch_info</span> <span class="o">=</span> <span class="n">_check_requirement_satisfied</span><span class="p">(</span><span class="n">req_line</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">mismatch_info</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># Suppress databricks-feature-lookup warning for feature store cases</span>
+                <span class="k">if</span> <span class="n">mismatch_info</span><span class="o">.</span><span class="n">package_name</span> <span class="o">==</span> <span class="n">_DATABRICKS_FEATURE_LOOKUP</span><span class="p">:</span>
+                    <span class="k">continue</span>
                 <span class="n">mismatch_infos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">mismatch_info</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">mismatch_infos</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
