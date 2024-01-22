@@ -50,7 +50,7 @@
     <link rel="top" title="MLflow 2.9.3.dev0 documentation" href="../../../index.html"/>
         <link rel="up" title="MLflow Transformers Flavor" href="../index.html"/>
         <link rel="next" title="MLflow OpenAI Flavor" href="/../../openai/index.html"/>
-        <link rel="prev" title="Fine-Tuning Transformers with MLflow for Enhanced Model Management" href="/../tutorials/fine-tuning/transformers-fine-tuning.html"/> 
+        <link rel="prev" title="Prompt Templating with MLflow and Transformers" href="/../tutorials/prompt-templating/prompt-templating.html"/> 
 
   
   <script src="../../../_static/js/modernizr.min.js"></script>
@@ -342,6 +342,65 @@ expected input to the model to ensure your inference request can be read properl
 <p>**** The mask syntax for the model that you’ve chosen is going to be specific to that model’s implementation. Some are ‘[MASK]’, while others are ‘&lt;mask&gt;’. Verify the expected syntax to
 avoid failed inference requests.</p>
 <p>***** If using <cite>pyfunc</cite> in MLflow Model Serving for realtime inference, the raw audio in bytes format must be base64 encoded prior to submitting to the endpoint. String inputs will be interpreted as uri locations.</p>
+<div class="section" id="saving-prompt-templates-with-transformer-pipelines">
+<h3>Saving Prompt Templates with Transformer Pipelines<a class="headerlink" href="#saving-prompt-templates-with-transformer-pipelines" title="Permalink to this headline"> </a></h3>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This feature is only available in MLflow 2.10.0 and above.</p>
+</div>
+<p>MLflow supports specifying prompt templates for certain pipeline types:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://huggingface.co/transformers/main_classes/pipelines.html#transformers.FeatureExtractionPipeline">feature-extraction</a></p></li>
+<li><p><a class="reference external" href="https://huggingface.co/transformers/main_classes/pipelines.html#transformers.FillMaskPipeline">fill-mask</a></p></li>
+<li><p><a class="reference external" href="https://huggingface.co/transformers/main_classes/pipelines.html#transformers.SummarizationPipeline">summarization</a></p></li>
+<li><p><a class="reference external" href="https://huggingface.co/transformers/main_classes/pipelines.html#transformers.Text2TextGenerationPipeline">text2text-generation</a></p></li>
+<li><p><a class="reference external" href="https://huggingface.co/transformers/main_classes/pipelines.html#transformers.TextGenerationPipeline">text-generation</a></p></li>
+</ul>
+<p>Prompt templates are strings that are used to format user inputs prior to <code class="docutils literal notranslate"><span class="pre">pyfunc</span></code> inference. To specify a prompt template,
+use the <code class="docutils literal notranslate"><span class="pre">prompt_template</span></code> argument when calling <a class="reference internal" href="../../../python_api/mlflow.transformers.html#mlflow.transformers.save_model" title="mlflow.transformers.save_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.transformers.save_model()</span></code></a> or <a class="reference internal" href="../../../python_api/mlflow.transformers.html#mlflow.transformers.log_model" title="mlflow.transformers.log_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.transformers.log_model()</span></code></a>.
+The prompt template must be a string with a single format placeholder, <code class="docutils literal notranslate"><span class="pre">{prompt}</span></code>.</p>
+<p>For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">pipeline</span>
+
+<span class="c1"># Initialize a pipeline. `distilgpt2` uses a &quot;text-generation&quot; pipeline</span>
+<span class="n">generator</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="s2">&quot;distilgpt2&quot;</span><span class="p">)</span>
+
+<span class="c1"># Define a prompt template</span>
+<span class="n">prompt_template</span> <span class="o">=</span> <span class="s2">&quot;Answer the following question: </span><span class="si">{prompt}</span><span class="s2">&quot;</span>
+
+<span class="c1"># Save the model</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">transformers</span><span class="o">.</span><span class="n">save_model</span><span class="p">(</span>
+    <span class="n">transformers_model</span><span class="o">=</span><span class="n">generator</span><span class="p">,</span>
+    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;path/to/model&quot;</span><span class="p">,</span>
+    <span class="n">prompt_template</span><span class="o">=</span><span class="n">prompt_template</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>When the model is then loaded with <a class="reference internal" href="../../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.load_model" title="mlflow.pyfunc.load_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.pyfunc.load_model()</span></code></a>, the prompt
+template will be used to format user inputs before passing them into the pipeline:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="c1"># Load the model with pyfunc</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="s2">&quot;path/to/model&quot;</span><span class="p">)</span>
+
+<span class="c1"># The prompt template will be used to format this input, so the</span>
+<span class="c1"># string that is passed to the text-generation pipeline will be:</span>
+<span class="c1"># &quot;Answer the following question: What is MLflow?&quot;</span>
+<span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;What is MLflow?&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">text-generation</span></code> pipelines with a prompt template will have the <a class="reference external" href="https://huggingface.co/docs/huggingface_hub/main/en/package_reference/inference_client#huggingface_hub.inference._text_generation.TextGenerationParameters.return_full_text">return_full_text pipeline argument</a>
+set to <code class="docutils literal notranslate"><span class="pre">False</span></code> by default. This is to prevent the template from being shown to the users,
+which could potentially cause confusion as it was not part of their original input. To
+override this behaviour, either set <code class="docutils literal notranslate"><span class="pre">return_full_text</span></code> to <code class="docutils literal notranslate"><span class="pre">True</span></code> via <code class="docutils literal notranslate"><span class="pre">params</span></code>, or by
+including it in a <code class="docutils literal notranslate"><span class="pre">model_config</span></code> dict in <code class="docutils literal notranslate"><span class="pre">log_model()</span></code>. See <a class="reference external" href="#using-model-config-and-model-signature-params-for-transformers-inference">this section</a>
+for more details on how to do this.</p>
+</div>
+<p>For a more in-depth guide, check out the <a class="reference internal" href="../tutorials/prompt-templating/prompt-templating.html"><span class="doc">Prompt Templating notebook</span></a>!</p>
+</div>
 <div class="section" id="using-model-config-and-model-signature-params-for-transformers-inference">
 <h3>Using model_config and model signature params for <cite>transformers</cite> inference<a class="headerlink" href="#using-model-config-and-model-signature-params-for-transformers-inference" title="Permalink to this headline"> </a></h3>
 <p>For <cite>transformers</cite> inference, there are two ways to pass in additional arguments to the pipeline.</p>
@@ -818,7 +877,7 @@ or the other as an allowed input type.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../tutorials/fine-tuning/transformers-fine-tuning.html" class="btn btn-neutral" title="Fine-Tuning Transformers with MLflow for Enhanced Model Management" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+        <a href="../tutorials/prompt-templating/prompt-templating.html" class="btn btn-neutral" title="Prompt Templating with MLflow and Transformers" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
       
       
         <a href="../../openai/index.html" class="btn btn-neutral" title="MLflow OpenAI Flavor" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>

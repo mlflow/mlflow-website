@@ -408,6 +408,7 @@
 <span class="kn">import</span> <span class="nn">tempfile</span>
 <span class="kn">import</span> <span class="nn">threading</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">lru_cache</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -492,8 +493,8 @@
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.nfs_on_spark</span> <span class="kn">import</span> <span class="n">get_nfs_cache_root_dir</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.requirements_utils</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">_check_requirement_satisfied</span><span class="p">,</span>
     <span class="n">_parse_requirements</span><span class="p">,</span>
+    <span class="n">warn_dependency_requirement_mismatches</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="n">FLAVOR_NAME</span> <span class="o">=</span> <span class="s2">&quot;python_function&quot;</span>
@@ -777,46 +778,12 @@
         <span class="k">return</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_dump</span><span class="p">({</span><span class="s2">&quot;mlflow.pyfunc.loaded_model&quot;</span><span class="p">:</span> <span class="n">info</span><span class="p">},</span> <span class="n">default_flow_style</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">_warn_dependency_requirement_mismatches</span><span class="p">(</span><span class="n">model_path</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Inspects the model&#39;s dependencies and prints a warning if the current Python environment</span>
-<span class="sd">    doesn&#39;t satisfy them.</span>
-
-<span class="sd">    :param model_path: The local path to the model</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">_DATABRICKS_FEATURE_LOOKUP</span> <span class="o">=</span> <span class="s2">&quot;databricks-feature-lookup&quot;</span>
+<span class="k">def</span> <span class="nf">_get_pip_requirements_from_model_path</span><span class="p">(</span><span class="n">model_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
     <span class="n">req_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="n">_REQUIREMENTS_FILE_NAME</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">req_file_path</span><span class="p">):</span>
-        <span class="k">return</span>
+        <span class="k">return</span> <span class="p">[]</span>
 
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">mismatch_infos</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">req</span> <span class="ow">in</span> <span class="n">_parse_requirements</span><span class="p">(</span><span class="n">req_file_path</span><span class="p">,</span> <span class="n">is_constraint</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-            <span class="n">req_line</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">req_str</span>
-            <span class="n">mismatch_info</span> <span class="o">=</span> <span class="n">_check_requirement_satisfied</span><span class="p">(</span><span class="n">req_line</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">mismatch_info</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="c1"># Suppress databricks-feature-lookup warning for feature store cases</span>
-                <span class="k">if</span> <span class="n">mismatch_info</span><span class="o">.</span><span class="n">package_name</span> <span class="o">==</span> <span class="n">_DATABRICKS_FEATURE_LOOKUP</span><span class="p">:</span>
-                    <span class="k">continue</span>
-                <span class="n">mismatch_infos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">mismatch_info</span><span class="p">))</span>
-
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">mismatch_infos</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">mismatch_str</span> <span class="o">=</span> <span class="s2">&quot; - &quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> - &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mismatch_infos</span><span class="p">)</span>
-            <span class="n">warning_msg</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="s2">&quot;Detected one or more mismatches between the model&#39;s dependencies and the current &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;Python environment:</span><span class="se">\n</span><span class="si">{</span><span class="n">mismatch_str</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
-                <span class="s2">&quot;To fix the mismatches, call `mlflow.pyfunc.get_model_dependencies(model_uri)` &quot;</span>
-                <span class="s2">&quot;to fetch the model&#39;s environment and install dependencies using the resulting &quot;</span>
-                <span class="s2">&quot;environment file.&quot;</span>
-            <span class="p">)</span>
-            <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">warning_msg</span><span class="p">)</span>
-
-    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Encountered an unexpected error (</span><span class="si">{</span><span class="n">e</span><span class="si">!r}</span><span class="s2">) while detecting model dependency &quot;</span>
-            <span class="s2">&quot;mismatches. Set logging level to DEBUG to see the full traceback.&quot;</span>
-        <span class="p">)</span>
-        <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">req</span><span class="o">.</span><span class="n">req_str</span> <span class="k">for</span> <span class="n">req</span> <span class="ow">in</span> <span class="n">_parse_requirements</span><span class="p">(</span><span class="n">req_file_path</span><span class="p">,</span> <span class="n">is_constraint</span><span class="o">=</span><span class="kc">False</span><span class="p">)]</span>
 
 
 <div class="viewcode-block" id="load_model"><a class="viewcode-back" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.load_model">[docs]</a><span class="k">def</span> <span class="nf">load_model</span><span class="p">(</span>
@@ -856,7 +823,8 @@
     <span class="n">local_path</span> <span class="o">=</span> <span class="n">_download_artifact_from_uri</span><span class="p">(</span><span class="n">artifact_uri</span><span class="o">=</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">output_path</span><span class="o">=</span><span class="n">dst_path</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">suppress_warnings</span><span class="p">:</span>
-        <span class="n">_warn_dependency_requirement_mismatches</span><span class="p">(</span><span class="n">local_path</span><span class="p">)</span>
+        <span class="n">model_requirements</span> <span class="o">=</span> <span class="n">_get_pip_requirements_from_model_path</span><span class="p">(</span><span class="n">local_path</span><span class="p">)</span>
+        <span class="n">warn_dependency_requirement_mismatches</span><span class="p">(</span><span class="n">model_requirements</span><span class="p">)</span>
 
     <span class="n">model_meta</span> <span class="o">=</span> <span class="n">Model</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">local_path</span><span class="p">,</span> <span class="n">MLMODEL_FILE_NAME</span><span class="p">))</span>
 
@@ -1145,6 +1113,32 @@
 <span class="n">_MLFLOW_SERVER_OUTPUT_TAIL_LINES_TO_KEEP</span> <span class="o">=</span> <span class="mi">200</span>
 
 
+<span class="k">def</span> <span class="nf">_convert_spec_type_to_spark_type</span><span class="p">(</span><span class="n">spec_type</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">pyspark.sql.types</span> <span class="kn">import</span> <span class="n">ArrayType</span><span class="p">,</span> <span class="n">StructField</span><span class="p">,</span> <span class="n">StructType</span>
+
+    <span class="kn">from</span> <span class="nn">mlflow.types.schema</span> <span class="kn">import</span> <span class="n">Array</span><span class="p">,</span> <span class="n">DataType</span><span class="p">,</span> <span class="n">Object</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spec_type</span><span class="p">,</span> <span class="n">DataType</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">spec_type</span><span class="o">.</span><span class="n">to_spark</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spec_type</span><span class="p">,</span> <span class="n">Array</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">ArrayType</span><span class="p">(</span><span class="n">_convert_spec_type_to_spark_type</span><span class="p">(</span><span class="n">spec_type</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spec_type</span><span class="p">,</span> <span class="n">Object</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">StructType</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">StructField</span><span class="p">(</span>
+                    <span class="nb">property</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                    <span class="n">_convert_spec_type_to_spark_type</span><span class="p">(</span><span class="nb">property</span><span class="o">.</span><span class="n">dtype</span><span class="p">),</span>
+                    <span class="c1"># we set nullable to True for all properties</span>
+                    <span class="c1"># to avoid some errors like java.lang.NullPointerException</span>
+                    <span class="c1"># when the signature is not inferred based on correct data.</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="nb">property</span> <span class="ow">in</span> <span class="n">spec_type</span><span class="o">.</span><span class="n">properties</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+
+
 <span class="k">def</span> <span class="nf">_cast_output_spec_to_spark_type</span><span class="p">(</span><span class="n">spec</span><span class="p">):</span>
     <span class="kn">from</span> <span class="nn">pyspark.sql.types</span> <span class="kn">import</span> <span class="n">ArrayType</span>
 
@@ -1152,7 +1146,7 @@
 
     <span class="c1"># TODO: handle optional output columns.</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">ColSpec</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">spec</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">to_spark</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">_convert_spec_type_to_spark_type</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">TensorSpec</span><span class="p">):</span>
         <span class="n">data_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">from_numpy_type</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">data_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1219,26 +1213,36 @@
     <span class="k">return</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_convert_array_values</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">elem_type</span><span class="p">,</span> <span class="n">array_dim</span><span class="p">,</span> <span class="n">spark_primitive_type_to_np_type</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_convert_array_values</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">result_type</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convert list or numpy array values to spark dataframe column values.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">np_type</span> <span class="o">=</span> <span class="n">spark_primitive_type_to_np_type</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">elem_type</span><span class="p">))</span>
-    <span class="k">if</span> <span class="n">np_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
-            <span class="s2">&quot;Unsupported array type field with element type &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">elem_type</span><span class="o">.</span><span class="n">simpleString</span><span class="p">()</span><span class="si">}</span><span class="s2"> in struct type.&quot;</span><span class="p">,</span>
-            <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
+    <span class="kn">from</span> <span class="nn">pyspark.sql.types</span> <span class="kn">import</span> <span class="n">ArrayType</span><span class="p">,</span> <span class="n">StructType</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result_type</span><span class="p">,</span> <span class="n">ArrayType</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;result_type must be ArrayType, got </span><span class="si">{</span><span class="n">result_type</span><span class="o">.</span><span class="n">simpleString</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="c1"># For array type result values, if provided value is None or NaN, regard it as a null array.</span>
-    <span class="c1"># see https://github.com/mlflow/mlflow/issues/8986</span>
-    <span class="k">if</span> <span class="n">array_dim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">[</span><span class="kc">None</span> <span class="k">if</span> <span class="n">_is_none_or_nan</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np_type</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span><span class="p">]</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">[</span><span class="kc">None</span> <span class="k">if</span> <span class="n">_is_none_or_nan</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">else</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np_type</span><span class="p">))</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span><span class="p">]</span>
+    <span class="n">spark_primitive_type_to_np_type</span> <span class="o">=</span> <span class="n">_get_spark_primitive_type_to_np_type</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">result_type</span><span class="o">.</span><span class="n">elementType</span><span class="p">)</span> <span class="ow">in</span> <span class="n">spark_primitive_type_to_np_type</span><span class="p">:</span>
+        <span class="n">np_type</span> <span class="o">=</span> <span class="n">spark_primitive_type_to_np_type</span><span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">result_type</span><span class="o">.</span><span class="n">elementType</span><span class="p">)]</span>
+        <span class="c1"># For array type result values, if provided value is None or NaN, regard it as a null array.</span>
+        <span class="c1"># see https://github.com/mlflow/mlflow/issues/8986</span>
+        <span class="k">return</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">_is_none_or_nan</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np_type</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result_type</span><span class="o">.</span><span class="n">elementType</span><span class="p">,</span> <span class="n">ArrayType</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">_convert_array_values</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">result_type</span><span class="o">.</span><span class="n">elementType</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result_type</span><span class="o">.</span><span class="n">elementType</span><span class="p">,</span> <span class="n">StructType</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">_convert_struct_values</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">result_type</span><span class="o">.</span><span class="n">elementType</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span><span class="p">]</span>
+
+    <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
+        <span class="s2">&quot;Unsupported array type field with element type &quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">result_type</span><span class="o">.</span><span class="n">elementType</span><span class="o">.</span><span class="n">simpleString</span><span class="p">()</span><span class="si">}</span><span class="s2"> in Array type.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
 
 
+<span class="nd">@lru_cache</span>
 <span class="k">def</span> <span class="nf">_get_spark_primitive_types</span><span class="p">():</span>
     <span class="kn">from</span> <span class="nn">pyspark.sql</span> <span class="kn">import</span> <span class="n">types</span>
 
@@ -1252,8 +1256,22 @@
     <span class="p">)</span>
 
 
+<span class="nd">@lru_cache</span>
+<span class="k">def</span> <span class="nf">_get_spark_primitive_type_to_np_type</span><span class="p">():</span>
+    <span class="kn">from</span> <span class="nn">pyspark.sql</span> <span class="kn">import</span> <span class="n">types</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="n">types</span><span class="o">.</span><span class="n">IntegerType</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span>
+        <span class="n">types</span><span class="o">.</span><span class="n">LongType</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span>
+        <span class="n">types</span><span class="o">.</span><span class="n">FloatType</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
+        <span class="n">types</span><span class="o">.</span><span class="n">DoubleType</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
+        <span class="n">types</span><span class="o">.</span><span class="n">BooleanType</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">,</span>
+        <span class="n">types</span><span class="o">.</span><span class="n">StringType</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">str_</span><span class="p">,</span>
+    <span class="p">}</span>
+
+
 <span class="k">def</span> <span class="nf">_check_udf_return_struct_type</span><span class="p">(</span><span class="n">struct_type</span><span class="p">):</span>
-    <span class="kn">from</span> <span class="nn">pyspark.sql.types</span> <span class="kn">import</span> <span class="n">ArrayType</span>
+    <span class="kn">from</span> <span class="nn">pyspark.sql.types</span> <span class="kn">import</span> <span class="n">ArrayType</span><span class="p">,</span> <span class="n">StructType</span>
 
     <span class="n">primitive_types</span> <span class="o">=</span> <span class="n">_get_spark_primitive_types</span><span class="p">()</span>
 
@@ -1263,8 +1281,11 @@
             <span class="k">continue</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">field_type</span><span class="p">,</span> <span class="n">ArrayType</span><span class="p">)</span> <span class="ow">and</span> <span class="n">_check_udf_return_array_type</span><span class="p">(</span>
-            <span class="n">field_type</span><span class="p">,</span> <span class="n">allow_struct</span><span class="o">=</span><span class="kc">False</span>
+            <span class="n">field_type</span><span class="p">,</span> <span class="n">allow_struct</span><span class="o">=</span><span class="kc">True</span>
         <span class="p">):</span>
+            <span class="k">continue</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">field_type</span><span class="p">,</span> <span class="n">StructType</span><span class="p">)</span> <span class="ow">and</span> <span class="n">_check_udf_return_struct_type</span><span class="p">(</span><span class="n">field_type</span><span class="p">):</span>
             <span class="k">continue</span>
 
         <span class="k">return</span> <span class="kc">False</span>
@@ -1278,14 +1299,11 @@
     <span class="n">elem_type</span> <span class="o">=</span> <span class="n">array_type</span><span class="o">.</span><span class="n">elementType</span>
     <span class="n">primitive_types</span> <span class="o">=</span> <span class="n">_get_spark_primitive_types</span><span class="p">()</span>
 
-    <span class="k">if</span> <span class="p">(</span>
-        <span class="c1"># 1D array of primitives</span>
-        <span class="nb">isinstance</span><span class="p">(</span><span class="n">elem_type</span><span class="p">,</span> <span class="n">primitive_types</span><span class="p">)</span>
-        <span class="ow">or</span>
-        <span class="c1"># 2D array of primitives</span>
-        <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">elem_type</span><span class="p">,</span> <span class="n">ArrayType</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">elem_type</span><span class="o">.</span><span class="n">elementType</span><span class="p">,</span> <span class="n">primitive_types</span><span class="p">))</span>
-    <span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">elem_type</span><span class="p">,</span> <span class="n">primitive_types</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">elem_type</span><span class="p">,</span> <span class="n">ArrayType</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_check_udf_return_array_type</span><span class="p">(</span><span class="n">elem_type</span><span class="p">,</span> <span class="n">allow_struct</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">elem_type</span><span class="p">,</span> <span class="n">StructType</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">allow_struct</span><span class="p">:</span>
@@ -1311,6 +1329,71 @@
         <span class="k">return</span> <span class="n">_check_udf_return_struct_type</span><span class="p">(</span><span class="n">data_type</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="kc">False</span>
+
+
+<span class="k">def</span> <span class="nf">_convert_struct_values</span><span class="p">(</span>
+    <span class="n">result</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
+    <span class="n">result_type</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert spark StructType values to spark dataframe column values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="kn">from</span> <span class="nn">pyspark.sql.types</span> <span class="kn">import</span> <span class="n">ArrayType</span><span class="p">,</span> <span class="n">StructType</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result_type</span><span class="p">,</span> <span class="n">StructType</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;result_type must be StructType, got </span><span class="si">{</span><span class="n">result_type</span><span class="o">.</span><span class="n">simpleString</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Unsupported result type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2">, expected dict or pandas DataFrame&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="n">spark_primitive_type_to_np_type</span> <span class="o">=</span> <span class="n">_get_spark_primitive_type_to_np_type</span><span class="p">()</span>
+    <span class="n">is_pandas_df</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span>
+    <span class="n">result_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">field_name</span> <span class="ow">in</span> <span class="n">result_type</span><span class="o">.</span><span class="n">fieldNames</span><span class="p">():</span>
+        <span class="n">field_type</span> <span class="o">=</span> <span class="n">result_type</span><span class="p">[</span><span class="n">field_name</span><span class="p">]</span><span class="o">.</span><span class="n">dataType</span>
+        <span class="n">field_values</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="n">field_name</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">field_type</span><span class="p">)</span> <span class="ow">in</span> <span class="n">spark_primitive_type_to_np_type</span><span class="p">:</span>
+            <span class="n">np_type</span> <span class="o">=</span> <span class="n">spark_primitive_type_to_np_type</span><span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">field_type</span><span class="p">)]</span>
+            <span class="k">if</span> <span class="n">is_pandas_df</span><span class="p">:</span>
+                <span class="n">field_values</span> <span class="o">=</span> <span class="n">field_values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np_type</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">field_values</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="kc">None</span>
+                    <span class="k">if</span> <span class="n">_is_none_or_nan</span><span class="p">(</span><span class="n">field_values</span><span class="p">)</span>
+                    <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">field_values</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np_type</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+                <span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">field_type</span><span class="p">,</span> <span class="n">ArrayType</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">is_pandas_df</span><span class="p">:</span>
+                <span class="n">field_values</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
+                    <span class="n">_convert_array_values</span><span class="p">(</span><span class="n">field_value</span><span class="p">,</span> <span class="n">field_type</span><span class="p">)</span> <span class="k">for</span> <span class="n">field_value</span> <span class="ow">in</span> <span class="n">field_values</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">field_values</span> <span class="o">=</span> <span class="n">_convert_array_values</span><span class="p">(</span><span class="n">field_values</span><span class="p">,</span> <span class="n">field_type</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">field_type</span><span class="p">,</span> <span class="n">StructType</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">is_pandas_df</span><span class="p">:</span>
+                <span class="n">field_values</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="n">_convert_struct_values</span><span class="p">(</span><span class="n">field_value</span><span class="p">,</span> <span class="n">field_type</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">field_value</span> <span class="ow">in</span> <span class="n">field_values</span>
+                    <span class="p">]</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">field_values</span> <span class="o">=</span> <span class="n">_convert_struct_values</span><span class="p">(</span><span class="n">field_values</span><span class="p">,</span> <span class="n">field_type</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Unsupported field type </span><span class="si">{</span><span class="n">field_type</span><span class="o">.</span><span class="n">simpleString</span><span class="p">()</span><span class="si">}</span><span class="s2"> in struct type.&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="n">result_dict</span><span class="p">[</span><span class="n">field_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">field_values</span>
+
+    <span class="k">if</span> <span class="n">is_pandas_df</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">result_dict</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result_dict</span>
 
 
 <span class="k">def</span> <span class="nf">_is_spark_connect</span><span class="p">():</span>
@@ -1500,7 +1583,8 @@
 
     <span class="k">if</span> <span class="n">env_manager</span> <span class="o">==</span> <span class="n">_EnvManager</span><span class="o">.</span><span class="n">LOCAL</span><span class="p">:</span>
         <span class="c1"># Assume spark executor python environment is the same with spark driver side.</span>
-        <span class="n">_warn_dependency_requirement_mismatches</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">)</span>
+        <span class="n">model_requirements</span> <span class="o">=</span> <span class="n">_get_pip_requirements_from_model_path</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">)</span>
+        <span class="n">warn_dependency_requirement_mismatches</span><span class="p">(</span><span class="n">model_requirements</span><span class="p">)</span>
         <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
             <span class="s1">&#39;Calling `spark_udf()` with `env_manager=&quot;local&quot;` does not recreate the same &#39;</span>
             <span class="s2">&quot;environment that was used during training, which may lead to errors or inaccurate &quot;</span>
@@ -1574,10 +1658,9 @@
 <span class="s2"> - string</span>
 <span class="s2"> - boolean</span>
 <span class="s2">Compound types:</span>
-<span class="s2"> - array&lt;primitive&gt;: An array of primitives, e.g., array&lt;int&gt;.</span>
-<span class="s2"> - array&lt;array&lt;primitive&gt;&gt;: A 2D array of primitives, e.g., array&lt;array&lt;int&gt;&gt;.</span>
+<span class="s2"> - ND array of primitives / structs.</span>
 <span class="s2"> - struct&lt;field: primitive | array&lt;primitive&gt; | array&lt;array&lt;primitive&gt;&gt;, ...&gt;:</span>
-<span class="s2">   A struct with primitive, array&lt;primitive&gt;, or array&lt;array&lt;primitive&gt;&gt;,</span>
+<span class="s2">   A struct with primitive, ND array&lt;primitive/structs&gt;,</span>
 <span class="s2">   e.g., struct&lt;a:int, b:array&lt;int&gt;&gt;.</span>
 <span class="s2">&quot;&quot;&quot;</span>
         <span class="p">)</span>
@@ -1619,53 +1702,15 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="n">result</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 
-        <span class="n">spark_primitive_type_to_np_type</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">IntegerType</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span>
-            <span class="n">LongType</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span>
-            <span class="n">FloatType</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
-            <span class="n">DoubleType</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
-            <span class="n">BooleanType</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">,</span>
-            <span class="n">StringType</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">str_</span><span class="p">,</span>
-        <span class="p">}</span>
-
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result_type</span><span class="p">,</span> <span class="n">ArrayType</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result_type</span><span class="o">.</span><span class="n">elementType</span><span class="p">,</span> <span class="n">ArrayType</span><span class="p">):</span>
-            <span class="n">result_values</span> <span class="o">=</span> <span class="n">_convert_array_values</span><span class="p">(</span>
-                <span class="n">result</span><span class="p">,</span> <span class="n">result_type</span><span class="o">.</span><span class="n">elementType</span><span class="o">.</span><span class="n">elementType</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">spark_primitive_type_to_np_type</span>
-            <span class="p">)</span>
+            <span class="n">result_values</span> <span class="o">=</span> <span class="n">_convert_array_values</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">result_type</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">result_values</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
             <span class="n">result</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">result</span><span class="p">])</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="k">else</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result_type</span><span class="p">,</span> <span class="n">SparkStructType</span><span class="p">):</span>
-            <span class="n">result_dict</span> <span class="o">=</span> <span class="p">{}</span>
-            <span class="k">for</span> <span class="n">field_name</span> <span class="ow">in</span> <span class="n">result_type</span><span class="o">.</span><span class="n">fieldNames</span><span class="p">():</span>
-                <span class="n">field_type</span> <span class="o">=</span> <span class="n">result_type</span><span class="p">[</span><span class="n">field_name</span><span class="p">]</span><span class="o">.</span><span class="n">dataType</span>
-                <span class="n">field_values</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="n">field_name</span><span class="p">]</span>
-
-                <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">field_type</span><span class="p">)</span> <span class="ow">in</span> <span class="n">spark_primitive_type_to_np_type</span><span class="p">:</span>
-                    <span class="n">np_type</span> <span class="o">=</span> <span class="n">spark_primitive_type_to_np_type</span><span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">field_type</span><span class="p">)]</span>
-                    <span class="n">field_values</span> <span class="o">=</span> <span class="n">field_values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np_type</span><span class="p">)</span>
-
-                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">field_type</span><span class="p">,</span> <span class="n">ArrayType</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">field_type</span><span class="o">.</span><span class="n">elementType</span><span class="p">,</span> <span class="n">ArrayType</span><span class="p">):</span>
-                        <span class="n">array_dim</span> <span class="o">=</span> <span class="mi">2</span>
-                        <span class="n">elem_type</span> <span class="o">=</span> <span class="n">field_type</span><span class="o">.</span><span class="n">elementType</span><span class="o">.</span><span class="n">elementType</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">array_dim</span> <span class="o">=</span> <span class="mi">1</span>
-                        <span class="n">elem_type</span> <span class="o">=</span> <span class="n">field_type</span><span class="o">.</span><span class="n">elementType</span>
-
-                    <span class="n">field_values</span> <span class="o">=</span> <span class="n">_convert_array_values</span><span class="p">(</span>
-                        <span class="n">field_values</span><span class="p">,</span> <span class="n">elem_type</span><span class="p">,</span> <span class="n">array_dim</span><span class="p">,</span> <span class="n">spark_primitive_type_to_np_type</span>
-                    <span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;Unsupported field type </span><span class="si">{</span><span class="n">field_type</span><span class="o">.</span><span class="n">simpleString</span><span class="p">()</span><span class="si">}</span><span class="s2"> in struct type.&quot;</span><span class="p">,</span>
-                        <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
-                    <span class="p">)</span>
-                <span class="n">result_dict</span><span class="p">[</span><span class="n">field_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">field_values</span>
-
-            <span class="k">return</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">result_dict</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">_convert_struct_values</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">result_type</span><span class="p">)</span>
 
         <span class="n">elem_type</span> <span class="o">=</span> <span class="n">result_type</span><span class="o">.</span><span class="n">elementType</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result_type</span><span class="p">,</span> <span class="n">ArrayType</span><span class="p">)</span> <span class="k">else</span> <span class="n">result_type</span>
 

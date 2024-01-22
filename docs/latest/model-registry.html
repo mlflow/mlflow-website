@@ -506,13 +506,20 @@ mlflow<span class="w"> </span>models<span class="w"> </span>serve<span class="w"
 </div>
 <div class="section" id="promoting-an-mlflow-model-across-environments">
 <h4><a class="toc-backref" href="#id13">Promoting an MLflow Model across environments</a><a class="headerlink" href="#promoting-an-mlflow-model-across-environments" title="Permalink to this headline"> </a></h4>
-<p>Over the course of a model’s lifecycle, it might progress through various separate environments like
-development, testing, staging, production, and so on. This segregation facilitates continuous integration
-and deployment for the model. In MLflow, you can use registered models to set up environments for your
-MLflow Models, where each registered model corresponds to a specific environment. Furthermore, you can
-configure access controls for the registered models using <a class="reference internal" href="auth/index.html#auth"><span class="std std-ref">MLflow Authentication</span></a>. Then,
-to promote MLflow Models across environments, you can use the <a class="reference internal" href="python_api/mlflow.client.html#mlflow.client.MlflowClient.copy_model_version" title="mlflow.client.MlflowClient.copy_model_version"><code class="xref py py-meth docutils literal notranslate"><span class="pre">copy_model_version()</span></code></a> method
-to copy model versions across registered models.</p>
+<p>In mature DevOps and MLOps workflows, organizations use separate environments (typically, dev,
+staging, and prod) with access controls to enable quick development without compromising stability
+in production. In MLflow, you can use registered models and <a class="reference internal" href="auth/index.html#auth"><span class="std std-ref">MLflow Authentication</span></a> to
+express access-controlled environments for your MLflow models. For example, you can create registered
+models corresponding to each combination of environment and business problem (e.g.
+<code class="docutils literal notranslate"><span class="pre">prod.ml_team.revenue_forecasting</span></code>, <code class="docutils literal notranslate"><span class="pre">dev.ml_team.revenue_forecasting</span></code>) and configure permissions
+accordingly. As you iterate on MLflow models for your business problem, you can promote them
+through the various environments for continuous integration and deployment.</p>
+<p>For mature production-grade setups, we recommend setting up automated workflows that train and register
+models in each environment. To productionize the latest iteration on a business problem, promote your
+machine learning code across environments via source control and CI/CD systems.</p>
+<p>For simple model deployment use cases, you can register your trained MLflow Model to a dev environment
+registered model as the latest model version and then use <a class="reference internal" href="python_api/mlflow.client.html#mlflow.client.MlflowClient.copy_model_version" title="mlflow.client.MlflowClient.copy_model_version"><code class="xref py py-meth docutils literal notranslate"><span class="pre">copy_model_version()</span></code></a>
+to promote it across registered models.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow</span> <span class="kn">import</span> <span class="n">MlflowClient</span>
 
 <span class="n">client</span> <span class="o">=</span> <span class="n">MlflowClient</span><span class="p">()</span>
@@ -524,6 +531,12 @@ to copy model versions across registered models.</p>
 </div>
 <p>This code snippet copies the model version with the <code class="docutils literal notranslate"><span class="pre">candidate</span></code> alias in the <code class="docutils literal notranslate"><span class="pre">regression-model-staging</span></code>
 model to the <code class="docutils literal notranslate"><span class="pre">regression-model-production</span></code> model as the latest version.</p>
+<p>You can also promote model versions in the UI. To do this, navigate to the model version details page
+and select the <code class="docutils literal notranslate"><span class="pre">Promote</span> <span class="pre">model</span></code> button. This opens a modal where you can choose a registered model
+to which the current model version will be copied.</p>
+<div class="figure align-default">
+<img alt="_images/oss_registry_6_version.png" src="_images/oss_registry_6_version.png" />
+</div>
 </div>
 <div class="section" id="adding-or-updating-an-mlflow-model-descriptions">
 <h4><a class="toc-backref" href="#id14">Adding or Updating an MLflow Model Descriptions</a><a class="headerlink" href="#adding-or-updating-an-mlflow-model-descriptions" title="Permalink to this headline"> </a></h4>
@@ -926,7 +939,7 @@ At a later point, if that archived model is not needed, you can delete it.</p>
 <p><strong>Model version aliases</strong></p>
 <p>Model version aliases provide a flexible way to create named references for particular model versions, and are useful for identifying which model version(s) are deployed within an environment. For example, setting a <strong>champion</strong> alias on a model version enables you to fetch the model version by that alias via the <a class="reference internal" href="python_api/mlflow.client.html#mlflow.client.MlflowClient.get_model_version_by_alias" title="mlflow.client.MlflowClient.get_model_version_by_alias"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_model_version_by_alias()</span></code></a> client API or the model URI <code class="docutils literal notranslate"><span class="pre">models:/&lt;registered</span> <span class="pre">model</span> <span class="pre">name&gt;&#64;champion</span></code>. Aliases can be reassigned to new model versions via the UI and client API. Unlike model registry stages, more than one alias can be applied to any given model version, allowing for easier A/B testing and model rollout.</p>
 <p><strong>Set up separate environments for models</strong></p>
-<p>In mature DevOps and MLOps workflows, organizations use separate environments (typically, dev, staging, and prod) with access controls to enable quick development without compromising stability in production. With <a class="reference internal" href="auth/index.html#auth"><span class="std std-ref">MLflow Authentication</span></a>, you can use registered models to express access-controlled environments for your MLflow models. For example, you can create registered models corresponding to each combination of environment and business problem (e.g. <cite>prod.ml_team.revenue_forecasting</cite>, <cite>dev.ml_team.revenue_forecasting</cite>) and configure permissions accordingly. Automate model retraining against your production registered models, or for simple model deployment use cases, use <a class="reference internal" href="python_api/mlflow.client.html#mlflow.client.MlflowClient.copy_model_version" title="mlflow.client.MlflowClient.copy_model_version"><code class="xref py py-meth docutils literal notranslate"><span class="pre">copy_model_version()</span></code></a> to promote model versions across registered models.</p>
+<p>In mature DevOps and MLOps workflows, organizations use separate environments (typically, dev, staging, and prod) with access controls to enable quick development without compromising stability in production. With <a class="reference internal" href="auth/index.html#auth"><span class="std std-ref">MLflow Authentication</span></a>, you can use registered models to express access-controlled environments for your MLflow models. For example, you can create registered models corresponding to each combination of environment and business problem (e.g. <code class="docutils literal notranslate"><span class="pre">prod.ml_team.revenue_forecasting</span></code>, <code class="docutils literal notranslate"><span class="pre">dev.ml_team.revenue_forecasting</span></code>) and configure permissions accordingly. Automate model retraining against your production registered models, or for simple model deployment use cases, use <a class="reference internal" href="python_api/mlflow.client.html#mlflow.client.MlflowClient.copy_model_version" title="mlflow.client.MlflowClient.copy_model_version"><code class="xref py py-meth docutils literal notranslate"><span class="pre">copy_model_version()</span></code></a> to promote model versions across registered models.</p>
 </div>
 <div class="section" id="migrating-models-away-from-stages">
 <h3><a class="toc-backref" href="#id23">Migrating models away from stages</a><a class="headerlink" href="#migrating-models-away-from-stages" title="Permalink to this headline"> </a></h3>

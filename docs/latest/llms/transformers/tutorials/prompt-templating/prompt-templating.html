@@ -1,0 +1,878 @@
+
+  
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Prompt Templating with MLflow and Transformers &mdash; MLflow 2.9.3.dev0 documentation</title>
+  
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/llms/transformers/tutorials/prompt-templating/prompt-templating.html">
+  
+  
+    <link rel="shortcut icon" href="../../../../_static/favicon.ico"/>
+    
+
+    
+
+  
+    
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/css/cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/css/grids.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/css/mobile.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/css/simple-cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/css/tabs.css" type="text/css" />
+    
+  
+        <link rel="index" title="Index"
+              href="../../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../../search.html"/>
+    <link rel="top" title="MLflow 2.9.3.dev0 documentation" href="../../../../index.html"/>
+        <link rel="up" title="MLflow Transformers Flavor" href="../../index.html"/>
+        <link rel="next" title="🤗 Transformers within MLflow" href="/../../guide/index.html"/>
+        <link rel="prev" title="Fine-Tuning Transformers with MLflow for Enhanced Model Management" href="/../fine-tuning/transformers-fine-tuning.html"/> 
+
+  
+  <script src="../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+<script type="text/javascript" src="../../../../_static/jquery.js"></script>
+<script type="text/javascript" src="../../../../_static/underscore.js"></script>
+<script type="text/javascript" src="../../../../_static/doctools.js"></script>
+<script type="text/javascript" src="../../../../_static/languagesections.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript" src="../../../../None"></script>
+
+<body class="wy-body-for-nav" role="document">
+  
+
+  
+  <nav class="wy-nav-top header" role="navigation" aria-label="top navigation">
+    <ul>
+  <li class="menu-toggle">
+    <i data-toggle="wy-nav-top" class="wy-nav-top-menu-button db-icon db-icon-menu pull-left"></i>
+    <a href="../../../../index.html" class="wy-nav-top-logo"
+      ><img src="../../../../_static/MLflow-logo-final-black.png" alt="MLflow"
+    /></a>
+    <span class="version">2.9.3.dev0</span>
+  </li>
+</ul>
+  </nav>
+  <page>
+    
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side relative">
+      <div class="wy-side-scroll">
+  <div class="wy-side-nav-search">
+    
+
+    
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+    
+  </div>
+
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+    
+      <a href="../../../../index.html" class="main-navigation-home"><img src="../../../../_static/icons/nav-home.svg"> MLflow</a>
+    
+
+    
+      
+
+      
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../introduction/index.html">What is MLflow?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting-started/index.html">Getting Started with MLflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../new-features/index.html">New Features</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../index.html">LLMs</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../index.html#id1">MLflow Deployments Server for LLMs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../index.html#id2">LLM Evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../index.html#id3">Prompt Engineering UI</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../index.html#native-mlflow-flavors-for-llms">Native MLflow Flavors for LLMs</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../../../index.html#explore-the-native-llm-flavors">Explore the Native LLM Flavors</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="../../index.html">MLflow Transformers Flavor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../openai/index.html">MLflow OpenAI Flavor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../sentence-transformers/index.html">MLflow Sentence-Transformers Flavor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../langchain/index.html">MLflow LangChain Flavor</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../index.html#id4">LLM Tracking in MLflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../index.html#tutorials-and-use-case-guides-for-llms-in-mlflow">Tutorials and Use Case Guides for LLMs in MLflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../model-evaluation/index.html">Model Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deep-learning/index.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../traditional-ml/index.html">Traditional ML</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment/index.html">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tracking.html">MLflow Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../system-metrics/index.html">System Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../projects.html">MLflow Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../models.html">MLflow Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../model-registry.html">MLflow Model Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../recipes.html">MLflow Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../plugins.html">MLflow Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../auth/index.html">MLflow Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../search-runs.html">Search Runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../search-experiments.html">Search Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../python_api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../R-api.html">R API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../java_api/index.html">Java API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../rest-api.html">REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../docker.html">Official MLflow Docker Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../community-model-flavors.html">Community Model Flavors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials-and-examples/index.html">Tutorials and Examples</a></li>
+</ul>
+
+      
+    
+  </div>
+
+  <div role="contentinfo">
+    
+
+    <p>
+      <a id='feedbacklink' href="https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a>
+    </p>
+  </div>
+</div>
+    </nav>
+
+    <main class="wy-grid-for-nav">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+          <div class="rst-content">
+            
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../../index.html">Documentation</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../../../index.html">LLMs</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../../index.html">MLflow Transformers Flavor</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+    
+      <li>Prompt Templating with MLflow and Transformers</li>
+    
+    
+    <!-- <li class="wy-breadcrumbs-aside">
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/llms/transformers/tutorials/prompt-templating/prompt-templating.ipynb" class="fa fa-github"> Edit on GitHub</a>
+    </li> -->
+    
+  </ul>
+</div>
+            <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <div itemprop="articleBody">
+                
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div class="section" id="Prompt-Templating-with-MLflow-and-Transformers">
+<h1>Prompt Templating with MLflow and Transformers<a class="headerlink" href="#Prompt-Templating-with-MLflow-and-Transformers" title="Permalink to this headline"> </a></h1>
+<p>Welcome to our in-depth tutorial on using prompt templates to conveniently customize the behavior of Transformers pipelines using MLflow.</p>
+<div class="section" id="Learning-Objectives">
+<h2>Learning Objectives<a class="headerlink" href="#Learning-Objectives" title="Permalink to this headline"> </a></h2>
+<p>In this tutorial, you will:</p>
+<ul class="simple">
+<li><p>Set up a text generation pipeline using TinyLlama-1.1B as an example model</p></li>
+<li><p>Set a prompt template that will be used to format user queries at inference time</p></li>
+<li><p>Load the model for querying</p></li>
+</ul>
+</div>
+<div class="section" id="What-is-a-prompt-template,-and-why-use-one?">
+<h2>What is a prompt template, and why use one?<a class="headerlink" href="#What-is-a-prompt-template,-and-why-use-one?" title="Permalink to this headline"> </a></h2>
+<p>When dealing with large language models, the way a query is structured can significantly impact the model’s performance. We often need to add some preamble, or format the query in a way that gives us the results that we want. It’s not ideal to expect the end-user of our applications to know exactly what this format should be, so we typically have a pre-processing step to format the user input in a way that works best with the underlying model. In other words, we apply a prompt template to the
+user’s input.</p>
+<p>MLflow provides a convenient way to set this on certain pipeline types using the <code class="docutils literal notranslate"><span class="pre">transformers</span></code> flavor. As of now, the only pipelines that we support are:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://huggingface.co/transformers/main_classes/pipelines.html#transformers.FeatureExtractionPipeline">feature-extraction</a></p></li>
+<li><p><a class="reference external" href="https://huggingface.co/transformers/main_classes/pipelines.html#transformers.FillMaskPipeline">fill-mask</a></p></li>
+<li><p><a class="reference external" href="https://huggingface.co/transformers/main_classes/pipelines.html#transformers.SummarizationPipeline">summarization</a></p></li>
+<li><p><a class="reference external" href="https://huggingface.co/transformers/main_classes/pipelines.html#transformers.Text2TextGenerationPipeline">text2text-generation</a></p></li>
+<li><p><a class="reference external" href="https://huggingface.co/transformers/main_classes/pipelines.html#transformers.TextGenerationPipeline">text-generation</a></p></li>
+</ul>
+<p>If you need a runthrough of the basics of how to use the <code class="docutils literal notranslate"><span class="pre">transformers</span></code> flavor, check out the <a class="reference external" href="https://mlflow.org/docs/latest/llms/transformers/guide/index.html">Introductory Guide</a>!</p>
+<p>Now, let’s dive in and see how it’s done!</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Disable tokenizers warnings when constructing pipelines</span>
+<span class="o">%</span><span class="k">env</span> TOKENIZERS_PARALLELISM=false
+
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="c1"># Disable a few less-than-useful UserWarnings from setuptools and pydantic</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">UserWarning</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+env: TOKENIZERS_PARALLELISM=false
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Pipeline-setup-and-inference">
+<h2>Pipeline setup and inference<a class="headerlink" href="#Pipeline-setup-and-inference" title="Permalink to this headline"> </a></h2>
+<p>First, let’s configure our Transformers pipeline. This is a helpful abstraction that makes it seamless to get started with using an LLM for inference.</p>
+<p>For this demonstration, let’s say the user’s input is the phrase “Tell me the largest bird”. Let’s experiment with a few different prompt templates, and see which one we like best.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">pipeline</span>
+
+<span class="n">generator</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span><span class="s2">&quot;text-generation&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">&quot;TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T&quot;</span><span class="p">)</span>
+
+<span class="n">user_input</span> <span class="o">=</span> <span class="s2">&quot;Tell me the largest bird&quot;</span>
+<span class="n">prompt_templates</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="c1"># no template</span>
+    <span class="s2">&quot;</span><span class="si">{prompt}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="c1"># question-answer style template</span>
+    <span class="s2">&quot;Q: </span><span class="si">{prompt}</span><span class="se">\n</span><span class="s2">A:&quot;</span><span class="p">,</span>
+    <span class="c1"># dialogue style template with a system prompt</span>
+    <span class="p">(</span>
+        <span class="s2">&quot;You are an assistant that is knowledgeable about birds. &quot;</span>
+        <span class="s2">&quot;If asked about the largest bird, you will reply &#39;Duck&#39;.</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;User: </span><span class="si">{prompt}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;Assistant:&quot;</span>
+    <span class="p">),</span>
+<span class="p">]</span>
+
+<span class="n">responses</span> <span class="o">=</span> <span class="n">generator</span><span class="p">(</span>
+    <span class="p">[</span><span class="n">template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">prompt</span><span class="o">=</span><span class="n">user_input</span><span class="p">)</span> <span class="k">for</span> <span class="n">template</span> <span class="ow">in</span> <span class="n">prompt_templates</span><span class="p">],</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">15</span>
+<span class="p">)</span>
+<span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">response</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">responses</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Response to Template #</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;generated_text&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Response to Template #0:
+Tell me the largest bird you&#39;ve ever seen.
+I&#39;ve seen a lot of birds
+
+Response to Template #1:
+Q: Tell me the largest bird
+A: The largest bird is a pigeon.
+
+A: The largest
+
+Response to Template #2:
+You are an assistant that is knowledgeable about birds. If asked about the largest bird, you will reply &#39;Duck&#39;.
+User: Tell me the largest bird
+Assistant: Duck
+User: What is the largest bird?
+Assistant:
+
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Saving-the-model-and-template-with-MLflow">
+<h1>Saving the model and template with MLflow<a class="headerlink" href="#Saving-the-model-and-template-with-MLflow" title="Permalink to this headline"> </a></h1>
+<p>Now that we’ve experimented with a few prompt templates, let’s pick one, and save it together with our pipeline using MLflow. Before we do this, let’s take a few minutes to learn about an important component of MLflow models—signatures!</p>
+<div class="section" id="Creating-a-model-signature">
+<h2>Creating a model signature<a class="headerlink" href="#Creating-a-model-signature" title="Permalink to this headline"> </a></h2>
+<p>A model signature codifies a model’s expected inputs, outputs, and inference params. MLflow enforces this signature at inference time, and will raise a helpful exception if the user input does not match up with the expected format.</p>
+<p>Creating a signature can be done simply by calling <code class="docutils literal notranslate"><span class="pre">mlflow.models.infer_signature()</span></code>, and providing a sample input and output value. We can use <code class="docutils literal notranslate"><span class="pre">mlflow.transformers.generate_signature_output()</span></code> to easily generate a sample output. If we want to pass any additional arguments to the pipeline at inference time (e.g. <code class="docutils literal notranslate"><span class="pre">max_new_tokens</span></code> above), we can do so via <code class="docutils literal notranslate"><span class="pre">params</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="n">sample_input</span> <span class="o">=</span> <span class="s2">&quot;Tell me the largest bird&quot;</span>
+<span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;max_new_tokens&quot;</span><span class="p">:</span> <span class="mi">15</span><span class="p">}</span>
+<span class="n">signature</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">infer_signature</span><span class="p">(</span>
+    <span class="n">sample_input</span><span class="p">,</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">transformers</span><span class="o">.</span><span class="n">generate_signature_output</span><span class="p">(</span><span class="n">generator</span><span class="p">,</span> <span class="n">sample_input</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">),</span>
+    <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># visualize the signature</span>
+<span class="n">signature</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2024/01/16 17:28:42 WARNING mlflow.transformers: params provided to the `predict` method will override the inference configuration saved with the model. If the params provided are not valid for the pipeline, MlflowException will be raised.
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+inputs:
+  [string (required)]
+outputs:
+  [string (required)]
+params:
+  [&#39;max_new_tokens&#39;: long (default: 15)]
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Starting-a-new-experiment">
+<h2>Starting a new experiment<a class="headerlink" href="#Starting-a-new-experiment" title="Permalink to this headline"> </a></h2>
+<p>We create a new <a class="reference external" href="https://mlflow.org/docs/latest/tracking.html#experiments">MLflow Experiment</a> so that the run we’re going to log our model to does not log to the default experiment and instead has its own contextually relevant entry.</p>
+</div>
+<div class="section" id="Logging-the-model-with-the-prompt-template">
+<h2>Logging the model with the prompt template<a class="headerlink" href="#Logging-the-model-with-the-prompt-template" title="Permalink to this headline"> </a></h2>
+<p>Logging the model using MLflow saves the model and its essential metadata so it can be efficiently tracked and versioned. We’ll use <code class="docutils literal notranslate"><span class="pre">mlflow.transformers.log_model()</span></code>, which is tailored to make this process as seamless as possible. To save the prompt template, all we have to do is pass it in using the <code class="docutils literal notranslate"><span class="pre">prompt_template</span></code> keyword argument.</p>
+<p>Two important thing to take note of:</p>
+<ol class="arabic simple">
+<li><p>A prompt template must be a string with exactly one named placeholder <code class="docutils literal notranslate"><span class="pre">{prompt}</span></code>. MLflow will raise an error if a prompt template is provided that does not conform to this format.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">text-generation</span></code> pipelines with a prompt template will have the <a class="reference external" href="https://huggingface.co/docs/huggingface_hub/main/en/package_reference/inference_client#huggingface_hub.inference._text_generation.TextGenerationParameters.return_full_text">return_full_text pipeline argument</a> set to <code class="docutils literal notranslate"><span class="pre">False</span></code> by default. This is to prevent the template from being shown to the users, which could potentially cause confusion as it was not part of their original input. To override this behaviour, either set
+<code class="docutils literal notranslate"><span class="pre">return_full_text</span></code> to <code class="docutils literal notranslate"><span class="pre">True</span></code> via <code class="docutils literal notranslate"><span class="pre">params</span></code>, or by including it in a <code class="docutils literal notranslate"><span class="pre">model_config</span></code> dict in <code class="docutils literal notranslate"><span class="pre">log_model()</span></code>.</p></li>
+</ol>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># If you are running this tutorial in local mode, leave the next line commented out.</span>
+<span class="c1"># Otherwise, uncomment the following line and set your tracking uri to your local or remote tracking server.</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_tracking_uri</span><span class="p">(</span><span class="s2">&quot;http://127.0.0.1:5000&quot;</span><span class="p">)</span>
+
+<span class="c1"># Set a name for the experiment that is indicative of what the runs being created within it are in regards to</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s2">&quot;prompt-templating&quot;</span><span class="p">)</span>
+
+<span class="n">prompt_template</span> <span class="o">=</span> <span class="s2">&quot;Q: </span><span class="si">{prompt}</span><span class="se">\n</span><span class="s2">A:&quot;</span>
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="n">model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">transformers</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+        <span class="n">transformers_model</span><span class="o">=</span><span class="n">generator</span><span class="p">,</span>
+        <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
+        <span class="n">task</span><span class="o">=</span><span class="s2">&quot;text-generation&quot;</span><span class="p">,</span>
+        <span class="n">signature</span><span class="o">=</span><span class="n">signature</span><span class="p">,</span>
+        <span class="n">input_example</span><span class="o">=</span><span class="s2">&quot;Tell me the largest bird&quot;</span><span class="p">,</span>
+        <span class="n">prompt_template</span><span class="o">=</span><span class="n">prompt_template</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2024/01/16 17:28:45 INFO mlflow.tracking.fluent: Experiment with name &#39;prompt-templating&#39; does not exist. Creating a new experiment.
+2024/01/16 17:28:52 INFO mlflow.transformers: text-generation pipelines saved with prompt templates have the `return_full_text` pipeline kwarg set to False by default. To override this behavior, provide a `model_config` dict with `return_full_text` set to `True` when saving the model.
+2024/01/16 17:32:57 WARNING mlflow.utils.environment: Encountered an unexpected error while inferring pip requirements (model URI: /var/folders/qd/9rwd0_gd0qs65g4sdqlm51hr0000gp/T/tmpbs0poq1a/model, flavor: transformers), fall back to return [&#39;transformers==4.34.1&#39;, &#39;torch==2.1.1&#39;, &#39;torchvision==0.16.1&#39;, &#39;accelerate==0.25.0&#39;]. Set logging level to DEBUG to see the full traceback.
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Loading-the-model-for-inference">
+<h1>Loading the model for inference<a class="headerlink" href="#Loading-the-model-for-inference" title="Permalink to this headline"> </a></h1>
+<p>Next, we can load the model using <code class="docutils literal notranslate"><span class="pre">mlflow.pyfunc.load_model()</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">pyfunc</span></code> module in MLflow serves as a generic wrapper for Python functions. It gives us a standard interface for loading and querying models as python functions, without having to worry about the specifics of the underlying models.</p>
+<p>Utilizing <a class="reference external" href="https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#mlflow.pyfunc.load_model">mlflow.pyfunc.load_model</a>, our previously logged text generation model is loaded using its unique model URI. This URI is a reference to the stored model artifacts. MLflow efficiently handles the model’s deserialization, along with any associated dependencies, preparing it for immediate use.</p>
+<p>Now, when we call the <code class="docutils literal notranslate"><span class="pre">predict()</span></code> method on our loaded model, the user’s input should be formatted with our chosen prompt template prior to inference!</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">loaded_generator</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_uri</span><span class="o">=</span><span class="n">model_info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
+
+<span class="n">loaded_generator</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;Tell me the largest bird&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "709dd14c0bd5433e95fcbb60755f7ed0", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2024/01/16 17:33:16 INFO mlflow.store.artifact.artifact_repo: The progress bar can be disabled by setting the environment variable MLFLOW_ENABLE_ARTIFACTS_PROGRESS_BAR to false
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "152e1683f12343b185b392ff7ab4413d", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2024/01/16 17:33:56 WARNING mlflow.transformers: params provided to the `predict` method will override the inference configuration saved with the model. If the params provided are not valid for the pipeline, MlflowException will be raised.
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&#39;The largest bird is a pigeon.\n\nA: The largest&#39;]
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Closing-Remarks">
+<h1>Closing Remarks<a class="headerlink" href="#Closing-Remarks" title="Permalink to this headline"> </a></h1>
+<p>This demonstration showcased a simple way to format user queries using prompt templates. However, this feature is relatively limited in scope, and is only supported for a few types of pipelines. If your use-case is more complex, you might want to check out our <a class="reference external" href="https://www.mlflow.org/docs/latest/llms/custom-pyfunc-for-llms/notebooks/custom-pyfunc-advanced-llm.html">guide for creating a custom PyFunc</a>!</p>
+</div>
+
+
+              </div>
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../fine-tuning/transformers-fine-tuning.html" class="btn btn-neutral" title="Fine-Tuning Transformers with MLflow for Enhanced Model Management" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+      
+      
+        <a href="../../guide/index.html" class="btn btn-neutral" title="🤗 Transformers within MLflow" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+      <p class="copyright">
+          &copy; MLflow Project, a Series of LF Projects, LLC. All rights reserved.
+      </p>
+
+  </div> 
+
+</footer>
+          </div>
+        </div>
+      </section>
+    </main>
+  </page>
+
+  
+
+
+  
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+      URL_ROOT:'../../../../',
+      VERSION:'2.9.3.dev0',
+      COLLAPSE_INDEX:false,
+      FILE_SUFFIX:'.html',
+      LINK_SUFFIX: '.html',
+      HAS_SOURCE:  true
+    };
+  </script>
+
+  
+
+  <script type="text/javascript" src="../../../../_static/js/clipboard.min.js"></script>
+  <script type="text/javascript" src="../../../../_static/js/jquery.waypoints.min.js"></script>
+
+  
+  
+  
+  <script type="text/javascript">var CLIPPY_SVG_PATH = "../../../../_static/clippy.svg";</script>
+  <script type="text/javascript" src="../../../../_static/js/custom.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.StickyNav.enable();
+    });
+
+  </script>
+  
+
+  
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        // Get the code block designator class entries
+        const allHighlights = document.querySelectorAll('.highlight');
+        // Disable copyable links for notebook cell numbering and for cell outputs
+        const highlights = Array.from(allHighlights).filter(highlight => !highlight.closest('.highlight-none') && 
+            !highlight.closest('.nboutput'));
+    
+        highlights.forEach(function(highlight) {
+            const copyIcon = document.createElement('span');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.innerHTML = '&#xf0ea;';
+
+            copyIcon.addEventListener('click', function() {
+                const code = highlight.querySelector('pre').textContent;
+                copyToClipboard(code);
+
+                // Flash effect on click
+                this.style.color = '#0194E2';
+                setTimeout(() => {
+                    this.style.color = ''; 
+                }, 100);
+
+                // Display "Code copied to clipboard" near the clicked icon
+                const message = document.createElement('span');
+                message.textContent = "Copied!";
+                message.classList.add('copy-message'); 
+
+                // Append the message to the icon
+                this.appendChild(message);
+
+                setTimeout(() => {
+                    this.removeChild(message);
+                }, 500);
+            });
+
+            highlight.appendChild(copyIcon);
+        });
+    });
+  </script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Force download for notebook-download-btn
+        const downloadButtons = document.querySelectorAll('.notebook-download-btn');
+        downloadButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                // Fetch the raw content of the notebook from GitHub
+                fetch(button.href)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = url;
+                        const filename = button.href.split('/').pop();
+                        link.download = filename; 
+
+                        document.body.appendChild(link);
+                        link.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    })
+                    .catch(err => console.error('Error fetching the notebook:', err));
+            });
+        });
+    });
+</script> 
+</body>
+</html>

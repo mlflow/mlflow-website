@@ -206,6 +206,7 @@
 <span class="kn">from</span> <span class="nn">mlflow.utils.requirements_utils</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">_infer_requirements</span><span class="p">,</span>
     <span class="n">_parse_requirements</span><span class="p">,</span>
+    <span class="n">warn_dependency_requirement_mismatches</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.version</span> <span class="kn">import</span> <span class="n">VERSION</span>
 
@@ -719,6 +720,9 @@
 
     <span class="n">sanitized_pip_reqs</span> <span class="o">=</span> <span class="n">_deduplicate_requirements</span><span class="p">(</span><span class="n">pip_reqs</span><span class="p">)</span>
 
+    <span class="c1"># Check if pip requirements contain incompatible version with the current environment</span>
+    <span class="n">warn_dependency_requirement_mismatches</span><span class="p">(</span><span class="n">sanitized_pip_reqs</span><span class="p">)</span>
+
     <span class="k">if</span> <span class="n">constraints</span><span class="p">:</span>
         <span class="n">sanitized_pip_reqs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;-c </span><span class="si">{</span><span class="n">_CONSTRAINTS_FILE_NAME</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
@@ -876,6 +880,9 @@
     <span class="n">pip_reqs</span><span class="p">,</span> <span class="n">constraints</span> <span class="o">=</span> <span class="n">_parse_pip_requirements</span><span class="p">(</span><span class="n">pip_reqs</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">_contains_mlflow_requirement</span><span class="p">(</span><span class="n">pip_reqs</span><span class="p">):</span>
         <span class="n">pip_reqs</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">_generate_mlflow_version_pinning</span><span class="p">())</span>
+
+    <span class="c1"># Check if pip requirements contain incompatible version with the current environment</span>
+    <span class="n">warn_dependency_requirement_mismatches</span><span class="p">(</span><span class="n">pip_reqs</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">constraints</span><span class="p">:</span>
         <span class="n">pip_reqs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;-c </span><span class="si">{</span><span class="n">_CONSTRAINTS_FILE_NAME</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
