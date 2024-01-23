@@ -256,8 +256,7 @@ export default function Home(): JSX.Element {
               paddingBottom: "32px",
             }}
           >
-            Build better models and generative AI apps on an unified,
-            end-to-end,
+            Build better models and generative AI apps on a unified, end-to-end,
             <br />
             open source MLOps platform
           </div>
