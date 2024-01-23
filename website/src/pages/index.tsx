@@ -337,7 +337,7 @@ export default function Home(): JSX.Element {
           <ConceptCard
             logo="img/concepts/visualization.svg"
             title="Visualization"
-            href="/docs/latest/getting-started/quickstart-2/index.html#compare-the-results"
+            href="docs/latest/getting-started/quickstart-2/index.html#compare-the-results"
           />
           <ConceptCard
             logo="img/concepts/generative-ai.svg"
