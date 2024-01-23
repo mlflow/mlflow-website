@@ -17,8 +17,7 @@ const LogoCard = ({
           <div className={styles.container}>
             <img src={src} className={styles.img} />
             <div>
-              <h2 className={styles.title}>{title}</h2>
-              See the docs ↗︎
+              <h3 className={styles.title}>{title}</h3>
             </div>
           </div>
         </a>
