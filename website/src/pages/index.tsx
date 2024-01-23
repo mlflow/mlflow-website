@@ -297,38 +297,26 @@ export default function Home(): JSX.Element {
 
       <AutoScroll
         images={[
-          // Databricks
-          // Meta
-          // Microsoft
-          // MosaicML
-          // Nextdoor
-          // Grammarly
-          // Atlassian
-          // Samsara
-          // Scribd
-          // Headspace Health
-          // Grab
-          // Gousto
-          // Riot Games
-          // Nike
-          // Comcast
-          // Intuit
           "img/companies/databricks.svg",
           "img/companies/meta.svg",
           "img/companies/microsoft.svg",
           "img/companies/mosaicml.svg",
-          "img/companies/nextdoor.svg",
-          "img/companies/grammarly.svg",
-          "img/companies/atlassian.svg",
-          "img/companies/samsara.svg",
-          "img/companies/scribd.svg",
-          "img/companies/headspace.svg",
-          "img/companies/grab.svg",
-          "img/companies/gousto.svg",
-          "img/companies/riot-games.svg",
-          "img/companies/nike.svg",
-          "img/companies/comcast.svg",
-          "img/companies/intuit.svg",
+          "img/companies/zillow.svg",
+          "img/companies/toyota.svg",
+          "img/companies/booking.svg",
+          "img/companies/wix.svg",
+          "img/companies/accenture.svg",
+          "img/companies/asml.svg",
+          // "img/companies/atlassian.svg",
+          // "img/companies/samsara.svg",
+          // "img/companies/scribd.svg",
+          // "img/companies/headspace.svg",
+          // "img/companies/grab.svg",
+          // "img/companies/gousto.svg",
+          // "img/companies/riot-games.svg",
+          // "img/companies/nike.svg",
+          // "img/companies/comcast.svg",
+          // "img/companies/intuit.svg",
         ]}
       />
 
