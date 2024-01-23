@@ -218,6 +218,12 @@ serve the model for prediction, MLflow automatically installs the dependencies t
 worry about managing dependencies in MLflow Model.</p>
 <p>However, in some cases, you may need to add or modify some dependencies. This page provides a high-level description of how MLflow manages
 dependencies and guidance for how to customize dependencies for your use case.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>One tip for improving MLflow’s dependency inference accuracy is to add an <code class="docutils literal notranslate"><span class="pre">input_example</span></code> when saving your model. This enables MLflow to
+perform a model prediction before saving the model, thereby capturing the dependencies used during the prediction.
+Please refer to <a class="reference internal" href="../models.html#input-example"><span class="std std-ref">Model Input Example</span></a> for additional, detailed usage of this parameter.</p>
+</div>
 <div class="contents local topic" id="table-of-contents">
 <p class="topic-title">Table of Contents</p>
 <ul class="simple">
@@ -311,6 +317,7 @@ when logging the model. For example,</p>
         <span class="n">python_model</span><span class="o">=</span><span class="n">CustomModel</span><span class="p">(),</span>
         <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
         <span class="n">extra_pip_requirements</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;pandas==2.0.3&quot;</span><span class="p">],</span>
+        <span class="n">input_example</span><span class="o">=</span><span class="n">input_data</span><span class="p">,</span>
     <span class="p">)</span>
 </pre></div>
 </div>
@@ -394,6 +401,7 @@ To do so, specify <strong>code_path</strong> when logging the model. For example
     <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
         <span class="n">python_model</span><span class="o">=</span><span class="n">MyModel</span><span class="p">(),</span>
         <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
+        <span class="n">input_example</span><span class="o">=</span><span class="n">input_data</span><span class="p">,</span>
         <span class="n">code_paths</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;utils.py&quot;</span><span class="p">],</span>
     <span class="p">)</span>
 </pre></div>
@@ -433,6 +441,7 @@ For example, let’s say that you have the following file structure in your proj
     <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
         <span class="n">python_model</span><span class="o">=</span><span class="n">MyModel</span><span class="p">(),</span>
         <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
+        <span class="n">input_example</span><span class="o">=</span><span class="n">input_data</span><span class="p">,</span>
         <span class="n">code_paths</span><span class="o">=</span><span class="p">[</span>
             <span class="s2">&quot;src/utils.py&quot;</span>
         <span class="p">],</span>  <span class="c1"># the file will be saved at code/utils.py not code/src/utils.py</span>
@@ -459,6 +468,7 @@ This way, MLflow will copy the entire <code class="docutils literal notranslate"
     <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
         <span class="n">python_model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
         <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
+        <span class="n">input_example</span><span class="o">=</span><span class="n">input_data</span><span class="p">,</span>
         <span class="n">code_paths</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;src&quot;</span><span class="p">],</span>  <span class="c1"># the whole /src directory will be saved at code/src</span>
     <span class="p">)</span>
 
@@ -563,6 +573,12 @@ curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </spa
 model dependencies and save them as part of the MLflow Model metadata. However, this might not always be complete and miss some dependencies e.g. [extras] dependencies
 for certain libraries. This can cause errors when serving your model, such as “ModuleNotFoundError” or “ImportError”. Below are some steps that can help to diagnose
 and fix missing dependency errors.</p>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>To reduce the possibility of dependency errors, you can add <code class="docutils literal notranslate"><span class="pre">input_example</span></code> when saving your model. This enables MLflow to
+perform a model prediction before saving the model, thereby capturing the dependencies used during the prediction.
+Please refer to <a class="reference internal" href="../models.html#input-example"><span class="std std-ref">Model Input Example</span></a> for additional, detailed usage of this parameter.</p>
+</div>
 <div class="section" id="check-the-missing-dependencies">
 <h4>1. Check the missing dependencies<a class="headerlink" href="#check-the-missing-dependencies" title="Permalink to this headline"> </a></h4>
 <p>The missing dependencies are listed in the error message. For example, if you see the following error message:</p>
@@ -602,7 +618,7 @@ defined in the model metadata. Since this doesn’t mutate the model, you can it
 </div>
 </div>
 <div class="section" id="update-the-model-metadata">
-<h4>1. Update the model metadata<a class="headerlink" href="#update-the-model-metadata" title="Permalink to this headline"> </a></h4>
+<h4>3. Update the model metadata<a class="headerlink" href="#update-the-model-metadata" title="Permalink to this headline"> </a></h4>
 <p>Once you find the correct dependencies, you can create a new model with the correct dependencies.
 To do so, specify the <code class="docutils literal notranslate"><span class="pre">extra_pip_requirements</span></code> option when logging the model.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
@@ -611,6 +627,7 @@ To do so, specify the <code class="docutils literal notranslate"><span class="pr
     <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
     <span class="n">python_model</span><span class="o">=</span><span class="n">python_model</span><span class="p">,</span>
     <span class="n">extra_pip_requirements</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;opencv-python==4.8.0&quot;</span><span class="p">],</span>
+    <span class="n">input_example</span><span class="o">=</span><span class="n">input_data</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
