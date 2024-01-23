@@ -298,8 +298,8 @@ export default function Home(): JSX.Element {
       <AutoScroll
         images={[
           "img/companies/databricks.svg",
-          "img/companies/meta.svg",
           "img/companies/microsoft.svg",
+          "img/companies/meta.svg",
           "img/companies/mosaicml.svg",
           "img/companies/zillow.svg",
           "img/companies/toyota.svg",
