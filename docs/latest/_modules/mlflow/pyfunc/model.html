@@ -223,8 +223,8 @@
     <span class="n">_process_pip_requirements</span><span class="p">,</span>
     <span class="n">_PythonEnv</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.file_utils</span> <span class="kn">import</span> <span class="n">TempDir</span><span class="p">,</span> <span class="n">_copy_file_or_tree</span><span class="p">,</span> <span class="n">get_total_file_size</span><span class="p">,</span> <span class="n">write_to</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.model_utils</span> <span class="kn">import</span> <span class="n">_get_flavor_configuration</span>
+<span class="kn">from</span> <span class="nn">mlflow.utils.file_utils</span> <span class="kn">import</span> <span class="n">TempDir</span><span class="p">,</span> <span class="n">get_total_file_size</span><span class="p">,</span> <span class="n">write_to</span>
+<span class="kn">from</span> <span class="nn">mlflow.utils.model_utils</span> <span class="kn">import</span> <span class="n">_get_flavor_configuration</span><span class="p">,</span> <span class="n">_validate_and_copy_code_paths</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.requirements_utils</span> <span class="kn">import</span> <span class="n">_get_pinned_requirement</span>
 
 <span class="n">CONFIG_KEY_ARTIFACTS</span> <span class="o">=</span> <span class="s2">&quot;artifacts&quot;</span>
@@ -493,11 +493,7 @@
             <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">tmp_artifacts_dir</span><span class="o">.</span><span class="n">path</span><span class="p">(),</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">saved_artifacts_dir_subpath</span><span class="p">))</span>
         <span class="n">custom_model_config_kwargs</span><span class="p">[</span><span class="n">CONFIG_KEY_ARTIFACTS</span><span class="p">]</span> <span class="o">=</span> <span class="n">saved_artifacts_config</span>
 
-    <span class="n">saved_code_subpath</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="k">if</span> <span class="n">code_paths</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">saved_code_subpath</span> <span class="o">=</span> <span class="s2">&quot;code&quot;</span>
-        <span class="k">for</span> <span class="n">code_path</span> <span class="ow">in</span> <span class="n">code_paths</span><span class="p">:</span>
-            <span class="n">_copy_file_or_tree</span><span class="p">(</span><span class="n">src</span><span class="o">=</span><span class="n">code_path</span><span class="p">,</span> <span class="n">dst</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">dst_dir</span><span class="o">=</span><span class="n">saved_code_subpath</span><span class="p">)</span>
+    <span class="n">saved_code_subpath</span> <span class="o">=</span> <span class="n">_validate_and_copy_code_paths</span><span class="p">(</span><span class="n">code_paths</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
 
     <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">add_to_model</span><span class="p">(</span>
         <span class="n">model</span><span class="o">=</span><span class="n">mlflow_model</span><span class="p">,</span>
