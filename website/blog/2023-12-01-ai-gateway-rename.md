@@ -11,6 +11,8 @@ If you are currently using the MLflow AI Gateway, please read this in full to ge
 
 Please note that the feature previously known as the `MLflow AI Gateway`, which was in an experimental phase, has undergone significant updates and improvements.
 
+<!-- truncate -->
+
 ## Introducing "MLflow Deployments for LLMs"
 
 This feature, while still in experimental status, has been renamed and migrated to utilize the `deployments` API.

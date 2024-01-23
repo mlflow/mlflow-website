@@ -11,6 +11,8 @@ Looking to learn more about the autologging functionality included in MLflow? Lo
 
 Robust logging practices are central to the iterative development and improvement of machine learning models. Carefully tracking metrics, parameters, and artifacts can be challenging when working with complex machine learning libraries or when experimenting with multiple different frameworks with varying APIs and selections of different objects and values to track.
 
+<!-- truncate -->
+
 MLflow’s **automatic logging functionality** offers a simple solution that is compatible with many widely-used machine learning libraries, such as [PyTorch](https://mlflow.org/docs/latest/python_api/mlflow.pytorch.html), [Scikit-learn](https://mlflow.org/docs/latest/python_api/mlflow.sklearn.html#mlflow.sklearn.autolog), and [XGBoost](https://mlflow.org/docs/latest/python_api/mlflow.xgboost.html#mlflow.xgboost.autolog). Using `mlflow.autolog()` instructs MLflow to capture essential data without requiring the user to specify what to capture manually. It is an accessible and powerful entrypoint for MLflow’s logging capabilities.
 
 To enable automatic logging, simply add the following line to your machine learning scripts/notebooks, before initiating activities like model training or evaluation that may include information or artifacts you would like to log:

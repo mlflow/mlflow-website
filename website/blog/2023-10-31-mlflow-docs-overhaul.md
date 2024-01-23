@@ -15,6 +15,8 @@ We're thrilled to announce a comprehensive overhaul of the MLflow Docs. This ini
 
 The MLflow documentation has always been an essential resource for our users. Over time, we've received invaluable feedback, and we've listened. The modernization effort is a direct response to the needs and preferences of our community.
 
+<!-- truncate -->
+
 Along with working on covering new cutting-edge features as part of this documentation overhaul, we're working on addressing the complexity of getting started. As the first part of a series of tutorials and guides focusing on the initial learning phase, we've created a new [getting started guide](https://www.mlflow.org/docs/latest/getting-started/logging-first-model/index.html), the first of many in a new series we're working on in an effort to teach the fundamentals of using MLflow. We feel that more in-depth instructional tutorials for learning the concepts and tools of MLflow will help to enhance the user experience for not only new users, but experienced users who need a refresher of how to do certain tasks.
 
 There are more of these coming in the future!
