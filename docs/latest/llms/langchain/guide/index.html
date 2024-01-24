@@ -256,6 +256,7 @@ deployment of complex NLP applications.</p>
 <li><p><strong>Simplified Logging and Loading</strong>: MLflow’s <cite>langchain</cite> flavor provides functions like <cite>log_model()</cite> and <cite>load_model()</cite>, enabling easy logging and retrieval of LangChain models within the MLflow ecosystem.</p></li>
 <li><p><strong>Simplified Deployment</strong>: LangChain models logged in MLflow can be interpreted as generic Python functions, simplifying their deployment and use in diverse applications. With dependency management incorporated directly into your logged model, you can deploy your application knowing that the environment that you used to train the model is what will be used to serve it.</p></li>
 <li><p><strong>Versatile Model Interaction</strong>: The integration allows developers to leverage LangChain’s unique features in conjunction with MLflow’s robust model tracking and management capabilities.</p></li>
+<li><p><strong>Autologging</strong>: MLflow’s <cite>langchain</cite> flavor provides autologging of LangChain models, which automatically logs artifacts, metrics and models for inference.</p></li>
 </ul>
 <p>The <code class="docutils literal notranslate"><span class="pre">langchain</span></code> model flavor enables logging of <a class="reference external" href="https://github.com/hwchase17/langchain">LangChain models</a> in MLflow format via
 the <a class="reference internal" href="../../../python_api/mlflow.langchain.html#mlflow.langchain.save_model" title="mlflow.langchain.save_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.langchain.save_model()</span></code></a> and <a class="reference internal" href="../../../python_api/mlflow.langchain.html#mlflow.langchain.log_model" title="mlflow.langchain.log_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.langchain.log_model()</span></code></a> functions. Use of these
@@ -610,6 +611,87 @@ for consistent performance.</p></li>
 <span class="p">]</span>
 </pre></div>
 </div>
+</div>
+</div>
+</div>
+<div class="section" id="mlflow-langchain-autologging">
+<h3>MLflow Langchain Autologging<a class="headerlink" href="#mlflow-langchain-autologging" title="Permalink to this headline"> </a></h3>
+<p>MLflow <cite>langchain</cite> flavor supports autologging of LangChain models, which provides the following benefits:</p>
+<ul class="simple">
+<li><p><strong>Streamlined Logging Process</strong>: Simplified Logging with Autologging eliminates the manual effort required to log LangChain models and metrics in MLflow. It achieves this by seamlessly integrating the MlflowCallbackHandler, which automatically records metrics and artifacts.</p></li>
+<li><p><strong>Effortless Artifact Logging</strong>: Autologging simplifies the process by automatically logging artifacts that encapsulate crucial details about the LangChain model. This includes information about various tools, chains, retrievers, agents, and llms used during inference, along with configurations and other relevant metadata.</p></li>
+<li><p><strong>Seamless Metrics Recording</strong>: Autologging effortlessly captures metrics for evaluating generated texts, as well as key objects such as llms and agents employed during inference.</p></li>
+<li><p><strong>Automated Input and Output Logging</strong>: Autologging takes care of logging inputs and outputs of the LangChain model during inference. The recorded results are neatly organized into an inference_inputs_outputs.json file, providing a comprehensive overview of the model’s inference history.</p></li>
+</ul>
+<div class="section" id="an-example-of-mlflow-langchain-autologging">
+<h4>An example of MLflow langchain autologging<a class="headerlink" href="#an-example-of-mlflow-langchain-autologging" title="Permalink to this headline"> </a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">itemgetter</span>
+
+<span class="kn">from</span> <span class="nn">langchain.llms</span> <span class="kn">import</span> <span class="n">OpenAI</span>
+<span class="kn">from</span> <span class="nn">langchain.prompts</span> <span class="kn">import</span> <span class="n">PromptTemplate</span>
+<span class="kn">from</span> <span class="nn">langchain.schema.output_parser</span> <span class="kn">import</span> <span class="n">StrOutputParser</span>
+<span class="kn">from</span> <span class="nn">langchain.schema.runnable</span> <span class="kn">import</span> <span class="n">RunnableLambda</span>
+
+<span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="k">assert</span> <span class="s2">&quot;OPENAI_API_KEY&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">,</span> <span class="s2">&quot;Please set the OPENAI_API_KEY environment variable.&quot;</span>
+
+<span class="c1"># Enable mlflow langchain autologging</span>
+<span class="c1"># Note: We only support auto-logging models that do not contain retrievers</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">langchain</span><span class="o">.</span><span class="n">autolog</span><span class="p">(</span>
+    <span class="n">log_input_examples</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">log_model_signatures</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">log_models</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">log_inputs_outputs</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">registered_model_name</span><span class="o">=</span><span class="s2">&quot;lc_model&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">prompt_with_history_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">Here is a history between you and a human: </span><span class="si">{chat_history}</span>
+
+<span class="s2">Now, please answer this question: </span><span class="si">{question}</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">prompt_with_history</span> <span class="o">=</span> <span class="n">PromptTemplate</span><span class="p">(</span>
+    <span class="n">input_variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;chat_history&quot;</span><span class="p">,</span> <span class="s2">&quot;question&quot;</span><span class="p">],</span> <span class="n">template</span><span class="o">=</span><span class="n">prompt_with_history_str</span>
+<span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">extract_question</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">input</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;content&quot;</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">extract_history</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">input</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+
+<span class="n">llm</span> <span class="o">=</span> <span class="n">OpenAI</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
+
+<span class="c1"># Build a chain with LCEL</span>
+<span class="n">chain_with_history</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;question&quot;</span><span class="p">:</span> <span class="n">itemgetter</span><span class="p">(</span><span class="s2">&quot;messages&quot;</span><span class="p">)</span> <span class="o">|</span> <span class="n">RunnableLambda</span><span class="p">(</span><span class="n">extract_question</span><span class="p">),</span>
+        <span class="s2">&quot;chat_history&quot;</span><span class="p">:</span> <span class="n">itemgetter</span><span class="p">(</span><span class="s2">&quot;messages&quot;</span><span class="p">)</span> <span class="o">|</span> <span class="n">RunnableLambda</span><span class="p">(</span><span class="n">extract_history</span><span class="p">),</span>
+    <span class="p">}</span>
+    <span class="o">|</span> <span class="n">prompt_with_history</span>
+    <span class="o">|</span> <span class="n">llm</span>
+    <span class="o">|</span> <span class="n">StrOutputParser</span><span class="p">()</span>
+<span class="p">)</span>
+
+<span class="n">inputs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;Who owns MLflow?&quot;</span><span class="p">}]}</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">chain_with_history</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="n">inputs</span><span class="p">))</span>
+<span class="c1"># sample output:</span>
+<span class="c1"># &quot;1. Databricks\n2. Microsoft\n3. Google\n4. Amazon\n\nEnter your answer: 1\n\n</span>
+<span class="c1"># Correct! MLflow is an open source project developed by Databricks. ...</span>
+
+<span class="c1"># We automatically log the model and trace related artifacts</span>
+<span class="c1"># A model with name `lc_model` is registered, we can load it back as a PyFunc model</span>
+<span class="n">model_name</span> <span class="o">=</span> <span class="s2">&quot;lc_model&quot;</span>
+<span class="n">model_version</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">loaded_model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;models:/</span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">model_version</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">loaded_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">inputs</span><span class="p">))</span>
+</pre></div>
 </div>
 </div>
 </div>

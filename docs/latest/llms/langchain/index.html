@@ -350,7 +350,7 @@ exploring these more advanced use cases.</p>
 <blockquote>
 <div><p>Some objects, especially those with intricate internal states or dependencies on external system resources, are not inherently pickleable. This limitation
 arises because serialization essentially requires converting an object to a byte stream, which can be complex for objects tightly coupled with system states
-or those having external I/O operations.</p>
+or those having external I/O operations. Try upgrading PyDantic to 2.x version to resolve this issue.</p>
 </div></blockquote>
 </li>
 <li><p><strong>Verifying Native Serialization Support</strong>: Ensure that the langchain object (chain, agent, or retriever) is serializable natively using langchain APIs if saving or logging with MLflow doesn’t work.</p>
@@ -383,6 +383,24 @@ will not be automatically logged as part of the model at all times (see below fo
 dependencies. The model flavor contains two options for declaring these dependencies: <code class="docutils literal notranslate"><span class="pre">extra_pip_requirements</span></code> and <code class="docutils literal notranslate"><span class="pre">pip_requirements</span></code>. While specifying
 <code class="docutils literal notranslate"><span class="pre">pip_requirements</span></code> is entirely valid, we recommend using <code class="docutils literal notranslate"><span class="pre">extra_pip_requirements</span></code> as it does not rely on defining all of the core dependent packages that
 are required to use the langchain model for inference (the other core dependencies will be inferred automatically).</p>
+</div></blockquote>
+</li>
+</ul>
+</div>
+<div class="section" id="i-can-t-load-the-model-logged-by-mlflow-langchain-autologging">
+<h3>I can’t load the model logged by mlflow langchain autologging<a class="headerlink" href="#i-can-t-load-the-model-logged-by-mlflow-langchain-autologging" title="Permalink to this headline"> </a></h3>
+<ul>
+<li><p><strong>Model contains langchain retrievers</strong>: LangChain retrievers are not supported by MLflow autologging.</p>
+<blockquote>
+<div><p>If your model contains a retriever, you will need to manually log the model using the <code class="docutils literal notranslate"><span class="pre">mlflow.langchain.log_model</span></code> API.
+As loading those models requires specifying <cite>loader_fn</cite> and <cite>persist_dir</cite> parameters, please check examples in
+<a class="reference external" href="https://github.com/mlflow/mlflow/blob/master/examples/langchain/retriever_chain.py">retriever_chain</a></p>
+</div></blockquote>
+</li>
+<li><p><strong>Can’t pickle certain objects</strong>: Try manually log the model.</p>
+<blockquote>
+<div><p>For certain models that langchain does not support native saving/loading, we pickle the object and save it, while it requires cloudpickle version to be
+consistent when saving/loading the model, as well as PyDantic version to be 2.x. Try manually log the model with <code class="docutils literal notranslate"><span class="pre">mlflow.langchain.log_model</span></code> API.</p>
 </div></blockquote>
 </li>
 </ul>
