@@ -1,6 +1,6 @@
 # MLflow Site Refresh
 
-# https://mlflow.github.io/mlflow-site-refresh/
+# https://mlflow.github.io/mlflow-website/
 
 ## Development
 
