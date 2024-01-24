@@ -152,7 +152,10 @@ const config: Config = {
               label: "Stack Overflow",
               href: "https://stackoverflow.com/questions/tagged/mlflow",
             },
-
+            {
+              label: "LinkedIn",
+              href: "https://www.linkedin.com/company/mlflow-org",
+            },
             {
               label: "X",
               href: "https://x.com/mlflow",
