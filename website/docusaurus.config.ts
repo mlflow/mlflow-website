@@ -54,7 +54,7 @@ const config: Config = {
         },
         gtag: {
           // containerId: process.env.GTM_ID || "GTM-TEST",
-          trackingID: "G-E8ZPTRLNBL",
+          trackingID: "G-2T6XELK24S",
           anonymizeIP: true,
         },
       } satisfies Preset.Options,
