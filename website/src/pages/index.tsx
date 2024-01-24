@@ -758,7 +758,7 @@ export default function Home(): JSX.Element {
           <div
             style={{
               textAlign: "center",
-              fontSize: "1.5rem",
+              fontSize: "20px",
               width: "70%",
               margin: "auto",
             }}
