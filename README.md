@@ -1,4 +1,4 @@
-# MLflow Site Refresh
+# MLflow Website
 
 # https://mlflow.github.io/mlflow-website/
 
