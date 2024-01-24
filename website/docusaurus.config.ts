@@ -52,10 +52,8 @@ const config: Config = {
         theme: {
           customCss: "./src/css/custom.css",
         },
-        gtag: {
-          // containerId: process.env.GTM_ID || "GTM-TEST",
-          trackingID: "G-2T6XELK24S",
-          anonymizeIP: true,
+        googleTagManager: {
+          containerId: process.env.GTM_ID || "GTM-TEST",
         },
       } satisfies Preset.Options,
     ],
