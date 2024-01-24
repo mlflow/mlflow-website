@@ -9,7 +9,7 @@ export type Author = {
 
 export type Blog = {
   title: string;
-  tags: string[];
+  tags?: string[];
   authors: Author[];
   path: string;
   date: string;
@@ -73,7 +73,6 @@ export const latestReleases: Release[] = [
   {
     title: "MLflow 2.9.2",
     path: "releases/2023/12/14/2.9.2-release",
-    tags: ["release"],
     authors: [
       {
         name: "MLflow maintainers",
@@ -88,7 +87,6 @@ export const latestReleases: Release[] = [
   {
     title: "MLflow 2.9.1",
     path: "releases/2023/12/07/2.9.1-release",
-    tags: ["release"],
     authors: [
       {
         name: "MLflow maintainers",
@@ -103,7 +101,6 @@ export const latestReleases: Release[] = [
   {
     title: "MLflow 2.9.0",
     path: "releases/2023/12/06/2.9.0-release",
-    tags: ["release"],
     authors: [
       {
         name: "MLflow maintainers",

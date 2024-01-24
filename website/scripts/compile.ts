@@ -118,7 +118,7 @@ export type Author = {
 
 export type Blog = {
   title: string;
-  tags: string[];
+  tags?: string[];
   authors: Author[];
   path: string;
   date: string;
