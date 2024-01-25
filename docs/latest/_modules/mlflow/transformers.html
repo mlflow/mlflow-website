@@ -212,6 +212,7 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">pathlib</span>
 <span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">string</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">lru_cache</span>
@@ -295,6 +296,8 @@
 <span class="n">_IMAGE_PROCESSOR_TYPE_KEY</span> <span class="o">=</span> <span class="s2">&quot;image_processor_type&quot;</span>
 <span class="n">_INFERENCE_CONFIG_BINARY_KEY</span> <span class="o">=</span> <span class="s2">&quot;inference_config.txt&quot;</span>
 <span class="n">_INSTANCE_TYPE_KEY</span> <span class="o">=</span> <span class="s2">&quot;instance_type&quot;</span>
+<span class="n">_LICENSE_FILE_NAME</span> <span class="o">=</span> <span class="s2">&quot;LICENSE.txt&quot;</span>
+<span class="n">_LICENSE_FILE_PATTERN</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;license(\.[a-z]+|$)&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
 <span class="n">_MODEL_KEY</span> <span class="o">=</span> <span class="s2">&quot;model&quot;</span>
 <span class="n">_MODEL_BINARY_KEY</span> <span class="o">=</span> <span class="s2">&quot;model_binary&quot;</span>
 <span class="n">_MODEL_BINARY_FILE_NAME</span> <span class="o">=</span> <span class="s2">&quot;model&quot;</span>
@@ -734,11 +737,16 @@
             <span class="n">inference_config</span><span class="o">=</span><span class="n">inference_config</span><span class="p">,</span>
         <span class="p">)</span>
 
+    <span class="n">model_name</span> <span class="o">=</span> <span class="n">transformers_model</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">name_or_path</span>
+
     <span class="c1"># Get the model card from either the argument or the HuggingFace marketplace</span>
-    <span class="n">card_data</span> <span class="o">=</span> <span class="n">model_card</span> <span class="k">if</span> <span class="n">model_card</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_fetch_model_card</span><span class="p">(</span><span class="n">transformers_model</span><span class="p">)</span>
+    <span class="n">card_data</span> <span class="o">=</span> <span class="n">model_card</span> <span class="ow">or</span> <span class="n">_fetch_model_card</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
 
     <span class="c1"># If the card data can be acquired, save the text and the data separately</span>
     <span class="n">_write_card_data</span><span class="p">(</span><span class="n">card_data</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+
+    <span class="c1"># Write the license information (or guidance) along with the model</span>
+    <span class="n">_write_license_information</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">card_data</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
 
     <span class="n">model_bin_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="n">_MODEL_BINARY_KEY</span><span class="p">:</span> <span class="n">_MODEL_BINARY_FILE_NAME</span><span class="p">}</span>
 
@@ -1298,7 +1306,7 @@
     <span class="k">return</span> <span class="n">_torch_dype_mapping</span><span class="p">()[</span><span class="n">flavor_config</span><span class="p">[</span><span class="s2">&quot;torch_dtype&quot;</span><span class="p">]]</span>
 
 
-<span class="k">def</span> <span class="nf">_fetch_model_card</span><span class="p">(</span><span class="n">model_or_pipeline</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_fetch_model_card</span><span class="p">(</span><span class="n">model_name</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Attempts to retrieve the model card for the specified model architecture iff the</span>
 <span class="sd">    `huggingface_hub` library is installed. If a card cannot be found in the registry or</span>
@@ -1314,18 +1322,16 @@
         <span class="p">)</span>
         <span class="k">return</span>
 
-    <span class="n">model</span> <span class="o">=</span> <span class="n">model_or_pipeline</span><span class="o">.</span><span class="n">model</span>
-
     <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">hub</span><span class="p">,</span> <span class="s2">&quot;ModelCard&quot;</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">hub</span><span class="o">.</span><span class="n">ModelCard</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">name_or_path</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">hub</span><span class="o">.</span><span class="n">ModelCard</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The model card could not be retrieved from the hub due to </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;The version of huggingface_hub that is installed does not provide &quot;</span>
+            <span class="s2">&quot;The version of huggingface_hub that is installed does not provide &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;ModelCard functionality. You have version </span><span class="si">{</span><span class="n">hub</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2"> installed. &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;Update huggingface_hub to &gt;= &#39;0.10.0&#39; to retrieve the ModelCard data.&quot;</span>
+            <span class="s2">&quot;Update huggingface_hub to &gt;= &#39;0.10.0&#39; to retrieve the ModelCard data.&quot;</span>
         <span class="p">)</span>
 
 
@@ -1343,6 +1349,62 @@
             <span class="n">yaml</span><span class="o">.</span><span class="n">safe_dump</span><span class="p">(</span>
                 <span class="n">card_data</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span> <span class="n">stream</span><span class="o">=</span><span class="n">file</span><span class="p">,</span> <span class="n">default_flow_style</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span>
             <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_extract_license_file_from_repository</span><span class="p">(</span><span class="n">model_name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the top-level file inventory of `RepoFile` objects from the huggingface hub&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">huggingface_hub</span> <span class="k">as</span> <span class="nn">hub</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Unable to list repository contents for the model repo </span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2">. In order &quot;</span>
+            <span class="s2">&quot;to enable repository listing functionality, please install the huggingface_hub &quot;</span>
+            <span class="s2">&quot;package by running `pip install huggingface_hub&gt;0.10.0&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="n">hub</span><span class="o">.</span><span class="n">list_repo_files</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">next</span><span class="p">(</span><span class="n">file</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span> <span class="k">if</span> <span class="n">_LICENSE_FILE_PATTERN</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">file</span><span class="p">))</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Failed to retrieve repository file listing data for </span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2"> due to </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_write_license_information</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">card_data</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Writes the license file or instructions to retrieve license information.&quot;&quot;&quot;</span>
+
+    <span class="n">fallback</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;A license file could not be found for the &#39;</span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2">&#39; repository. </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;To ensure that you are in compliance with the license requirements for this &quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;model, please visit the model repository here: https://huggingface.co/</span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">license_file</span> <span class="o">:=</span> <span class="n">_extract_license_file_from_repository</span><span class="p">(</span><span class="n">model_name</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">huggingface_hub</span> <span class="k">as</span> <span class="nn">hub</span>
+
+            <span class="n">license_location</span> <span class="o">=</span> <span class="n">hub</span><span class="o">.</span><span class="n">hf_hub_download</span><span class="p">(</span><span class="n">repo_id</span><span class="o">=</span><span class="n">model_name</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">license_file</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to download the license file due to: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">local_license_path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">license_location</span><span class="p">)</span>
+            <span class="n">target_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">local_license_path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">local_license_path</span><span class="p">,</span> <span class="n">target_path</span><span class="p">)</span>
+                <span class="k">return</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The license file could not be copied due to: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Fallback or card data license info</span>
+    <span class="k">if</span> <span class="n">card_data</span> <span class="ow">and</span> <span class="n">card_data</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">license</span> <span class="o">!=</span> <span class="s2">&quot;other&quot;</span><span class="p">:</span>
+        <span class="n">fallback</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fallback</span><span class="si">}</span><span class="se">\n</span><span class="s2">The declared license type is: &#39;</span><span class="si">{</span><span class="n">card_data</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">license</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;Unable to find license information for this model. Please verify &quot;</span>
+            <span class="s2">&quot;permissible usage for the model you are storing prior to use.&quot;</span>
+        <span class="p">)</span>
+    <span class="n">path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">_LICENSE_FILE_NAME</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">fallback</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_build_pipeline_from_model_input</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">task</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
