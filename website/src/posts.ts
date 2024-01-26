@@ -21,6 +21,37 @@ export type Release = Blog & { version: string };
 // Sort by date descending
 export const latestBlogs: Blog[] = [
   {
+    title: "2023 Year in Review",
+    path: "blog/2024/01/26/mlflow-year-in-review",
+    tags: ["MLflow", 2023, "Linux Foundation"],
+    authors: [
+      {
+        name: "Carly Akerly",
+        title: "OSS Marketing Consultant at The Linux Foundation",
+        url: "https://www.linkedin.com/in/carlyakerly/",
+        image_url:
+          "https://media.licdn.com/dms/image/D4D03AQF8d8p9QZ_iqw/profile-displayphoto-shrink_400_400/0/1690234884832?e=1711584000&v=beta&t=BNrwToz_9zb8oMJzIU0T6Age5QiugOvLEVcwCR_gq4U",
+      },
+    ],
+    date: "2024-01-26",
+    thumbnail: "img/blog/2023-year-in-review.png",
+  },
+  {
+    title: "Streamline your MLflow Projects with Free Hosted MLflow",
+    path: "blog/2024/01/25/databricks-ce",
+    tags: ["managed mlflow", "getting started"],
+    authors: [
+      {
+        name: "Abe Omorogbe",
+        title: "Product Manager, ML at Databricks",
+        url: "https://www.linkedin.com/in/abeomor/",
+        image_url:
+          "https://media.licdn.com/dms/image/D4E03AQG-dAkLO2hx_Q/profile-displayphoto-shrink_400_400/0/1693252025753?e=1711584000&v=beta&t=02Bl1a73vp7Zpt8ZXSK_BRDF6DIZWAx1l8oSgkWNa5g",
+      },
+    ],
+    date: "2024-01-25",
+  },
+  {
     title: "MLflow AI Gateway renamed to MLflow Deployments for LLMs",
     path: "blog/2023/12/01/ai-gateway-rename",
     tags: ["ai"],
@@ -34,37 +65,6 @@ export const latestBlogs: Blog[] = [
     ],
     date: "2023-12-01",
     thumbnail: "img/blog/ai-gateway.png",
-  },
-  {
-    title:
-      "Automatic Metric, Parameter, and Artifact Logging with mlflow.autolog",
-    path: "blog/2023/11/30/mlflow-autolog",
-    tags: ["autolog"],
-    authors: [
-      {
-        name: "Daniel Liden",
-        title: "Developer Advocate at Databricks",
-        url: "https://www.linkedin.com/in/danielliden",
-        image_url: "https://github.com/djliden.png",
-      },
-    ],
-    date: "2023-11-30",
-    thumbnail: "img/blog/mlflow-autolog.png",
-  },
-  {
-    title: "MLflow Docs Overhaul",
-    path: "blog/2023/10/31/mlflow-docs-overhaul",
-    tags: ["docs"],
-    authors: [
-      {
-        name: "MLflow maintainers",
-        title: "MLflow maintainers",
-        url: "https://github.com/mlflow/mlflow.git",
-        image_url: "https://github.com/mlflow-automation.png",
-      },
-    ],
-    date: "2023-10-31",
-    thumbnail: "img/blog/docs-overhaul.png",
   },
 ];
 
