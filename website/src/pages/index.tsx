@@ -238,7 +238,7 @@ export default function Home(): JSX.Element {
         <Spacer height={64} />
         <H1>
           ML and GenAI
-          <br /> made simple
+          <br /> made simpler
         </H1>
         <div
           style={{
