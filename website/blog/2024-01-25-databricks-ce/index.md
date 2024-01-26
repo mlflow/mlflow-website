@@ -1,9 +1,6 @@
 ---
 title: Streamline your MLflow Projects with Free Hosted MLflow
 description: A guide to using Databricks Community Edition with integrated managed MLflow
-slug: databricks-ce
-date: 2024-01-25
-categories: blog
 authors: [abe-omorogbe]
 tags: [managed mlflow, getting started]
 ---
