@@ -15,9 +15,9 @@ If you're new to MLflow and want to get started with a fully-managed and complet
 ## Streamline Your ML Projects: Get Started with Hosted MLflow for Free
 
 Explore the world of big data and machine learning with [Databricks Community Edition (CE)](https://community.cloud.databricks.com/), a free, limited[^1] version of the Databricks platform.
- Ideal for beginners and those new to Databricks and MLflow, this edition streamlines the learning curve by offering a managed environment. It eliminates the complexity of manually
- setting up a tracking server. Databricks CE includes hosted MLflow, enabling efficient management and visualization of your MLflow experiments. This makes it a prime choice for
- developing machine learning projects in a user-friendly interface, allowing you to connect from your favorite IDE, notebook environment, or even from within Databricks CE's notebooks.
+Ideal for beginners and those new to Databricks and MLflow, this edition streamlines the learning curve by offering a managed environment. It eliminates the complexity of manually
+setting up a tracking server. Databricks CE includes hosted MLflow, enabling efficient management and visualization of your MLflow experiments. This makes it a prime choice for
+developing machine learning projects in a user-friendly interface, allowing you to connect from your favorite IDE, notebook environment, or even from within Databricks CE's notebooks.
 
 [^1]: The Model Registry and Model Deployment features are not available in the Databricks Community Edition.
 
@@ -70,8 +70,8 @@ Before you start, ensure that you have the necessary packages installed. Run the
 #### 3. Setting Up Databricks CE Authentication
 
 The main advantage of Databricks Community Edition (CE) is its convenience: it offers an MLflow tracking server without requiring
- [local infrastructure setup](https://mlflow.org/docs/latest/getting-started/logging-first-model/step1-tracking-server.html). You can easily access this server through the
- [mlflow.login()](https://mlflow.org/docs/latest/python_api/mlflow.html#mlflow.login) function after creating your CE account, streamlining the process for MLflow experiment tracking.
+[local infrastructure setup](https://mlflow.org/docs/latest/getting-started/logging-first-model/step1-tracking-server.html). You can easily access this server through the
+[mlflow.login()](https://mlflow.org/docs/latest/python_api/mlflow.html#mlflow.login) function after creating your CE account, streamlining the process for MLflow experiment tracking.
 
 To authenticate with Databricks CE, use the [mlflow.login()](https://mlflow.org/docs/latest/python_api/mlflow.html#mlflow.login) function. This will prompt you for:
 
@@ -105,13 +105,14 @@ with mlflow.start_run():
     mlflow.log_metric("bar", 2)
 ```
 
-> **Note**: The Databricks environment requires you to set experiments with the directory (from root) 
+> **Note**: The Databricks environment requires you to set experiments with the directory (from root)
+
     `/Users/{your email address for your account}/{name of your experiment}`, which is different from the behavior in self-hosted MLflow (and when running MLFlow locally).
 
 #### 5. Viewing Your Experiment in Databricks CE
 
 Now let’s navigate to Databricks CE to view the experiment result. Log in to your [Databricks CE](https://community.cloud.databricks.com/)
- account, and click on the top left to select machine learning in the drop down list. Finally, click on the experiment icon. See the screenshots below:
+account, and click on the top left to select machine learning in the drop down list. Finally, click on the experiment icon. See the screenshots below:
 
 Navigate to the Machine Learning Section
 
@@ -126,7 +127,7 @@ In the “Experiments” view, you should be able to find the experiment `/Users
 ![Experiment view of Databricks MLflow server](view-experiment.png)
 
 Clicking on the run name, which in this example is 'youthful-lamb-287' (note that you will see a different, randomly generated name in your CE console),
- will take you to the run view that looks similar to the following:
+will take you to the run view that looks similar to the following:
 
 ![Run view of Databricks MLflow server](view-run.png)
 
@@ -135,16 +136,16 @@ In the run view, you will see our dummy metrics `“foo”` and `“bar”` have
 #### 6. Run any MLflow tutorial in Databricks CE
 
 If you want to try a tutorial from the MLflow website, you can use Databricks CE to quickly test (and modify, if you're inclined) the tutorial. For example, if you wanted to test
- the [Creating Custom Pyfunc tutorial](https://mlflow.org/docs/latest/traditional-ml/creating-custom-pyfunc/notebooks/basic-pyfunc.html):
+the [Creating Custom Pyfunc tutorial](https://mlflow.org/docs/latest/traditional-ml/creating-custom-pyfunc/notebooks/basic-pyfunc.html):
 
 1. Click Workspace and  select “Import notebook”
 
 ![Import a Notebook](import-notebook.png)
 
 2. Use the `URL` option to import the notebook directly from the MLflow documentation website. For this example, to import, replace the last element of the url
- from `html` to `ipynb`. This can be done with any of the tutorial or guide notebooks that are hosted on the MLflow website.
+   from `html` to `ipynb`. This can be done with any of the tutorial or guide notebooks that are hosted on the MLflow website.
 
-    .../notebooks/basic-pyfunc.~~html~~ &rarr; .../notebooks/basic-pyfunc.**ipynb**[^3]
+   .../notebooks/basic-pyfunc.~~html~~ &rarr; .../notebooks/basic-pyfunc.**ipynb**[^3]
 
 [^3]: Or you can [download the notebook](https://mlflow.org/docs/latest/traditional-ml/creating-custom-pyfunc/notebooks/basic-pyfunc.ipynb) and manually load it in the UI by selecting `File` instead of `URL`.
 
@@ -153,7 +154,7 @@ If you want to try a tutorial from the MLflow website, you can use Databricks CE
 ### Conclusion
 
 Databricks Community Edition (CE) offers an accessible and collaborative platform for MLflow experiment tracking, presenting several advantages. Its setup process is effortless
- and quick, providing a user-friendly experience. Additionally, it's free to use, making it an ideal choice for beginners, learners, and small-scale projects.
+and quick, providing a user-friendly experience. Additionally, it's free to use, making it an ideal choice for beginners, learners, and small-scale projects.
 
 ### Getting started
 
