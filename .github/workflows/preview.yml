@@ -1,7 +1,7 @@
 name: Preview
 
 on:
-  pull_request_target:
+  pull_request:
 
 jobs:
   preview:
@@ -22,9 +22,21 @@ jobs:
               pull_number: number,
             });
             const { merge_commit_sha } = pr.data;
+            const head_sha = pr.data.head.sha;
             const link = `https://stackblitz.com/github/mlflow/mlflow-website/tree/${merge_commit_sha}/website`;
-            const marker = "<!-- Preview -->";
-            const body = `${marker}\n\n## [Preview](${link})`;
+            const marker = "<!-- PREVIEW -->";
+            const body = `
+            ${marker}
+
+            ## Preview for ${head_sha}
+
+            <a href="${link}" target="_blank">
+              <img
+                alt="Open in StackBlitz"
+                src="https://developer.stackblitz.com/img/open_in_stackblitz.svg"
+              />
+            </a>
+            `;
             const comments = await github.paginate(github.rest.issues.listComments, {
               owner,
               repo,
@@ -33,16 +45,16 @@ jobs:
             const comment = comments.find(({ body }) => body.includes(marker));
             if (comment) {
               await github.rest.issues.updateComment({
-              comment_id: comment.id,
-              owner,
-              repo,
-              body,
+                comment_id: comment.id,
+                owner,
+                repo,
+                body,
               });
             } else {
               await github.rest.issues.createComment({
-              issue_number: number,
-              owner,
-              repo,
-              body,
+                issue_number: number,
+                owner,
+                repo,
+                body,
               });
             }
