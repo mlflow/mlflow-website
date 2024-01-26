@@ -10,7 +10,7 @@ const Anchor = React.forwardRef<HTMLAnchorElement, { id: string }>(
         </a>
       </div>
     );
-  }
+  },
 );
 
 export default Anchor;

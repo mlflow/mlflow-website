@@ -205,7 +205,7 @@ export default function Home(): JSX.Element {
 
   const sectionRefs = Object.keys(SECTIONS).reduce(
     (acc, key) => ({ ...acc, [key]: useRef<HTMLAnchorElement>(null) }),
-    {}
+    {},
   ) as Record<keyof typeof SECTIONS, React.RefObject<HTMLAnchorElement>>;
 
   useEffect(() => {
@@ -219,7 +219,7 @@ export default function Home(): JSX.Element {
           }
         });
       },
-      { threshold: 0.5, rootMargin: "0% 0px -80% 0px" }
+      { threshold: 0.5, rootMargin: "0% 0px -80% 0px" },
     );
 
     Object.values(sectionRefs).forEach((value) => {
