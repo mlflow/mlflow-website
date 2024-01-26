@@ -23,7 +23,7 @@ export const latestBlogs: Blog[] = [
   {
     title: "2023 Year in Review",
     path: "blog/2024/01/26/mlflow-year-in-review",
-    tags: ["MLflow", 2023, "Linux Foundation"],
+    tags: ["MLflow", "2023", "Linux Foundation"],
     authors: [
       {
         name: "Carly Akerly",

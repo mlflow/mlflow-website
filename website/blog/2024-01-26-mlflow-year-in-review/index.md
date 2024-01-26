@@ -5,7 +5,7 @@ slug: MLflow-2023
 date: 2024-01-26
 categories: blog
 authors: [carly-akerly]
-tags: [MLflow, 2023, Linux Foundation]
+tags: [MLflow, "2023", Linux Foundation]
 thumbnail: img/blog/2023-year-in-review.png
 ---
 
