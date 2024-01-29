@@ -30,7 +30,7 @@ function Blog({ blog }: { blog: BlogType }): JSX.Element {
                   <a
                     className={clsx(
                       "button button--sm button--outline button--primary",
-                      styles.tag
+                      styles.tag,
                     )}
                     href={`/blog/tags/${tag}`}
                   >
