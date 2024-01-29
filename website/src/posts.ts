@@ -59,19 +59,19 @@ export const latestBlogs: Blog[] = [
     thumbnail: "img/blog/databricks-ce.png",
   },
   {
-    title: "MLflow AI Gateway renamed to MLflow Deployments for LLMs",
-    path: "/blog/ai-gateway-rename",
-    tags: ["ai"],
+    title: "Custom MLflow Models with mlflow.pyfunc",
+    path: "/blog/custom-pyfunc",
+    tags: ["pyfunc", "models"],
     authors: [
       {
-        name: "MLflow maintainers",
-        title: "MLflow maintainers",
-        url: "https://github.com/mlflow/mlflow.git",
-        image_url: "https://github.com/mlflow-automation.png",
+        name: "Daniel Liden",
+        title: "Developer Advocate at Databricks",
+        url: "https://www.linkedin.com/in/danielliden",
+        image_url: "https://github.com/djliden.png",
       },
     ],
-    date: "2023-12-01",
-    thumbnail: "img/blog/ai-gateway.png",
+    date: "2024-01-23",
+    thumbnail: "img/blog/custom-pyfunc.png",
   },
 ];
 
