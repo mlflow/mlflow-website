@@ -1,7 +1,7 @@
 import styles from "./styles.module.css";
 import { Blog as BlogType } from "../../posts";
 import clsx from "clsx";
-import Link from '@docusaurus/Link';
+import Link from "@docusaurus/Link";
 
 function Blog({ blog }: { blog: BlogType }): JSX.Element {
   const { title, path, tags, authors, date, thumbnail } = blog;

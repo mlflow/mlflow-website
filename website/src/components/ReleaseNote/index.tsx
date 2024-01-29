@@ -2,7 +2,7 @@ import { Release } from "../../posts";
 import ArrowText from "../ArrowText";
 import clsx from "clsx";
 import styles from "./styles.module.css";
-import Link from '@docusaurus/Link';
+import Link from "@docusaurus/Link";
 
 const ReleaseNote = ({ release }: { release: Release }) => {
   const { title, authors, date, path, version } = release;
