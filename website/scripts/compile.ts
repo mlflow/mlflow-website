@@ -74,7 +74,7 @@ function loadBlogs(dir: string): Blog[] {
     .map((blog) => {
       const { date, path } = resolvePath(blog);
       const { title, tags, authors, thumbnail, slug } = parseFrontmatter(
-        readFileSync(blog, "utf8")
+        readFileSync(blog, "utf8"),
       );
       const yaml = load(readFileSync("blog/authors.yml", "utf8")) as AuthorMap;
       return {
