@@ -79,7 +79,7 @@ export const latestBlogs: Blog[] = [
 export const latestReleases: Release[] = [
   {
     title: "MLflow 2.10.0",
-    path: "blog/undefined",
+    path: "releases/2.10.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -93,7 +93,7 @@ export const latestReleases: Release[] = [
   },
   {
     title: "MLflow 2.9.2",
-    path: "blog/undefined",
+    path: "releases/2.9.2",
     authors: [
       {
         name: "MLflow maintainers",
@@ -107,7 +107,7 @@ export const latestReleases: Release[] = [
   },
   {
     title: "MLflow 2.9.1",
-    path: "blog/undefined",
+    path: "releases/2.9.1",
     authors: [
       {
         name: "MLflow maintainers",
