@@ -28,7 +28,7 @@ export type Release = {
 export const latestBlogs: Blog[] = [
   {
     title: "2023 Year in Review",
-    path: "blog/mlflow-year-in-review",
+    path: "/blog/mlflow-year-in-review",
     tags: ["MLflow", "2023", "Linux Foundation"],
     authors: [
       {
@@ -44,7 +44,7 @@ export const latestBlogs: Blog[] = [
   },
   {
     title: "Streamline your MLflow Projects with Free Hosted MLflow",
-    path: "blog/databricks-ce",
+    path: "/blog/databricks-ce",
     tags: ["managed mlflow", "getting started"],
     authors: [
       {
@@ -60,7 +60,7 @@ export const latestBlogs: Blog[] = [
   },
   {
     title: "MLflow AI Gateway renamed to MLflow Deployments for LLMs",
-    path: "blog/ai-gateway-rename",
+    path: "/blog/ai-gateway-rename",
     tags: ["ai"],
     authors: [
       {
@@ -79,7 +79,7 @@ export const latestBlogs: Blog[] = [
 export const latestReleases: Release[] = [
   {
     title: "MLflow 2.10.0",
-    path: "releases/2.10.0",
+    path: "/releases/2.10.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -93,7 +93,7 @@ export const latestReleases: Release[] = [
   },
   {
     title: "MLflow 2.9.2",
-    path: "releases/2.9.2",
+    path: "/releases/2.9.2",
     authors: [
       {
         name: "MLflow maintainers",
@@ -107,7 +107,7 @@ export const latestReleases: Release[] = [
   },
   {
     title: "MLflow 2.9.1",
-    path: "releases/2.9.1",
+    path: "/releases/2.9.1",
     authors: [
       {
         name: "MLflow maintainers",
