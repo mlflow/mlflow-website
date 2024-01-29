@@ -131,7 +131,6 @@ export type Blog = {
 
 export type Release = {
   title: string;
-  tags?: string[];
   authors: Author[];
   path: string;
   date: string;
