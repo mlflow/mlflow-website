@@ -329,22 +329,7 @@ use the `load_context` method to handle model artifacts correctly.
 
 The `load_context` method receives a `context` object containing artifacts the model can use during
 inference. You can specify these artifacts using the `artifacts` argument when saving or logging
-models, making them accessible to the `load_context` method via the `context.artifacts` dictionary:
-
-```python
-# Log the model using mlflow with the model file as an artifact
-with mlflow.start_run():
-    model_info = mlflow.pyfunc.log_model(
-        artifact_path="my_custom_model",
-        python_model=<model>,
-        # Specify where artifacts can be found
-        artifacts={
-            "artifact": <artifact_1_path>,
-            "another_artifact": <another_artifact_path>
-        },
-        [...]
-    )
-```
+models, making them accessible to the `load_context` method via the `context.artifacts` dictionary.
 
 In practice, the `load_context` method often initializes the model called by the `predict` method by
 handling the loading of model artifacts.
