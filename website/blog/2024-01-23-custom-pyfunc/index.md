@@ -2,8 +2,6 @@
 title: Custom MLflow Models with mlflow.pyfunc
 description: A guide for creating custom MLflow models
 slug: custom-pyfunc
-date: 2024-01-23
-categories: blog
 authors: [daniel-liden]
 tags: [pyfunc, models]
 thumbnail: img/blog/custom-pyfunc.png
