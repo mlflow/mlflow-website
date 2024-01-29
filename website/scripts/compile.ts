@@ -28,7 +28,6 @@ type Blog = {
   path: string;
   date: string;
   thumbnail: string;
-  slug: string;
 };
 
 type BlogPath = {
@@ -75,17 +74,16 @@ function loadBlogs(dir: string): Blog[] {
     .map((blog) => {
       const { date, path } = resolvePath(blog);
       const { title, tags, authors, thumbnail, slug } = parseFrontmatter(
-        readFileSync(blog, "utf8"),
+        readFileSync(blog, "utf8")
       );
       const yaml = load(readFileSync("blog/authors.yml", "utf8")) as AuthorMap;
       return {
         title,
-        path,
+        path: `blog/${slug}`,
         tags,
         authors: authors.map((author) => yaml[author]),
         date,
         thumbnail,
-        slug,
       };
     });
 }
@@ -125,7 +123,6 @@ export type Blog = {
   authors: Author[];
   path: string;
   date: string;
-  slug: string;
   thumbnail: string;
 };
 

@@ -13,7 +13,6 @@ export type Blog = {
   authors: Author[];
   path: string;
   date: string;
-  slug: string;
   thumbnail: string;
 };
 
@@ -29,7 +28,7 @@ export type Release = {
 export const latestBlogs: Blog[] = [
   {
     title: "2023 Year in Review",
-    path: "blog/2024/01/26/mlflow-year-in-review",
+    path: "blog/mlflow-year-in-review",
     tags: ["MLflow", "2023", "Linux Foundation"],
     authors: [
       {
@@ -42,11 +41,10 @@ export const latestBlogs: Blog[] = [
     ],
     date: "2024-01-26",
     thumbnail: "img/blog/2023-year-in-review.png",
-    slug: "mlflow-year-in-review",
   },
   {
     title: "Streamline your MLflow Projects with Free Hosted MLflow",
-    path: "blog/2024/01/25/databricks-ce",
+    path: "blog/databricks-ce",
     tags: ["managed mlflow", "getting started"],
     authors: [
       {
@@ -59,11 +57,10 @@ export const latestBlogs: Blog[] = [
     ],
     date: "2024-01-25",
     thumbnail: "img/blog/databricks-ce.png",
-    slug: "databricks-ce",
   },
   {
     title: "MLflow AI Gateway renamed to MLflow Deployments for LLMs",
-    path: "blog/2023/12/01/ai-gateway-rename",
+    path: "blog/ai-gateway-rename",
     tags: ["ai"],
     authors: [
       {
@@ -75,7 +72,6 @@ export const latestBlogs: Blog[] = [
     ],
     date: "2023-12-01",
     thumbnail: "img/blog/ai-gateway.png",
-    slug: "ai-gateway-rename",
   },
 ];
 
@@ -83,7 +79,7 @@ export const latestBlogs: Blog[] = [
 export const latestReleases: Release[] = [
   {
     title: "MLflow 2.10.0",
-    path: "releases/2024/01/26/2.10.0-release",
+    path: "blog/undefined",
     authors: [
       {
         name: "MLflow maintainers",
@@ -97,7 +93,7 @@ export const latestReleases: Release[] = [
   },
   {
     title: "MLflow 2.9.2",
-    path: "releases/2023/12/14/2.9.2-release",
+    path: "blog/undefined",
     authors: [
       {
         name: "MLflow maintainers",
@@ -111,7 +107,7 @@ export const latestReleases: Release[] = [
   },
   {
     title: "MLflow 2.9.1",
-    path: "releases/2023/12/07/2.9.1-release",
+    path: "blog/undefined",
     authors: [
       {
         name: "MLflow maintainers",
