@@ -60,7 +60,7 @@ export const latestBlogs: Blog[] = [
   },
   {
     title: "Custom MLflow Models with mlflow.pyfunc",
-    path: "blog/custom-pyfunc",
+    path: "/blog/custom-pyfunc",
     tags: ["pyfunc", "models"],
     authors: [
       {
