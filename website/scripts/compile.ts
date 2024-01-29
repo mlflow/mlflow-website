@@ -79,7 +79,7 @@ function loadBlogs(dir: string): Blog[] {
       const yaml = load(readFileSync("blog/authors.yml", "utf8")) as AuthorMap;
       return {
         title,
-        path: `blog/${slug}`,
+        path: `${dir}/${slug}`,
         tags,
         authors: authors.map((author) => yaml[author]),
         date,
