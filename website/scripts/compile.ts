@@ -7,6 +7,7 @@ type Frontmatter = {
   tags: string[];
   authors: string[];
   thumbnail?: string;
+  slug: string;
 };
 
 type Author = {
@@ -26,7 +27,7 @@ type Blog = {
   authors: Author[];
   path: string;
   date: string;
-  thumbnail?: string;
+  thumbnail: string;
 };
 
 type BlogPath = {
@@ -72,13 +73,13 @@ function loadBlogs(dir: string): Blog[] {
     .filter(isBlog)
     .map((blog) => {
       const { date, path } = resolvePath(blog);
-      const { title, tags, authors, thumbnail } = parseFrontmatter(
+      const { title, tags, authors, thumbnail, slug } = parseFrontmatter(
         readFileSync(blog, "utf8"),
       );
       const yaml = load(readFileSync("blog/authors.yml", "utf8")) as AuthorMap;
       return {
         title,
-        path,
+        path: `blog/${slug}`,
         tags,
         authors: authors.map((author) => yaml[author]),
         date,
@@ -122,10 +123,16 @@ export type Blog = {
   authors: Author[];
   path: string;
   date: string;
-  thumbnail?: string;
+  thumbnail: string;
 };
 
-export type Release = Blog & { version: string };
+export type Release = {
+  title: string;
+  authors: Author[];
+  path: string;
+  date: string;
+  version: string;
+};
 
 // Sort by date descending
 export const latestBlogs: Blog[] = ${blogsJson};

@@ -82,6 +82,34 @@ const config: Config = {
         blogTitle: "Releases",
       },
     ],
+    [
+      // This plugin is always inactive in development and only active in production because it works on the build output.
+      "@docusaurus/plugin-client-redirects",
+      {
+        redirects: [
+          {
+            from: "/blog/2024/01/25/databricks-ce",
+            to: "/blog/databricks-ce",
+          },
+          {
+            from: "/blog/2024/01/26/mlflow-year-in-review",
+            to: "/blog/mlflow-year-in-review",
+          },
+          {
+            from: "/blog/2023/12/01/ai-gateway-rename",
+            to: "/blog/ai-gateway-rename",
+          },
+          {
+            from: "/blog/2023/11/30/mlflow-autolog",
+            to: "/blog/mlflow-autolog",
+          },
+          {
+            from: "/blog/2023/10/31/mlflow-docs-overhaul",
+            to: "/blog/mlflow-docs-overhaul",
+          },
+        ],
+      },
+    ],
   ],
 
   themeConfig: {

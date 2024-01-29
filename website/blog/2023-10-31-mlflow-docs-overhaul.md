@@ -1,6 +1,7 @@
 ---
 title: MLflow Docs Overhaul
 tags: [docs]
+slug: mlflow-docs-overhaul
 authors: [mlflow-maintainers]
 thumbnail: img/blog/docs-overhaul.png
 ---

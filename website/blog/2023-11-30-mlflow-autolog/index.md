@@ -1,5 +1,6 @@
 ---
 title: "Automatic Metric, Parameter, and Artifact Logging with mlflow.autolog"
+slug: mlflow-autolog
 tags: [autolog]
 authors: [daniel-liden]
 thumbnail: img/blog/mlflow-autolog.png
