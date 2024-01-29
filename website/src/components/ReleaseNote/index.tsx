@@ -2,6 +2,7 @@ import { Release } from "../../posts";
 import ArrowText from "../ArrowText";
 import clsx from "clsx";
 import styles from "./styles.module.css";
+import Link from "@docusaurus/Link";
 
 const ReleaseNote = ({ release }: { release: Release }) => {
   const { title, authors, date, path, version } = release;
@@ -9,7 +10,7 @@ const ReleaseNote = ({ release }: { release: Release }) => {
   return (
     <div className={clsx("card", styles.card)}>
       <div className={clsx("card__body", styles.cardBody)}>
-        <a className={styles.a} href={path}>
+        <Link className={styles.a} to={path}>
           <p className={styles.p}>
             {new Date(date).toLocaleDateString("en-US", {
               year: "numeric",
@@ -19,7 +20,7 @@ const ReleaseNote = ({ release }: { release: Release }) => {
           </p>
           <h4>{title}</h4>
           <p>{`We're happy to announce the release of MLflow ${version}.`}</p>
-        </a>
+        </Link>
       </div>
     </div>
   );

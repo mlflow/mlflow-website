@@ -1,6 +1,7 @@
 import styles from "./styles.module.css";
 import { Blog as BlogType } from "../../posts";
 import clsx from "clsx";
+import Link from "@docusaurus/Link";
 
 function Blog({ blog }: { blog: BlogType }): JSX.Element {
   const { title, path, tags, authors, date, thumbnail } = blog;
@@ -8,8 +9,8 @@ function Blog({ blog }: { blog: BlogType }): JSX.Element {
   return (
     <div className={clsx("card", styles.card)}>
       <div className={clsx("card__body", styles.cardBody)}>
-        <a
-          href={path}
+        <Link
+          to={path}
           style={{
             textDecoration: "none",
             color: "inherit",
@@ -63,7 +64,7 @@ function Blog({ blog }: { blog: BlogType }): JSX.Element {
               </div>
             </div>
           </div>
-        </a>
+        </Link>
       </div>
     </div>
   );
