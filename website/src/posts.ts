@@ -13,10 +13,18 @@ export type Blog = {
   authors: Author[];
   path: string;
   date: string;
-  thumbnail?: string;
+  slug: string;
+  thumbnail: string;
 };
 
-export type Release = Blog & { version: string };
+export type Release = {
+  title: string;
+  tags?: string[];
+  authors: Author[];
+  path: string;
+  date: string;
+  version: string;
+};
 
 // Sort by date descending
 export const latestBlogs: Blog[] = [
@@ -35,6 +43,24 @@ export const latestBlogs: Blog[] = [
     ],
     date: "2024-01-26",
     thumbnail: "img/blog/2023-year-in-review.png",
+    slug: "mlflow-year-in-review",
+  },
+  {
+    title: "Streamline your MLflow Projects with Free Hosted MLflow",
+    path: "blog/2024/01/25/databricks-ce",
+    tags: ["managed mlflow", "getting started"],
+    authors: [
+      {
+        name: "Abe Omorogbe",
+        title: "Product Manager, ML at Databricks",
+        url: "https://www.linkedin.com/in/abeomor/",
+        image_url:
+          "https://media.licdn.com/dms/image/D4E03AQG-dAkLO2hx_Q/profile-displayphoto-shrink_400_400/0/1693252025753?e=1711584000&v=beta&t=02Bl1a73vp7Zpt8ZXSK_BRDF6DIZWAx1l8oSgkWNa5g",
+      },
+    ],
+    date: "2024-01-25",
+    thumbnail: "img/blog/databricks-ce.png",
+    slug: "databricks-ce",
   },
   {
     title: "MLflow AI Gateway renamed to MLflow Deployments for LLMs",
@@ -50,22 +76,7 @@ export const latestBlogs: Blog[] = [
     ],
     date: "2023-12-01",
     thumbnail: "img/blog/ai-gateway.png",
-  },
-  {
-    title:
-      "Automatic Metric, Parameter, and Artifact Logging with mlflow.autolog",
-    path: "blog/2023/11/30/mlflow-autolog",
-    tags: ["autolog"],
-    authors: [
-      {
-        name: "Daniel Liden",
-        title: "Developer Advocate at Databricks",
-        url: "https://www.linkedin.com/in/danielliden",
-        image_url: "https://github.com/djliden.png",
-      },
-    ],
-    date: "2023-11-30",
-    thumbnail: "img/blog/mlflow-autolog.png",
+    slug: "ai-gateway-rename",
   },
 ];
 

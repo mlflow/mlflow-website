@@ -1,6 +1,7 @@
 ---
 title: 2023 Year in Review
 description: MLflow year-end recap
+slug: mlflow-year-in-review
 authors: [carly-akerly]
 tags: [MLflow, "2023", Linux Foundation]
 thumbnail: img/blog/2023-year-in-review.png

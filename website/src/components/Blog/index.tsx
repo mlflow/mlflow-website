@@ -3,13 +3,13 @@ import { Blog as BlogType } from "../../posts";
 import clsx from "clsx";
 
 function Blog({ blog }: { blog: BlogType }): JSX.Element {
-  const { title, path, tags, authors, date, thumbnail } = blog;
+  const { title, path, tags, authors, date, thumbnail, slug } = blog;
   const author = authors[0];
   return (
     <div className={clsx("card", styles.card)}>
       <div className={clsx("card__body", styles.cardBody)}>
         <a
-          href={path}
+          href={`/blog/${slug}`}
           style={{
             textDecoration: "none",
             color: "inherit",
@@ -30,7 +30,7 @@ function Blog({ blog }: { blog: BlogType }): JSX.Element {
                   <a
                     className={clsx(
                       "button button--sm button--outline button--primary",
-                      styles.tag,
+                      styles.tag
                     )}
                     href={`/blog/tags/${tag}`}
                   >
