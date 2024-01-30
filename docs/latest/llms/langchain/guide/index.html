@@ -623,6 +623,125 @@ for consistent performance.</p></li>
 <li><p><strong>Seamless Metrics Recording</strong>: Autologging effortlessly captures metrics for evaluating generated texts, as well as key objects such as llms and agents employed during inference.</p></li>
 <li><p><strong>Automated Input and Output Logging</strong>: Autologging takes care of logging inputs and outputs of the LangChain model during inference. The recorded results are neatly organized into an inference_inputs_outputs.json file, providing a comprehensive overview of the model’s inference history.</p></li>
 </ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To use MLflow LangChain autologging, please upgrade langchain to <strong>version 0.1.0</strong> or higher.
+Depending on your existing environment, you may need to manually install langchain_community&gt;=0.0.16 in order to enable the automatic logging of artifacts and metrics. (this behavior will be modified in the future to be an optional import)
+If autologging doesn’t log artifacts as expected, please check the warning messages in <cite>stdout</cite> logs.
+For langchain_community==0.0.16, you will need to install the <cite>textstat</cite> and <cite>spacy</cite> libraries manually, as well as restarting any active interactive environment (i.e., a notebook environment). On Databricks, you can achieve this via executing <cite>dbutils.library.restartPython()</cite> to force the Python REPL to restart, allowing the newly installed libraries to be available.</p>
+</div>
+<p>MLflow langchain autologging injects <a class="reference external" href="https://github.com/langchain-ai/langchain/blob/master/libs/community/langchain_community/callbacks/mlflow_callback.py">MlflowCallbackHandler</a> into the langchain model inference process to log
+metrics and artifacts automatically. We will only log the model if both <cite>log_models</cite> is set to <cite>True</cite> when calling <a class="reference internal" href="../../../python_api/mlflow.langchain.html#mlflow.langchain.autolog" title="mlflow.langchain.autolog"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.langchain.autolog()</span></code></a> and the objects being invoked are within the supported model types: <cite>Chain</cite>, <cite>AgentExecutor</cite>, <cite>BaseRetriever</cite>, <cite>RunnableSequence</cite>, <cite>RunnableParallel</cite>, <cite>RunnableBranch</cite>, <cite>SimpleChatModel</cite>, <cite>ChatPromptTemplate</cite>,
+<cite>RunnableLambda</cite>, <cite>RunnablePassthrough</cite>. Additional model types will be supported in the future.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>We patch <cite>invoke</cite> function for all supported langchain models, <cite>__call__</cite> function for Chains, AgentExecutors models, and <cite>get_relevant_documents</cite> function for BaseRetrievers, so only when those functions are called MLflow autologs metrics and artifacts.
+If the model contains retrievers, we don’t support autologging the model because it requires saving <cite>loader_fn</cite> and <cite>persist_dir</cite> in order to load the model. Please log the model manually if you want to log the model with retrievers.</p>
+</div>
+<p>The following metrics and artifacts are logged by default (depending on the models involved):</p>
+<dl>
+<dt>Artifacts:</dt><dd><table class="docutils align-default">
+<colgroup>
+<col style="width: 39%" />
+<col style="width: 61%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Artifact name</p></td>
+<td><p>Explanation</p></td>
+</tr>
+<tr class="row-even"><td><p>table_action_records.html</p></td>
+<td><p>Each action’s details, including chains, tools, llms, agents, retrievers.</p></td>
+</tr>
+<tr class="row-odd"><td><p>table_session_analysis.html</p></td>
+<td><p>Details about prompt and output for each prompt step; token usages;
+text analysis metrics</p></td>
+</tr>
+<tr class="row-even"><td><p>chat_html.html</p></td>
+<td><p>LLM input and output details</p></td>
+</tr>
+<tr class="row-odd"><td><p>llm_start_x_prompt_y.json</p></td>
+<td><p>Includes prompt and kwargs passed during llm <cite>generate</cite> call</p></td>
+</tr>
+<tr class="row-even"><td><p>llm_end_x_generation_y.json</p></td>
+<td><p>Includes llm_output of the LLM result</p></td>
+</tr>
+<tr class="row-odd"><td><p>ent-&lt;hash string of generation.text&gt;.html</p></td>
+<td><p>Visualization of the generation text using spacy “en_core_web_sm” model
+with style ent (if spacy is installed and the model is downloaded)</p></td>
+</tr>
+<tr class="row-even"><td><p>dep-&lt;hash string of generation.text&gt;.html</p></td>
+<td><p>Visualization of the generation text using spacy “en_core_web_sm” model
+with style dep (if spacy is installed and the model is downloaded)</p></td>
+</tr>
+<tr class="row-odd"><td><p>llm_new_tokens_x.json</p></td>
+<td><p>Records new tokens added to the LLM during inference</p></td>
+</tr>
+<tr class="row-even"><td><p>chain_start_x.json</p></td>
+<td><p>Records the inputs and chain related information during inference</p></td>
+</tr>
+<tr class="row-odd"><td><p>chain_end_x.json</p></td>
+<td><p>Records the chain outputs</p></td>
+</tr>
+<tr class="row-even"><td><p>tool_start_x.json</p></td>
+<td><p>Records the tool’s name, descriptions information during inference</p></td>
+</tr>
+<tr class="row-odd"><td><p>tool_end_x.json</p></td>
+<td><p>Records observation of the tool</p></td>
+</tr>
+<tr class="row-even"><td><p>retriever_start_x.json</p></td>
+<td><p>Records the retriever’s information during inference</p></td>
+</tr>
+<tr class="row-odd"><td><p>retriever_end_x.json</p></td>
+<td><p>Records the retriever’s result documents</p></td>
+</tr>
+<tr class="row-even"><td><p>agent_finish_x.json</p></td>
+<td><p>Records final return value of the ActionAgent, including output and log</p></td>
+</tr>
+<tr class="row-odd"><td><p>agent_action_x.json</p></td>
+<td><p>Records the ActionAgent’s action details</p></td>
+</tr>
+<tr class="row-even"><td><p>on_text_x.json</p></td>
+<td><p>Records the text during inference</p></td>
+</tr>
+<tr class="row-odd"><td><p>inference_inputs_outputs.json</p></td>
+<td><p>Input and output details for each inference call (logged by default, can
+be turned off by setting <cite>log_inputs_outputs=False</cite> when turn on autolog)</p></td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt>Metrics:</dt><dd><table class="docutils align-default">
+<colgroup>
+<col style="width: 39%" />
+<col style="width: 61%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Metric types</p></td>
+<td><p>Details</p></td>
+</tr>
+<tr class="row-even"><td><p>Basic Metrics</p></td>
+<td><p>step, starts, ends, errors, text_ctr, chain_starts, chain_ends, llm_starts
+llm_ends, llm_streams, tool_starts, tool_ends, agent_ends, retriever_ends
+retriever_starts (they’re the count number of each component invocation)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Text Analysis Metrics</p></td>
+<td><p>flesch_reading_ease, flesch_kincaid_grade, smog_index, coleman_liau_index
+automated_readability_index, dale_chall_readability_score,
+difficult_words, linsear_write_formula, gunning_fog, fernandez_huerta,
+szigriszt_pazos, gutierrez_polini, crawford, gulpease_index, osman
+(they’re the text analysis metrics of the generation text if <cite>textstat</cite>
+library is installed)</p></td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Each inference call logs those artifacts into a separate directory named <cite>artifacts-&lt;session_id&gt;-&lt;idx&gt;</cite>, where <cite>session_id</cite> is randomly generated uuid, and <cite>idx</cite> is the index of the inference call.
+<cite>session_id</cite> is also preserved in the <cite>inference_inputs_outputs.json</cite> file, so you can easily find the corresponding artifacts for each inference call.</p>
+</div>
+<p>If you encounter any issues unexpected, please feel free to open an issue in <a class="reference external" href="https://github.com/mlflow/mlflow/issues">MLflow Github repo</a>.</p>
 <div class="section" id="an-example-of-mlflow-langchain-autologging">
 <h4>An example of MLflow langchain autologging<a class="headerlink" href="#an-example-of-mlflow-langchain-autologging" title="Permalink to this headline"> </a></h4>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
@@ -634,6 +753,11 @@ for consistent performance.</p></li>
 <span class="kn">from</span> <span class="nn">langchain.schema.runnable</span> <span class="kn">import</span> <span class="n">RunnableLambda</span>
 
 <span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="c1"># Uncomment the following to use the full abilities of langchain autologgin</span>
+<span class="c1"># %pip install `langchain_community&gt;=0.0.16`</span>
+<span class="c1"># These two libraries enable autologging to log text analysis related artifacts</span>
+<span class="c1"># %pip install textstat spacy</span>
 
 <span class="k">assert</span> <span class="s2">&quot;OPENAI_API_KEY&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">,</span> <span class="s2">&quot;Please set the OPENAI_API_KEY environment variable.&quot;</span>
 
