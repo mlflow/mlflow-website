@@ -201,6 +201,7 @@
                 
   <h1>Source code for mlflow.exceptions</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="kn">from</span> <span class="nn">mlflow.protos.databricks_pb2</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ABORTED</span><span class="p">,</span>
@@ -255,6 +256,8 @@
 <span class="n">HTTP_STATUS_TO_ERROR_CODE</span><span class="p">[</span><span class="mi">400</span><span class="p">]</span> <span class="o">=</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">Name</span><span class="p">(</span><span class="n">BAD_REQUEST</span><span class="p">)</span>
 <span class="n">HTTP_STATUS_TO_ERROR_CODE</span><span class="p">[</span><span class="mi">404</span><span class="p">]</span> <span class="o">=</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">Name</span><span class="p">(</span><span class="n">ENDPOINT_NOT_FOUND</span><span class="p">)</span>
 <span class="n">HTTP_STATUS_TO_ERROR_CODE</span><span class="p">[</span><span class="mi">500</span><span class="p">]</span> <span class="o">=</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">Name</span><span class="p">(</span><span class="n">INTERNAL_ERROR</span><span class="p">)</span>
+
+<span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="get_error_code"><a class="viewcode-back" href="../../python_api/exceptions/mlflow.exceptions.html#mlflow.exceptions.get_error_code">[docs]</a><span class="k">def</span> <span class="nf">get_error_code</span><span class="p">(</span><span class="n">http_status</span><span class="p">):</span>
@@ -316,13 +319,35 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Exception thrown on non 200-level responses from the REST API&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">json</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">json</span> <span class="o">=</span> <span class="n">json</span>
+
         <span class="n">error_code</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;error_code&quot;</span><span class="p">,</span> <span class="n">ErrorCode</span><span class="o">.</span><span class="n">Name</span><span class="p">(</span><span class="n">INTERNAL_ERROR</span><span class="p">))</span>
         <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
             <span class="n">error_code</span><span class="p">,</span>
             <span class="n">json</span><span class="p">[</span><span class="s2">&quot;message&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="s2">&quot;message&quot;</span> <span class="ow">in</span> <span class="n">json</span> <span class="k">else</span> <span class="s2">&quot;Response: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">json</span><span class="p">),</span>
         <span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">error_code</span><span class="o">=</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">Value</span><span class="p">(</span><span class="n">error_code</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">json</span> <span class="o">=</span> <span class="n">json</span></div>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">error_code</span><span class="o">=</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">Value</span><span class="p">(</span><span class="n">error_code</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># The `error_code` can be an http error code, in which case we convert it to the</span>
+                <span class="c1"># corresponding `ErrorCode`.</span>
+                <span class="n">error_code</span> <span class="o">=</span> <span class="n">HTTP_STATUS_TO_ERROR_CODE</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">error_code</span><span class="p">)]</span>
+                <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">error_code</span><span class="o">=</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">Value</span><span class="p">(</span><span class="n">error_code</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">ValueError</span> <span class="ow">or</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Received error code not recognized by MLflow: </span><span class="si">{</span><span class="n">error_code</span><span class="si">}</span><span class="s2">, this may &quot;</span>
+                    <span class="s2">&quot;indicate your request encountered an error before reaching MLflow server, &quot;</span>
+                    <span class="s2">&quot;e.g., within a proxy server or authentication / authorization service.&quot;</span>
+                <span class="p">)</span>
+                <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Overriding `__reduce__` to make `RestException` instance pickle-able.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">RestException</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">json</span><span class="p">,)</span></div>
 
 
 <div class="viewcode-block" id="ExecutionException"><a class="viewcode-back" href="../../python_api/exceptions/mlflow.exceptions.html#mlflow.exceptions.ExecutionException">[docs]</a><span class="k">class</span> <span class="nc">ExecutionException</span><span class="p">(</span><span class="n">MlflowException</span><span class="p">):</span>

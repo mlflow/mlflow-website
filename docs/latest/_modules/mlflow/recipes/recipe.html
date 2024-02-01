@@ -236,12 +236,12 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Recipe base class.</span>
 
-<span class="sd">        :param recipe_root_path: String path to the directory under which the recipe template</span>
-<span class="sd">                                   such as recipe.yaml, profiles/{profile}.yaml and</span>
-<span class="sd">                                   steps/{step_name}.py are defined.</span>
-<span class="sd">        :param profile: String specifying the profile name, with which</span>
-<span class="sd">                        {recipe_root_path}/profiles/{profile}.yaml is read and merged with</span>
-<span class="sd">                        recipe.yaml to generate the configuration to run the recipe.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            recipe_root_path: String path to the directory under which the recipe template</span>
+<span class="sd">                such as recipe.yaml, profiles/{profile}.yaml and steps/{step_name}.py are defined.</span>
+<span class="sd">            profile: String specifying the profile name, with which</span>
+<span class="sd">                {recipe_root_path}/profiles/{profile}.yaml is read and merged with</span>
+<span class="sd">                recipe.yaml to generate the configuration to run the recipe.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_recipe_root_path</span> <span class="o">=</span> <span class="n">recipe_root_path</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_run_args</span> <span class="o">=</span> <span class="p">{}</span>
@@ -270,10 +270,13 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Runs a step in the recipe, or the entire recipe if a step is not specified.</span>
 
-<span class="sd">        :param step: String name to run a step within the recipe. The step and its dependencies</span>
-<span class="sd">                     will be run sequentially. If a step is not specified, the entire recipe is</span>
-<span class="sd">                     executed.</span>
-<span class="sd">        :return: None</span>
+<span class="sd">        Args:</span>
+<span class="sd">            step: String name to run a step within the recipe. The step and its dependencies</span>
+<span class="sd">                will be run sequentially. If a step is not specified, the entire recipe is</span>
+<span class="sd">                executed.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># TODO Record performance here.</span>
@@ -316,9 +319,12 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Displays main output from a step, or a recipe DAG if no step is specified.</span>
 
-<span class="sd">        :param step: String name to display a step output within the recipe. If a step is not</span>
-<span class="sd">                     specified, the DAG of the recipe is shown instead.</span>
-<span class="sd">        :return: None</span>
+<span class="sd">        Args:</span>
+<span class="sd">            step: String name to display a step output within the recipe. If a step is not</span>
+<span class="sd">                specified, the DAG of the recipe is shown instead.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_steps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_recipe_steps</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">step</span><span class="p">:</span>
@@ -334,8 +340,9 @@
 <span class="sd">        for a particular step, the step will be re-executed in its entirety the next time it is</span>
 <span class="sd">        invoked via ``BaseRecipe.run()``.</span>
 
-<span class="sd">        :param step: String name of the step to clean within the recipe. If not specified,</span>
-<span class="sd">                     cached outputs are removed for all recipe steps.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            step: String name of the step to clean within the recipe. If not specified,</span>
+<span class="sd">                cached outputs are removed for all recipe steps.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">to_clean</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_steps</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">step</span> <span class="k">else</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_step</span><span class="p">(</span><span class="n">step</span><span class="p">)]</span>
         <span class="n">clean_execution_state</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_recipe_root_path</span><span class="p">,</span> <span class="n">to_clean</span><span class="p">)</span></div>
@@ -572,16 +579,18 @@
 <span class="sd">        must be the root directory of an MLflow Recipe repository or a subdirectory of an</span>
 <span class="sd">        MLflow Recipe repository.</span>
 
-<span class="sd">        :param profile: The name of the profile to use for configuring the problem-specific or</span>
-<span class="sd">                        task-specific recipe. Profiles customize the configuration of</span>
-<span class="sd">                        one or more recipe steps, and recipe executions with different profiles</span>
-<span class="sd">                        often produce different results.</span>
-<span class="sd">        :return: A recipe for a particular ML problem or MLOps task. For example, an instance of</span>
-<span class="sd">                 `RegressionRecipe &lt;https://github.com/mlflow/recipes-regression-template&gt;`_</span>
-<span class="sd">                 for regression problems.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            profile: The name of the profile to use for configuring the problem-specific or</span>
+<span class="sd">                task-specific recipe. Profiles customize the configuration of</span>
+<span class="sd">                one or more recipe steps, and recipe executions with different profiles</span>
+<span class="sd">                often produce different results.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A recipe for a particular ML problem or MLOps task. For example, an instance of</span>
+<span class="sd">            `RegressionRecipe &lt;https://github.com/mlflow/recipes-regression-template&gt;`_</span>
+<span class="sd">            for regression problems.</span>
 
 <span class="sd">        .. code-block:: python</span>
-<span class="sd">            :caption: Example</span>
 
 <span class="sd">            import os</span>
 <span class="sd">            from mlflow.recipes import Recipe</span>

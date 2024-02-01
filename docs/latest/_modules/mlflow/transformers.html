@@ -2258,7 +2258,7 @@
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coerce_exploded_dict_to_single_dict</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_input_for_table_question_answering</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_conversation_input</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span>
+        <span class="k">if</span> <span class="p">(</span>  <span class="c1"># noqa: SIM114</span>
             <span class="nb">isinstance</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="p">,</span>
                 <span class="p">(</span>
@@ -2271,6 +2271,36 @@
             <span class="p">)</span>
             <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
             <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">data</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
+        <span class="c1"># NB: For Text2TextGenerationPipeline, we need more complex handling for dictionary,</span>
+        <span class="c1"># as we allow both single string input and dictionary input (or list of them). Both</span>
+        <span class="c1"># are once wrapped to Pandas DataFrame during schema enforcement and convert back to</span>
+        <span class="c1"># dictionary. The difference between two is columns of the DataFrame, where the first</span>
+        <span class="c1"># case (string) will have auto-generated columns like 0, 1, ... while the latter (dict)</span>
+        <span class="c1"># will have the original keys to be the columns. When converting back to dictionary,</span>
+        <span class="c1"># those columns will becomes the key of dictionary.</span>
+        <span class="c1">#</span>
+        <span class="c1"># E.g.</span>
+        <span class="c1">#  1. If user&#39;s input is string like model.predict(&quot;foo&quot;)</span>
+        <span class="c1">#    -&gt; Raw input: &quot;foo&quot;</span>
+        <span class="c1">#    -&gt; Pandas dataframe has column 0, with single row &quot;foo&quot;</span>
+        <span class="c1">#    -&gt; Derived dictionary will be {0: &quot;foo&quot;}</span>
+        <span class="c1">#  2. If user&#39;s input is dictionary like model.predict({&quot;text&quot;: &quot;foo&quot;})</span>
+        <span class="c1">#    -&gt; Raw input: {&quot;text&quot;: &quot;foo&quot;}</span>
+        <span class="c1">#    -&gt; Pandas dataframe has column &quot;text&quot;, with single row &quot;foo&quot;</span>
+        <span class="c1">#    -&gt; Derived dictionary will be {&quot;text&quot;: &quot;foo&quot;}</span>
+        <span class="c1">#</span>
+        <span class="c1"># Then for the first case, we want to extract values only, similar to other pipelines.</span>
+        <span class="c1"># However, for the second case, we want to keep the key-value pair as it is.</span>
+        <span class="c1"># In long-term, we should definitely change the upstream handling to avoid this</span>
+        <span class="c1"># complexity, but here we just try to make it work by checking if the key is auto-generated.</span>
+        <span class="k">elif</span> <span class="p">(</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">transformers</span><span class="o">.</span><span class="n">Text2TextGenerationPipeline</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">data</span><span class="p">)</span>
+            <span class="c1"># Pandas Dataframe derived dictionary will have integer key (row index)</span>
+            <span class="ow">and</span> <span class="mi">0</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
         <span class="p">):</span>
             <span class="k">return</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">transformers</span><span class="o">.</span><span class="n">TextClassificationPipeline</span><span class="p">):</span>
@@ -3128,6 +3158,7 @@
         <span class="c1"># throw for unsupported types</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
             <span class="s2">&quot;Prompt templating is only supported for data of type str or List[str]. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">input_data</span><span class="p">)</span><span class="si">}</span><span class="s2"> instead.&quot;</span>
         <span class="p">)</span>
 
 

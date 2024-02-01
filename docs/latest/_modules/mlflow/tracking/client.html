@@ -282,13 +282,14 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tracking_uri</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">registry_uri</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param tracking_uri: Address of local or remote tracking server. If not provided, defaults</span>
-<span class="sd">                             to the service set by ``mlflow.tracking.set_tracking_uri``. See</span>
-<span class="sd">                             `Where Runs Get Recorded &lt;../tracking.html#where-runs-get-recorded&gt;`_</span>
-<span class="sd">                             for more info.</span>
-<span class="sd">        :param registry_uri: Address of local or remote model registry server. If not provided,</span>
-<span class="sd">                             defaults to the service set by ``mlflow.tracking.set_registry_uri``. If</span>
-<span class="sd">                             no such service was set, defaults to the tracking uri of the client.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            tracking_uri: Address of local or remote tracking server. If not provided, defaults</span>
+<span class="sd">                to the service set by ``mlflow.tracking.set_tracking_uri``. See</span>
+<span class="sd">                `Where Runs Get Recorded &lt;../tracking.html#where-runs-get-recorded&gt;`_</span>
+<span class="sd">                for more info.</span>
+<span class="sd">            registry_uri: Address of local or remote model registry server. If not provided,</span>
+<span class="sd">                defaults to the service set by ``mlflow.tracking.set_registry_uri``. If</span>
+<span class="sd">                no such service was set, defaults to the tracking uri of the client.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">final_tracking_uri</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">_resolve_tracking_uri</span><span class="p">(</span><span class="n">tracking_uri</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_registry_uri</span> <span class="o">=</span> <span class="n">registry_utils</span><span class="o">.</span><span class="n">_resolve_registry_uri</span><span class="p">(</span><span class="n">registry_uri</span><span class="p">,</span> <span class="n">tracking_uri</span><span class="p">)</span>
@@ -304,13 +305,15 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tracking_client</span><span class="o">.</span><span class="n">tracking_uri</span>
 
     <span class="k">def</span> <span class="nf">_get_registry_client</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Attempts to create a py:class:`ModelRegistryClient` if one does not already exist.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Attempts to create a ModelRegistryClient if one does not already exist.</span>
 
-<span class="sd">        :raises: py:class:`mlflow.exceptions.MlflowException` if the py:class:`ModelRegistryClient`</span>
-<span class="sd">                 cannot be created. This may occur, for example, when the registry URI refers</span>
-<span class="sd">                 to an unsupported store type (e.g., the FileStore).</span>
-<span class="sd">        :return: A py:class:`ModelRegistryClient` instance</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            MlflowException: If the ModelRegistryClient cannot be created. This may occur, for</span>
+<span class="sd">            example, when the registry URI refers to an unsupported store type (e.g., the</span>
+<span class="sd">            FileStore).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A ModelRegistryClient instance.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Attempt to fetch a `ModelRegistryClient` that is lazily instantiated and defined as</span>
         <span class="c1"># an instance variable on this `MlflowClient` instance. Because the instance variable</span>
@@ -349,10 +352,13 @@
 <span class="sd">        the same key are logged for the run, the :py:class:`RunData &lt;mlflow.entities.RunData&gt;`</span>
 <span class="sd">        contains the most recently logged value at the largest step for each metric.</span>
 
-<span class="sd">        :param run_id: Unique identifier for the run.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            run_id: Unique identifier for the run.</span>
 
-<span class="sd">        :return: A single :py:class:`mlflow.entities.Run` object, if the run exists. Otherwise,</span>
-<span class="sd">                 raises an exception.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            A single :py:class:`mlflow.entities.Run` object, if the run exists. Otherwise,</span>
+<span class="sd">            raises an exception.</span>
+
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -377,17 +383,19 @@
 <span class="sd">            run_id: e36b42c587a1413ead7c3b6764120618</span>
 <span class="sd">            params: {&#39;p&#39;: &#39;0&#39;}</span>
 <span class="sd">            status: FINISHED</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tracking_client</span><span class="o">.</span><span class="n">get_run</span><span class="p">(</span><span class="n">run_id</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MlflowClient.get_parent_run"><a class="viewcode-back" href="../../../python_api/mlflow.client.html#mlflow.client.MlflowClient.get_parent_run">[docs]</a>    <span class="k">def</span> <span class="nf">get_parent_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Run</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Gets the parent run for the given run id if one exists.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the parent run for the given run id if one exists.</span>
 
-<span class="sd">        :param run_id: Unique identifier for the child run.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            run_id: Unique identifier for the child run.</span>
 
-<span class="sd">        :return: A single :py:class:`mlflow.entities.Run` object, if the parent run exists.</span>
-<span class="sd">                    Otherwise, returns None.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            A single :py:class:`mlflow.entities.Run` object, if the parent run exists. Otherwise,</span>
+<span class="sd">            returns None.</span>
 
 <span class="sd">        .. testcode:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -411,6 +419,7 @@
 
 <span class="sd">            child_run_id: 7d175204675e40328e46d9a6a5a7ee6a</span>
 <span class="sd">            parent_run_id: 8979459433a24a52ab3be87a229a9cdf</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">child_run</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tracking_client</span><span class="o">.</span><span class="n">get_run</span><span class="p">(</span><span class="n">run_id</span><span class="p">)</span>
         <span class="n">parent_run_id</span> <span class="o">=</span> <span class="n">child_run</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">MLFLOW_PARENT_RUN_ID</span><span class="p">)</span>
@@ -419,13 +428,14 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tracking_client</span><span class="o">.</span><span class="n">get_run</span><span class="p">(</span><span class="n">parent_run_id</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MlflowClient.get_metric_history"><a class="viewcode-back" href="../../../python_api/mlflow.client.html#mlflow.client.MlflowClient.get_metric_history">[docs]</a>    <span class="k">def</span> <span class="nf">get_metric_history</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Metric</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return a list of metric objects corresponding to all values logged for a given metric.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a list of metric objects corresponding to all values logged for a given metric.</span>
 
-<span class="sd">        :param run_id: Unique identifier for run</span>
-<span class="sd">        :param key: Metric name within the run</span>
+<span class="sd">        Args:</span>
+<span class="sd">            run_id: Unique identifier for run.</span>
+<span class="sd">            key: Metric name within the run.</span>
 
-<span class="sd">        :return: A list of :py:class:`mlflow.entities.Metric` entities if logged, else empty list</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            A list of :py:class:`mlflow.entities.Metric` entities if logged, else empty list.</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -501,12 +511,15 @@
 <span class="sd">        Unlike :py:func:`mlflow.start_run`, does not change the &quot;active run&quot; used by</span>
 <span class="sd">        :py:func:`mlflow.log_param`.</span>
 
-<span class="sd">        :param experiment_id: The string ID of the experiment to create a run in.</span>
-<span class="sd">        :param start_time: If not provided, use the current timestamp.</span>
-<span class="sd">        :param tags: A dictionary of key-value pairs that are converted into</span>
-<span class="sd">                     :py:class:`mlflow.entities.RunTag` objects.</span>
-<span class="sd">        :param run_name: The name of this run.</span>
-<span class="sd">        :return: :py:class:`mlflow.entities.Run` that was created.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            experiment_id: The string ID of the experiment to create a run in.</span>
+<span class="sd">            start_time: If not provided, use the current timestamp.</span>
+<span class="sd">            tags: A dictionary of key-value pairs that are converted into</span>
+<span class="sd">                :py:class:`mlflow.entities.RunTag` objects.</span>
+<span class="sd">            run_name: The name of this run.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            :py:class:`mlflow.entities.Run` that was created.</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -551,55 +564,57 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Search for experiments that match the specified search query.</span>
 
-<span class="sd">        :param view_type: One of enum values ``ACTIVE_ONLY``, ``DELETED_ONLY``, or ``ALL``</span>
-<span class="sd">                          defined in :py:class:`mlflow.entities.ViewType`.</span>
-<span class="sd">        :param max_results: Maximum number of experiments desired. Certain server backend may apply</span>
-<span class="sd">                            its own limit.</span>
-<span class="sd">        :param filter_string:</span>
-<span class="sd">            Filter query string (e.g., ``&quot;name = &#39;my_experiment&#39;&quot;``), defaults to searching for all</span>
-<span class="sd">            experiments. The following identifiers, comparators, and logical operators are</span>
-<span class="sd">            supported.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            view_type: One of enum values ``ACTIVE_ONLY``, ``DELETED_ONLY``, or ``ALL``</span>
+<span class="sd">                defined in :py:class:`mlflow.entities.ViewType`.</span>
+<span class="sd">            max_results: Maximum number of experiments desired. Certain server backend may apply</span>
+<span class="sd">                its own limit.</span>
+<span class="sd">            filter_string: Filter query string (e.g., ``&quot;name = &#39;my_experiment&#39;&quot;``), defaults to</span>
+<span class="sd">                searching for all experiments. The following identifiers, comparators, and logical</span>
+<span class="sd">                operators are supported.</span>
 
-<span class="sd">            Identifiers</span>
-<span class="sd">              - ``name``: Experiment name</span>
-<span class="sd">              - ``creation_time``: Experiment creation time</span>
-<span class="sd">              - ``last_update_time``: Experiment last update time</span>
-<span class="sd">              - ``tags.&lt;tag_key&gt;``: Experiment tag. If ``tag_key`` contains</span>
-<span class="sd">                spaces, it must be wrapped with backticks (e.g., ``&quot;tags.`extra key`&quot;``).</span>
+<span class="sd">                Identifiers</span>
+<span class="sd">                  - ``name``: Experiment name</span>
+<span class="sd">                  - ``creation_time``: Experiment creation time</span>
+<span class="sd">                  - ``last_update_time``: Experiment last update time</span>
+<span class="sd">                  - ``tags.&lt;tag_key&gt;``: Experiment tag. If ``tag_key`` contains</span>
+<span class="sd">                    spaces, it must be wrapped with backticks (e.g., ``&quot;tags.`extra key`&quot;``).</span>
 
-<span class="sd">            Comparators for string attributes and tags</span>
-<span class="sd">              - ``=``: Equal to</span>
-<span class="sd">              - ``!=``: Not equal to</span>
-<span class="sd">              - ``LIKE``: Case-sensitive pattern match</span>
-<span class="sd">              - ``ILIKE``: Case-insensitive pattern match</span>
+<span class="sd">                Comparators for string attributes and tags</span>
+<span class="sd">                  - ``=``: Equal to</span>
+<span class="sd">                  - ``!=``: Not equal to</span>
+<span class="sd">                  - ``LIKE``: Case-sensitive pattern match</span>
+<span class="sd">                  - ``ILIKE``: Case-insensitive pattern match</span>
 
-<span class="sd">            Comparators for numeric attributes</span>
-<span class="sd">              - ``=``: Equal to</span>
-<span class="sd">              - ``!=``: Not equal to</span>
-<span class="sd">              - ``&lt;``: Less than</span>
-<span class="sd">              - ``&lt;=``: Less than or equal to</span>
-<span class="sd">              - ``&gt;``: Greater than</span>
-<span class="sd">              - ``&gt;=``: Greater than or equal to</span>
+<span class="sd">                Comparators for numeric attributes</span>
+<span class="sd">                  - ``=``: Equal to</span>
+<span class="sd">                  - ``!=``: Not equal to</span>
+<span class="sd">                  - ``&lt;``: Less than</span>
+<span class="sd">                  - ``&lt;=``: Less than or equal to</span>
+<span class="sd">                  - ``&gt;``: Greater than</span>
+<span class="sd">                  - ``&gt;=``: Greater than or equal to</span>
 
-<span class="sd">            Logical operators</span>
-<span class="sd">              - ``AND``: Combines two sub-queries and returns True if both of them are True.</span>
+<span class="sd">                Logical operators</span>
+<span class="sd">                  - ``AND``: Combines two sub-queries and returns True if both of them are True.</span>
 
-<span class="sd">        :param order_by:</span>
-<span class="sd">            List of columns to order by. The ``order_by`` column can contain an optional ``DESC`` or</span>
-<span class="sd">            ``ASC`` value (e.g., ``&quot;name DESC&quot;``). The default ordering is ``ASC``, so ``&quot;name&quot;`` is</span>
-<span class="sd">            equivalent to ``&quot;name ASC&quot;``. If unspecified, defaults to ``[&quot;last_update_time DESC&quot;]``,</span>
-<span class="sd">            which lists experiments updated most recently first. The following fields are supported:</span>
+<span class="sd">            order_by: List of columns to order by. The ``order_by`` column can contain an optional</span>
+<span class="sd">                ``DESC`` or ``ASC`` value (e.g., ``&quot;name DESC&quot;``). The default ordering is ``ASC``,</span>
+<span class="sd">                so ``&quot;name&quot;`` is equivalent to ``&quot;name ASC&quot;``. If unspecified, defaults to</span>
+<span class="sd">                ``[&quot;last_update_time DESC&quot;]``, which lists experiments updated most recently first.</span>
+<span class="sd">                The following fields are supported:</span>
 
-<span class="sd">            - ``experiment_id``: Experiment ID</span>
-<span class="sd">            - ``name``: Experiment name</span>
-<span class="sd">            - ``creation_time``: Experiment creation time</span>
-<span class="sd">            - ``last_update_time``: Experiment last update time</span>
+<span class="sd">                - ``experiment_id``: Experiment ID</span>
+<span class="sd">                - ``name``: Experiment name</span>
+<span class="sd">                - ``creation_time``: Experiment creation time</span>
+<span class="sd">                - ``last_update_time``: Experiment last update time</span>
 
-<span class="sd">        :param page_token: Token specifying the next page of results. It should be obtained from</span>
-<span class="sd">                           a ``search_experiments`` call.</span>
-<span class="sd">        :return: A :py:class:`PagedList &lt;mlflow.store.entities.PagedList&gt;` of</span>
-<span class="sd">                 :py:class:`Experiment &lt;mlflow.entities.Experiment&gt;` objects. The pagination token</span>
-<span class="sd">                 for the next page can be obtained via the ``token`` attribute of the object.</span>
+<span class="sd">            page_token: Token specifying the next page of results. It should be obtained from</span>
+<span class="sd">                a ``search_experiments`` call.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A :py:class:`PagedList &lt;mlflow.store.entities.PagedList&gt;` of</span>
+<span class="sd">            :py:class:`Experiment &lt;mlflow.entities.Experiment&gt;` objects. The pagination token</span>
+<span class="sd">            for the next page can be obtained via the ``token`` attribute of the object.</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -657,44 +672,48 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="MlflowClient.get_experiment"><a class="viewcode-back" href="../../../python_api/mlflow.client.html#mlflow.client.MlflowClient.get_experiment">[docs]</a>    <span class="k">def</span> <span class="nf">get_experiment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">experiment_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Experiment</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Retrieve an experiment by experiment_id from the backend store</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Retrieve an experiment by experiment_id from the backend store</span>
 
-<span class="sd">        :param experiment_id: The experiment ID returned from ``create_experiment``.</span>
-<span class="sd">        :return: :py:class:`mlflow.entities.Experiment`</span>
+<span class="sd">        Args:</span>
+<span class="sd">            experiment_id: The experiment ID returned from ``create_experiment``.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            :py:class:`mlflow.entities.Experiment`</span>
 
 <span class="sd">        .. code-block:: python</span>
-<span class="sd">            :caption: Example</span>
+<span class="sd">          :caption: Example</span>
 
-<span class="sd">            from mlflow import MlflowClient</span>
+<span class="sd">          from mlflow import MlflowClient</span>
 
-<span class="sd">            client = MlflowClient()</span>
-<span class="sd">            exp_id = client.create_experiment(&quot;Experiment&quot;)</span>
-<span class="sd">            experiment = client.get_experiment(exp_id)</span>
+<span class="sd">          client = MlflowClient()</span>
+<span class="sd">          exp_id = client.create_experiment(&quot;Experiment&quot;)</span>
+<span class="sd">          experiment = client.get_experiment(exp_id)</span>
 
-<span class="sd">            # Show experiment info</span>
-<span class="sd">            print(f&quot;Name: {experiment.name}&quot;)</span>
-<span class="sd">            print(f&quot;Experiment ID: {experiment.experiment_id}&quot;)</span>
-<span class="sd">            print(f&quot;Artifact Location: {experiment.artifact_location}&quot;)</span>
-<span class="sd">            print(f&quot;Lifecycle_stage: {experiment.lifecycle_stage}&quot;)</span>
+<span class="sd">          # Show experiment info</span>
+<span class="sd">          print(f&quot;Name: {experiment.name}&quot;)</span>
+<span class="sd">          print(f&quot;Experiment ID: {experiment.experiment_id}&quot;)</span>
+<span class="sd">          print(f&quot;Artifact Location: {experiment.artifact_location}&quot;)</span>
+<span class="sd">          print(f&quot;Lifecycle_stage: {experiment.lifecycle_stage}&quot;)</span>
 
 <span class="sd">        .. code-block:: text</span>
-<span class="sd">            :caption: Output</span>
+<span class="sd">          :caption: Output</span>
 
-<span class="sd">            Name: Experiment</span>
-<span class="sd">            Experiment ID: 1</span>
-<span class="sd">            Artifact Location: file:///.../mlruns/1</span>
-<span class="sd">            Lifecycle_stage: active</span>
+<span class="sd">          Name: Experiment</span>
+<span class="sd">          Experiment ID: 1</span>
+<span class="sd">          Artifact Location: file:///.../mlruns/1</span>
+<span class="sd">          Lifecycle_stage: active</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tracking_client</span><span class="o">.</span><span class="n">get_experiment</span><span class="p">(</span><span class="n">experiment_id</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MlflowClient.get_experiment_by_name"><a class="viewcode-back" href="../../../python_api/mlflow.client.html#mlflow.client.MlflowClient.get_experiment_by_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_experiment_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Experiment</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Retrieve an experiment by experiment name from the backend store</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Retrieve an experiment by experiment name from the backend store</span>
 
-<span class="sd">        :param name: The experiment name, which is case sensitive.</span>
-<span class="sd">        :return: An instance of :py:class:`mlflow.entities.Experiment`</span>
-<span class="sd">                 if an experiment with the specified name exists, otherwise None.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            name: The experiment name, which is case sensitive.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            An instance of :py:class:`mlflow.entities.Experiment`</span>
+<span class="sd">            if an experiment with the specified name exists, otherwise None.</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -704,7 +723,6 @@
 <span class="sd">            # Case-sensitive name</span>
 <span class="sd">            client = MlflowClient()</span>
 <span class="sd">            experiment = client.get_experiment_by_name(&quot;Default&quot;)</span>
-
 <span class="sd">            # Show experiment info</span>
 <span class="sd">            print(f&quot;Name: {experiment.name}&quot;)</span>
 <span class="sd">            print(f&quot;Experiment ID: {experiment.experiment_id}&quot;)</span>
@@ -729,13 +747,16 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create an experiment.</span>
 
-<span class="sd">        :param name: The experiment name. Must be unique.</span>
-<span class="sd">        :param artifact_location: The location to store run artifacts.</span>
-<span class="sd">                                  If not provided, the server picks an appropriate default.</span>
-<span class="sd">        :param tags: A dictionary of key-value pairs that are converted into</span>
-<span class="sd">                                :py:class:`mlflow.entities.ExperimentTag` objects, set as</span>
-<span class="sd">                                experiment tags upon experiment creation.</span>
-<span class="sd">        :return: String as an integer ID of the created experiment.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            name: The experiment name. Must be unique.</span>
+<span class="sd">            artifact_location: The location to store run artifacts. If not provided, the server</span>
+<span class="sd">                picks anappropriate default.</span>
+<span class="sd">            tags: A dictionary of key-value pairs that are converted into</span>
+<span class="sd">                :py:class:`mlflow.entities.ExperimentTag` objects, set as</span>
+<span class="sd">                experiment tags upon experiment creation.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            String as an integer ID of the created experiment.</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -768,17 +789,18 @@
 <span class="sd">            Artifact Location: file:///.../mlruns</span>
 <span class="sd">            Tags: {&#39;version&#39;: &#39;v1&#39;, &#39;priority&#39;: &#39;P1&#39;, &#39;nlp.framework&#39;: &#39;Spark NLP&#39;}</span>
 <span class="sd">            Lifecycle_stage: active</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tracking_client</span><span class="o">.</span><span class="n">create_experiment</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">artifact_location</span><span class="p">,</span> <span class="n">tags</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MlflowClient.delete_experiment"><a class="viewcode-back" href="../../../python_api/mlflow.client.html#mlflow.client.MlflowClient.delete_experiment">[docs]</a>    <span class="k">def</span> <span class="nf">delete_experiment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">experiment_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Delete an experiment from the backend store.</span>
-<span class="sd">        This deletion is a soft-delete, not a permanent deletion.</span>
-<span class="sd">        Experiment names can not be reused, unless the deleted experiment</span>
-<span class="sd">        is permanently deleted by a database admin.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Delete an experiment from the backend store.</span>
 
-<span class="sd">        :param experiment_id: The experiment ID returned from ``create_experiment``.</span>
+<span class="sd">        This deletion is a soft-delete, not a permanent deletion. Experiment names can not be</span>
+<span class="sd">        reused, unless the deleted experiment is permanently deleted by a database admin.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            experiment_id: The experiment ID returned from ``create_experiment``.</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -802,6 +824,7 @@
 <span class="sd">            Name: New Experiment</span>
 <span class="sd">            Artifact Location: file:///.../mlruns/1</span>
 <span class="sd">            Lifecycle_stage: deleted</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tracking_client</span><span class="o">.</span><span class="n">delete_experiment</span><span class="p">(</span><span class="n">experiment_id</span><span class="p">)</span></div>
 
@@ -809,7 +832,8 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Restore a deleted experiment unless permanently deleted.</span>
 
-<span class="sd">        :param experiment_id: The experiment ID returned from ``create_experiment``.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            experiment_id: The experiment ID returned from ``create_experiment``.</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -848,6 +872,7 @@
 <span class="sd">            Name: New Experiment</span>
 <span class="sd">            Experiment Id: 1</span>
 <span class="sd">            Lifecycle_stage: active</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tracking_client</span><span class="o">.</span><span class="n">restore_experiment</span><span class="p">(</span><span class="n">experiment_id</span><span class="p">)</span></div>
 
@@ -855,7 +880,8 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Update an experiment&#39;s name. The new name must be unique.</span>
 
-<span class="sd">        :param experiment_id: The experiment ID returned from ``create_experiment``.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            experiment_id: The experiment ID returned from ``create_experiment``.</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -893,6 +919,7 @@
 <span class="sd">            Name: Social Media NLP Experiments</span>
 <span class="sd">            Experiment_id: 1</span>
 <span class="sd">            Lifecycle_stage: active</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tracking_client</span><span class="o">.</span><span class="n">rename_experiment</span><span class="p">(</span><span class="n">experiment_id</span><span class="p">,</span> <span class="n">new_name</span><span class="p">)</span></div>
 
@@ -908,26 +935,28 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Log a metric against the run ID.</span>
 
-<span class="sd">        :param run_id: The run id to which the metric should be logged.</span>
-<span class="sd">        :param key: Metric name (string). This string may only contain alphanumerics, underscores</span>
-<span class="sd">                    (_), dashes (-), periods (.), spaces ( ), and slashes (/).</span>
-<span class="sd">                    All backend stores will support keys up to length 250, but some may</span>
-<span class="sd">                    support larger keys.</span>
-<span class="sd">        :param value: Metric value (float). Note that some special values such</span>
-<span class="sd">                      as +/- Infinity may be replaced by other values depending on the store. For</span>
-<span class="sd">                      example, the SQLAlchemy store replaces +/- Inf with max / min float values.</span>
-<span class="sd">                      All backend stores will support values up to length 5000, but some</span>
-<span class="sd">                      may support larger values.</span>
-<span class="sd">        :param timestamp: Time when this metric was calculated. Defaults to the current system time.</span>
-<span class="sd">        :param step: Integer training step (iteration) at which was the metric calculated.</span>
-<span class="sd">                     Defaults to 0.</span>
-<span class="sd">        :param synchronous: *Experimental* If True, blocks until the metric is logged successfully.</span>
-<span class="sd">                            If False, logs the metric asynchronously and returns a future</span>
-<span class="sd">                            representing the logging operation.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            run_id: The run id to which the metric should be logged.</span>
+<span class="sd">            key: Metric name. This string may only contain alphanumerics, underscores</span>
+<span class="sd">                (_), dashes (-), periods (.), spaces ( ), and slashes (/).</span>
+<span class="sd">                All backend stores will support keys up to length 250, but some may</span>
+<span class="sd">                support larger keys.</span>
+<span class="sd">            value: Metric value. Note that some special values such</span>
+<span class="sd">                as +/- Infinity may be replaced by other values depending on the store. For</span>
+<span class="sd">                example, the SQLAlchemy store replaces +/- Inf with max / min float values.</span>
+<span class="sd">                All backend stores will support values up to length 5000, but some</span>
+<span class="sd">                may support larger values.</span>
+<span class="sd">            timestamp: Time when this metric was calculated. Defaults to the current system time.</span>
+<span class="sd">            step: Integer training step (iteration) at which was the metric calculated.</span>
+<span class="sd">                Defaults to 0.</span>
+<span class="sd">            synchronous: *Experimental* If True, blocks until the metric is logged successfully.</span>
+<span class="sd">                If False, logs the metric asynchronously and returns a future</span>
+<span class="sd">                representing the logging operation.</span>
 
-<span class="sd">        :return: When `synchronous=True`, returns None. When `synchronous=False`, returns an</span>
-<span class="sd">             :py:class:`mlflow.utils.async_logging.run_operations.RunOperations` instance that</span>
-<span class="sd">             represents future for logging operation.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            When `synchronous=True`, returns None. When `synchronous=False`, returns an</span>
+<span class="sd">            :py:class:`mlflow.utils.async_logging.run_operations.RunOperations` instance that</span>
+<span class="sd">            represents future for logging operation.</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -982,21 +1011,23 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Log a parameter (e.g. model hyperparameter) against the run ID.</span>
 
-<span class="sd">        :param run_id: The run id to which the param should be logged.</span>
-<span class="sd">        :param key: Parameter name (string). This string may only contain alphanumerics, underscores</span>
-<span class="sd">                    (_), dashes (-), periods (.), spaces ( ), and slashes (/).</span>
-<span class="sd">                    All backend stores support keys up to length 250, but some may</span>
-<span class="sd">                    support larger keys.</span>
-<span class="sd">        :param value: Parameter value (string, but will be string-ified if not).</span>
-<span class="sd">                      All built-in backend stores support values up to length 6000, but some</span>
-<span class="sd">                      may support larger values.</span>
-<span class="sd">        :param synchronous: *Experimental* If True, blocks until the parameter is logged</span>
-<span class="sd">                            successfully. If False, logs the parameter asynchronously and</span>
-<span class="sd">                            returns a future representing the logging operation.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            run_id: The run id to which the param should be logged.</span>
+<span class="sd">            key: Parameter name. This string may only contain alphanumerics, underscores</span>
+<span class="sd">                (_), dashes (-), periods (.), spaces ( ), and slashes (/).</span>
+<span class="sd">                All backend stores support keys up to length 250, but some may</span>
+<span class="sd">                support larger keys.</span>
+<span class="sd">            value: Parameter value, but will be string-ified if not.</span>
+<span class="sd">                All built-in backend stores support values up to length 6000, but some</span>
+<span class="sd">                may support larger values.</span>
+<span class="sd">            synchronous: *Experimental* If True, blocks until the parameter is logged</span>
+<span class="sd">                successfully. If False, logs the parameter asynchronously and</span>
+<span class="sd">                returns a future representing the logging operation.</span>
 
-<span class="sd">        :return: When `synchronous=True`, returns parameter value. When `synchronous=False`,</span>
-<span class="sd">                 returns an :py:class:`mlflow.utils.async_logging.run_operations.RunOperations`</span>
-<span class="sd">                 instance that represents future for logging operation.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            When `synchronous=True`, returns parameter value. When `synchronous=False`,</span>
+<span class="sd">            returns an :py:class:`mlflow.utils.async_logging.run_operations.RunOperations`</span>
+<span class="sd">            instance that represents future for logging operation.</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -1018,7 +1049,6 @@
 <span class="sd">            run = client.create_run(experiment_id)</span>
 <span class="sd">            print_run_info(run)</span>
 <span class="sd">            print(&quot;--&quot;)</span>
-
 <span class="sd">            # Log the parameter. Unlike mlflow.log_param this method</span>
 <span class="sd">            # does not start a run if one does not exist. It will log</span>
 <span class="sd">            # the parameter in the backend store</span>
@@ -1049,12 +1079,12 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set a tag on the experiment with the specified ID. Value is converted to a string.</span>
 
-<span class="sd">        :param experiment_id: String ID of the experiment.</span>
-<span class="sd">        :param key: Name of the tag.</span>
-<span class="sd">        :param value: Tag value (converted to a string).</span>
+<span class="sd">        Args:</span>
+<span class="sd">            experiment_id: String ID of the experiment.</span>
+<span class="sd">            key: Name of the tag.</span>
+<span class="sd">            value: Tag value (converted to a string).</span>
 
 <span class="sd">        .. code-block:: python</span>
-<span class="sd">            :caption: Example</span>
 
 <span class="sd">            from mlflow import MlflowClient</span>
 
@@ -1069,10 +1099,10 @@
 <span class="sd">            print(f&quot;Tags: {experiment.tags}&quot;)</span>
 
 <span class="sd">        .. code-block:: text</span>
-<span class="sd">            :caption: Output</span>
 
 <span class="sd">            Name: Social Media NLP Experiments</span>
 <span class="sd">            Tags: {&#39;nlp.framework&#39;: &#39;Spark NLP&#39;}</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tracking_client</span><span class="o">.</span><span class="n">set_experiment_tag</span><span class="p">(</span><span class="n">experiment_id</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
 
@@ -1082,21 +1112,21 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set a tag on the run with the specified ID. Value is converted to a string.</span>
 
-<span class="sd">        :param run_id: String ID of the run.</span>
-<span class="sd">        :param key: Tag name (string). This string may only contain alphanumerics,</span>
-<span class="sd">                    underscores (_), dashes (-), periods (.), spaces ( ), and slashes (/).</span>
-<span class="sd">                    All backend stores will support keys up to length 250, but some may</span>
-<span class="sd">                    support larger keys.</span>
-<span class="sd">        :param value: Tag value (string, but will be string-ified if not).</span>
-<span class="sd">                      All backend stores will support values up to length 5000, but some</span>
-<span class="sd">                      may support larger values.</span>
-<span class="sd">        :param synchronous: *Experimental* If True, blocks until the tag is logged successfully.</span>
-<span class="sd">                            If False, logs the tag asynchronously and returns a future</span>
-<span class="sd">                            representing the logging operation.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            run_id: String ID of the run.</span>
+<span class="sd">            key: Tag name. This string may only contain alphanumerics, underscores (_), dashes (-),</span>
+<span class="sd">                periods (.), spaces ( ), and slashes (/). All backend stores will support keys up to</span>
+<span class="sd">                length 250, but some may support larger keys.</span>
+<span class="sd">            value: Tag value, but will be string-ified if not. All backend stores will support</span>
+<span class="sd">                values up to length 5000, but some may support larger values.</span>
+<span class="sd">            synchronous: *Experimental* If True, blocks until the tag is logged successfully. If</span>
+<span class="sd">                False, logs the tag asynchronously and returns a future representing the logging</span>
+<span class="sd">                operation.</span>
 
-<span class="sd">        :return: When `synchronous=True`, returns None. When `synchronous=False`, returns an</span>
-<span class="sd">             :py:class:`mlflow.utils.async_logging.run_operations.RunOperations` instance that</span>
-<span class="sd">             represents future for logging operation.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            When `synchronous=True`, returns None. When `synchronous=False`, returns an</span>
+<span class="sd">            `mlflow.utils.async_logging.run_operations.RunOperations` instance that represents</span>
+<span class="sd">            future for logging operation.</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -1115,7 +1145,6 @@
 <span class="sd">            run = client.create_run(experiment_id)</span>
 <span class="sd">            print_run_info(run)</span>
 <span class="sd">            print(&quot;--&quot;)</span>
-
 <span class="sd">            # Set a tag and fetch updated run info</span>
 <span class="sd">            client.set_tag(run.info.run_id, &quot;nlp.framework&quot;, &quot;Spark NLP&quot;)</span>
 <span class="sd">            run = client.get_run(run.info.run_id)</span>
@@ -1133,11 +1162,11 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tracking_client</span><span class="o">.</span><span class="n">set_tag</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">synchronous</span><span class="o">=</span><span class="n">synchronous</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MlflowClient.delete_tag"><a class="viewcode-back" href="../../../python_api/mlflow.client.html#mlflow.client.MlflowClient.delete_tag">[docs]</a>    <span class="k">def</span> <span class="nf">delete_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Delete a tag from a run. This is irreversible.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Delete a tag from a run. This is irreversible.</span>
 
-<span class="sd">        :param run_id: String ID of the run</span>
-<span class="sd">        :param key: Name of the tag</span>
+<span class="sd">        Args:</span>
+<span class="sd">            run_id: String ID of the run.</span>
+<span class="sd">            key: Name of the tag.</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -1171,20 +1200,21 @@
 <span class="sd">            --</span>
 <span class="sd">            run_id: b7077267a59a45d78cd9be0de4bc41f5</span>
 <span class="sd">            Tags: {&#39;t2&#39;: &#39;2&#39;}</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tracking_client</span><span class="o">.</span><span class="n">delete_tag</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MlflowClient.update_run"><a class="viewcode-back" href="../../../python_api/mlflow.client.html#mlflow.client.MlflowClient.update_run">[docs]</a>    <span class="k">def</span> <span class="nf">update_run</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">status</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Update a run with the specified ID to a new status or name.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update a run with the specified ID to a new status or name.</span>
 
-<span class="sd">        :param run_id: The ID of the Run to update.</span>
-<span class="sd">        :param status: The new status of the run to set, if specified.</span>
-<span class="sd">                       At least one of ``status`` or ``name`` should be specified.</span>
-<span class="sd">        :param name: The new name of the run to set, if specified.</span>
-<span class="sd">                     At least one of ``name`` or ``status`` should be specified.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            run_id: The ID of the Run to update.</span>
+<span class="sd">            status: The new status of the run to set, if specified. At least one of ``status`` or</span>
+<span class="sd">                ``name`` should be specified.</span>
+<span class="sd">            name: The new name of the run to set, if specified. At least one of ``name`` or</span>
+<span class="sd">                ``status`` should be specified.</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -1220,6 +1250,7 @@
 <span class="sd">            run_id: 1cf6bf8bf6484dd8a598bd43be367b20</span>
 <span class="sd">            run_name: new_name</span>
 <span class="sd">            status: FINISHED</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tracking_client</span><span class="o">.</span><span class="n">update_run</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
 
@@ -1234,19 +1265,22 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Log multiple metrics, params, and/or tags.</span>
 
-<span class="sd">        :param run_id: String ID of the run</span>
-<span class="sd">        :param metrics: If provided, List of Metric(key, value, timestamp) instances.</span>
-<span class="sd">        :param params: If provided, List of Param(key, value) instances.</span>
-<span class="sd">        :param tags: If provided, List of RunTag(key, value) instances.</span>
-<span class="sd">        :param synchronous: *Experimental* If True, blocks until the metrics/tags/params are logged</span>
-<span class="sd">                            successfully. If False, logs the metrics/tags/params asynchronously</span>
-<span class="sd">                            and returns a future representing the logging operation.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            run_id: String ID of the run</span>
+<span class="sd">            metrics: If provided, List of Metric(key, value, timestamp) instances.</span>
+<span class="sd">            params: If provided, List of Param(key, value) instances.</span>
+<span class="sd">            tags: If provided, List of RunTag(key, value) instances.</span>
+<span class="sd">            synchronous: *Experimental* If True, blocks until the metrics/tags/params are logged</span>
+<span class="sd">                successfully. If False, logs the metrics/tags/params asynchronously</span>
+<span class="sd">                and returns a future representing the logging operation.</span>
 
-<span class="sd">        Raises an MlflowException if any errors occur.</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            mlflow.MlflowException: If any errors occur.</span>
 
-<span class="sd">        :return: When `synchronous=True`, returns None. When `synchronous=False`, returns an</span>
-<span class="sd">             :py:class:`mlflow.utils.async_logging.run_operations.RunOperations` instance that</span>
-<span class="sd">             represents future for logging operation.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            When `synchronous=True`, returns None. When `synchronous=False`, returns an</span>
+<span class="sd">            :py:class:`mlflow.utils.async_logging.run_operations.RunOperations` instance that</span>
+<span class="sd">            represents future for logging operation.</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -1291,6 +1325,7 @@
 <span class="sd">            metrics: {&#39;m&#39;: 1.5}</span>
 <span class="sd">            tags: {&#39;t&#39;: &#39;t&#39;}</span>
 <span class="sd">            status: FINISHED</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tracking_client</span><span class="o">.</span><span class="n">log_batch</span><span class="p">(</span>
             <span class="n">run_id</span><span class="p">,</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">tags</span><span class="p">,</span> <span class="n">synchronous</span><span class="o">=</span><span class="n">synchronous</span>
@@ -1305,20 +1340,21 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Log one or more dataset inputs to a run.</span>
 
-<span class="sd">        :param run_id: String ID of the run</span>
-<span class="sd">        :param datasets: List of :py:class:`mlflow.entities.DatasetInput` instances to log.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            run_id: String ID of the run.</span>
+<span class="sd">            datasets: List of :py:class:`mlflow.entities.DatasetInput` instances to log.</span>
 
-<span class="sd">        Raises an MlflowException if any errors occur.</span>
-<span class="sd">        :return: None</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            mlflow.MlflowException: If any errors occur.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tracking_client</span><span class="o">.</span><span class="n">log_inputs</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">datasets</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MlflowClient.log_artifact"><a class="viewcode-back" href="../../../python_api/mlflow.client.html#mlflow.client.MlflowClient.log_artifact">[docs]</a>    <span class="k">def</span> <span class="nf">log_artifact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_id</span><span class="p">,</span> <span class="n">local_path</span><span class="p">,</span> <span class="n">artifact_path</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Write a local file or directory to the remote ``artifact_uri``.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Write a local file or directory to the remote ``artifact_uri``.</span>
 
-<span class="sd">        :param local_path: Path to the file or directory to write.</span>
-<span class="sd">        :param artifact_path: If provided, the directory in ``artifact_uri`` to write to.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            local_path: Path to the file or directory to write.</span>
+<span class="sd">            artifact_path: If provided, the directory in ``artifact_uri`` to write to.</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -1347,17 +1383,18 @@
 
 <span class="sd">            artifact: features.txt</span>
 <span class="sd">            is_dir: False</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tracking_client</span><span class="o">.</span><span class="n">log_artifact</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">local_path</span><span class="p">,</span> <span class="n">artifact_path</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MlflowClient.log_artifacts"><a class="viewcode-back" href="../../../python_api/mlflow.client.html#mlflow.client.MlflowClient.log_artifacts">[docs]</a>    <span class="k">def</span> <span class="nf">log_artifacts</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">local_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">artifact_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Write a directory of files to the remote ``artifact_uri``.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Write a directory of files to the remote ``artifact_uri``.</span>
 
-<span class="sd">        :param local_dir: Path to the directory of files to write.</span>
-<span class="sd">        :param artifact_path: If provided, the directory in ``artifact_uri`` to write to.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            local_dir: Path to the directory of files to write.</span>
+<span class="sd">            artifact_path: If provided, the directory in ``artifact_uri`` to write to.</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -1393,17 +1430,21 @@
 
 <span class="sd">            artifact: states</span>
 <span class="sd">            is_dir: True</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tracking_client</span><span class="o">.</span><span class="n">log_artifacts</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">local_dir</span><span class="p">,</span> <span class="n">artifact_path</span><span class="p">)</span></div>
 
     <span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
     <span class="k">def</span> <span class="nf">_log_artifact_helper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_id</span><span class="p">,</span> <span class="n">artifact_file</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Yields a temporary path to store a file, and then calls `log_artifact` against that path.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Yields a temporary path to store a file, and then calls `log_artifact` against that path.</span>
 
-<span class="sd">        :param run_id: String ID of the run.</span>
-<span class="sd">        :param artifact_file: The run-relative artifact file path in posixpath format.</span>
-<span class="sd">        :return: Temporary path to store a file.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            run_id: String ID of the run.</span>
+<span class="sd">            artifact_file: The run-relative artifact file path in posixpath format.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Temporary path to store a file.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">norm_path</span> <span class="o">=</span> <span class="n">posixpath</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">artifact_file</span><span class="p">)</span>
         <span class="n">filename</span> <span class="o">=</span> <span class="n">posixpath</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">norm_path</span><span class="p">)</span>
@@ -1416,13 +1457,13 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">log_artifact</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">tmp_path</span><span class="p">,</span> <span class="n">artifact_dir</span><span class="p">)</span>
 
 <div class="viewcode-block" id="MlflowClient.log_text"><a class="viewcode-back" href="../../../python_api/mlflow.client.html#mlflow.client.MlflowClient.log_text">[docs]</a>    <span class="k">def</span> <span class="nf">log_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">artifact_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Log text as an artifact.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Log text as an artifact.</span>
 
-<span class="sd">        :param run_id: String ID of the run.</span>
-<span class="sd">        :param text: String containing text to log.</span>
-<span class="sd">        :param artifact_file: The run-relative artifact file path in posixpath format to which</span>
-<span class="sd">                              the text is saved (e.g. &quot;dir/file.txt&quot;).</span>
+<span class="sd">        Args:</span>
+<span class="sd">            run_id: String ID of the run.</span>
+<span class="sd">            text: String containing text to log.</span>
+<span class="sd">            artifact_file: The run-relative artifact file path in posixpath format to which</span>
+<span class="sd">                the text is saved (e.g. &quot;dir/file.txt&quot;).</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -1440,22 +1481,23 @@
 
 <span class="sd">            # Log HTML text</span>
 <span class="sd">            client.log_text(run.info.run_id, &quot;&lt;h1&gt;header&lt;/h1&gt;&quot;, &quot;index.html&quot;)</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_artifact_helper</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">artifact_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">tmp_path</span><span class="p">:</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">text</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MlflowClient.log_dict"><a class="viewcode-back" href="../../../python_api/mlflow.client.html#mlflow.client.MlflowClient.log_dict">[docs]</a>    <span class="k">def</span> <span class="nf">log_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dictionary</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">artifact_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Log a JSON/YAML-serializable object (e.g. `dict`) as an artifact. The serialization</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Log a JSON/YAML-serializable object (e.g. `dict`) as an artifact. The serialization</span>
 <span class="sd">        format (JSON or YAML) is automatically inferred from the extension of `artifact_file`.</span>
 <span class="sd">        If the file extension doesn&#39;t exist or match any of [&quot;.json&quot;, &quot;.yml&quot;, &quot;.yaml&quot;],</span>
 <span class="sd">        JSON format is used.</span>
 
-<span class="sd">        :param run_id: String ID of the run.</span>
-<span class="sd">        :param dictionary: Dictionary to log.</span>
-<span class="sd">        :param artifact_file: The run-relative artifact file path in posixpath format to which</span>
-<span class="sd">                              the dictionary is saved (e.g. &quot;dir/data.json&quot;).</span>
+<span class="sd">        Args:</span>
+<span class="sd">            run_id: String ID of the run.</span>
+<span class="sd">            dictionary: Dictionary to log.</span>
+<span class="sd">            artifact_file: The run-relative artifact file path in posixpath format to which</span>
+<span class="sd">                the dictionary is saved (e.g. &quot;dir/data.json&quot;).</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -1478,6 +1520,7 @@
 <span class="sd">            # JSON format is used.</span>
 <span class="sd">            mlflow.log_dict(run_id, dictionary, &quot;data&quot;)</span>
 <span class="sd">            mlflow.log_dict(run_id, dictionary, &quot;data.txt&quot;)</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">extension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">artifact_file</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
 
@@ -1497,8 +1540,7 @@
         <span class="o">*</span><span class="p">,</span>
         <span class="n">save_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Log a figure as an artifact. The following figure objects are supported:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Log a figure as an artifact. The following figure objects are supported:</span>
 
 <span class="sd">        - `matplotlib.figure.Figure`_</span>
 <span class="sd">        - `plotly.graph_objects.Figure`_</span>
@@ -1509,11 +1551,12 @@
 <span class="sd">        .. _plotly.graph_objects.Figure:</span>
 <span class="sd">            https://plotly.com/python-api-reference/generated/plotly.graph_objects.Figure.html</span>
 
-<span class="sd">        :param run_id: String ID of the run.</span>
-<span class="sd">        :param figure: Figure to log.</span>
-<span class="sd">        :param artifact_file: The run-relative artifact file path in posixpath format to which</span>
-<span class="sd">                              the figure is saved (e.g. &quot;dir/file.png&quot;).</span>
-<span class="sd">        :param save_kwargs: Additional keyword arguments passed to the method that saves the figure.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            run_id: String ID of the run.</span>
+<span class="sd">            figure: Figure to log.</span>
+<span class="sd">            artifact_file: The run-relative artifact file path in posixpath format to which</span>
+<span class="sd">                the figure is saved (e.g. &quot;dir/file.png&quot;).</span>
+<span class="sd">            save_kwargs: Additional keyword arguments passed to the method that saves the figure.</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Matplotlib Example</span>
@@ -1537,6 +1580,7 @@
 
 <span class="sd">            run = client.create_run(experiment_id=&quot;0&quot;)</span>
 <span class="sd">            client.log_figure(run.info.run_id, fig, &quot;figure.html&quot;)</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">def</span> <span class="nf">_is_matplotlib_figure</span><span class="p">(</span><span class="n">fig</span><span class="p">):</span>
@@ -1574,8 +1618,7 @@
 <div class="viewcode-block" id="MlflowClient.log_image"><a class="viewcode-back" href="../../../python_api/mlflow.client.html#mlflow.client.MlflowClient.log_image">[docs]</a>    <span class="k">def</span> <span class="nf">log_image</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;numpy.ndarray&quot;</span><span class="p">,</span> <span class="s2">&quot;PIL.Image.Image&quot;</span><span class="p">],</span> <span class="n">artifact_file</span><span class="p">:</span> <span class="nb">str</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Log an image as an artifact. The following image objects are supported:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Log an image as an artifact. The following image objects are supported:</span>
 
 <span class="sd">        - `numpy.ndarray`_</span>
 <span class="sd">        - `PIL.Image.Image`_</span>
@@ -1606,10 +1649,11 @@
 <span class="sd">                - H x W x 3 (an RGB channel order is assumed)</span>
 <span class="sd">                - H x W x 4 (an RGBA channel order is assumed)</span>
 
-<span class="sd">        :param run_id: String ID of the run.</span>
-<span class="sd">        :param image: Image to log.</span>
-<span class="sd">        :param artifact_file: The run-relative artifact file path in posixpath format to which</span>
-<span class="sd">                              the image is saved (e.g. &quot;dir/image.png&quot;).</span>
+<span class="sd">        Args:</span>
+<span class="sd">            run_id: String ID of the run.</span>
+<span class="sd">            image: Image to log.</span>
+<span class="sd">            artifact_file: The run-relative artifact file path in posixpath format to which</span>
+<span class="sd">                the image is saved (e.g. &quot;dir/image.png&quot;).</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Numpy Example</span>
@@ -1714,11 +1758,11 @@
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported image object type: &#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">image</span><span class="p">)</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_check_artifact_file_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">artifact_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Check if the artifact_file contains any forbidden characters.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if the artifact_file contains any forbidden characters.</span>
 
-<span class="sd">        :param artifact_file: The run-relative artifact file path in posixpath format to which</span>
-<span class="sd">                              the table is saved (e.g. &quot;dir/file.json&quot;).</span>
+<span class="sd">        Args:</span>
+<span class="sd">            artifact_file: The run-relative artifact file path in posixpath format to which</span>
+<span class="sd">                the table is saved (e.g. &quot;dir/file.json&quot;).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">characters_to_check</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">,</span> <span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="s2">&quot;[&quot;</span><span class="p">,</span> <span class="s2">&quot;]&quot;</span><span class="p">,</span> <span class="s2">&quot;{&quot;</span><span class="p">,</span> <span class="s2">&quot;}&quot;</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">characters_to_check</span><span class="p">:</span>
@@ -1736,11 +1780,11 @@
 <span class="sd">        Log a table to MLflow Tracking as a JSON artifact. If the artifact_file already exists</span>
 <span class="sd">        in the run, the data would be appended to the existing artifact_file.</span>
 
-<span class="sd">        :param run_id: String ID of the run.</span>
-<span class="sd">        :param data: Dictionary or pandas.DataFrame to log.</span>
-<span class="sd">        :param artifact_file: The run-relative artifact file path in posixpath format to which</span>
-<span class="sd">                                the table is saved (e.g. &quot;dir/file.json&quot;).</span>
-<span class="sd">        :return: None</span>
+<span class="sd">        Args:</span>
+<span class="sd">            run_id: String ID of the run.</span>
+<span class="sd">            data: Dictionary or pandas.DataFrame to log.</span>
+<span class="sd">            artifact_file: The run-relative artifact file path in posixpath format to which</span>
+<span class="sd">                the table is saved (e.g. &quot;dir/file.json&quot;).</span>
 
 <span class="sd">        .. testcode:: python</span>
 <span class="sd">            :caption: Dictionary Example</span>
@@ -1753,7 +1797,6 @@
 <span class="sd">                &quot;outputs&quot;: [&quot;MLflow is ...&quot;, &quot;Databricks is ...&quot;],</span>
 <span class="sd">                &quot;toxicity&quot;: [0.0, 0.0],</span>
 <span class="sd">            }</span>
-
 <span class="sd">            client = MlflowClient()</span>
 <span class="sd">            run = client.create_run(experiment_id=&quot;0&quot;)</span>
 <span class="sd">            client.log_table(</span>
@@ -1773,11 +1816,9 @@
 <span class="sd">                &quot;toxicity&quot;: [0.0, 0.0],</span>
 <span class="sd">            }</span>
 <span class="sd">            df = pd.DataFrame.from_dict(table_dict)</span>
-
 <span class="sd">            client = MlflowClient()</span>
 <span class="sd">            run = client.create_run(experiment_id=&quot;0&quot;)</span>
 <span class="sd">            client.log_table(run.info.run_id, data=df, artifact_file=&quot;qabot_eval_results.json&quot;)</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
@@ -1844,19 +1885,21 @@
 <span class="sd">        specified artifact_file in the specified run_ids. The extra_columns are columns that</span>
 <span class="sd">        are not in the table but are augmented with run information and added to the DataFrame.</span>
 
-<span class="sd">        :param experiment_id: The experiment ID to load the table from.</span>
-<span class="sd">        :param artifact_file: The run-relative artifact file path in posixpath format to which</span>
-<span class="sd">                              table to load (e.g. &quot;dir/file.json&quot;).</span>
-<span class="sd">        :param run_ids: Optional list of run_ids to load the table from. If no run_ids are</span>
-<span class="sd">                        specified, the table is loaded from all runs in the current experiment.</span>
-<span class="sd">        :param extra_columns: Optional list of extra columns to add to the returned DataFrame</span>
-<span class="sd">                              For example, if extra_columns=[&quot;run_id&quot;], then the returned DataFrame</span>
-<span class="sd">                              will have a column named run_id.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            experiment_id: The experiment ID to load the table from.</span>
+<span class="sd">            artifact_file: The run-relative artifact file path in posixpath format to which</span>
+<span class="sd">                table to load (e.g. &quot;dir/file.json&quot;).</span>
+<span class="sd">            run_ids: Optional list of run_ids to load the table from. If no run_ids are</span>
+<span class="sd">                specified, the table is loaded from all runs in the current experiment.</span>
+<span class="sd">            extra_columns: Optional list of extra columns to add to the returned DataFrame</span>
+<span class="sd">                For example, if extra_columns=[&quot;run_id&quot;], then the returned DataFrame</span>
+<span class="sd">                will have a column named run_id.</span>
 
-<span class="sd">        :return: pandas.DataFrame containing the loaded table if the artifact exists</span>
-<span class="sd">                 or else throw a MlflowException.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            pandas.DataFrame containing the loaded table if the artifact exists</span>
+<span class="sd">            or else throw a MlflowException.</span>
 
-<span class="sd">        .. testcode:: python</span>
+<span class="sd">         .. testcode:: python</span>
 <span class="sd">            :caption: Example with passing run_ids</span>
 
 <span class="sd">            import mlflow</span>
@@ -1869,7 +1912,6 @@
 <span class="sd">                &quot;toxicity&quot;: [0.0, 0.0],</span>
 <span class="sd">            }</span>
 <span class="sd">            df = pd.DataFrame.from_dict(table_dict)</span>
-
 <span class="sd">            client = MlflowClient()</span>
 <span class="sd">            run = client.create_run(experiment_id=&quot;0&quot;)</span>
 <span class="sd">            client.log_table(run.info.run_id, data=df, artifact_file=&quot;qabot_eval_results.json&quot;)</span>
@@ -1898,7 +1940,6 @@
 <span class="sd">                &quot;toxicity&quot;: [0.0, 0.0],</span>
 <span class="sd">            }</span>
 <span class="sd">            df = pd.DataFrame.from_dict(table_dict)</span>
-
 <span class="sd">            client = MlflowClient()</span>
 <span class="sd">            run = client.create_run(experiment_id=&quot;0&quot;)</span>
 <span class="sd">            client.log_table(run.info.run_id, data=df, artifact_file=&quot;qabot_eval_results.json&quot;)</span>
@@ -1975,22 +2016,24 @@
             <span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_record_logged_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_id</span><span class="p">,</span> <span class="n">mlflow_model</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Record logged model info with the tracking server.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Record logged model info with the tracking server.</span>
 
-<span class="sd">        :param run_id: run_id under which the model has been logged.</span>
-<span class="sd">        :param mlflow_model: Model info to be recorded.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            run_id: run_id under which the model has been logged.</span>
+<span class="sd">            mlflow_model: Model info to be recorded.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tracking_client</span><span class="o">.</span><span class="n">_record_logged_model</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">mlflow_model</span><span class="p">)</span>
 
 <div class="viewcode-block" id="MlflowClient.list_artifacts"><a class="viewcode-back" href="../../../python_api/mlflow.client.html#mlflow.client.MlflowClient.list_artifacts">[docs]</a>    <span class="k">def</span> <span class="nf">list_artifacts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">FileInfo</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        List the artifacts for a run.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;List the artifacts for a run.</span>
 
-<span class="sd">        :param run_id: The run to list artifacts from.</span>
-<span class="sd">        :param path: The run&#39;s relative artifact path to list from. By default it is set to None</span>
-<span class="sd">                     or the root artifact path.</span>
-<span class="sd">        :return: List of :py:class:`mlflow.entities.FileInfo`</span>
+<span class="sd">        Args:</span>
+<span class="sd">            run_id: The run to list artifacts from.</span>
+<span class="sd">            path: The run&#39;s relative artifact path to list from. By default it is set to None</span>
+<span class="sd">                or the root artifact path.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List of :py:class:`mlflow.entities.FileInfo`</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -2033,6 +2076,7 @@
 <span class="sd">            artifact: labels.txt</span>
 <span class="sd">            is_dir: False</span>
 <span class="sd">            size: 5</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tracking_client</span><span class="o">.</span><span class="n">list_artifacts</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span></div>
 
@@ -2041,14 +2085,17 @@
 <span class="sd">        Download an artifact file or directory from a run to a local directory if applicable,</span>
 <span class="sd">        and return a local path for it.</span>
 
-<span class="sd">        :param run_id: The run to download artifacts from.</span>
-<span class="sd">        :param path: Relative source path to the desired artifact.</span>
-<span class="sd">        :param dst_path: Absolute path of the local filesystem destination directory to which to</span>
-<span class="sd">                         download the specified artifacts. This directory must already exist.</span>
-<span class="sd">                         If unspecified, the artifacts will either be downloaded to a new</span>
-<span class="sd">                         uniquely-named directory on the local filesystem or will be returned</span>
-<span class="sd">                         directly in the case of the LocalArtifactRepository.</span>
-<span class="sd">        :return: Local path of desired artifact.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            run_id: The run to download artifacts from.</span>
+<span class="sd">            path: Relative source path to the desired artifact.</span>
+<span class="sd">            dst_path: Absolute path of the local filesystem destination directory to which to</span>
+<span class="sd">                download the specified artifacts. This directory must already exist.</span>
+<span class="sd">                If unspecified, the artifacts will either be downloaded to a new</span>
+<span class="sd">                uniquely-named directory on the local filesystem or will be returned</span>
+<span class="sd">                directly in the case of the LocalArtifactRepository.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Local path of desired artifact.</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -2087,12 +2134,11 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set a run&#39;s status to terminated.</span>
 
-<span class="sd">        :param status: A string value of :py:class:`mlflow.entities.RunStatus`.</span>
-<span class="sd">                       Defaults to &quot;FINISHED&quot;.</span>
-<span class="sd">        :param end_time: If not provided, defaults to the current time.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            status: A string value of :py:class:`mlflow.entities.RunStatus`. Defaults to &quot;FINISHED&quot;.</span>
+<span class="sd">            end_time: If not provided, defaults to the current time.</span>
 
 <span class="sd">        .. code-block:: python</span>
-<span class="sd">            :caption: Example</span>
 
 <span class="sd">            from mlflow import MlflowClient</span>
 
@@ -2119,20 +2165,21 @@
 <span class="sd">            print_run_info(run)</span>
 
 <span class="sd">        .. code-block:: text</span>
-<span class="sd">            :caption: Output</span>
 
 <span class="sd">            run_id: 575fb62af83f469e84806aee24945973</span>
 <span class="sd">            status: RUNNING</span>
 <span class="sd">            --</span>
 <span class="sd">            run_id: 575fb62af83f469e84806aee24945973</span>
 <span class="sd">            status: KILLED</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tracking_client</span><span class="o">.</span><span class="n">set_terminated</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span> <span class="n">end_time</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MlflowClient.delete_run"><a class="viewcode-back" href="../../../python_api/mlflow.client.html#mlflow.client.MlflowClient.delete_run">[docs]</a>    <span class="k">def</span> <span class="nf">delete_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Deletes a run with the given ID.</span>
 
-<span class="sd">        :param run_id: The unique run id to delete.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            run_id: The unique run id to delete.</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -2155,14 +2202,15 @@
 
 <span class="sd">            run_id: a61c7a1851324f7094e8d5014c58c8c8; lifecycle_stage: active</span>
 <span class="sd">            run_id: a61c7a1851324f7094e8d5014c58c8c8; lifecycle_stage: deleted</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tracking_client</span><span class="o">.</span><span class="n">delete_run</span><span class="p">(</span><span class="n">run_id</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MlflowClient.restore_run"><a class="viewcode-back" href="../../../python_api/mlflow.client.html#mlflow.client.MlflowClient.restore_run">[docs]</a>    <span class="k">def</span> <span class="nf">restore_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Restores a deleted run with the given ID.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Restores a deleted run with the given ID.</span>
 
-<span class="sd">        :param run_id: The unique run id to restore.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            run_id: The unique run id to restore.</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -2188,6 +2236,7 @@
 <span class="sd">            run_id: 7bc59754d7e74534a7917d62f2873ac0; lifecycle_stage: active</span>
 <span class="sd">            run_id: 7bc59754d7e74534a7917d62f2873ac0; lifecycle_stage: deleted</span>
 <span class="sd">            run_id: 7bc59754d7e74534a7917d62f2873ac0; lifecycle_stage: active</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tracking_client</span><span class="o">.</span><span class="n">restore_run</span><span class="p">(</span><span class="n">run_id</span><span class="p">)</span></div>
 
@@ -2203,18 +2252,20 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Search for Runs that fit the specified criteria.</span>
 
-<span class="sd">        :param experiment_ids: List of experiment IDs, or a single int or string id.</span>
-<span class="sd">        :param filter_string: Filter query string, defaults to searching all runs.</span>
-<span class="sd">        :param run_view_type: one of enum values ACTIVE_ONLY, DELETED_ONLY, or ALL runs</span>
-<span class="sd">                              defined in :py:class:`mlflow.entities.ViewType`.</span>
-<span class="sd">        :param max_results: Maximum number of runs desired.</span>
-<span class="sd">        :param order_by: List of columns to order by (e.g., &quot;metrics.rmse&quot;). The ``order_by`` column</span>
-<span class="sd">                     can contain an optional ``DESC`` or ``ASC`` value. The default is ``ASC``.</span>
-<span class="sd">                     The default ordering is to sort by ``start_time DESC``, then ``run_id``.</span>
-<span class="sd">        :param page_token: Token specifying the next page of results. It should be obtained from</span>
-<span class="sd">            a ``search_runs`` call.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            experiment_ids: List of experiment IDs, or a single int or string id.</span>
+<span class="sd">            filter_string: Filter query string, defaults to searching all runs.</span>
+<span class="sd">            run_view_type: one of enum values ACTIVE_ONLY, DELETED_ONLY, or ALL runs</span>
+<span class="sd">                defined in :py:class:`mlflow.entities.ViewType`.</span>
+<span class="sd">            max_results: Maximum number of runs desired.</span>
+<span class="sd">            order_by: List of columns to order by (e.g., &quot;metrics.rmse&quot;). The ``order_by`` column</span>
+<span class="sd">                can contain an optional ``DESC`` or ``ASC`` value. The default is ``ASC``.</span>
+<span class="sd">                The default ordering is to sort by ``start_time DESC``, then ``run_id``.</span>
+<span class="sd">            page_token: Token specifying the next page of results. It should be obtained from</span>
+<span class="sd">                a ``search_runs`` call.</span>
 
-<span class="sd">        :return: A :py:class:`PagedList &lt;mlflow.store.entities.PagedList&gt;` of</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            A :py:class:`PagedList &lt;mlflow.store.entities.PagedList&gt;` of</span>
 <span class="sd">            :py:class:`Run &lt;mlflow.entities.Run&gt;` objects that satisfy the search expressions.</span>
 <span class="sd">            If the underlying tracking store supports pagination, the token for the next page may</span>
 <span class="sd">            be obtained via the ``token`` attribute of the returned object.</span>
@@ -2232,7 +2283,6 @@
 <span class="sd">                    print(f&quot;run_id: {r.info.run_id}&quot;)</span>
 <span class="sd">                    print(f&quot;lifecycle_stage: {r.info.lifecycle_stage}&quot;)</span>
 <span class="sd">                    print(f&quot;metrics: {r.data.metrics}&quot;)</span>
-
 <span class="sd">                    # Exclude mlflow system tags</span>
 <span class="sd">                    tags = {k: v for k, v in r.data.tags.items() if not k.startswith(&quot;mlflow.&quot;)}</span>
 <span class="sd">                    print(f&quot;tags: {tags}&quot;)</span>
@@ -2246,17 +2296,14 @@
 <span class="sd">            with mlflow.start_run(experiment_id=experiment_id):</span>
 <span class="sd">                mlflow.log_metric(&quot;m&quot;, 2.50)</span>
 <span class="sd">                mlflow.set_tag(&quot;s.release&quot;, &quot;1.2.0-GA&quot;)</span>
-
 <span class="sd">            # Search all runs under experiment id and order them by</span>
 <span class="sd">            # descending value of the metric &#39;m&#39;</span>
 <span class="sd">            client = MlflowClient()</span>
 <span class="sd">            runs = client.search_runs(experiment_id, order_by=[&quot;metrics.m DESC&quot;])</span>
 <span class="sd">            print_run_info(runs)</span>
 <span class="sd">            print(&quot;--&quot;)</span>
-
 <span class="sd">            # Delete the first run</span>
 <span class="sd">            client.delete_run(run_id=run.info.run_id)</span>
-
 <span class="sd">            # Search only deleted runs under the experiment id and use a case insensitive pattern</span>
 <span class="sd">            # in the filter_string for the tag.</span>
 <span class="sd">            filter_string = &quot;tags.s.release ILIKE &#39;%rc%&#39;&quot;</span>
@@ -2296,12 +2343,15 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a new registered model in backend store.</span>
 
-<span class="sd">        :param name: Name of the new model. This is expected to be unique in the backend store.</span>
-<span class="sd">        :param tags: A dictionary of key-value pairs that are converted into</span>
-<span class="sd">                     :py:class:`mlflow.entities.model_registry.RegisteredModelTag` objects.</span>
-<span class="sd">        :param description: Description of the model.</span>
-<span class="sd">        :return: A single object of :py:class:`mlflow.entities.model_registry.RegisteredModel`</span>
-<span class="sd">                 created by backend.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            name: Name of the new model. This is expected to be unique in the backend store.</span>
+<span class="sd">            tags: A dictionary of key-value pairs that are converted into</span>
+<span class="sd">                :py:class:`mlflow.entities.model_registry.RegisteredModelTag` objects.</span>
+<span class="sd">            description: Description of the model.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A single object of :py:class:`mlflow.entities.model_registry.RegisteredModel`</span>
+<span class="sd">            created by backend.</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -2331,17 +2381,19 @@
 <span class="sd">            name: SocialMediaTextAnalyzer</span>
 <span class="sd">            tags: {&#39;nlp.framework&#39;: &#39;Spark NLP&#39;}</span>
 <span class="sd">            description: This sentiment analysis model classifies the tone-happy, sad, angry.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_registry_client</span><span class="p">()</span><span class="o">.</span><span class="n">create_registered_model</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">tags</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MlflowClient.rename_registered_model"><a class="viewcode-back" href="../../../python_api/mlflow.client.html#mlflow.client.MlflowClient.rename_registered_model">[docs]</a>    <span class="k">def</span> <span class="nf">rename_registered_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">new_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RegisteredModel</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Update registered model name.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update registered model name.</span>
 
-<span class="sd">        :param name: Name of the registered model to update.</span>
-<span class="sd">        :param new_name: New proposed name for the registered model.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            name: Name of the registered model to update.</span>
+<span class="sd">            new_name: New proposed name for the registered model.</span>
 
-<span class="sd">        :return: A single updated :py:class:`mlflow.entities.model_registry.RegisteredModel` object.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            A single updated :py:class:`mlflow.entities.model_registry.RegisteredModel` object.</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -2392,9 +2444,12 @@
 <span class="sd">        Updates metadata for RegisteredModel entity. Input field ``description`` should be non-None.</span>
 <span class="sd">        Backend raises exception if a registered model with given name does not exist.</span>
 
-<span class="sd">        :param name: Name of the registered model to update.</span>
-<span class="sd">        :param description: (Optional) New description.</span>
-<span class="sd">        :return: A single updated :py:class:`mlflow.entities.model_registry.RegisteredModel` object.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            name: Name of the registered model to update.</span>
+<span class="sd">            description: (Optional) New description.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A single updated :py:class:`mlflow.entities.model_registry.RegisteredModel` object.</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -2443,7 +2498,8 @@
 <span class="sd">        Delete registered model.</span>
 <span class="sd">        Backend raises exception if a registered model with given name does not exist.</span>
 
-<span class="sd">        :param name: Name of the registered model to delete.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            name: Name of the registered model to delete.</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -2504,33 +2560,35 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Search for registered models in backend that satisfy the filter criteria.</span>
 
-<span class="sd">        :param filter_string: Filter query string</span>
-<span class="sd">            (e.g., ``&quot;name = &#39;a_model_name&#39; and tag.key = &#39;value1&#39;&quot;``),</span>
-<span class="sd">            defaults to searching for all registered models. The following identifiers, comparators,</span>
-<span class="sd">            and logical operators are supported.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            filter_string: Filter query string (e.g., &quot;name = &#39;a_model_name&#39; and tag.key =</span>
+<span class="sd">                &#39;value1&#39;&quot;), defaults to searching for all registered models. The following</span>
+<span class="sd">                identifiers, comparators, and logical operators are supported.</span>
 
-<span class="sd">            Identifiers</span>
-<span class="sd">              - ``name``: registered model name.</span>
-<span class="sd">              - ``tags.&lt;tag_key&gt;``: registered model tag. If ``tag_key`` contains spaces, it must be</span>
-<span class="sd">                wrapped with backticks (e.g., ``&quot;tags.`extra key`&quot;``).</span>
+<span class="sd">                Identifiers</span>
+<span class="sd">                  - ``name``: registered model name.</span>
+<span class="sd">                  - ``tags.&lt;tag_key&gt;``: registered model tag. If ``tag_key`` contains spaces, it</span>
+<span class="sd">                    must be wrapped with backticks (e.g., &quot;tags.`extra key`&quot;).</span>
 
-<span class="sd">            Comparators</span>
-<span class="sd">              - ``=``: Equal to.</span>
-<span class="sd">              - ``!=``: Not equal to.</span>
-<span class="sd">              - ``LIKE``: Case-sensitive pattern match.</span>
-<span class="sd">              - ``ILIKE``: Case-insensitive pattern match.</span>
+<span class="sd">                Comparators</span>
+<span class="sd">                  - ``=``: Equal to.</span>
+<span class="sd">                  - ``!=``: Not equal to.</span>
+<span class="sd">                  - ``LIKE``: Case-sensitive pattern match.</span>
+<span class="sd">                  - ``ILIKE``: Case-insensitive pattern match.</span>
 
-<span class="sd">            Logical operators</span>
-<span class="sd">              - ``AND``: Combines two sub-queries and returns True if both of them are True.</span>
+<span class="sd">                Logical operators</span>
+<span class="sd">                  - ``AND``: Combines two sub-queries and returns True if both of them are True.</span>
 
-<span class="sd">        :param max_results: Maximum number of registered models desired.</span>
-<span class="sd">        :param order_by: List of column names with ASC|DESC annotation, to be used for ordering</span>
-<span class="sd">                         matching search results.</span>
-<span class="sd">        :param page_token: Token specifying the next page of results. It should be obtained from</span>
-<span class="sd">                            a ``search_registered_models`` call.</span>
-<span class="sd">        :return: A PagedList of :py:class:`mlflow.entities.model_registry.RegisteredModel` objects</span>
-<span class="sd">                that satisfy the search expressions. The pagination token for the next page can be</span>
-<span class="sd">                obtained via the ``token`` attribute of the object.</span>
+<span class="sd">            max_results: Maximum number of registered models desired.</span>
+<span class="sd">            order_by: List of column names with ASC|DESC annotation, to be used for ordering</span>
+<span class="sd">                matching search results.</span>
+<span class="sd">            page_token: Token specifying the next page of results. It should be obtained from</span>
+<span class="sd">                a ``search_registered_models`` call.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A PagedList of :py:class:`mlflow.entities.model_registry.RegisteredModel` objects</span>
+<span class="sd">            that satisfy the search expressions. The pagination token for the next page can be</span>
+<span class="sd">            obtained via the ``token`` attribute of the object.</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -2588,9 +2646,13 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="MlflowClient.get_registered_model"><a class="viewcode-back" href="../../../python_api/mlflow.client.html#mlflow.client.MlflowClient.get_registered_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_registered_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RegisteredModel</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param name: Name of the registered model to get.</span>
-<span class="sd">        :return: A single :py:class:`mlflow.entities.model_registry.RegisteredModel` object.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a registered model.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name: Name of the registered model to get.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A single :py:class:`mlflow.entities.model_registry.RegisteredModel` object.</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -2611,7 +2673,6 @@
 <span class="sd">            desc = &quot;This sentiment analysis model classifies the tone-happy, sad, angry.&quot;</span>
 <span class="sd">            mlflow.set_tracking_uri(&quot;sqlite:///mlruns.db&quot;)</span>
 <span class="sd">            client = MlflowClient()</span>
-
 <span class="sd">            # Create and fetch the registered model</span>
 <span class="sd">            client.create_registered_model(name, tags, desc)</span>
 <span class="sd">            model = client.get_registered_model(name)</span>
@@ -2635,10 +2696,13 @@
 <span class="sd">        Latest version models for each requests stage. If no ``stages`` provided, returns the</span>
 <span class="sd">        latest version for each stage.</span>
 
-<span class="sd">        :param name: Name of the registered model from which to get the latest versions.</span>
-<span class="sd">        :param stages: List of desired stages. If input list is None, return latest versions for</span>
-<span class="sd">                       for ALL_STAGES.</span>
-<span class="sd">        :return: List of :py:class:`mlflow.entities.model_registry.ModelVersion` objects.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            name: Name of the registered model from which to get the latest versions.</span>
+<span class="sd">            stages: List of desired stages. If input list is None, return latest versions for</span>
+<span class="sd">                for ALL_STAGES.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List of :py:class:`mlflow.entities.model_registry.ModelVersion` objects.</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -2660,7 +2724,6 @@
 
 <span class="sd">            mlflow.set_tracking_uri(&quot;sqlite:///mlruns.db&quot;)</span>
 <span class="sd">            X, y = make_regression(n_features=4, n_informative=2, random_state=0, shuffle=False)</span>
-
 <span class="sd">            # Create two runs Log MLflow entities</span>
 <span class="sd">            with mlflow.start_run() as run1:</span>
 <span class="sd">                params = {&quot;n_estimators&quot;: 3, &quot;random_state&quot;: 42}</span>
@@ -2668,25 +2731,21 @@
 <span class="sd">                signature = infer_signature(X, rfr.predict(X))</span>
 <span class="sd">                mlflow.log_params(params)</span>
 <span class="sd">                mlflow.sklearn.log_model(rfr, artifact_path=&quot;sklearn-model&quot;, signature=signature)</span>
-
 <span class="sd">            with mlflow.start_run() as run2:</span>
 <span class="sd">                params = {&quot;n_estimators&quot;: 6, &quot;random_state&quot;: 42}</span>
 <span class="sd">                rfr = RandomForestRegressor(**params).fit(X, y)</span>
 <span class="sd">                signature = infer_signature(X, rfr.predict(X))</span>
 <span class="sd">                mlflow.log_params(params)</span>
 <span class="sd">                mlflow.sklearn.log_model(rfr, artifact_path=&quot;sklearn-model&quot;, signature=signature)</span>
-
 <span class="sd">            # Register model name in the model registry</span>
 <span class="sd">            name = &quot;RandomForestRegression&quot;</span>
 <span class="sd">            client = MlflowClient()</span>
 <span class="sd">            client.create_registered_model(name)</span>
-
 <span class="sd">            # Create a two versions of the rfr model under the registered model name</span>
 <span class="sd">            for run_id in [run1.info.run_id, run2.info.run_id]:</span>
 <span class="sd">                model_uri = f&quot;runs:/{run_id}/sklearn-model&quot;</span>
 <span class="sd">                mv = client.create_model_version(name, model_uri, run_id)</span>
 <span class="sd">                print(f&quot;model version {mv.version} created&quot;)</span>
-
 <span class="sd">            # Fetch latest version; this will be version 2</span>
 <span class="sd">            print(&quot;--&quot;)</span>
 <span class="sd">            print_models_info(client.get_latest_versions(name, stages=[&quot;None&quot;]))</span>
@@ -2705,13 +2764,12 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_registry_client</span><span class="p">()</span><span class="o">.</span><span class="n">get_latest_versions</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">stages</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MlflowClient.set_registered_model_tag"><a class="viewcode-back" href="../../../python_api/mlflow.client.html#mlflow.client.MlflowClient.set_registered_model_tag">[docs]</a>    <span class="k">def</span> <span class="nf">set_registered_model_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Set a tag for the registered model.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set a tag for the registered model.</span>
 
-<span class="sd">        :param name: Registered model name.</span>
-<span class="sd">        :param key: Tag key to log.</span>
-<span class="sd">        :param value: Tag value log.</span>
-<span class="sd">        :return: None</span>
+<span class="sd">        Args:</span>
+<span class="sd">            name: Registered model name.</span>
+<span class="sd">            key: Tag key to log.</span>
+<span class="sd">            value: Tag value log.</span>
 
 <span class="sd">        .. code-block:: Python</span>
 <span class="sd">            :caption: Example</span>
@@ -2734,7 +2792,6 @@
 <span class="sd">            client.create_registered_model(name, tags, desc)</span>
 <span class="sd">            model = client.get_registered_model(name)</span>
 <span class="sd">            print_model_info(model)</span>
-
 <span class="sd">            client.set_registered_model_tag(name, &quot;nlp.framework2&quot;, &quot;VADER&quot;)</span>
 <span class="sd">            model = client.get_registered_model(name)</span>
 <span class="sd">            print_model_info(model)</span>
@@ -2752,12 +2809,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_get_registry_client</span><span class="p">()</span><span class="o">.</span><span class="n">set_registered_model_tag</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MlflowClient.delete_registered_model_tag"><a class="viewcode-back" href="../../../python_api/mlflow.client.html#mlflow.client.MlflowClient.delete_registered_model_tag">[docs]</a>    <span class="k">def</span> <span class="nf">delete_registered_model_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Delete a tag associated with the registered model.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Delete a tag associated with the registered model.</span>
 
-<span class="sd">        :param name: Registered model name.</span>
-<span class="sd">        :param key: Registered model tag key.</span>
-<span class="sd">        :return: None</span>
+<span class="sd">        Args:</span>
+<span class="sd">            name: Registered model name.</span>
+<span class="sd">            key: Registered model tag key.</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -2782,7 +2838,6 @@
 
 <span class="sd">            # Fetch all registered models</span>
 <span class="sd">            print_registered_models_info(client.search_registered_models())</span>
-
 <span class="sd">            # Delete a tag from model `name2`</span>
 <span class="sd">            client.delete_registered_model_tag(&quot;name2&quot;, &quot;t2&quot;)</span>
 <span class="sd">            print_registered_models_info(client.search_registered_models())</span>
@@ -2872,21 +2927,24 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a new model version from given source.</span>
 
-<span class="sd">        :param name: Name for the containing registered model.</span>
-<span class="sd">        :param source: URI indicating the location of the model artifacts. The artifact URI can be</span>
-<span class="sd">                       run relative (e.g. ``runs:/&lt;run_id&gt;/&lt;model_artifact_path&gt;``), a model</span>
-<span class="sd">                       registry URI (e.g. ``models:/&lt;model_name&gt;/&lt;version&gt;``), or other URIs</span>
-<span class="sd">                       supported by the model registry backend (e.g. `&quot;s3://my_bucket/my/model&quot;`).</span>
-<span class="sd">        :param run_id: Run ID from MLflow tracking server that generated the model</span>
-<span class="sd">        :param tags: A dictionary of key-value pairs that are converted into</span>
-<span class="sd">                     :py:class:`mlflow.entities.model_registry.ModelVersionTag` objects.</span>
-<span class="sd">        :param run_link: Link to the run from an MLflow tracking server that generated this model.</span>
-<span class="sd">        :param description: Description of the version.</span>
-<span class="sd">        :param await_creation_for: Number of seconds to wait for the model version to finish being</span>
-<span class="sd">                                    created and is in ``READY`` status. By default, the function</span>
-<span class="sd">                                    waits for five minutes. Specify 0 or None to skip waiting.</span>
-<span class="sd">        :return: Single :py:class:`mlflow.entities.model_registry.ModelVersion` object created by</span>
-<span class="sd">                 backend.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            name: Name for the containing registered model.</span>
+<span class="sd">            source: URI indicating the location of the model artifacts. The artifact URI can be</span>
+<span class="sd">                run relative (e.g. ``runs:/&lt;run_id&gt;/&lt;model_artifact_path&gt;``), a model</span>
+<span class="sd">                registry URI (e.g. ``models:/&lt;model_name&gt;/&lt;version&gt;``), or other URIs</span>
+<span class="sd">                supported by the model registry backend (e.g. `&quot;s3://my_bucket/my/model&quot;`).</span>
+<span class="sd">            run_id: Run ID from MLflow tracking server that generated the model.</span>
+<span class="sd">            tags: A dictionary of key-value pairs that are converted into</span>
+<span class="sd">                :py:class:`mlflow.entities.model_registry.ModelVersionTag` objects.</span>
+<span class="sd">            run_link: Link to the run from an MLflow tracking server that generated this model.</span>
+<span class="sd">            description: Description of the version.</span>
+<span class="sd">            await_creation_for: Number of seconds to wait for the model version to finish being</span>
+<span class="sd">                created and is in ``READY`` status. By default, the function</span>
+<span class="sd">                waits for five minutes. Specify 0 or None to skip waiting.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Single :py:class:`mlflow.entities.model_registry.ModelVersion` object created by</span>
+<span class="sd">            backend.</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -2948,13 +3006,15 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Copy a model version from one registered model to another as a new model version.</span>
 
-<span class="sd">        :param src_model_uri: the model URI of the model version to copy. This must be a model</span>
-<span class="sd">                              registry URI with a `&quot;models:/&quot;` scheme (e.g.,</span>
-<span class="sd">                              `&quot;models:/iris_model@champion&quot;`).</span>
-<span class="sd">        :param dst_name: the name of the registered model to copy the model version to. If a</span>
-<span class="sd">                         registered model with this name does not exist, it will be created.</span>
-<span class="sd">        :return: Single :py:class:`mlflow.entities.model_registry.ModelVersion` object representing</span>
-<span class="sd">                 the copied model version.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            src_model_uri: The model URI of the model version to copy. This must be a model</span>
+<span class="sd">                registry URI with a `&quot;models:/&quot;` scheme (e.g., `&quot;models:/iris_model@champion&quot;`).</span>
+<span class="sd">            dst_name: The name of the registered model to copy the model version to. If a</span>
+<span class="sd">                registered model with this name does not exist, it will be created.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Single :py:class:`mlflow.entities.model_registry.ModelVersion` object representing</span>
+<span class="sd">            the copied model version.</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -3031,13 +3091,15 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Update metadata associated with a model version in backend.</span>
 
-<span class="sd">        :param name: Name of the containing registered model.</span>
-<span class="sd">        :param version: Version number of the model version.</span>
-<span class="sd">        :param description: New description.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            name: Name of the containing registered model.</span>
+<span class="sd">            version: Version number of the model version.</span>
+<span class="sd">            description: New description.</span>
 
-<span class="sd">        :return: A single :py:class:`mlflow.entities.model_registry.ModelVersion` object.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            A single :py:class:`mlflow.entities.model_registry.ModelVersion` object.</span>
 
-<span class="sd">        .. code-block:: python</span>
+<span class="sd">         .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
 
 <span class="sd">            import mlflow.sklearn</span>
@@ -3068,13 +3130,11 @@
 <span class="sd">            # Register model name in the model registry</span>
 <span class="sd">            client = MlflowClient()</span>
 <span class="sd">            client.create_registered_model(name)</span>
-
 <span class="sd">            # Create a new version of the rfr model under the registered model name</span>
 <span class="sd">            model_uri = f&quot;runs:/{run.info.run_id}/sklearn-model&quot;</span>
 <span class="sd">            mv = client.create_model_version(name, model_uri, run.info.run_id)</span>
 <span class="sd">            print_model_version_info(mv)</span>
 <span class="sd">            print(&quot;--&quot;)</span>
-
 <span class="sd">            # Update model version&#39;s description</span>
 <span class="sd">            desc = &quot;A new version of the model using ensemble trees&quot;</span>
 <span class="sd">            mv = client.update_model_version(name, mv.version, desc)</span>
@@ -3105,16 +3165,19 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Update model version stage.</span>
 
-<span class="sd">        :param name: Registered model name.</span>
-<span class="sd">        :param version: Registered model version.</span>
-<span class="sd">        :param stage: New desired stage for this model version.</span>
-<span class="sd">        :param archive_existing_versions: If this flag is set to ``True``, all existing model</span>
-<span class="sd">            versions in the stage will be automatically moved to the &quot;archived&quot; stage. Only valid</span>
-<span class="sd">            when ``stage`` is ``&quot;staging&quot;`` or ``&quot;production&quot;`` otherwise an error will be raised.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            name: Registered model name.</span>
+<span class="sd">            version: Registered model version.</span>
+<span class="sd">            stage: New desired stage for this model version.</span>
+<span class="sd">            archive_existing_versions: If this flag is set to ``True``, all existing model</span>
+<span class="sd">                versions in the stage will be automatically moved to the &quot;archived&quot; stage. Only</span>
+<span class="sd">                valid when ``stage`` is ``&quot;staging&quot;`` or ``&quot;production&quot;`` otherwise an error will be</span>
+<span class="sd">                raised.</span>
 
-<span class="sd">        :return: A single :py:class:`mlflow.entities.model_registry.ModelVersion` object.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            A single :py:class:`mlflow.entities.model_registry.ModelVersion` object.</span>
 
-<span class="sd">        .. code-block:: python</span>
+<span class="sd">         .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
 
 <span class="sd">            import mlflow.sklearn</span>
@@ -3153,7 +3216,6 @@
 <span class="sd">            mv = client.create_model_version(name, model_uri, run.info.run_id, description=desc)</span>
 <span class="sd">            print_model_version_info(mv)</span>
 <span class="sd">            print(&quot;--&quot;)</span>
-
 <span class="sd">            # transition model version from None -&gt; staging</span>
 <span class="sd">            mv = client.transition_model_version_stage(name, mv.version, &quot;staging&quot;)</span>
 <span class="sd">            print_model_version_info(mv)</span>
@@ -3179,8 +3241,9 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Delete model version in backend.</span>
 
-<span class="sd">        :param name: Name of the containing registered model.</span>
-<span class="sd">        :param version: Version number of the model version.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            name: Name of the containing registered model.</span>
+<span class="sd">            version: Version number of the model version.</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -3263,9 +3326,14 @@
 
 <div class="viewcode-block" id="MlflowClient.get_model_version"><a class="viewcode-back" href="../../../python_api/mlflow.client.html#mlflow.client.MlflowClient.get_model_version">[docs]</a>    <span class="k">def</span> <span class="nf">get_model_version</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ModelVersion</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param name: Name of the containing registered model.</span>
-<span class="sd">        :param version: Version number as an integer of the model version.</span>
-<span class="sd">        :return: A single :py:class:`mlflow.entities.model_registry.ModelVersion` object.</span>
+<span class="sd">        Converts the docstring args and returns to google style.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name: Name of the containing registered model.</span>
+<span class="sd">            version: Version number as an integer of the model version.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A single :py:class:`mlflow.entities.model_registry.ModelVersion` object.</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -3318,6 +3386,7 @@
 <span class="sd">            --</span>
 <span class="sd">            Name: RandomForestRegression</span>
 <span class="sd">            Version: 2</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_registry_client</span><span class="p">()</span><span class="o">.</span><span class="n">get_model_version</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span></div>
 
@@ -3325,12 +3394,14 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the download location in Model Registry for this model version.</span>
 
-<span class="sd">        :param name: Name of the containing registered model.</span>
-<span class="sd">        :param version: Version number as an integer of the model version.</span>
-<span class="sd">        :return: A single URI location that allows reads for downloading.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            name: Name of the containing registered model.</span>
+<span class="sd">            version: Version number as an integer of the model version.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A single URI location that allows reads for downloading.</span>
 
 <span class="sd">        .. code-block:: python</span>
-<span class="sd">            :caption: Example</span>
 
 <span class="sd">            import mlflow.sklearn</span>
 <span class="sd">            from mlflow import MlflowClient</span>
@@ -3361,7 +3432,6 @@
 <span class="sd">            print(f&quot;Download URI: {artifact_uri}&quot;)</span>
 
 <span class="sd">        .. code-block:: text</span>
-<span class="sd">            :caption: Output</span>
 
 <span class="sd">            Download URI: runs:/027d7bbe81924c5a82b3e4ce979fcab7/sklearn-model</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -3378,39 +3448,41 @@
 <span class="sd">        Search for model versions in backend that satisfy the filter criteria.</span>
 
 <span class="sd">        .. warning:</span>
-
 <span class="sd">            The model version search results may not have aliases populated for performance reasons.</span>
 
-<span class="sd">        :param filter_string: Filter query string</span>
-<span class="sd">            (e.g., ``&quot;name = &#39;a_model_name&#39; and tag.key = &#39;value1&#39;&quot;``),</span>
-<span class="sd">            defaults to searching for all model versions. The following identifiers, comparators,</span>
-<span class="sd">            and logical operators are supported.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            filter_string: Filter query string</span>
+<span class="sd">                (e.g., ``&quot;name = &#39;a_model_name&#39; and tag.key = &#39;value1&#39;&quot;``),</span>
+<span class="sd">                defaults to searching for all model versions. The following identifiers,</span>
+<span class="sd">                comparators, and logical operators are supported.</span>
 
-<span class="sd">            Identifiers</span>
-<span class="sd">              - ``name``: model name.</span>
-<span class="sd">              - ``source_path``: model version source path.</span>
-<span class="sd">              - ``run_id``: The id of the mlflow run that generates the model version.</span>
-<span class="sd">              - ``tags.&lt;tag_key&gt;``: model version tag. If ``tag_key`` contains spaces, it must be</span>
-<span class="sd">                wrapped with backticks (e.g., ``&quot;tags.`extra key`&quot;``).</span>
+<span class="sd">                Identifiers</span>
+<span class="sd">                  - ``name``: model name.</span>
+<span class="sd">                  - ``source_path``: model version source path.</span>
+<span class="sd">                  - ``run_id``: The id of the mlflow run that generates the model version.</span>
+<span class="sd">                  - ``tags.&lt;tag_key&gt;``: model version tag. If ``tag_key`` contains spaces, it must</span>
+<span class="sd">                    be wrapped with backticks (e.g., ``&quot;tags.`extra key`&quot;``).</span>
 
-<span class="sd">            Comparators</span>
-<span class="sd">              - ``=``: Equal to.</span>
-<span class="sd">              - ``!=``: Not equal to.</span>
-<span class="sd">              - ``LIKE``: Case-sensitive pattern match.</span>
-<span class="sd">              - ``ILIKE``: Case-insensitive pattern match.</span>
-<span class="sd">              - ``IN``: In a value list. Only ``run_id`` identifier supports ``IN`` comparator.</span>
+<span class="sd">                Comparators</span>
+<span class="sd">                  - ``=``: Equal to.</span>
+<span class="sd">                  - ``!=``: Not equal to.</span>
+<span class="sd">                  - ``LIKE``: Case-sensitive pattern match.</span>
+<span class="sd">                  - ``ILIKE``: Case-insensitive pattern match.</span>
+<span class="sd">                  - ``IN``: In a value list. Only ``run_id`` identifier supports ``IN`` comparator.</span>
 
-<span class="sd">            Logical operators</span>
-<span class="sd">              - ``AND``: Combines two sub-queries and returns True if both of them are True.</span>
+<span class="sd">                Logical operators</span>
+<span class="sd">                  - ``AND``: Combines two sub-queries and returns True if both of them are True.</span>
 
-<span class="sd">        :param max_results: Maximum number of model versions desired.</span>
-<span class="sd">        :param order_by: List of column names with ASC|DESC annotation, to be used for ordering</span>
-<span class="sd">                         matching search results.</span>
-<span class="sd">        :param page_token: Token specifying the next page of results. It should be obtained from</span>
-<span class="sd">                            a ``search_model_versions`` call.</span>
-<span class="sd">        :return: A PagedList of :py:class:`mlflow.entities.model_registry.ModelVersion`</span>
-<span class="sd">                 objects that satisfy the search expressions. The pagination token for the next</span>
-<span class="sd">                 page can be obtained via the ``token`` attribute of the object.</span>
+<span class="sd">            max_results: Maximum number of model versions desired.</span>
+<span class="sd">            order_by: List of column names with ASC|DESC annotation, to be used for ordering</span>
+<span class="sd">                matching search results.</span>
+<span class="sd">            page_token: Token specifying the next page of results. It should be obtained from</span>
+<span class="sd">                a ``search_model_versions`` call.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A PagedList of :py:class:`mlflow.entities.model_registry.ModelVersion`</span>
+<span class="sd">            objects that satisfy the search expressions. The pagination token for the next</span>
+<span class="sd">            page can be obtained via the ``token`` attribute of the object.</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -3454,7 +3526,10 @@
         <span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">version</span><span class="p">:</span> <span class="nb">str</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>  <span class="c1"># pylint: disable=unused-argument</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :return: A list of valid stages.</span>
+<span class="sd">        This is a docstring. Here is info.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A list of valid stages.</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -3492,6 +3567,7 @@
 <span class="sd">            :caption: Output</span>
 
 <span class="sd">            Model list of valid stages: [&#39;None&#39;, &#39;Staging&#39;, &#39;Production&#39;, &#39;Archived&#39;]</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">ALL_STAGES</span></div>
 
@@ -3503,17 +3579,16 @@
         <span class="n">value</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">stage</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Set a tag for the model version.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set a tag for the model version.</span>
 <span class="sd">        When stage is set, tag will be set for latest model version of the stage.</span>
 <span class="sd">        Setting both version and stage parameter will result in error.</span>
 
-<span class="sd">        :param name: Registered model name.</span>
-<span class="sd">        :param version: Registered model version.</span>
-<span class="sd">        :param key: Tag key to log. key is required.</span>
-<span class="sd">        :param value: Tag value to log. value is required.</span>
-<span class="sd">        :param stage: Registered model stage.</span>
-<span class="sd">        :return: None</span>
+<span class="sd">        Args:</span>
+<span class="sd">            name: Registered model name.</span>
+<span class="sd">            version: Registered model version.</span>
+<span class="sd">            key: Tag key to log. key is required.</span>
+<span class="sd">            value: Tag value to log. value is required.</span>
+<span class="sd">            stage: Registered model stage.</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -3559,7 +3634,6 @@
 
 <span class="sd">            # Tag using model stage</span>
 <span class="sd">            client.set_model_version_tag(name, key=&quot;t1&quot;, value=&quot;1&quot;, stage=mv.current_stage)</span>
-
 <span class="sd">            mv = client.get_model_version(name, mv.version)</span>
 <span class="sd">            print_model_version_info(mv)</span>
 
@@ -3596,16 +3670,16 @@
         <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">stage</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Delete a tag associated with the model version.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Delete a tag associated with the model version.</span>
+
 <span class="sd">        When stage is set, tag will be deleted for latest model version of the stage.</span>
 <span class="sd">        Setting both version and stage parameter will result in error.</span>
 
-<span class="sd">        :param name: Registered model name.</span>
-<span class="sd">        :param version: Registered model version.</span>
-<span class="sd">        :param key: Tag key. key is required.</span>
-<span class="sd">        :param stage: Registered model stage.</span>
-<span class="sd">        :return: None</span>
+<span class="sd">        Args:</span>
+<span class="sd">            name: Registered model name.</span>
+<span class="sd">            version: Registered model version.</span>
+<span class="sd">            key: Tag key. key is required.</span>
+<span class="sd">            stage: Registered model stage.</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -3634,7 +3708,6 @@
 <span class="sd">            with mlflow.start_run() as run:</span>
 <span class="sd">                mlflow.log_params(params)</span>
 <span class="sd">                mlflow.sklearn.log_model(rfr, artifact_path=&quot;sklearn-model&quot;, signature=signature)</span>
-
 <span class="sd">            # Register model name in the model registry</span>
 <span class="sd">            client = MlflowClient()</span>
 <span class="sd">            client.create_registered_model(name)</span>
@@ -3683,11 +3756,11 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set a registered model alias pointing to a model version.</span>
 
-<span class="sd">        :param name: Registered model name.</span>
-<span class="sd">        :param alias: Name of the alias. Note that aliases of the format ``v&lt;number&gt;``, such as</span>
-<span class="sd">                      ``v9`` and ``v42``, are reserved and cannot be set.</span>
-<span class="sd">        :param version: Registered model version number.</span>
-<span class="sd">        :return: None</span>
+<span class="sd">        Args:</span>
+<span class="sd">            name: Registered model name.</span>
+<span class="sd">            alias: Name of the alias. Note that aliases of the format ``v&lt;number&gt;``, such as</span>
+<span class="sd">                ``v9`` and ``v42``, are reserved and cannot be set.</span>
+<span class="sd">            version: Registered model version number.</span>
 
 <span class="sd">        .. code-block:: Python</span>
 <span class="sd">            :caption: Example</span>
@@ -3744,6 +3817,7 @@
 <span class="sd">            --Model--</span>
 <span class="sd">            name: RandomForestRegression</span>
 <span class="sd">            aliases: {}</span>
+
 <span class="sd">            --Model Version--</span>
 <span class="sd">            Name: RandomForestRegression</span>
 <span class="sd">            Version: 1</span>
@@ -3752,6 +3826,7 @@
 <span class="sd">            --Model--</span>
 <span class="sd">            name: RandomForestRegression</span>
 <span class="sd">            aliases: {&quot;test-alias&quot;: &quot;1&quot;}</span>
+
 <span class="sd">            --Model Version--</span>
 <span class="sd">            Name: RandomForestRegression</span>
 <span class="sd">            Version: 1</span>
@@ -3763,12 +3838,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_get_registry_client</span><span class="p">()</span><span class="o">.</span><span class="n">set_registered_model_alias</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">alias</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MlflowClient.delete_registered_model_alias"><a class="viewcode-back" href="../../../python_api/mlflow.client.html#mlflow.client.MlflowClient.delete_registered_model_alias">[docs]</a>    <span class="k">def</span> <span class="nf">delete_registered_model_alias</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">alias</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Delete an alias associated with a registered model.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Delete an alias associated with a registered model.</span>
 
-<span class="sd">        :param name: Registered model name.</span>
-<span class="sd">        :param alias: Name of the alias.</span>
-<span class="sd">        :return: None</span>
+<span class="sd">        Args:</span>
+<span class="sd">            name: Registered model name.</span>
+<span class="sd">            alias: Name of the alias.</span>
 
 <span class="sd">        .. code-block:: Python</span>
 <span class="sd">            :caption: Example</span>
@@ -3857,14 +3931,16 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_get_registry_client</span><span class="p">()</span><span class="o">.</span><span class="n">delete_registered_model_alias</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">alias</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MlflowClient.get_model_version_by_alias"><a class="viewcode-back" href="../../../python_api/mlflow.client.html#mlflow.client.MlflowClient.get_model_version_by_alias">[docs]</a>    <span class="k">def</span> <span class="nf">get_model_version_by_alias</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">alias</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ModelVersion</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get the model version instance by name and alias.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the model version instance by name and alias.</span>
 
-<span class="sd">        :param name: Registered model name.</span>
-<span class="sd">        :param alias: Name of the alias.</span>
-<span class="sd">        :return: A single :py:class:`mlflow.entities.model_registry.ModelVersion` object.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            name: Registered model name.</span>
+<span class="sd">            alias: Name of the alias.</span>
 
-<span class="sd">        .. code-block:: Python</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            A single :py:class:`mlflow.entities.model_registry.ModelVersion` object.</span>
+
+<span class="sd">         .. code-block:: Python</span>
 <span class="sd">            :caption: Example</span>
 
 <span class="sd">            import mlflow</span>
@@ -3872,47 +3948,39 @@
 <span class="sd">            from mlflow.models import infer_signature</span>
 <span class="sd">            from sklearn.datasets import make_regression</span>
 <span class="sd">            from sklearn.ensemble import RandomForestRegressor</span>
-
 <span class="sd">            def print_model_info(rm):</span>
 <span class="sd">                print(&quot;--Model--&quot;)</span>
 <span class="sd">                print(&quot;name: {}&quot;.format(rm.name))</span>
 <span class="sd">                print(&quot;aliases: {}&quot;.format(rm.aliases))</span>
-
 <span class="sd">            def print_model_version_info(mv):</span>
 <span class="sd">                print(&quot;--Model Version--&quot;)</span>
 <span class="sd">                print(&quot;Name: {}&quot;.format(mv.name))</span>
 <span class="sd">                print(&quot;Version: {}&quot;.format(mv.version))</span>
 <span class="sd">                print(&quot;Aliases: {}&quot;.format(mv.aliases))</span>
-
 <span class="sd">            mlflow.set_tracking_uri(&quot;sqlite:///mlruns.db&quot;)</span>
 <span class="sd">            params = {&quot;n_estimators&quot;: 3, &quot;random_state&quot;: 42}</span>
 <span class="sd">            name = &quot;RandomForestRegression&quot;</span>
 <span class="sd">            X, y = make_regression(n_features=4, n_informative=2, random_state=0, shuffle=False)</span>
 <span class="sd">            rfr = RandomForestRegressor(**params).fit(X, y)</span>
 <span class="sd">            signature = infer_signature(X, rfr.predict(X))</span>
-
 <span class="sd">            # Log MLflow entities</span>
 <span class="sd">            with mlflow.start_run() as run:</span>
 <span class="sd">                mlflow.log_params(params)</span>
 <span class="sd">                mlflow.sklearn.log_model(rfr, artifact_path=&quot;sklearn-model&quot;, signature=signature)</span>
-
 <span class="sd">            # Register model name in the model registry</span>
 <span class="sd">            client = MlflowClient()</span>
 <span class="sd">            client.create_registered_model(name)</span>
 <span class="sd">            model = client.get_registered_model(name)</span>
 <span class="sd">            print_model_info(model)</span>
-
 <span class="sd">            # Create a new version of the rfr model under the registered model name</span>
 <span class="sd">            model_uri = &quot;runs:/{}/sklearn-model&quot;.format(run.info.run_id)</span>
 <span class="sd">            mv = client.create_model_version(name, model_uri, run.info.run_id)</span>
 <span class="sd">            print_model_version_info(mv)</span>
-
 <span class="sd">            # Set registered model alias</span>
 <span class="sd">            client.set_registered_model_alias(name, &quot;test-alias&quot;, mv.version)</span>
 <span class="sd">            print()</span>
 <span class="sd">            print_model_info(model)</span>
 <span class="sd">            print_model_version_info(mv)</span>
-
 <span class="sd">            # Get model version by alias</span>
 <span class="sd">            alias_mv = client.get_model_version_by_alias(name, &quot;test-alias&quot;)</span>
 <span class="sd">            print()</span>
@@ -3928,7 +3996,6 @@
 <span class="sd">            Name: RandomForestRegression</span>
 <span class="sd">            Version: 1</span>
 <span class="sd">            Aliases: []</span>
-
 <span class="sd">            --Model--</span>
 <span class="sd">            name: RandomForestRegression</span>
 <span class="sd">            aliases: {&quot;test-alias&quot;: &quot;1&quot;}</span>
@@ -3936,7 +4003,6 @@
 <span class="sd">            Name: RandomForestRegression</span>
 <span class="sd">            Version: 1</span>
 <span class="sd">            Aliases: [&quot;test-alias&quot;]</span>
-
 <span class="sd">            --Model Version--</span>
 <span class="sd">            Name: RandomForestRegression</span>
 <span class="sd">            Version: 1</span>
