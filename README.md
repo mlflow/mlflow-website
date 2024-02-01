@@ -44,5 +44,6 @@ This repository doesn't contain the MLflow documentation. To populate the `/webs
 cd /path/to/mlflow/docs
 make rsthtml
 
-cp -r build/html/* /path/to/mlflow-website/website/docs
+mkdir -p /path/to/mlflow-website/website/static/docs/latest
+cp -r build/html/* /path/to/mlflow-website/website/docs/latest
 ```
