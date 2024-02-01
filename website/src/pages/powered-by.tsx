@@ -17,7 +17,12 @@ function CompanyTile({ name, url }: CompanyTileProps): React.ReactElement {
   return (
     <a href={url} target="_blank">
       <div className={styles.logoContainer}>
-        <img className={styles.logo} src={nameToSrc(name)} alt={name} title={name} />
+        <img
+          className={styles.logo}
+          src={nameToSrc(name)}
+          alt={name}
+          title={name}
+        />
       </div>
     </a>
   );
