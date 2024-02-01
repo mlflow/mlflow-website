@@ -8,26 +8,26 @@ function nameToSrc(name: string) {
   return `img/companies/${name.toLowerCase().replace(/ /g, "-")}.svg`;
 }
 
-type CustomerTileProps = {
+type CompanyTileProps = {
   name: string;
   url: string;
 };
 
-function CustomerTile({ name, url }: CustomerTileProps): React.ReactElement {
+function CompanyTile({ name, url }: CompanyTileProps): React.ReactElement {
   return (
     <a href={url} target="_blank">
       <div className={styles.logoContainer}>
-        <img className={styles.logo} src={nameToSrc(name)} alt={name} />
+        <img className={styles.logo} src={nameToSrc(name)} alt={name} title={name} />
       </div>
     </a>
   );
 }
 
-export default function Customers(): React.ReactElement {
+export default function Companies(): React.ReactElement {
   return (
     <Layout
       wrapperClassName={styles.pageContainer}
-      title="Powered By"
+      title="Powered By MLflow"
       description="Powered By MLflow"
     >
       <H2>Powered by MLflow</H2>
@@ -59,7 +59,7 @@ export default function Customers(): React.ReactElement {
           }}
         >
           {Object.keys(companies).map((name) => {
-            return <CustomerTile name={name} url={companies[name]} />;
+            return <CompanyTile name={name} url={companies[name]} />;
           })}
         </div>
       </div>

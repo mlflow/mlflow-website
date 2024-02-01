@@ -311,7 +311,7 @@ export default function Home(): JSX.Element {
           // "img/companies/scribd.svg",
           // "img/companies/headspace.svg",
           // "img/companies/grab.svg",
-          "img/companies/gousto.svg",
+          // "img/companies/gousto.svg",
           // "img/companies/riot-games.svg",
           // "img/companies/nike.svg",
           // "img/companies/comcast.svg",
