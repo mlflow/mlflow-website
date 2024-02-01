@@ -1,6 +1,6 @@
 # MLflow Website
 
-This repository contains the source code for the MLflow website, which is built using [Docusaurus](https://docusaurus.io/).
+This repository contains the source code for [the MLflow website](https://mlflow.org/), which is built using [Docusaurus](https://docusaurus.io/).
 
 ## Preview
 
