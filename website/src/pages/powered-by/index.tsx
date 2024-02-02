@@ -31,12 +31,7 @@ export default function Companies(): React.ReactElement {
       <div className={styles.text}>
         MLflow is trusted by organizations of all sizes to power their AI and
         machine learning workflows. Below are some of the organizations using
-        and contributing to MLflow. To add your organization here, email our
-        user list at{" "}
-        <a href="https://groups.google.com/g/mlflow-users">
-          mlflow-users@googlegroups.com
-        </a>
-        !
+        and contributing to MLflow.
       </div>
       <div className={styles.logosSectionOuter}>
         <div className={styles.logosSectionInner}>
