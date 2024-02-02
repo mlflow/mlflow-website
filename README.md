@@ -50,5 +50,5 @@ cp -r build/html/* /path/to/mlflow-website/website/docs/latest
 
 ### Example PRs
 
-- Adding a new blog post: #3
-- Adding a new page: #22
+- Add a new blog post: [#3](https://github.com/mlflow/mlflow-website/pull/3)
+- Add a new page: [#22](https://github.com/mlflow/mlflow-website/pull/22)
