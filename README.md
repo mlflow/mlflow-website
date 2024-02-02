@@ -47,3 +47,8 @@ make rsthtml
 mkdir -p /path/to/mlflow-website/website/static/docs/latest
 cp -r build/html/* /path/to/mlflow-website/website/docs/latest
 ```
+
+### Example PRs
+
+- Adding a new blog post: #3
+- Adding a new page: #22
