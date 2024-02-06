@@ -425,20 +425,26 @@ MLlib persistence format and produces an MLflow Model with the Spark flavor.</p>
 pyspark.ml.Model or pyspark.ml.Transformer which implement
 MLReadable and MLWritable.</p></li>
 <li><p><strong>artifact_path</strong> – Run relative artifact path.</p></li>
-<li><p><strong>conda_env</strong> – <p>Either a dictionary representation of a Conda environment or the path to a
-Conda environment yaml file. If provided, this decsribes the environment
-this model should be run in. At minimum, it should specify the dependencies
-contained in <a class="reference internal" href="#mlflow.spark.get_default_conda_env" title="mlflow.spark.get_default_conda_env"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_default_conda_env()</span></code></a>. If <cite>None</cite>, the default
-<a class="reference internal" href="#mlflow.spark.get_default_conda_env" title="mlflow.spark.get_default_conda_env"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_default_conda_env()</span></code></a> environment is added to the model.
-The following is an <em>example</em> dictionary representation of a Conda
-environment:</p>
+<li><p><strong>conda_env</strong> – <p>Either a dictionary representation of a Conda environment or the path to a conda
+environment yaml file. If provided, this describes the environment this model should be run in.
+At a minimum, it should specify the dependencies contained in <a class="reference internal" href="#mlflow.spark.get_default_conda_env" title="mlflow.spark.get_default_conda_env"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_default_conda_env()</span></code></a>.
+If <code class="docutils literal notranslate"><span class="pre">None</span></code>, a conda environment with pip requirements inferred by
+<a class="reference internal" href="mlflow.models.html#mlflow.models.infer_pip_requirements" title="mlflow.models.infer_pip_requirements"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.models.infer_pip_requirements()</span></code></a> is added
+to the model. If the requirement inference fails, it falls back to using
+<a class="reference internal" href="#mlflow.spark.get_default_pip_requirements" title="mlflow.spark.get_default_pip_requirements"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_default_pip_requirements()</span></code></a>. pip requirements from <code class="docutils literal notranslate"><span class="pre">conda_env</span></code> are written to a pip
+<code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> file and the full conda environment is written to <code class="docutils literal notranslate"><span class="pre">conda.yaml</span></code>.
+The following is an <em>example</em> dictionary representation of a conda environment:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;mlflow-env&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;channels&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;defaults&#39;</span><span class="p">],</span>
-    <span class="s1">&#39;dependencies&#39;</span><span class="p">:</span> <span class="p">[</span>
-        <span class="s1">&#39;python=3.8.15&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;pyspark=2.3.0&#39;</span>
-    <span class="p">]</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;mlflow-env&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;channels&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;conda-forge&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;dependencies&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">&quot;python=3.8.15&quot;</span><span class="p">,</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;pip&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;pyspark==x.y.z&quot;</span>
+            <span class="p">],</span>
+        <span class="p">},</span>
+    <span class="p">],</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -568,20 +574,26 @@ pyspark.ml.Model or pyspark.ml.Transformer which implement
 MLReadable and MLWritable.</p></li>
 <li><p><strong>path</strong> – Local path where the model is to be saved.</p></li>
 <li><p><strong>mlflow_model</strong> – MLflow model config this flavor is being added to.</p></li>
-<li><p><strong>conda_env</strong> – <p>Either a dictionary representation of a Conda environment or the path to a
-Conda environment yaml file. If provided, this decsribes the environment
-this model should be run in. At minimum, it should specify the dependencies
-contained in <a class="reference internal" href="#mlflow.spark.get_default_conda_env" title="mlflow.spark.get_default_conda_env"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_default_conda_env()</span></code></a>. If <cite>None</cite>, the default
-<a class="reference internal" href="#mlflow.spark.get_default_conda_env" title="mlflow.spark.get_default_conda_env"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_default_conda_env()</span></code></a> environment is added to the model.
-The following is an <em>example</em> dictionary representation of a Conda
-environment:</p>
+<li><p><strong>conda_env</strong> – <p>Either a dictionary representation of a Conda environment or the path to a conda
+environment yaml file. If provided, this describes the environment this model should be run in.
+At a minimum, it should specify the dependencies contained in <a class="reference internal" href="#mlflow.spark.get_default_conda_env" title="mlflow.spark.get_default_conda_env"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_default_conda_env()</span></code></a>.
+If <code class="docutils literal notranslate"><span class="pre">None</span></code>, a conda environment with pip requirements inferred by
+<a class="reference internal" href="mlflow.models.html#mlflow.models.infer_pip_requirements" title="mlflow.models.infer_pip_requirements"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.models.infer_pip_requirements()</span></code></a> is added
+to the model. If the requirement inference fails, it falls back to using
+<a class="reference internal" href="#mlflow.spark.get_default_pip_requirements" title="mlflow.spark.get_default_pip_requirements"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_default_pip_requirements()</span></code></a>. pip requirements from <code class="docutils literal notranslate"><span class="pre">conda_env</span></code> are written to a pip
+<code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> file and the full conda environment is written to <code class="docutils literal notranslate"><span class="pre">conda.yaml</span></code>.
+The following is an <em>example</em> dictionary representation of a conda environment:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;mlflow-env&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;channels&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;defaults&#39;</span><span class="p">],</span>
-    <span class="s1">&#39;dependencies&#39;</span><span class="p">:</span> <span class="p">[</span>
-        <span class="s1">&#39;python=3.8.15&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;pyspark=2.3.0&#39;</span>
-    <span class="p">]</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;mlflow-env&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;channels&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;conda-forge&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;dependencies&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">&quot;python=3.8.15&quot;</span><span class="p">,</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;pip&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;pyspark==x.y.z&quot;</span>
+            <span class="p">],</span>
+        <span class="p">},</span>
+    <span class="p">],</span>
 <span class="p">}</span>
 </pre></div>
 </div>

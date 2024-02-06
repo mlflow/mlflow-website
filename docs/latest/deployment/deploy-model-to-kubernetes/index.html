@@ -67,6 +67,7 @@
 <script type="text/javascript" src="../../_static/jquery.js"></script>
 <script type="text/javascript" src="../../_static/underscore.js"></script>
 <script type="text/javascript" src="../../_static/doctools.js"></script>
+<script type="text/javascript" src="../../_static/tabs.js"></script>
 <script type="text/javascript" src="../../_static/languagesections.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
@@ -139,6 +140,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../deploy-model-to-sagemaker.html">Deploy MLflow Model to Amazon SageMaker</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Deploy MLflow Model to Kubernetes</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#using-mlserver-as-the-inference-server">Using MLServer as the Inference Server</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#building-a-docker-image-for-mlflow-model">Building a Docker Image for MLflow Model</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#deployment-steps">Deployment Steps</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tutorial">Tutorial</a></li>
 </ul>
@@ -229,9 +231,38 @@ as a core Python inference server in Kubernetes-native frameworks like <a class=
 of Kubernetes to serve your model at scale. See <a class="reference internal" href="../deploy-model-locally.html#serving-frameworks"><span class="std std-ref">Serving Framework</span></a> for the detailed comparison between Flask and MLServer,
 and why MLServer is a better choice for ML production use cases.</p>
 </div>
+<div class="section" id="building-a-docker-image-for-mlflow-model">
+<span id="build-docker-for-deployment"></span><h2>Building a Docker Image for MLflow Model<a class="headerlink" href="#building-a-docker-image-for-mlflow-model" title="Permalink to this headline"> </a></h2>
+<p>The essential step to deploy an MLflow model to Kubernetes is to build a Docker image that contains the MLflow model and the inference server. This can be done via
+<code class="docutils literal notranslate"><span class="pre">build-docker</span></code> CLI command or Python API.</p>
+<div class="sphinx-tabs docutils container">
+<div aria-label="Tabbed content" role="tablist"><button aria-controls="panel-0-0-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-0-0-0" name="0-0" role="tab" tabindex="0">CLI</button><button aria-controls="panel-0-0-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-1" name="0-1" role="tab" tabindex="-1">Python</button></div><div aria-labelledby="tab-0-0-0" class="sphinx-tabs-panel" id="panel-0-0-0" name="0-0" role="tabpanel" tabindex="0"><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mlflow<span class="w"> </span>models<span class="w"> </span>build-docker<span class="w"> </span>-m<span class="w"> </span>runs:/&lt;run_id&gt;/model<span class="w"> </span>-n<span class="w"> </span>&lt;image_name&gt;<span class="w"> </span>--enable-mlserver
+</pre></div>
+</div>
+<p>If you want to use the bare-bones Flask server instead of MLServer, remove the <code class="docutils literal notranslate"><span class="pre">--enable-mlserver</span></code> flag. For other options, see the
+<a class="reference external" href="../../cli.html#mlflow-models-build-docker">build-docker</a> command documentation.</p>
+</div><div aria-labelledby="tab-0-0-1" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-1" name="0-1" role="tabpanel" tabindex="0"><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">build_docker</span><span class="p">(</span>
+    <span class="n">model_uri</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;runs:/</span><span class="si">{</span><span class="n">run_id</span><span class="si">}</span><span class="s2">/model&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;&lt;image_name&gt;&quot;</span><span class="p">,</span>
+    <span class="n">enable_mlserver</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>If you want to use the bare-bones Flask server instead of MLServer, remove <code class="docutils literal notranslate"><span class="pre">enable_mlserver=True</span></code>. For other options, see the
+<a class="reference external" href="../../python_api/mlflow.models.html#mlflow.models.build_docker">mlflow.models.build_docker</a> function documentation.</p>
+</div></div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Since MLflow 2.10.1, the Docker image spec has been changed to reduce the image size and improve the performance.
+Most notably, Java is no longer installed in the image except for the Java model flavor such as <code class="docutils literal notranslate"><span class="pre">spark</span></code>.
+If you need to install Java for other flavors, e.g. custom Python model that uses SparkML, please specify the <code class="docutils literal notranslate"><span class="pre">--install-java</span></code> flag to enforce Java installation.</p>
+</div>
+</div>
 <div class="section" id="deployment-steps">
 <h2>Deployment Steps<a class="headerlink" href="#deployment-steps" title="Permalink to this headline"> </a></h2>
-<p>Please refer to the following partner documentations for deploying MLflow Models to Kubernetes using MLServer:</p>
+<p>Please refer to the following partner documentations for deploying MLflow Models to Kubernetes using MLServer. You can also follow the tutorial below to learn the end-to-end process including environment setup, model training, and deployment.</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://kserve.github.io/website/latest/modelserving/v1beta1/mlflow/v2/">Deploy MLflow models with KServe InferenceService</a></p></li>
 <li><p><a class="reference external" href="https://docs.seldon.io/projects/seldon-core/en/latest/servers/mlflow.html">Deploy MLflow models to Seldon Core</a></p></li>

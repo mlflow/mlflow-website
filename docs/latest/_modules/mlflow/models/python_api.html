@@ -231,6 +231,15 @@
 <span class="sd">    specified. If ``model_uri`` is not specified, an MLflow Model directory must be mounted as a</span>
 <span class="sd">    volume into the /opt/ml/model directory in the container.</span>
 
+<span class="sd">    .. important::</span>
+
+<span class="sd">        Since MLflow 2.10.1, the Docker image built with ``--model-uri`` does **not install Java**</span>
+<span class="sd">        for improved performance, unless the model flavor is one of ``[&quot;johnsnowlabs&quot;, &quot;h2o&quot;,</span>
+<span class="sd">        &quot;mleap&quot;, &quot;spark&quot;]``. If you need to install Java for other flavors, e.g. custom Python model</span>
+<span class="sd">        that uses SparkML, please specify ``install-java=True`` to enforce Java installation.</span>
+<span class="sd">        For earlier versions, Java is always installed to the image.</span>
+
+
 <span class="sd">    .. warning::</span>
 
 <span class="sd">        If ``model_uri`` is unspecified, the resulting image doesn&#39;t support serving models with</span>
@@ -246,6 +255,28 @@
 
 <span class="sd">    See https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html for more information on the</span>
 <span class="sd">    &#39;python_function&#39; flavor.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        model_uri: URI to the model. A local path, a &#39;runs:/&#39; URI, or a remote storage URI (e.g.,</span>
+<span class="sd">            an &#39;s3://&#39; URI). For more information about supported remote URIs for model artifacts,</span>
+<span class="sd">            see https://mlflow.org/docs/latest/tracking.html#artifact-stores&quot;</span>
+<span class="sd">        name: Name of the Docker image to build. Defaults to &#39;mlflow-pyfunc&#39;.</span>
+<span class="sd">        install_java: If specified, install Java in the image. Default is False in order to</span>
+<span class="sd">            reduce both the image size and the build time. Model flavors requiring Java will enable</span>
+<span class="sd">            this setting automatically, such as the Spark flavor. (This argument is only available</span>
+<span class="sd">            in MLflow 2.10.1 and later. In earlier versions, Java is always installed to the image.)</span>
+
+<span class="sd">        enable_mlserver: If specified, the image will be built with the Seldon MLserver as backend.</span>
+<span class="sd">        env_manager: If specified, create an environment for MLmodel using the specified environment</span>
+<span class="sd">            manager. The following values are supported: (1) virtualenv (default): use virtualenv</span>
+<span class="sd">            and pyenv for Python version management (2) conda: use conda (3) local: use the local</span>
+<span class="sd">            environment without creating a new one.</span>
+
+<span class="sd">        install_mlflow: If specified and there is a conda or virtualenv environment to be activated</span>
+<span class="sd">            mlflow will be installed into the environment after it has been activated.</span>
+<span class="sd">            The version of installed mlflow will be the same as the one used to invoke this command.</span>
+
+<span class="sd">        mlflow_home: Path to local clone of MLflow project. Use for development only.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">get_flavor_backend</span><span class="p">(</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">docker_build</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">env_manager</span><span class="o">=</span><span class="n">env_manager</span><span class="p">)</span><span class="o">.</span><span class="n">build_image</span><span class="p">(</span>
         <span class="n">model_uri</span><span class="p">,</span>
@@ -276,23 +307,24 @@
 <span class="sd">    data formats accepted by this function, see the following documentation:</span>
 <span class="sd">    https://www.mlflow.org/docs/latest/models.html#built-in-deployment-tools.</span>
 
-<span class="sd">    :param model_uri: URI to the model. A local path, a local or remote URI e.g. runs:/, s3://.</span>
-<span class="sd">    :param input_data: Input data for prediction. Must be valid input for the PyFunc model.</span>
-<span class="sd">    :param input_path: Path to a file containing input data. If provided, &#39;input_data&#39; must be None.</span>
-<span class="sd">    :param content_type: Content type of the input data. Can be one of {‘json’, ‘csv’}.</span>
-<span class="sd">    :param output_path: File to output results to as json. If not provided, output to stdout.</span>
-<span class="sd">    :param env_manager: Specify a way to create an environment for MLmodel inference:</span>
+<span class="sd">    Args:</span>
+<span class="sd">        model_uri: URI to the model. A local path, a local or remote URI e.g. runs:/, s3://.</span>
+<span class="sd">        input_data: Input data for prediction. Must be valid input for the PyFunc model.</span>
+<span class="sd">        input_path: Path to a file containing input data. If provided, &#39;input_data&#39; must be None.</span>
+<span class="sd">        content_type: Content type of the input data. Can be one of {‘json’, ‘csv’}.</span>
+<span class="sd">        output_path: File to output results to as json. If not provided, output to stdout.</span>
+<span class="sd">        env_manager: Specify a way to create an environment for MLmodel inference:</span>
 
-<span class="sd">        - virtualenv (default): use virtualenv (and pyenv for Python version management)</span>
-<span class="sd">        - local: use the local environment</span>
-<span class="sd">        - conda: use conda</span>
+<span class="sd">            - virtualenv (default): use virtualenv (and pyenv for Python version management)</span>
+<span class="sd">            - local: use the local environment</span>
+<span class="sd">            - conda: use conda</span>
 
-<span class="sd">    :param install_mlflow: If specified and there is a conda or virtualenv environment to be</span>
-<span class="sd">        activated mlflow will be installed into the environment after it has been activated.</span>
-<span class="sd">        The version of installed mlflow will be the same as the one used to invoke this command.</span>
-<span class="sd">    :param pip_requirements_override: If specified, install the specified python dependencies to</span>
-<span class="sd">        the model inference environment. This is particularly useful when you want to add extra</span>
-<span class="sd">        dependencies or try different versions of the dependencies defined in the logged model.</span>
+<span class="sd">        install_mlflow: If specified and there is a conda or virtualenv environment to be activated</span>
+<span class="sd">            mlflow will be installed into the environment after it has been activated. The version</span>
+<span class="sd">            of installed mlflow will be the same as the one used to invoke this command.</span>
+<span class="sd">        pip_requirements_override: If specified, install the specified python dependencies to the</span>
+<span class="sd">            model inference environment. This is particularly useful when you want to add extra</span>
+<span class="sd">            dependencies or try different versions of the dependencies defined in the logged model.</span>
 
 <span class="sd">    Code example:</span>
 

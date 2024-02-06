@@ -256,7 +256,8 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Find the underlying models flavor.</span>
 
-<span class="sd">    :param model: underlying model of the explainer.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        model: underlying model of the explainer.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># checking if underlying model is wrapped</span>
@@ -291,9 +292,9 @@
 
 <div class="viewcode-block" id="get_default_pip_requirements"><a class="viewcode-back" href="../../python_api/mlflow.shap.html#mlflow.shap.get_default_pip_requirements">[docs]</a><span class="k">def</span> <span class="nf">get_default_pip_requirements</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    :return: A list of default pip requirements for MLflow Models produced by this flavor.</span>
-<span class="sd">             Calls to :func:`save_explainer()` and :func:`log_explainer()` produce a pip environment</span>
-<span class="sd">             that, at minimum, contains these requirements.</span>
+<span class="sd">    A list of default pip requirements for MLflow Models produced by this flavor. Calls to</span>
+<span class="sd">    :func:`save_explainer()` and :func:`log_explainer()` produce a pip environment that, at</span>
+<span class="sd">    minimum, contains these requirements.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">import</span> <span class="nn">shap</span>
 
@@ -302,9 +303,9 @@
 
 <div class="viewcode-block" id="get_default_conda_env"><a class="viewcode-back" href="../../python_api/mlflow.shap.html#mlflow.shap.get_default_conda_env">[docs]</a><span class="k">def</span> <span class="nf">get_default_conda_env</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    :return: The default Conda environment for</span>
-<span class="sd">             MLflow Models produced by calls to</span>
-<span class="sd">             :func:`save_explainer()` and :func:`log_explainer()`.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        The default Conda environment for MLflow Models produced by calls to</span>
+<span class="sd">        :func:`save_explainer()` and :func:`log_explainer()`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">_mlflow_conda_env</span><span class="p">(</span><span class="n">additional_pip_deps</span><span class="o">=</span><span class="n">get_default_pip_requirements</span><span class="p">())</span></div>
 
@@ -360,42 +361,44 @@
 <span class="sd">        - SHAP values (computed using `shap.KernelExplainer`_)</span>
 <span class="sd">        - Summary bar plot (shows the average impact of each feature on model output)</span>
 
-<span class="sd">    :param predict_function:</span>
-<span class="sd">        A function to compute the output of a model (e.g. ``predict_proba`` method of</span>
-<span class="sd">        scikit-learn classifiers). Must have the following signature:</span>
+<span class="sd">    Args:</span>
+<span class="sd">        predict_function:</span>
+<span class="sd">            A function to compute the output of a model (e.g. ``predict_proba`` method of</span>
+<span class="sd">            scikit-learn classifiers). Must have the following signature:</span>
 
-<span class="sd">        .. code-block:: python</span>
+<span class="sd">            .. code-block:: python</span>
 
-<span class="sd">            def predict_function(X) -&gt; pred:</span>
-<span class="sd">                ...</span>
+<span class="sd">                def predict_function(X) -&gt; pred:</span>
+<span class="sd">                    ...</span>
 
-<span class="sd">        - ``X``: An array-like object whose shape should be (# samples, # features).</span>
-<span class="sd">        - ``pred``: An array-like object whose shape should be (# samples) for</span>
-<span class="sd">          a regressor or (# classes, # samples) for a classifier. For a classifier,</span>
-<span class="sd">          the values in ``pred`` should correspond to the predicted probability of each class.</span>
+<span class="sd">            - ``X``: An array-like object whose shape should be (# samples, # features).</span>
+<span class="sd">            - ``pred``: An array-like object whose shape should be (# samples) for a regressor or</span>
+<span class="sd">              (# classes, # samples) for a classifier. For a classifier, the values in ``pred``</span>
+<span class="sd">              should correspond to the predicted probability of each class.</span>
 
-<span class="sd">        Acceptable array-like object types:</span>
+<span class="sd">            Acceptable array-like object types:</span>
 
-<span class="sd">            - ``numpy.array``</span>
-<span class="sd">            - ``pandas.DataFrame``</span>
-<span class="sd">            - ``shap.common.DenseData``</span>
-<span class="sd">            - ``scipy.sparse matrix``</span>
+<span class="sd">                - ``numpy.array``</span>
+<span class="sd">                - ``pandas.DataFrame``</span>
+<span class="sd">                - ``shap.common.DenseData``</span>
+<span class="sd">                - ``scipy.sparse matrix``</span>
 
-<span class="sd">    :param features:</span>
-<span class="sd">        A matrix of features to compute SHAP values with. The provided features should</span>
-<span class="sd">        have shape (# samples, # features), and can be either of the array-like object</span>
-<span class="sd">        types listed above.</span>
+<span class="sd">        features:</span>
+<span class="sd">            A matrix of features to compute SHAP values with. The provided features should</span>
+<span class="sd">            have shape (# samples, # features), and can be either of the array-like object</span>
+<span class="sd">            types listed above.</span>
 
-<span class="sd">        .. note::</span>
-<span class="sd">            Background data for `shap.KernelExplainer`_ is generated by subsampling ``features``</span>
-<span class="sd">            with `shap.kmeans`_. The background data size is limited to 100 rows for performance</span>
-<span class="sd">            reasons.</span>
+<span class="sd">            .. note::</span>
+<span class="sd">                Background data for `shap.KernelExplainer`_ is generated by subsampling ``features``</span>
+<span class="sd">                with `shap.kmeans`_. The background data size is limited to 100 rows for performance</span>
+<span class="sd">                reasons.</span>
 
-<span class="sd">    :param artifact_path:</span>
-<span class="sd">        The run-relative artifact path to which the explanation is saved.</span>
-<span class="sd">        If unspecified, defaults to &quot;model_explanations_shap&quot;.</span>
+<span class="sd">        artifact_path:</span>
+<span class="sd">            The run-relative artifact path to which the explanation is saved.</span>
+<span class="sd">            If unspecified, defaults to &quot;model_explanations_shap&quot;.</span>
 
-<span class="sd">    :return: Artifact URI of the logged explanations.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        Artifact URI of the logged explanations.</span>
 
 <span class="sd">    .. _SHAP: https://github.com/slundberg/shap</span>
 
@@ -506,46 +509,42 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Log an SHAP explainer as an MLflow artifact for the current run.</span>
 
-<span class="sd">    :param explainer: SHAP explainer to be saved.</span>
-<span class="sd">    :param artifact_path: Run-relative artifact path.</span>
-<span class="sd">    :param serialize_model_using_mlflow: When set to True, MLflow will extract the underlying</span>
-<span class="sd">                                        model and serialize it as an MLmodel, otherwise it</span>
-<span class="sd">                                        uses SHAP&#39;s internal serialization. Defaults to True.</span>
-<span class="sd">                                        Currently MLflow serialization is only supported for</span>
-<span class="sd">                                        models of &#39;sklearn&#39; or &#39;pytorch&#39; flavors.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        explainer: SHAP explainer to be saved.</span>
+<span class="sd">        artifact_path: Run-relative artifact path.</span>
+<span class="sd">        serialize_model_using_mlflow: When set to True, MLflow will extract the underlying</span>
+<span class="sd">            model and serialize it as an MLmodel, otherwise it uses SHAP&#39;s internal serialization.</span>
+<span class="sd">            Defaults to True. Currently MLflow serialization is only supported for models of</span>
+<span class="sd">            &#39;sklearn&#39; or &#39;pytorch&#39; flavors.</span>
+<span class="sd">        conda_env: {{ conda_env }}</span>
+<span class="sd">        code_paths: A list of local filesystem paths to Python file dependencies (or directories</span>
+<span class="sd">            containing file dependencies). These files are *prepended* to the system path when the</span>
+<span class="sd">            model is loaded.</span>
+<span class="sd">        registered_model_name: If given, create a model version under ``registered_model_name``,</span>
+<span class="sd">            also creating a registered model if one with the given name does not exist.</span>
+<span class="sd">        signature: :py:class:`ModelSignature &lt;mlflow.models.ModelSignature&gt;` describes model input</span>
+<span class="sd">            and output :py:class:`Schema &lt;mlflow.types.Schema&gt;`. The model signature can be</span>
+<span class="sd">            :py:func:`inferred &lt;mlflow.models.infer_signature&gt;` from datasets with valid model input</span>
+<span class="sd">            (e.g. the training dataset with target column omitted) and valid model output</span>
+<span class="sd">            (e.g. model predictions generated on the training dataset), for example:</span>
 
-<span class="sd">    :param conda_env: {{ conda_env }}</span>
-<span class="sd">    :param code_paths: A list of local filesystem paths to Python file dependencies (or directories</span>
-<span class="sd">                       containing file dependencies). These files are *prepended* to the system</span>
-<span class="sd">                       path when the model is loaded.</span>
-<span class="sd">    :param registered_model_name: If given, create a model version under</span>
-<span class="sd">                                  ``registered_model_name``, also creating a registered model if one</span>
-<span class="sd">                                  with the given name does not exist.</span>
+<span class="sd">            .. code-block:: python</span>
 
-<span class="sd">    :param signature: :py:class:`ModelSignature &lt;mlflow.models.ModelSignature&gt;`</span>
-<span class="sd">                      describes model input and output :py:class:`Schema &lt;mlflow.types.Schema&gt;`.</span>
-<span class="sd">                      The model signature can be :py:func:`inferred &lt;mlflow.models.infer_signature&gt;`</span>
-<span class="sd">                      from datasets with valid model input (e.g. the training dataset with target</span>
-<span class="sd">                      column omitted) and valid model output (e.g. model predictions generated on</span>
-<span class="sd">                      the training dataset), for example:</span>
+<span class="sd">                from mlflow.models import infer_signature</span>
 
-<span class="sd">                      .. code-block:: python</span>
+<span class="sd">                train = df.drop_column(&quot;target_label&quot;)</span>
+<span class="sd">                predictions = ...  # compute model predictions</span>
+<span class="sd">                signature = infer_signature(train, predictions)</span>
+<span class="sd">        input_example: {{ input_example }}</span>
+<span class="sd">        await_registration_for: Number of seconds to wait for the model version to finish</span>
+<span class="sd">            being created and is in ``READY`` status. By default, the function waits for five</span>
+<span class="sd">            minutes. Specify 0 or None to skip waiting.</span>
+<span class="sd">        pip_requirements: {{ pip_requirements }}</span>
+<span class="sd">        extra_pip_requirements: {{ extra_pip_requirements }}</span>
+<span class="sd">        metadata: Custom metadata dictionary passed to the model and stored in the MLmodel file.</span>
 
-<span class="sd">                        from mlflow.models import infer_signature</span>
-
-<span class="sd">                        train = df.drop_column(&quot;target_label&quot;)</span>
-<span class="sd">                        predictions = ...  # compute model predictions</span>
-<span class="sd">                        signature = infer_signature(train, predictions)</span>
-<span class="sd">    :param input_example: {{ input_example }}</span>
-<span class="sd">    :param await_registration_for: Number of seconds to wait for the model version to finish</span>
-<span class="sd">                            being created and is in ``READY`` status. By default, the function</span>
-<span class="sd">                            waits for five minutes. Specify 0 or None to skip waiting.</span>
-<span class="sd">    :param pip_requirements: {{ pip_requirements }}</span>
-<span class="sd">    :param extra_pip_requirements: {{ extra_pip_requirements }}</span>
-<span class="sd">    :param metadata: Custom metadata dictionary passed to the model and stored in the MLmodel file.</span>
-
-<span class="sd">                     .. Note:: Experimental: This parameter may change or be removed in a future</span>
-<span class="sd">                                             release without warning.</span>
+<span class="sd">            .. Note:: Experimental: This parameter may change or be removed in a future</span>
+<span class="sd">                release without warning.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">Model</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
@@ -586,40 +585,38 @@
 <span class="sd">        - :py:mod:`mlflow.shap`</span>
 <span class="sd">        - :py:mod:`mlflow.pyfunc`</span>
 
-<span class="sd">    :param explainer: SHAP explainer to be saved.</span>
-<span class="sd">    :param path: Local path where the explainer is to be saved.</span>
-<span class="sd">    :param serialize_model_using_mlflow: When set to True, MLflow will extract the underlying</span>
-<span class="sd">                                         model and serialize it as an MLmodel, otherwise it</span>
-<span class="sd">                                         uses SHAP&#39;s internal serialization. Defaults to True.</span>
-<span class="sd">                                         Currently MLflow serialization is only supported for</span>
-<span class="sd">                                         models of &#39;sklearn&#39; or &#39;pytorch&#39; flavors.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        explainer: SHAP explainer to be saved.</span>
+<span class="sd">        path: Local path where the explainer is to be saved.</span>
+<span class="sd">        serialize_model_using_mlflow: When set to True, MLflow will extract the underlying</span>
+<span class="sd">            model and serialize it as an MLmodel, otherwise it uses SHAP&#39;s internal serialization.</span>
+<span class="sd">            Defaults to True. Currently MLflow serialization is only supported for models of</span>
+<span class="sd">            &#39;sklearn&#39; or &#39;pytorch&#39; flavors.</span>
+<span class="sd">        conda_env: {{ conda_env }}</span>
+<span class="sd">        code_paths: A list of local filesystem paths to Python file dependencies (or directories</span>
+<span class="sd">            containing file dependencies). These files are *prepended* to the system path when the</span>
+<span class="sd">            model is loaded.</span>
+<span class="sd">        mlflow_model: :py:mod:`mlflow.models.Model` this flavor is being added to.</span>
+<span class="sd">        signature: :py:class:`ModelSignature &lt;mlflow.models.ModelSignature&gt;` describes model input</span>
+<span class="sd">            and output :py:class:`Schema &lt;mlflow.types.Schema&gt;`. The model signature can be</span>
+<span class="sd">            :py:func:`inferred &lt;mlflow.models.infer_signature&gt;` from datasets with valid model input</span>
+<span class="sd">            (e.g. the training dataset with target column omitted) and valid model output (e.g.</span>
+<span class="sd">            model predictions generated on the training dataset), for example:</span>
 
-<span class="sd">    :param conda_env: {{ conda_env }}</span>
-<span class="sd">    :param code_paths: A list of local filesystem paths to Python file dependencies (or directories</span>
-<span class="sd">                       containing file dependencies). These files are *prepended* to the system</span>
-<span class="sd">                       path when the model is loaded.</span>
-<span class="sd">    :param mlflow_model: :py:mod:`mlflow.models.Model` this flavor is being added to.</span>
-<span class="sd">    :param signature: :py:class:`ModelSignature &lt;mlflow.models.ModelSignature&gt;`</span>
-<span class="sd">                      describes model input and output :py:class:`Schema &lt;mlflow.types.Schema&gt;`.</span>
-<span class="sd">                      The model signature can be :py:func:`inferred &lt;mlflow.models.infer_signature&gt;`</span>
-<span class="sd">                      from datasets with valid model input (e.g. the training dataset with target</span>
-<span class="sd">                      column omitted) and valid model output (e.g. model predictions generated on</span>
-<span class="sd">                      the training dataset), for example:</span>
+<span class="sd">            .. code-block:: python</span>
 
-<span class="sd">                      .. code-block:: python</span>
+<span class="sd">                from mlflow.models import infer_signature</span>
 
-<span class="sd">                        from mlflow.models import infer_signature</span>
+<span class="sd">                train = df.drop_column(&quot;target_label&quot;)</span>
+<span class="sd">                predictions = ...  # compute model predictions</span>
+<span class="sd">                signature = infer_signature(train, predictions)</span>
+<span class="sd">        input_example: {{ input_example }}</span>
+<span class="sd">        pip_requirements: {{ pip_requirements }}</span>
+<span class="sd">        extra_pip_requirements: {{ extra_pip_requirements }}</span>
+<span class="sd">        metadata: Custom metadata dictionary passed to the model and stored in the MLmodel file.</span>
 
-<span class="sd">                        train = df.drop_column(&quot;target_label&quot;)</span>
-<span class="sd">                        predictions = ...  # compute model predictions</span>
-<span class="sd">                        signature = infer_signature(train, predictions)</span>
-<span class="sd">    :param input_example: {{ input_example }}</span>
-<span class="sd">    :param pip_requirements: {{ pip_requirements }}</span>
-<span class="sd">    :param extra_pip_requirements: {{ extra_pip_requirements }}</span>
-<span class="sd">    :param metadata: Custom metadata dictionary passed to the model and stored in the MLmodel file.</span>
-
-<span class="sd">                     .. Note:: Experimental: This parameter may change or be removed in a future</span>
-<span class="sd">                                             release without warning.</span>
+<span class="sd">            .. Note:: Experimental: This parameter may change or be removed in a future</span>
+<span class="sd">                release without warning.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">import</span> <span class="nn">shap</span>
 
@@ -734,7 +731,8 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extract conda and pip dependencies from conda environments</span>
 
-<span class="sd">    :param conda_env: Conda environment</span>
+<span class="sd">    Args:</span>
+<span class="sd">        conda_env: Conda environment</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">conda_deps</span> <span class="o">=</span> <span class="p">[]</span>
@@ -767,8 +765,9 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Merge conda environments of underlying model and shap.</span>
 
-<span class="sd">    :param shap_environment: SHAP conda environment.</span>
-<span class="sd">    :param model_environment: Underlying model conda environment.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        shap_environment: SHAP conda environment.</span>
+<span class="sd">        model_environment: Underlying model conda environment.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># merge the channels from the two environments and remove the default conda</span>
     <span class="c1"># channels if present since its added later in `_mlflow_conda_env`</span>
@@ -793,20 +792,22 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Load a SHAP explainer from a local file or a run.</span>
 
-<span class="sd">    :param model_uri: The location, in URI format, of the MLflow model, for example:</span>
+<span class="sd">    Args:</span>
+<span class="sd">        model_uri: The location, in URI format, of the MLflow model. For example:</span>
 
-<span class="sd">                      - ``/Users/me/path/to/local/model``</span>
-<span class="sd">                      - ``relative/path/to/local/model``</span>
-<span class="sd">                      - ``s3://my_bucket/path/to/model``</span>
-<span class="sd">                      - ``runs:/&lt;mlflow_run_id&gt;/run-relative/path/to/model``</span>
-<span class="sd">                      - ``models:/&lt;model_name&gt;/&lt;model_version&gt;``</span>
-<span class="sd">                      - ``models:/&lt;model_name&gt;/&lt;stage&gt;``</span>
+<span class="sd">            - ``/Users/me/path/to/local/model``</span>
+<span class="sd">            - ``relative/path/to/local/model``</span>
+<span class="sd">            - ``s3://my_bucket/path/to/model``</span>
+<span class="sd">            - ``runs:/&lt;mlflow_run_id&gt;/run-relative/path/to/model``</span>
+<span class="sd">            - ``models:/&lt;model_name&gt;/&lt;model_version&gt;``</span>
+<span class="sd">            - ``models:/&lt;model_name&gt;/&lt;stage&gt;``</span>
 
-<span class="sd">                      For more information about supported URI schemes, see</span>
-<span class="sd">                      `Referencing Artifacts &lt;https://www.mlflow.org/docs/latest/concepts.html#</span>
-<span class="sd">                      artifact-locations&gt;`_.</span>
+<span class="sd">            For more information about supported URI schemes, see</span>
+<span class="sd">            `Referencing Artifacts &lt;https://www.mlflow.org/docs/latest/concepts.html#</span>
+<span class="sd">            artifact-locations&gt;`_.</span>
 
-<span class="sd">    :return: A SHAP explainer.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        A SHAP explainer.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">explainer_path</span> <span class="o">=</span> <span class="n">_download_artifact_from_uri</span><span class="p">(</span><span class="n">artifact_uri</span><span class="o">=</span><span class="n">model_uri</span><span class="p">)</span>
@@ -830,8 +831,10 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Load a SHAP explainer saved as an MLflow artifact on the local file system.</span>
 
-<span class="sd">    :param explainer_file: Local filesystem path to the MLflow Model saved with the ``shap`` flavor</span>
-<span class="sd">    :param model: model to override underlying explainer model.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        explainer_file: Local filesystem path to the MLflow Model saved with the ``shap`` flavor.</span>
+<span class="sd">        model: Model to override underlying explainer model.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">import</span> <span class="nn">shap</span>
 
@@ -865,13 +868,15 @@
         <span class="bp">self</span><span class="p">,</span> <span class="n">dataframe</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># pylint: disable=unused-argument</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param dataframe: Model input data.</span>
-<span class="sd">        :param params: Additional parameters to pass to the model for inference.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            dataframe: Model input data.</span>
+<span class="sd">            params: Additional parameters to pass to the model for inference.</span>
 
-<span class="sd">                       .. Note:: Experimental: This parameter may change or be removed in a future</span>
-<span class="sd">                                               release without warning.</span>
+<span class="sd">                .. Note:: Experimental: This parameter may change or be removed in a future</span>
+<span class="sd">                    release without warning.</span>
 
-<span class="sd">        :return: Model predictions.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Model predictions.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">explainer</span><span class="p">(</span><span class="n">dataframe</span><span class="o">.</span><span class="n">values</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
 </pre></div>

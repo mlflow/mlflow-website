@@ -225,6 +225,7 @@
 <span class="kn">from</span> <span class="nn">mlflow.models.model</span> <span class="kn">import</span> <span class="n">MLMODEL_FILE_NAME</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.signature</span> <span class="kn">import</span> <span class="n">_extract_type_hints</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracking.artifact_utils</span> <span class="kn">import</span> <span class="n">_download_artifact_from_uri</span>
+<span class="kn">from</span> <span class="nn">mlflow.types.llm</span> <span class="kn">import</span> <span class="n">ChatMessage</span><span class="p">,</span> <span class="n">ChatParams</span><span class="p">,</span> <span class="n">ChatResponse</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.annotations</span> <span class="kn">import</span> <span class="n">experimental</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.environment</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">_CONDA_ENV_FILE_NAME</span><span class="p">,</span>
@@ -396,6 +397,40 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model_config</span></div>
 
 
+<div class="viewcode-block" id="ChatModel"><a class="viewcode-back" href="../../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.ChatModel">[docs]</a><span class="nd">@experimental</span>
+<span class="k">class</span> <span class="nc">ChatModel</span><span class="p">(</span><span class="n">PythonModel</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A subclass of :class:`~PythonModel` that makes it more convenient to implement models</span>
+<span class="sd">    that are compatible with popular LLM chat APIs. By subclassing :class:`~ChatModel`,</span>
+<span class="sd">    users can create MLflow models with a ``predict()`` method that is more convenient</span>
+<span class="sd">    for chat tasks than the generic :class:`~PythonModel` API. ChatModels automatically</span>
+<span class="sd">    define input/output signatures and an input example, so manually specifying these values</span>
+<span class="sd">    when calling :func:`mlflow.pyfunc.save_model() &lt;mlflow.pyfunc.save_model&gt;` is not necessary.</span>
+
+<span class="sd">    See the documentation of the ``predict()`` method below for details on that parameters and</span>
+<span class="sd">    outputs that are expected by the ``ChatModel`` API.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ChatModel.predict"><a class="viewcode-back" href="../../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.ChatModel.predict">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">messages</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ChatMessage</span><span class="p">],</span> <span class="n">params</span><span class="p">:</span> <span class="n">ChatParams</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ChatResponse</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluates a chat input and produces a chat output.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            messages (List[:py:class:`ChatMessage &lt;mlflow.types.llm.ChatMessage&gt;`]):</span>
+<span class="sd">                A list of :py:class:`ChatMessage &lt;mlflow.types.llm.ChatMessage&gt;`</span>
+<span class="sd">                objects representing chat history.</span>
+<span class="sd">            params (:py:class:`ChatParams &lt;mlflow.types.llm.ChatParams&gt;`):</span>
+<span class="sd">                A :py:class:`ChatParams &lt;mlflow.types.llm.ChatParams&gt;` object</span>
+<span class="sd">                containing various parameters used to modify model behavior during</span>
+<span class="sd">                inference.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A :py:class:`ChatResponse &lt;mlflow.types.llm.ChatResponse&gt;` object containing</span>
+<span class="sd">            the model&#39;s response(s), as well as other metadata.</span>
+<span class="sd">        &quot;&quot;&quot;</span></div></div>
+
+
 <span class="k">def</span> <span class="nf">_save_model_with_class_artifacts_params</span><span class="p">(</span>
     <span class="n">path</span><span class="p">,</span>
     <span class="n">python_model</span><span class="p">,</span>
@@ -510,7 +545,7 @@
 
     <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">add_to_model</span><span class="p">(</span>
         <span class="n">model</span><span class="o">=</span><span class="n">mlflow_model</span><span class="p">,</span>
-        <span class="n">loader_module</span><span class="o">=</span><span class="vm">__name__</span><span class="p">,</span>
+        <span class="n">loader_module</span><span class="o">=</span><span class="n">_get_pyfunc_loader_module</span><span class="p">(</span><span class="n">python_model</span><span class="p">),</span>
         <span class="n">code</span><span class="o">=</span><span class="n">saved_code_subpath</span><span class="p">,</span>
         <span class="n">conda_env</span><span class="o">=</span><span class="n">_CONDA_ENV_FILE_NAME</span><span class="p">,</span>
         <span class="n">python_env</span><span class="o">=</span><span class="n">_PYTHON_ENV_FILE_NAME</span><span class="p">,</span>
@@ -555,7 +590,9 @@
     <span class="n">_PythonEnv</span><span class="o">.</span><span class="n">current</span><span class="p">()</span><span class="o">.</span><span class="n">to_yaml</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">_PYTHON_ENV_FILE_NAME</span><span class="p">))</span>
 
 
-<span class="k">def</span> <span class="nf">_load_pyfunc</span><span class="p">(</span><span class="n">model_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">model_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_load_context_model_and_signature</span><span class="p">(</span>
+    <span class="n">model_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">model_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">):</span>
     <span class="n">pyfunc_config</span> <span class="o">=</span> <span class="n">_get_flavor_configuration</span><span class="p">(</span>
         <span class="n">model_path</span><span class="o">=</span><span class="n">model_path</span><span class="p">,</span> <span class="n">flavor_name</span><span class="o">=</span><span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">FLAVOR_NAME</span>
     <span class="p">)</span>
@@ -595,6 +632,12 @@
     <span class="n">context</span> <span class="o">=</span> <span class="n">PythonModelContext</span><span class="p">(</span><span class="n">artifacts</span><span class="o">=</span><span class="n">artifacts</span><span class="p">,</span> <span class="n">model_config</span><span class="o">=</span><span class="n">model_config</span><span class="p">)</span>
     <span class="n">python_model</span><span class="o">.</span><span class="n">load_context</span><span class="p">(</span><span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
     <span class="n">signature</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">model_path</span><span class="p">)</span><span class="o">.</span><span class="n">signature</span>
+
+    <span class="k">return</span> <span class="n">context</span><span class="p">,</span> <span class="n">python_model</span><span class="p">,</span> <span class="n">signature</span>
+
+
+<span class="k">def</span> <span class="nf">_load_pyfunc</span><span class="p">(</span><span class="n">model_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">model_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="n">context</span><span class="p">,</span> <span class="n">python_model</span><span class="p">,</span> <span class="n">signature</span> <span class="o">=</span> <span class="n">_load_context_model_and_signature</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="n">model_config</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">_PythonModelPyfuncWrapper</span><span class="p">(</span>
         <span class="n">python_model</span><span class="o">=</span><span class="n">python_model</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">,</span> <span class="n">signature</span><span class="o">=</span><span class="n">signature</span>
     <span class="p">)</span>
@@ -671,6 +714,12 @@
             <span class="p">)</span>
         <span class="n">_log_warning_if_params_not_in_predict_signature</span><span class="p">(</span><span class="n">_logger</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">python_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_input</span><span class="p">(</span><span class="n">model_input</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">_get_pyfunc_loader_module</span><span class="p">(</span><span class="n">python_model</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">python_model</span><span class="p">,</span> <span class="n">ChatModel</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">loaders</span><span class="o">.</span><span class="n">chat_model</span><span class="o">.</span><span class="vm">__name__</span>
+    <span class="k">return</span> <span class="vm">__name__</span>
 </pre></div>
 
               </div>

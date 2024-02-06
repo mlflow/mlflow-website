@@ -202,13 +202,27 @@
               <div itemprop="articleBody">
                 
   <h1>Source code for mlflow.data.delta_dataset_source</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">from</span> <span class="nn">mlflow.data.dataset_source</span> <span class="kn">import</span> <span class="n">DatasetSource</span>
 <span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
+<span class="kn">from</span> <span class="nn">mlflow.protos.databricks_managed_catalog_messages_pb2</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">GetTable</span><span class="p">,</span>
+    <span class="n">GetTableResponse</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">mlflow.protos.databricks_managed_catalog_service_pb2</span> <span class="kn">import</span> <span class="n">UnityCatalogService</span>
 <span class="kn">from</span> <span class="nn">mlflow.protos.databricks_pb2</span> <span class="kn">import</span> <span class="n">INVALID_PARAMETER_VALUE</span>
+<span class="kn">from</span> <span class="nn">mlflow.utils._spark_utils</span> <span class="kn">import</span> <span class="n">_get_active_spark_session</span>
+<span class="kn">from</span> <span class="nn">mlflow.utils._unity_catalog_utils</span> <span class="kn">import</span> <span class="n">get_full_name_from_sc</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.annotations</span> <span class="kn">import</span> <span class="n">experimental</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.databricks_utils</span> <span class="kn">import</span> <span class="n">is_in_databricks_runtime</span>
+<span class="kn">from</span> <span class="nn">mlflow.utils.databricks_utils</span> <span class="kn">import</span> <span class="n">get_databricks_host_creds</span><span class="p">,</span> <span class="n">is_in_databricks_runtime</span>
+<span class="kn">from</span> <span class="nn">mlflow.utils.proto_json_utils</span> <span class="kn">import</span> <span class="n">message_to_json</span>
+<span class="kn">from</span> <span class="nn">mlflow.utils.rest_utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_REST_API_PATH_PREFIX</span><span class="p">,</span>
+    <span class="n">call_endpoint</span><span class="p">,</span>
+    <span class="n">extract_api_info_for_service</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="n">DATABRICKS_HIVE_METASTORE_NAME</span> <span class="o">=</span> <span class="s2">&quot;hive_metastore&quot;</span>
 <span class="c1"># these two catalog names both points to the workspace local default HMS (hive metastore).</span>
@@ -216,6 +230,8 @@
 <span class="c1"># samples catalog is managed by databricks for hosting public dataset like NYC taxi dataset.</span>
 <span class="c1"># it is neither a UC nor local metastore catalog</span>
 <span class="n">DATABRICKS_SAMPLES_CATALOG_NAME</span> <span class="o">=</span> <span class="s2">&quot;samples&quot;</span>
+
+<span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="DeltaDatasetSource"><a class="viewcode-back" href="../../../python_api/mlflow.data.html#mlflow.data.delta_dataset_source.DeltaDatasetSource">[docs]</a><span class="nd">@experimental</span>
@@ -229,6 +245,7 @@
         <span class="n">path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">delta_table_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">delta_table_version</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">delta_table_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">delta_table_name</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
@@ -236,8 +253,14 @@
                 <span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="n">path</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_delta_table_name</span> <span class="o">=</span> <span class="n">delta_table_name</span>
+        <span class="k">if</span> <span class="n">delta_table_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_delta_table_name</span> <span class="o">=</span> <span class="n">get_full_name_from_sc</span><span class="p">(</span>
+                <span class="n">delta_table_name</span><span class="p">,</span> <span class="n">_get_active_spark_session</span><span class="p">()</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_delta_table_name</span> <span class="o">=</span> <span class="n">delta_table_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_delta_table_version</span> <span class="o">=</span> <span class="n">delta_table_version</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_delta_table_id</span> <span class="o">=</span> <span class="n">delta_table_id</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_get_source_type</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -272,6 +295,10 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta_table_name</span>
 
     <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">delta_table_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta_table_id</span>
+
+    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">delta_table_version</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta_table_version</span>
 
@@ -291,6 +318,30 @@
                 <span class="n">catalog_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">DATABRICKS_LOCAL_METASTORE_NAMES</span>
                 <span class="ow">and</span> <span class="n">catalog_name</span> <span class="o">!=</span> <span class="n">DATABRICKS_SAMPLES_CATALOG_NAME</span>
             <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">_lookup_table_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_name</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">req_body</span> <span class="o">=</span> <span class="n">message_to_json</span><span class="p">(</span><span class="n">GetTable</span><span class="p">(</span><span class="n">full_name_arg</span><span class="o">=</span><span class="n">table_name</span><span class="p">))</span>
+            <span class="n">_METHOD_TO_INFO</span> <span class="o">=</span> <span class="n">extract_api_info_for_service</span><span class="p">(</span>
+                <span class="n">UnityCatalogService</span><span class="p">,</span> <span class="n">_REST_API_PATH_PREFIX</span>
+            <span class="p">)</span>
+            <span class="n">db_creds</span> <span class="o">=</span> <span class="n">get_databricks_host_creds</span><span class="p">()</span>
+            <span class="n">endpoint</span><span class="p">,</span> <span class="n">method</span> <span class="o">=</span> <span class="n">_METHOD_TO_INFO</span><span class="p">[</span><span class="n">GetTable</span><span class="p">]</span>
+            <span class="c1"># We need to replace the full_name_arg in the endpoint definition with</span>
+            <span class="c1"># the actual table name for the REST API to work.</span>
+            <span class="n">final_endpoint</span> <span class="o">=</span> <span class="n">endpoint</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{full_name_arg}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">table_name</span><span class="p">)</span>
+            <span class="n">resp</span> <span class="o">=</span> <span class="n">call_endpoint</span><span class="p">(</span>
+                <span class="n">host_creds</span><span class="o">=</span><span class="n">db_creds</span><span class="p">,</span>
+                <span class="n">endpoint</span><span class="o">=</span><span class="n">final_endpoint</span><span class="p">,</span>
+                <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span>
+                <span class="n">json_body</span><span class="o">=</span><span class="n">req_body</span><span class="p">,</span>
+                <span class="n">response_proto</span><span class="o">=</span><span class="n">GetTableResponse</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">resp</span><span class="o">.</span><span class="n">table_id</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">_to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="n">info</span> <span class="o">=</span> <span class="p">{}</span>
@@ -302,6 +353,10 @@
             <span class="n">info</span><span class="p">[</span><span class="s2">&quot;delta_table_version&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta_table_version</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_databricks_uc_table</span><span class="p">():</span>
             <span class="n">info</span><span class="p">[</span><span class="s2">&quot;is_databricks_uc_table&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta_table_id</span><span class="p">:</span>
+                <span class="n">info</span><span class="p">[</span><span class="s2">&quot;delta_table_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta_table_id</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">info</span><span class="p">[</span><span class="s2">&quot;delta_table_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lookup_table_id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_delta_table_name</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">info</span>
 
     <span class="nd">@classmethod</span>
@@ -310,6 +365,7 @@
             <span class="n">path</span><span class="o">=</span><span class="n">source_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;path&quot;</span><span class="p">),</span>
             <span class="n">delta_table_name</span><span class="o">=</span><span class="n">source_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;delta_table_name&quot;</span><span class="p">),</span>
             <span class="n">delta_table_version</span><span class="o">=</span><span class="n">source_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;delta_table_version&quot;</span><span class="p">),</span>
+            <span class="n">delta_table_id</span><span class="o">=</span><span class="n">source_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;delta_table_id&quot;</span><span class="p">),</span>
         <span class="p">)</span></div>
 </pre></div>
 
