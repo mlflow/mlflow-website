@@ -2,6 +2,7 @@
   
 
 <!DOCTYPE html>
+<!-- source: docs/source/_modules/mlflow/models/signature -->
 <!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
@@ -9,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mlflow.models.signature &mdash; MLflow 2.10.1.dev0 documentation</title>
+  <title>mlflow.models.signature &mdash; MLflow 2.10.3.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -55,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="MLflow 2.10.1.dev0 documentation" href="../../../index.html"/>
+    <link rel="top" title="MLflow 2.10.3.dev0 documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
   
@@ -86,7 +87,7 @@
     <a href="../../../index.html" class="wy-nav-top-logo"
       ><img src="../../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.10.1.dev0</span>
+    <span class="version">2.10.3.dev0</span>
   </li>
 </ul>
   </nav>
@@ -288,7 +289,8 @@
 <span class="sd">        Input and output schema are represented as json strings. This is so that the</span>
 <span class="sd">        representation is compact when embedded in an MLmodel yaml file.</span>
 
-<span class="sd">        :return: dictionary representation with input and output schema represented as json strings.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            dictionary representation with input and output schema represented as json strings.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="p">{</span>
@@ -302,13 +304,15 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Deserialize from dictionary representation.</span>
 
-<span class="sd">        :param signature_dict: Dictionary representation of model signature.</span>
-<span class="sd">                               Expected dictionary format:</span>
-<span class="sd">                               `{&#39;inputs&#39;: &lt;json string&gt;,</span>
-<span class="sd">                               &#39;outputs&#39;: &lt;json string&gt;,</span>
-<span class="sd">                               &#39;params&#39;: &lt;json string&gt;&quot; }`</span>
+<span class="sd">        Args:</span>
+<span class="sd">            signature_dict: Dictionary representation of model signature.</span>
+<span class="sd">                Expected dictionary format:</span>
+<span class="sd">                `{&#39;inputs&#39;: &lt;json string&gt;,</span>
+<span class="sd">                &#39;outputs&#39;: &lt;json string&gt;,</span>
+<span class="sd">                &#39;params&#39;: &lt;json string&gt;&quot; }`</span>
 
-<span class="sd">        :return: ModelSignature populated with the data form the dictionary.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            ModelSignature populated with the data form the dictionary.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">inputs</span> <span class="o">=</span> <span class="n">Schema</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">x</span> <span class="o">:=</span> <span class="n">signature_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;inputs&quot;</span><span class="p">))</span> <span class="k">else</span> <span class="kc">None</span>
         <span class="n">outputs</span> <span class="o">=</span> <span class="n">Schema</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">x</span> <span class="o">:=</span> <span class="n">signature_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;outputs&quot;</span><span class="p">))</span> <span class="k">else</span> <span class="kc">None</span>
@@ -366,51 +370,53 @@
 <span class="sd">    as type :py:data:`datetime &lt;mlflow.types.DataType.datetime&gt;`, which is coerced to</span>
 <span class="sd">    TimestampType at inference.</span>
 
-<span class="sd">    :param model_input: Valid input to the model. E.g. (a subset of) the training dataset.</span>
-<span class="sd">    :param model_output: Valid model output. E.g. Model predictions for the (subset of) training</span>
-<span class="sd">                         dataset.</span>
-<span class="sd">    :param params: Valid parameters for inference. It should be a dictionary of parameters</span>
-<span class="sd">                   that can be set on the model during inference by passing `params` to pyfunc</span>
-<span class="sd">                   `predict` method.</span>
+<span class="sd">    Args:</span>
+<span class="sd">      model_input: Valid input to the model. E.g. (a subset of) the training dataset.</span>
+<span class="sd">      model_output: Valid model output. E.g. Model predictions for the (subset of) training</span>
+<span class="sd">                    dataset.</span>
+<span class="sd">      params: Valid parameters for inference. It should be a dictionary of parameters</span>
+<span class="sd">              that can be set on the model during inference by passing `params` to pyfunc</span>
+<span class="sd">              `predict` method.</span>
 
-<span class="sd">                   An example of valid parameters:</span>
+<span class="sd">              An example of valid parameters:</span>
 
-<span class="sd">                   .. code-block:: python</span>
+<span class="sd">              .. code-block:: python</span>
 
-<span class="sd">                        from mlflow.models import infer_signature</span>
-<span class="sd">                        from mlflow.transformers import generate_signature_output</span>
+<span class="sd">                    from mlflow.models import infer_signature</span>
+<span class="sd">                    from mlflow.transformers import generate_signature_output</span>
 
-<span class="sd">                        # Define parameters for inference</span>
-<span class="sd">                        params = {</span>
-<span class="sd">                            &quot;num_beams&quot;: 5,</span>
-<span class="sd">                            &quot;max_length&quot;: 30,</span>
-<span class="sd">                            &quot;do_sample&quot;: True,</span>
-<span class="sd">                            &quot;remove_invalid_values&quot;: True,</span>
-<span class="sd">                        }</span>
+<span class="sd">                    # Define parameters for inference</span>
+<span class="sd">                    params = {</span>
+<span class="sd">                        &quot;num_beams&quot;: 5,</span>
+<span class="sd">                        &quot;max_length&quot;: 30,</span>
+<span class="sd">                        &quot;do_sample&quot;: True,</span>
+<span class="sd">                        &quot;remove_invalid_values&quot;: True,</span>
+<span class="sd">                    }</span>
 
-<span class="sd">                        # Infer the signature including parameters</span>
-<span class="sd">                        signature = infer_signature(</span>
-<span class="sd">                            data,</span>
-<span class="sd">                            generate_signature_output(model, data),</span>
-<span class="sd">                            params=params,</span>
-<span class="sd">                        )</span>
+<span class="sd">                    # Infer the signature including parameters</span>
+<span class="sd">                    signature = infer_signature(</span>
+<span class="sd">                        data,</span>
+<span class="sd">                        generate_signature_output(model, data),</span>
+<span class="sd">                        params=params,</span>
+<span class="sd">                    )</span>
 
-<span class="sd">                        # Saving model with model signature</span>
-<span class="sd">                        mlflow.transformers.save_model(</span>
-<span class="sd">                            model,</span>
-<span class="sd">                            path=model_path,</span>
-<span class="sd">                            signature=signature,</span>
-<span class="sd">                        )</span>
+<span class="sd">                    # Saving model with model signature</span>
+<span class="sd">                    mlflow.transformers.save_model(</span>
+<span class="sd">                        model,</span>
+<span class="sd">                        path=model_path,</span>
+<span class="sd">                        signature=signature,</span>
+<span class="sd">                    )</span>
 
-<span class="sd">                        pyfunc_loaded = mlflow.pyfunc.load_model(model_path)</span>
+<span class="sd">                    pyfunc_loaded = mlflow.pyfunc.load_model(model_path)</span>
 
-<span class="sd">                        # Passing params to `predict` function directly</span>
-<span class="sd">                        result = pyfunc_loaded.predict(data, params=params)</span>
+<span class="sd">                    # Passing params to `predict` function directly</span>
+<span class="sd">                    result = pyfunc_loaded.predict(data, params=params)</span>
 
-<span class="sd">                   .. Note:: Experimental: This parameter may change or be removed in a future</span>
-<span class="sd">                                           release without warning.</span>
+<span class="sd">              .. Note:: Experimental: This parameter may change or be removed in a future</span>
+<span class="sd">                                     release without warning.</span>
 
-<span class="sd">    :return: ModelSignature</span>
+<span class="sd">    Returns:</span>
+<span class="sd">      ModelSignature</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">inputs</span> <span class="o">=</span> <span class="n">_infer_schema</span><span class="p">(</span><span class="n">model_input</span><span class="p">)</span> <span class="k">if</span> <span class="n">model_input</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
     <span class="n">outputs</span> <span class="o">=</span> <span class="n">_infer_schema</span><span class="p">(</span><span class="n">model_output</span><span class="p">)</span> <span class="k">if</span> <span class="n">model_output</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
@@ -461,9 +467,12 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extract type hints from a function.</span>
 
-<span class="sd">    :param f: Function to extract type hints from.</span>
-<span class="sd">    :param input_arg_index: Index of the function argument that corresponds to the model input.</span>
-<span class="sd">    :return: A `_TypeHints` object containing the input and output type hints.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        f: Function to extract type hints from.</span>
+<span class="sd">        input_arg_index: Index of the function argument that corresponds to the model input.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A `_TypeHints` object containing the input and output type hints.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s2">&quot;__annotations__&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s2">&quot;__call__&quot;</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">_extract_type_hints</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="fm">__call__</span><span class="p">,</span> <span class="n">input_arg_index</span><span class="p">)</span>
@@ -541,9 +550,12 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Infer the signature from an example input and a PyFunc wrapped model. Catches all exceptions.</span>
 
-<span class="sd">    :param input_example: An instance representing a typical input to the model.</span>
-<span class="sd">    :param wrapped_model: A PyFunc wrapped model which has a `predict` method.</span>
-<span class="sd">    :return: A `ModelSignature` object containing the inferred schema of both the model&#39;s inputs</span>
+<span class="sd">    Args:</span>
+<span class="sd">        input_example: An instance representing a typical input to the model.</span>
+<span class="sd">        wrapped_model: A PyFunc wrapped model which has a `predict` method.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A `ModelSignature` object containing the inferred schema of both the model&#39;s inputs</span>
 <span class="sd">        based on the `input_example` and the model&#39;s outputs based on the prediction from the</span>
 <span class="sd">        `wrapped_model`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -595,21 +607,22 @@
 <span class="sd">    information about setting signatures on model versions, see</span>
 <span class="sd">    `this doc section &lt;https://www.mlflow.org/docs/latest/models.html#set-signature-on-mv&gt;`_.</span>
 
-<span class="sd">    :param model_uri: The location, in URI format, of the MLflow model. For example:</span>
+<span class="sd">    Args:</span>
+<span class="sd">        model_uri: The location, in URI format, of the MLflow model. For example:</span>
 
-<span class="sd">                      - ``/Users/me/path/to/local/model``</span>
-<span class="sd">                      - ``relative/path/to/local/model``</span>
-<span class="sd">                      - ``s3://my_bucket/path/to/model``</span>
-<span class="sd">                      - ``runs:/&lt;mlflow_run_id&gt;/run-relative/path/to/model``</span>
-<span class="sd">                      - ``mlflow-artifacts:/path/to/model``</span>
+<span class="sd">            - ``/Users/me/path/to/local/model``</span>
+<span class="sd">            - ``relative/path/to/local/model``</span>
+<span class="sd">            - ``s3://my_bucket/path/to/model``</span>
+<span class="sd">            - ``runs:/&lt;mlflow_run_id&gt;/run-relative/path/to/model``</span>
+<span class="sd">            - ``mlflow-artifacts:/path/to/model``</span>
 
-<span class="sd">                      For more information about supported URI schemes, see</span>
-<span class="sd">                      `Referencing Artifacts &lt;https://www.mlflow.org/docs/latest/concepts.html#</span>
-<span class="sd">                      artifact-locations&gt;`_.</span>
+<span class="sd">            For more information about supported URI schemes, see</span>
+<span class="sd">            `Referencing Artifacts &lt;https://www.mlflow.org/docs/latest/concepts.html#</span>
+<span class="sd">            artifact-locations&gt;`_.</span>
 
-<span class="sd">                      Please note that model URIs with the ``models:/`` scheme are not supported.</span>
+<span class="sd">            Please note that model URIs with the ``models:/`` scheme are not supported.</span>
 
-<span class="sd">    :param signature: ModelSignature to set on the model.</span>
+<span class="sd">        signature: ModelSignature to set on the model.</span>
 
 <span class="sd">    .. code-block:: python</span>
 <span class="sd">        :caption: Example</span>
@@ -686,7 +699,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../../',
-      VERSION:'2.10.1.dev0',
+      VERSION:'2.10.3.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

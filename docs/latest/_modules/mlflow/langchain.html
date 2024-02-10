@@ -2,6 +2,7 @@
   
 
 <!DOCTYPE html>
+<!-- source: docs/source/_modules/mlflow/langchain -->
 <!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
@@ -9,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mlflow.langchain &mdash; MLflow 2.10.1.dev0 documentation</title>
+  <title>mlflow.langchain &mdash; MLflow 2.10.3.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -55,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="MLflow 2.10.1.dev0 documentation" href="../../index.html"/>
+    <link rel="top" title="MLflow 2.10.3.dev0 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
@@ -86,7 +87,7 @@
     <a href="../../index.html" class="wy-nav-top-logo"
       ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.10.1.dev0</span>
+    <span class="version">2.10.3.dev0</span>
   </li>
 </ul>
   </nav>
@@ -221,6 +222,7 @@
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">from</span> <span class="nn">packaging.version</span> <span class="kn">import</span> <span class="n">Version</span>
 
 <span class="kn">import</span> <span class="nn">mlflow</span>
 <span class="kn">from</span> <span class="nn">mlflow</span> <span class="kn">import</span> <span class="n">pyfunc</span>
@@ -228,6 +230,10 @@
 <span class="kn">from</span> <span class="nn">mlflow.langchain._langchain_autolog</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">_update_langchain_model_config</span><span class="p">,</span>
     <span class="n">patched_inference</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">mlflow.langchain.databricks_dependencies</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_DATABRICKS_DEPENDENCY_KEY</span><span class="p">,</span>
+    <span class="n">_detect_databricks_dependencies</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.langchain.runnables</span> <span class="kn">import</span> <span class="n">_load_runnables</span><span class="p">,</span> <span class="n">_save_runnables</span>
 <span class="kn">from</span> <span class="nn">mlflow.langchain.utils</span> <span class="kn">import</span> <span class="p">(</span>
@@ -472,6 +478,11 @@
         <span class="n">_MODEL_TYPE_KEY</span><span class="p">:</span> <span class="n">lc_model</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
         <span class="o">**</span><span class="n">model_data_kwargs</span><span class="p">,</span>
     <span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">Version</span><span class="p">(</span><span class="n">langchain</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">Version</span><span class="p">(</span><span class="s2">&quot;0.0.311&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">databricks_dependency</span> <span class="o">:=</span> <span class="n">_detect_databricks_dependencies</span><span class="p">(</span><span class="n">lc_model</span><span class="p">):</span>
+            <span class="n">flavor_conf</span><span class="p">[</span><span class="n">_DATABRICKS_DEPENDENCY_KEY</span><span class="p">]</span> <span class="o">=</span> <span class="n">databricks_dependency</span>
+
     <span class="n">mlflow_model</span><span class="o">.</span><span class="n">add_flavor</span><span class="p">(</span>
         <span class="n">FLAVOR_NAME</span><span class="p">,</span>
         <span class="n">langchain_version</span><span class="o">=</span><span class="n">langchain</span><span class="o">.</span><span class="n">__version__</span><span class="p">,</span>
@@ -782,7 +793,9 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># pylint: disable=unused-argument</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">,</span>
+        <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># pylint: disable=unused-argument</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Model input data and additional parameters.</span>
@@ -901,43 +914,44 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Enables (or disables) and configures autologging from Langchain to MLflow.</span>
 
-<span class="sd">    :param log_input_examples: If ``True``, input examples from inference data are collected and</span>
-<span class="sd">                               logged along with Langchain model artifacts during inference. If</span>
-<span class="sd">                               ``False``, input examples are not logged.</span>
-<span class="sd">                               Note: Input examples are MLflow model attributes</span>
-<span class="sd">                               and are only collected if ``log_models`` is also ``True``.</span>
-<span class="sd">    :param log_model_signatures: If ``True``,</span>
-<span class="sd">                                 :py:class:`ModelSignatures &lt;mlflow.models.ModelSignature&gt;`</span>
-<span class="sd">                                 describing model inputs and outputs are collected and logged along</span>
-<span class="sd">                                 with Langchain model artifacts during inference. If ``False``,</span>
-<span class="sd">                                 signatures are not logged.</span>
-<span class="sd">                                 Note: Model signatures are MLflow model attributes</span>
-<span class="sd">                                 and are only collected if ``log_models`` is also ``True``.</span>
-<span class="sd">    :param log_models: If ``True``, langchain models are logged as MLflow model artifacts.</span>
-<span class="sd">                       If ``False``, langchain models are not logged.</span>
-<span class="sd">                       Input examples and model signatures, which are attributes of MLflow models,</span>
-<span class="sd">                       are also omitted when ``log_models`` is ``False``.</span>
-<span class="sd">    :param log_datasets: If ``True``, dataset information is logged to MLflow Tracking</span>
-<span class="sd">                         if applicable. If ``False``, dataset information is not logged.</span>
-<span class="sd">    :param log_inputs_outputs: If ``True``, inference data and results are combined into a single</span>
-<span class="sd">                                  pandas DataFrame and logged to MLflow Tracking as an artifact.</span>
-<span class="sd">                                  If ``False``, inference data and results are not logged.</span>
-<span class="sd">                                  Default to ``True``.</span>
-<span class="sd">    :param disable: If ``True``, disables the Langchain autologging integration. If ``False``,</span>
-<span class="sd">                    enables the Langchain autologging integration.</span>
-<span class="sd">    :param exclusive: If ``True``, autologged content is not logged to user-created fluent runs.</span>
-<span class="sd">                      If ``False``, autologged content is logged to the active fluent run,</span>
-<span class="sd">                      which may be user-created.</span>
-<span class="sd">    :param disable_for_unsupported_versions: If ``True``, disable autologging for versions of</span>
-<span class="sd">                      langchain that have not been tested against this version of the MLflow</span>
-<span class="sd">                      client or are incompatible.</span>
-<span class="sd">    :param silent: If ``True``, suppress all event logs and warnings from MLflow during Langchain</span>
-<span class="sd">                   autologging. If ``False``, show all events and warnings during Langchain</span>
-<span class="sd">                   autologging.</span>
-<span class="sd">    :param registered_model_name: If given, each time a model is trained, it is registered as a</span>
-<span class="sd">                                  new model version of the registered model with this name.</span>
-<span class="sd">                                  The registered model is created if it does not already exist.</span>
-<span class="sd">    :param extra_tags: A dictionary of extra tags to set on each managed run created by autologging.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        log_input_examples: If ``True``, input examples from inference data are collected and</span>
+<span class="sd">            logged along with Langchain model artifacts during inference. If</span>
+<span class="sd">            ``False``, input examples are not logged.</span>
+<span class="sd">            Note: Input examples are MLflow model attributes</span>
+<span class="sd">            and are only collected if ``log_models`` is also ``True``.</span>
+<span class="sd">        log_model_signatures: If ``True``,</span>
+<span class="sd">            :py:class:`ModelSignatures &lt;mlflow.models.ModelSignature&gt;`</span>
+<span class="sd">            describing model inputs and outputs are collected and logged along</span>
+<span class="sd">            with Langchain model artifacts during inference. If ``False``,</span>
+<span class="sd">            signatures are not logged.</span>
+<span class="sd">            Note: Model signatures are MLflow model attributes</span>
+<span class="sd">            and are only collected if ``log_models`` is also ``True``.</span>
+<span class="sd">        log_models: If ``True``, langchain models are logged as MLflow model artifacts.</span>
+<span class="sd">            If ``False``, langchain models are not logged.</span>
+<span class="sd">            Input examples and model signatures, which are attributes of MLflow models,</span>
+<span class="sd">            are also omitted when ``log_models`` is ``False``.</span>
+<span class="sd">        log_datasets: If ``True``, dataset information is logged to MLflow Tracking</span>
+<span class="sd">            if applicable. If ``False``, dataset information is not logged.</span>
+<span class="sd">        log_inputs_outputs: If ``True``, inference data and results are combined into a single</span>
+<span class="sd">            pandas DataFrame and logged to MLflow Tracking as an artifact.</span>
+<span class="sd">            If ``False``, inference data and results are not logged.</span>
+<span class="sd">            Default to ``True``.</span>
+<span class="sd">        disable: If ``True``, disables the Langchain autologging integration. If ``False``,</span>
+<span class="sd">            enables the Langchain autologging integration.</span>
+<span class="sd">        exclusive: If ``True``, autologged content is not logged to user-created fluent runs.</span>
+<span class="sd">            If ``False``, autologged content is logged to the active fluent run,</span>
+<span class="sd">            which may be user-created.</span>
+<span class="sd">        disable_for_unsupported_versions: If ``True``, disable autologging for versions of</span>
+<span class="sd">            langchain that have not been tested against this version of the MLflow</span>
+<span class="sd">            client or are incompatible.</span>
+<span class="sd">        silent: If ``True``, suppress all event logs and warnings from MLflow during Langchain</span>
+<span class="sd">            autologging. If ``False``, show all events and warnings during Langchain</span>
+<span class="sd">            autologging.</span>
+<span class="sd">        registered_model_name: If given, each time a model is trained, it is registered as a</span>
+<span class="sd">            new model version of the registered model with this name.</span>
+<span class="sd">            The registered model is created if it does not already exist.</span>
+<span class="sd">        extra_tags: A dictionary of extra tags to set on each managed run created by autologging.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">with</span> <span class="n">contextlib</span><span class="o">.</span><span class="n">suppress</span><span class="p">(</span><span class="ne">ImportError</span><span class="p">):</span>
@@ -992,7 +1006,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../',
-      VERSION:'2.10.1.dev0',
+      VERSION:'2.10.3.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

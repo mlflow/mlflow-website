@@ -2,6 +2,7 @@
   
 
 <!DOCTYPE html>
+<!-- source: docs/source/_modules/mlflow/transformers -->
 <!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
@@ -9,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mlflow.transformers &mdash; MLflow 2.10.1.dev0 documentation</title>
+  <title>mlflow.transformers &mdash; MLflow 2.10.3.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -55,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="MLflow 2.10.1.dev0 documentation" href="../../index.html"/>
+    <link rel="top" title="MLflow 2.10.3.dev0 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
@@ -86,7 +87,7 @@
     <a href="../../index.html" class="wy-nav-top-logo"
       ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.10.1.dev0</span>
+    <span class="version">2.10.3.dev0</span>
   </li>
 </ul>
   </nav>
@@ -209,6 +210,7 @@
 <span class="kn">import</span> <span class="nn">contextlib</span>
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">importlib</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
@@ -240,11 +242,9 @@
     <span class="n">Model</span><span class="p">,</span>
     <span class="n">ModelInputExample</span><span class="p">,</span>
     <span class="n">ModelSignature</span><span class="p">,</span>
-    <span class="n">infer_pip_requirements</span><span class="p">,</span>
-    <span class="n">infer_signature</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.model</span> <span class="kn">import</span> <span class="n">MLMODEL_FILE_NAME</span>
-<span class="kn">from</span> <span class="nn">mlflow.models.utils</span> <span class="kn">import</span> <span class="n">_contains_params</span><span class="p">,</span> <span class="n">_save_example</span>
+<span class="kn">from</span> <span class="nn">mlflow.models.utils</span> <span class="kn">import</span> <span class="n">_save_example</span>
 <span class="kn">from</span> <span class="nn">mlflow.protos.databricks_pb2</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">BAD_REQUEST</span><span class="p">,</span>
     <span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
@@ -257,7 +257,6 @@
     <span class="n">_SUPPORTED_LLM_INFERENCE_TASK_TYPES_BY_PIPELINE_TASK</span><span class="p">,</span>
     <span class="n">postprocess_output_for_llm_inference_task</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.types.schema</span> <span class="kn">import</span> <span class="n">ColSpec</span><span class="p">,</span> <span class="n">Schema</span><span class="p">,</span> <span class="n">TensorSpec</span>
 <span class="kn">from</span> <span class="nn">mlflow.types.utils</span> <span class="kn">import</span> <span class="n">_validate_input_dictionary_contains_only_strings_and_lists_of_strings</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.annotations</span> <span class="kn">import</span> <span class="n">experimental</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.autologging_utils</span> <span class="kn">import</span> <span class="p">(</span>
@@ -280,6 +279,7 @@
     <span class="n">_process_pip_requirements</span><span class="p">,</span>
     <span class="n">_PythonEnv</span><span class="p">,</span>
     <span class="n">_validate_env_arguments</span><span class="p">,</span>
+    <span class="n">infer_pip_requirements_with_timeout</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.file_utils</span> <span class="kn">import</span> <span class="n">get_total_file_size</span><span class="p">,</span> <span class="n">write_to</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.model_utils</span> <span class="kn">import</span> <span class="p">(</span>
@@ -292,9 +292,20 @@
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.requirements_utils</span> <span class="kn">import</span> <span class="n">_get_pinned_requirement</span>
 
+<span class="n">IS_TRANSFORMERS_AVAILABLE</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">find_spec</span><span class="p">(</span><span class="s2">&quot;transformers&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+<span class="c1"># The following modules depend on transformers and only imported when it is available</span>
+<span class="k">if</span> <span class="n">IS_TRANSFORMERS_AVAILABLE</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">mlflow.transformers.signature</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="n">_generate_signature_output</span><span class="p">,</span>
+        <span class="n">format_input_example_for_special_cases</span><span class="p">,</span>
+        <span class="n">infer_or_get_default_signature</span><span class="p">,</span>
+    <span class="p">)</span>
+
 <span class="c1"># The following import is only used for type hinting</span>
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">torch</span>
+
 
 <span class="n">FLAVOR_NAME</span> <span class="o">=</span> <span class="s2">&quot;transformers&quot;</span>
 
@@ -687,6 +698,8 @@
     <span class="c1"># using accelerate iff the model weights have been loaded using a device_map that is</span>
     <span class="c1"># heterogeneous. There is a distinct possibility for a partial write to occur, causing an</span>
     <span class="c1"># invalid state of the model&#39;s weights in this scenario. Hence, we raise.</span>
+    <span class="c1"># We might be able to remove this check once this PR is merged to transformers:</span>
+    <span class="c1"># https://github.com/huggingface/transformers/issues/20072</span>
     <span class="k">if</span> <span class="n">_is_model_distributed_in_memory</span><span class="p">(</span><span class="n">built_pipeline</span><span class="o">.</span><span class="n">model</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
             <span class="s2">&quot;The model that is attempting to be saved has been loaded into memory &quot;</span>
@@ -701,7 +714,7 @@
     <span class="k">if</span> <span class="n">signature</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">mlflow_model</span><span class="o">.</span><span class="n">signature</span> <span class="o">=</span> <span class="n">signature</span>
     <span class="k">if</span> <span class="n">input_example</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">input_example</span> <span class="o">=</span> <span class="n">_format_input_example_for_special_cases</span><span class="p">(</span><span class="n">input_example</span><span class="p">,</span> <span class="n">built_pipeline</span><span class="p">)</span>
+        <span class="n">input_example</span> <span class="o">=</span> <span class="n">format_input_example_for_special_cases</span><span class="p">(</span><span class="n">input_example</span><span class="p">,</span> <span class="n">built_pipeline</span><span class="p">)</span>
         <span class="n">_save_example</span><span class="p">(</span><span class="n">mlflow_model</span><span class="p">,</span> <span class="n">input_example</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="n">example_no_conversion</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">metadata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">mlflow_model</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">metadata</span>
@@ -775,10 +788,8 @@
     <span class="c1"># Currently supported types are NLP-based language tasks which have a pipeline definition</span>
     <span class="c1"># consisting exclusively of a Model and a Tokenizer.</span>
     <span class="k">if</span> <span class="n">_should_add_pyfunc_to_model</span><span class="p">(</span><span class="n">built_pipeline</span><span class="p">):</span>
-        <span class="c1"># For pyfunc supported models, if a signature is not supplied, infer the signature</span>
-        <span class="c1"># from the input_example if provided, otherwise, apply a generic signature.</span>
         <span class="k">if</span> <span class="n">mlflow_model</span><span class="o">.</span><span class="n">signature</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">mlflow_model</span><span class="o">.</span><span class="n">signature</span> <span class="o">=</span> <span class="n">_get_default_pipeline_signature</span><span class="p">(</span>
+            <span class="n">mlflow_model</span><span class="o">.</span><span class="n">signature</span> <span class="o">=</span> <span class="n">infer_or_get_default_signature</span><span class="p">(</span>
                 <span class="n">pipeline</span><span class="o">=</span><span class="n">built_pipeline</span><span class="p">,</span>
                 <span class="n">example</span><span class="o">=</span><span class="n">input_example</span><span class="p">,</span>
                 <span class="n">model_config</span><span class="o">=</span><span class="n">model_config</span> <span class="ow">or</span> <span class="n">inference_config</span><span class="p">,</span>
@@ -830,7 +841,10 @@
     <span class="k">if</span> <span class="n">conda_env</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">pip_requirements</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">default_reqs</span> <span class="o">=</span> <span class="n">get_default_pip_requirements</span><span class="p">(</span><span class="n">transformers_model</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
-            <span class="n">inferred_reqs</span> <span class="o">=</span> <span class="n">infer_pip_requirements</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="n">FLAVOR_NAME</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="n">default_reqs</span><span class="p">)</span>
+            <span class="c1"># Infer the pip requirements with a timeout to avoid hanging indefinitely at prediction</span>
+            <span class="n">inferred_reqs</span> <span class="o">=</span> <span class="n">infer_pip_requirements_with_timeout</span><span class="p">(</span>
+                <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="n">FLAVOR_NAME</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="n">default_reqs</span>
+            <span class="p">)</span>
             <span class="n">default_reqs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">inferred_reqs</span><span class="p">)</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">default_reqs</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">default_reqs</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1762,149 +1776,6 @@
     <span class="k">return</span> <span class="kc">True</span>
 
 
-<span class="k">def</span> <span class="nf">_format_input_example_for_special_cases</span><span class="p">(</span><span class="n">input_example</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Handles special formatting for specific types of Pipelines so that the displayed example</span>
-<span class="sd">    reflects the correct example input structure that mirrors the behavior of the input parsing</span>
-<span class="sd">    for pyfunc.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">transformers</span>
-
-    <span class="n">input_data</span> <span class="o">=</span> <span class="n">input_example</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_example</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="k">else</span> <span class="n">input_example</span>
-
-    <span class="k">if</span> <span class="p">(</span>
-        <span class="nb">isinstance</span><span class="p">(</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">transformers</span><span class="o">.</span><span class="n">ZeroShotClassificationPipeline</span><span class="p">)</span>
-        <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
-        <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_data</span><span class="p">[</span><span class="s2">&quot;candidate_labels&quot;</span><span class="p">],</span> <span class="nb">list</span><span class="p">)</span>
-    <span class="p">):</span>
-        <span class="n">input_data</span><span class="p">[</span><span class="s2">&quot;candidate_labels&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">input_data</span><span class="p">[</span><span class="s2">&quot;candidate_labels&quot;</span><span class="p">])</span>
-    <span class="k">return</span> <span class="n">input_data</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_example</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="k">else</span> <span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="n">input_example</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-
-
-<span class="k">def</span> <span class="nf">_get_default_pipeline_signature</span><span class="p">(</span>
-    <span class="n">pipeline</span><span class="p">,</span> <span class="n">example</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flavor_config</span><span class="o">=</span><span class="kc">None</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ModelSignature</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Assigns a default ModelSignature for a given Pipeline type that has pyfunc support. These</span>
-<span class="sd">    default signatures should only be generated and assigned when saving a model iff the user</span>
-<span class="sd">    has not supplied a signature.</span>
-<span class="sd">    For signature inference in some Pipelines that support complex input types, an input example</span>
-<span class="sd">    is needed.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="kn">import</span> <span class="nn">transformers</span>
-
-    <span class="k">if</span> <span class="n">example</span><span class="p">:</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">params</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="k">if</span> <span class="n">_contains_params</span><span class="p">(</span><span class="n">example</span><span class="p">):</span>
-                <span class="n">example</span><span class="p">,</span> <span class="n">params</span> <span class="o">=</span> <span class="n">example</span>
-            <span class="n">example</span> <span class="o">=</span> <span class="n">_format_input_example_for_special_cases</span><span class="p">(</span><span class="n">example</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">)</span>
-            <span class="n">prediction</span> <span class="o">=</span> <span class="n">generate_signature_output</span><span class="p">(</span>
-                <span class="n">pipeline</span><span class="o">=</span><span class="n">pipeline</span><span class="p">,</span>
-                <span class="n">data</span><span class="o">=</span><span class="n">example</span><span class="p">,</span>
-                <span class="n">model_config</span><span class="o">=</span><span class="n">model_config</span><span class="p">,</span>
-                <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
-                <span class="n">flavor_config</span><span class="o">=</span><span class="n">flavor_config</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="k">return</span> <span class="n">infer_signature</span><span class="p">(</span><span class="n">example</span><span class="p">,</span> <span class="n">prediction</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="s2">&quot;Attempted to generate a signature for the saved model or pipeline &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;but encountered an error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span>
-            <span class="k">raise</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span>
-            <span class="n">pipeline</span><span class="p">,</span>
-            <span class="p">(</span>
-                <span class="n">transformers</span><span class="o">.</span><span class="n">TokenClassificationPipeline</span><span class="p">,</span>
-                <span class="n">transformers</span><span class="o">.</span><span class="n">ConversationalPipeline</span><span class="p">,</span>
-                <span class="n">transformers</span><span class="o">.</span><span class="n">TranslationPipeline</span><span class="p">,</span>
-                <span class="n">transformers</span><span class="o">.</span><span class="n">FillMaskPipeline</span><span class="p">,</span>
-                <span class="n">transformers</span><span class="o">.</span><span class="n">TextGenerationPipeline</span><span class="p">,</span>
-                <span class="n">transformers</span><span class="o">.</span><span class="n">Text2TextGenerationPipeline</span><span class="p">,</span>
-            <span class="p">),</span>
-        <span class="p">):</span>
-            <span class="k">return</span> <span class="n">ModelSignature</span><span class="p">(</span>
-                <span class="n">inputs</span><span class="o">=</span><span class="n">Schema</span><span class="p">([</span><span class="n">ColSpec</span><span class="p">(</span><span class="s2">&quot;string&quot;</span><span class="p">)]),</span> <span class="n">outputs</span><span class="o">=</span><span class="n">Schema</span><span class="p">([</span><span class="n">ColSpec</span><span class="p">(</span><span class="s2">&quot;string&quot;</span><span class="p">)])</span>
-            <span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span>
-            <span class="n">pipeline</span><span class="p">,</span>
-            <span class="p">(</span>
-                <span class="n">transformers</span><span class="o">.</span><span class="n">TextClassificationPipeline</span><span class="p">,</span>
-                <span class="n">transformers</span><span class="o">.</span><span class="n">ImageClassificationPipeline</span><span class="p">,</span>
-            <span class="p">),</span>
-        <span class="p">):</span>
-            <span class="k">return</span> <span class="n">ModelSignature</span><span class="p">(</span>
-                <span class="n">inputs</span><span class="o">=</span><span class="n">Schema</span><span class="p">([</span><span class="n">ColSpec</span><span class="p">(</span><span class="s2">&quot;string&quot;</span><span class="p">)]),</span>
-                <span class="n">outputs</span><span class="o">=</span><span class="n">Schema</span><span class="p">([</span><span class="n">ColSpec</span><span class="p">(</span><span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;label&quot;</span><span class="p">),</span> <span class="n">ColSpec</span><span class="p">(</span><span class="s2">&quot;double&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;score&quot;</span><span class="p">)]),</span>
-            <span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">transformers</span><span class="o">.</span><span class="n">ZeroShotClassificationPipeline</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">ModelSignature</span><span class="p">(</span>
-                <span class="n">inputs</span><span class="o">=</span><span class="n">Schema</span><span class="p">(</span>
-                    <span class="p">[</span>
-                        <span class="n">ColSpec</span><span class="p">(</span><span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;sequences&quot;</span><span class="p">),</span>
-                        <span class="n">ColSpec</span><span class="p">(</span><span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;candidate_labels&quot;</span><span class="p">),</span>
-                        <span class="n">ColSpec</span><span class="p">(</span><span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;hypothesis_template&quot;</span><span class="p">),</span>
-                    <span class="p">]</span>
-                <span class="p">),</span>
-                <span class="n">outputs</span><span class="o">=</span><span class="n">Schema</span><span class="p">(</span>
-                    <span class="p">[</span>
-                        <span class="n">ColSpec</span><span class="p">(</span><span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;sequence&quot;</span><span class="p">),</span>
-                        <span class="n">ColSpec</span><span class="p">(</span><span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;labels&quot;</span><span class="p">),</span>
-                        <span class="n">ColSpec</span><span class="p">(</span><span class="s2">&quot;double&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;scores&quot;</span><span class="p">),</span>
-                    <span class="p">]</span>
-                <span class="p">),</span>
-            <span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">transformers</span><span class="o">.</span><span class="n">AutomaticSpeechRecognitionPipeline</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">ModelSignature</span><span class="p">(</span>
-                <span class="n">inputs</span><span class="o">=</span><span class="n">Schema</span><span class="p">([</span><span class="n">ColSpec</span><span class="p">(</span><span class="s2">&quot;binary&quot;</span><span class="p">)]),</span>
-                <span class="n">outputs</span><span class="o">=</span><span class="n">Schema</span><span class="p">([</span><span class="n">ColSpec</span><span class="p">(</span><span class="s2">&quot;string&quot;</span><span class="p">)]),</span>
-            <span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">transformers</span><span class="o">.</span><span class="n">AudioClassificationPipeline</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">ModelSignature</span><span class="p">(</span>
-                <span class="n">inputs</span><span class="o">=</span><span class="n">Schema</span><span class="p">([</span><span class="n">ColSpec</span><span class="p">(</span><span class="s2">&quot;binary&quot;</span><span class="p">)]),</span>
-                <span class="n">outputs</span><span class="o">=</span><span class="n">Schema</span><span class="p">([</span><span class="n">ColSpec</span><span class="p">(</span><span class="s2">&quot;double&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;score&quot;</span><span class="p">),</span> <span class="n">ColSpec</span><span class="p">(</span><span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;label&quot;</span><span class="p">)]),</span>
-            <span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span>
-            <span class="n">pipeline</span><span class="p">,</span>
-            <span class="p">(</span>
-                <span class="n">transformers</span><span class="o">.</span><span class="n">TableQuestionAnsweringPipeline</span><span class="p">,</span>
-                <span class="n">transformers</span><span class="o">.</span><span class="n">QuestionAnsweringPipeline</span><span class="p">,</span>
-            <span class="p">),</span>
-        <span class="p">):</span>
-            <span class="n">column_1</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="n">column_2</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">transformers</span><span class="o">.</span><span class="n">TableQuestionAnsweringPipeline</span><span class="p">):</span>
-                <span class="n">column_1</span> <span class="o">=</span> <span class="s2">&quot;query&quot;</span>
-                <span class="n">column_2</span> <span class="o">=</span> <span class="s2">&quot;table&quot;</span>
-            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">transformers</span><span class="o">.</span><span class="n">QuestionAnsweringPipeline</span><span class="p">):</span>
-                <span class="n">column_1</span> <span class="o">=</span> <span class="s2">&quot;question&quot;</span>
-                <span class="n">column_2</span> <span class="o">=</span> <span class="s2">&quot;context&quot;</span>
-            <span class="k">return</span> <span class="n">ModelSignature</span><span class="p">(</span>
-                <span class="n">inputs</span><span class="o">=</span><span class="n">Schema</span><span class="p">(</span>
-                    <span class="p">[</span>
-                        <span class="n">ColSpec</span><span class="p">(</span><span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">column_1</span><span class="p">),</span>
-                        <span class="n">ColSpec</span><span class="p">(</span><span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">column_2</span><span class="p">),</span>
-                    <span class="p">]</span>
-                <span class="p">),</span>
-                <span class="n">outputs</span><span class="o">=</span><span class="n">Schema</span><span class="p">([</span><span class="n">ColSpec</span><span class="p">(</span><span class="s2">&quot;string&quot;</span><span class="p">)]),</span>
-            <span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">transformers</span><span class="o">.</span><span class="n">FeatureExtractionPipeline</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">ModelSignature</span><span class="p">(</span>
-                <span class="n">inputs</span><span class="o">=</span><span class="n">Schema</span><span class="p">([</span><span class="n">ColSpec</span><span class="p">(</span><span class="s2">&quot;string&quot;</span><span class="p">)]),</span>
-                <span class="n">outputs</span><span class="o">=</span><span class="n">Schema</span><span class="p">([</span><span class="n">TensorSpec</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;float64&quot;</span><span class="p">),</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;double&quot;</span><span class="p">)]),</span>
-            <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="s2">&quot;An unsupported Pipeline type was supplied for signature inference. &quot;</span>
-                <span class="s2">&quot;Either provide an `input_example` or generate a signature manually &quot;</span>
-                <span class="s2">&quot;via `infer_signature` if you would like to have a signature recorded &quot;</span>
-                <span class="s2">&quot;in the MLmodel file.&quot;</span>
-            <span class="p">)</span>
-
-
 <span class="k">class</span> <span class="nc">_TransformersModel</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Type validator class for models that are submitted as a dictionary for saving and logging.</span>
@@ -2069,12 +1940,7 @@
             <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="n">pyfunc_model</span> <span class="o">=</span> <span class="n">_TransformersWrapper</span><span class="p">(</span>
-        <span class="n">pipeline</span><span class="o">=</span><span class="n">pipeline</span><span class="p">,</span>
-        <span class="n">flavor_config</span><span class="o">=</span><span class="n">flavor_config</span><span class="p">,</span>
-        <span class="n">model_config</span><span class="o">=</span><span class="n">model_config</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="k">return</span> <span class="n">pyfunc_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">_generate_signature_output</span><span class="p">(</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">model_config</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span></div>
 
 
 <span class="k">class</span> <span class="nc">_TransformersWrapper</span><span class="p">:</span>
@@ -3400,7 +3266,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../',
-      VERSION:'2.10.1.dev0',
+      VERSION:'2.10.3.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

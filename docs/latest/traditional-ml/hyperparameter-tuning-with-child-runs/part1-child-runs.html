@@ -2,6 +2,7 @@
   
 
 <!DOCTYPE html>
+<!-- source: docs/source/traditional-ml/hyperparameter-tuning-with-child-runs/part1-child-runs.rst -->
 <!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
@@ -9,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Understanding Parent and Child Runs in MLflow &mdash; MLflow 2.10.1.dev0 documentation</title>
+  <title>Understanding Parent and Child Runs in MLflow &mdash; MLflow 2.10.3.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -55,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="MLflow 2.10.1.dev0 documentation" href="../../index.html"/>
+    <link rel="top" title="MLflow 2.10.3.dev0 documentation" href="../../index.html"/>
         <link rel="up" title="Hyperparameter Tuning with MLflow and Optuna" href="index.html"/>
         <link rel="next" title="Leveraging Visualizations and MLflow for In-depth Model Analysis" href="/part2-logging-plots.html"/>
         <link rel="prev" title="Logging Visualizations with MLflow" href="/notebooks/logging-plots-in-mlflow.html"/> 
@@ -87,7 +88,7 @@
     <a href="../../index.html" class="wy-nav-top-logo"
       ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.10.1.dev0</span>
+    <span class="version">2.10.3.dev0</span>
   </li>
 </ul>
   </nav>
@@ -355,11 +356,12 @@ relatively performance amongst our iterative trials.</p>
 </div>
 <p>After executing this, we can navigate to the MLflow UI to see the results of the iterations and compare each run’s
 error metrics to the parameters that were selected.</p>
-<div class="figure align-center" id="id3">
-<a class="reference internal image-reference" href="../../_images/no-child-first.gif"><img alt="Hyperparameter tuning no child runs" src="../../_images/no-child-first.gif" style="width: 1024px;" /></a>
-<p class="caption"><span class="caption-text">Initial Hyperparameter tuning execution</span><a class="headerlink" href="#id3" title="Permalink to this image"> </a></p>
-</div>
-<p>What happens when we need to run this again with some slight modifications?</p>
+<div>
+    <video controls autoplay muted loop style="width: 100%; height: auto; margin-top: 10px; margin-bottom: 10px;">
+        <source src="../../_static/images/guides/introductory/hyperparameter-tuning-with-child-runs/no-child-first.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+</div><p>What happens when we need to run this again with some slight modifications?</p>
 <p>Our code might change in-place with the values being tested:</p>
 <div class="code-section docutils container">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">log_run</span><span class="p">(</span><span class="n">run_name</span><span class="p">,</span> <span class="n">test_no</span><span class="p">):</span>
@@ -380,11 +382,12 @@ original hyperparameter test.</p>
 <li><p>Change the underlying model architecture (test 1 is a Random Forest model, while test 2 is a Gradient Boosted Trees model)</p></li>
 </ul>
 <p>Let’s take a look at the UI and see if it is clear which iteration a particular run is a member of.</p>
-<div class="figure align-center" id="id4">
-<a class="reference internal image-reference" href="../../_images/no-child-more.gif"><img alt="Adding more runs" src="../../_images/no-child-more.gif" style="width: 1024px;" /></a>
-<p class="caption"><span class="caption-text">Challenges with iterative tuning without child run encapsulation</span><a class="headerlink" href="#id4" title="Permalink to this image"> </a></p>
-</div>
-<p>It’s not too hard to imagine how complicated this can become if there are thousands of runs in this experiment.</p>
+<div>
+    <video controls autoplay muted loop style="width: 100%; height: auto; margin-top: 10px; margin-bottom: 10px;">
+        <source src="../../_static/images/guides/introductory/hyperparameter-tuning-with-child-runs/no-child-more.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+</div><p>It’s not too hard to imagine how complicated this can become if there are thousands of runs in this experiment.</p>
 <p>There is a solution for this, though. We can setup the exact same testing scenario with few small modifications to make it easy to find
 related runs, declutter the UI, and greatly simplify the overall process of evaluating hyperparameter ranges and parameter inclusions
 during the process of tuning. Only a few modification are needed:</p>
@@ -494,11 +497,12 @@ with different conditions of hyperparameter selection criteria.</p>
 </div>
 </div>
 <p>Once we execute these three tuning run tests, we can view the results in the UI:</p>
-<div class="figure align-center" id="id5">
-<a class="reference internal image-reference" href="../../_images/child-runs.gif"><img alt="Using child runs" src="../../_images/child-runs.gif" style="width: 860px;" /></a>
-<p class="caption"><span class="caption-text">Encapsulating tests with child runs</span><a class="headerlink" href="#id5" title="Permalink to this image"> </a></p>
-</div>
-<p>In the above video, you can see that we purposefully avoided including the parent run in the run comparison.
+<div>
+    <video controls autoplay muted loop style="width: 100%; height: auto; margin-top: 10px; margin-bottom: 10px;">
+        <source src="../../_static/images/guides/introductory/hyperparameter-tuning-with-child-runs/child-runs.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+</div><p>In the above video, you can see that we purposefully avoided including the parent run in the run comparison.
 This is due to the fact that no metrics or parameters were actually written to these parent runs; rather, they
 were used purely for organizational purposes to limit the volume of runs visible within the UI.</p>
 <p>In practice, it is best to store the best conditions found with a hyperparamter execution of child runs within
@@ -516,11 +520,12 @@ recommended to develop your own implementation that fulfills the following requi
 <li><p>Add the ability to specify an iteration count to the number of children created from the calling entry point.</p></li>
 </ul>
 <p>The results in the UI for this challenge are shown below.</p>
-<div class="figure align-center" id="id6">
-<a class="reference internal image-reference" href="../../_images/parent-child-challenge.gif"><img alt="Challenge" src="../../_images/parent-child-challenge.gif" style="width: 860px;" /></a>
-<p class="caption"><span class="caption-text">Adding best child run data to parent run</span><a class="headerlink" href="#id6" title="Permalink to this image"> </a></p>
-</div>
-</div>
+<div>
+    <video controls autoplay muted loop style="width: 100%; height: auto; margin-top: 10px; margin-bottom: 10px;">
+        <source src="../../_static/images/guides/introductory/hyperparameter-tuning-with-child-runs/parent-child-challenge.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+</div></div>
 <div class="section" id="conclusion">
 <h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline"> </a></h2>
 <p>The usage of parent and child runs associations can greatly simplify iterative model development.
@@ -568,7 +573,7 @@ exactly what you intend to compare, all with minimal effort.</p>
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../',
-      VERSION:'2.10.1.dev0',
+      VERSION:'2.10.3.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

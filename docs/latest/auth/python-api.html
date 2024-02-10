@@ -2,6 +2,7 @@
   
 
 <!DOCTYPE html>
+<!-- source: docs/source/auth/python-api.rst -->
 <!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
@@ -9,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>MLflow Authentication Python API &mdash; MLflow 2.10.1.dev0 documentation</title>
+  <title>MLflow Authentication Python API &mdash; MLflow 2.10.3.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -55,7 +56,7 @@
         <link rel="index" title="Index"
               href="../genindex.html"/>
         <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="MLflow 2.10.1.dev0 documentation" href="../index.html"/>
+    <link rel="top" title="MLflow 2.10.3.dev0 documentation" href="../index.html"/>
         <link rel="up" title="MLflow Authentication" href="index.html"/>
         <link rel="next" title="MLflow Authentication REST API" href="/rest-api.html"/>
         <link rel="prev" title="MLflow Authentication" href="/index.html"/> 
@@ -87,7 +88,7 @@
     <a href="../index.html" class="wy-nav-top-logo"
       ><img src="../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.10.1.dev0</span>
+    <span class="version">2.10.3.dev0</span>
   </li>
 </ul>
   </nav>
@@ -234,16 +235,17 @@ See <a class="reference external" href="https://mlflow.org/docs/latest/auth.html
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>experiment_id</strong> – The id of the experiment.</p></li>
 <li><p><strong>username</strong> – The username.</p></li>
-<li><p><strong>permission</strong> – Permission to grant.
-Must be one of “READ”, “EDIT”, “MANAGE” and “NO_PERMISSIONS”.</p></li>
+<li><p><strong>permission</strong> – Permission to grant. Must be one of “READ”, “EDIT”, “MANAGE” and
+“NO_PERMISSIONS”.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A single <a class="reference internal" href="#mlflow.server.auth.entities.ExperimentPermission" title="mlflow.server.auth.entities.ExperimentPermission"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.server.auth.entities.ExperimentPermission</span></code></a> object.
-Raises <code class="docutils literal notranslate"><span class="pre">RestException</span></code> if the user does not exist,
-or a permission already exists for this experiment user pair,
-or if the permission is invalid.
-Does not require <code class="docutils literal notranslate"><span class="pre">experiment_id</span></code> to be an existing experiment.</p>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="../python_api/exceptions/mlflow.exceptions.html#mlflow.exceptions.RestException" title="mlflow.exceptions.RestException"><strong>mlflow.exceptions.RestException</strong></a> – if the user does not exist, or a permission already
+    exists for this experiment user pair, or if the permission is invalid. Does not
+    require <code class="docutils literal notranslate"><span class="pre">experiment_id</span></code> to be an existing experiment.</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A single <a class="reference internal" href="#mlflow.server.auth.entities.ExperimentPermission" title="mlflow.server.auth.entities.ExperimentPermission"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.server.auth.entities.ExperimentPermission</span></code></a> object.</p>
 </dd>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id1">
@@ -258,6 +260,7 @@ Does not require <code class="docutils literal notranslate"><span class="pre">ex
 <span class="n">client</span> <span class="o">=</span> <span class="n">AuthServiceClient</span><span class="p">(</span><span class="s2">&quot;tracking_uri&quot;</span><span class="p">)</span>
 <span class="n">client</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span><span class="s2">&quot;newuser&quot;</span><span class="p">,</span> <span class="s2">&quot;newpassword&quot;</span><span class="p">)</span>
 <span class="n">ep</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">create_experiment_permission</span><span class="p">(</span><span class="s2">&quot;myexperiment&quot;</span><span class="p">,</span> <span class="s2">&quot;newuser&quot;</span><span class="p">,</span> <span class="s2">&quot;READ&quot;</span><span class="p">)</span>
+
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;experiment_id: </span><span class="si">{</span><span class="n">ep</span><span class="o">.</span><span class="n">experiment_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;user_id: </span><span class="si">{</span><span class="n">ep</span><span class="o">.</span><span class="n">user_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;permission: </span><span class="si">{</span><span class="n">ep</span><span class="o">.</span><span class="n">permission</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -282,43 +285,20 @@ permission: READ
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – The name of the registered model.</p></li>
 <li><p><strong>username</strong> – The username.</p></li>
-<li><p><strong>permission</strong> – Permission to grant.
-Must be one of “READ”, “EDIT”, “MANAGE” and “NO_PERMISSIONS”.</p></li>
+<li><p><strong>permission</strong> – Permission to grant. Must be one of “READ”, “EDIT”, “MANAGE” and
+“NO_PERMISSIONS”.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A single <a class="reference internal" href="#mlflow.server.auth.entities.RegisteredModelPermission" title="mlflow.server.auth.entities.RegisteredModelPermission"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.server.auth.entities.RegisteredModelPermission</span></code></a> object.
-Raises <code class="docutils literal notranslate"><span class="pre">RestException</span></code> if the user does not exist,
-or a permission already exists for this registered model user pair,
-or if the permission is invalid.
-Does not require <code class="docutils literal notranslate"><span class="pre">name</span></code> to be an existing registered model.</p>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="../python_api/exceptions/mlflow.exceptions.html#mlflow.exceptions.RestException" title="mlflow.exceptions.RestException"><strong>mlflow.exceptions.RestException</strong></a> – if the user does not exist,
+    or a permission already exists for this registered model user pair,
+    or if the permission is invalid.
+    Does not require <code class="docutils literal notranslate"><span class="pre">name</span></code> to be an existing registered model.</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A single <a class="reference internal" href="#mlflow.server.auth.entities.RegisteredModelPermission" title="mlflow.server.auth.entities.RegisteredModelPermission"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.server.auth.entities.RegisteredModelPermission</span></code></a> object.</p>
 </dd>
 </dl>
-<div class="literal-block-wrapper docutils container" id="id3">
-<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id3" title="Permalink to this code"> </a></div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">MLFLOW_TRACKING_USERNAME</span><span class="o">=</span>admin
-<span class="nb">export</span><span class="w"> </span><span class="nv">MLFLOW_TRACKING_PASSWORD</span><span class="o">=</span>password
-</pre></div>
-</div>
-</div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.server.auth.client</span> <span class="kn">import</span> <span class="n">AuthServiceClient</span>
-
-<span class="n">client</span> <span class="o">=</span> <span class="n">AuthServiceClient</span><span class="p">(</span><span class="s2">&quot;tracking_uri&quot;</span><span class="p">)</span>
-<span class="n">client</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span><span class="s2">&quot;newuser&quot;</span><span class="p">,</span> <span class="s2">&quot;newpassword&quot;</span><span class="p">)</span>
-<span class="n">rmp</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">create_registered_model_permission</span><span class="p">(</span><span class="s2">&quot;myregisteredmodel&quot;</span><span class="p">,</span> <span class="s2">&quot;newuser&quot;</span><span class="p">,</span> <span class="s2">&quot;READ&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;name: </span><span class="si">{</span><span class="n">rmp</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;user_id: </span><span class="si">{</span><span class="n">rmp</span><span class="o">.</span><span class="n">user_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;permission: </span><span class="si">{</span><span class="n">rmp</span><span class="o">.</span><span class="n">permission</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="literal-block-wrapper docutils container" id="id4">
-<div class="code-block-caption"><span class="caption-text">Output</span><a class="headerlink" href="#id4" title="Permalink to this code"> </a></div>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>name: myregisteredmodel
-user_id: 3
-permission: READ
-</pre></div>
-</div>
-</div>
 </dd></dl>
 
 <dl class="py method">
@@ -332,13 +312,15 @@ permission: READ
 <li><p><strong>password</strong> – The user’s password. Must not be empty string.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A single <a class="reference internal" href="#mlflow.server.auth.entities.User" title="mlflow.server.auth.entities.User"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.server.auth.entities.User</span></code></a> object.
-Raises <code class="docutils literal notranslate"><span class="pre">RestException</span></code> if the username is already taken.</p>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="../python_api/exceptions/mlflow.exceptions.html#mlflow.exceptions.RestException" title="mlflow.exceptions.RestException"><strong>mlflow.exceptions.RestException</strong></a> – if the username is already taken.</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A single <a class="reference internal" href="#mlflow.server.auth.entities.User" title="mlflow.server.auth.entities.User"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.server.auth.entities.User</span></code></a> object.</p>
 </dd>
 </dl>
-<div class="literal-block-wrapper docutils container" id="id5">
-<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id5" title="Permalink to this code"> </a></div>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id3" title="Permalink to this code"> </a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.server.auth.client</span> <span class="kn">import</span> <span class="n">AuthServiceClient</span>
 
 <span class="n">client</span> <span class="o">=</span> <span class="n">AuthServiceClient</span><span class="p">(</span><span class="s2">&quot;tracking_uri&quot;</span><span class="p">)</span>
@@ -350,8 +332,8 @@ Raises <code class="docutils literal notranslate"><span class="pre">RestExceptio
 </pre></div>
 </div>
 </div>
-<div class="literal-block-wrapper docutils container" id="id6">
-<div class="code-block-caption"><span class="caption-text">Output</span><a class="headerlink" href="#id6" title="Permalink to this code"> </a></div>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">Output</span><a class="headerlink" href="#id4" title="Permalink to this code"> </a></div>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>user_id: 3
 username: newuser
 password_hash: REDACTED
@@ -372,16 +354,15 @@ is_admin: False
 <li><p><strong>username</strong> – The username.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>None. Raises <code class="docutils literal notranslate"><span class="pre">RestException</span></code> if the user does not exist,
-or no permission exists for this experiment user pair,
-or if the permission is invalid.
-Note that the default permission will still be effective even
-after the permission has been deleted.</p>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="../python_api/exceptions/mlflow.exceptions.html#mlflow.exceptions.RestException" title="mlflow.exceptions.RestException"><strong>mlflow.exceptions.RestException</strong></a> – if the user does not exist, or no permission exists for
+    this experiment user pair, or if the permission is invalid.
+    Note that the default permission will still be effective even
+    after the permission has been deleted.</p>
 </dd>
 </dl>
-<div class="literal-block-wrapper docutils container" id="id7">
-<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id7" title="Permalink to this code"> </a></div>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id5" title="Permalink to this code"> </a></div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">MLFLOW_TRACKING_USERNAME</span><span class="o">=</span>admin
 <span class="nb">export</span><span class="w"> </span><span class="nv">MLFLOW_TRACKING_PASSWORD</span><span class="o">=</span>password
 </pre></div>
@@ -408,16 +389,16 @@ after the permission has been deleted.</p>
 <li><p><strong>username</strong> – The username.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>None. Raises <code class="docutils literal notranslate"><span class="pre">RestException</span></code> if the user does not exist,
-or no permission exists for this registered model user pair,
-or if the permission is invalid.
-Note that the default permission will still be effective even
-after the permission has been deleted.</p>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="../python_api/exceptions/mlflow.exceptions.html#mlflow.exceptions.RestException" title="mlflow.exceptions.RestException"><strong>mlflow.exceptions.RestException</strong></a> – if the user does not exist,
+    or no permission exists for this registered model user pair,
+    or if the permission is invalid.
+    Note that the default permission will still be effective even
+    after the permission has been deleted.</p>
 </dd>
 </dl>
-<div class="literal-block-wrapper docutils container" id="id8">
-<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id8" title="Permalink to this code"> </a></div>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id6" title="Permalink to this code"> </a></div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">MLFLOW_TRACKING_USERNAME</span><span class="o">=</span>admin
 <span class="nb">export</span><span class="w"> </span><span class="nv">MLFLOW_TRACKING_PASSWORD</span><span class="o">=</span>password
 </pre></div>
@@ -441,12 +422,12 @@ after the permission has been deleted.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>username</strong> – The username.</p>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>None. Raises <code class="docutils literal notranslate"><span class="pre">RestException</span></code> if the user does not exist.</p>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="../python_api/exceptions/mlflow.exceptions.html#mlflow.exceptions.RestException" title="mlflow.exceptions.RestException"><strong>mlflow.exceptions.RestException</strong></a> – if the user does not exist</p>
 </dd>
 </dl>
-<div class="literal-block-wrapper docutils container" id="id9">
-<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id9" title="Permalink to this code"> </a></div>
+<div class="literal-block-wrapper docutils container" id="id7">
+<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id7" title="Permalink to this code"> </a></div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">MLFLOW_TRACKING_USERNAME</span><span class="o">=</span>admin
 <span class="nb">export</span><span class="w"> </span><span class="nv">MLFLOW_TRACKING_PASSWORD</span><span class="o">=</span>password
 </pre></div>
@@ -473,16 +454,18 @@ after the permission has been deleted.</p>
 <li><p><strong>username</strong> – The username.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A single <a class="reference internal" href="#mlflow.server.auth.entities.ExperimentPermission" title="mlflow.server.auth.entities.ExperimentPermission"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.server.auth.entities.ExperimentPermission</span></code></a> object.
-Raises <code class="docutils literal notranslate"><span class="pre">RestException</span></code> if the user does not exist,
-or no permission exists for this experiment user pair.
-Note that the default permission will still be effective even if
-no permission exists.</p>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="../python_api/exceptions/mlflow.exceptions.html#mlflow.exceptions.RestException" title="mlflow.exceptions.RestException"><strong>mlflow.exceptions.RestException</strong></a> – if the user does not exist,
+    or no permission exists for this experiment user pair.
+    Note that the default permission will still be effective even if
+    no permission exists.</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A single <a class="reference internal" href="#mlflow.server.auth.entities.ExperimentPermission" title="mlflow.server.auth.entities.ExperimentPermission"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.server.auth.entities.ExperimentPermission</span></code></a> object.</p>
 </dd>
 </dl>
-<div class="literal-block-wrapper docutils container" id="id10">
-<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id10" title="Permalink to this code"> </a></div>
+<div class="literal-block-wrapper docutils container" id="id8">
+<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id8" title="Permalink to this code"> </a></div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">MLFLOW_TRACKING_USERNAME</span><span class="o">=</span>admin
 <span class="nb">export</span><span class="w"> </span><span class="nv">MLFLOW_TRACKING_PASSWORD</span><span class="o">=</span>password
 </pre></div>
@@ -499,8 +482,8 @@ no permission exists.</p>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;permission: </span><span class="si">{</span><span class="n">ep</span><span class="o">.</span><span class="n">permission</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="literal-block-wrapper docutils container" id="id11">
-<div class="code-block-caption"><span class="caption-text">Output</span><a class="headerlink" href="#id11" title="Permalink to this code"> </a></div>
+<div class="literal-block-wrapper docutils container" id="id9">
+<div class="code-block-caption"><span class="caption-text">Output</span><a class="headerlink" href="#id9" title="Permalink to this code"> </a></div>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>experiment_id: myexperiment
 user_id: 3
 permission: READ
@@ -520,16 +503,17 @@ permission: READ
 <li><p><strong>username</strong> – The username.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A single <a class="reference internal" href="#mlflow.server.auth.entities.RegisteredModelPermission" title="mlflow.server.auth.entities.RegisteredModelPermission"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.server.auth.entities.RegisteredModelPermission</span></code></a> object.
-Raises <code class="docutils literal notranslate"><span class="pre">RestException</span></code> if the user does not exist,
-or no permission exists for this registered model user pair.
-Note that the default permission will still be effective even if
-no permission exists.</p>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="../python_api/exceptions/mlflow.exceptions.html#mlflow.exceptions.RestException" title="mlflow.exceptions.RestException"><strong>mlflow.exceptions.RestException</strong></a> – if the user does not
+    exist, or no permission exists for this registered model user pair. Note that the
+    default permission will still be effective even if no permission exists.</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A single <a class="reference internal" href="#mlflow.server.auth.entities.RegisteredModelPermission" title="mlflow.server.auth.entities.RegisteredModelPermission"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.server.auth.entities.RegisteredModelPermission</span></code></a> object.</p>
 </dd>
 </dl>
-<div class="literal-block-wrapper docutils container" id="id12">
-<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id12" title="Permalink to this code"> </a></div>
+<div class="literal-block-wrapper docutils container" id="id10">
+<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id10" title="Permalink to this code"> </a></div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">MLFLOW_TRACKING_USERNAME</span><span class="o">=</span>admin
 <span class="nb">export</span><span class="w"> </span><span class="nv">MLFLOW_TRACKING_PASSWORD</span><span class="o">=</span>password
 </pre></div>
@@ -541,13 +525,14 @@ no permission exists.</p>
 <span class="n">client</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span><span class="s2">&quot;newuser&quot;</span><span class="p">,</span> <span class="s2">&quot;newpassword&quot;</span><span class="p">)</span>
 <span class="n">client</span><span class="o">.</span><span class="n">create_registered_model_permission</span><span class="p">(</span><span class="s2">&quot;myregisteredmodel&quot;</span><span class="p">,</span> <span class="s2">&quot;newuser&quot;</span><span class="p">,</span> <span class="s2">&quot;READ&quot;</span><span class="p">)</span>
 <span class="n">rmp</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_registered_model_permission</span><span class="p">(</span><span class="s2">&quot;myregisteredmodel&quot;</span><span class="p">,</span> <span class="s2">&quot;newuser&quot;</span><span class="p">)</span>
+
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;name: </span><span class="si">{</span><span class="n">rmp</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;user_id: </span><span class="si">{</span><span class="n">rmp</span><span class="o">.</span><span class="n">user_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;permission: </span><span class="si">{</span><span class="n">rmp</span><span class="o">.</span><span class="n">permission</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="literal-block-wrapper docutils container" id="id13">
-<div class="code-block-caption"><span class="caption-text">Output</span><a class="headerlink" href="#id13" title="Permalink to this code"> </a></div>
+<div class="literal-block-wrapper docutils container" id="id11">
+<div class="code-block-caption"><span class="caption-text">Output</span><a class="headerlink" href="#id11" title="Permalink to this code"> </a></div>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>name: myregisteredmodel
 user_id: 3
 permission: READ
@@ -564,13 +549,15 @@ permission: READ
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>username</strong> – The username.</p>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A single <a class="reference internal" href="#mlflow.server.auth.entities.User" title="mlflow.server.auth.entities.User"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.server.auth.entities.User</span></code></a> object.
-Raises <code class="docutils literal notranslate"><span class="pre">RestException</span></code> if the user does not exist.</p>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="../python_api/exceptions/mlflow.exceptions.html#mlflow.exceptions.RestException" title="mlflow.exceptions.RestException"><strong>mlflow.exceptions.RestException</strong></a> – if the user does not exist</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A single <a class="reference internal" href="#mlflow.server.auth.entities.User" title="mlflow.server.auth.entities.User"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.server.auth.entities.User</span></code></a> object.</p>
 </dd>
 </dl>
-<div class="literal-block-wrapper docutils container" id="id14">
-<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id14" title="Permalink to this code"> </a></div>
+<div class="literal-block-wrapper docutils container" id="id12">
+<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id12" title="Permalink to this code"> </a></div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">MLFLOW_TRACKING_USERNAME</span><span class="o">=</span>admin
 <span class="nb">export</span><span class="w"> </span><span class="nv">MLFLOW_TRACKING_PASSWORD</span><span class="o">=</span>password
 </pre></div>
@@ -580,16 +567,16 @@ Raises <code class="docutils literal notranslate"><span class="pre">RestExceptio
 
 <span class="n">client</span> <span class="o">=</span> <span class="n">AuthServiceClient</span><span class="p">(</span><span class="s2">&quot;tracking_uri&quot;</span><span class="p">)</span>
 <span class="n">client</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span><span class="s2">&quot;newuser&quot;</span><span class="p">,</span> <span class="s2">&quot;newpassword&quot;</span><span class="p">)</span>
-
 <span class="n">user</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_user</span><span class="p">(</span><span class="s2">&quot;newuser&quot;</span><span class="p">)</span>
+
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;user_id: </span><span class="si">{</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;username: </span><span class="si">{</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;password_hash: </span><span class="si">{</span><span class="n">user</span><span class="o">.</span><span class="n">password_hash</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;is_admin: </span><span class="si">{</span><span class="n">user</span><span class="o">.</span><span class="n">is_admin</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="literal-block-wrapper docutils container" id="id15">
-<div class="code-block-caption"><span class="caption-text">Output</span><a class="headerlink" href="#id15" title="Permalink to this code"> </a></div>
+<div class="literal-block-wrapper docutils container" id="id13">
+<div class="code-block-caption"><span class="caption-text">Output</span><a class="headerlink" href="#id13" title="Permalink to this code"> </a></div>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>user_id: 3
 username: newuser
 password_hash: REDACTED
@@ -608,18 +595,17 @@ is_admin: False
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>experiment_id</strong> – The id of the experiment.</p></li>
 <li><p><strong>username</strong> – The username.</p></li>
-<li><p><strong>permission</strong> – New permission to grant.
-Must be one of “READ”, “EDIT”, “MANAGE” and “NO_PERMISSIONS”.</p></li>
+<li><p><strong>permission</strong> – New permission to grant. Must be one of “READ”, “EDIT”, “MANAGE” and
+“NO_PERMISSIONS”.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>None. Raises <code class="docutils literal notranslate"><span class="pre">RestException</span></code> if the user does not exist,
-or no permission exists for this experiment user pair,
-or if the permission is invalid.</p>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="../python_api/exceptions/mlflow.exceptions.html#mlflow.exceptions.RestException" title="mlflow.exceptions.RestException"><strong>mlflow.exceptions.RestException</strong></a> – if the user does not exist, or no permission exists for
+    this experiment user pair, or if the permission is invalid</p>
 </dd>
 </dl>
-<div class="literal-block-wrapper docutils container" id="id16">
-<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id16" title="Permalink to this code"> </a></div>
+<div class="literal-block-wrapper docutils container" id="id14">
+<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id14" title="Permalink to this code"> </a></div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">MLFLOW_TRACKING_USERNAME</span><span class="o">=</span>admin
 <span class="nb">export</span><span class="w"> </span><span class="nv">MLFLOW_TRACKING_PASSWORD</span><span class="o">=</span>password
 </pre></div>
@@ -644,18 +630,17 @@ or if the permission is invalid.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – The name of the registered model.</p></li>
 <li><p><strong>username</strong> – The username.</p></li>
-<li><p><strong>permission</strong> – New permission to grant.
-Must be one of “READ”, “EDIT”, “MANAGE” and “NO_PERMISSIONS”.</p></li>
+<li><p><strong>permission</strong> – New permission to grant. Must be one of “READ”, “EDIT”, “MANAGE” and
+“NO_PERMISSIONS”.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>None. Raises <code class="docutils literal notranslate"><span class="pre">RestException</span></code> if the user does not exist,
-or no permission exists for this registered model user pair,
-or if the permission is invalid.</p>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="../python_api/exceptions/mlflow.exceptions.html#mlflow.exceptions.RestException" title="mlflow.exceptions.RestException"><strong>mlflow.exceptions.RestException</strong></a> – if the user does not exist, or no permission exists for
+    this registered model user pair, or if the permission is invalid.</p>
 </dd>
 </dl>
-<div class="literal-block-wrapper docutils container" id="id17">
-<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id17" title="Permalink to this code"> </a></div>
+<div class="literal-block-wrapper docutils container" id="id15">
+<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id15" title="Permalink to this code"> </a></div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">MLFLOW_TRACKING_USERNAME</span><span class="o">=</span>admin
 <span class="nb">export</span><span class="w"> </span><span class="nv">MLFLOW_TRACKING_PASSWORD</span><span class="o">=</span>password
 </pre></div>
@@ -682,12 +667,12 @@ or if the permission is invalid.</p>
 <li><p><strong>is_admin</strong> – The new admin status.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>None. Raises <code class="docutils literal notranslate"><span class="pre">RestException</span></code> if the user does not exist.</p>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="../python_api/exceptions/mlflow.exceptions.html#mlflow.exceptions.RestException" title="mlflow.exceptions.RestException"><strong>mlflow.exceptions.RestException</strong></a> – if the user does not exist</p>
 </dd>
 </dl>
-<div class="literal-block-wrapper docutils container" id="id18">
-<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id18" title="Permalink to this code"> </a></div>
+<div class="literal-block-wrapper docutils container" id="id16">
+<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id16" title="Permalink to this code"> </a></div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">MLFLOW_TRACKING_USERNAME</span><span class="o">=</span>admin
 <span class="nb">export</span><span class="w"> </span><span class="nv">MLFLOW_TRACKING_PASSWORD</span><span class="o">=</span>password
 </pre></div>
@@ -714,12 +699,12 @@ or if the permission is invalid.</p>
 <li><p><strong>password</strong> – The new password.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>None. Raises <code class="docutils literal notranslate"><span class="pre">RestException</span></code> if the user does not exist.</p>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="../python_api/exceptions/mlflow.exceptions.html#mlflow.exceptions.RestException" title="mlflow.exceptions.RestException"><strong>mlflow.exceptions.RestException</strong></a> – if the user does not exist</p>
 </dd>
 </dl>
-<div class="literal-block-wrapper docutils container" id="id19">
-<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id19" title="Permalink to this code"> </a></div>
+<div class="literal-block-wrapper docutils container" id="id17">
+<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id17" title="Permalink to this code"> </a></div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">MLFLOW_TRACKING_USERNAME</span><span class="o">=</span>admin
 <span class="nb">export</span><span class="w"> </span><span class="nv">MLFLOW_TRACKING_PASSWORD</span><span class="o">=</span>password
 </pre></div>
@@ -889,7 +874,7 @@ or if the permission is invalid.</p>
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../',
-      VERSION:'2.10.1.dev0',
+      VERSION:'2.10.3.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

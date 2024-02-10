@@ -2,6 +2,7 @@
   
 
 <!DOCTYPE html>
+<!-- source: docs/source/_modules/mlflow/openai -->
 <!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
@@ -9,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mlflow.openai &mdash; MLflow 2.10.1.dev0 documentation</title>
+  <title>mlflow.openai &mdash; MLflow 2.10.3.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -55,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="MLflow 2.10.1.dev0 documentation" href="../../index.html"/>
+    <link rel="top" title="MLflow 2.10.3.dev0 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
@@ -86,7 +87,7 @@
     <a href="../../index.html" class="wy-nav-top-logo"
       ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.10.1.dev0</span>
+    <span class="version">2.10.3.dev0</span>
   </li>
 </ul>
   </nav>
@@ -241,10 +242,11 @@
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span>
 
 <span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">from</span> <span class="nn">packaging.version</span> <span class="kn">import</span> <span class="n">Version</span>
 
 <span class="kn">import</span> <span class="nn">mlflow</span>
 <span class="kn">from</span> <span class="nn">mlflow</span> <span class="kn">import</span> <span class="n">pyfunc</span>
-<span class="kn">from</span> <span class="nn">mlflow.environment_variables</span> <span class="kn">import</span> <span class="n">_MLFLOW_TESTING</span><span class="p">,</span> <span class="n">MLFLOW_OPENAI_SECRET_SCOPE</span>
+<span class="kn">from</span> <span class="nn">mlflow.environment_variables</span> <span class="kn">import</span> <span class="n">MLFLOW_OPENAI_SECRET_SCOPE</span>
 <span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
 <span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">Model</span><span class="p">,</span> <span class="n">ModelInputExample</span><span class="p">,</span> <span class="n">ModelSignature</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.model</span> <span class="kn">import</span> <span class="n">MLMODEL_FILE_NAME</span>
@@ -316,47 +318,39 @@
     <span class="k">return</span> <span class="n">_mlflow_conda_env</span><span class="p">(</span><span class="n">additional_pip_deps</span><span class="o">=</span><span class="n">get_default_pip_requirements</span><span class="p">())</span></div>
 
 
-<span class="k">def</span> <span class="nf">_get_class_to_task_mapping</span><span class="p">():</span>
-    <span class="kn">from</span> <span class="nn">openai.api_resources</span> <span class="kn">import</span> <span class="p">(</span>
-        <span class="n">Audio</span><span class="p">,</span>
-        <span class="n">ChatCompletion</span><span class="p">,</span>
-        <span class="n">Completion</span><span class="p">,</span>
-        <span class="n">Deployment</span><span class="p">,</span>
-        <span class="n">Edit</span><span class="p">,</span>
-        <span class="n">Embedding</span><span class="p">,</span>
-        <span class="n">Engine</span><span class="p">,</span>
-        <span class="n">File</span><span class="p">,</span>
-        <span class="n">FineTune</span><span class="p">,</span>
-        <span class="n">Image</span><span class="p">,</span>
-        <span class="n">Moderation</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="kn">from</span> <span class="nn">openai.api_resources</span> <span class="kn">import</span> <span class="p">(</span>
-        <span class="n">Model</span> <span class="k">as</span> <span class="n">OpenAIModel</span><span class="p">,</span>
-    <span class="p">)</span>
+<span class="k">def</span> <span class="nf">_get_obj_to_task_mapping</span><span class="p">():</span>
+    <span class="kn">import</span> <span class="nn">openai</span>
 
-    <span class="k">return</span> <span class="p">{</span>
-        <span class="n">Audio</span><span class="p">:</span> <span class="n">Audio</span><span class="o">.</span><span class="n">OBJECT_NAME</span><span class="p">,</span>
-        <span class="n">ChatCompletion</span><span class="p">:</span> <span class="n">ChatCompletion</span><span class="o">.</span><span class="n">OBJECT_NAME</span><span class="p">,</span>
-        <span class="n">Completion</span><span class="p">:</span> <span class="n">Completion</span><span class="o">.</span><span class="n">OBJECT_NAME</span><span class="p">,</span>
-        <span class="n">Edit</span><span class="p">:</span> <span class="n">Edit</span><span class="o">.</span><span class="n">OBJECT_NAME</span><span class="p">,</span>
-        <span class="n">Deployment</span><span class="p">:</span> <span class="n">Deployment</span><span class="o">.</span><span class="n">OBJECT_NAME</span><span class="p">,</span>
-        <span class="n">Embedding</span><span class="p">:</span> <span class="n">Embedding</span><span class="o">.</span><span class="n">OBJECT_NAME</span><span class="p">,</span>
-        <span class="n">Engine</span><span class="p">:</span> <span class="n">Engine</span><span class="o">.</span><span class="n">OBJECT_NAME</span><span class="p">,</span>
-        <span class="n">File</span><span class="p">:</span> <span class="n">File</span><span class="o">.</span><span class="n">OBJECT_NAME</span><span class="p">,</span>
-        <span class="n">Image</span><span class="p">:</span> <span class="n">Image</span><span class="o">.</span><span class="n">OBJECT_NAME</span><span class="p">,</span>
-        <span class="n">FineTune</span><span class="p">:</span> <span class="n">FineTune</span><span class="o">.</span><span class="n">OBJECT_NAME</span><span class="p">,</span>
-        <span class="n">OpenAIModel</span><span class="p">:</span> <span class="n">OpenAIModel</span><span class="o">.</span><span class="n">OBJECT_NAME</span><span class="p">,</span>
-        <span class="n">Moderation</span><span class="p">:</span> <span class="s2">&quot;moderations&quot;</span><span class="p">,</span>
-    <span class="p">}</span>
+    <span class="k">if</span> <span class="n">Version</span><span class="p">(</span><span class="n">_get_openai_package_version</span><span class="p">())</span><span class="o">.</span><span class="n">major</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">openai</span> <span class="kn">import</span> <span class="n">api_resources</span> <span class="k">as</span> <span class="n">ar</span>
 
-
-<span class="k">def</span> <span class="nf">_class_to_task</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-    <span class="n">task</span> <span class="o">=</span> <span class="n">_get_class_to_task_mapping</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">task</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">MlflowException</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Unsupported class: </span><span class="si">{</span><span class="bp">cls</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span>
-        <span class="p">)</span>
-    <span class="k">return</span> <span class="n">task</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="n">ar</span><span class="o">.</span><span class="n">Audio</span><span class="p">:</span> <span class="n">ar</span><span class="o">.</span><span class="n">Audio</span><span class="o">.</span><span class="n">OBJECT_NAME</span><span class="p">,</span>
+            <span class="n">ar</span><span class="o">.</span><span class="n">ChatCompletion</span><span class="p">:</span> <span class="n">ar</span><span class="o">.</span><span class="n">ChatCompletion</span><span class="o">.</span><span class="n">OBJECT_NAME</span><span class="p">,</span>
+            <span class="n">ar</span><span class="o">.</span><span class="n">Completion</span><span class="p">:</span> <span class="n">ar</span><span class="o">.</span><span class="n">Completion</span><span class="o">.</span><span class="n">OBJECT_NAME</span><span class="p">,</span>
+            <span class="n">ar</span><span class="o">.</span><span class="n">Edit</span><span class="p">:</span> <span class="n">ar</span><span class="o">.</span><span class="n">Edit</span><span class="o">.</span><span class="n">OBJECT_NAME</span><span class="p">,</span>
+            <span class="n">ar</span><span class="o">.</span><span class="n">Deployment</span><span class="p">:</span> <span class="n">ar</span><span class="o">.</span><span class="n">Deployment</span><span class="o">.</span><span class="n">OBJECT_NAME</span><span class="p">,</span>
+            <span class="n">ar</span><span class="o">.</span><span class="n">Embedding</span><span class="p">:</span> <span class="n">ar</span><span class="o">.</span><span class="n">Embedding</span><span class="o">.</span><span class="n">OBJECT_NAME</span><span class="p">,</span>
+            <span class="n">ar</span><span class="o">.</span><span class="n">Engine</span><span class="p">:</span> <span class="n">ar</span><span class="o">.</span><span class="n">Engine</span><span class="o">.</span><span class="n">OBJECT_NAME</span><span class="p">,</span>
+            <span class="n">ar</span><span class="o">.</span><span class="n">File</span><span class="p">:</span> <span class="n">ar</span><span class="o">.</span><span class="n">File</span><span class="o">.</span><span class="n">OBJECT_NAME</span><span class="p">,</span>
+            <span class="n">ar</span><span class="o">.</span><span class="n">Image</span><span class="p">:</span> <span class="n">ar</span><span class="o">.</span><span class="n">Image</span><span class="o">.</span><span class="n">OBJECT_NAME</span><span class="p">,</span>
+            <span class="n">ar</span><span class="o">.</span><span class="n">FineTune</span><span class="p">:</span> <span class="n">ar</span><span class="o">.</span><span class="n">FineTune</span><span class="o">.</span><span class="n">OBJECT_NAME</span><span class="p">,</span>
+            <span class="n">ar</span><span class="o">.</span><span class="n">Model</span><span class="p">:</span> <span class="n">ar</span><span class="o">.</span><span class="n">Model</span><span class="o">.</span><span class="n">OBJECT_NAME</span><span class="p">,</span>
+            <span class="n">ar</span><span class="o">.</span><span class="n">Moderation</span><span class="p">:</span> <span class="s2">&quot;moderations&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="n">openai</span><span class="o">.</span><span class="n">audio</span><span class="p">:</span> <span class="s2">&quot;audio&quot;</span><span class="p">,</span>
+            <span class="n">openai</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">completions</span><span class="p">:</span> <span class="s2">&quot;chat.completions&quot;</span><span class="p">,</span>
+            <span class="n">openai</span><span class="o">.</span><span class="n">completions</span><span class="p">:</span> <span class="s2">&quot;completions&quot;</span><span class="p">,</span>
+            <span class="n">openai</span><span class="o">.</span><span class="n">images</span><span class="o">.</span><span class="n">edit</span><span class="p">:</span> <span class="s2">&quot;images.edit&quot;</span><span class="p">,</span>
+            <span class="n">openai</span><span class="o">.</span><span class="n">embeddings</span><span class="p">:</span> <span class="s2">&quot;embeddings&quot;</span><span class="p">,</span>
+            <span class="n">openai</span><span class="o">.</span><span class="n">files</span><span class="p">:</span> <span class="s2">&quot;files&quot;</span><span class="p">,</span>
+            <span class="n">openai</span><span class="o">.</span><span class="n">images</span><span class="p">:</span> <span class="s2">&quot;images&quot;</span><span class="p">,</span>
+            <span class="n">openai</span><span class="o">.</span><span class="n">fine_tuning</span><span class="p">:</span> <span class="s2">&quot;fine_tuning&quot;</span><span class="p">,</span>
+            <span class="n">openai</span><span class="o">.</span><span class="n">moderations</span><span class="p">:</span> <span class="s2">&quot;moderations&quot;</span><span class="p">,</span>
+            <span class="n">openai</span><span class="o">.</span><span class="n">models</span><span class="p">:</span> <span class="s2">&quot;models&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
 
 
 <span class="k">def</span> <span class="nf">_get_model_name</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
@@ -364,23 +358,30 @@
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">model</span>
-    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">openai</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="n">Version</span><span class="p">(</span><span class="n">_get_openai_package_version</span><span class="p">())</span><span class="o">.</span><span class="n">major</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">openai</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">model</span><span class="o">.</span><span class="n">id</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">MlflowException</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Unsupported model type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">model</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span>
-        <span class="p">)</span>
+
+    <span class="k">raise</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">MlflowException</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Unsupported model type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">model</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span>
+    <span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_get_task_name</span><span class="p">(</span><span class="n">task</span><span class="p">):</span>
+    <span class="n">mapping</span> <span class="o">=</span> <span class="n">_get_obj_to_task_mapping</span><span class="p">()</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">task</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mapping</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">MlflowException</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Unsupported task: </span><span class="si">{</span><span class="n">task</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span>
+            <span class="p">)</span>
         <span class="k">return</span> <span class="n">task</span>
-    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">_class_to_task</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">MlflowException</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Unsupported task type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">task</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span>
-        <span class="p">)</span>
+        <span class="n">task_name</span> <span class="o">=</span> <span class="n">mapping</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">task_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">MlflowException</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Unsupported task object: </span><span class="si">{</span><span class="n">task</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">task_name</span>
 
 
 <span class="k">def</span> <span class="nf">_get_api_config</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">_OpenAIApiConfig</span><span class="p">:</span>
@@ -468,9 +469,8 @@
 <span class="sd">    Save an OpenAI model to a path on the local file system.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        model: The OpenAI model name or reference instance, e.g.,</span>
-<span class="sd">            ``openai.Model.retrieve(&quot;gpt-3.5-turbo&quot;)``.</span>
-<span class="sd">        task: The task the model is performing, e.g., ``openai.ChatCompletion`` or</span>
+<span class="sd">        model: The OpenAI model name.</span>
+<span class="sd">        task: The task the model is performing, e.g., ``openai.chat.completions`` or</span>
 <span class="sd">            ``&#39;chat.completions&#39;``.</span>
 <span class="sd">        path: Local path where the model is to be saved.</span>
 <span class="sd">        conda_env: {{ conda_env }}</span>
@@ -512,7 +512,7 @@
 <span class="sd">        # Chat</span>
 <span class="sd">        mlflow.openai.save_model(</span>
 <span class="sd">            model=&quot;gpt-3.5-turbo&quot;,</span>
-<span class="sd">            task=openai.ChatCompletion,</span>
+<span class="sd">            task=openai.chat.completions,</span>
 <span class="sd">            messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Tell me a joke.&quot;}],</span>
 <span class="sd">            path=&quot;model&quot;,</span>
 <span class="sd">        )</span>
@@ -520,7 +520,7 @@
 <span class="sd">        # Completions</span>
 <span class="sd">        mlflow.openai.save_model(</span>
 <span class="sd">            model=&quot;text-davinci-002&quot;,</span>
-<span class="sd">            task=openai.Completion,</span>
+<span class="sd">            task=openai.completions,</span>
 <span class="sd">            prompt=&quot;{text}. The general sentiment of the text is&quot;,</span>
 <span class="sd">            path=&quot;model&quot;,</span>
 <span class="sd">        )</span>
@@ -528,7 +528,7 @@
 <span class="sd">        # Embeddings</span>
 <span class="sd">        mlflow.openai.save_model(</span>
 <span class="sd">            model=&quot;text-embedding-ada-002&quot;,</span>
-<span class="sd">            task=openai.Embedding,</span>
+<span class="sd">            task=openai.embeddings,</span>
 <span class="sd">            path=&quot;model&quot;,</span>
 <span class="sd">        )</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -670,7 +670,7 @@
 <span class="sd">    Args:</span>
 <span class="sd">        model: The OpenAI model name or reference instance, e.g.,</span>
 <span class="sd">            ``openai.Model.retrieve(&quot;gpt-3.5-turbo&quot;)``.</span>
-<span class="sd">        task: The task the model is performing, e.g., ``openai.ChatCompletion`` or</span>
+<span class="sd">        task: The task the model is performing, e.g., ``openai.chat.completions`` or</span>
 <span class="sd">            ``&#39;chat.completions&#39;``.</span>
 <span class="sd">        artifact_path: Run-relative artifact path.</span>
 <span class="sd">        conda_env: {{ conda_env }}</span>
@@ -723,7 +723,7 @@
 <span class="sd">        with mlflow.start_run():</span>
 <span class="sd">            info = mlflow.openai.log_model(</span>
 <span class="sd">                model=&quot;gpt-3.5-turbo&quot;,</span>
-<span class="sd">                task=openai.ChatCompletion,</span>
+<span class="sd">                task=openai.chat.completions,</span>
 <span class="sd">                messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Tell me a joke about {animal}.&quot;}],</span>
 <span class="sd">                artifact_path=&quot;model&quot;,</span>
 <span class="sd">            )</span>
@@ -735,7 +735,7 @@
 <span class="sd">        with mlflow.start_run():</span>
 <span class="sd">            info = mlflow.openai.log_model(</span>
 <span class="sd">                model=&quot;text-embedding-ada-002&quot;,</span>
-<span class="sd">                task=openai.Embedding,</span>
+<span class="sd">                task=openai.embeddings,</span>
 <span class="sd">                artifact_path=&quot;embeddings&quot;,</span>
 <span class="sd">            )</span>
 <span class="sd">            model = mlflow.pyfunc.load_model(info.model_uri)</span>
@@ -908,8 +908,8 @@
 
     <span class="k">def</span> <span class="nf">_construct_request_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_url</span><span class="p">,</span> <span class="n">default_url</span><span class="p">):</span>
         <span class="n">api_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request_configs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;api_type&quot;</span><span class="p">)</span>
+        <span class="n">api_base</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request_configs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;api_base&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">api_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;azure&quot;</span><span class="p">,</span> <span class="s2">&quot;azure_ad&quot;</span><span class="p">,</span> <span class="s2">&quot;azuread&quot;</span><span class="p">):</span>
-            <span class="n">api_base</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request_configs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;api_base&quot;</span><span class="p">)</span>
             <span class="n">api_version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request_configs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;api_version&quot;</span><span class="p">)</span>
             <span class="n">deployment_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request_configs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;deployment_id&quot;</span><span class="p">)</span>
 
@@ -917,8 +917,8 @@
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">api_base</span><span class="si">}</span><span class="s2">/openai/deployments/</span><span class="si">{</span><span class="n">deployment_id</span><span class="si">}</span><span class="s2">/&quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">task_url</span><span class="si">}</span><span class="s2">?api-version=</span><span class="si">{</span><span class="n">api_version</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">default_url</span>
+
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">api_base</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">task_url</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">api_base</span> <span class="k">else</span> <span class="n">default_url</span>
 
     <span class="k">def</span> <span class="nf">_predict_chat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
         <span class="kn">from</span> <span class="nn">mlflow.openai.api_request_parallel_processor</span> <span class="kn">import</span> <span class="n">process_api_requests</span>
@@ -1014,37 +1014,13 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_embeddings</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">params</span> <span class="ow">or</span> <span class="p">{})</span>
 
 
-<span class="k">class</span> <span class="nc">_TestOpenAIWrapper</span><span class="p">(</span><span class="n">_OpenAIWrapper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A wrapper class that should be used for testing purposes only.&quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># pylint: disable=unused-argument</span>
-    <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Args:</span>
-<span class="sd">            data: Model input data.</span>
-<span class="sd">            params: Additional parameters to pass to the model for inference.</span>
-
-<span class="sd">                .. Note:: Experimental: This parameter may change or be removed in a future</span>
-<span class="sd">                           release without warning.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            Model predictions.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">mlflow.utils.openai_utils</span> <span class="kn">import</span> <span class="n">_mock_openai_request</span>
-
-        <span class="k">with</span> <span class="n">_mock_openai_request</span><span class="p">():</span>
-            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-
-
 <span class="k">def</span> <span class="nf">_load_pyfunc</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Loads PyFunc implementation. Called by ``pyfunc.load_model``.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        path: Local filesystem path to the MLflow Model with the ``openai`` flavor.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">wrapper_cls</span> <span class="o">=</span> <span class="n">_TestOpenAIWrapper</span> <span class="k">if</span> <span class="n">_MLFLOW_TESTING</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="k">else</span> <span class="n">_OpenAIWrapper</span>
-    <span class="k">return</span> <span class="n">wrapper_cls</span><span class="p">(</span><span class="n">_load_model</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">_OpenAIWrapper</span><span class="p">(</span><span class="n">_load_model</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
 
 
 <div class="viewcode-block" id="load_model"><a class="viewcode-back" href="../../python_api/openai/index.html#mlflow.openai.load_model">[docs]</a><span class="nd">@experimental</span>
@@ -1105,7 +1081,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../',
-      VERSION:'2.10.1.dev0',
+      VERSION:'2.10.3.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

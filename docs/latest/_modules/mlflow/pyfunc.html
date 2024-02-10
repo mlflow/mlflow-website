@@ -2,6 +2,7 @@
   
 
 <!DOCTYPE html>
+<!-- source: docs/source/_modules/mlflow/pyfunc -->
 <!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
@@ -9,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mlflow.pyfunc &mdash; MLflow 2.10.1.dev0 documentation</title>
+  <title>mlflow.pyfunc &mdash; MLflow 2.10.3.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -55,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="MLflow 2.10.1.dev0 documentation" href="../../index.html"/>
+    <link rel="top" title="MLflow 2.10.3.dev0 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
@@ -86,7 +87,7 @@
     <a href="../../index.html" class="wy-nav-top-logo"
       ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.10.1.dev0</span>
+    <span class="version">2.10.3.dev0</span>
   </li>
 </ul>
   </nav>
@@ -433,7 +434,6 @@
 <span class="kn">import</span> <span class="nn">mlflow.pyfunc.model</span>
 <span class="kn">from</span> <span class="nn">mlflow.environment_variables</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">_MLFLOW_TESTING</span><span class="p">,</span>
-    <span class="n">MLFLOW_OPENAI_RETRIES_ENABLED</span><span class="p">,</span>
     <span class="n">MLFLOW_SCORING_SERVER_REQUEST_TIMEOUT</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
@@ -563,21 +563,24 @@
 
 <span class="sd">        All paths are relative to the exported model root directory.</span>
 
-<span class="sd">    :param model: Existing model.</span>
-<span class="sd">    :param loader_module: The module to be used to load the model.</span>
-<span class="sd">    :param data: Path to the model data.</span>
-<span class="sd">    :param code: Path to the code dependencies.</span>
-<span class="sd">    :param conda_env: Conda environment.</span>
-<span class="sd">    :param python_env: Python environment.</span>
-<span class="sd">    :param req: pip requirements file.</span>
-<span class="sd">    :param kwargs: Additional key-value pairs to include in the ``pyfunc`` flavor specification.</span>
-<span class="sd">                   Values must be YAML-serializable.</span>
-<span class="sd">    :param model_config: The model configuration to apply to the model. This configuration</span>
-<span class="sd">                         is available during model loading.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        model: Existing model.</span>
+<span class="sd">        loader_module: The module to be used to load the model.</span>
+<span class="sd">        data: Path to the model data.</span>
+<span class="sd">        code: Path to the code dependencies.</span>
+<span class="sd">        conda_env: Conda environment.</span>
+<span class="sd">        python_env: Python environment.</span>
+<span class="sd">        req: pip requirements file.</span>
+<span class="sd">        kwargs: Additional key-value pairs to include in the ``pyfunc`` flavor specification.</span>
+<span class="sd">                Values must be YAML-serializable.</span>
+<span class="sd">        model_config: The model configuration to apply to the model. This configuration</span>
+<span class="sd">                      is available during model loading.</span>
 
-<span class="sd">                     .. Note:: Experimental: This parameter may change or be removed in a future</span>
-<span class="sd">                                             release without warning.</span>
-<span class="sd">    :return: Updated model configuration.</span>
+<span class="sd">                      .. Note:: Experimental: This parameter may change or be removed in a future</span>
+<span class="sd">                                              release without warning.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Updated model configuration.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">params</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="n">params</span><span class="p">[</span><span class="n">MAIN</span><span class="p">]</span> <span class="o">=</span> <span class="n">loader_module</span>
@@ -651,31 +654,32 @@
 
 <div class="viewcode-block" id="PyFuncModel.predict"><a class="viewcode-back" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PyFuncModel.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">PyFuncInput</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PyFuncOutput</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Generate model predictions.</span>
+<span class="sd">        Generates model predictions.</span>
 
 <span class="sd">        If the model contains signature, enforce the input schema first before calling the model</span>
 <span class="sd">        implementation with the sanitized input. If the pyfunc model does not include model schema,</span>
 <span class="sd">        the input is passed to the model implementation as is. See `Model Signature Enforcement</span>
-<span class="sd">        &lt;https://www.mlflow.org/docs/latest/models.html#signature-enforcement&gt;`_ for more details.&quot;</span>
+<span class="sd">        &lt;https://www.mlflow.org/docs/latest/models.html#signature-enforcement&gt;`_ for more details.</span>
 
-<span class="sd">        :param data: Model input as one of pandas.DataFrame, numpy.ndarray,</span>
-<span class="sd">                     scipy.sparse.(csc.csc_matrix | csr.csr_matrix), List[Any], or</span>
-<span class="sd">                     Dict[str, numpy.ndarray].</span>
-<span class="sd">                     For model signatures with tensor spec inputs</span>
-<span class="sd">                     (e.g. the Tensorflow core / Keras model), the input data type must be one of</span>
-<span class="sd">                     `numpy.ndarray`, `List[numpy.ndarray]`, `Dict[str, numpy.ndarray]` or</span>
-<span class="sd">                     `pandas.DataFrame`. If data is of `pandas.DataFrame` type and the model</span>
-<span class="sd">                     contains a signature with tensor spec inputs, the corresponding column values</span>
-<span class="sd">                     in the pandas DataFrame will be reshaped to the required shape with &#39;C&#39; order</span>
-<span class="sd">                     (i.e. read / write the elements using C-like index order), and DataFrame</span>
-<span class="sd">                     column values will be cast as the required tensor spec type.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            data: Model input as one of pandas.DataFrame, numpy.ndarray,</span>
+<span class="sd">                scipy.sparse.(csc.csc_matrix | csr.csr_matrix), List[Any], or</span>
+<span class="sd">                Dict[str, numpy.ndarray].</span>
+<span class="sd">                For model signatures with tensor spec inputs</span>
+<span class="sd">                (e.g. the Tensorflow core / Keras model), the input data type must be one of</span>
+<span class="sd">                `numpy.ndarray`, `List[numpy.ndarray]`, `Dict[str, numpy.ndarray]` or</span>
+<span class="sd">                `pandas.DataFrame`. If data is of `pandas.DataFrame` type and the model</span>
+<span class="sd">                contains a signature with tensor spec inputs, the corresponding column values</span>
+<span class="sd">                in the pandas DataFrame will be reshaped to the required shape with &#39;C&#39; order</span>
+<span class="sd">                (i.e. read / write the elements using C-like index order), and DataFrame</span>
+<span class="sd">                column values will be cast as the required tensor spec type.</span>
+<span class="sd">            params: Additional parameters to pass to the model for inference.</span>
 
-<span class="sd">        :param params: Additional parameters to pass to the model for inference.</span>
+<span class="sd">                .. Note:: Experimental: This parameter may change or be removed in a future</span>
+<span class="sd">                    release without warning.</span>
 
-<span class="sd">                       .. Note:: Experimental: This parameter may change or be removed in a future</span>
-<span class="sd">                                               release without warning.</span>
-
-<span class="sd">        :return: Model predictions as one of pandas.DataFrame, pandas.Series, numpy.ndarray or list.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Model predictions as one of pandas.DataFrame, pandas.Series, numpy.ndarray or list.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">input_schema</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get_input_schema</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">input_schema</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -691,26 +695,10 @@
 
         <span class="n">params</span> <span class="o">=</span> <span class="n">_validate_params</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">_predict</span><span class="p">():</span>
-            <span class="c1"># Models saved prior to MLflow 2.5.0 do not support `params` in the pyfunc `predict()`</span>
-            <span class="c1"># function definition, nor do they support `**kwargs`. Accordingly, we only pass</span>
-            <span class="c1"># `params` to the `predict()` method if it defines the `params` argument</span>
-            <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_predict_fn</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;params&quot;</span><span class="p">):</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_fn</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
-            <span class="n">_log_warning_if_params_not_in_predict_signature</span><span class="p">(</span><span class="n">_logger</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_fn</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="s2">&quot;openai&quot;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span> <span class="ow">and</span> <span class="n">MLFLOW_OPENAI_RETRIES_ENABLED</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
-            <span class="kn">from</span> <span class="nn">mlflow.openai.retry</span> <span class="kn">import</span> <span class="n">openai_auto_retry_patch</span>
-
-            <span class="k">try</span><span class="p">:</span>
-                <span class="k">with</span> <span class="n">openai_auto_retry_patch</span><span class="p">():</span>
-                    <span class="k">return</span> <span class="n">_predict</span><span class="p">()</span>
-            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">_MLFLOW_TESTING</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
-                    <span class="k">raise</span>
-
-        <span class="k">return</span> <span class="n">_predict</span><span class="p">()</span></div>
+        <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_predict_fn</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;params&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_fn</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+        <span class="n">_log_warning_if_params_not_in_predict_signature</span><span class="p">(</span><span class="n">_logger</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_fn</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PyFuncModel.unwrap_python_model"><a class="viewcode-back" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PyFuncModel.unwrap_python_model">[docs]</a>    <span class="nd">@experimental</span>
     <span class="k">def</span> <span class="nf">unwrap_python_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -720,9 +708,11 @@
 <span class="sd">        This method is useful for accessing custom model functions, while still being able to</span>
 <span class="sd">        leverage the MLflow designed workflow through the `predict()` method.</span>
 
-<span class="sd">        :return: The underlying wrapped model object</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            The underlying wrapped model object</span>
 
-<span class="sd">        .. testcode:: python</span>
+<span class="sd">        .. code-block:: python</span>
+<span class="sd">            :test:</span>
 <span class="sd">            :caption: Example</span>
 
 <span class="sd">            import mlflow</span>
@@ -746,20 +736,16 @@
 <span class="sd">            # load the model</span>
 <span class="sd">            loaded_model = mlflow.pyfunc.load_model(model_uri=model_info.model_uri)</span>
 <span class="sd">            print(type(loaded_model))  # &lt;class &#39;mlflow.pyfunc.model.PyFuncModel&#39;&gt;</span>
-
 <span class="sd">            unwrapped_model = loaded_model.unwrap_python_model()</span>
 <span class="sd">            print(type(unwrapped_model))  # &lt;class &#39;__main__.MyModel&#39;&gt;</span>
 
 <span class="sd">            # does not work, only predict() is exposed</span>
 <span class="sd">            # print(loaded_model.my_custom_function(some_input))</span>
-
 <span class="sd">            print(unwrapped_model.my_custom_function(some_input))  # works</span>
-
 <span class="sd">            print(loaded_model.predict(some_input))  # works</span>
 
 <span class="sd">            # works, but None is needed for context arg</span>
 <span class="sd">            print(unwrapped_model.predict(None, some_input))</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">python_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model_impl</span><span class="o">.</span><span class="n">python_model</span>
@@ -818,30 +804,31 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Load a model stored in Python function format.</span>
 
-<span class="sd">    :param model_uri: The location, in URI format, of the MLflow model. For example:</span>
+<span class="sd">    Args:</span>
+<span class="sd">        model_uri: The location, in URI format, of the MLflow model. For example:</span>
 
-<span class="sd">                      - ``/Users/me/path/to/local/model``</span>
-<span class="sd">                      - ``relative/path/to/local/model``</span>
-<span class="sd">                      - ``s3://my_bucket/path/to/model``</span>
-<span class="sd">                      - ``runs:/&lt;mlflow_run_id&gt;/run-relative/path/to/model``</span>
-<span class="sd">                      - ``models:/&lt;model_name&gt;/&lt;model_version&gt;``</span>
-<span class="sd">                      - ``models:/&lt;model_name&gt;/&lt;stage&gt;``</span>
-<span class="sd">                      - ``mlflow-artifacts:/path/to/model``</span>
+<span class="sd">            - ``/Users/me/path/to/local/model``</span>
+<span class="sd">            - ``relative/path/to/local/model``</span>
+<span class="sd">            - ``s3://my_bucket/path/to/model``</span>
+<span class="sd">            - ``runs:/&lt;mlflow_run_id&gt;/run-relative/path/to/model``</span>
+<span class="sd">            - ``models:/&lt;model_name&gt;/&lt;model_version&gt;``</span>
+<span class="sd">            - ``models:/&lt;model_name&gt;/&lt;stage&gt;``</span>
+<span class="sd">            - ``mlflow-artifacts:/path/to/model``</span>
 
-<span class="sd">                      For more information about supported URI schemes, see</span>
-<span class="sd">                      `Referencing Artifacts &lt;https://www.mlflow.org/docs/latest/concepts.html#</span>
-<span class="sd">                      artifact-locations&gt;`_.</span>
-<span class="sd">    :param suppress_warnings: If ``True``, non-fatal warning messages associated with the model</span>
-<span class="sd">                              loading process will be suppressed. If ``False``, these warning</span>
-<span class="sd">                              messages will be emitted.</span>
-<span class="sd">    :param dst_path: The local filesystem path to which to download the model artifact.</span>
-<span class="sd">                     This directory must already exist. If unspecified, a local output</span>
-<span class="sd">                     path will be created.</span>
-<span class="sd">    :param model_config: The model configuration to apply to the model. This configuration</span>
-<span class="sd">                         is available during model loading.</span>
+<span class="sd">            For more information about supported URI schemes, see</span>
+<span class="sd">            `Referencing Artifacts &lt;https://www.mlflow.org/docs/latest/concepts.html#</span>
+<span class="sd">            artifact-locations&gt;`_.</span>
+<span class="sd">        suppress_warnings: If ``True``, non-fatal warning messages associated with the model</span>
+<span class="sd">            loading process will be suppressed. If ``False``, these warning messages will be</span>
+<span class="sd">            emitted.</span>
+<span class="sd">        dst_path: The local filesystem path to which to download the model artifact.</span>
+<span class="sd">            This directory must already exist. If unspecified, a local output</span>
+<span class="sd">            path will be created.</span>
+<span class="sd">        model_config: The model configuration to apply to the model. This configuration</span>
+<span class="sd">            is available during model loading.</span>
 
-<span class="sd">                     .. Note:: Experimental: This parameter may change or be removed in a future</span>
-<span class="sd">                                             release without warning.</span>
+<span class="sd">            .. Note:: Experimental: This parameter may change or be removed in a future</span>
+<span class="sd">                release without warning.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">local_path</span> <span class="o">=</span> <span class="n">_download_artifact_from_uri</span><span class="p">(</span><span class="n">artifact_uri</span><span class="o">=</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">output_path</span><span class="o">=</span><span class="n">dst_path</span><span class="p">)</span>
 
@@ -899,13 +886,15 @@
 
     <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param data: Model input data.</span>
-<span class="sd">        :param params: Additional parameters to pass to the model for inference.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            data: Model input data.</span>
+<span class="sd">            params: Additional parameters to pass to the model for inference.</span>
 
-<span class="sd">                       .. Note:: Experimental: This parameter may change or be removed in a future</span>
-<span class="sd">                                               release without warning.</span>
+<span class="sd">                .. Note:: Experimental: This parameter may change or be removed in a future</span>
+<span class="sd">                    release without warning.</span>
 
-<span class="sd">        :return: Model predictions.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Model predictions.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">invoke</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;params&quot;</span><span class="p">):</span>
             <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span><span class="o">.</span><span class="n">get_predictions</span><span class="p">()</span>
@@ -933,11 +922,14 @@
 <span class="sd">    Return a _ServedPyFuncModel that invokes the scoring server for prediction. Otherwise, load and</span>
 <span class="sd">    return the model locally as a PyFuncModel using :py:func:`mlflow.pyfunc.load_model`.</span>
 
-<span class="sd">    :param model_uri: The uri of the model.</span>
-<span class="sd">    :param env_manager: The environment manager to load the model.</span>
-<span class="sd">    :param model_config: The model configuration to use by the model, only if the model</span>
-<span class="sd">                             accepts it.</span>
-<span class="sd">    :return: A _ServedPyFuncModel for non-local ``env_manager``s or a PyFuncModel otherwise.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        model_uri: The uri of the model.</span>
+<span class="sd">        env_manager: The environment manager to load the model.</span>
+<span class="sd">        model_config: The model configuration to use by the model, only if the model</span>
+<span class="sd">                      accepts it.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A _ServedPyFuncModel for non-local ``env_manager``s or a PyFuncModel otherwise.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">mlflow.pyfunc.scoring_server.client</span> <span class="kn">import</span> <span class="n">ScoringServerClient</span><span class="p">,</span> <span class="n">StdinScoringServerClient</span>
 
@@ -1055,17 +1047,20 @@
 <span class="sd">        ``mlflow.artifacts.download_artifacts(&quot;&lt;model_uri&gt;/requirements.txt&quot;)`` or</span>
 <span class="sd">        ``mlflow.artifacts.download_artifacts(&quot;&lt;model_uri&gt;/conda.yaml&quot;)`` instead.</span>
 
-<span class="sd">    :param model_uri: The uri of the model to get dependencies from.</span>
-<span class="sd">    :param format: The format of the returned dependency file. If the ``&quot;pip&quot;`` format is</span>
-<span class="sd">                   specified, the path to a pip ``requirements.txt`` file is returned.</span>
-<span class="sd">                   If the ``&quot;conda&quot;`` format is specified, the path to a ``&quot;conda.yaml&quot;``</span>
-<span class="sd">                   file is returned . If the ``&quot;pip&quot;`` format is specified but the model</span>
-<span class="sd">                   was not saved with a ``requirements.txt`` file, the ``pip`` section</span>
-<span class="sd">                   of the model&#39;s ``conda.yaml`` file is extracted instead, and any</span>
-<span class="sd">                   additional conda dependencies are ignored. Default value is ``&quot;pip&quot;``.</span>
-<span class="sd">    :return: The local filesystem path to either a pip ``requirements.txt`` file</span>
-<span class="sd">             (if ``format=&quot;pip&quot;``) or a ``conda.yaml`` file (if ``format=&quot;conda&quot;``)</span>
-<span class="sd">             specifying the model&#39;s dependencies.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        model_uri: The uri of the model to get dependencies from.</span>
+<span class="sd">        format: The format of the returned dependency file. If the ``&quot;pip&quot;`` format is</span>
+<span class="sd">            specified, the path to a pip ``requirements.txt`` file is returned.</span>
+<span class="sd">            If the ``&quot;conda&quot;`` format is specified, the path to a ``&quot;conda.yaml&quot;``</span>
+<span class="sd">            file is returned . If the ``&quot;pip&quot;`` format is specified but the model</span>
+<span class="sd">            was not saved with a ``requirements.txt`` file, the ``pip`` section</span>
+<span class="sd">            of the model&#39;s ``conda.yaml`` file is extracted instead, and any</span>
+<span class="sd">            additional conda dependencies are ignored. Default value is ``&quot;pip&quot;``.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The local filesystem path to either a pip ``requirements.txt`` file</span>
+<span class="sd">        (if ``format=&quot;pip&quot;``) or a ``conda.yaml`` file (if ``format=&quot;conda&quot;``)</span>
+<span class="sd">        specifying the model&#39;s dependencies.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">dep_file</span> <span class="o">=</span> <span class="n">_get_model_dependencies</span><span class="p">(</span><span class="n">model_uri</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
 
@@ -1083,23 +1078,24 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Load a model stored in Python function format.</span>
 
-<span class="sd">    :param model_uri: The location, in URI format, of the MLflow model. For example:</span>
+<span class="sd">    Args:</span>
+<span class="sd">        model_uri: The location, in URI format, of the MLflow model. For example:</span>
 
-<span class="sd">                      - ``/Users/me/path/to/local/model``</span>
-<span class="sd">                      - ``relative/path/to/local/model``</span>
-<span class="sd">                      - ``s3://my_bucket/path/to/model``</span>
-<span class="sd">                      - ``runs:/&lt;mlflow_run_id&gt;/run-relative/path/to/model``</span>
-<span class="sd">                      - ``models:/&lt;model_name&gt;/&lt;model_version&gt;``</span>
-<span class="sd">                      - ``models:/&lt;model_name&gt;/&lt;stage&gt;``</span>
-<span class="sd">                      - ``mlflow-artifacts:/path/to/model``</span>
+<span class="sd">            - ``/Users/me/path/to/local/model``</span>
+<span class="sd">            - ``relative/path/to/local/model``</span>
+<span class="sd">            - ``s3://my_bucket/path/to/model``</span>
+<span class="sd">            - ``runs:/&lt;mlflow_run_id&gt;/run-relative/path/to/model``</span>
+<span class="sd">            - ``models:/&lt;model_name&gt;/&lt;model_version&gt;``</span>
+<span class="sd">            - ``models:/&lt;model_name&gt;/&lt;stage&gt;``</span>
+<span class="sd">            - ``mlflow-artifacts:/path/to/model``</span>
 
-<span class="sd">                      For more information about supported URI schemes, see</span>
-<span class="sd">                      `Referencing Artifacts &lt;https://www.mlflow.org/docs/latest/concepts.html#</span>
-<span class="sd">                      artifact-locations&gt;`_.</span>
+<span class="sd">            For more information about supported URI schemes, see</span>
+<span class="sd">            `Referencing Artifacts &lt;https://www.mlflow.org/docs/latest/concepts.html#</span>
+<span class="sd">            artifact-locations&gt;`_.</span>
 
-<span class="sd">    :param suppress_warnings: If ``True``, non-fatal warning messages associated with the model</span>
-<span class="sd">                              loading process will be suppressed. If ``False``, these warning</span>
-<span class="sd">                              messages will be emitted.</span>
+<span class="sd">        suppress_warnings: If ``True``, non-fatal warning messages associated with the model</span>
+<span class="sd">            loading process will be suppressed. If ``False``, these warning messages will be</span>
+<span class="sd">            emitted.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">load_model</span><span class="p">(</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">suppress_warnings</span><span class="p">)</span></div>
 
@@ -1476,82 +1472,86 @@
 <span class="sd">        predict = mlflow.pyfunc.spark_udf(spark, &quot;/my/local/model&quot;)</span>
 <span class="sd">        df.withColumn(&quot;prediction&quot;, predict(struct(&quot;name&quot;, &quot;age&quot;))).show()</span>
 
-<span class="sd">    :param spark: A SparkSession object.</span>
-<span class="sd">    :param model_uri: The location, in URI format, of the MLflow model with the</span>
-<span class="sd">                      :py:mod:`mlflow.pyfunc` flavor. For example:</span>
+<span class="sd">    Args:</span>
+<span class="sd">        spark: A SparkSession object.</span>
+<span class="sd">        model_uri: The location, in URI format, of the MLflow model with the</span>
+<span class="sd">            :py:mod:`mlflow.pyfunc` flavor. For example:</span>
 
-<span class="sd">                      - ``/Users/me/path/to/local/model``</span>
-<span class="sd">                      - ``relative/path/to/local/model``</span>
-<span class="sd">                      - ``s3://my_bucket/path/to/model``</span>
-<span class="sd">                      - ``runs:/&lt;mlflow_run_id&gt;/run-relative/path/to/model``</span>
-<span class="sd">                      - ``models:/&lt;model_name&gt;/&lt;model_version&gt;``</span>
-<span class="sd">                      - ``models:/&lt;model_name&gt;/&lt;stage&gt;``</span>
-<span class="sd">                      - ``mlflow-artifacts:/path/to/model``</span>
+<span class="sd">            - ``/Users/me/path/to/local/model``</span>
+<span class="sd">            - ``relative/path/to/local/model``</span>
+<span class="sd">            - ``s3://my_bucket/path/to/model``</span>
+<span class="sd">            - ``runs:/&lt;mlflow_run_id&gt;/run-relative/path/to/model``</span>
+<span class="sd">            - ``models:/&lt;model_name&gt;/&lt;model_version&gt;``</span>
+<span class="sd">            - ``models:/&lt;model_name&gt;/&lt;stage&gt;``</span>
+<span class="sd">            - ``mlflow-artifacts:/path/to/model``</span>
 
-<span class="sd">                      For more information about supported URI schemes, see</span>
-<span class="sd">                      `Referencing Artifacts &lt;https://www.mlflow.org/docs/latest/concepts.html#</span>
-<span class="sd">                      artifact-locations&gt;`_.</span>
+<span class="sd">            For more information about supported URI schemes, see</span>
+<span class="sd">            `Referencing Artifacts &lt;https://www.mlflow.org/docs/latest/concepts.html#</span>
+<span class="sd">            artifact-locations&gt;`_.</span>
 
-<span class="sd">    :param result_type: the return type of the user-defined function. The value can be either a</span>
-<span class="sd">        ``pyspark.sql.types.DataType`` object or a DDL-formatted type string. Only a primitive</span>
-<span class="sd">        type, an array ``pyspark.sql.types.ArrayType`` of primitive type, or a struct type</span>
-<span class="sd">        containing fields of above 2 kinds of types are allowed.</span>
-<span class="sd">        If unspecified, it tries to infer result type from model signature</span>
-<span class="sd">        output schema, if model output schema is not available, it fallbacks to use ``double``</span>
-<span class="sd">        type.</span>
+<span class="sd">        result_type: the return type of the user-defined function. The value can be either a</span>
+<span class="sd">            ``pyspark.sql.types.DataType`` object or a DDL-formatted type string. Only a primitive</span>
+<span class="sd">            type, an array ``pyspark.sql.types.ArrayType`` of primitive type, or a struct type</span>
+<span class="sd">            containing fields of above 2 kinds of types are allowed.</span>
+<span class="sd">            If unspecified, it tries to infer result type from model signature</span>
+<span class="sd">            output schema, if model output schema is not available, it fallbacks to use ``double``</span>
+<span class="sd">            type.</span>
 
-<span class="sd">        The following classes of result type are supported:</span>
+<span class="sd">            The following classes of result type are supported:</span>
 
-<span class="sd">        - &quot;int&quot; or ``pyspark.sql.types.IntegerType``: The leftmost integer that can fit in an</span>
-<span class="sd">          ``int32`` or an exception if there is none.</span>
+<span class="sd">            - &quot;int&quot; or ``pyspark.sql.types.IntegerType``: The leftmost integer that can fit in an</span>
+<span class="sd">              ``int32`` or an exception if there is none.</span>
 
-<span class="sd">        - &quot;long&quot; or ``pyspark.sql.types.LongType``: The leftmost long integer that can fit in an</span>
-<span class="sd">          ``int64`` or an exception if there is none.</span>
+<span class="sd">            - &quot;long&quot; or ``pyspark.sql.types.LongType``: The leftmost long integer that can fit in an</span>
+<span class="sd">              ``int64`` or an exception if there is none.</span>
 
-<span class="sd">        - ``ArrayType(IntegerType|LongType)``: All integer columns that can fit into the requested</span>
-<span class="sd">          size.</span>
+<span class="sd">            - ``ArrayType(IntegerType|LongType)``: All integer columns that can fit into the</span>
+<span class="sd">              requested size.</span>
 
-<span class="sd">        - &quot;float&quot; or ``pyspark.sql.types.FloatType``: The leftmost numeric result cast to</span>
-<span class="sd">          ``float32`` or an exception if there is none.</span>
+<span class="sd">            - &quot;float&quot; or ``pyspark.sql.types.FloatType``: The leftmost numeric result cast to</span>
+<span class="sd">              ``float32`` or an exception if there is none.</span>
 
-<span class="sd">        - &quot;double&quot; or ``pyspark.sql.types.DoubleType``: The leftmost numeric result cast to</span>
-<span class="sd">          ``double`` or an exception if there is none.</span>
+<span class="sd">            - &quot;double&quot; or ``pyspark.sql.types.DoubleType``: The leftmost numeric result cast to</span>
+<span class="sd">              ``double`` or an exception if there is none.</span>
 
-<span class="sd">        - ``ArrayType(FloatType|DoubleType)``: All numeric columns cast to the requested type or</span>
-<span class="sd">          an exception if there are no numeric columns.</span>
+<span class="sd">            - ``ArrayType(FloatType|DoubleType)``: All numeric columns cast to the requested type or</span>
+<span class="sd">              an exception if there are no numeric columns.</span>
 
-<span class="sd">        - &quot;string&quot; or ``pyspark.sql.types.StringType``: The leftmost column converted to ``string``.</span>
+<span class="sd">            - &quot;string&quot; or ``pyspark.sql.types.StringType``: The leftmost column converted to</span>
+<span class="sd">              ``string``.</span>
 
-<span class="sd">        - &quot;boolean&quot; or &quot;bool&quot; or ``pyspark.sql.types.BooleanType``: The leftmost column converted</span>
-<span class="sd">          to ``bool`` or an exception if there is none.</span>
+<span class="sd">            - &quot;boolean&quot; or &quot;bool&quot; or ``pyspark.sql.types.BooleanType``: The leftmost column</span>
+<span class="sd">              converted to ``bool`` or an exception if there is none.</span>
 
-<span class="sd">        - ``ArrayType(StringType)``: All columns converted to ``string``.</span>
+<span class="sd">            - ``ArrayType(StringType)``: All columns converted to ``string``.</span>
 
-<span class="sd">        - &quot;field1 FIELD1_TYPE, field2 FIELD2_TYPE, ...&quot;: A struct type containing multiple fields</span>
-<span class="sd">          separated by comma, each field type must be one of types listed above.</span>
+<span class="sd">            - &quot;field1 FIELD1_TYPE, field2 FIELD2_TYPE, ...&quot;: A struct type containing multiple</span>
+<span class="sd">              fields separated by comma, each field type must be one of types listed above.</span>
 
-<span class="sd">    :param env_manager: The environment manager to use in order to create the python environment</span>
-<span class="sd">                        for model inference. Note that environment is only restored in the context</span>
-<span class="sd">                        of the PySpark UDF; the software environment outside of the UDF is</span>
-<span class="sd">                        unaffected. Default value is ``local``, and the following values are</span>
-<span class="sd">                        supported:</span>
+<span class="sd">        env_manager: The environment manager to use in order to create the python environment</span>
+<span class="sd">            for model inference. Note that environment is only restored in the context</span>
+<span class="sd">            of the PySpark UDF; the software environment outside of the UDF is</span>
+<span class="sd">            unaffected. Default value is ``local``, and the following values are</span>
+<span class="sd">            supported:</span>
 
-<span class="sd">                         - ``virtualenv``: Use virtualenv to restore the python environment that</span>
-<span class="sd">                           was used to train the model.</span>
-<span class="sd">                         - ``conda``: (Recommended) Use Conda to restore the software environment</span>
-<span class="sd">                           that was used to train the model.</span>
-<span class="sd">                         - ``local``: Use the current Python environment for model inference, which</span>
-<span class="sd">                           may differ from the environment used to train the model and may lead to</span>
-<span class="sd">                           errors or invalid predictions.</span>
+<span class="sd">            - ``virtualenv``: Use virtualenv to restore the python environment that</span>
+<span class="sd">              was used to train the model.</span>
+<span class="sd">            - ``conda``: (Recommended) Use Conda to restore the software environment</span>
+<span class="sd">              that was used to train the model.</span>
+<span class="sd">            - ``local``: Use the current Python environment for model inference, which</span>
+<span class="sd">              may differ from the environment used to train the model and may lead to</span>
+<span class="sd">              errors or invalid predictions.</span>
 
-<span class="sd">    :param params: Additional parameters to pass to the model for inference.</span>
+<span class="sd">        params: Additional parameters to pass to the model for inference.</span>
 
-<span class="sd">                   .. Note:: Experimental: This parameter may change or be removed in a future</span>
-<span class="sd">                                           release without warning.</span>
+<span class="sd">            .. Note:: Experimental: This parameter may change or be removed in a future</span>
+<span class="sd">                                    release without warning.</span>
 
-<span class="sd">    :param extra_env: Extra environment variables to pass to the UDF executors.</span>
-<span class="sd">    :return: Spark UDF that applies the model&#39;s ``predict`` method to the data and returns a</span>
-<span class="sd">             type specified by ``result_type``, which by default is a double.</span>
+<span class="sd">        extra_env: Extra environment variables to pass to the UDF executors.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Spark UDF that applies the model&#39;s ``predict`` method to the data and returns a</span>
+<span class="sd">        type specified by ``result_type``, which by default is a double.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># Scope Spark import to this method so users don&#39;t need pyspark to use non-Spark-related</span>
@@ -1717,7 +1717,8 @@
                     <span class="p">)</span>
             <span class="n">pdf</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
                 <span class="n">data</span><span class="o">=</span><span class="p">{</span>
-                    <span class="n">names</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span> <span class="n">arg</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span>
+                    <span class="n">names</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span> <span class="n">arg</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span>
                     <span class="c1"># pandas_udf receives a StructType column as a pandas DataFrame.</span>
                     <span class="c1"># We need to convert it back to a dict of pandas Series.</span>
                     <span class="k">else</span> <span class="n">arg</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
@@ -1786,7 +1787,7 @@
 
     <span class="nd">@pandas_udf</span><span class="p">(</span><span class="n">result_type</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">udf</span><span class="p">(</span>
-        <span class="n">iterator</span><span class="p">:</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span> <span class="o">...</span><span class="p">]]</span>
+        <span class="n">iterator</span><span class="p">:</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span> <span class="o">...</span><span class="p">]],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">result_type_hint</span><span class="p">]:</span>
         <span class="c1"># importing here to prevent circular import</span>
         <span class="kn">from</span> <span class="nn">mlflow.pyfunc.scoring_server.client</span> <span class="kn">import</span> <span class="p">(</span>
@@ -2027,130 +2028,134 @@
 <span class="sd">    parameters for the first workflow: ``python_model``, ``artifacts``, cannot be</span>
 <span class="sd">    specified together.</span>
 
-<span class="sd">    :param path: The path to which to save the Python model.</span>
-<span class="sd">    :param loader_module: The name of the Python module that is used to load the model</span>
-<span class="sd">                          from ``data_path``. This module must define a method with the prototype</span>
-<span class="sd">                          ``_load_pyfunc(data_path)``. If not ``None``, this module and its</span>
-<span class="sd">                          dependencies must be included in one of the following locations:</span>
+<span class="sd">    Args:</span>
+<span class="sd">        path: The path to which to save the Python model.</span>
+<span class="sd">        loader_module: The name of the Python module that is used to load the model</span>
+<span class="sd">            from ``data_path``. This module must define a method with the prototype</span>
+<span class="sd">            ``_load_pyfunc(data_path)``. If not ``None``, this module and its</span>
+<span class="sd">            dependencies must be included in one of the following locations:</span>
 
-<span class="sd">                          - The MLflow library.</span>
-<span class="sd">                          - Package(s) listed in the model&#39;s Conda environment, specified by</span>
-<span class="sd">                            the ``conda_env`` parameter.</span>
-<span class="sd">                          - One or more of the files specified by the ``code_path`` parameter.</span>
+<span class="sd">            - The MLflow library.</span>
+<span class="sd">            - Package(s) listed in the model&#39;s Conda environment, specified by</span>
+<span class="sd">              the ``conda_env`` parameter.</span>
+<span class="sd">            - One or more of the files specified by the ``code_path`` parameter.</span>
 
-<span class="sd">    :param data_path: Path to a file or directory containing model data.</span>
-<span class="sd">    :param code_path: A list of local filesystem paths to Python file dependencies (or directories</span>
-<span class="sd">                      containing file dependencies). These files are *prepended* to the system</span>
-<span class="sd">                      path before the model is loaded.</span>
-<span class="sd">    :param conda_env: {{ conda_env }}</span>
-<span class="sd">    :param mlflow_model: :py:mod:`mlflow.models.Model` configuration to which to add the</span>
-<span class="sd">                         **python_function** flavor.</span>
-<span class="sd">    :param python_model:</span>
-<span class="sd">        An instance of a subclass of :class:`~PythonModel` or a callable object with a single</span>
-<span class="sd">        argument (see the examples below). The passed-in object is serialized using the CloudPickle</span>
-<span class="sd">        library. Any dependencies of the class should be included in one of the following locations:</span>
+<span class="sd">        data_path: Path to a file or directory containing model data.</span>
+<span class="sd">        code_path: A list of local filesystem paths to Python file dependencies (or directories</span>
+<span class="sd">            containing file dependencies). These files are *prepended* to the system</span>
+<span class="sd">            path before the model is loaded.</span>
+<span class="sd">        conda_env: {{ conda_env }}</span>
+<span class="sd">        mlflow_model: :py:mod:`mlflow.models.Model` configuration to which to add the</span>
+<span class="sd">            **python_function** flavor.</span>
+<span class="sd">        python_model:</span>
+<span class="sd">            An instance of a subclass of :class:`~PythonModel` or a callable object with a single</span>
+<span class="sd">            argument (see the examples below). The passed-in object is serialized using the</span>
+<span class="sd">            CloudPickle library. Any dependencies of the class should be included in one of the</span>
+<span class="sd">            following locations:</span>
 
-<span class="sd">        - The MLflow library.</span>
-<span class="sd">        - Package(s) listed in the model&#39;s Conda environment, specified by the ``conda_env``</span>
-<span class="sd">          parameter.</span>
-<span class="sd">        - One or more of the files specified by the ``code_path`` parameter.</span>
+<span class="sd">            - The MLflow library.</span>
+<span class="sd">            - Package(s) listed in the model&#39;s Conda environment, specified by the ``conda_env``</span>
+<span class="sd">              parameter.</span>
+<span class="sd">            - One or more of the files specified by the ``code_path`` parameter.</span>
 
-<span class="sd">        Note: If the class is imported from another module, as opposed to being defined in the</span>
-<span class="sd">        ``__main__`` scope, the defining module should also be included in one of the listed</span>
-<span class="sd">        locations.</span>
+<span class="sd">            Note: If the class is imported from another module, as opposed to being defined in the</span>
+<span class="sd">            ``__main__`` scope, the defining module should also be included in one of the listed</span>
+<span class="sd">            locations.</span>
 
-<span class="sd">        **Examples**</span>
+<span class="sd">            **Examples**</span>
 
-<span class="sd">        Class model</span>
+<span class="sd">            Class model</span>
 
-<span class="sd">        .. code-block:: python</span>
+<span class="sd">            .. code-block:: python</span>
 
-<span class="sd">            from typing import List, Dict</span>
-<span class="sd">            import mlflow</span>
+<span class="sd">                from typing import List, Dict</span>
+<span class="sd">                import mlflow</span>
 
 
-<span class="sd">            class MyModel(mlflow.pyfunc.PythonModel):</span>
-<span class="sd">                def predict(self, context, model_input: List[str], params=None) -&gt; List[str]:</span>
+<span class="sd">                class MyModel(mlflow.pyfunc.PythonModel):</span>
+<span class="sd">                    def predict(self, context, model_input: List[str], params=None) -&gt; List[str]:</span>
+<span class="sd">                        return [i.upper() for i in model_input]</span>
+
+
+<span class="sd">                mlflow.pyfunc.save_model(&quot;model&quot;, python_model=MyModel(), input_example=[&quot;a&quot;])</span>
+<span class="sd">                model = mlflow.pyfunc.load_model(&quot;model&quot;)</span>
+<span class="sd">                print(model.predict([&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]))  # -&gt; [&quot;A&quot;, &quot;B&quot;, &quot;C&quot;]</span>
+
+<span class="sd">            Functional model</span>
+
+<span class="sd">            .. note::</span>
+<span class="sd">                Experimental: Functional model support is experimental and may change or be removed</span>
+<span class="sd">                in a future release without warning.</span>
+
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                from typing import List</span>
+<span class="sd">                import mlflow</span>
+
+
+<span class="sd">                def predict(model_input: List[str]) -&gt; List[str]:</span>
 <span class="sd">                    return [i.upper() for i in model_input]</span>
 
 
-<span class="sd">            mlflow.pyfunc.save_model(&quot;model&quot;, python_model=MyModel(), input_example=[&quot;a&quot;])</span>
-<span class="sd">            model = mlflow.pyfunc.load_model(&quot;model&quot;)</span>
-<span class="sd">            print(model.predict([&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]))  # -&gt; [&quot;A&quot;, &quot;B&quot;, &quot;C&quot;]</span>
+<span class="sd">                mlflow.pyfunc.save_model(&quot;model&quot;, python_model=predict, input_example=[&quot;a&quot;])</span>
+<span class="sd">                model = mlflow.pyfunc.load_model(&quot;model&quot;)</span>
+<span class="sd">                print(model.predict([&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]))  # -&gt; [&quot;A&quot;, &quot;B&quot;, &quot;C&quot;]</span>
 
-<span class="sd">        Functional model</span>
+<span class="sd">            If the `predict` method or function has type annotations, MLflow automatically</span>
+<span class="sd">            constructs a model signature based on the type annotations (unless the ``signature``</span>
+<span class="sd">            argument is explicitly specified), and converts the input value to the specified type</span>
+<span class="sd">            before passing it to the function. Currently, the following type annotations are</span>
+<span class="sd">            supported:</span>
 
-<span class="sd">        .. note::</span>
-<span class="sd">            Experimental: Functional model support is experimental and may change or be removed in</span>
-<span class="sd">            a future release without warning.</span>
+<span class="sd">                - ``List[str]``</span>
+<span class="sd">                - ``List[Dict[str, str]]``</span>
 
-<span class="sd">        .. code-block:: python</span>
+<span class="sd">        artifacts: A dictionary containing ``&lt;name, artifact_uri&gt;`` entries. Remote artifact URIs</span>
+<span class="sd">            are resolved to absolute filesystem paths, producing a dictionary of</span>
+<span class="sd">            ``&lt;name, absolute_path&gt;`` entries. ``python_model`` can reference these</span>
+<span class="sd">            resolved entries as the ``artifacts`` property of the ``context`` parameter</span>
+<span class="sd">            in :func:`PythonModel.load_context() &lt;mlflow.pyfunc.PythonModel.load_context&gt;`</span>
+<span class="sd">            and :func:`PythonModel.predict() &lt;mlflow.pyfunc.PythonModel.predict&gt;`.</span>
+<span class="sd">            For example, consider the following ``artifacts`` dictionary::</span>
 
-<span class="sd">            from typing import List</span>
-<span class="sd">            import mlflow</span>
+<span class="sd">                {</span>
+<span class="sd">                    &quot;my_file&quot;: &quot;s3://my-bucket/path/to/my/file&quot;</span>
+<span class="sd">                }</span>
 
+<span class="sd">            In this case, the ``&quot;my_file&quot;`` artifact is downloaded from S3. The</span>
+<span class="sd">            ``python_model`` can then refer to ``&quot;my_file&quot;`` as an absolute filesystem</span>
+<span class="sd">            path via ``context.artifacts[&quot;my_file&quot;]``.</span>
 
-<span class="sd">            def predict(model_input: List[str]) -&gt; List[str]:</span>
-<span class="sd">                return [i.upper() for i in model_input]</span>
+<span class="sd">            If ``None``, no artifacts are added to the model.</span>
 
+<span class="sd">        signature: :py:class:`ModelSignature &lt;mlflow.models.ModelSignature&gt;`</span>
+<span class="sd">            describes model input and output :py:class:`Schema &lt;mlflow.types.Schema&gt;`.</span>
+<span class="sd">            The model signature can be :py:func:`inferred &lt;mlflow.models.infer_signature&gt;`</span>
+<span class="sd">            from datasets with valid model input (e.g. the training dataset with target</span>
+<span class="sd">            column omitted) and valid model output (e.g. model predictions generated on</span>
+<span class="sd">            the training dataset), for example:</span>
 
-<span class="sd">            mlflow.pyfunc.save_model(&quot;model&quot;, python_model=predict, input_example=[&quot;a&quot;])</span>
-<span class="sd">            model = mlflow.pyfunc.load_model(&quot;model&quot;)</span>
-<span class="sd">            print(model.predict([&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]))  # -&gt; [&quot;A&quot;, &quot;B&quot;, &quot;C&quot;]</span>
+<span class="sd">            .. code-block:: python</span>
 
-<span class="sd">        If the `predict` method or function has type annotations, MLflow automatically constructs</span>
-<span class="sd">        a model signature based on the type annotations (unless the ``signature`` argument is</span>
-<span class="sd">        explicitly specified), and converts the input value to the specified type before passing</span>
-<span class="sd">        it to the function. Currently, the following type annotations are supported:</span>
+<span class="sd">                from mlflow.models import infer_signature</span>
 
-<span class="sd">            - ``List[str]``</span>
-<span class="sd">            - ``List[Dict[str, str]]``</span>
+<span class="sd">                train = df.drop_column(&quot;target_label&quot;)</span>
+<span class="sd">                predictions = ...  # compute model predictions</span>
+<span class="sd">                signature = infer_signature(train, predictions)</span>
+<span class="sd">        input_example: {{ input_example }}</span>
+<span class="sd">        pip_requirements: {{ pip_requirements }}</span>
+<span class="sd">        extra_pip_requirements: {{ extra_pip_requirements }}</span>
+<span class="sd">        metadata: Custom metadata dictionary passed to the model and stored in the MLmodel file.</span>
 
-<span class="sd">    :param artifacts: A dictionary containing ``&lt;name, artifact_uri&gt;`` entries. Remote artifact URIs</span>
-<span class="sd">                      are resolved to absolute filesystem paths, producing a dictionary of</span>
-<span class="sd">                      ``&lt;name, absolute_path&gt;`` entries. ``python_model`` can reference these</span>
-<span class="sd">                      resolved entries as the ``artifacts`` property of the ``context`` parameter</span>
-<span class="sd">                      in :func:`PythonModel.load_context() &lt;mlflow.pyfunc.PythonModel.load_context&gt;`</span>
-<span class="sd">                      and :func:`PythonModel.predict() &lt;mlflow.pyfunc.PythonModel.predict&gt;`.</span>
-<span class="sd">                      For example, consider the following ``artifacts`` dictionary::</span>
+<span class="sd">            .. Note:: Experimental: This parameter may change or be removed in a future</span>
+<span class="sd">                                    release without warning.</span>
 
-<span class="sd">                        {</span>
-<span class="sd">                            &quot;my_file&quot;: &quot;s3://my-bucket/path/to/my/file&quot;</span>
-<span class="sd">                        }</span>
+<span class="sd">        model_config: The model configuration to apply to the model. This configuration</span>
+<span class="sd">            is available during model loading.</span>
 
-<span class="sd">                      In this case, the ``&quot;my_file&quot;`` artifact is downloaded from S3. The</span>
-<span class="sd">                      ``python_model`` can then refer to ``&quot;my_file&quot;`` as an absolute filesystem</span>
-<span class="sd">                      path via ``context.artifacts[&quot;my_file&quot;]``.</span>
-
-<span class="sd">                      If ``None``, no artifacts are added to the model.</span>
-
-<span class="sd">    :param signature: :py:class:`ModelSignature &lt;mlflow.models.ModelSignature&gt;`</span>
-<span class="sd">                      describes model input and output :py:class:`Schema &lt;mlflow.types.Schema&gt;`.</span>
-<span class="sd">                      The model signature can be :py:func:`inferred &lt;mlflow.models.infer_signature&gt;`</span>
-<span class="sd">                      from datasets with valid model input (e.g. the training dataset with target</span>
-<span class="sd">                      column omitted) and valid model output (e.g. model predictions generated on</span>
-<span class="sd">                      the training dataset), for example:</span>
-
-<span class="sd">                      .. code-block:: python</span>
-
-<span class="sd">                        from mlflow.models import infer_signature</span>
-
-<span class="sd">                        train = df.drop_column(&quot;target_label&quot;)</span>
-<span class="sd">                        predictions = ...  # compute model predictions</span>
-<span class="sd">                        signature = infer_signature(train, predictions)</span>
-<span class="sd">    :param input_example: {{ input_example }}</span>
-<span class="sd">    :param pip_requirements: {{ pip_requirements }}</span>
-<span class="sd">    :param extra_pip_requirements: {{ extra_pip_requirements }}</span>
-<span class="sd">    :param metadata: Custom metadata dictionary passed to the model and stored in the MLmodel file.</span>
-
-<span class="sd">                     .. Note:: Experimental: This parameter may change or be removed in a future</span>
-<span class="sd">                                             release without warning.</span>
-<span class="sd">    :param model_config: The model configuration to apply to the model. This configuration</span>
-<span class="sd">                         is available during model loading.</span>
-
-<span class="sd">                     .. Note:: Experimental: This parameter may change or be removed in a future</span>
-<span class="sd">                                             release without warning.</span>
-<span class="sd">    :param example_no_conversion: {{ example_no_conversion }}</span>
+<span class="sd">            .. Note:: Experimental: This parameter may change or be removed in a future</span>
+<span class="sd">                                    release without warning.</span>
+<span class="sd">        example_no_conversion: {{ example_no_conversion }}</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">_validate_env_arguments</span><span class="p">(</span><span class="n">conda_env</span><span class="p">,</span> <span class="n">pip_requirements</span><span class="p">,</span> <span class="n">extra_pip_requirements</span><span class="p">)</span>
     <span class="n">_validate_pyfunc_model_config</span><span class="p">(</span><span class="n">model_config</span><span class="p">)</span>
@@ -2321,145 +2326,149 @@
 <span class="sd">    You cannot specify the parameters for the second workflow: ``loader_module``, ``data_path``</span>
 <span class="sd">    and the parameters for the first workflow: ``python_model``, ``artifacts`` together.</span>
 
-<span class="sd">    :param artifact_path: The run-relative artifact path to which to log the Python model.</span>
-<span class="sd">    :param loader_module: The name of the Python module that is used to load the model</span>
-<span class="sd">                          from ``data_path``. This module must define a method with the prototype</span>
-<span class="sd">                          ``_load_pyfunc(data_path)``. If not ``None``, this module and its</span>
-<span class="sd">                          dependencies must be included in one of the following locations:</span>
+<span class="sd">    Args:</span>
+<span class="sd">        artifact_path: The run-relative artifact path to which to log the Python model.</span>
+<span class="sd">        loader_module: The name of the Python module that is used to load the model</span>
+<span class="sd">            from ``data_path``. This module must define a method with the prototype</span>
+<span class="sd">            ``_load_pyfunc(data_path)``. If not ``None``, this module and its</span>
+<span class="sd">            dependencies must be included in one of the following locations:</span>
 
-<span class="sd">                          - The MLflow library.</span>
-<span class="sd">                          - Package(s) listed in the model&#39;s Conda environment, specified by</span>
-<span class="sd">                            the ``conda_env`` parameter.</span>
-<span class="sd">                          - One or more of the files specified by the ``code_path`` parameter.</span>
+<span class="sd">            - The MLflow library.</span>
+<span class="sd">            - Package(s) listed in the model&#39;s Conda environment, specified by</span>
+<span class="sd">              the ``conda_env`` parameter.</span>
+<span class="sd">            - One or more of the files specified by the ``code_path`` parameter.</span>
 
-<span class="sd">    :param data_path: Path to a file or directory containing model data.</span>
-<span class="sd">    :param code_path: A list of local filesystem paths to Python file dependencies (or directories</span>
-<span class="sd">                      containing file dependencies). These files are *prepended* to the system</span>
-<span class="sd">                      path before the model is loaded.</span>
-<span class="sd">    :param conda_env: {{ conda_env }}</span>
-<span class="sd">    :param python_model:</span>
-<span class="sd">        An instance of a subclass of :class:`~PythonModel` or a callable object with a single</span>
-<span class="sd">        argument (see the examples below). The passed-in object is serialized using the CloudPickle</span>
-<span class="sd">        library. Any dependencies of the class should be included in one of the following locations:</span>
+<span class="sd">        data_path: Path to a file or directory containing model data.</span>
+<span class="sd">        code_path: A list of local filesystem paths to Python file dependencies (or directories</span>
+<span class="sd">            containing file dependencies). These files are *prepended* to the system</span>
+<span class="sd">            path before the model is loaded.</span>
+<span class="sd">        conda_env: {{ conda_env }}</span>
+<span class="sd">        python_model:</span>
+<span class="sd">            An instance of a subclass of :class:`~PythonModel` or a callable object with a single</span>
+<span class="sd">            argument (see the examples below). The passed-in object is serialized using the</span>
+<span class="sd">            CloudPickle library. Any dependencies of the class should be included in one of the</span>
+<span class="sd">            following locations:</span>
 
-<span class="sd">        - The MLflow library.</span>
-<span class="sd">        - Package(s) listed in the model&#39;s Conda environment, specified by the ``conda_env``</span>
-<span class="sd">          parameter.</span>
-<span class="sd">        - One or more of the files specified by the ``code_path`` parameter.</span>
+<span class="sd">            - The MLflow library.</span>
+<span class="sd">            - Package(s) listed in the model&#39;s Conda environment, specified by the ``conda_env``</span>
+<span class="sd">              parameter.</span>
+<span class="sd">            - One or more of the files specified by the ``code_path`` parameter.</span>
 
-<span class="sd">        Note: If the class is imported from another module, as opposed to being defined in the</span>
-<span class="sd">        ``__main__`` scope, the defining module should also be included in one of the listed</span>
-<span class="sd">        locations.</span>
+<span class="sd">            Note: If the class is imported from another module, as opposed to being defined in the</span>
+<span class="sd">            ``__main__`` scope, the defining module should also be included in one of the listed</span>
+<span class="sd">            locations.</span>
 
-<span class="sd">        **Examples**</span>
+<span class="sd">            **Examples**</span>
 
-<span class="sd">        Class model</span>
+<span class="sd">            Class model</span>
 
-<span class="sd">        .. code-block:: python</span>
+<span class="sd">            .. code-block:: python</span>
 
-<span class="sd">            from typing import List</span>
-<span class="sd">            import mlflow</span>
+<span class="sd">                from typing import List</span>
+<span class="sd">                import mlflow</span>
 
 
-<span class="sd">            class MyModel(mlflow.pyfunc.PythonModel):</span>
-<span class="sd">                def predict(self, context, model_input: List[str], params=None) -&gt; List[str]:</span>
+<span class="sd">                class MyModel(mlflow.pyfunc.PythonModel):</span>
+<span class="sd">                    def predict(self, context, model_input: List[str], params=None) -&gt; List[str]:</span>
+<span class="sd">                        return [i.upper() for i in model_input]</span>
+
+
+<span class="sd">                with mlflow.start_run():</span>
+<span class="sd">                    model_info = mlflow.pyfunc.log_model(artifact_path=&quot;model&quot;, python_model=MyModel())  # pylint: disable=line-too-long</span>
+
+
+<span class="sd">                loaded_model = mlflow.pyfunc.load_model(model_uri=model_info.model_uri)</span>
+<span class="sd">                print(loaded_model.predict([&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]))  # -&gt; [&quot;A&quot;, &quot;B&quot;, &quot;C&quot;]</span>
+
+<span class="sd">            Functional model</span>
+
+<span class="sd">            .. note::</span>
+<span class="sd">                Experimental: Functional model support is experimental and may change or be removed</span>
+<span class="sd">                in a future release without warning.</span>
+
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                from typing import List</span>
+<span class="sd">                import mlflow</span>
+
+
+<span class="sd">                def predict(model_input: List[str]) -&gt; List[str]:</span>
 <span class="sd">                    return [i.upper() for i in model_input]</span>
 
 
-<span class="sd">            with mlflow.start_run():</span>
-<span class="sd">                model_info = mlflow.pyfunc.log_model(artifact_path=&quot;model&quot;, python_model=MyModel())</span>
+<span class="sd">                with mlflow.start_run():</span>
+<span class="sd">                    model_info = mlflow.pyfunc.log_model(</span>
+<span class="sd">                        artifact_path=&quot;model&quot;, python_model=predict, input_example=[&quot;a&quot;]</span>
+<span class="sd">                    )</span>
 
 
-<span class="sd">            loaded_model = mlflow.pyfunc.load_model(model_uri=model_info.model_uri)</span>
-<span class="sd">            print(loaded_model.predict([&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]))  # -&gt; [&quot;A&quot;, &quot;B&quot;, &quot;C&quot;]</span>
+<span class="sd">                loaded_model = mlflow.pyfunc.load_model(model_uri=model_info.model_uri)</span>
+<span class="sd">                print(loaded_model.predict([&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]))  # -&gt; [&quot;A&quot;, &quot;B&quot;, &quot;C&quot;]</span>
 
-<span class="sd">        Functional model</span>
+<span class="sd">            If the `predict` method or function has type annotations, MLflow automatically</span>
+<span class="sd">            constructs a model signature based on the type annotations (unless the ``signature``</span>
+<span class="sd">            argument is explicitly specified), and converts the input value to the specified type</span>
+<span class="sd">            before passing it to the function. Currently, the following type annotations are</span>
+<span class="sd">            supported:</span>
 
-<span class="sd">        .. note::</span>
-<span class="sd">            Experimental: Functional model support is experimental and may change or be removed in</span>
-<span class="sd">            a future release without warning.</span>
+<span class="sd">                - ``List[str]``</span>
+<span class="sd">                - ``List[Dict[str, str]]``</span>
 
-<span class="sd">        .. code-block:: python</span>
+<span class="sd">        artifacts: A dictionary containing ``&lt;name, artifact_uri&gt;`` entries. Remote artifact URIs</span>
+<span class="sd">            are resolved to absolute filesystem paths, producing a dictionary of</span>
+<span class="sd">            ``&lt;name, absolute_path&gt;`` entries. ``python_model`` can reference these</span>
+<span class="sd">            resolved entries as the ``artifacts`` property of the ``context`` parameter</span>
+<span class="sd">            in :func:`PythonModel.load_context() &lt;mlflow.pyfunc.PythonModel.load_context&gt;`</span>
+<span class="sd">            and :func:`PythonModel.predict() &lt;mlflow.pyfunc.PythonModel.predict&gt;`.</span>
+<span class="sd">            For example, consider the following ``artifacts`` dictionary::</span>
 
-<span class="sd">            from typing import List</span>
-<span class="sd">            import mlflow</span>
+<span class="sd">                {&quot;my_file&quot;: &quot;s3://my-bucket/path/to/my/file&quot;}</span>
 
+<span class="sd">            In this case, the ``&quot;my_file&quot;`` artifact is downloaded from S3. The</span>
+<span class="sd">            ``python_model`` can then refer to ``&quot;my_file&quot;`` as an absolute filesystem</span>
+<span class="sd">            path via ``context.artifacts[&quot;my_file&quot;]``.</span>
 
-<span class="sd">            def predict(model_input: List[str]) -&gt; List[str]:</span>
-<span class="sd">                return [i.upper() for i in model_input]</span>
+<span class="sd">            If ``None``, no artifacts are added to the model.</span>
+<span class="sd">        registered_model_name: This argument may change or be removed in a</span>
+<span class="sd">            future release without warning. If given, create a model</span>
+<span class="sd">            version under ``registered_model_name``, also creating a</span>
+<span class="sd">            registered model if one with the given name does not exist.</span>
 
+<span class="sd">        signature: :py:class:`ModelSignature &lt;mlflow.models.ModelSignature&gt;`</span>
+<span class="sd">            describes model input and output :py:class:`Schema &lt;mlflow.types.Schema&gt;`.</span>
+<span class="sd">            The model signature can be :py:func:`inferred &lt;mlflow.models.infer_signature&gt;`</span>
+<span class="sd">            from datasets with valid model input (e.g. the training dataset with target</span>
+<span class="sd">            column omitted) and valid model output (e.g. model predictions generated on</span>
+<span class="sd">            the training dataset), for example:</span>
 
-<span class="sd">            with mlflow.start_run():</span>
-<span class="sd">                model_info = mlflow.pyfunc.log_model(</span>
-<span class="sd">                    artifact_path=&quot;model&quot;, python_model=predict, input_example=[&quot;a&quot;]</span>
-<span class="sd">                )</span>
+<span class="sd">            .. code-block:: python</span>
 
+<span class="sd">                from mlflow.models import infer_signature</span>
 
-<span class="sd">            loaded_model = mlflow.pyfunc.load_model(model_uri=model_info.model_uri)</span>
-<span class="sd">            print(loaded_model.predict([&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]))  # -&gt; [&quot;A&quot;, &quot;B&quot;, &quot;C&quot;]</span>
+<span class="sd">                train = df.drop_column(&quot;target_label&quot;)</span>
+<span class="sd">                predictions = ...  # compute model predictions</span>
+<span class="sd">                signature = infer_signature(train, predictions)</span>
 
-<span class="sd">        If the `predict` method or function has type annotations, MLflow automatically constructs</span>
-<span class="sd">        a model signature based on the type annotations (unless the ``signature`` argument is</span>
-<span class="sd">        explicitly specified), and converts the input value to the specified type before passing</span>
-<span class="sd">        it to the function. Currently, the following type annotations are supported:</span>
+<span class="sd">        input_example: {{ input_example }}</span>
+<span class="sd">        await_registration_for: Number of seconds to wait for the model version to finish</span>
+<span class="sd">            being created and is in ``READY`` status. By default, the function</span>
+<span class="sd">            waits for five minutes. Specify 0 or None to skip waiting.</span>
+<span class="sd">        pip_requirements: {{ pip_requirements }}</span>
+<span class="sd">        extra_pip_requirements: {{ extra_pip_requirements }}</span>
+<span class="sd">        metadata: Custom metadata dictionary passed to the model and stored in the MLmodel file.</span>
 
-<span class="sd">            - ``List[str]``</span>
-<span class="sd">            - ``List[Dict[str, str]]``</span>
+<span class="sd">            .. Note:: Experimental: This parameter may change or be removed in a future</span>
+<span class="sd">                                    release without warning.</span>
+<span class="sd">        model_config: The model configuration to apply to the model. This configuration</span>
+<span class="sd">            is available during model loading.</span>
 
-<span class="sd">    :param artifacts: A dictionary containing ``&lt;name, artifact_uri&gt;`` entries. Remote artifact URIs</span>
-<span class="sd">                      are resolved to absolute filesystem paths, producing a dictionary of</span>
-<span class="sd">                      ``&lt;name, absolute_path&gt;`` entries. ``python_model`` can reference these</span>
-<span class="sd">                      resolved entries as the ``artifacts`` property of the ``context`` parameter</span>
-<span class="sd">                      in :func:`PythonModel.load_context() &lt;mlflow.pyfunc.PythonModel.load_context&gt;`</span>
-<span class="sd">                      and :func:`PythonModel.predict() &lt;mlflow.pyfunc.PythonModel.predict&gt;`.</span>
-<span class="sd">                      For example, consider the following ``artifacts`` dictionary::</span>
+<span class="sd">            .. Note:: Experimental: This parameter may change or be removed in a future</span>
+<span class="sd">                                    release without warning.</span>
+<span class="sd">        example_no_conversion: {{ example_no_conversion }}</span>
 
-<span class="sd">                        {</span>
-<span class="sd">                            &quot;my_file&quot;: &quot;s3://my-bucket/path/to/my/file&quot;</span>
-<span class="sd">                        }</span>
-
-<span class="sd">                      In this case, the ``&quot;my_file&quot;`` artifact is downloaded from S3. The</span>
-<span class="sd">                      ``python_model`` can then refer to ``&quot;my_file&quot;`` as an absolute filesystem</span>
-<span class="sd">                      path via ``context.artifacts[&quot;my_file&quot;]``.</span>
-
-<span class="sd">                      If ``None``, no artifacts are added to the model.</span>
-<span class="sd">    :param registered_model_name: This argument may change or be removed in a</span>
-<span class="sd">                                  future release without warning. If given, create a model</span>
-<span class="sd">                                  version under ``registered_model_name``, also creating a</span>
-<span class="sd">                                  registered model if one with the given name does not exist.</span>
-
-<span class="sd">    :param signature: :py:class:`ModelSignature &lt;mlflow.models.ModelSignature&gt;`</span>
-<span class="sd">                      describes model input and output :py:class:`Schema &lt;mlflow.types.Schema&gt;`.</span>
-<span class="sd">                      The model signature can be :py:func:`inferred &lt;mlflow.models.infer_signature&gt;`</span>
-<span class="sd">                      from datasets with valid model input (e.g. the training dataset with target</span>
-<span class="sd">                      column omitted) and valid model output (e.g. model predictions generated on</span>
-<span class="sd">                      the training dataset), for example:</span>
-
-<span class="sd">                      .. code-block:: python</span>
-
-<span class="sd">                        from mlflow.models import infer_signature</span>
-
-<span class="sd">                        train = df.drop_column(&quot;target_label&quot;)</span>
-<span class="sd">                        predictions = ...  # compute model predictions</span>
-<span class="sd">                        signature = infer_signature(train, predictions)</span>
-<span class="sd">    :param input_example: {{ input_example }}</span>
-<span class="sd">    :param await_registration_for: Number of seconds to wait for the model version to finish</span>
-<span class="sd">                            being created and is in ``READY`` status. By default, the function</span>
-<span class="sd">                            waits for five minutes. Specify 0 or None to skip waiting.</span>
-<span class="sd">    :param pip_requirements: {{ pip_requirements }}</span>
-<span class="sd">    :param extra_pip_requirements: {{ extra_pip_requirements }}</span>
-<span class="sd">    :param metadata: Custom metadata dictionary passed to the model and stored in the MLmodel file.</span>
-
-<span class="sd">                     .. Note:: Experimental: This parameter may change or be removed in a future</span>
-<span class="sd">                                             release without warning.</span>
-<span class="sd">    :param model_config: The model configuration to apply to the model. This configuration</span>
-<span class="sd">                         is available during model loading.</span>
-
-<span class="sd">                     .. Note:: Experimental: This parameter may change or be removed in a future</span>
-<span class="sd">                                             release without warning.</span>
-<span class="sd">    :param example_no_conversion: {{ example_no_conversion }}</span>
-<span class="sd">    :return: A :py:class:`ModelInfo &lt;mlflow.models.model.ModelInfo&gt;` instance that contains the</span>
-<span class="sd">             metadata of the logged model.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        A :py:class:`ModelInfo &lt;mlflow.models.model.ModelInfo&gt;` instance that contains the</span>
+<span class="sd">        metadata of the logged model.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">Model</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
         <span class="n">artifact_path</span><span class="o">=</span><span class="n">artifact_path</span><span class="p">,</span>
@@ -2495,18 +2504,22 @@
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Export model as a generic Python function model.</span>
-<span class="sd">    :param path: The path to which to save the Python model.</span>
-<span class="sd">    :param loader_module: The name of the Python module that is used to load the model</span>
-<span class="sd">                          from ``data_path``. This module must define a method with the prototype</span>
-<span class="sd">                          ``_load_pyfunc(data_path)``.</span>
-<span class="sd">    :param data_path: Path to a file or directory containing model data.</span>
-<span class="sd">    :param code_paths: A list of local filesystem paths to Python file dependencies (or directories</span>
-<span class="sd">                      containing file dependencies). These files are *prepended* to the system</span>
-<span class="sd">                      path before the model is loaded.</span>
-<span class="sd">    :param conda_env: Either a dictionary representation of a Conda environment or the path to a</span>
-<span class="sd">                      Conda environment yaml file. If provided, this decsribes the environment</span>
-<span class="sd">                      this model should be run in.</span>
-<span class="sd">    :return: Model configuration containing model info.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        path: The path to which to save the Python model.</span>
+<span class="sd">        loader_module: The name of the Python module that is used to load the model</span>
+<span class="sd">            from ``data_path``. This module must define a method with the prototype</span>
+<span class="sd">            ``_load_pyfunc(data_path)``.</span>
+<span class="sd">        data_path: Path to a file or directory containing model data.</span>
+<span class="sd">        code_paths: A list of local filesystem paths to Python file dependencies (or directories</span>
+<span class="sd">            containing file dependencies). These files are *prepended* to the system</span>
+<span class="sd">            path before the model is loaded.</span>
+<span class="sd">        conda_env: Either a dictionary representation of a Conda environment or the path to a</span>
+<span class="sd">            Conda environment yaml file. If provided, this describes the environment</span>
+<span class="sd">            this model should be run in.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Model configuration containing model info.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">data</span> <span class="o">=</span> <span class="kc">None</span>
@@ -2596,7 +2609,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../',
-      VERSION:'2.10.1.dev0',
+      VERSION:'2.10.3.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

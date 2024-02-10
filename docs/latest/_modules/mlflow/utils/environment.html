@@ -2,6 +2,7 @@
   
 
 <!DOCTYPE html>
+<!-- source: docs/source/_modules/mlflow/utils/environment -->
 <!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
@@ -9,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mlflow.utils.environment &mdash; MLflow 2.10.1.dev0 documentation</title>
+  <title>mlflow.utils.environment &mdash; MLflow 2.10.3.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -55,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="MLflow 2.10.1.dev0 documentation" href="../../../index.html"/>
+    <link rel="top" title="MLflow 2.10.3.dev0 documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
   
@@ -86,7 +87,7 @@
     <a href="../../../index.html" class="wy-nav-top-logo"
       ><img src="../../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.10.1.dev0</span>
+    <span class="version">2.10.3.dev0</span>
   </li>
 </ul>
   </nav>
@@ -211,7 +212,7 @@
 <span class="kn">from</span> <span class="nn">packaging.requirements</span> <span class="kn">import</span> <span class="n">InvalidRequirement</span><span class="p">,</span> <span class="n">Requirement</span>
 <span class="kn">from</span> <span class="nn">packaging.version</span> <span class="kn">import</span> <span class="n">Version</span>
 
-<span class="kn">from</span> <span class="nn">mlflow.environment_variables</span> <span class="kn">import</span> <span class="n">_MLFLOW_TESTING</span>
+<span class="kn">from</span> <span class="nn">mlflow.environment_variables</span> <span class="kn">import</span> <span class="n">_MLFLOW_TESTING</span><span class="p">,</span> <span class="n">MLFLOW_INPUT_EXAMPLE_INFERENCE_TIMEOUT</span>
 <span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
 <span class="kn">from</span> <span class="nn">mlflow.protos.databricks_pb2</span> <span class="kn">import</span> <span class="n">INVALID_PARAMETER_VALUE</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils</span> <span class="kn">import</span> <span class="n">PYTHON_VERSION</span><span class="p">,</span> <span class="n">insecure_hash</span>
@@ -221,6 +222,7 @@
     <span class="n">_parse_requirements</span><span class="p">,</span>
     <span class="n">warn_dependency_requirement_mismatches</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span> <span class="nn">mlflow.utils.timeout</span> <span class="kn">import</span> <span class="n">MlflowTimeoutError</span><span class="p">,</span> <span class="n">run_with_timeout</span>
 <span class="kn">from</span> <span class="nn">mlflow.version</span> <span class="kn">import</span> <span class="n">VERSION</span>
 
 <span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -587,10 +589,47 @@
         <span class="p">)</span>
 
 
-<span class="n">_INFER_PIP_REQUIREMENTS_FALLBACK_MESSAGE</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="s2">&quot;Encountered an unexpected error while inferring pip requirements (model URI: </span><span class="si">%s</span><span class="s2">, flavor: </span><span class="si">%s</span><span class="s2">),&quot;</span>
-    <span class="s2">&quot; fall back to return </span><span class="si">%s</span><span class="s2">. Set logging level to DEBUG to see the full traceback.&quot;</span>
+<span class="n">_INFER_PIP_REQUIREMENTS_GENERAL_ERROR_MESSAGE</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;Encountered an unexpected error while inferring pip requirements &quot;</span>
+    <span class="s2">&quot;(model URI: </span><span class="si">{model_uri}</span><span class="s2">, flavor: </span><span class="si">{flavor}</span><span class="s2">). Fall back to return </span><span class="si">{fallback}</span><span class="s2">. &quot;</span>
+    <span class="s2">&quot;Set logging level to DEBUG to see the full traceback. &quot;</span>
 <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">infer_pip_requirements_with_timeout</span><span class="p">(</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">flavor</span><span class="p">,</span> <span class="n">fallback</span><span class="p">):</span>
+    <span class="n">timeout</span> <span class="o">=</span> <span class="n">MLFLOW_INPUT_EXAMPLE_INFERENCE_TIMEOUT</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">timeout</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_IS_UNIX</span><span class="p">:</span>
+        <span class="n">timeout</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;On Windows, timeout is not supported for model requirement inference. Therefore, &quot;</span>
+            <span class="s2">&quot;the operation is not bound by a timeout and may hang indefinitely. If it hangs, &quot;</span>
+            <span class="s2">&quot;please consider specifying the signature manually.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">timeout</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">run_with_timeout</span><span class="p">(</span><span class="n">timeout</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">infer_pip_requirements</span><span class="p">(</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">flavor</span><span class="p">,</span> <span class="n">fallback</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">infer_pip_requirements</span><span class="p">(</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">flavor</span><span class="p">,</span> <span class="n">fallback</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">fallback</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">MlflowTimeoutError</span><span class="p">):</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s2">&quot;Attempted to infer pip requirements for the saved model or pipeline but the &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;operation timed out in </span><span class="si">{</span><span class="n">timeout</span><span class="si">}</span><span class="s2"> seconds. Fall back to return </span><span class="si">{</span><span class="n">fallback</span><span class="si">}</span><span class="s2">. &quot;</span>
+                    <span class="s2">&quot;You can specify a different timeout by setting the environment variable &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">MLFLOW_INPUT_EXAMPLE_INFERENCE_TIMEOUT</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="n">_INFER_PIP_REQUIREMENTS_GENERAL_ERROR_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">model_uri</span><span class="o">=</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">flavor</span><span class="o">=</span><span class="n">flavor</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="n">fallback</span>
+                <span class="p">)</span>
+            <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">fallback</span>
+        <span class="k">raise</span>
 
 
 <div class="viewcode-block" id="infer_pip_requirements"><a class="viewcode-back" href="../../../python_api/mlflow.models.html#mlflow.models.infer_pip_requirements">[docs]</a><span class="k">def</span> <span class="nf">infer_pip_requirements</span><span class="p">(</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">flavor</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -611,7 +650,11 @@
         <span class="k">return</span> <span class="n">_infer_requirements</span><span class="p">(</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">flavor</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">fallback</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">_INFER_PIP_REQUIREMENTS_FALLBACK_MESSAGE</span><span class="p">,</span> <span class="n">model_uri</span><span class="p">,</span> <span class="n">flavor</span><span class="p">,</span> <span class="n">fallback</span><span class="p">)</span>
+            <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="n">msg</span><span class="o">=</span><span class="n">_INFER_PIP_REQUIREMENTS_GENERAL_ERROR_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">model_uri</span><span class="o">=</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">flavor</span><span class="o">=</span><span class="n">flavor</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="n">fallback</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
             <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">fallback</span>
         <span class="k">raise</span></div>
@@ -1004,7 +1047,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../../',
-      VERSION:'2.10.1.dev0',
+      VERSION:'2.10.3.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

@@ -2,6 +2,7 @@
   
 
 <!DOCTYPE html>
+<!-- source: docs/source/_modules/mlflow/projects -->
 <!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
@@ -9,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mlflow.projects &mdash; MLflow 2.10.1.dev0 documentation</title>
+  <title>mlflow.projects &mdash; MLflow 2.10.3.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -55,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="MLflow 2.10.1.dev0 documentation" href="../../index.html"/>
+    <link rel="top" title="MLflow 2.10.3.dev0 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
@@ -86,7 +87,7 @@
     <a href="../../index.html" class="wy-nav-top-logo"
       ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.10.1.dev0</span>
+    <span class="version">2.10.3.dev0</span>
   </li>
 </ul>
   </nav>
@@ -251,9 +252,12 @@
 <span class="sd">    If ``experiment_name`` is provided and does not exist, an experiment</span>
 <span class="sd">    of that name is created and its id is returned.</span>
 
-<span class="sd">    :param experiment_name: Name of experiment under which to launch the run.</span>
-<span class="sd">    :param experiment_id: ID of experiment under which to launch the run.</span>
-<span class="sd">    :return: str</span>
+<span class="sd">    Args:</span>
+<span class="sd">        experiment_name: Name of experiment under which to launch the run.</span>
+<span class="sd">        experiment_id: ID of experiment under which to launch the run.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="n">experiment_name</span> <span class="ow">and</span> <span class="n">experiment_id</span><span class="p">:</span>
@@ -424,66 +428,70 @@
 <span class="sd">    For information on using this method in chained workflows, see `Building Multistep Workflows</span>
 <span class="sd">    &lt;../projects.html#building-multistep-workflows&gt;`_.</span>
 
-<span class="sd">    :raises: :py:class:`mlflow.exceptions.ExecutionException` If a run launched in blocking mode</span>
-<span class="sd">             is unsuccessful.</span>
+<span class="sd">    Raises:</span>
+<span class="sd">        :py:class:`mlflow.exceptions.ExecutionException` If a run launched in blocking mode</span>
+<span class="sd">            is unsuccessful.</span>
 
-<span class="sd">    :param uri: URI of project to run. A local filesystem path</span>
-<span class="sd">                or a Git repository URI (e.g. https://github.com/mlflow/mlflow-example)</span>
-<span class="sd">                pointing to a project directory containing an MLproject file.</span>
-<span class="sd">    :param entry_point: Entry point to run within the project. If no entry point with the specified</span>
-<span class="sd">                        name is found, runs the project file ``entry_point`` as a script,</span>
-<span class="sd">                        using &quot;python&quot; to run ``.py`` files and the default shell (specified by</span>
-<span class="sd">                        environment variable ``$SHELL``) to run ``.sh`` files.</span>
-<span class="sd">    :param version: For Git-based projects, either a commit hash or a branch name.</span>
-<span class="sd">    :param parameters: Parameters (dictionary) for the entry point command.</span>
-<span class="sd">    :param docker_args: Arguments (dictionary) for the docker command.</span>
-<span class="sd">    :param experiment_name: Name of experiment under which to launch the run.</span>
-<span class="sd">    :param experiment_id: ID of experiment under which to launch the run.</span>
-<span class="sd">    :param backend: Execution backend for the run: MLflow provides built-in support for &quot;local&quot;,</span>
-<span class="sd">                    &quot;databricks&quot;, and &quot;kubernetes&quot; (experimental) backends. If running against</span>
-<span class="sd">                    Databricks, will run against a Databricks workspace determined as follows:</span>
-<span class="sd">                    if a Databricks tracking URI of the form ``databricks://profile`` has been set</span>
-<span class="sd">                    (e.g. by setting the MLFLOW_TRACKING_URI environment variable), will run</span>
-<span class="sd">                    against the workspace specified by &lt;profile&gt;. Otherwise, runs against the</span>
-<span class="sd">                    workspace specified by the default Databricks CLI profile.</span>
-<span class="sd">    :param backend_config: A dictionary, or a path to a JSON file (must end in &#39;.json&#39;), which will</span>
-<span class="sd">                           be passed as config to the backend. The exact content which should be</span>
-<span class="sd">                           provided is different for each execution backend and is documented</span>
-<span class="sd">                           at https://www.mlflow.org/docs/latest/projects.html.</span>
-<span class="sd">    :param storage_dir: Used only if ``backend`` is &quot;local&quot;. MLflow downloads artifacts from</span>
-<span class="sd">                        distributed URIs passed to parameters of type ``path`` to subdirectories of</span>
-<span class="sd">                        ``storage_dir``.</span>
-<span class="sd">    :param synchronous: Whether to block while waiting for a run to complete. Defaults to True.</span>
-<span class="sd">                        Note that if ``synchronous`` is False and ``backend`` is &quot;local&quot;, this</span>
-<span class="sd">                        method will return, but the current process will block when exiting until</span>
-<span class="sd">                        the local run completes. If the current process is interrupted, any</span>
-<span class="sd">                        asynchronous runs launched via this method will be terminated. If</span>
-<span class="sd">                        ``synchronous`` is True and the run fails, the current process will</span>
-<span class="sd">                        error out as well.</span>
-<span class="sd">    :param run_id: Note: this argument is used internally by the MLflow project APIs and should</span>
-<span class="sd">                   not be specified. If specified, the run ID will be used instead of</span>
-<span class="sd">                   creating a new run.</span>
-<span class="sd">    :param run_name: The name to give the MLflow Run associated with the project execution.</span>
-<span class="sd">                     If ``None``, the MLflow Run name is left unset.</span>
-<span class="sd">    :param env_manager: Specify an environment manager to create a new environment for the run and</span>
-<span class="sd">                        install project dependencies within that environment. The following values</span>
-<span class="sd">                        are supported:</span>
+<span class="sd">    Args:</span>
+<span class="sd">        uri: URI of project to run. A local filesystem path</span>
+<span class="sd">            or a Git repository URI (e.g. https://github.com/mlflow/mlflow-example)</span>
+<span class="sd">            pointing to a project directory containing an MLproject file.</span>
+<span class="sd">        entry_point: Entry point to run within the project. If no entry point with the specified</span>
+<span class="sd">            name is found, runs the project file ``entry_point`` as a script,</span>
+<span class="sd">            using &quot;python&quot; to run ``.py`` files and the default shell (specified by</span>
+<span class="sd">            environment variable ``$SHELL``) to run ``.sh`` files.</span>
+<span class="sd">        version: For Git-based projects, either a commit hash or a branch name.</span>
+<span class="sd">        parameters: Parameters (dictionary) for the entry point command.</span>
+<span class="sd">        docker_args: Arguments (dictionary) for the docker command.</span>
+<span class="sd">        experiment_name: Name of experiment under which to launch the run.</span>
+<span class="sd">        experiment_id: ID of experiment under which to launch the run.</span>
+<span class="sd">        backend: Execution backend for the run: MLflow provides built-in support for &quot;local&quot;,</span>
+<span class="sd">            &quot;databricks&quot;, and &quot;kubernetes&quot; (experimental) backends. If running against</span>
+<span class="sd">            Databricks, will run against a Databricks workspace determined as follows:</span>
+<span class="sd">            if a Databricks tracking URI of the form ``databricks://profile`` has been set</span>
+<span class="sd">            (e.g. by setting the MLFLOW_TRACKING_URI environment variable), will run</span>
+<span class="sd">            against the workspace specified by &lt;profile&gt;. Otherwise, runs against the</span>
+<span class="sd">            workspace specified by the default Databricks CLI profile.</span>
+<span class="sd">        backend_config: A dictionary, or a path to a JSON file (must end in &#39;.json&#39;), which will</span>
+<span class="sd">            be passed as config to the backend. The exact content which should be</span>
+<span class="sd">            provided is different for each execution backend and is documented</span>
+<span class="sd">            at https://www.mlflow.org/docs/latest/projects.html.</span>
+<span class="sd">        storage_dir: Used only if ``backend`` is &quot;local&quot;. MLflow downloads artifacts from</span>
+<span class="sd">            distributed URIs passed to parameters of type ``path`` to subdirectories of</span>
+<span class="sd">            ``storage_dir``.</span>
+<span class="sd">        synchronous: Whether to block while waiting for a run to complete. Defaults to True.</span>
+<span class="sd">            Note that if ``synchronous`` is False and ``backend`` is &quot;local&quot;, this</span>
+<span class="sd">            method will return, but the current process will block when exiting until</span>
+<span class="sd">            the local run completes. If the current process is interrupted, any</span>
+<span class="sd">            asynchronous runs launched via this method will be terminated. If</span>
+<span class="sd">            ``synchronous`` is True and the run fails, the current process will</span>
+<span class="sd">            error out as well.</span>
+<span class="sd">        run_id: Note: this argument is used internally by the MLflow project APIs and should</span>
+<span class="sd">            not be specified. If specified, the run ID will be used instead of</span>
+<span class="sd">            creating a new run.</span>
+<span class="sd">        run_name: The name to give the MLflow Run associated with the project execution.</span>
+<span class="sd">            If ``None``, the MLflow Run name is left unset.</span>
+<span class="sd">        env_manager: Specify an environment manager to create a new environment for the run and</span>
+<span class="sd">            install project dependencies within that environment. The following values</span>
+<span class="sd">            are supported:</span>
 
-<span class="sd">                        - local: use the local environment</span>
-<span class="sd">                        - virtualenv: use virtualenv (and pyenv for Python version management)</span>
-<span class="sd">                        - conda: use conda</span>
+<span class="sd">            - local: use the local environment</span>
+<span class="sd">            - virtualenv: use virtualenv (and pyenv for Python version management)</span>
+<span class="sd">            - conda: use conda</span>
 
-<span class="sd">                        If unspecified, MLflow automatically determines the environment manager to</span>
-<span class="sd">                        use by inspecting files in the project directory. For example, if</span>
-<span class="sd">                        ``python_env.yaml`` is present, virtualenv will be used.</span>
-<span class="sd">    :param build_image: Whether to build a new docker image of the project or to reuse an existing</span>
-<span class="sd">                        image. Default: False (reuse an existing image)</span>
-<span class="sd">    :param docker_auth: A dictionary representing information to authenticate with a Docker</span>
-<span class="sd">                        registry. See `docker.client.DockerClient.login</span>
-<span class="sd">                        &lt;https://docker-py.readthedocs.io/en/stable/client.html#docker.client.DockerClient.login&gt;`_</span>
-<span class="sd">                        for available options.</span>
-<span class="sd">    :return: :py:class:`mlflow.projects.SubmittedRun` exposing information (e.g. run ID)</span>
-<span class="sd">             about the launched run.</span>
+<span class="sd">            If unspecified, MLflow automatically determines the environment manager to</span>
+<span class="sd">            use by inspecting files in the project directory. For example, if</span>
+<span class="sd">            ``python_env.yaml`` is present, virtualenv will be used.</span>
+<span class="sd">        build_image: Whether to build a new docker image of the project or to reuse an existing</span>
+<span class="sd">            image. Default: False (reuse an existing image)</span>
+<span class="sd">        docker_auth: A dictionary representing information to authenticate with a Docker</span>
+<span class="sd">            registry. See `docker.client.DockerClient.login</span>
+<span class="sd">            &lt;https://docker-py.readthedocs.io/en/stable/client.html#docker.client.DockerClient.login&gt;`_</span>
+<span class="sd">            for available options.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        :py:class:`mlflow.projects.SubmittedRun` exposing information (e.g. run ID)</span>
+<span class="sd">        about the launched run.</span>
 
 <span class="sd">    .. code-block:: python</span>
 <span class="sd">        :caption: Example</span>
@@ -659,7 +667,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../',
-      VERSION:'2.10.1.dev0',
+      VERSION:'2.10.3.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

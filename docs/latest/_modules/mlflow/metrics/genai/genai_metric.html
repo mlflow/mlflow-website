@@ -2,6 +2,7 @@
   
 
 <!DOCTYPE html>
+<!-- source: docs/source/_modules/mlflow/metrics/genai/genai_metric -->
 <!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
@@ -9,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mlflow.metrics.genai.genai_metric &mdash; MLflow 2.10.1.dev0 documentation</title>
+  <title>mlflow.metrics.genai.genai_metric &mdash; MLflow 2.10.3.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -55,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../../search.html"/>
-    <link rel="top" title="MLflow 2.10.1.dev0 documentation" href="../../../../index.html"/>
+    <link rel="top" title="MLflow 2.10.3.dev0 documentation" href="../../../../index.html"/>
         <link rel="up" title="mlflow.metrics" href="../../metrics.html"/> 
 
   
@@ -86,7 +87,7 @@
     <a href="../../../../index.html" class="wy-nav-top-logo"
       ><img src="../../../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.10.1.dev0</span>
+    <span class="version">2.10.3.dev0</span>
   </li>
 </ul>
   </nav>
@@ -301,35 +302,39 @@
 <span class="sd">    Create a genai metric used to evaluate LLM using LLM as a judge in MLflow. The full grading</span>
 <span class="sd">    prompt is stored in the metric_details field of the ``EvaluationMetric`` object.</span>
 
-<span class="sd">    :param name: Name of the metric.</span>
-<span class="sd">    :param definition: Definition of the metric.</span>
-<span class="sd">    :param grading_prompt: Grading criteria of the metric.</span>
-<span class="sd">    :param examples: (Optional) Examples of the metric.</span>
-<span class="sd">    :param version: (Optional) Version of the metric. Currently supported versions are: v1.</span>
-<span class="sd">    :param model: (Optional) Model uri of an openai, gateway, or deployments judge model in the</span>
-<span class="sd">        format of &quot;openai:/gpt-4&quot;, &quot;gateway:/my-route&quot;, &quot;endpoints:/databricks-llama-2-70b-chat&quot;.</span>
-<span class="sd">        Defaults to &quot;openai:/gpt-4&quot;. If using</span>
-<span class="sd">        Azure OpenAI, the ``OPENAI_DEPLOYMENT_NAME`` environment variable will take precedence.</span>
-<span class="sd">        Your use of a third party LLM service (e.g., OpenAI) for evaluation may be subject to and</span>
-<span class="sd">        governed by the LLM service&#39;s terms of use.</span>
-<span class="sd">    :param grading_context_columns: (Optional) The name of the grading context column, or a list of</span>
-<span class="sd">        grading context column names, required to compute the metric. The</span>
-<span class="sd">        ``grading_context_columns`` are used by the LLM as a judge as additional information to</span>
-<span class="sd">        compute the metric. The columns are extracted from the input dataset or output predictions</span>
-<span class="sd">        based on ``col_mapping`` in the ``evaluator_config`` passed to :py:func:`mlflow.evaluate()`.</span>
-<span class="sd">    :param include_input: (Optional) Whether to include the input when computing the metric.</span>
-<span class="sd">    :param parameters: (Optional) Parameters for the LLM used to compute the metric. By default, we</span>
-<span class="sd">        set the temperature to 0.0, max_tokens to 200, and top_p to 1.0. We recommend</span>
-<span class="sd">        setting the temperature to 0.0 for the LLM used as a judge to ensure consistent results.</span>
-<span class="sd">    :param aggregations: (Optional) The list of options to aggregate the scores. Currently supported</span>
-<span class="sd">        options are: min, max, mean, median, variance, p90.</span>
-<span class="sd">    :param greater_is_better: (Optional) Whether the metric is better when it is greater.</span>
-<span class="sd">    :param max_workers: (Optional) The maximum number of workers to use for judge scoring.</span>
-<span class="sd">        Defaults to 10 workers.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        name: Name of the metric.</span>
+<span class="sd">        definition: Definition of the metric.</span>
+<span class="sd">        grading_prompt: Grading criteria of the metric.</span>
+<span class="sd">        examples: (Optional) Examples of the metric.</span>
+<span class="sd">        version: (Optional) Version of the metric. Currently supported versions are: v1.</span>
+<span class="sd">        model: (Optional) Model uri of an openai, gateway, or deployments judge model in the</span>
+<span class="sd">            format of &quot;openai:/gpt-4&quot;, &quot;gateway:/my-route&quot;,</span>
+<span class="sd">            &quot;endpoints:/databricks-llama-2-70b-chat&quot;.  Defaults to &quot;openai:/gpt-4&quot;. If using</span>
+<span class="sd">            Azure OpenAI, the ``OPENAI_DEPLOYMENT_NAME`` environment variable will take precedence.</span>
+<span class="sd">            Your use of a third party LLM service (e.g., OpenAI) for evaluation may be subject to</span>
+<span class="sd">            and governed by the LLM service&#39;s terms of use.</span>
+<span class="sd">        grading_context_columns: (Optional) The name of the grading context column, or a list of</span>
+<span class="sd">            grading context column names, required to compute the metric. The</span>
+<span class="sd">            ``grading_context_columns`` are used by the LLM as a judge as additional information to</span>
+<span class="sd">            compute the metric. The columns are extracted from the input dataset or output</span>
+<span class="sd">            predictions based on ``col_mapping`` in the ``evaluator_config`` passed to</span>
+<span class="sd">            :py:func:`mlflow.evaluate()`.  include_input: (Optional) Whether to include the input</span>
+<span class="sd">            when computing the metric.</span>
+<span class="sd">        parameters: (Optional) Parameters for the LLM used to compute the metric. By default, we</span>
+<span class="sd">            set the temperature to 0.0, max_tokens to 200, and top_p to 1.0. We recommend</span>
+<span class="sd">            setting the temperature to 0.0 for the LLM used as a judge to ensure consistent results.</span>
+<span class="sd">        aggregations: (Optional) The list of options to aggregate the scores. Currently supported</span>
+<span class="sd">            options are: min, max, mean, median, variance, p90.</span>
+<span class="sd">        greater_is_better: (Optional) Whether the metric is better when it is greater.</span>
+<span class="sd">        max_workers: (Optional) The maximum number of workers to use for judge scoring.</span>
+<span class="sd">            Defaults to 10 workers.</span>
 
-<span class="sd">    :return: A metric object.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        A metric object.</span>
 
-<span class="sd">    .. testcode:: python</span>
+<span class="sd">    .. code-block:: python</span>
+<span class="sd">        :test:</span>
 <span class="sd">        :caption: Example for creating a genai metric</span>
 
 <span class="sd">        from mlflow.metrics.genai import EvaluationExample, make_genai_metric</span>
@@ -357,7 +362,6 @@
 <span class="sd">                )</span>
 <span class="sd">            },</span>
 <span class="sd">        )</span>
-
 <span class="sd">        metric = make_genai_metric(</span>
 <span class="sd">            name=&quot;answer_correctness&quot;,</span>
 <span class="sd">            definition=(</span>
@@ -630,7 +634,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../../../',
-      VERSION:'2.10.1.dev0',
+      VERSION:'2.10.3.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

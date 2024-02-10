@@ -2,6 +2,7 @@
   
 
 <!DOCTYPE html>
+<!-- source: docs/source/_modules/mlflow/models/evaluation/base -->
 <!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
@@ -9,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mlflow.models.evaluation.base &mdash; MLflow 2.10.1.dev0 documentation</title>
+  <title>mlflow.models.evaluation.base &mdash; MLflow 2.10.3.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -55,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../../search.html"/>
-    <link rel="top" title="MLflow 2.10.1.dev0 documentation" href="../../../../index.html"/>
+    <link rel="top" title="MLflow 2.10.3.dev0 documentation" href="../../../../index.html"/>
         <link rel="up" title="Module code" href="../../../index.html"/> 
 
   
@@ -86,7 +87,7 @@
     <a href="../../../../index.html" class="wy-nav-top-logo"
       ><img src="../../../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.10.1.dev0</span>
+    <span class="version">2.10.3.dev0</span>
   </li>
 </ul>
   </nav>
@@ -201,6 +202,7 @@
                 
   <h1>Source code for mlflow.models.evaluation.base</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">keyword</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">operator</span>
@@ -277,42 +279,45 @@
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    An evaluation metric.</span>
 
-<span class="sd">    :param eval_fn:</span>
-<span class="sd">        A function that computes the metric with the following signature:</span>
+<span class="sd">    Args:</span>
+<span class="sd">        eval_fn: A function that computes the metric with the following signature:</span>
 
-<span class="sd">        .. code-block:: python</span>
+<span class="sd">            .. code-block:: python</span>
 
-<span class="sd">            def eval_fn(</span>
-<span class="sd">                predictions: pandas.Series,</span>
-<span class="sd">                targets: pandas.Series,</span>
-<span class="sd">                metrics: Dict[str, MetricValue],</span>
-<span class="sd">                **kwargs,</span>
-<span class="sd">            ) -&gt; Union[float, MetricValue]:</span>
-<span class="sd">                &quot;&quot;&quot;</span>
-<span class="sd">                :param predictions: A pandas Series containing the predictions made by the model.</span>
-<span class="sd">                :param targets: (Optional) A pandas Series containing the corresponding labels</span>
-<span class="sd">                    for the predictions made on that input.</span>
-<span class="sd">                :param metrics: (Optional) A dictionary containing the metrics calculated by the</span>
-<span class="sd">                    default evaluator.</span>
-<span class="sd">                    The keys are the names of the metrics and the values are the metric values.</span>
-<span class="sd">                    To access the MetricValue for the metrics calculated by the system, make sure</span>
-<span class="sd">                    to specify the type hint for this parameter as Dict[str, MetricValue].</span>
-<span class="sd">                    Refer to the DefaultEvaluator behavior section for what metrics</span>
-<span class="sd">                    will be returned based on the type of model (i.e. classifier or regressor).</span>
-<span class="sd">                :param kwargs: Includes a list of args that are used to compute the metric. These</span>
-<span class="sd">                    args could information coming from input data, model outputs or parameters</span>
-<span class="sd">                    specified in the `evaluator_config` argument of the `mlflow.evaluate` API.</span>
-<span class="sd">                :return:</span>
-<span class="sd">                    MetricValue with per-row scores, per-row justifications, and aggregate results.</span>
-<span class="sd">                &quot;&quot;&quot;</span>
-<span class="sd">                ...</span>
+<span class="sd">                def eval_fn(</span>
+<span class="sd">                    predictions: pandas.Series,</span>
+<span class="sd">                    targets: pandas.Series,</span>
+<span class="sd">                    metrics: Dict[str, MetricValue],</span>
+<span class="sd">                    **kwargs,</span>
+<span class="sd">                ) -&gt; Union[float, MetricValue]:</span>
+<span class="sd">                    &quot;&quot;&quot;</span>
+<span class="sd">                    Args:</span>
+<span class="sd">                        predictions: A pandas Series containing the predictions made by the model.</span>
+<span class="sd">                        targets: (Optional) A pandas Series containing the corresponding labels</span>
+<span class="sd">                            for the predictions made on that input.</span>
+<span class="sd">                        metrics: (Optional) A dictionary containing the metrics calculated by the</span>
+<span class="sd">                            default evaluator.  The keys are the names of the metrics and the values</span>
+<span class="sd">                            are the metric values.  To access the MetricValue for the metrics</span>
+<span class="sd">                            calculated by the system, make sure to specify the type hint for this</span>
+<span class="sd">                            parameter as Dict[str, MetricValue].  Refer to the DefaultEvaluator</span>
+<span class="sd">                            behavior section for what metrics will be returned based on the type of</span>
+<span class="sd">                            model (i.e. classifier or regressor).</span>
+<span class="sd">                        kwargs: Includes a list of args that are used to compute the metric. These</span>
+<span class="sd">                            args could information coming from input data, model outputs or</span>
+<span class="sd">                            parameters specified in the `evaluator_config` argument of the</span>
+<span class="sd">                            `mlflow.evaluate` API.</span>
 
-<span class="sd">    :param name: The name of the metric.</span>
-<span class="sd">    :param greater_is_better: Whether a higher value of the metric is better.</span>
-<span class="sd">    :param long_name: (Optional) The long name of the metric. For example,</span>
-<span class="sd">        ``&quot;root_mean_squared_error&quot;`` for ``&quot;mse&quot;``.</span>
-<span class="sd">    :param version: (Optional) The metric version. For example ``v1``.</span>
-<span class="sd">    :param metric_details: (Optional) A description of the metric and how it is calculated.</span>
+<span class="sd">                    Returns: MetricValue with per-row scores, per-row justifications, and aggregate</span>
+<span class="sd">                        results.</span>
+<span class="sd">                    &quot;&quot;&quot;</span>
+<span class="sd">                    ...</span>
+
+<span class="sd">        name: The name of the metric.</span>
+<span class="sd">        greater_is_better: Whether a higher value of the metric is better.</span>
+<span class="sd">        long_name: (Optional) The long name of the metric. For example,</span>
+<span class="sd">            ``&quot;root_mean_squared_error&quot;`` for ``&quot;mse&quot;``.</span>
+<span class="sd">        version: (Optional) The metric version. For example ``v1``.</span>
+<span class="sd">        metric_details: (Optional) A description of the metric and how it is calculated.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -350,43 +355,45 @@
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    A factory function to create an :py:class:`EvaluationMetric` object.</span>
 
-<span class="sd">    :param eval_fn:</span>
-<span class="sd">        A function that computes the metric with the following signature:</span>
+<span class="sd">    Args:</span>
+<span class="sd">        eval_fn: A function that computes the metric with the following signature:</span>
 
-<span class="sd">        .. code-block:: python</span>
+<span class="sd">            .. code-block:: python</span>
 
-<span class="sd">            def eval_fn(</span>
-<span class="sd">                predictions: pandas.Series,</span>
-<span class="sd">                targets: pandas.Series,</span>
-<span class="sd">                metrics: Dict[str, MetricValue],</span>
-<span class="sd">                **kwargs,</span>
-<span class="sd">            ) -&gt; Union[float, MetricValue]:</span>
-<span class="sd">                &quot;&quot;&quot;</span>
-<span class="sd">                :param predictions: A pandas Series containing the predictions made by the model.</span>
-<span class="sd">                :param targets: (Optional) A pandas Series containing the corresponding labels</span>
-<span class="sd">                    for the predictions made on that input.</span>
-<span class="sd">                :param metrics: (Optional) A dictionary containing the metrics calculated by the</span>
-<span class="sd">                    default evaluator.</span>
-<span class="sd">                    The keys are the names of the metrics and the values are the metric values.</span>
-<span class="sd">                    To access the MetricValue for the metrics calculated by the system, make sure</span>
-<span class="sd">                    to specify the type hint for this parameter as Dict[str, MetricValue].</span>
-<span class="sd">                    Refer to the DefaultEvaluator behavior section for what metrics</span>
-<span class="sd">                    will be returned based on the type of model (i.e. classifier or regressor).</span>
-<span class="sd">                :param kwargs: Includes a list of args that are used to compute the metric. These</span>
-<span class="sd">                    args could information coming from input data, model outputs or parameters</span>
-<span class="sd">                    specified in the `evaluator_config` argument of the `mlflow.evaluate` API.</span>
-<span class="sd">                :return:</span>
-<span class="sd">                    MetricValue with per-row scores, per-row justifications, and aggregate results.</span>
-<span class="sd">                &quot;&quot;&quot;</span>
-<span class="sd">                ...</span>
+<span class="sd">                def eval_fn(</span>
+<span class="sd">                    predictions: pandas.Series,</span>
+<span class="sd">                    targets: pandas.Series,</span>
+<span class="sd">                    metrics: Dict[str, MetricValue],</span>
+<span class="sd">                    **kwargs,</span>
+<span class="sd">                ) -&gt; Union[float, MetricValue]:</span>
+<span class="sd">                    &quot;&quot;&quot;</span>
+<span class="sd">                    Args:</span>
+<span class="sd">                        predictions: A pandas Series containing the predictions made by the model.</span>
+<span class="sd">                        targets: (Optional) A pandas Series containing the corresponding labels</span>
+<span class="sd">                            for the predictions made on that input.</span>
+<span class="sd">                        metrics: (Optional) A dictionary containing the metrics calculated by the</span>
+<span class="sd">                            default evaluator.  The keys are the names of the metrics and the values</span>
+<span class="sd">                            are the metric values.  To access the MetricValue for the metrics</span>
+<span class="sd">                            calculated by the system, make sure to specify the type hint for this</span>
+<span class="sd">                            parameter as Dict[str, MetricValue].  Refer to the DefaultEvaluator</span>
+<span class="sd">                            behavior section for what metrics will be returned based on the type of</span>
+<span class="sd">                            model (i.e. classifier or regressor).  kwargs: Includes a list of args</span>
+<span class="sd">                            that are used to compute the metric. These args could information coming</span>
+<span class="sd">                            from input data, model outputs or parameters specified in the</span>
+<span class="sd">                            `evaluator_config` argument of the `mlflow.evaluate` API.</span>
 
-<span class="sd">    :param greater_is_better: Whether a higher value of the metric is better.</span>
-<span class="sd">    :param name: The name of the metric. This argument must be specified if ``eval_fn`` is a lambda</span>
-<span class="sd">                 function or the ``eval_fn.__name__`` attribute is not available.</span>
-<span class="sd">    :param long_name: (Optional) The long name of the metric. For example, ``&quot;mean_squared_error&quot;``</span>
-<span class="sd">        for ``&quot;mse&quot;``.</span>
-<span class="sd">    :param version: (Optional) The metric version. For example ``v1``.</span>
-<span class="sd">    :param metric_details: (Optional) A description of the metric and how it is calculated.</span>
+<span class="sd">                    Returns: MetricValue with per-row scores, per-row justifications, and aggregate</span>
+<span class="sd">                        results.</span>
+<span class="sd">                    &quot;&quot;&quot;</span>
+<span class="sd">                    ...</span>
+
+<span class="sd">        greater_is_better: Whether a higher value of the metric is better.</span>
+<span class="sd">        name: The name of the metric. This argument must be specified if ``eval_fn`` is a lambda</span>
+<span class="sd">                    function or the ``eval_fn.__name__`` attribute is not available.</span>
+<span class="sd">        long_name: (Optional) The long name of the metric. For example, ``&quot;mean_squared_error&quot;``</span>
+<span class="sd">            for ``&quot;mse&quot;``.</span>
+<span class="sd">        version: (Optional) The metric version. For example ``v1``.</span>
+<span class="sd">        metric_details: (Optional) A description of the metric and how it is calculated.</span>
 
 <span class="sd">    .. seealso::</span>
 
@@ -405,6 +412,33 @@
                 <span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="n">name</span> <span class="o">=</span> <span class="n">eval_fn</span><span class="o">.</span><span class="vm">__name__</span>
+
+    <span class="k">if</span> <span class="s2">&quot;/&quot;</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Invalid metric name &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;. Metric names cannot include forward slashes (&#39;/&#39;).&quot;</span><span class="p">,</span>
+            <span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="o">.</span><span class="n">isidentifier</span><span class="p">():</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;The metric name &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; provided is not a valid Python identifier, which will &quot;</span>
+            <span class="s2">&quot;prevent its use as a base metric for derived metrics. Please use a valid identifier &quot;</span>
+            <span class="s2">&quot;to enable creation of derived metrics that use the given metric.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">keyword</span><span class="o">.</span><span class="n">iskeyword</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;The metric name &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; is a reserved Python keyword, which will &quot;</span>
+            <span class="s2">&quot;prevent its use as a base metric for derived metrics. Please use a valid identifier &quot;</span>
+            <span class="s2">&quot;to enable creation of derived metrics that use the given metric.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;predictions&quot;</span><span class="p">,</span> <span class="s2">&quot;targets&quot;</span><span class="p">,</span> <span class="s2">&quot;metrics&quot;</span><span class="p">]:</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;The metric name &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; is used as a special parameter in MLflow metrics, which &quot;</span>
+            <span class="s2">&quot;will prevent its use as a base metric for derived metrics. Please use a different &quot;</span>
+            <span class="s2">&quot;name to enable creation of derived metrics that use the given metric.&quot;</span>
+        <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">EvaluationMetric</span><span class="p">(</span><span class="n">eval_fn</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">greater_is_better</span><span class="p">,</span> <span class="n">long_name</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">metric_details</span><span class="p">)</span></div>
 
@@ -585,9 +619,32 @@
 
 
 <span class="k">def</span> <span class="nf">_hash_ndarray_as_bytes</span><span class="p">(</span><span class="n">nd_array</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">nd_array</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="n">nd_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">nd_array</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">_hash_uint64_ndarray_as_bytes</span><span class="p">(</span>
         <span class="n">pd</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">hash_array</span><span class="p">(</span><span class="n">nd_array</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="s2">&quot;C&quot;</span><span class="p">))</span>
     <span class="p">)</span> <span class="o">+</span> <span class="n">_hash_uint64_ndarray_as_bytes</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">nd_array</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint64&quot;</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">_hash_data_as_bytes</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="n">_hash_ndarray_as_bytes</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_hash_dict_as_bytes</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_hash_uint64_ndarray_as_bytes</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">hash_array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">data</span><span class="p">])))</span>
+    <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported data type for hashing: `</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s2">`&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_hash_dict_as_bytes</span><span class="p">(</span><span class="n">data_dict</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">_hash_ndarray_as_bytes</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">data_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">+=</span> <span class="n">_hash_ndarray_as_bytes</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">data_dict</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+    <span class="c1"># If the values containing non-hashable objects, we will hash the values recursively.</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">data_dict</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">result</span> <span class="o">+=</span> <span class="n">_hash_data_as_bytes</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
 
 
 <span class="k">def</span> <span class="nf">_hash_array_like_obj_as_bytes</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
@@ -607,10 +664,8 @@
             <span class="k">if</span> <span class="n">spark_vector_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">spark_vector_type</span><span class="p">):</span>
                     <span class="k">return</span> <span class="n">_hash_ndarray_as_bytes</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">toArray</span><span class="p">())</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-                <span class="k">return</span> <span class="n">_hash_ndarray_as_bytes</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-                <span class="k">return</span> <span class="n">_hash_ndarray_as_bytes</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+                <span class="k">return</span> <span class="n">_hash_data_as_bytes</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">v</span>
 
         <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">applymap</span><span class="p">(</span><span class="n">_hash_array_like_element_as_bytes</span><span class="p">)</span>
@@ -963,13 +1018,15 @@
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">can_evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">model_type</span><span class="p">,</span> <span class="n">evaluator_config</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param model_type: A string describing the model type (e.g., &quot;regressor&quot;, &quot;classifier&quot;, …).</span>
-<span class="sd">        :param evaluator_config: A dictionary of additional configurations for</span>
-<span class="sd">                                 the evaluator.</span>
-<span class="sd">        :param kwargs: For forwards compatibility, a placeholder for additional arguments</span>
-<span class="sd">                       that may be added to the evaluation interface in the future.</span>
-<span class="sd">        :return: True if the evaluator can evaluate the specified model on the</span>
-<span class="sd">                 specified dataset. False otherwise.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            model_type: A string describing the model type (e.g., &quot;regressor&quot;, &quot;classifier&quot;, …).</span>
+<span class="sd">            evaluator_config: A dictionary of additional configurations for</span>
+<span class="sd">                the evaluator.</span>
+<span class="sd">            kwargs: For forwards compatibility, a placeholder for additional arguments</span>
+<span class="sd">                that may be added to the evaluation interface in the future.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            True if the evaluator can evaluate the specified model on the</span>
+<span class="sd">            specified dataset. False otherwise.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
@@ -992,31 +1049,34 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The abstract API to log metrics and artifacts, and return evaluation results.</span>
 
-<span class="sd">        :param model_type: A string describing the model type</span>
-<span class="sd">                           (e.g., ``&quot;regressor&quot;``, ``&quot;classifier&quot;``, …).</span>
-<span class="sd">        :param dataset: An instance of `mlflow.models.evaluation.base._EvaluationDataset`</span>
-<span class="sd">                        containing features and labels (optional) for model evaluation.</span>
-<span class="sd">        :param run_id: The ID of the MLflow Run to which to log results.</span>
-<span class="sd">        :param evaluator_config: A dictionary of additional configurations for</span>
-<span class="sd">                                 the evaluator.</span>
-<span class="sd">        :param model: A pyfunc model instance, used as the candidate_model</span>
-<span class="sd">                      to be compared with baseline_model (specified by the `baseline_model` param)</span>
-<span class="sd">                      for model validation. If None, the model output is supposed to be found in</span>
-<span class="sd">                      ``dataset.predictions_data``.</span>
-<span class="sd">        :param extra_metrics: A list of :py:class:`EvaluationMetric` objects.</span>
-<span class="sd">        :param custom_artifacts: A list of callable custom artifact functions.</span>
-<span class="sd">        :param kwargs: For forwards compatibility, a placeholder for additional arguments that</span>
-<span class="sd">                       may be added to the evaluation interface in the future.</span>
-<span class="sd">        :param baseline_model: (Optional) A string URI referring to a MLflow model with the pyfunc</span>
-<span class="sd">                                          flavor as a baseline model to be compared with the</span>
-<span class="sd">                                          candidate model (specified by the `model` param) for model</span>
-<span class="sd">                                          validation. (pyfunc model instance is not allowed)</span>
-<span class="sd">        :param predictions: The column name of the model output column that is used for evaluation.</span>
-<span class="sd">                            This is only used when a model returns a pandas dataframe that contains</span>
-<span class="sd">                            multiple columns.</span>
-<span class="sd">        :return: A :py:class:`mlflow.models.EvaluationResult` instance containing</span>
-<span class="sd">                 evaluation metrics for candidate model and baseline model and</span>
-<span class="sd">                 artifacts for candidate model.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            model_type: A string describing the model type</span>
+<span class="sd">                (e.g., ``&quot;regressor&quot;``, ``&quot;classifier&quot;``, …).</span>
+<span class="sd">            dataset: An instance of `mlflow.models.evaluation.base._EvaluationDataset`</span>
+<span class="sd">                containing features and labels (optional) for model evaluation.</span>
+<span class="sd">            run_id: The ID of the MLflow Run to which to log results.</span>
+<span class="sd">            evaluator_config: A dictionary of additional configurations for</span>
+<span class="sd">                the evaluator.</span>
+<span class="sd">            model: A pyfunc model instance, used as the candidate_model</span>
+<span class="sd">                to be compared with baseline_model (specified by the `baseline_model` param)</span>
+<span class="sd">                for model validation. If None, the model output is supposed to be found in</span>
+<span class="sd">                ``dataset.predictions_data``.</span>
+<span class="sd">            extra_metrics: A list of :py:class:`EvaluationMetric` objects.</span>
+<span class="sd">            custom_artifacts: A list of callable custom artifact functions.</span>
+<span class="sd">            kwargs: For forwards compatibility, a placeholder for additional arguments that</span>
+<span class="sd">                may be added to the evaluation interface in the future.</span>
+<span class="sd">            baseline_model: (Optional) A string URI referring to a MLflow model with the pyfunc</span>
+<span class="sd">                flavor as a baseline model to be compared with the</span>
+<span class="sd">                candidate model (specified by the `model` param) for model</span>
+<span class="sd">                validation. (pyfunc model instance is not allowed)</span>
+<span class="sd">            predictions: The column name of the model output column that is used for evaluation.</span>
+<span class="sd">                This is only used when a model returns a pandas dataframe that contains</span>
+<span class="sd">                multiple columns.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A :py:class:`mlflow.models.EvaluationResult` instance containing</span>
+<span class="sd">            evaluation metrics for candidate model and baseline model and</span>
+<span class="sd">            artifacts for candidate model.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
@@ -1151,10 +1211,12 @@
 <span class="sd">    Validate the model based on validation_thresholds by metrics value and</span>
 <span class="sd">    metrics comparison between candidate model&#39;s metrics (candidate_metrics) and</span>
 <span class="sd">    baseline model&#39;s metrics (baseline_metrics).</span>
-<span class="sd">    :param validation_thresholds: A dictionary from metric_name to MetricThreshold.</span>
-<span class="sd">    :param candidate_metrics: The metric evaluation result of the candidate model.</span>
-<span class="sd">    :param baseline_metrics: The metric evaluation result of the baseline model.</span>
-<span class="sd">    If the validation does not pass, raise an MlflowException with detail failure message.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        validation_thresholds: A dictionary from metric_name to MetricThreshold.</span>
+<span class="sd">        candidate_metrics: The metric evaluation result of the candidate model.</span>
+<span class="sd">        baseline_metrics: The metric evaluation result of the baseline model.</span>
+<span class="sd">            If the validation does not pass, raise an MlflowException with detail failure message.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">baseline_metrics</span><span class="p">:</span>
         <span class="n">baseline_metrics</span> <span class="o">=</span> <span class="p">{}</span>
@@ -1386,7 +1448,8 @@
     <span class="n">model_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">baseline_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Evaluate the model performance on given data and selected metrics.</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Evaluate the model performance on given data and selected metrics.</span>
 
 <span class="sd">    This function evaluates a PyFunc model or custom callable on the specified dataset using</span>
 <span class="sd">    specified ``evaluators``, and logs resulting metrics &amp; artifacts to MLflow tracking server.</span>
@@ -1606,279 +1669,283 @@
 <span class="sd">          specified, unless the ``evaluator_config`` option **log_model_explainability** is</span>
 <span class="sd">          explicitly set to ``True``.</span>
 
-<span class="sd">    :param model: Optional. If specified, it should be one of the following:</span>
+<span class="sd">    Args:</span>
+<span class="sd">        model: Optional. If specified, it should be one of the following:</span>
 
-<span class="sd">                  - A pyfunc model instance</span>
+<span class="sd">            - A pyfunc model instance</span>
+<span class="sd">            - A URI referring to a pyfunc model</span>
+<span class="sd">            - A callable function: This function should be able to take in model input and</span>
+<span class="sd">              return predictions. It should follow the signature of the</span>
+<span class="sd">              :py:func:`predict &lt;mlflow.pyfunc.PyFuncModel.predict&gt;` method. Here&#39;s an example</span>
+<span class="sd">              of a valid function:</span>
 
-<span class="sd">                  - A URI referring to a pyfunc model</span>
+<span class="sd">              ..code-block:: python</span>
 
-<span class="sd">                  - A callable function: This function should be able to take in model input and</span>
-<span class="sd">                    return predictions. It should follow the signature of the</span>
-<span class="sd">                    :py:func:`predict &lt;mlflow.pyfunc.PyFuncModel.predict&gt;` method. Here&#39;s an example</span>
-<span class="sd">                    of a valid function:</span>
+<span class="sd">                  model = mlflow.pyfunc.load_model(model_uri)</span>
 
-<span class="sd">                        model = mlflow.pyfunc.load_model(model_uri)</span>
+<span class="sd">                  def fn(model_input):</span>
+<span class="sd">                      return model.predict(model_input)</span>
 
-<span class="sd">                        def fn(model_input):</span>
-<span class="sd">                            return model.predict(model_input)</span>
+<span class="sd">            If omitted, it indicates a static dataset will be used for evaluation instead of a</span>
+<span class="sd">            model.  In this case, the ``data`` argument must be a Pandas DataFrame or an mlflow</span>
+<span class="sd">            PandasDataset that contains model outputs, and the ``predictions`` argument must be the</span>
+<span class="sd">            name of the column in ``data`` that contains model outputs.</span>
 
-<span class="sd">        If omitted, it indicates a static dataset will be used for evaluation instead of a model.</span>
-<span class="sd">        In this case, the ``data`` argument must be a Pandas DataFrame or an mlflow PandasDataset</span>
-<span class="sd">        that contains model outputs, and the ``predictions`` argument must be the name of the</span>
-<span class="sd">        column in ``data`` that contains model outputs.</span>
+<span class="sd">        data: One of the</span>
+<span class="sd">            following:</span>
 
-<span class="sd">    :param data: One of the following:</span>
+<span class="sd">            - A numpy array or list of evaluation features, excluding labels.</span>
+<span class="sd">            - A Pandas DataFrame containing evaluation features, labels, and optionally model</span>
+<span class="sd">                outputs. Model outputs are required to be provided when model is unspecified.</span>
+<span class="sd">                If ``feature_names`` argument not specified, all columns except for the label</span>
+<span class="sd">                column and model_output column are regarded as feature columns. Otherwise,</span>
+<span class="sd">                only column names present in ``feature_names`` are regarded as feature columns.</span>
+<span class="sd">            -  A Spark DataFrame containing evaluation features and labels. If</span>
+<span class="sd">                ``feature_names`` argument not specified, all columns except for the label</span>
+<span class="sd">                column are regarded as feature columns. Otherwise, only column names present in</span>
+<span class="sd">                ``feature_names`` are regarded as feature columns. Only the first 10000 rows in</span>
+<span class="sd">                the Spark DataFrame will be used as evaluation data.</span>
+<span class="sd">            - A :py:class:`mlflow.data.dataset.Dataset` instance containing evaluation</span>
+<span class="sd">                features, labels, and optionally model outputs. Model outputs are only supported</span>
+<span class="sd">                with a PandasDataset. Model outputs are required when model is unspecified, and</span>
+<span class="sd">                should be specified via the ``predictions`` prerty of the PandasDataset.</span>
 
-<span class="sd">                 - A numpy array or list of evaluation features, excluding labels.</span>
+<span class="sd">        targets: If ``data`` is a numpy array or list, a numpy array or list of evaluation</span>
+<span class="sd">            labels. If ``data`` is a DataFrame, the string name of a column from ``data``</span>
+<span class="sd">            that contains evaluation labels. Required for classifier and regressor models,</span>
+<span class="sd">            but optional for question-answering, text-summarization, and text models. If</span>
+<span class="sd">            ``data`` is a :py:class:`mlflow.data.dataset.Dataset` that defines targets,</span>
+<span class="sd">            then ``targets`` is optional.</span>
 
-<span class="sd">                 - A Pandas DataFrame containing evaluation features, labels, and optionally model</span>
-<span class="sd">                   outputs. Model outputs are required to be provided when model is unspecified.</span>
-<span class="sd">                   If ``feature_names`` argument not specified, all columns except for the label</span>
-<span class="sd">                   column and model_output column are regarded as feature columns. Otherwise,</span>
-<span class="sd">                   only column names present in ``feature_names`` are regarded as feature columns.</span>
+<span class="sd">        predictions: Optional. The name of the column that contains model outputs. There are two</span>
+<span class="sd">            cases where this argument is required:</span>
 
-<span class="sd">                 -  A Spark DataFrame containing evaluation features and labels. If</span>
-<span class="sd">                    ``feature_names`` argument not specified, all columns except for the label</span>
-<span class="sd">                    column are regarded as feature columns. Otherwise, only column names present in</span>
-<span class="sd">                    ``feature_names`` are regarded as feature columns. Only the first 10000 rows in</span>
-<span class="sd">                    the Spark DataFrame will be used as evaluation data.</span>
+<span class="sd">            - When ``model`` is specified and outputs multiple columns. The</span>
+<span class="sd">              ``predictions`` should be the name of the column that is used for</span>
+<span class="sd">              evaluation.</span>
+<span class="sd">            - When ``model`` is not specified and ``data`` is a pandas dataframe. The</span>
+<span class="sd">              ``predictions`` should be the name of the column in ``data`` that</span>
+<span class="sd">              contains model outputs.</span>
 
-<span class="sd">                 - A :py:class:`mlflow.data.dataset.Dataset` instance containing evaluation</span>
-<span class="sd">                   features, labels, and optionally model outputs. Model outputs are only supported</span>
-<span class="sd">                   with a PandasDataset. Model outputs are required when model is unspecified, and</span>
-<span class="sd">                   should be specified via the ``predictions`` property of the PandasDataset.</span>
+<span class="sd">            .. code-block:: python</span>
+<span class="sd">                :caption: Example usage of predictions</span>
 
-<span class="sd">    :param targets: If ``data`` is a numpy array or list, a numpy array or list of evaluation</span>
-<span class="sd">                    labels. If ``data`` is a DataFrame, the string name of a column from ``data``</span>
-<span class="sd">                    that contains evaluation labels. Required for classifier and regressor models,</span>
-<span class="sd">                    but optional for question-answering, text-summarization, and text models. If</span>
-<span class="sd">                    ``data`` is a :py:class:`mlflow.data.dataset.Dataset` that defines targets,</span>
-<span class="sd">                    then ``targets`` is optional.</span>
-
-<span class="sd">    :param predictions: Optional. The name of the column that contains model outputs. There are two</span>
-<span class="sd">                        cases where this argument is required:</span>
-
-<span class="sd">                        - When ``model`` is specified and outputs multiple columns. The</span>
-<span class="sd">                          ``predictions`` should be the name of the column that is used for</span>
-<span class="sd">                          evaluation.</span>
-<span class="sd">                        - When ``model`` is not specified and ``data`` is a pandas dataframe. The</span>
-<span class="sd">                          ``predictions`` should be the name of the column in ``data`` that</span>
-<span class="sd">                          contains model outputs.</span>
-
-<span class="sd">        .. code-block:: python</span>
-<span class="sd">            :caption: Example usage of predictions</span>
-
-<span class="sd">            # Evaluate a model that outputs multiple columns</span>
-<span class="sd">            data = pd.DataFrame({&quot;question&quot;: [&quot;foo&quot;]})</span>
-
-
-<span class="sd">            def model(inputs):</span>
-<span class="sd">                return pd.DataFrame({&quot;answer&quot;: [&quot;bar&quot;], &quot;source&quot;: [&quot;baz&quot;]})</span>
+<span class="sd">                # Evaluate a model that outputs multiple columns</span>
+<span class="sd">                data = pd.DataFrame({&quot;question&quot;: [&quot;foo&quot;]})</span>
 
 
-<span class="sd">            results = evaluate(model=model, data=data, predictions=&quot;answer&quot;, ...)</span>
-
-<span class="sd">            # Evaluate a static dataset</span>
-<span class="sd">            data = pd.DataFrame({&quot;question&quot;: [&quot;foo&quot;], &quot;answer&quot;: [&quot;bar&quot;], &quot;source&quot;: [&quot;baz&quot;]})</span>
-<span class="sd">            results = evaluate(data=data, predictions=&quot;answer&quot;, ...)</span>
-
-<span class="sd">    :param model_type: (Optional) A string describing the model type. The default evaluator</span>
-<span class="sd">                       supports the following model types:</span>
-
-<span class="sd">                       - ``&#39;classifier&#39;``</span>
-<span class="sd">                       - ``&#39;regressor&#39;``</span>
-<span class="sd">                       - ``&#39;question-answering&#39;``</span>
-<span class="sd">                       - ``&#39;text-summarization&#39;``</span>
-<span class="sd">                       - ``&#39;text&#39;``</span>
-<span class="sd">                       - ``&#39;retriever&#39;``</span>
-
-<span class="sd">                       If no ``model_type`` is specified, then you must provide a a list of</span>
-<span class="sd">                       metrics to compute via the ``extra_metrics`` param.</span>
-
-<span class="sd">                       .. note::</span>
-<span class="sd">                            ``&#39;question-answering&#39;``, ``&#39;text-summarization&#39;``, ``&#39;text&#39;``, and</span>
-<span class="sd">                            ``&#39;retriever&#39;`` are experimental and may be changed or removed in a</span>
-<span class="sd">                            future release.</span>
-
-<span class="sd">    :param dataset_path: (Optional) The path where the data is stored. Must not contain double</span>
-<span class="sd">                         quotes (``“``). If specified, the path is logged to the ``mlflow.datasets``</span>
-<span class="sd">                         tag for lineage tracking purposes.</span>
-
-<span class="sd">    :param feature_names: (Optional) A list. If the ``data`` argument is a numpy array or list,</span>
-<span class="sd">                          ``feature_names`` is a list of the feature names for each feature. If</span>
-<span class="sd">                          ``feature_names=None``, then the ``feature_names`` are generated using the</span>
-<span class="sd">                          format ``feature_{feature_index}``. If the ``data`` argument is a Pandas</span>
-<span class="sd">                          DataFrame or a Spark DataFrame, ``feature_names`` is a list of the names</span>
-<span class="sd">                          of the feature columns in the DataFrame. If ``feature_names=None``, then</span>
-<span class="sd">                          all columns except the label column and the predictions column are</span>
-<span class="sd">                          regarded as feature columns.</span>
-
-<span class="sd">    :param evaluators: The name of the evaluator to use for model evaluation, or a list of</span>
-<span class="sd">                       evaluator names. If unspecified, all evaluators capable of evaluating the</span>
-<span class="sd">                       specified model on the specified dataset are used. The default evaluator</span>
-<span class="sd">                       can be referred to by the name ``&quot;default&quot;``. To see all available</span>
-<span class="sd">                       evaluators, call :py:func:`mlflow.models.list_evaluators`.</span>
-
-<span class="sd">    :param evaluator_config: A dictionary of additional configurations to supply to the evaluator.</span>
-<span class="sd">                             If multiple evaluators are specified, each configuration should be</span>
-<span class="sd">                             supplied as a nested dictionary whose key is the evaluator name.</span>
-
-<span class="sd">    :param extra_metrics:</span>
-<span class="sd">        (Optional) A list of :py:class:`EvaluationMetric &lt;mlflow.models.EvaluationMetric&gt;` objects.</span>
-<span class="sd">        These metrics are computed in addition to the default metrics associated with pre-defined</span>
-<span class="sd">        `model_type`, and setting `model_type=None` will only compute the metrics specified in</span>
-<span class="sd">        `extra_metrics`. See the `mlflow.metrics` module for more information about the</span>
-<span class="sd">        builtin metrics and how to define extra metrics.</span>
-
-<span class="sd">        .. code-block:: python</span>
-<span class="sd">            :caption: Example usage of extra metrics</span>
-
-<span class="sd">            import mlflow</span>
-<span class="sd">            import numpy as np</span>
+<span class="sd">                def model(inputs):</span>
+<span class="sd">                    return pd.DataFrame({&quot;answer&quot;: [&quot;bar&quot;], &quot;source&quot;: [&quot;baz&quot;]})</span>
 
 
-<span class="sd">            def root_mean_squared_error(eval_df, _builtin_metrics):</span>
-<span class="sd">                return np.sqrt((np.abs(eval_df[&quot;prediction&quot;] - eval_df[&quot;target&quot;]) ** 2).mean)</span>
+<span class="sd">                results = evaluate(model=model, data=data, predictions=&quot;answer&quot;, ...)</span>
+
+<span class="sd">                # Evaluate a static dataset</span>
+<span class="sd">                data = pd.DataFrame({&quot;question&quot;: [&quot;foo&quot;], &quot;answer&quot;: [&quot;bar&quot;], &quot;source&quot;: [&quot;baz&quot;]})</span>
+<span class="sd">                results = evaluate(data=data, predictions=&quot;answer&quot;, ...)</span>
+
+<span class="sd">        model_type: (Optional) A string describing the model type. The default evaluator</span>
+<span class="sd">            supports the following model types:</span>
+
+<span class="sd">            - ``&#39;classifier&#39;``</span>
+<span class="sd">            - ``&#39;regressor&#39;``</span>
+<span class="sd">            - ``&#39;question-answering&#39;``</span>
+<span class="sd">            - ``&#39;text-summarization&#39;``</span>
+<span class="sd">            - ``&#39;text&#39;``</span>
+<span class="sd">            - ``&#39;retriever&#39;``</span>
+
+<span class="sd">            If no ``model_type`` is specified, then you must provide a a list of</span>
+<span class="sd">            metrics to compute via the ``extra_metrics`` param.</span>
+
+<span class="sd">            .. note::</span>
+<span class="sd">                ``&#39;question-answering&#39;``, ``&#39;text-summarization&#39;``, ``&#39;text&#39;``, and</span>
+<span class="sd">                ``&#39;retriever&#39;`` are experimental and may be changed or removed in a</span>
+<span class="sd">                future release.</span>
+
+<span class="sd">        dataset_path: (Optional) The path where the data is stored. Must not contain double</span>
+<span class="sd">            quotes (``“``). If specified, the path is logged to the ``mlflow.datasets``</span>
+<span class="sd">            tag for lineage tracking purposes.</span>
+
+<span class="sd">        feature_names: (Optional) A list. If the ``data`` argument is a numpy array or list,</span>
+<span class="sd">            ``feature_names`` is a list of the feature names for each feature. If</span>
+<span class="sd">            ``feature_names=None``, then the ``feature_names`` are generated using the</span>
+<span class="sd">            format ``feature_{feature_index}``. If the ``data`` argument is a Pandas</span>
+<span class="sd">            DataFrame or a Spark DataFrame, ``feature_names`` is a list of the names</span>
+<span class="sd">            of the feature columns in the DataFrame. If ``feature_names=None``, then</span>
+<span class="sd">            all columns except the label column and the predictions column are</span>
+<span class="sd">            regarded as feature columns.</span>
+
+<span class="sd">        evaluators: The name of the evaluator to use for model evaluation, or a list of</span>
+<span class="sd">            evaluator names. If unspecified, all evaluators capable of evaluating the</span>
+<span class="sd">            specified model on the specified dataset are used. The default evaluator</span>
+<span class="sd">            can be referred to by the name ``&quot;default&quot;``. To see all available</span>
+<span class="sd">            evaluators, call :py:func:`mlflow.models.list_evaluators`.</span>
+
+<span class="sd">        evaluator_config: A dictionary of additional configurations to supply to the evaluator.</span>
+<span class="sd">            If multiple evaluators are specified, each configuration should be</span>
+<span class="sd">            supplied as a nested dictionary whose key is the evaluator name.</span>
+
+<span class="sd">        extra_metrics:</span>
+<span class="sd">            (Optional) A list of :py:class:`EvaluationMetric &lt;mlflow.models.EvaluationMetric&gt;`</span>
+<span class="sd">            objects.  These metrics are computed in addition to the default metrics associated with</span>
+<span class="sd">            pre-defined `model_type`, and setting `model_type=None` will only compute the metrics</span>
+<span class="sd">            specified in `extra_metrics`. See the `mlflow.metrics` module for more information about</span>
+<span class="sd">            the builtin metrics and how to define extra metrics.</span>
+
+<span class="sd">            .. code-block:: python</span>
+<span class="sd">                :caption: Example usage of extra metrics</span>
+
+<span class="sd">                import mlflow</span>
+<span class="sd">                import numpy as np</span>
 
 
-<span class="sd">            rmse_metric = mlflow.models.make_metric(</span>
-<span class="sd">                eval_fn=root_mean_squared_error,</span>
-<span class="sd">                greater_is_better=False,</span>
-<span class="sd">            )</span>
-<span class="sd">            mlflow.evaluate(..., extra_metrics=[rmse_metric])</span>
-
-<span class="sd">    :param custom_artifacts:</span>
-<span class="sd">        (Optional) A list of custom artifact functions with the following signature:</span>
-
-<span class="sd">        .. code-block:: python</span>
-
-<span class="sd">            def custom_artifact(</span>
-<span class="sd">                eval_df: Union[pandas.Dataframe, pyspark.sql.DataFrame],</span>
-<span class="sd">                builtin_metrics: Dict[str, float],</span>
-<span class="sd">                artifacts_dir: str,</span>
-<span class="sd">            ) -&gt; Dict[str, Any]:</span>
-<span class="sd">                &quot;&quot;&quot;</span>
-<span class="sd">                :param eval_df:</span>
-<span class="sd">                    A Pandas or Spark DataFrame containing ``prediction`` and ``target`` column.</span>
-<span class="sd">                    The ``prediction`` column contains the predictions made by the model.</span>
-<span class="sd">                    The ``target`` column contains the corresponding labels to the predictions made</span>
-<span class="sd">                    on that row.</span>
-<span class="sd">                :param builtin_metrics:</span>
-<span class="sd">                    A dictionary containing the metrics calculated by the default evaluator.</span>
-<span class="sd">                    The keys are the names of the metrics and the values are the scalar values of</span>
-<span class="sd">                    the metrics. Refer to the DefaultEvaluator behavior section for what metrics</span>
-<span class="sd">                    will be returned based on the type of model (i.e. classifier or regressor).</span>
-<span class="sd">                :param artifacts_dir:</span>
-<span class="sd">                    A temporary directory path that can be used by the custom artifacts function to</span>
-<span class="sd">                    temporarily store produced artifacts. The directory will be deleted after the</span>
-<span class="sd">                    artifacts are logged.</span>
-<span class="sd">                :return:</span>
-<span class="sd">                    A dictionary that maps artifact names to artifact objects</span>
-<span class="sd">                    (e.g. a Matplotlib Figure) or to artifact paths within ``artifacts_dir``.</span>
-<span class="sd">                &quot;&quot;&quot;</span>
-<span class="sd">                ...</span>
-
-<span class="sd">        Object types that artifacts can be represented as:</span>
-
-<span class="sd">            - A string uri representing the file path to the artifact. MLflow will infer the type of</span>
-<span class="sd">              the artifact based on the file extension.</span>
-<span class="sd">            - A string representation of a JSON object. This will be saved as a .json artifact.</span>
-<span class="sd">            - Pandas DataFrame. This will be resolved as a CSV artifact.</span>
-<span class="sd">            - Numpy array. This will be saved as a .npy artifact.</span>
-<span class="sd">            - Matplotlib Figure. This will be saved as an image artifact. Note that</span>
-<span class="sd">              ``matplotlib.pyplot.savefig`` is called behind the scene with default configurations.</span>
-<span class="sd">              To customize, either save the figure with the desired configurations and return its</span>
-<span class="sd">              file path or define customizations through environment variables in</span>
-<span class="sd">              ``matplotlib.rcParams``.</span>
-<span class="sd">            - Other objects will be attempted to be pickled with the default protocol.</span>
-
-<span class="sd">        .. code-block:: python</span>
-<span class="sd">            :caption: Example usage of custom artifacts</span>
-
-<span class="sd">            import mlflow</span>
-<span class="sd">            import matplotlib.pyplot as plt</span>
+<span class="sd">                def root_mean_squared_error(eval_df, _builtin_metrics):</span>
+<span class="sd">                    return np.sqrt((np.abs(eval_df[&quot;prediction&quot;] - eval_df[&quot;target&quot;]) ** 2).mean)</span>
 
 
-<span class="sd">            def scatter_plot(eval_df, builtin_metrics, artifacts_dir):</span>
-<span class="sd">                plt.scatter(eval_df[&quot;prediction&quot;], eval_df[&quot;target&quot;])</span>
-<span class="sd">                plt.xlabel(&quot;Targets&quot;)</span>
-<span class="sd">                plt.ylabel(&quot;Predictions&quot;)</span>
-<span class="sd">                plt.title(&quot;Targets vs. Predictions&quot;)</span>
-<span class="sd">                plt.savefig(os.path.join(artifacts_dir, &quot;example.png&quot;))</span>
-<span class="sd">                plt.close()</span>
-<span class="sd">                return {&quot;pred_target_scatter&quot;: os.path.join(artifacts_dir, &quot;example.png&quot;)}</span>
-
-
-<span class="sd">            def pred_sample(eval_df, _builtin_metrics, _artifacts_dir):</span>
-<span class="sd">                return {&quot;pred_sample&quot;: pred_sample.head(10)}</span>
-
-
-<span class="sd">            mlflow.evaluate(..., custom_artifacts=[scatter_plot, pred_sample])</span>
-
-<span class="sd">    :param validation_thresholds: (Optional) A dictionary of metric name to</span>
-<span class="sd">        :py:class:`mlflow.models.MetricThreshold` used for model validation. Each metric name must</span>
-<span class="sd">        either be the name of a builtin metric or the name of a metric defined in the</span>
-<span class="sd">        ``extra_metrics`` parameter.</span>
-
-<span class="sd">        .. code-block:: python</span>
-<span class="sd">            :caption: Example of Model Validation</span>
-
-<span class="sd">            from mlflow.models import MetricThreshold</span>
-
-<span class="sd">            thresholds = {</span>
-<span class="sd">                &quot;accuracy_score&quot;: MetricThreshold(</span>
-<span class="sd">                    # accuracy should be &gt;=0.8</span>
-<span class="sd">                    threshold=0.8,</span>
-<span class="sd">                    # accuracy should be at least 5 percent greater than baseline model accuracy</span>
-<span class="sd">                    min_absolute_change=0.05,</span>
-<span class="sd">                    # accuracy should be at least 0.05 greater than baseline model accuracy</span>
-<span class="sd">                    min_relative_change=0.05,</span>
-<span class="sd">                    greater_is_better=True,</span>
-<span class="sd">                ),</span>
-<span class="sd">            }</span>
-
-<span class="sd">            with mlflow.start_run():</span>
-<span class="sd">                mlflow.evaluate(</span>
-<span class="sd">                    model=your_candidate_model,</span>
-<span class="sd">                    data,</span>
-<span class="sd">                    targets,</span>
-<span class="sd">                    model_type,</span>
-<span class="sd">                    dataset_name,</span>
-<span class="sd">                    evaluators,</span>
-<span class="sd">                    validation_thresholds=thresholds,</span>
-<span class="sd">                    baseline_model=your_baseline_model,</span>
+<span class="sd">                rmse_metric = mlflow.models.make_metric(</span>
+<span class="sd">                    eval_fn=root_mean_squared_error,</span>
+<span class="sd">                    greater_is_better=False,</span>
 <span class="sd">                )</span>
+<span class="sd">                mlflow.evaluate(..., extra_metrics=[rmse_metric])</span>
 
-<span class="sd">        See :ref:`the Model Validation documentation &lt;model-validation&gt;`</span>
-<span class="sd">        for more details.</span>
+<span class="sd">        custom_artifacts:</span>
+<span class="sd">            (Optional) A list of custom artifact functions with the following signature:</span>
 
-<span class="sd">    :param baseline_model: (Optional) A string URI referring to an MLflow model with the pyfunc</span>
-<span class="sd">                           flavor. If specified, the candidate ``model`` is compared to this</span>
-<span class="sd">                           baseline for model validation purposes.</span>
+<span class="sd">            .. code-block:: python</span>
 
-<span class="sd">    :param env_manager: Specify an environment manager to load the candidate ``model`` and</span>
-<span class="sd">                        ``baseline_model`` in isolated Python evironments and restore their</span>
-<span class="sd">                        dependencies. Default value is ``local``, and the following values are</span>
-<span class="sd">                        supported:</span>
+<span class="sd">                def custom_artifact(</span>
+<span class="sd">                    eval_df: Union[pandas.Dataframe, pyspark.sql.DataFrame],</span>
+<span class="sd">                    builtin_metrics: Dict[str, float],</span>
+<span class="sd">                    artifacts_dir: str,</span>
+<span class="sd">                ) -&gt; Dict[str, Any]:</span>
+<span class="sd">                    &quot;&quot;&quot;</span>
+<span class="sd">                    Args:</span>
+<span class="sd">                        eval_df:</span>
+<span class="sd">                            A Pandas or Spark DataFrame containing ``prediction`` and ``target``</span>
+<span class="sd">                            column.  The ``prediction`` column contains the predictions made by the</span>
+<span class="sd">                            model.  The ``target`` column contains the corresponding labels to the</span>
+<span class="sd">                            predictions made on that row.</span>
+<span class="sd">                        builtin_metrics:</span>
+<span class="sd">                            A dictionary containing the metrics calculated by the default evaluator.</span>
+<span class="sd">                            The keys are the names of the metrics and the values are the scalar</span>
+<span class="sd">                            values of the metrics. Refer to the DefaultEvaluator behavior section</span>
+<span class="sd">                            for what metrics will be returned based on the type of model (i.e.</span>
+<span class="sd">                            classifier or regressor).</span>
+<span class="sd">                        artifacts_dir:</span>
+<span class="sd">                            A temporary directory path that can be used by the custom artifacts</span>
+<span class="sd">                            function to temporarily store produced artifacts. The directory will be</span>
+<span class="sd">                            deleted after the artifacts are logged.</span>
 
-<span class="sd">                         - ``virtualenv``: (Recommended) Use virtualenv to restore the python</span>
-<span class="sd">                           environment that was used to train the model.</span>
-<span class="sd">                         - ``conda``:  Use Conda to restore the software environment that was used</span>
-<span class="sd">                           to train the model.</span>
-<span class="sd">                         - ``local``: Use the current Python environment for model inference, which</span>
-<span class="sd">                           may differ from the environment used to train the model and may lead to</span>
-<span class="sd">                           errors or invalid predictions.</span>
+<span class="sd">                    Returns:</span>
+<span class="sd">                        A dictionary that maps artifact names to artifact objects</span>
+<span class="sd">                        (e.g. a Matplotlib Figure) or to artifact paths within ``artifacts_dir``.</span>
+<span class="sd">                    &quot;&quot;&quot;</span>
+<span class="sd">                    ...</span>
 
-<span class="sd">    :param model_config: the model configuration to use for loading the model with pyfunc. Inspect</span>
-<span class="sd">                         the model&#39;s pyfunc flavor to know which keys are supported for your</span>
-<span class="sd">                         specific model. If not indicated, the default model configuration</span>
-<span class="sd">                         from the model is used (if any).</span>
-<span class="sd">    :param baseline_config: the model configuration to use for loading the baseline</span>
-<span class="sd">                            model. If not indicated, the default model configuration</span>
-<span class="sd">                            from the baseline model is used (if any).</span>
+<span class="sd">            Object types that artifacts can be represented as:</span>
 
-<span class="sd">    :return: An :py:class:`mlflow.models.EvaluationResult` instance containing</span>
-<span class="sd">             metrics of candidate model and baseline model, and artifacts of candidate model.</span>
+<span class="sd">                - A string uri representing the file path to the artifact. MLflow will infer the</span>
+<span class="sd">                  type of the artifact based on the file extension.</span>
+<span class="sd">                - A string representation of a JSON object. This will be saved as a .json artifact.</span>
+<span class="sd">                - Pandas DataFrame. This will be resolved as a CSV artifact.</span>
+<span class="sd">                - Numpy array. This will be saved as a .npy artifact.</span>
+<span class="sd">                - Matplotlib Figure. This will be saved as an image artifact. Note that</span>
+<span class="sd">                  ``matplotlib.pyplot.savefig`` is called behind the scene with default</span>
+<span class="sd">                  configurations.</span>
+<span class="sd">                  To customize, either save the figure with the desired configurations and return</span>
+<span class="sd">                  its file path or define customizations through environment variables in</span>
+<span class="sd">                  ``matplotlib.rcParams``.</span>
+<span class="sd">                - Other objects will be attempted to be pickled with the default protocol.</span>
+
+<span class="sd">            .. code-block:: python</span>
+<span class="sd">                :caption: Example usage of custom artifacts</span>
+
+<span class="sd">                import mlflow</span>
+<span class="sd">                import matplotlib.pyplot as plt</span>
+
+
+<span class="sd">                def scatter_plot(eval_df, builtin_metrics, artifacts_dir):</span>
+<span class="sd">                    plt.scatter(eval_df[&quot;prediction&quot;], eval_df[&quot;target&quot;])</span>
+<span class="sd">                    plt.xlabel(&quot;Targets&quot;)</span>
+<span class="sd">                    plt.ylabel(&quot;Predictions&quot;)</span>
+<span class="sd">                    plt.title(&quot;Targets vs. Predictions&quot;)</span>
+<span class="sd">                    plt.savefig(os.path.join(artifacts_dir, &quot;example.png&quot;))</span>
+<span class="sd">                    plt.close()</span>
+<span class="sd">                    return {&quot;pred_target_scatter&quot;: os.path.join(artifacts_dir, &quot;example.png&quot;)}</span>
+
+
+<span class="sd">                def pred_sample(eval_df, _builtin_metrics, _artifacts_dir):</span>
+<span class="sd">                    return {&quot;pred_sample&quot;: pred_sample.head(10)}</span>
+
+
+<span class="sd">                mlflow.evaluate(..., custom_artifacts=[scatter_plot, pred_sample])</span>
+
+<span class="sd">        validation_thresholds: (Optional) A dictionary of metric name to</span>
+<span class="sd">            :py:class:`mlflow.models.MetricThreshold` used for model validation. Each metric name</span>
+<span class="sd">            must either be the name of a builtin metric or the name of a metric defined in the</span>
+<span class="sd">            ``extra_metrics`` parameter.</span>
+
+<span class="sd">            .. code-block:: python</span>
+<span class="sd">                :caption: Example of Model Validation</span>
+
+<span class="sd">                from mlflow.models import MetricThreshold</span>
+
+<span class="sd">                thresholds = {</span>
+<span class="sd">                    &quot;accuracy_score&quot;: MetricThreshold(</span>
+<span class="sd">                        # accuracy should be &gt;=0.8</span>
+<span class="sd">                        threshold=0.8,</span>
+<span class="sd">                        # accuracy should be at least 5 percent greater than baseline model accuracy</span>
+<span class="sd">                        min_absolute_change=0.05,</span>
+<span class="sd">                        # accuracy should be at least 0.05 greater than baseline model accuracy</span>
+<span class="sd">                        min_relative_change=0.05,</span>
+<span class="sd">                        greater_is_better=True,</span>
+<span class="sd">                    ),</span>
+<span class="sd">                }</span>
+
+<span class="sd">                with mlflow.start_run():</span>
+<span class="sd">                    mlflow.evaluate(</span>
+<span class="sd">                        model=your_candidate_model,</span>
+<span class="sd">                        data,</span>
+<span class="sd">                        targets,</span>
+<span class="sd">                        model_type,</span>
+<span class="sd">                        dataset_name,</span>
+<span class="sd">                        evaluators,</span>
+<span class="sd">                        validation_thresholds=thresholds,</span>
+<span class="sd">                        baseline_model=your_baseline_model,</span>
+<span class="sd">                    )</span>
+
+<span class="sd">            See :ref:`the Model Validation documentation &lt;model-validation&gt;`</span>
+<span class="sd">            for more details.</span>
+
+<span class="sd">        baseline_model: (Optional) A string URI referring to an MLflow model with the pyfunc</span>
+<span class="sd">            flavor. If specified, the candidate ``model`` is compared to this</span>
+<span class="sd">            baseline for model validation purposes.</span>
+
+<span class="sd">        env_manager: Specify an environment manager to load the candidate ``model`` and</span>
+<span class="sd">            ``baseline_model`` in isolated Python environments and restore their</span>
+<span class="sd">            dependencies. Default value is ``local``, and the following values are</span>
+<span class="sd">            supported:</span>
+
+<span class="sd">            - ``virtualenv``: (Recommended) Use virtualenv to restore the python</span>
+<span class="sd">              environment that was used to train the model.</span>
+<span class="sd">            - ``conda``:  Use Conda to restore the software environment that was used</span>
+<span class="sd">              to train the model.</span>
+<span class="sd">            - ``local``: Use the current Python environment for model inference, which</span>
+<span class="sd">              may differ from the environment used to train the model and may lead to</span>
+<span class="sd">              errors or invalid predictions.</span>
+
+<span class="sd">        model_config: the model configuration to use for loading the model with pyfunc. Inspect</span>
+<span class="sd">            the model&#39;s pyfunc flavor to know which keys are supported for your</span>
+<span class="sd">            specific model. If not indicated, the default model configuration</span>
+<span class="sd">            from the model is used (if any).</span>
+<span class="sd">        baseline_config: the model configuration to use for loading the baseline</span>
+<span class="sd">            model. If not indicated, the default model configuration</span>
+<span class="sd">            from the baseline model is used (if any).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        An :py:class:`mlflow.models.EvaluationResult` instance containing</span>
+<span class="sd">        metrics of candidate model and baseline model, and artifacts of candidate model.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="kn">from</span> <span class="nn">mlflow.pyfunc</span> <span class="kn">import</span> <span class="n">PyFuncModel</span><span class="p">,</span> <span class="n">_load_model_or_server</span><span class="p">,</span> <span class="n">_ServedPyFuncModel</span>
     <span class="kn">from</span> <span class="nn">mlflow.utils</span> <span class="kn">import</span> <span class="n">env_manager</span> <span class="k">as</span> <span class="n">_EnvManager</span>
@@ -2140,7 +2207,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../../../',
-      VERSION:'2.10.1.dev0',
+      VERSION:'2.10.3.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',
