@@ -36,7 +36,7 @@ export const latestBlogs: Blog[] = [
         title: "OSS Marketing Consultant at The Linux Foundation",
         url: "https://www.linkedin.com/in/carlyakerly/",
         image_url:
-          "https://media.licdn.com/dms/image/D4D03AQF8d8p9QZ_iqw/profile-displayphoto-shrink_400_400/0/1690234884832?e=1711584000&v=beta&t=BNrwToz_9zb8oMJzIU0T6Age5QiugOvLEVcwCR_gq4U",
+          "https://media.licdn.com/dms/image/D4E03AQGccXoDMQGe8w/profile-displayphoto-shrink_400_400/0/1707268516995?e=1713398400&v=beta&t=AMO6IRfMLpVEiZ-RDBK8t68H1cPpBGpoQA9CBj8FwUQ",
       },
     ],
     date: "2024-01-26",
