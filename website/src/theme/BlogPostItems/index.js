@@ -14,13 +14,30 @@ export default function BlogPostItems({
   const isBlog = items.some(({ content }) =>
     content.metadata.permalink.startsWith("/blog/"),
   );
+  if (isBlog) {
+    return (
+      <Grid>
+        {isBlog
+          ? BLOGS.map((blog) => <Blog key={blog.id} blog={blog} />)
+          : RELEASES.map((release) => (
+              <ReleaseNote key={release.id} release={release} />
+            ))}
+      </Grid>
+    );
+  }
+
   return (
-    <Grid>
-      {isBlog
-        ? BLOGS.map((blog) => <Blog key={blog.id} blog={blog} />)
-        : RELEASES.map((release) => (
-            <ReleaseNote key={release.id} release={release} />
-          ))}
-    </Grid>
+    <>
+      {items.map(({ content: BlogPostContent }) => (
+        <BlogPostProvider
+          key={BlogPostContent.metadata.permalink}
+          content={BlogPostContent}
+        >
+          <BlogPostItemComponent>
+            <BlogPostContent />
+          </BlogPostItemComponent>
+        </BlogPostProvider>
+      ))}
+    </>
   );
 }
