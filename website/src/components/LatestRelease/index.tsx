@@ -1,12 +1,12 @@
 import styles from "./styles.module.css";
-import { latestReleases } from "../../posts";
+import { RELEASES } from "../../posts";
 
 const Version = ({ version }: { version: string }) => {
   return <div className={styles.version}>{`v${version}`}</div>;
 };
 
 const LatestRelease = () => {
-  const { path, version } = latestReleases[0];
+  const { path, version } = RELEASES[0];
   return (
     <a className={styles.a} href={path}>
       <div className={styles.container}>

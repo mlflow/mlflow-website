@@ -3,7 +3,7 @@ import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import Layout from "@theme/Layout";
 import AutoScroll from "@site/src/components/AutoScroll";
 import FloatingNav from "../components/FloatingNav";
-import { latestBlogs, latestReleases } from "../posts";
+import { BLOGS, RELEASES } from "../posts";
 import MLflowLogoAndCards from "../components/community-section/MLflowLogoAndCards";
 import Arrow from "../components/community-section/Arrow";
 import BrowserOnly from "@docusaurus/BrowserOnly";
@@ -783,7 +783,7 @@ export default function Home(): JSX.Element {
           </h2>
         </div>
         <Grid>
-          {latestReleases.map((release, idx) => (
+          {RELEASES.slice(0, 3).map((release, idx) => (
             <ReleaseNote release={release} key={idx} />
           ))}
         </Grid>
@@ -802,7 +802,7 @@ export default function Home(): JSX.Element {
         </div>
 
         <Grid>
-          {latestBlogs.map((blog, idx) => (
+          {BLOGS.slice(0, 3).map((blog, idx) => (
             <Blog blog={blog} key={idx} />
           ))}
         </Grid>

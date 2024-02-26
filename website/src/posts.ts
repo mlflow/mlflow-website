@@ -25,7 +25,7 @@ export type Release = {
 };
 
 // Sort by date descending
-export const latestBlogs: Blog[] = [
+export const BLOGS: Blog[] = [
   {
     title: "2023 Year in Review",
     path: "/blog/mlflow-year-in-review",
@@ -73,10 +73,56 @@ export const latestBlogs: Blog[] = [
     date: "2024-01-23",
     thumbnail: "img/blog/custom-pyfunc.png",
   },
+  {
+    title: "MLflow AI Gateway renamed to MLflow Deployments for LLMs",
+    path: "/blog/ai-gateway-rename",
+    tags: ["ai"],
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2023-12-01",
+    thumbnail: "img/blog/ai-gateway.png",
+  },
+  {
+    title:
+      "Automatic Metric, Parameter, and Artifact Logging with mlflow.autolog",
+    path: "/blog/mlflow-autolog",
+    tags: ["autolog"],
+    authors: [
+      {
+        name: "Daniel Liden",
+        title: "Developer Advocate at Databricks",
+        url: "https://www.linkedin.com/in/danielliden",
+        image_url: "https://github.com/djliden.png",
+      },
+    ],
+    date: "2023-11-30",
+    thumbnail: "img/blog/mlflow-autolog.png",
+  },
+  {
+    title: "MLflow Docs Overhaul",
+    path: "/blog/mlflow-docs-overhaul",
+    tags: ["docs"],
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2023-10-31",
+    thumbnail: "img/blog/docs-overhaul.png",
+  },
 ];
 
 // Sort by date descending
-export const latestReleases: Release[] = [
+export const RELEASES: Release[] = [
   {
     title: "MLflow 2.10.2",
     path: "/releases/2.10.2",
@@ -118,5 +164,1055 @@ export const latestReleases: Release[] = [
     ],
     date: "2024-01-26",
     version: "2.10.0",
+  },
+  {
+    title: "MLflow 2.9.2",
+    path: "/releases/2.9.2",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2023-12-14",
+    version: "2.9.2",
+  },
+  {
+    title: "MLflow 2.9.1",
+    path: "/releases/2.9.1",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2023-12-07",
+    version: "2.9.1",
+  },
+  {
+    title: "MLflow 2.9.0",
+    path: "/releases/2.9.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2023-12-06",
+    version: "2.9.0",
+  },
+  {
+    title: "MLflow 2.8.1",
+    path: "/releases/2.8.1",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2023-11-15",
+    version: "2.8.1",
+  },
+  {
+    title: "MLflow 2.8.0",
+    path: "/releases/2.8.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2023-10-29",
+    version: "2.8.0",
+  },
+  {
+    title: "MLflow 2.7.1",
+    path: "/releases/2.7.1",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2023-09-17",
+    version: "2.7.1",
+  },
+  {
+    title: "MLflow 2.7.0",
+    path: "/releases/2.7.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2023-09-12",
+    version: "2.7.0",
+  },
+  {
+    title: "MLflow 2.6.0",
+    path: "/releases/2.6.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2023-08-15",
+    version: "2.6.0",
+  },
+  {
+    title: "MLflow 2.5.0",
+    path: "/releases/2.5.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2023-07-17",
+    version: "2.5.0",
+  },
+  {
+    title: "MLflow 2.4.0",
+    path: "/releases/2.4.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2023-06-06",
+    version: "2.4.0",
+  },
+  {
+    title: "MLflow 2.3.2",
+    path: "/releases/2.3.2",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2023-05-12",
+    version: "2.3.2",
+  },
+  {
+    title: "MLflow 2.3.1",
+    path: "/releases/2.3.1",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2023-04-28",
+    version: "2.3.1",
+  },
+  {
+    title: "MLflow 2.3.0",
+    path: "/releases/2.3.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2023-04-18",
+    version: "2.3.0",
+  },
+  {
+    title: "MLflow 2.2.2",
+    path: "/releases/2.2.2",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2023-03-14",
+    version: "2.2.2",
+  },
+  {
+    title: "MLflow 2.2.1",
+    path: "/releases/2.2.1",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2023-03-02",
+    version: "2.2.1",
+  },
+  {
+    title: "MLflow 2.2.0",
+    path: "/releases/2.2.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2023-03-01",
+    version: "2.2.0",
+  },
+  {
+    title: "MLflow 2.1.1",
+    path: "/releases/2.1.1",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2022-12-26",
+    version: "2.1.1",
+  },
+  {
+    title: "MLflow 2.1.0",
+    path: "/releases/2.1.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2022-12-21",
+    version: "2.1.0",
+  },
+  {
+    title: "MLflow 2.0.1",
+    path: "/releases/2.0.1",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2022-11-14",
+    version: "2.0.1",
+  },
+  {
+    title: "MLflow 1.30.0",
+    path: "/releases/1.30.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2022-10-19",
+    version: "1.30.0",
+  },
+  {
+    title: "MLflow 1.29.0",
+    path: "/releases/1.29.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2022-09-19",
+    version: "1.29.0",
+  },
+  {
+    title: "MLflow 1.28.0",
+    path: "/releases/1.28.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2022-08-11",
+    version: "1.28.0",
+  },
+  {
+    title: "MLflow 1.27.0",
+    path: "/releases/1.27.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2022-06-28",
+    version: "1.27.0",
+  },
+  {
+    title: "MLflow 1.26.1",
+    path: "/releases/1.26.1",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2022-05-27",
+    version: "1.26.1",
+  },
+  {
+    title: "MLflow 1.26.0",
+    path: "/releases/1.26.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2022-05-16",
+    version: "1.26.0",
+  },
+  {
+    title: "MLflow 1.24.0",
+    path: "/releases/1.24.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2022-02-28",
+    version: "1.24.0",
+  },
+  {
+    title: "MLflow 1.23.1",
+    path: "/releases/1.23.1",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2022-01-27",
+    version: "1.23.1",
+  },
+  {
+    title: "MLflow 1.23.0",
+    path: "/releases/1.23.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2022-01-17",
+    version: "1.23.0",
+  },
+  {
+    title: "MLflow 1.22.0",
+    path: "/releases/1.22.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2021-11-29",
+    version: "1.22.0",
+  },
+  {
+    title: "MLflow 1.21.0",
+    path: "/releases/1.21.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2021-10-25",
+    version: "1.21.0",
+  },
+  {
+    title: "MLflow 1.20.2",
+    path: "/releases/1.20.2",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2021-09-03",
+    version: "1.20.2",
+  },
+  {
+    title: "MLflow 1.20.0",
+    path: "/releases/1.20.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2021-08-26",
+    version: "1.20.0",
+  },
+  {
+    title: "MLflow 1.20.1",
+    path: "/releases/1.20.1",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2021-08-26",
+    version: "1.20.1",
+  },
+  {
+    title: "MLflow 1.19.0",
+    path: "/releases/1.19.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2021-07-14",
+    version: "1.19.0",
+  },
+  {
+    title: "MLflow 1.18.0",
+    path: "/releases/1.18.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2021-06-18",
+    version: "1.18.0",
+  },
+  {
+    title: "MLflow 1.17.0",
+    path: "/releases/1.17.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2021-05-08",
+    version: "1.17.0",
+  },
+  {
+    title: "MLflow 1.16.0",
+    path: "/releases/1.16.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2021-04-24",
+    version: "1.16.0",
+  },
+  {
+    title: "MLflow 1.15.0",
+    path: "/releases/1.15.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2021-03-26",
+    version: "1.15.0",
+  },
+  {
+    title: "MLflow 1.14.1",
+    path: "/releases/1.14.1",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2021-03-01",
+    version: "1.14.1",
+  },
+  {
+    title: "MLflow 1.14.0",
+    path: "/releases/1.14.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2021-02-20",
+    version: "1.14.0",
+  },
+  {
+    title: "MLflow 1.13.1",
+    path: "/releases/1.13.1",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2020-12-31",
+    version: "1.13.1",
+  },
+  {
+    title: "MLflow 1.13.0",
+    path: "/releases/1.13.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2020-12-24",
+    version: "1.13.0",
+  },
+  {
+    title: "MLflow 1.12.1",
+    path: "/releases/1.12.1",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2020-11-19",
+    version: "1.12.1",
+  },
+  {
+    title: "MLflow 1.12.0",
+    path: "/releases/1.12.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2020-11-11",
+    version: "1.12.0",
+  },
+  {
+    title: "MLflow 1.11.0",
+    path: "/releases/1.11.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2020-08-31",
+    version: "1.11.0",
+  },
+  {
+    title: "MLflow 1.10.0",
+    path: "/releases/1.10.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2020-07-20",
+    version: "1.10.0",
+  },
+  {
+    title: "MLflow 1.9.1",
+    path: "/releases/1.9.1",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2020-06-25",
+    version: "1.9.1",
+  },
+  {
+    title: "MLflow 1.9.0",
+    path: "/releases/1.9.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2020-06-19",
+    version: "1.9.0",
+  },
+  {
+    title: "MLflow 1.8.0",
+    path: "/releases/1.8.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2020-04-21",
+    version: "1.8.0",
+  },
+  {
+    title: "MLflow 1.7.2",
+    path: "/releases/1.7.2",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2020-03-20",
+    version: "1.7.2",
+  },
+  {
+    title: "MLflow 1.7.1",
+    path: "/releases/1.7.1",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2020-03-17",
+    version: "1.7.1",
+  },
+  {
+    title: "MLflow 1.7.0",
+    path: "/releases/1.7.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2020-03-02",
+    version: "1.7.0",
+  },
+  {
+    title: "MLflow 1.6.0",
+    path: "/releases/1.6.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2020-01-29",
+    version: "1.6.0",
+  },
+  {
+    title: "MLflow 1.5.0",
+    path: "/releases/1.5.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2019-12-19",
+    version: "1.5.0",
+  },
+  {
+    title: "MLflow 1.4.0",
+    path: "/releases/1.4.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2019-10-30",
+    version: "1.4.0",
+  },
+  {
+    title: "MLflow 1.3.0",
+    path: "/releases/1.3.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2019-09-30",
+    version: "1.3.0",
+  },
+  {
+    title: "MLflow 1.2.0",
+    path: "/releases/1.2.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2019-08-12",
+    version: "1.2.0",
+  },
+  {
+    title: "MLflow 1.1.0",
+    path: "/releases/1.1.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2019-07-22",
+    version: "1.1.0",
+  },
+  {
+    title: "MLflow 0.9.1",
+    path: "/releases/0.9.1",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2019-04-21",
+    version: "0.9.1",
+  },
+  {
+    title: "MLflow 0.9.0",
+    path: "/releases/0.9.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2019-03-28",
+    version: "0.9.0",
+  },
+  {
+    title: "MLflow 0.8.2",
+    path: "/releases/0.8.2",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2019-01-28",
+    version: "0.8.2",
+  },
+  {
+    title: "MLflow 0.8.1",
+    path: "/releases/0.8.1",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2018-12-21",
+    version: "0.8.1",
+  },
+  {
+    title: "MLflow 0.8.0",
+    path: "/releases/0.8.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2018-11-12",
+    version: "0.8.0",
+  },
+  {
+    title: "MLflow 0.7.0",
+    path: "/releases/0.7.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2018-10-01",
+    version: "0.7.0",
+  },
+  {
+    title: "MLflow 0.6.0",
+    path: "/releases/0.6.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2018-09-10",
+    version: "0.6.0",
+  },
+  {
+    title: "MLflow 0.5.2",
+    path: "/releases/0.5.2",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2018-08-24",
+    version: "0.5.2",
+  },
+  {
+    title: "MLflow 0.5.1",
+    path: "/releases/0.5.1",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2018-08-23",
+    version: "0.5.1",
+  },
+  {
+    title: "MLflow 0.5.0",
+    path: "/releases/0.5.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2018-08-17",
+    version: "0.5.0",
+  },
+  {
+    title: "MLflow 0.4.2",
+    path: "/releases/0.4.2",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2018-08-07",
+    version: "0.4.2",
+  },
+  {
+    title: "MLflow 0.4.1",
+    path: "/releases/0.4.1",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2018-08-03",
+    version: "0.4.1",
+  },
+  {
+    title: "MLflow 0.4.0",
+    path: "/releases/0.4.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2018-08-01",
+    version: "0.4.0",
+  },
+  {
+    title: "MLflow 0.3.0",
+    path: "/releases/0.3.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2018-07-18",
+    version: "0.3.0",
+  },
+  {
+    title: "MLflow 0.2.1",
+    path: "/releases/0.2.1",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2018-06-28",
+    version: "0.2.1",
+  },
+  {
+    title: "MLflow 0.2.0",
+    path: "/releases/0.2.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2018-06-27",
+    version: "0.2.0",
+  },
+  {
+    title: "MLflow 0.1.0",
+    path: "/releases/0.1.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2018-06-05",
+    version: "0.1.0",
   },
 ];
