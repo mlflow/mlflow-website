@@ -103,8 +103,8 @@ function loadReleases(dir: string): Release[] {
   }));
 }
 
-const blogs = loadBlogs("blog").sort(sortByDateDesc).slice(0, 3);
-const releases = loadReleases("releases").sort(sortByDateDesc).slice(0, 3);
+const blogs = loadBlogs("blog").sort(sortByDateDesc);
+const releases = loadReleases("releases").sort(sortByDateDesc);
 const blogsJson = JSON.stringify(blogs, null, 2);
 const releasesJson = JSON.stringify(releases, null, 2);
 const src = `
@@ -135,9 +135,9 @@ export type Release = {
 };
 
 // Sort by date descending
-export const latestBlogs: Blog[] = ${blogsJson};
+export const BLOGS: Blog[] = ${blogsJson};
 
 // Sort by date descending
-export const latestReleases: Release[] = ${releasesJson};
+export const RELEASES: Release[] = ${releasesJson};
 `;
 writeFileSync("src/posts.ts", src);
