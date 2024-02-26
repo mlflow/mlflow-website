@@ -227,6 +227,7 @@
 
 <span class="kn">import</span> <span class="nn">mlflow</span>
 <span class="kn">from</span> <span class="nn">mlflow</span> <span class="kn">import</span> <span class="n">pyfunc</span>
+<span class="kn">from</span> <span class="nn">mlflow.client</span> <span class="kn">import</span> <span class="n">MlflowClient</span>
 <span class="kn">from</span> <span class="nn">mlflow.environment_variables</span> <span class="kn">import</span> <span class="n">MLFLOW_DEFAULT_PREDICTION_DEVICE</span>
 <span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
 <span class="kn">from</span> <span class="nn">mlflow.ml_package_versions</span> <span class="kn">import</span> <span class="n">_ML_PACKAGE_VERSIONS</span>
@@ -992,7 +993,7 @@
             <span class="k">return</span> <span class="n">predicted</span>
 
 
-<div class="viewcode-block" id="log_state_dict"><a class="viewcode-back" href="../../python_api/mlflow.pytorch.html#mlflow.pytorch.log_state_dict">[docs]</a><span class="k">def</span> <span class="nf">log_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">,</span> <span class="n">artifact_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">log_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">,</span> <span class="n">artifact_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Log a state_dict as an MLflow artifact for the current run.</span>
 
@@ -1027,10 +1028,10 @@
     <span class="k">with</span> <span class="n">TempDir</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmp</span><span class="p">:</span>
         <span class="n">local_path</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">path</span><span class="p">()</span>
         <span class="n">save_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="o">=</span><span class="n">state_dict</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">local_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_artifacts</span><span class="p">(</span><span class="n">local_path</span><span class="p">,</span> <span class="n">artifact_path</span><span class="p">)</span></div>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_artifacts</span><span class="p">(</span><span class="n">local_path</span><span class="p">,</span> <span class="n">artifact_path</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="save_state_dict"><a class="viewcode-back" href="../../python_api/mlflow.pytorch.html#mlflow.pytorch.save_state_dict">[docs]</a><span class="k">def</span> <span class="nf">save_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">save_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Save a state_dict to a path on the local file system</span>
 
@@ -1053,10 +1054,10 @@
 
     <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">state_dict_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">_TORCH_STATE_DICT_FILE_NAME</span><span class="p">)</span>
-    <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">state_dict</span><span class="p">,</span> <span class="n">state_dict_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+    <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">state_dict</span><span class="p">,</span> <span class="n">state_dict_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="load_state_dict"><a class="viewcode-back" href="../../python_api/mlflow.pytorch.html#mlflow.pytorch.load_state_dict">[docs]</a><span class="k">def</span> <span class="nf">load_state_dict</span><span class="p">(</span><span class="n">state_dict_uri</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">load_state_dict</span><span class="p">(</span><span class="n">state_dict_uri</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Load a state_dict from a local file or a run.</span>
 
@@ -1090,7 +1091,7 @@
 
     <span class="n">local_path</span> <span class="o">=</span> <span class="n">_download_artifact_from_uri</span><span class="p">(</span><span class="n">artifact_uri</span><span class="o">=</span><span class="n">state_dict_uri</span><span class="p">)</span>
     <span class="n">state_dict_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">local_path</span><span class="p">,</span> <span class="n">_TORCH_STATE_DICT_FILE_NAME</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">state_dict_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">state_dict_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="autolog"><a class="viewcode-back" href="../../python_api/mlflow.pytorch.html#mlflow.pytorch.autolog">[docs]</a><span class="nd">@autologging_integration</span><span class="p">(</span><span class="n">FLAVOR_NAME</span><span class="p">)</span>
@@ -1105,7 +1106,13 @@
     <span class="n">silent</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">registered_model_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">extra_tags</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-<span class="p">):</span>  <span class="c1"># pylint: disable=unused-argument</span>
+    <span class="n">checkpoint</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">checkpoint_monitor</span><span class="o">=</span><span class="s2">&quot;val_loss&quot;</span><span class="p">,</span>
+    <span class="n">checkpoint_mode</span><span class="o">=</span><span class="s2">&quot;min&quot;</span><span class="p">,</span>
+    <span class="n">checkpoint_save_best_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">checkpoint_save_weights_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">checkpoint_save_freq</span><span class="o">=</span><span class="s2">&quot;epoch&quot;</span><span class="p">,</span>
+<span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Enables (or disables) and configures autologging from `PyTorch Lightning</span>
 <span class="sd">    &lt;https://pytorch-lightning.readthedocs.io/en/latest&gt;`_ to MLflow.</span>
@@ -1159,6 +1166,25 @@
 <span class="sd">            new model version of the registered model with this name. The registered model is</span>
 <span class="sd">            created if it does not already exist.</span>
 <span class="sd">        extra_tags: A dictionary of extra tags to set on each managed run created by autologging.</span>
+<span class="sd">        checkpoint: Enable automatic model checkpointing, this feature only supports</span>
+<span class="sd">            pytorch-lightning &gt;= 1.6.0.</span>
+<span class="sd">        checkpoint_monitor: In automatic model checkpointing, the metric name to monitor if</span>
+<span class="sd">            you set `model_checkpoint_save_best_only` to True.</span>
+<span class="sd">        checkpoint_save_best_only: If True, automatic model checkpointing only saves when</span>
+<span class="sd">            the model is considered the &quot;best&quot; model according to the quantity</span>
+<span class="sd">            monitored and previous checkpoint model is overwritten.</span>
+<span class="sd">        checkpoint_mode: one of {&quot;min&quot;, &quot;max&quot;}. In automatic model checkpointing,</span>
+<span class="sd">            if save_best_only=True, the decision to overwrite the current save file is made based on</span>
+<span class="sd">            either the maximization or the minimization of the monitored quantity.</span>
+<span class="sd">        checkpoint_save_weights_only: In automatic model checkpointing, if True, then</span>
+<span class="sd">            only the model’s weights will be saved. Otherwise, the optimizer states,</span>
+<span class="sd">            lr-scheduler states, etc are added in the checkpoint too.</span>
+<span class="sd">        checkpoint_save_freq: `&quot;epoch&quot;` or integer. When using `&quot;epoch&quot;`, the callback</span>
+<span class="sd">            saves the model after each epoch. When using integer, the callback</span>
+<span class="sd">            saves the model at end of this many batches. Note that if the saving isn&#39;t aligned to</span>
+<span class="sd">            epochs, the monitored metric may potentially be less reliable (it</span>
+<span class="sd">            could reflect as little as 1 batch, since the metrics get reset</span>
+<span class="sd">            every epoch). Defaults to `&quot;epoch&quot;`.</span>
 
 <span class="sd">    .. code-block:: python</span>
 <span class="sd">        :test:</span>
@@ -1304,6 +1330,108 @@
     <span class="n">autolog</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">autolog</span><span class="o">.</span><span class="vm">__doc__</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;MIN_REQ_VERSION&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">MIN_REQ_VERSION</span><span class="p">))</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
         <span class="s2">&quot;MAX_REQ_VERSION&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">MAX_REQ_VERSION</span><span class="p">)</span>
     <span class="p">)</span>
+
+
+<div class="viewcode-block" id="load_checkpoint"><a class="viewcode-back" href="../../python_api/mlflow.pytorch.html#mlflow.pytorch.load_checkpoint">[docs]</a><span class="k">def</span> <span class="nf">load_checkpoint</span><span class="p">(</span><span class="n">model_class</span><span class="p">,</span> <span class="n">run_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">epoch</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">global_step</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    If you enable &quot;checkpoint&quot; in autologging, during pytorch-lightning model</span>
+<span class="sd">    training execution, checkpointed models are logged as MLflow artifacts.</span>
+<span class="sd">    Using this API, you can load the checkpointed model.</span>
+
+<span class="sd">    If you want to load the latest checkpoint, set both `epoch` and `global_step` to None.</span>
+<span class="sd">    If &quot;checkpoint_save_freq&quot; is set to &quot;epoch&quot; in autologging,</span>
+<span class="sd">    you can set `epoch` param to the epoch of the checkpoint to load specific epoch checkpoint.</span>
+<span class="sd">    If &quot;checkpoint_save_freq&quot; is set to an integer in autologging,</span>
+<span class="sd">    you can set `global_step` param to the global step of the checkpoint to load specific</span>
+<span class="sd">    global step checkpoint.</span>
+<span class="sd">    `epoch` param and `global_step` can&#39;t be set together.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        model_class: The class of the training model, the class should inherit</span>
+<span class="sd">            &#39;pytorch_lightning.LightningModule&#39;.</span>
+<span class="sd">        run_id: The id of the run which model is logged to. If not provided,</span>
+<span class="sd">            current active run is used.</span>
+<span class="sd">        epoch: The epoch of the checkpoint to be loaded, if you set</span>
+<span class="sd">            &quot;checkpoint_save_freq&quot; to &quot;epoch&quot;.</span>
+<span class="sd">        global_step: The global step of the checkpoint to be loaded, if</span>
+<span class="sd">            you set &quot;checkpoint_save_freq&quot; to an integer.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The instance of a pytorch-lightning model restored from the specified checkpoint.</span>
+
+<span class="sd">    .. code-block:: python</span>
+<span class="sd">        :caption: Example</span>
+
+<span class="sd">        import mlflow.pytorch</span>
+
+<span class="sd">        mlflow.pytorch.autolog(checkpoint=True)</span>
+
+<span class="sd">        model = MyLightningModuleNet()  # A custom-pytorch lightning model</span>
+<span class="sd">        trainer = Trainer()</span>
+
+<span class="sd">        with mlflow.start_run() as run:</span>
+<span class="sd">            trainer.fit(net)</span>
+
+<span class="sd">        run_id = run.info.run_id</span>
+
+<span class="sd">        # load latest checkpoint model</span>
+<span class="sd">        latest_checkpoint_model = mlflow.pytorch.load_checkpoint(MyLightningModuleNet, run_id)</span>
+
+<span class="sd">        # load history checkpoint model logged in second epoch</span>
+<span class="sd">        checkpoint_model = mlflow.pytorch.load_checkpoint(MyLightningModuleNet, run_id, epoch=2)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">mlflow.utils.mlflow_tags</span> <span class="kn">import</span> <span class="n">LATEST_CHECKPOINT_ARTIFACT_TAG_KEY</span>
+
+    <span class="n">client</span> <span class="o">=</span> <span class="n">MlflowClient</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">run_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">run</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">active_run</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">run</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                <span class="s2">&quot;There is no active run, please provide the &#39;run_id&#39; for &quot;</span> <span class="s2">&quot;&#39;load_checkpoint&#39; call.&quot;</span>
+            <span class="p">)</span>
+        <span class="n">run_id</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">run_id</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">run</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_run</span><span class="p">(</span><span class="n">run_id</span><span class="p">)</span>
+
+    <span class="n">latest_checkpoint_artifact_path</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">LATEST_CHECKPOINT_ARTIFACT_TAG_KEY</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">latest_checkpoint_artifact_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="s2">&quot;There is no logged checkpoint artifact in the current run.&quot;</span><span class="p">)</span>
+
+    <span class="n">checkpoint_filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">latest_checkpoint_artifact_path</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">epoch</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">global_step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+            <span class="s2">&quot;Only one of &#39;epoch&#39; and &#39;global_step&#39; can be set for &#39;load_checkpoint&#39;.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">global_step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">checkpoint_artifact_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;checkpoints/global_step_</span><span class="si">{</span><span class="n">global_step</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">checkpoint_filename</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">elif</span> <span class="n">epoch</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">checkpoint_artifact_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;checkpoints/epoch_</span><span class="si">{</span><span class="n">epoch</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">checkpoint_filename</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">checkpoint_artifact_path</span> <span class="o">=</span> <span class="n">latest_checkpoint_artifact_path</span>
+
+    <span class="n">downloaded_checkpoint_filepath</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">download_artifacts</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">checkpoint_artifact_path</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">model_class</span><span class="o">.</span><span class="n">load_from_checkpoint</span><span class="p">(</span><span class="n">downloaded_checkpoint_filepath</span><span class="p">)</span></div>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;autolog&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;load_model&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;save_model&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;log_model&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;get_default_pip_requirements&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;get_default_conda_env&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;load_checkpoint&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">mlflow.pytorch._lightning_autolog</span> <span class="kn">import</span> <span class="n">MlflowModelCheckpointCallback</span>  <span class="c1"># noqa: F401</span>
+
+    <span class="n">__all__</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;MLflowModelCheckpointCallback&quot;</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="c1"># Swallow exception if pytorch-lightning is not installed.</span>
+    <span class="k">pass</span>
 </pre></div>
 
               </div>

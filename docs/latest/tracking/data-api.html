@@ -1,0 +1,586 @@
+
+  
+
+<!DOCTYPE html>
+<!-- source: docs/source/tracking/data-api.rst -->
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>MLflow Dataset Tracking Tutorial &mdash; MLflow 2.10.3.dev0 documentation</title>
+  
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/tracking/data-api.html">
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    
+
+    
+
+  
+    
+        <!-- Google Tag Manager -->
+        <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer',"GTM-N6WMTTJ");</script>
+        <!-- End Google Tag Manager -->
+    
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/cards.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/grids.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/mobile.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/simple-cards.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/tabs.css" type="text/css" />
+    
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="MLflow 2.10.3.dev0 documentation" href="../index.html"/>
+        <link rel="up" title="MLflow Tracking" href="../tracking.html"/>
+        <link rel="next" title="Backend Stores" href="/backend-stores.html"/>
+        <link rel="prev" title="Automatic Logging with MLflow Tracking" href="/autolog.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+<script type="text/javascript" src="../_static/jquery.js"></script>
+<script type="text/javascript" src="../_static/underscore.js"></script>
+<script type="text/javascript" src="../_static/doctools.js"></script>
+<script type="text/javascript" src="../_static/languagesections.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+
+<body class="wy-body-for-nav" role="document">
+  
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N6WMTTJ"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+  
+
+  
+  <nav class="wy-nav-top header" role="navigation" aria-label="top navigation">
+    <ul>
+  <li class="menu-toggle">
+    <i data-toggle="wy-nav-top" class="wy-nav-top-menu-button db-icon db-icon-menu pull-left"></i>
+    <a href="../index.html" class="wy-nav-top-logo"
+      ><img src="../_static/MLflow-logo-final-black.png" alt="MLflow"
+    /></a>
+    <span class="version">2.10.3.dev0</span>
+  </li>
+</ul>
+  </nav>
+  <page>
+    
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side relative">
+      <div class="wy-side-scroll">
+  <div class="wy-side-nav-search">
+    
+
+    
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+    
+  </div>
+
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+    
+      <a href="../index.html" class="main-navigation-home"><img src="../_static/icons/nav-home.svg"> MLflow</a>
+    
+
+    
+      
+
+      
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../introduction/index.html">What is MLflow?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/index.html">Getting Started with MLflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../new-features/index.html">New Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../llms/index.html">LLMs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../model-evaluation/index.html">Model Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deep-learning/index.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../traditional-ml/index.html">Traditional ML</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/index.html">Deployment</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../tracking.html">MLflow Tracking</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../tracking.html#quickstart">Quickstart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tracking.html#concepts">Concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tracking.html#tracking-runs">Tracking Runs</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../tracking.html#tracking-datasets">Tracking Datasets</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">MLflow Dataset Tracking Tutorial</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#key-interfaces">Key Interfaces</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#example-usage">Example Usage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#using-datasets-with-other-mlflow-features">Using Datasets with other MLflow Features</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../tracking.html#explore-runs-and-results">Explore Runs and Results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tracking.html#set-up-the-mlflow-tracking-environment">Set up the MLflow Tracking Environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tracking.html#faq">FAQ</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../system-metrics/index.html">System Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../projects.html">MLflow Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.html">MLflow Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../model-registry.html">MLflow Model Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../recipes.html">MLflow Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plugins.html">MLflow Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auth/index.html">MLflow Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../search-runs.html">Search Runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../search-experiments.html">Search Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python_api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../R-api.html">R API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../java_api/index.html">Java API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rest-api.html">REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docker.html">Official MLflow Docker Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../community-model-flavors.html">Community Model Flavors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials-and-examples/index.html">Tutorials and Examples</a></li>
+</ul>
+
+      
+    
+  </div>
+
+  <div role="contentinfo">
+    
+
+    <p>
+      <a id='feedbacklink' href="https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a>
+    </p>
+  </div>
+</div>
+    </nav>
+
+    <main class="wy-grid-for-nav">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+          <div class="rst-content">
+            
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Documentation</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../tracking.html">MLflow Tracking</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+    
+      <li>MLflow Dataset Tracking Tutorial</li>
+    
+    
+    <!-- <li class="wy-breadcrumbs-aside">
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/tracking/data-api.rst" class="fa fa-github"> Edit on GitHub</a>
+    </li> -->
+    
+  </ul>
+</div>
+            <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <div itemprop="articleBody">
+                
+  <div class="section" id="mlflow-dataset-tracking-tutorial">
+<h1>MLflow Dataset Tracking Tutorial<a class="headerlink" href="#mlflow-dataset-tracking-tutorial" title="Permalink to this headline"> </a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">mlflow.data</span></code> module is an integral part of the MLflow ecosystem, designed to enhance your machine learning workflow.
+This module enables you to record and retrieve dataset information during model training and evaluation, leveraging MLflow’s tracking capabilities.</p>
+<div class="section" id="key-interfaces">
+<h2>Key Interfaces<a class="headerlink" href="#key-interfaces" title="Permalink to this headline"> </a></h2>
+<p>There are two main abstract components associated with the <code class="docutils literal notranslate"><span class="pre">mlflow.data</span></code> module, <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> and <code class="docutils literal notranslate"><span class="pre">DatasetSource</span></code>:</p>
+<div class="section" id="dataset">
+<h3>Dataset<a class="headerlink" href="#dataset" title="Permalink to this headline"> </a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> abstraction is a metadata tracking object that holds the information about a given logged dataset.</p>
+<p>The information stored within a <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> object includes features, targets, and predictions, along with
+metadata like the dataset’s name, digest (hash), schema, and profile. You can log this metadata using the <a class="reference internal" href="../python_api/mlflow.html#mlflow.log_input" title="mlflow.log_input"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.log_input()</span></code></a> API.
+The module provides functions to construct <a class="reference internal" href="../python_api/mlflow.data.html#mlflow.data.dataset.Dataset" title="mlflow.data.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.data.dataset.Dataset</span></code></a> objects from various data types.</p>
+<p>There are a number of concrete implementations of this abstract class, including:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../python_api/mlflow.data.html#mlflow.data.spark_dataset.SparkDataset" title="mlflow.data.spark_dataset.SparkDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.data.spark_dataset.SparkDataset</span></code></a></p></li>
+<li><p><a class="reference internal" href="../python_api/mlflow.data.html#mlflow.data.pandas_dataset.PandasDataset" title="mlflow.data.pandas_dataset.PandasDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.data.pandas_dataset.PandasDataset</span></code></a></p></li>
+<li><p><a class="reference internal" href="../python_api/mlflow.data.html#mlflow.data.numpy_dataset.NumpyDataset" title="mlflow.data.numpy_dataset.NumpyDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.data.numpy_dataset.NumpyDataset</span></code></a></p></li>
+<li><p><a class="reference internal" href="../python_api/mlflow.data.html#mlflow.data.huggingface_dataset.HuggingFaceDataset" title="mlflow.data.huggingface_dataset.HuggingFaceDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.data.huggingface_dataset.HuggingFaceDataset</span></code></a></p></li>
+<li><p><a class="reference internal" href="../python_api/mlflow.data.html#mlflow.data.spark_dataset.SparkDataset" title="mlflow.data.spark_dataset.SparkDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.data.spark_dataset.SparkDataset</span></code></a></p></li>
+<li><p><a class="reference internal" href="../python_api/mlflow.data.html#mlflow.data.tensorflow_dataset.TensorFlowDataset" title="mlflow.data.tensorflow_dataset.TensorFlowDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.data.tensorflow_dataset.TensorFlowDataset</span></code></a></p></li>
+</ul>
+<p>The following example demonstrates how to construct a <a class="reference internal" href="../python_api/mlflow.data.html#mlflow.data.pandas_dataset.PandasDataset" title="mlflow.data.pandas_dataset.PandasDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.data.pandas_dataset.PandasDataset</span></code></a> object from a Pandas DataFrame:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow.data</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">mlflow.data.pandas_dataset</span> <span class="kn">import</span> <span class="n">PandasDataset</span>
+
+
+<span class="n">dataset_source_url</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/mlflow/mlflow/master/tests/datasets/winequality-white.csv&quot;</span>
+<span class="n">raw_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">dataset_source_url</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;;&quot;</span><span class="p">)</span>
+
+<span class="c1"># Create an instance of a PandasDataset</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">from_pandas</span><span class="p">(</span>
+    <span class="n">raw_data</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">dataset_source_url</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;wine quality - white&quot;</span><span class="p">,</span> <span class="n">targets</span><span class="o">=</span><span class="s2">&quot;quality&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="datasetsource">
+<h3>DatasetSource<a class="headerlink" href="#datasetsource" title="Permalink to this headline"> </a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">DatasetSource</span></code> is a component of a given Dataset object, providing a linked lineage to the original source of the data.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">DatasetSource</span></code> component of a <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> represents the source of a dataset, such as a directory in S3, a Delta Table, or a URL.
+It is referenced in the <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> for understanding the origin of the data. The <code class="docutils literal notranslate"><span class="pre">DatasetSource</span></code> of a logged
+dataset can be retrieved either by accessing the <code class="docutils literal notranslate"><span class="pre">source</span></code> property of the <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> object, or through using the <code class="docutils literal notranslate"><span class="pre">mlflow.data.get_source()</span></code> API.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Many of the supported autologging-enabled flavors within MLflow will automatically log the source of the dataset when logging the dataset itself.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The example shown below is purely for instructive purposes, as logging a dataset outside of a training run is not a common practice.</p>
+</div>
+</div>
+</div>
+<div class="section" id="example-usage">
+<h2>Example Usage<a class="headerlink" href="#example-usage" title="Permalink to this headline"> </a></h2>
+<p>The following example demonstrates how to use the <code class="docutils literal notranslate"><span class="pre">log_inputs</span></code> API to log a training dataset, retrieve its information, and fetch the data source:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">mlflow.data.pandas_dataset</span> <span class="kn">import</span> <span class="n">PandasDataset</span>
+
+
+<span class="n">dataset_source_url</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/mlflow/mlflow/master/tests/datasets/winequality-white.csv&quot;</span>
+<span class="n">raw_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">dataset_source_url</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;;&quot;</span><span class="p">)</span>
+
+<span class="c1"># Create an instance of a PandasDataset</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">from_pandas</span><span class="p">(</span>
+    <span class="n">raw_data</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">dataset_source_url</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;wine quality - white&quot;</span><span class="p">,</span> <span class="n">targets</span><span class="o">=</span><span class="s2">&quot;quality&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># Log the Dataset to an MLflow run by using the `log_input` API</span>
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">()</span> <span class="k">as</span> <span class="n">run</span><span class="p">:</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_input</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="s2">&quot;training&quot;</span><span class="p">)</span>
+
+<span class="c1"># Retrieve the run information</span>
+<span class="n">logged_run</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">get_run</span><span class="p">(</span><span class="n">run</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">run_id</span><span class="p">)</span>
+
+<span class="c1"># Retrieve the Dataset object</span>
+<span class="n">logged_dataset</span> <span class="o">=</span> <span class="n">logged_run</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">dataset_inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">dataset</span>
+
+<span class="c1"># View some of the recorded Dataset information</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dataset name: </span><span class="si">{</span><span class="n">logged_dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dataset digest: </span><span class="si">{</span><span class="n">logged_dataset</span><span class="o">.</span><span class="n">digest</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dataset profile: </span><span class="si">{</span><span class="n">logged_dataset</span><span class="o">.</span><span class="n">profile</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dataset schema: </span><span class="si">{</span><span class="n">logged_dataset</span><span class="o">.</span><span class="n">schema</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The stdout results of the above code snippet are as follows:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>Dataset<span class="w"> </span>name:<span class="w"> </span>wine<span class="w"> </span>quality<span class="w"> </span>-<span class="w"> </span>white
+Dataset<span class="w"> </span>digest:<span class="w"> </span>2a1e42c4
+Dataset<span class="w"> </span>profile:<span class="w"> </span><span class="o">{</span><span class="s2">&quot;num_rows&quot;</span>:<span class="w"> </span><span class="m">4898</span>,<span class="w"> </span><span class="s2">&quot;num_elements&quot;</span>:<span class="w"> </span><span class="m">58776</span><span class="o">}</span>
+Dataset<span class="w"> </span>schema:<span class="w"> </span><span class="o">{</span><span class="s2">&quot;mlflow_colspec&quot;</span>:<span class="w"> </span><span class="o">[</span>
+<span class="w">    </span><span class="o">{</span><span class="s2">&quot;type&quot;</span>:<span class="w"> </span><span class="s2">&quot;double&quot;</span>,<span class="w"> </span><span class="s2">&quot;name&quot;</span>:<span class="w"> </span><span class="s2">&quot;fixed acidity&quot;</span><span class="o">}</span>,
+<span class="w">    </span><span class="o">{</span><span class="s2">&quot;type&quot;</span>:<span class="w"> </span><span class="s2">&quot;double&quot;</span>,<span class="w"> </span><span class="s2">&quot;name&quot;</span>:<span class="w"> </span><span class="s2">&quot;volatile acidity&quot;</span><span class="o">}</span>,
+<span class="w">    </span><span class="o">{</span><span class="s2">&quot;type&quot;</span>:<span class="w"> </span><span class="s2">&quot;double&quot;</span>,<span class="w"> </span><span class="s2">&quot;name&quot;</span>:<span class="w"> </span><span class="s2">&quot;citric acid&quot;</span><span class="o">}</span>,
+<span class="w">    </span><span class="o">{</span><span class="s2">&quot;type&quot;</span>:<span class="w"> </span><span class="s2">&quot;double&quot;</span>,<span class="w"> </span><span class="s2">&quot;name&quot;</span>:<span class="w"> </span><span class="s2">&quot;residual sugar&quot;</span><span class="o">}</span>,
+<span class="w">    </span><span class="o">{</span><span class="s2">&quot;type&quot;</span>:<span class="w"> </span><span class="s2">&quot;double&quot;</span>,<span class="w"> </span><span class="s2">&quot;name&quot;</span>:<span class="w"> </span><span class="s2">&quot;chlorides&quot;</span><span class="o">}</span>,
+<span class="w">    </span><span class="o">{</span><span class="s2">&quot;type&quot;</span>:<span class="w"> </span><span class="s2">&quot;double&quot;</span>,<span class="w"> </span><span class="s2">&quot;name&quot;</span>:<span class="w"> </span><span class="s2">&quot;free sulfur dioxide&quot;</span><span class="o">}</span>,
+<span class="w">    </span><span class="o">{</span><span class="s2">&quot;type&quot;</span>:<span class="w"> </span><span class="s2">&quot;double&quot;</span>,<span class="w"> </span><span class="s2">&quot;name&quot;</span>:<span class="w"> </span><span class="s2">&quot;total sulfur dioxide&quot;</span><span class="o">}</span>,
+<span class="w">    </span><span class="o">{</span><span class="s2">&quot;type&quot;</span>:<span class="w"> </span><span class="s2">&quot;double&quot;</span>,<span class="w"> </span><span class="s2">&quot;name&quot;</span>:<span class="w"> </span><span class="s2">&quot;density&quot;</span><span class="o">}</span>,
+<span class="w">    </span><span class="o">{</span><span class="s2">&quot;type&quot;</span>:<span class="w"> </span><span class="s2">&quot;double&quot;</span>,<span class="w"> </span><span class="s2">&quot;name&quot;</span>:<span class="w"> </span><span class="s2">&quot;pH&quot;</span><span class="o">}</span>,
+<span class="w">    </span><span class="o">{</span><span class="s2">&quot;type&quot;</span>:<span class="w"> </span><span class="s2">&quot;double&quot;</span>,<span class="w"> </span><span class="s2">&quot;name&quot;</span>:<span class="w"> </span><span class="s2">&quot;sulphates&quot;</span><span class="o">}</span>,
+<span class="w">    </span><span class="o">{</span><span class="s2">&quot;type&quot;</span>:<span class="w"> </span><span class="s2">&quot;double&quot;</span>,<span class="w"> </span><span class="s2">&quot;name&quot;</span>:<span class="w"> </span><span class="s2">&quot;alcohol&quot;</span><span class="o">}</span>,
+<span class="w">    </span><span class="o">{</span><span class="s2">&quot;type&quot;</span>:<span class="w"> </span><span class="s2">&quot;long&quot;</span>,<span class="w"> </span><span class="s2">&quot;name&quot;</span>:<span class="w"> </span><span class="s2">&quot;quality&quot;</span><span class="o">}</span>
+<span class="w">    </span><span class="o">]}</span>
+</pre></div>
+</div>
+<p>We can navigate to the MLflow UI to see what this looks like for a logged Dataset as well.</p>
+<div class="figure align-center" style="width: 100%">
+<img alt="../_images/dataset-mlflow-ui.png" src="../_images/dataset-mlflow-ui.png" />
+</div>
+<p>When we want to load the dataset back from the location that it’s stored (calling <code class="docutils literal notranslate"><span class="pre">load</span></code> will download the data locally), we
+access the Dataset’s source via the following API:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Loading the dataset&#39;s source</span>
+<span class="n">dataset_source</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get_source</span><span class="p">(</span><span class="n">logged_dataset</span><span class="p">)</span>
+
+<span class="n">local_dataset</span> <span class="o">=</span> <span class="n">retrieved_data</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The local file where the data has been downloaded to: </span><span class="si">{</span><span class="n">local_dataset</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Load the data again</span>
+<span class="n">loaded_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">local_dataset</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;;&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The print statement from above resolves to the local file that was created when calling <code class="docutils literal notranslate"><span class="pre">load</span></code>.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>The<span class="w"> </span><span class="nb">local</span><span class="w"> </span>file<span class="w"> </span>where<span class="w"> </span>the<span class="w"> </span>data<span class="w"> </span>has<span class="w"> </span>been<span class="w"> </span>downloaded<span class="w"> </span>to:
+/var/folders/cd/n8n0rm2x53l_s0xv_j_xklb00000gp/T/tmpuxwtrul1/winequality-white.csv
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-datasets-with-other-mlflow-features">
+<h2>Using Datasets with other MLflow Features<a class="headerlink" href="#using-datasets-with-other-mlflow-features" title="Permalink to this headline"> </a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">mlflow.data</span></code> module serves the crucial role of associating datasets with MLflow runs. Aside from the obvious utility of having a record
+associated with an MLflow run to the dataset that was used during training, there are some integrations within MLflow that allow for direct
+usage of Datasets that have been logged with the <a class="reference internal" href="../python_api/mlflow.html#mlflow.log_input" title="mlflow.log_input"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.log_input()</span></code></a> API.</p>
+<div class="section" id="how-to-use-a-dataset-with-mlflow-evaluate">
+<h3>How to use a Dataset with MLflow evaluate<a class="headerlink" href="#how-to-use-a-dataset-with-mlflow-evaluate" title="Permalink to this headline"> </a></h3>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The integration of Datasets with MLflow evaluate was introduced in MLflow 2.8.0. Previous versions do not have this functionality.</p>
+</div>
+<p>To see how this integration functions, let’s take a look at a fairly simple and typical classification task.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">LabelEncoder</span>
+<span class="kn">import</span> <span class="nn">xgboost</span>
+
+<span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">from</span> <span class="nn">mlflow.data.pandas_dataset</span> <span class="kn">import</span> <span class="n">PandasDataset</span>
+
+
+<span class="n">dataset_source_url</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/mlflow/mlflow/master/tests/datasets/winequality-white.csv&quot;</span>
+<span class="n">raw_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">dataset_source_url</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;;&quot;</span><span class="p">)</span>
+
+<span class="c1"># Extract the features and target data separately</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">raw_data</span><span class="p">[</span><span class="s2">&quot;quality&quot;</span><span class="p">]</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">raw_data</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;quality&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Split the data into training and test sets</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.33</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">17</span>
+<span class="p">)</span>
+
+<span class="c1"># Create a label encoder object</span>
+<span class="n">le</span> <span class="o">=</span> <span class="n">LabelEncoder</span><span class="p">()</span>
+
+<span class="c1"># Fit and transform the target variable</span>
+<span class="n">y_train_encoded</span> <span class="o">=</span> <span class="n">le</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">y_train</span><span class="p">)</span>
+<span class="n">y_test_encoded</span> <span class="o">=</span> <span class="n">le</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">y_test</span><span class="p">)</span>
+
+<span class="c1"># Fit an XGBoost binary classifier on the training data split</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">xgboost</span><span class="o">.</span><span class="n">XGBClassifier</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train_encoded</span><span class="p">)</span>
+
+<span class="c1"># Build the Evaluation Dataset from the test set</span>
+<span class="n">y_test_pred</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X_test</span><span class="p">)</span>
+
+<span class="n">eval_data</span> <span class="o">=</span> <span class="n">X_test</span>
+<span class="n">eval_data</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_test</span>
+
+<span class="c1"># Assign the decoded predictions to the Evaluation Dataset</span>
+<span class="n">eval_data</span><span class="p">[</span><span class="s2">&quot;predictions&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">le</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">(</span><span class="n">y_test_pred</span><span class="p">)</span>
+
+<span class="c1"># Create the PandasDataset for use in mlflow evaluate</span>
+<span class="n">pd_dataset</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">from_pandas</span><span class="p">(</span>
+    <span class="n">eval_data</span><span class="p">,</span> <span class="n">predictions</span><span class="o">=</span><span class="s2">&quot;predictions&quot;</span><span class="p">,</span> <span class="n">targets</span><span class="o">=</span><span class="s2">&quot;label&quot;</span>
+<span class="p">)</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s2">&quot;White Wine Quality&quot;</span><span class="p">)</span>
+
+<span class="c1"># Log the Dataset, model, and execute an evaluation run using the configured Dataset</span>
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">()</span> <span class="k">as</span> <span class="n">run</span><span class="p">:</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_input</span><span class="p">(</span><span class="n">pd_dataset</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="s2">&quot;training&quot;</span><span class="p">)</span>
+
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">xgboost</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+        <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;white-wine-xgb&quot;</span><span class="p">,</span> <span class="n">xgb_model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">input_example</span><span class="o">=</span><span class="n">X_test</span>
+    <span class="p">)</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">pd_dataset</span><span class="p">,</span> <span class="n">predictions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_type</span><span class="o">=</span><span class="s2">&quot;classifier&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Using the <a class="reference internal" href="../python_api/mlflow.html#mlflow.evaluate" title="mlflow.evaluate"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code></a> API will automatically log the dataset used for the evaluation to the MLflow run. An explicit call to
+log the input is not required.</p>
+</div>
+<p>Navigating to the MLflow UI, we can see how the Dataset, model, metrics, and a classification-specific confusion matrix are all logged
+to the run.</p>
+<div class="figure align-center" style="width: 80%">
+<img alt="../_images/dataset-evaluate.png" src="../_images/dataset-evaluate.png" />
+</div>
+</div>
+</div>
+</div>
+
+
+              </div>
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="autolog.html" class="btn btn-neutral" title="Automatic Logging with MLflow Tracking" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+      
+      
+        <a href="backend-stores.html" class="btn btn-neutral" title="Backend Stores" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+      <p class="copyright">
+          &copy; MLflow Project, a Series of LF Projects, LLC. All rights reserved.
+      </p>
+
+  </div> 
+
+</footer>
+          </div>
+        </div>
+      </section>
+    </main>
+  </page>
+
+  
+
+
+  
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+      URL_ROOT:'../',
+      VERSION:'2.10.3.dev0',
+      COLLAPSE_INDEX:false,
+      FILE_SUFFIX:'.html',
+      LINK_SUFFIX: '.html',
+      HAS_SOURCE:  true
+    };
+  </script>
+
+  
+
+  <script type="text/javascript" src="../_static/js/clipboard.min.js"></script>
+  <script type="text/javascript" src="../_static/js/jquery.waypoints.min.js"></script>
+
+  
+  
+  
+  <script type="text/javascript">var CLIPPY_SVG_PATH = "../_static/clippy.svg";</script>
+  <script type="text/javascript" src="../_static/js/custom.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.StickyNav.enable();
+    });
+
+  </script>
+  
+
+  
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        // Get the code block designator class entries
+        const allHighlights = document.querySelectorAll('.highlight');
+        // Disable copyable links for notebook cell numbering and for cell outputs
+        const highlights = Array.from(allHighlights).filter(highlight => !highlight.closest('.highlight-none') && 
+            !highlight.closest('.nboutput'));
+    
+        highlights.forEach(function(highlight) {
+            const copyIcon = document.createElement('span');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.innerHTML = '&#xf0ea;';
+
+            copyIcon.addEventListener('click', function() {
+                const code = highlight.querySelector('pre').textContent;
+                copyToClipboard(code);
+
+                // Flash effect on click
+                this.style.color = '#0194E2';
+                setTimeout(() => {
+                    this.style.color = ''; 
+                }, 100);
+
+                // Display "Code copied to clipboard" near the clicked icon
+                const message = document.createElement('span');
+                message.textContent = "Copied!";
+                message.classList.add('copy-message'); 
+
+                // Append the message to the icon
+                this.appendChild(message);
+
+                setTimeout(() => {
+                    this.removeChild(message);
+                }, 500);
+            });
+
+            highlight.appendChild(copyIcon);
+        });
+    });
+  </script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Force download for notebook-download-btn
+        const downloadButtons = document.querySelectorAll('.notebook-download-btn');
+        downloadButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                // Fetch the raw content of the notebook from GitHub
+                fetch(button.href)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = url;
+                        const filename = button.href.split('/').pop();
+                        link.download = filename; 
+
+                        document.body.appendChild(link);
+                        link.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    })
+                    .catch(err => console.error('Error fetching the notebook:', err));
+            });
+        });
+    });
+</script> 
+</body>
+</html>

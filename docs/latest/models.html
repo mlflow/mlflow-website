@@ -2735,7 +2735,7 @@ in your current system environment in order to run the example):</p>
 <span class="n">mlflow</span><span class="o">.</span><span class="n">log_param</span><span class="p">(</span><span class="s2">&quot;system_prompt&quot;</span><span class="p">,</span> <span class="n">system_prompt</span><span class="p">)</span>
 <span class="n">logged_model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">openai</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
     <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-3.5-turbo&quot;</span><span class="p">,</span>
-    <span class="n">task</span><span class="o">=</span><span class="n">openai</span><span class="o">.</span><span class="n">ChatCompletion</span><span class="p">,</span>
+    <span class="n">task</span><span class="o">=</span><span class="n">openai</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">completions</span><span class="p">,</span>
     <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
     <span class="n">messages</span><span class="o">=</span><span class="p">[</span>
         <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">system_prompt</span><span class="p">},</span>
@@ -2784,13 +2784,12 @@ each model:</p>
 <h3>Evaluating with Extra Metrics<a class="headerlink" href="#evaluating-with-extra-metrics" title="Permalink to this headline"> </a></h3>
 <p>If the default set of metrics is insufficient, you can supply <code class="docutils literal notranslate"><span class="pre">extra_metrics</span></code> and <code class="docutils literal notranslate"><span class="pre">custom_artifacts</span></code>
 to <a class="reference internal" href="python_api/mlflow.html#mlflow.evaluate" title="mlflow.evaluate"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code></a> to produce extra metrics and artifacts for the model(s) that you’re evaluating.</p>
-<p>To define an extra metric, you should define an <code class="docutils literal notranslate"><span class="pre">eval_fn</span></code> function that takes in <code class="docutils literal notranslate"><span class="pre">predictions</span></code>, <code class="docutils literal notranslate"><span class="pre">targets</span></code>,
-and <code class="docutils literal notranslate"><span class="pre">metrics</span></code> as inputs and outputs a <code class="docutils literal notranslate"><span class="pre">MetricValue</span></code> object. <code class="docutils literal notranslate"><span class="pre">predictions</span></code> and <code class="docutils literal notranslate"><span class="pre">targets</span></code> are <code class="docutils literal notranslate"><span class="pre">pandas.Series</span></code>
+<p>To define an extra metric, you should define an <code class="docutils literal notranslate"><span class="pre">eval_fn</span></code> function that takes in <code class="docutils literal notranslate"><span class="pre">predictions</span></code> and <code class="docutils literal notranslate"><span class="pre">targets</span></code> as arguments
+and outputs a <code class="docutils literal notranslate"><span class="pre">MetricValue</span></code> object. <code class="docutils literal notranslate"><span class="pre">predictions</span></code> and <code class="docutils literal notranslate"><span class="pre">targets</span></code> are <code class="docutils literal notranslate"><span class="pre">pandas.Series</span></code>
 objects. If <code class="docutils literal notranslate"><span class="pre">predictions</span></code> or <code class="docutils literal notranslate"><span class="pre">targets</span></code> specified in <code class="docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code> is either <code class="docutils literal notranslate"><span class="pre">numpy.array</span></code> or <code class="docutils literal notranslate"><span class="pre">List</span></code>,
 they will be converted to <code class="docutils literal notranslate"><span class="pre">pandas.Series</span></code>.</p>
-<p><code class="docutils literal notranslate"><span class="pre">metrics</span></code> is a dictionary mapping a metric name <code class="docutils literal notranslate"><span class="pre">string</span></code> to a <code class="docutils literal notranslate"><span class="pre">MetricValue</span></code> object. It contains the values
-from built-in metrics and can be used to compute your custom metric. The built-in metrics are available when
-<code class="docutils literal notranslate"><span class="pre">model_type</span></code> is defined for <code class="docutils literal notranslate"><span class="pre">mlflow.evaluate(...</span> <span class="pre">model_type=&quot;classifier&quot;)</span></code>.</p>
+<p>To use values from other metrics to compute your custom metric, include the name of the metric as an argument to <code class="docutils literal notranslate"><span class="pre">eval_fn</span></code>.
+This argument will contain a <code class="docutils literal notranslate"><span class="pre">MetricValue</span></code> object which contains the values calculated from the specified metric and can be used to compute your custom metric.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;accuracy_score&quot;</span><span class="p">:</span> <span class="n">MetricValue</span><span class="p">(</span>
         <span class="n">scores</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">justifications</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">aggregate_results</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;accuracy_score&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">}</span>
@@ -2808,7 +2807,7 @@ from built-in metrics and can be used to compute your custom metric. The built-i
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.metrics</span> <span class="kn">import</span> <span class="n">MetricValue</span>
 
 
-<span class="k">def</span> <span class="nf">my_metric_eval_fn</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">metrics</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">my_metric_eval_fn</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">targets</span><span class="p">):</span>
     <span class="n">scores</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">predictions</span> <span class="o">-</span> <span class="n">targets</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">MetricValue</span><span class="p">(</span>
         <span class="n">scores</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">scores</span><span class="p">),</span>
@@ -2870,7 +2869,7 @@ specify one column among the model output columns as the predictions column usin
 and other output columns of the model will be accessible from the <code class="docutils literal notranslate"><span class="pre">eval_fn</span></code> based on their column names. For example, if
 your model has two outputs <code class="docutils literal notranslate"><span class="pre">retrieved_context</span></code> and <code class="docutils literal notranslate"><span class="pre">answer</span></code>, you can specify <code class="docutils literal notranslate"><span class="pre">answer</span></code> as the predictions
 column, and <code class="docutils literal notranslate"><span class="pre">retrieved_context</span></code> column will be accessible as the <code class="docutils literal notranslate"><span class="pre">context</span></code> parameter from <code class="docutils literal notranslate"><span class="pre">eval_fn</span></code> via <code class="docutils literal notranslate"><span class="pre">col_mapping</span></code>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">eval_fn</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">eval_fn</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
     <span class="n">scores</span> <span class="o">=</span> <span class="p">(</span><span class="n">predictions</span> <span class="o">==</span> <span class="n">targets</span><span class="p">)</span> <span class="o">+</span> <span class="n">context</span>
     <span class="k">return</span> <span class="n">MetricValue</span><span class="p">(</span>
         <span class="n">scores</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">scores</span><span class="p">),</span>
@@ -2905,7 +2904,7 @@ column, and <code class="docutils literal notranslate"><span class="pre">retriev
 </pre></div>
 </div>
 <p>However, you can also avoid using <code class="docutils literal notranslate"><span class="pre">col_mapping</span></code> if the parameter of <code class="docutils literal notranslate"><span class="pre">eval_fn</span></code> is the same as the output column name of the model.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">eval_fn</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">retrieved_context</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">eval_fn</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">retrieved_context</span><span class="p">):</span>
     <span class="n">scores</span> <span class="o">=</span> <span class="p">(</span><span class="n">predictions</span> <span class="o">==</span> <span class="n">targets</span><span class="p">)</span> <span class="o">+</span> <span class="n">retrieved_context</span>
     <span class="k">return</span> <span class="n">MetricValue</span><span class="p">(</span>
         <span class="n">scores</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">scores</span><span class="p">),</span>
@@ -2937,7 +2936,7 @@ column, and <code class="docutils literal notranslate"><span class="pre">retriev
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">col_mapping</span></code> also allows you to pass additional parameters to the extra metric function, in this case passing a value <code class="docutils literal notranslate"><span class="pre">k</span></code>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">eval_fn</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">eval_fn</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
     <span class="n">scores</span> <span class="o">=</span> <span class="n">k</span> <span class="o">*</span> <span class="p">(</span><span class="n">predictions</span> <span class="o">==</span> <span class="n">targets</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">MetricValue</span><span class="p">(</span><span class="n">scores</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">scores</span><span class="p">),</span> <span class="n">aggregate_results</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;mean&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">scores</span><span class="p">)})</span>
 
@@ -2963,6 +2962,48 @@ column, and <code class="docutils literal notranslate"><span class="pre">retriev
     <span class="n">targets</span><span class="o">=</span><span class="s2">&quot;targets&quot;</span><span class="p">,</span>
     <span class="n">extra_metrics</span><span class="o">=</span><span class="p">[</span><span class="n">weighted_mymetric</span><span class="p">],</span>
     <span class="n">evaluator_config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>You can also add the name of other metrics as an argument to the extra metric function, which will pass in the <code class="docutils literal notranslate"><span class="pre">MetricValue</span></code> calculated for that metric.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">eval_fn</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">retrieved_context</span><span class="p">):</span>
+    <span class="n">scores</span> <span class="o">=</span> <span class="p">(</span><span class="n">predictions</span> <span class="o">==</span> <span class="n">targets</span><span class="p">)</span> <span class="o">+</span> <span class="n">retrieved_context</span>
+    <span class="k">return</span> <span class="n">MetricValue</span><span class="p">(</span>
+        <span class="n">scores</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">scores</span><span class="p">),</span>
+        <span class="n">aggregate_results</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;mean&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">scores</span><span class="p">),</span> <span class="s2">&quot;sum&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">scores</span><span class="p">)},</span>
+    <span class="p">)</span>
+
+
+<span class="n">mymetric</span> <span class="o">=</span> <span class="n">make_metric</span><span class="p">(</span><span class="n">eval_fn</span><span class="o">=</span><span class="n">eval_fn</span><span class="p">,</span> <span class="n">greater_is_better</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;mymetric&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">eval_fn_2</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">mymetric</span><span class="p">):</span>
+    <span class="n">scores</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;true&quot;</span> <span class="k">if</span> <span class="n">score</span> <span class="k">else</span> <span class="s2">&quot;false&quot;</span> <span class="k">for</span> <span class="n">score</span> <span class="ow">in</span> <span class="n">mymetric</span><span class="o">.</span><span class="n">scores</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">MetricValue</span><span class="p">(</span>
+        <span class="n">scores</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">scores</span><span class="p">),</span>
+    <span class="p">)</span>
+
+
+<span class="n">mymetric2</span> <span class="o">=</span> <span class="n">make_metric</span><span class="p">(</span><span class="n">eval_fn</span><span class="o">=</span><span class="n">eval_fn_2</span><span class="p">,</span> <span class="n">greater_is_better</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;mymetric2&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;retrieved_context&quot;</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;inputs&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;answer&quot;</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;inputs&quot;</span><span class="p">]})</span>
+
+
+<span class="n">eval_dataset</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;targets&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">,</span> <span class="mf">7.0</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">],</span>
+        <span class="s2">&quot;inputs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">,</span> <span class="mf">7.0</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">],</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">,</span>
+    <span class="n">eval_dataset</span><span class="p">,</span>
+    <span class="n">predictions</span><span class="o">=</span><span class="s2">&quot;answer&quot;</span><span class="p">,</span>
+    <span class="n">targets</span><span class="o">=</span><span class="s2">&quot;targets&quot;</span><span class="p">,</span>
+    <span class="n">extra_metrics</span><span class="o">=</span><span class="p">[</span><span class="n">mymetric</span><span class="p">,</span> <span class="n">mymetric2</span><span class="p">],</span>
 <span class="p">)</span>
 </pre></div>
 </div>

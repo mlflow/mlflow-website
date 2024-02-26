@@ -482,7 +482,7 @@ div.rendered_html tbody tr:hover {
 <blockquote>
 <div><p>NOTE: In this tutorial, we’ll be using GPT-3.5 as our base language model. It’s important to note that the results obtained from a RAG system will differ from those obtained by interfacing directly with GPT models. RAG’s unique approach of combining external data retrieval with language model generation creates more nuanced and contextually rich responses.</p>
 </div></blockquote>
-<div style="text-align: center;"><p><img alt="35ab465507624501af1dc87863c58112" src="https://i.imgur.com/uwo1PCj.png" /></p>
+<div style="text-align: center;"><p><img alt="5afafff290b5415190a1ed44c8339cb5" src="https://i.imgur.com/uwo1PCj.png" /></p>
 </div></div>
 </div>
 <div class="section" id="Learning-Outcomes">
@@ -510,15 +510,15 @@ numerous other vector database solutions that can perform similar functionality;
 <div><p>NOTE: If you’d like to run this using your GPU, you can install <code class="docutils literal notranslate"><span class="pre">faiss-gpu</span></code> instead.</p>
 </div></blockquote>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">requests</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
 
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
 <span class="kn">from</span> <span class="nn">langchain.chains</span> <span class="kn">import</span> <span class="n">RetrievalQA</span>
 <span class="kn">from</span> <span class="nn">langchain.document_loaders</span> <span class="kn">import</span> <span class="n">TextLoader</span>
 <span class="kn">from</span> <span class="nn">langchain.embeddings.openai</span> <span class="kn">import</span> <span class="n">OpenAIEmbeddings</span>
@@ -529,6 +529,36 @@ numerous other vector database solutions that can perform similar functionality;
 <span class="kn">import</span> <span class="nn">mlflow</span>
 
 <span class="k">assert</span> <span class="s2">&quot;OPENAI_API_KEY&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">,</span> <span class="s2">&quot;Please set the OPENAI_API_KEY environment variable.&quot;</span>
+</pre></div>
+</div>
+</div>
+<blockquote>
+<div><p>NOTE: If you’d like to use Azure OpenAI with LangChain, you need to install <code class="docutils literal notranslate"><span class="pre">openai&gt;=1.10.0</span></code> and <code class="docutils literal notranslate"><span class="pre">langchain-openai&gt;=0.0.6</span></code>, specify the following credentials and parameters:</p>
+</div></blockquote>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">langchain_openai</span> <span class="kn">import</span> <span class="n">AzureOpenAI</span><span class="p">,</span> <span class="n">AzureOpenAIEmbeddings</span>
+
+<span class="c1"># Set this to `azure`</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;OPENAI_API_TYPE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;azure&quot;</span>
+<span class="c1"># The API version you want to use: set this to `2023-05-15` for the released version.</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;OPENAI_API_VERSION&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;2023-05-15&quot;</span>
+<span class="k">assert</span> <span class="p">(</span>
+    <span class="s2">&quot;AZURE_OPENAI_ENDPOINT&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span>
+<span class="p">),</span> <span class="s2">&quot;Please set the AZURE_OPENAI_ENDPOINT environment variable. It is the base URL for your Azure OpenAI resource. You can find this in the Azure portal under your Azure OpenAI resource.&quot;</span>
+<span class="k">assert</span> <span class="p">(</span>
+    <span class="s2">&quot;OPENAI_API_KEY&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span>
+<span class="p">),</span> <span class="s2">&quot;Please set the OPENAI_API_KEY environment variable. It is the API key for your Azure OpenAI resource. You can find this in the Azure portal under your Azure OpenAI resource.&quot;</span>
+
+<span class="n">azure_openai_llm</span> <span class="o">=</span> <span class="n">AzureOpenAI</span><span class="p">(</span>
+    <span class="n">deployment_name</span><span class="o">=</span><span class="s2">&quot;&lt;your-deployment-name&gt;&quot;</span><span class="p">,</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;gpt-35-turbo-instruct&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">azure_openai_embeddings</span> <span class="o">=</span> <span class="n">AzureOpenAIEmbeddings</span><span class="p">(</span>
+    <span class="n">azure_deployment</span><span class="o">=</span><span class="s2">&quot;&lt;your-deployment-name&gt;&quot;</span><span class="p">,</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>

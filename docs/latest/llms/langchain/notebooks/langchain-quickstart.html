@@ -518,6 +518,9 @@ div.rendered_html tbody tr:hover {
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s1">&#39;openai&lt;1&#39;</span><span class="w"> </span>tiktoken<span class="w"> </span>langchain<span class="w"> </span>mlflow
 </pre></div>
 </div>
+<blockquote>
+<div><p>NOTE: If you’d like to use Azure OpenAI with LangChain, you need to install <code class="docutils literal notranslate"><span class="pre">openai&gt;=1.10.0</span></code> and <code class="docutils literal notranslate"><span class="pre">langchain-openai&gt;=0.0.6</span></code>.</p>
+</div></blockquote>
 </div>
 <div class="section" id="API-Key-Security-Overview">
 <h2>API Key Security Overview<a class="headerlink" href="#API-Key-Security-Overview" title="Permalink to this headline"> </a></h2>
@@ -565,6 +568,36 @@ You may be able to resolve this warning by setting `model_config[&#39;protected_
 * &#39;schema_extra&#39; has been renamed to &#39;json_schema_extra&#39;
   warnings.warn(message, UserWarning)
 </pre></div></div>
+</div>
+<blockquote>
+<div><p>NOTE: If you’d like to use Azure OpenAI with LangChain, you need to specify the following credentials and parameters:</p>
+</div></blockquote>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">langchain_openai</span> <span class="kn">import</span> <span class="n">AzureOpenAI</span><span class="p">,</span> <span class="n">AzureOpenAIEmbeddings</span>
+
+<span class="c1"># Set this to `azure`</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;OPENAI_API_TYPE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;azure&quot;</span>
+<span class="c1"># The API version you want to use: set this to `2023-05-15` for the released version.</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;OPENAI_API_VERSION&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;2023-05-15&quot;</span>
+<span class="k">assert</span> <span class="p">(</span>
+    <span class="s2">&quot;AZURE_OPENAI_ENDPOINT&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span>
+<span class="p">),</span> <span class="s2">&quot;Please set the AZURE_OPENAI_ENDPOINT environment variable. It is the base URL for your Azure OpenAI resource. You can find this in the Azure portal under your Azure OpenAI resource.&quot;</span>
+<span class="k">assert</span> <span class="p">(</span>
+    <span class="s2">&quot;OPENAI_API_KEY&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span>
+<span class="p">),</span> <span class="s2">&quot;Please set the OPENAI_API_KEY environment variable. It is the API key for your Azure OpenAI resource. You can find this in the Azure portal under your Azure OpenAI resource.&quot;</span>
+
+<span class="n">azure_openai_llm</span> <span class="o">=</span> <span class="n">AzureOpenAI</span><span class="p">(</span>
+    <span class="n">deployment_name</span><span class="o">=</span><span class="s2">&quot;&lt;your-deployment-name&gt;&quot;</span><span class="p">,</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;gpt-35-turbo-instruct&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">azure_openai_embeddings</span> <span class="o">=</span> <span class="n">AzureOpenAIEmbeddings</span><span class="p">(</span>
+    <span class="n">azure_deployment</span><span class="o">=</span><span class="s2">&quot;&lt;your-deployment-name&gt;&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
 </div>
 </div>
 </div>

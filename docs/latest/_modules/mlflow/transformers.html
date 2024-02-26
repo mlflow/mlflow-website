@@ -210,7 +210,6 @@
 <span class="kn">import</span> <span class="nn">contextlib</span>
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">functools</span>
-<span class="kn">import</span> <span class="nn">importlib</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
@@ -220,7 +219,7 @@
 <span class="kn">import</span> <span class="nn">string</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">types</span> <span class="kn">import</span> <span class="n">MappingProxyType</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 <span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urlparse</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -252,10 +251,19 @@
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracking._model_registry</span> <span class="kn">import</span> <span class="n">DEFAULT_AWAIT_MAX_SLEEP_SECONDS</span>
 <span class="kn">from</span> <span class="nn">mlflow.transformers.llm_inference_utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_LLM_INFERENCE_TASK_CHAT</span><span class="p">,</span>
     <span class="n">_LLM_INFERENCE_TASK_KEY</span><span class="p">,</span>
+    <span class="n">_LLM_INFERENCE_TASK_PREFIX</span><span class="p">,</span>
     <span class="n">_METADATA_LLM_INFERENCE_TASK_KEY</span><span class="p">,</span>
     <span class="n">_SUPPORTED_LLM_INFERENCE_TASK_TYPES_BY_PIPELINE_TASK</span><span class="p">,</span>
+    <span class="n">convert_data_messages_with_chat_template</span><span class="p">,</span>
+    <span class="n">infer_signature_from_llm_inference_task</span><span class="p">,</span>
     <span class="n">postprocess_output_for_llm_inference_task</span><span class="p">,</span>
+    <span class="n">preprocess_llm_inference_params</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">mlflow.transformers.signature</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">format_input_example_for_special_cases</span><span class="p">,</span>
+    <span class="n">infer_or_get_default_signature</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.types.utils</span> <span class="kn">import</span> <span class="n">_validate_input_dictionary_contains_only_strings_and_lists_of_strings</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.annotations</span> <span class="kn">import</span> <span class="n">experimental</span>
@@ -292,20 +300,10 @@
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.requirements_utils</span> <span class="kn">import</span> <span class="n">_get_pinned_requirement</span>
 
-<span class="n">IS_TRANSFORMERS_AVAILABLE</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">find_spec</span><span class="p">(</span><span class="s2">&quot;transformers&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-
-<span class="c1"># The following modules depend on transformers and only imported when it is available</span>
-<span class="k">if</span> <span class="n">IS_TRANSFORMERS_AVAILABLE</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">mlflow.transformers.signature</span> <span class="kn">import</span> <span class="p">(</span>
-        <span class="n">_generate_signature_output</span><span class="p">,</span>
-        <span class="n">format_input_example_for_special_cases</span><span class="p">,</span>
-        <span class="n">infer_or_get_default_signature</span><span class="p">,</span>
-    <span class="p">)</span>
-
 <span class="c1"># The following import is only used for type hinting</span>
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">torch</span>
-
+    <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">Pipeline</span>
 
 <span class="n">FLAVOR_NAME</span> <span class="o">=</span> <span class="s2">&quot;transformers&quot;</span>
 
@@ -490,7 +488,7 @@
     <span class="n">model_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">example_no_conversion</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">prompt_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>  <span class="c1"># pylint: disable=unused-argument</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Save a trained transformers model to a path on the local file system.</span>
@@ -593,7 +591,7 @@
 <span class="sd">                sentence_pipeline = pipeline(</span>
 <span class="sd">                    task=task,</span>
 <span class="sd">                    tokenizer=AutoTokenizer.from_pretrained(architecture),</span>
-<span class="sd">                    model=architecture,  # pylint: disable=line-too-long</span>
+<span class="sd">                    model=architecture,</span>
 <span class="sd">                )</span>
 
 <span class="sd">                # Validate that the overrides function</span>
@@ -673,11 +671,6 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">import</span> <span class="nn">transformers</span>
 
-    <span class="n">_validate_transformers_model_dict</span><span class="p">(</span><span class="n">transformers_model</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transformers_model</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-        <span class="n">transformers_model</span> <span class="o">=</span> <span class="n">_TransformersModel</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="o">**</span><span class="n">transformers_model</span><span class="p">)</span>
-
     <span class="n">_validate_env_arguments</span><span class="p">(</span><span class="n">conda_env</span><span class="p">,</span> <span class="n">pip_requirements</span><span class="p">,</span> <span class="n">extra_pip_requirements</span><span class="p">)</span>
 
     <span class="n">path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span>
@@ -686,12 +679,18 @@
 
     <span class="n">code_dir_subpath</span> <span class="o">=</span> <span class="n">_validate_and_copy_code_paths</span><span class="p">(</span><span class="n">code_paths</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
 
-    <span class="n">transformers_task</span><span class="p">,</span> <span class="n">llm_inference_task</span> <span class="o">=</span> <span class="n">_get_or_infer_task_type</span><span class="p">(</span><span class="n">transformers_model</span><span class="p">,</span> <span class="n">task</span><span class="p">)</span>
+    <span class="n">_validate_transformers_model_dict</span><span class="p">(</span><span class="n">transformers_model</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transformers_model</span><span class="p">,</span> <span class="n">transformers</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
-        <span class="n">built_pipeline</span> <span class="o">=</span> <span class="n">_build_pipeline_from_model_input</span><span class="p">(</span><span class="n">transformers_model</span><span class="p">,</span> <span class="n">transformers_task</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transformers_model</span><span class="p">,</span> <span class="n">transformers</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
         <span class="n">built_pipeline</span> <span class="o">=</span> <span class="n">transformers_model</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transformers_model</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">built_pipeline</span> <span class="o">=</span> <span class="n">_build_pipeline_from_model_input</span><span class="p">(</span><span class="n">transformers_model</span><span class="p">,</span> <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+            <span class="s2">&quot;The `transformers_model` must be a Transformers Pipeline or a dictionary, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;received: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">transformers_model</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
+        <span class="p">)</span>
 
     <span class="c1"># Verify that the model has not been loaded to distributed memory</span>
     <span class="c1"># NB: transformers does not correctly save a model whose weights have been loaded</span>
@@ -711,8 +710,20 @@
 
     <span class="k">if</span> <span class="n">mlflow_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">mlflow_model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">signature</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+    <span class="k">if</span> <span class="n">task</span> <span class="ow">and</span> <span class="n">task</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">_LLM_INFERENCE_TASK_PREFIX</span><span class="p">):</span>
+        <span class="n">llm_inference_task</span> <span class="o">=</span> <span class="n">task</span>
+        <span class="n">_validate_llm_inference_task_type</span><span class="p">(</span><span class="n">llm_inference_task</span><span class="p">,</span> <span class="n">built_pipeline</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">llm_inference_task</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="n">llm_inference_task</span><span class="p">:</span>
+        <span class="n">mlflow_model</span><span class="o">.</span><span class="n">signature</span> <span class="o">=</span> <span class="n">infer_signature_from_llm_inference_task</span><span class="p">(</span>
+            <span class="n">llm_inference_task</span><span class="p">,</span> <span class="n">signature</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">signature</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">mlflow_model</span><span class="o">.</span><span class="n">signature</span> <span class="o">=</span> <span class="n">signature</span>
+
     <span class="k">if</span> <span class="n">input_example</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">input_example</span> <span class="o">=</span> <span class="n">format_input_example_for_special_cases</span><span class="p">(</span><span class="n">input_example</span><span class="p">,</span> <span class="n">built_pipeline</span><span class="p">)</span>
         <span class="n">_save_example</span><span class="p">(</span><span class="n">mlflow_model</span><span class="p">,</span> <span class="n">input_example</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="n">example_no_conversion</span><span class="p">)</span>
@@ -732,7 +743,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">mlflow_model</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="p">{</span><span class="n">_PROMPT_TEMPLATE_KEY</span><span class="p">:</span> <span class="n">prompt_template</span><span class="p">}</span>
 
-    <span class="n">flavor_conf</span> <span class="o">=</span> <span class="n">_generate_base_flavor_configuration</span><span class="p">(</span><span class="n">built_pipeline</span><span class="p">,</span> <span class="n">transformers_task</span><span class="p">)</span>
+    <span class="n">flavor_conf</span> <span class="o">=</span> <span class="n">_generate_base_flavor_configuration</span><span class="p">(</span><span class="n">built_pipeline</span><span class="p">)</span>
 
     <span class="n">components</span> <span class="o">=</span> <span class="n">_record_pipeline_components</span><span class="p">(</span><span class="n">built_pipeline</span><span class="p">)</span>
 
@@ -771,7 +782,7 @@
             <span class="n">inference_config</span><span class="o">=</span><span class="n">inference_config</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="n">model_name</span> <span class="o">=</span> <span class="n">transformers_model</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">name_or_path</span>
+    <span class="n">model_name</span> <span class="o">=</span> <span class="n">built_pipeline</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">name_or_path</span>
 
     <span class="c1"># Get the model card from either the argument or the HuggingFace marketplace</span>
     <span class="n">card_data</span> <span class="o">=</span> <span class="n">model_card</span> <span class="ow">or</span> <span class="n">_fetch_model_card</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
@@ -840,7 +851,7 @@
 
     <span class="k">if</span> <span class="n">conda_env</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">pip_requirements</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">default_reqs</span> <span class="o">=</span> <span class="n">get_default_pip_requirements</span><span class="p">(</span><span class="n">transformers_model</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
+            <span class="n">default_reqs</span> <span class="o">=</span> <span class="n">get_default_pip_requirements</span><span class="p">(</span><span class="n">built_pipeline</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
             <span class="c1"># Infer the pip requirements with a timeout to avoid hanging indefinitely at prediction</span>
             <span class="n">inferred_reqs</span> <span class="o">=</span> <span class="n">infer_pip_requirements_with_timeout</span><span class="p">(</span>
                 <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="n">FLAVOR_NAME</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="n">default_reqs</span>
@@ -986,7 +997,7 @@
 <span class="sd">                sentence_pipeline = pipeline(</span>
 <span class="sd">                    task=task,</span>
 <span class="sd">                    tokenizer=AutoTokenizer.from_pretrained(architecture),</span>
-<span class="sd">                    model=architecture,  # pylint: disable=line-too-long</span>
+<span class="sd">                    model=architecture,</span>
 <span class="sd">                )</span>
 
 <span class="sd">                # Validate that the overrides function</span>
@@ -1441,7 +1452,7 @@
     <span class="n">path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">_LICENSE_FILE_NAME</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">fallback</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_build_pipeline_from_model_input</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">task</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_build_pipeline_from_model_input</span><span class="p">(</span><span class="n">model_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">task</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Pipeline</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Utility for generating a pipeline from component parts. If required components are not</span>
 <span class="sd">    specified, use the transformers library pipeline component validation to force raising an</span>
@@ -1449,10 +1460,13 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">pipeline</span>
 
-    <span class="n">pipeline_config</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
-    <span class="n">pipeline_config</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;task&quot;</span><span class="p">:</span> <span class="n">task</span><span class="p">})</span>
+    <span class="k">if</span> <span class="n">task</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">task</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">_LLM_INFERENCE_TASK_PREFIX</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">transformers.pipelines</span> <span class="kn">import</span> <span class="n">get_task</span>
+
+        <span class="n">task</span> <span class="o">=</span> <span class="n">get_task</span><span class="p">(</span><span class="n">model_dict</span><span class="p">[</span><span class="n">_MODEL_KEY</span><span class="p">]</span><span class="o">.</span><span class="n">name_or_path</span><span class="p">)</span>
+
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">pipeline</span><span class="p">(</span><span class="o">**</span><span class="n">pipeline_config</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pipeline</span><span class="p">(</span><span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span> <span class="o">**</span><span class="n">model_dict</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
             <span class="s2">&quot;The provided model configuration cannot be created as a Pipeline. &quot;</span>
@@ -1519,10 +1533,7 @@
     <span class="k">return</span> <span class="n">component_instance</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">component_path</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_generate_base_flavor_configuration</span><span class="p">(</span>
-    <span class="n">pipeline</span><span class="p">,</span>
-    <span class="n">task</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="k">def</span> <span class="nf">_generate_base_flavor_configuration</span><span class="p">(</span><span class="n">pipeline</span><span class="p">:</span> <span class="n">Pipeline</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates the base flavor metadata needed for reconstructing a pipeline from saved</span>
 <span class="sd">    components. This is important because the ``Pipeline`` class does not have a loader</span>
@@ -1531,13 +1542,10 @@
 <span class="sd">    This function extracts key information from the submitted model object so that the precise</span>
 <span class="sd">    instance types can be loaded correctly.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">_validate_transformers_task_type</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
-
     <span class="n">flavor_configuration</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="n">_TASK_KEY</span><span class="p">:</span> <span class="n">task</span><span class="p">,</span>
+        <span class="n">_TASK_KEY</span><span class="p">:</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">task</span><span class="p">,</span>
         <span class="n">_INSTANCE_TYPE_KEY</span><span class="p">:</span> <span class="n">_get_instance_type</span><span class="p">(</span><span class="n">pipeline</span><span class="p">),</span>
-        <span class="n">_MODEL_PATH_OR_NAME_KEY</span><span class="p">:</span> <span class="n">_get_base_model_architecture</span><span class="p">(</span><span class="n">pipeline</span><span class="p">),</span>
+        <span class="n">_MODEL_PATH_OR_NAME_KEY</span><span class="p">:</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">name_or_path</span><span class="p">,</span>
         <span class="n">_PIPELINE_MODEL_TYPE_KEY</span><span class="p">:</span> <span class="n">_get_instance_type</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">model</span><span class="p">),</span>
     <span class="p">}</span>
 
@@ -1591,107 +1599,19 @@
     <span class="k">return</span> <span class="n">model_dtype</span> <span class="k">if</span> <span class="n">model_dtype</span> <span class="o">!=</span> <span class="n">torch</span><span class="o">.</span><span class="n">float32</span> <span class="k">else</span> <span class="kc">None</span>
 
 
-<span class="k">def</span> <span class="nf">_get_or_infer_task_type</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">task</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    From the ``task`` parameter, determine the appropriate ``transformers`` task type and</span>
-<span class="sd">    MLflow LLM inference task type if possible.</span>
-<span class="sd">    1. If ``task`` is not provided, infer the ``transformers`` task type from the model.</span>
-<span class="sd">    2. If ``task`` is provided and a valid ``transformers`` task type, use it.</span>
-<span class="sd">    3. If ``task`` is provided and not a valid ``transformers`` task type, assume it&#39;s an MLflow</span>
-<span class="sd">    LLM inference task type, and infer the ``transformers`` task type.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">transformers_task</span><span class="p">,</span> <span class="n">llm_inference_task</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
-
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">task</span><span class="p">:</span>
-        <span class="n">transformers_task</span> <span class="o">=</span> <span class="n">_infer_transformers_task_type</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">_is_transformers_task_type</span><span class="p">(</span><span class="n">task</span><span class="p">):</span>
-        <span class="n">transformers_task</span> <span class="o">=</span> <span class="n">task</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">transformers_task</span> <span class="o">=</span> <span class="n">_infer_transformers_task_type</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
-        <span class="n">llm_inference_task</span> <span class="o">=</span> <span class="n">task</span>
-        <span class="n">_validate_llm_inference_task_type</span><span class="p">(</span><span class="n">llm_inference_task</span><span class="p">,</span> <span class="n">transformers_task</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">transformers_task</span><span class="p">,</span> <span class="n">llm_inference_task</span>
-
-
-<span class="k">def</span> <span class="nf">_infer_transformers_task_type</span><span class="p">(</span><span class="n">model</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Performs inference of the task type, used in generating a pipeline object based on the</span>
-<span class="sd">    underlying model&#39;s intended use case. This utility relies on the definitions within the</span>
-<span class="sd">    transformers pipeline construction utility functions.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        model: Either the model or the Pipeline object that the task will be extracted or</span>
-<span class="sd">            inferred from</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        The task type string</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">Pipeline</span>
-    <span class="kn">from</span> <span class="nn">transformers.pipelines</span> <span class="kn">import</span> <span class="n">get_task</span>
-
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">Pipeline</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">model</span><span class="o">.</span><span class="n">task</span>
-    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">_TransformersModel</span><span class="p">):</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">get_task</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">name_or_path</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
-                <span class="s2">&quot;The task type cannot be inferred from the submitted Pipeline or dictionary of &quot;</span>
-                <span class="s2">&quot;model components. Please provide the task type explicitly when saving or logging &quot;</span>
-                <span class="s2">&quot;this submitted Pipeline or dictionary of components.&quot;</span><span class="p">,</span>
-                <span class="n">error_code</span><span class="o">=</span><span class="n">BAD_REQUEST</span><span class="p">,</span>
-            <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;The provided model type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">model</span><span class="p">)</span><span class="si">}</span><span class="s2"> is not supported. &quot;</span>
-            <span class="s2">&quot;Supported model types are: Pipeline or a dictionary with specific named keys. &quot;</span>
-            <span class="s2">&quot;Run `help(mlflow.transformers.save_model)` to see details of supported types.&quot;</span><span class="p">,</span>
-            <span class="n">error_code</span><span class="o">=</span><span class="n">BAD_REQUEST</span><span class="p">,</span>
-        <span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">_is_transformers_task_type</span><span class="p">(</span><span class="n">task</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">transformers.pipelines</span> <span class="kn">import</span> <span class="n">get_supported_tasks</span>
-
-    <span class="n">valid_tasks</span> <span class="o">=</span> <span class="n">get_supported_tasks</span><span class="p">()</span>
-
-    <span class="k">return</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">valid_tasks</span> <span class="ow">or</span> <span class="n">task</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;translation&quot;</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">_validate_transformers_task_type</span><span class="p">(</span><span class="n">transformers_task</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Validates that a ``transformers_task`` type is supported by the ``transformers`` library</span>
-<span class="sd">    and has been registered in the hub.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">transformers.pipelines</span> <span class="kn">import</span> <span class="n">get_supported_tasks</span>
-
-    <span class="n">valid_tasks</span> <span class="o">=</span> <span class="n">get_supported_tasks</span><span class="p">()</span>
-
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_transformers_task_type</span><span class="p">(</span><span class="n">transformers_task</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;The task provided is invalid. &#39;</span><span class="si">{</span><span class="n">transformers_task</span><span class="si">}</span><span class="s2">&#39; is not a supported task. &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;Must be one of the registered transformers tasks: </span><span class="si">{</span><span class="n">valid_tasks</span><span class="si">}</span><span class="s2">, or one of the &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;supported MLflow inference tasks&quot;</span><span class="p">,</span>
-            <span class="n">error_code</span><span class="o">=</span><span class="n">BAD_REQUEST</span><span class="p">,</span>
-        <span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">_validate_llm_inference_task_type</span><span class="p">(</span><span class="n">llm_inference_task</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">transformers_task</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">_validate_llm_inference_task_type</span><span class="p">(</span><span class="n">llm_inference_task</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">:</span> <span class="n">Pipeline</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Validates that an ``inference_task`` type is supported by ``transformers`` pipeline type.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">supported_llm_inference_tasks</span> <span class="o">=</span> <span class="n">_SUPPORTED_LLM_INFERENCE_TASK_TYPES_BY_PIPELINE_TASK</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-        <span class="n">transformers_task</span><span class="p">,</span> <span class="p">[]</span>
+        <span class="n">pipeline</span><span class="o">.</span><span class="n">task</span><span class="p">,</span> <span class="p">[]</span>
     <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">llm_inference_task</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">supported_llm_inference_tasks</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;The task provided is invalid. &#39;</span><span class="si">{</span><span class="n">llm_inference_task</span><span class="si">}</span><span class="s2">&#39; is not a supported task. &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;Must be one of the registered MLflow inference tasks supported for &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;the </span><span class="si">{</span><span class="n">transformers_task</span><span class="si">}</span><span class="s2"> pipeline: </span><span class="si">{</span><span class="n">supported_llm_inference_tasks</span><span class="si">}</span><span class="s2">, or one of the &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;registered transformers tasks&quot;</span><span class="p">,</span>
-            <span class="n">error_code</span><span class="o">=</span><span class="n">BAD_REQUEST</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;The task provided is invalid. &#39;</span><span class="si">{</span><span class="n">llm_inference_task</span><span class="si">}</span><span class="s2">&#39; is not a supported task for &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;the </span><span class="si">{</span><span class="n">pipeline</span><span class="o">.</span><span class="n">task</span><span class="si">}</span><span class="s2"> pipeline. Must be one of </span><span class="si">{</span><span class="n">supported_llm_inference_tasks</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
         <span class="p">)</span>
 
 
@@ -1709,18 +1629,6 @@
             <span class="k">return</span> <span class="s2">&quot;torch&quot;</span>
         <span class="k">elif</span> <span class="nb">issubclass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">FlaxPreTrainedModel</span><span class="p">):</span>
             <span class="k">return</span> <span class="s2">&quot;flax&quot;</span>
-
-
-<span class="k">def</span> <span class="nf">_get_base_model_architecture</span><span class="p">(</span><span class="n">model_or_pipeline</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Extracts the base model architecture type from a submitted model.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">Pipeline</span>
-
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_or_pipeline</span><span class="p">,</span> <span class="n">Pipeline</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">model_or_pipeline</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">name_or_path</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">model_or_pipeline</span><span class="p">[</span><span class="n">_MODEL_KEY</span><span class="p">]</span><span class="o">.</span><span class="n">name_or_path</span>
 
 
 <span class="k">def</span> <span class="nf">_get_instance_type</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
@@ -1774,109 +1682,6 @@
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">pipeline</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="ow">in</span> <span class="n">exclusion_pipeline_types</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">False</span>
     <span class="k">return</span> <span class="kc">True</span>
-
-
-<span class="k">class</span> <span class="nc">_TransformersModel</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Type validator class for models that are submitted as a dictionary for saving and logging.</span>
-<span class="sd">    Usage of this class should always leverage the type-checking from the class method</span>
-<span class="sd">    &#39;from_dict()&#39; instead of the instance-based configuration that is utilized with instantiating</span>
-<span class="sd">    a NamedTuple instance (it uses &#39;__new__()&#39; instead of an &#39;__init__()&#39;  dunder method, making</span>
-<span class="sd">    type validation on instantiation overly complex if we were to support that approach).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="c1"># NB: Assigning Any type here to eliminate local imports. Type validation is performed when</span>
-    <span class="c1"># calling the `from_dict` class method.</span>
-    <span class="n">model</span><span class="p">:</span> <span class="n">Any</span>
-    <span class="n">tokenizer</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">feature_extractor</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">image_processor</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">processor</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">torch_dtype</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
-
-    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">dict_repr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_asdict</span><span class="p">()</span>
-        <span class="c1"># NB: due to breaking changes in APIs, newer pipeline-supported argument keys are not</span>
-        <span class="c1"># backwards compatible. If there isn&#39;t an instance present, do not return an empty</span>
-        <span class="c1"># key to value mapping.</span>
-        <span class="k">return</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">obj</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">dict_repr</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">obj</span><span class="p">}</span>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_build_exception_msg</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">obj_name</span><span class="p">,</span> <span class="n">valid_types</span><span class="p">):</span>
-        <span class="n">type_msg</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s2">&quot;one of: &quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">valid_type</span><span class="o">.</span><span class="vm">__name__</span> <span class="k">for</span> <span class="n">valid_type</span> <span class="ow">in</span> <span class="n">valid_types</span><span class="p">])</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">valid_types</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span>
-            <span class="k">else</span> <span class="n">valid_types</span><span class="o">.</span><span class="vm">__name__</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;The </span><span class="si">{</span><span class="n">obj_name</span><span class="si">}</span><span class="s2"> type submitted is not compatible with the transformers flavor: &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;The allowed types must inherit from </span><span class="si">{</span><span class="n">type_msg</span><span class="si">}</span><span class="s2">.&quot;</span>
-        <span class="p">)</span>
-
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_validate_submitted_types</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">feature_extractor</span><span class="p">,</span> <span class="n">image_processor</span><span class="p">,</span> <span class="n">processor</span><span class="p">,</span> <span class="n">torch_dtype</span>
-    <span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="p">(</span>
-            <span class="n">FeatureExtractionMixin</span><span class="p">,</span>
-            <span class="n">FlaxPreTrainedModel</span><span class="p">,</span>
-            <span class="n">ImageFeatureExtractionMixin</span><span class="p">,</span>
-            <span class="n">ImageProcessingMixin</span><span class="p">,</span>
-            <span class="n">PreTrainedModel</span><span class="p">,</span>
-            <span class="n">PreTrainedTokenizerBase</span><span class="p">,</span>
-            <span class="n">ProcessorMixin</span><span class="p">,</span>
-            <span class="n">TFPreTrainedModel</span><span class="p">,</span>
-        <span class="p">)</span>
-
-        <span class="n">validation</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">PreTrainedModel</span><span class="p">,</span> <span class="n">TFPreTrainedModel</span><span class="p">,</span> <span class="n">FlaxPreTrainedModel</span><span class="p">)),</span>
-            <span class="p">(</span><span class="n">tokenizer</span><span class="p">,</span> <span class="s2">&quot;tokenizer&quot;</span><span class="p">,</span> <span class="n">PreTrainedTokenizerBase</span><span class="p">),</span>
-            <span class="p">(</span>
-                <span class="n">feature_extractor</span><span class="p">,</span>
-                <span class="s2">&quot;feature_extractor&quot;</span><span class="p">,</span>
-                <span class="p">(</span>
-                    <span class="n">FeatureExtractionMixin</span><span class="p">,</span>
-                    <span class="n">ImageFeatureExtractionMixin</span><span class="p">,</span>
-                    <span class="n">ProcessorMixin</span><span class="p">,</span>
-                    <span class="n">ImageProcessingMixin</span><span class="p">,</span>
-                <span class="p">),</span>
-            <span class="p">),</span>
-            <span class="p">(</span><span class="n">image_processor</span><span class="p">,</span> <span class="s2">&quot;image_processor&quot;</span><span class="p">,</span> <span class="n">ImageProcessingMixin</span><span class="p">),</span>
-            <span class="p">(</span><span class="n">processor</span><span class="p">,</span> <span class="s2">&quot;processor&quot;</span><span class="p">,</span> <span class="n">ProcessorMixin</span><span class="p">),</span>
-        <span class="p">]</span>
-        <span class="n">invalid_types</span> <span class="o">=</span> <span class="p">[]</span>
-
-        <span class="k">for</span> <span class="n">arg</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">types</span> <span class="ow">in</span> <span class="n">validation</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">arg</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">types</span><span class="p">):</span>
-                <span class="n">invalid_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_build_exception_msg</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">types</span><span class="p">))</span>
-        <span class="c1"># only import torch when torch_dtype is not None</span>
-        <span class="k">if</span> <span class="n">torch_dtype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">dtype</span>
-
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">torch_dtype</span><span class="p">,</span> <span class="n">dtype</span><span class="p">):</span>
-                <span class="n">invalid_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_build_exception_msg</span><span class="p">(</span><span class="n">torch_dtype</span><span class="p">,</span> <span class="s2">&quot;torch_dtype&quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">invalid_types</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">invalid_types</span><span class="p">),</span> <span class="n">error_code</span><span class="o">=</span><span class="n">BAD_REQUEST</span><span class="p">)</span>
-
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">,</span>
-        <span class="n">model</span><span class="p">,</span>
-        <span class="n">tokenizer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">feature_extractor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">image_processor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">processor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">torch_dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>  <span class="c1"># pylint: disable=unused-argument</span>
-    <span class="p">):</span>
-        <span class="bp">cls</span><span class="o">.</span><span class="n">_validate_submitted_types</span><span class="p">(</span>
-            <span class="n">model</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">feature_extractor</span><span class="p">,</span> <span class="n">image_processor</span><span class="p">,</span> <span class="n">processor</span><span class="p">,</span> <span class="n">torch_dtype</span>
-        <span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">_TransformersModel</span><span class="p">(</span>
-            <span class="n">model</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">feature_extractor</span><span class="p">,</span> <span class="n">image_processor</span><span class="p">,</span> <span class="n">processor</span><span class="p">,</span> <span class="n">torch_dtype</span>
-        <span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_get_model_config</span><span class="p">(</span><span class="n">local_path</span><span class="p">,</span> <span class="n">pyfunc_config</span><span class="p">):</span>
@@ -1933,6 +1738,8 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">import</span> <span class="nn">transformers</span>
 
+    <span class="kn">from</span> <span class="nn">mlflow.transformers</span> <span class="kn">import</span> <span class="n">signature</span>
+
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">transformers</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;The pipeline type submitted is not a valid transformers Pipeline. &quot;</span>
@@ -1940,7 +1747,7 @@
             <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">_generate_signature_output</span><span class="p">(</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">model_config</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">signature</span><span class="o">.</span><span class="n">generate_signature_output</span><span class="p">(</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">model_config</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span></div>
 
 
 <span class="k">class</span> <span class="nc">_TransformersWrapper</span><span class="p">:</span>
@@ -2010,6 +1817,14 @@
 
         <span class="k">if</span> <span class="n">return_tensors</span><span class="p">:</span>
             <span class="n">model_config</span><span class="p">[</span><span class="s2">&quot;return_tensors&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="n">model_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;return_full_text&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;The `return_full_text` parameter is mutually exclusive with the &quot;</span>
+                    <span class="s2">&quot;`return_tensors` parameter set when a MLflow inference task is provided. &quot;</span>
+                    <span class="s2">&quot;The `return_full_text` parameter will be ignored.&quot;</span>
+                <span class="p">)</span>
+                <span class="c1"># `return_full_text` is mutually exclusive with `return_tensors`</span>
+                <span class="n">model_config</span><span class="p">[</span><span class="s2">&quot;return_full_text&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
@@ -2053,6 +1868,12 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            Model predictions.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">llm_inference_task</span> <span class="o">==</span> <span class="n">_LLM_INFERENCE_TASK_CHAT</span><span class="p">:</span>
+            <span class="n">convert_data_messages_with_chat_template</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">llm_inference_task</span><span class="p">:</span>
+            <span class="n">data</span><span class="p">,</span> <span class="n">params</span> <span class="o">=</span> <span class="n">preprocess_llm_inference_params</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">flavor_config</span><span class="p">)</span>
+
         <span class="c1"># NB: This `predict` method updates the model_config several times. To make the predict</span>
         <span class="c1"># call idempotent, we keep the original self.model_config immutable and creates a deep</span>
         <span class="c1"># copy of it at every predict call.</span>
@@ -2201,7 +2022,12 @@
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">llm_inference_task</span><span class="p">:</span>
                 <span class="n">output</span> <span class="o">=</span> <span class="n">postprocess_output_for_llm_inference_task</span><span class="p">(</span>
-                    <span class="n">data</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">model_config</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">llm_inference_task</span>
+                    <span class="n">data</span><span class="p">,</span>
+                    <span class="n">output</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">flavor_config</span><span class="p">,</span>
+                    <span class="n">model_config</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">llm_inference_task</span><span class="p">,</span>
                 <span class="p">)</span>
 
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">transformers</span><span class="o">.</span><span class="n">FeatureExtractionPipeline</span><span class="p">):</span>
@@ -3161,7 +2987,7 @@
     <span class="n">disable_for_unsupported_versions</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">silent</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">extra_tags</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-<span class="p">):</span>  <span class="c1"># pylint: disable=unused-argument</span>
+<span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This autologging integration is solely used for disabling spurious autologging of irrelevant</span>
 <span class="sd">    sub-models that are created during the training and evaluation of transformers-based models.</span>

@@ -303,9 +303,9 @@
 <span class="sd">                            behavior section for what metrics will be returned based on the type of</span>
 <span class="sd">                            model (i.e. classifier or regressor).</span>
 <span class="sd">                        kwargs: Includes a list of args that are used to compute the metric. These</span>
-<span class="sd">                            args could information coming from input data, model outputs or</span>
-<span class="sd">                            parameters specified in the `evaluator_config` argument of the</span>
-<span class="sd">                            `mlflow.evaluate` API.</span>
+<span class="sd">                            args could be information coming from input data, model outputs,</span>
+<span class="sd">                            other metrics, or parameters specified in the `evaluator_config`</span>
+<span class="sd">                            argument of the `mlflow.evaluate` API.</span>
 
 <span class="sd">                    Returns: MetricValue with per-row scores, per-row justifications, and aggregate</span>
 <span class="sd">                        results.</span>
@@ -321,7 +321,13 @@
 <span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">eval_fn</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">greater_is_better</span><span class="p">,</span> <span class="n">long_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metric_details</span><span class="o">=</span><span class="kc">None</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">eval_fn</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">,</span>
+        <span class="n">greater_is_better</span><span class="p">,</span>
+        <span class="n">long_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">version</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">metric_details</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">eval_fn</span> <span class="o">=</span> <span class="n">eval_fn</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
@@ -381,6 +387,10 @@
 <span class="sd">                            that are used to compute the metric. These args could information coming</span>
 <span class="sd">                            from input data, model outputs or parameters specified in the</span>
 <span class="sd">                            `evaluator_config` argument of the `mlflow.evaluate` API.</span>
+<span class="sd">                        kwargs: Includes a list of args that are used to compute the metric. These</span>
+<span class="sd">                            args could be information coming from input data, model outputs,</span>
+<span class="sd">                            other metrics, or parameters specified in the `evaluator_config`</span>
+<span class="sd">                            argument of the `mlflow.evaluate` API.</span>
 
 <span class="sd">                    Returns: MetricValue with per-row scores, per-row justifications, and aggregate</span>
 <span class="sd">                        results.</span>
@@ -712,7 +722,14 @@
     <span class="n">SPARK_DATAFRAME_LIMIT</span> <span class="o">=</span> <span class="mi">10000</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">targets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">feature_names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">predictions</span><span class="o">=</span><span class="kc">None</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">targets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">feature_names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">predictions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The values of the constructor arguments comes from the `evaluate` call.</span>
@@ -1961,7 +1978,8 @@
 
     <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
-            <span class="n">message</span><span class="o">=</span><span class="s2">&quot;The data argument cannot be None.&quot;</span><span class="p">,</span> <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span>
+            <span class="n">message</span><span class="o">=</span><span class="s2">&quot;The data argument cannot be None.&quot;</span><span class="p">,</span>
+            <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="n">_EnvManager</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">env_manager</span><span class="p">)</span>

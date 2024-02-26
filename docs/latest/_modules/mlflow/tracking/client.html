@@ -1361,11 +1361,10 @@
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
 
-<span class="sd">            from mlflow import MlflowClient</span>
+<span class="sd">            import tempfile</span>
+<span class="sd">            from pathlib import Path</span>
 
-<span class="sd">            features = &quot;rooms, zipcode, median_price, school_rating, transport&quot;</span>
-<span class="sd">            with open(&quot;features.txt&quot;, &quot;w&quot;) as f:</span>
-<span class="sd">                f.write(features)</span>
+<span class="sd">            from mlflow import MlflowClient</span>
 
 <span class="sd">            # Create a run under the default experiment (whose id is &#39;0&#39;).</span>
 <span class="sd">            client = MlflowClient()</span>
@@ -1373,7 +1372,11 @@
 <span class="sd">            run = client.create_run(experiment_id)</span>
 
 <span class="sd">            # log and fetch the artifact</span>
-<span class="sd">            client.log_artifact(run.info.run_id, &quot;features.txt&quot;)</span>
+<span class="sd">            with tempfile.TemporaryDirectory() as tmp_dir:</span>
+<span class="sd">                path = Path(tmp_dir, &quot;features.txt&quot;)</span>
+<span class="sd">                path.write_text(features)</span>
+<span class="sd">                client.log_artifact(run.info.run_id, path)</span>
+
 <span class="sd">            artifacts = client.list_artifacts(run.info.run_id)</span>
 <span class="sd">            for artifact in artifacts:</span>
 <span class="sd">                print(f&quot;artifact: {artifact.path}&quot;)</span>
@@ -1401,26 +1404,27 @@
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
 
-<span class="sd">            import os</span>
 <span class="sd">            import json</span>
+<span class="sd">            import tempfile</span>
+<span class="sd">            from pathlib import Path</span>
 
 <span class="sd">            # Create some artifacts data to preserve</span>
 <span class="sd">            features = &quot;rooms, zipcode, median_price, school_rating, transport&quot;</span>
 <span class="sd">            data = {&quot;state&quot;: &quot;TX&quot;, &quot;Available&quot;: 25, &quot;Type&quot;: &quot;Detached&quot;}</span>
+<span class="sd">            with tempfile.TemporaryDirectory() as tmp_dir:</span>
+<span class="sd">                tmp_dir = Path(tmp_dir)</span>
+<span class="sd">                with (tmp_dir / &quot;data.json&quot;).open(&quot;w&quot;) as f:</span>
+<span class="sd">                    json.dump(data, f, indent=2)</span>
+<span class="sd">                with (tmp_dir / &quot;features.json&quot;).open(&quot;w&quot;) as f:</span>
+<span class="sd">                    f.write(features)</span>
 
-<span class="sd">            # Create couple of artifact files under the local directory &quot;data&quot;</span>
-<span class="sd">            os.makedirs(&quot;data&quot;, exist_ok=True)</span>
-<span class="sd">            with open(&quot;data/data.json&quot;, &quot;w&quot;, encoding=&quot;utf-8&quot;) as f:</span>
-<span class="sd">                json.dump(data, f, indent=2)</span>
-<span class="sd">            with open(&quot;data/features.txt&quot;, &quot;w&quot;) as f:</span>
-<span class="sd">                f.write(features)</span>
+<span class="sd">                # Create a run under the default experiment (whose id is &#39;0&#39;), and log</span>
+<span class="sd">                # all files in &quot;data&quot; to root artifact_uri/states</span>
+<span class="sd">                client = MlflowClient()</span>
+<span class="sd">                experiment_id = &quot;0&quot;</span>
+<span class="sd">                run = client.create_run(experiment_id)</span>
+<span class="sd">                client.log_artifacts(run.info.run_id, tmp_dir, artifact_path=&quot;states&quot;)</span>
 
-<span class="sd">            # Create a run under the default experiment (whose id is &#39;0&#39;), and log</span>
-<span class="sd">            # all files in &quot;data&quot; to root artifact_uri/states</span>
-<span class="sd">            client = MlflowClient()</span>
-<span class="sd">            experiment_id = &quot;0&quot;</span>
-<span class="sd">            run = client.create_run(experiment_id)</span>
-<span class="sd">            client.log_artifacts(run.info.run_id, &quot;data&quot;, artifact_path=&quot;states&quot;)</span>
 <span class="sd">            artifacts = client.list_artifacts(run.info.run_id)</span>
 <span class="sd">            for artifact in artifacts:</span>
 <span class="sd">                print(f&quot;artifact: {artifact.path}&quot;)</span>
@@ -3530,7 +3534,7 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="MlflowClient.get_model_version_stages"><a class="viewcode-back" href="../../../python_api/mlflow.client.html#mlflow.client.MlflowClient.get_model_version_stages">[docs]</a>    <span class="nd">@deprecated</span><span class="p">(</span><span class="n">since</span><span class="o">=</span><span class="s2">&quot;2.9.0&quot;</span><span class="p">,</span> <span class="n">impact</span><span class="o">=</span><span class="n">_STAGES_DEPRECATION_WARNING</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_model_version_stages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>  <span class="c1"># pylint: disable=unused-argument</span>
+    <span class="k">def</span> <span class="nf">get_model_version_stages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This is a docstring. Here is info.</span>
 
@@ -3754,7 +3758,7 @@
             <span class="p">)</span>
             <span class="n">latest_versions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_latest_versions</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">stages</span><span class="o">=</span><span class="p">[</span><span class="n">stage</span><span class="p">])</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">latest_versions</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="s2">&quot;Could not find any model version for </span><span class="si">{stage}</span><span class="s2"> stage&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not find any model version for </span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s2"> stage&quot;</span><span class="p">)</span>
             <span class="n">version</span> <span class="o">=</span> <span class="n">latest_versions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">version</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_get_registry_client</span><span class="p">()</span><span class="o">.</span><span class="n">delete_model_version_tag</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span></div>
 

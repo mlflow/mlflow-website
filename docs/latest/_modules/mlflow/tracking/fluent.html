@@ -385,7 +385,7 @@
     <span class="p">)</span>
 
 
-<div class="viewcode-block" id="ActiveRun"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.ActiveRun">[docs]</a><span class="k">class</span> <span class="nc">ActiveRun</span><span class="p">(</span><span class="n">Run</span><span class="p">):</span>  <span class="c1"># pylint: disable=abstract-method</span>
+<div class="viewcode-block" id="ActiveRun"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.ActiveRun">[docs]</a><span class="k">class</span> <span class="nc">ActiveRun</span><span class="p">(</span><span class="n">Run</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Wrapper around :py:class:`mlflow.entities.Run` to enable using Python ``with`` syntax.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run</span><span class="p">):</span>
@@ -1225,16 +1225,20 @@
 <span class="sd">        :test:</span>
 <span class="sd">        :caption: Example</span>
 
+<span class="sd">        import tempfile</span>
+<span class="sd">        from pathlib import Path</span>
+
 <span class="sd">        import mlflow</span>
 
 <span class="sd">        # Create a features.txt artifact file</span>
 <span class="sd">        features = &quot;rooms, zipcode, median_price, school_rating, transport&quot;</span>
-<span class="sd">        with open(&quot;features.txt&quot;, &quot;w&quot;) as f:</span>
-<span class="sd">            f.write(features)</span>
-<span class="sd">        # With artifact_path=None write features.txt under</span>
-<span class="sd">        # root artifact_uri/artifacts directory</span>
-<span class="sd">        with mlflow.start_run():</span>
-<span class="sd">            mlflow.log_artifact(&quot;features.txt&quot;)</span>
+<span class="sd">        with tempfile.TemporaryDirectory() as tmp_dir:</span>
+<span class="sd">            path = Path(tmp_dir, &quot;features.txt&quot;)</span>
+<span class="sd">            path.write_text(features)</span>
+<span class="sd">            # With artifact_path=None write features.txt under</span>
+<span class="sd">            # root artifact_uri/artifacts directory</span>
+<span class="sd">            with mlflow.start_run():</span>
+<span class="sd">                mlflow.log_artifact(path)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">run_id</span> <span class="o">=</span> <span class="n">run_id</span> <span class="ow">or</span> <span class="n">_get_or_start_run</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">run_id</span>
     <span class="n">MlflowClient</span><span class="p">()</span><span class="o">.</span><span class="n">log_artifact</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">local_path</span><span class="p">,</span> <span class="n">artifact_path</span><span class="p">)</span></div>
@@ -1256,21 +1260,23 @@
 <span class="sd">        :caption: Example</span>
 
 <span class="sd">        import json</span>
-<span class="sd">        import os</span>
+<span class="sd">        import tempfile</span>
+<span class="sd">        from pathlib import Path</span>
+
 <span class="sd">        import mlflow</span>
 
 <span class="sd">        # Create some files to preserve as artifacts</span>
 <span class="sd">        features = &quot;rooms, zipcode, median_price, school_rating, transport&quot;</span>
 <span class="sd">        data = {&quot;state&quot;: &quot;TX&quot;, &quot;Available&quot;: 25, &quot;Type&quot;: &quot;Detached&quot;}</span>
-<span class="sd">        # Create couple of artifact files under the directory &quot;data&quot;</span>
-<span class="sd">        os.makedirs(&quot;data&quot;, exist_ok=True)</span>
-<span class="sd">        with open(&quot;data/data.json&quot;, &quot;w&quot;, encoding=&quot;utf-8&quot;) as f:</span>
-<span class="sd">            json.dump(data, f, indent=2)</span>
-<span class="sd">        with open(&quot;data/features.txt&quot;, &quot;w&quot;) as f:</span>
-<span class="sd">            f.write(features)</span>
-<span class="sd">        # Write all files in &quot;data&quot; to root artifact_uri/states</span>
-<span class="sd">        with mlflow.start_run():</span>
-<span class="sd">            mlflow.log_artifacts(&quot;data&quot;, artifact_path=&quot;states&quot;)</span>
+<span class="sd">        with tempfile.TemporaryDirectory() as tmp_dir:</span>
+<span class="sd">            tmp_dir = Path(tmp_dir)</span>
+<span class="sd">            with (tmp_dir / &quot;data.json&quot;).open(&quot;w&quot;) as f:</span>
+<span class="sd">                json.dump(data, f, indent=2)</span>
+<span class="sd">            with (tmp_dir / &quot;features.json&quot;).open(&quot;w&quot;) as f:</span>
+<span class="sd">                f.write(features)</span>
+<span class="sd">            # Write all files in `tmp_dir` to root artifact_uri/states</span>
+<span class="sd">            with mlflow.start_run():</span>
+<span class="sd">                mlflow.log_artifacts(tmp_dir, artifact_path=&quot;states&quot;)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">run_id</span> <span class="o">=</span> <span class="n">run_id</span> <span class="ow">or</span> <span class="n">_get_or_start_run</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">run_id</span>
     <span class="n">MlflowClient</span><span class="p">()</span><span class="o">.</span><span class="n">log_artifacts</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">local_dir</span><span class="p">,</span> <span class="n">artifact_path</span><span class="p">)</span></div>
@@ -2218,7 +2224,6 @@
     <span class="n">disable_for_unsupported_versions</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">silent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">extra_tags</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="c1"># pylint: disable=unused-argument</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Enables (or disables) and configures autologging for all supported integrations.</span>

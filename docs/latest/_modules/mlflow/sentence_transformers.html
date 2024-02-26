@@ -218,6 +218,10 @@
 <span class="kn">from</span> <span class="nn">mlflow.models.signature</span> <span class="kn">import</span> <span class="n">_infer_signature_from_input_example</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.utils</span> <span class="kn">import</span> <span class="n">_save_example</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracking._model_registry</span> <span class="kn">import</span> <span class="n">DEFAULT_AWAIT_MAX_SLEEP_SECONDS</span>
+<span class="kn">from</span> <span class="nn">mlflow.types.llm</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">EMBEDDING_MODEL_INPUT_SCHEMA</span><span class="p">,</span>
+    <span class="n">EMBEDDING_MODEL_OUTPUT_SCHEMA</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.types.schema</span> <span class="kn">import</span> <span class="n">ColSpec</span><span class="p">,</span> <span class="n">Schema</span><span class="p">,</span> <span class="n">TensorSpec</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.annotations</span> <span class="kn">import</span> <span class="n">experimental</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.docstring_utils</span> <span class="kn">import</span> <span class="p">(</span>
@@ -249,6 +253,8 @@
 <span class="n">FLAVOR_NAME</span> <span class="o">=</span> <span class="s2">&quot;sentence_transformers&quot;</span>
 <span class="n">SENTENCE_TRANSFORMERS_DATA_PATH</span> <span class="o">=</span> <span class="s2">&quot;model.sentence_transformer&quot;</span>
 <span class="n">_INFERENCE_CONFIG_PATH</span> <span class="o">=</span> <span class="s2">&quot;inference_config&quot;</span>
+<span class="n">_LLM_INFERENCE_TASK_EMBEDDING</span> <span class="o">=</span> <span class="s2">&quot;llm/v1/embeddings&quot;</span>
+<span class="n">_LLM_V1_EMBEDDING_INPUT_KEY</span> <span class="o">=</span> <span class="s2">&quot;input&quot;</span>
 
 <span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -278,12 +284,33 @@
     <span class="k">return</span> <span class="n">_mlflow_conda_env</span><span class="p">(</span><span class="n">additional_pip_deps</span><span class="o">=</span><span class="n">get_default_pip_requirements</span><span class="p">())</span></div>
 
 
+<span class="nd">@experimental</span>
+<span class="k">def</span> <span class="nf">_verify_task_and_update_metadata</span><span class="p">(</span>
+    <span class="n">task</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="n">task</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">_LLM_INFERENCE_TASK_EMBEDDING</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Received invalid parameter value for `task` argument </span><span class="si">{</span><span class="n">task</span><span class="si">}</span><span class="s2">. Task type could &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;only be </span><span class="si">{</span><span class="n">_LLM_INFERENCE_TASK_EMBEDDING</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">metadata</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="s2">&quot;task&quot;</span> <span class="ow">in</span> <span class="n">metadata</span> <span class="ow">and</span> <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;task&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">task</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Received invalid parameter value for `task` argument </span><span class="si">{</span><span class="n">task</span><span class="si">}</span><span class="s2">. Task type is &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;inconsistent with the task value from metadata </span><span class="si">{</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;task&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;task&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">task</span>
+    <span class="k">return</span> <span class="n">metadata</span>
+
+
 <div class="viewcode-block" id="save_model"><a class="viewcode-back" href="../../python_api/mlflow.sentence_transformers.html#mlflow.sentence_transformers.save_model">[docs]</a><span class="nd">@experimental</span>
 <span class="nd">@docstring_version_compatibility_warning</span><span class="p">(</span><span class="n">integration_name</span><span class="o">=</span><span class="n">FLAVOR_NAME</span><span class="p">)</span>
 <span class="nd">@format_docstring</span><span class="p">(</span><span class="n">LOG_MODEL_PARAM_DOCS</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">package_name</span><span class="o">=</span><span class="n">FLAVOR_NAME</span><span class="p">))</span>
 <span class="k">def</span> <span class="nf">save_model</span><span class="p">(</span>
     <span class="n">model</span><span class="p">,</span>
     <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">task</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">inference_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">code_paths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">mlflow_model</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Model</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -300,6 +327,8 @@
 <span class="sd">    Args:</span>
 <span class="sd">        model: A trained ``sentence-transformers`` model.</span>
 <span class="sd">        path: Local path destination for the serialized model to be saved.</span>
+<span class="sd">        task: MLflow inference task type for ``sentence-transformers`` model. Candidate task type</span>
+<span class="sd">            is `llm/v1/embeddings`.</span>
 <span class="sd">        inference_config:</span>
 <span class="sd">            A dict of valid inference parameters that can be applied to a ``sentence-transformer``</span>
 <span class="sd">            model instance during inference.</span>
@@ -342,7 +371,11 @@
 
     <span class="n">code_dir_subpath</span> <span class="o">=</span> <span class="n">_validate_and_copy_code_paths</span><span class="p">(</span><span class="n">code_paths</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
 
-    <span class="k">if</span> <span class="n">signature</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">input_example</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">task</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">signature</span> <span class="o">=</span> <span class="n">ModelSignature</span><span class="p">(</span>
+            <span class="n">inputs</span><span class="o">=</span><span class="n">EMBEDDING_MODEL_INPUT_SCHEMA</span><span class="p">,</span> <span class="n">outputs</span><span class="o">=</span><span class="n">EMBEDDING_MODEL_OUTPUT_SCHEMA</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">signature</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">input_example</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">wrapped_model</span> <span class="o">=</span> <span class="n">_SentenceTransformerModelWrapper</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
         <span class="n">signature</span> <span class="o">=</span> <span class="n">_infer_signature_from_input_example</span><span class="p">(</span><span class="n">input_example</span><span class="p">,</span> <span class="n">wrapped_model</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">signature</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -358,6 +391,10 @@
         <span class="n">_save_example</span><span class="p">(</span><span class="n">mlflow_model</span><span class="p">,</span> <span class="n">input_example</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">metadata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">mlflow_model</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">metadata</span>
+    <span class="n">model_config</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">task</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">mlflow_model</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">_verify_task_and_update_metadata</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="n">mlflow_model</span><span class="o">.</span><span class="n">metadata</span><span class="p">)</span>
+        <span class="n">model_config</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;task&quot;</span><span class="p">:</span> <span class="n">_LLM_INFERENCE_TASK_EMBEDDING</span><span class="p">}</span>
 
     <span class="n">model</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">model_data_path</span><span class="p">))</span>
 
@@ -367,6 +404,7 @@
         <span class="n">data</span><span class="o">=</span><span class="n">SENTENCE_TRANSFORMERS_DATA_PATH</span><span class="p">,</span>
         <span class="n">conda_env</span><span class="o">=</span><span class="n">_CONDA_ENV_FILE_NAME</span><span class="p">,</span>
         <span class="n">python_env</span><span class="o">=</span><span class="n">_PYTHON_ENV_FILE_NAME</span><span class="p">,</span>
+        <span class="n">model_config</span><span class="o">=</span><span class="n">model_config</span><span class="p">,</span>
         <span class="n">code</span><span class="o">=</span><span class="n">code_dir_subpath</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">mlflow_model</span><span class="o">.</span><span class="n">add_flavor</span><span class="p">(</span>
@@ -411,6 +449,7 @@
 <span class="k">def</span> <span class="nf">log_model</span><span class="p">(</span>
     <span class="n">model</span><span class="p">,</span>
     <span class="n">artifact_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">task</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">inference_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">code_paths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">registered_model_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -453,6 +492,8 @@
 <span class="sd">    Args:</span>
 <span class="sd">        model: A trained ``sentence-transformers`` model.</span>
 <span class="sd">        artifact_path: Local path destination for the serialized model to be saved.</span>
+<span class="sd">        task: MLflow inference task type for ``sentence-transformers`` model. Candidate task type</span>
+<span class="sd">            is `llm/v1/embeddings`.</span>
 <span class="sd">        inference_config:</span>
 <span class="sd">            A dict of valid overrides that can be applied to a ``sentence-transformer`` model</span>
 <span class="sd">            instance during inference.</span>
@@ -486,6 +527,9 @@
 <span class="sd">                                    release without warning.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">task</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="n">_verify_task_and_update_metadata</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span>
+
     <span class="k">return</span> <span class="n">Model</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
         <span class="n">artifact_path</span><span class="o">=</span><span class="n">artifact_path</span><span class="p">,</span>
         <span class="n">flavor</span><span class="o">=</span><span class="n">mlflow</span><span class="o">.</span><span class="n">sentence_transformers</span><span class="p">,</span>
@@ -503,7 +547,7 @@
     <span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">_load_pyfunc</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_load_pyfunc</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">model_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Load PyFunc implementation for SentenceTransformer. Called by ``pyfunc.load_model``.</span>
 
@@ -513,7 +557,9 @@
     <span class="kn">import</span> <span class="nn">sentence_transformers</span>
 
     <span class="n">model</span> <span class="o">=</span> <span class="n">sentence_transformers</span><span class="o">.</span><span class="n">SentenceTransformer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">_SentenceTransformerModelWrapper</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+    <span class="n">model_config</span> <span class="o">=</span> <span class="n">model_config</span> <span class="ow">or</span> <span class="p">{}</span>
+    <span class="n">task</span> <span class="o">=</span> <span class="n">model_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;task&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_SentenceTransformerModelWrapper</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">task</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="load_model"><a class="viewcode-back" href="../../python_api/mlflow.sentence_transformers.html#mlflow.sentence_transformers.load_model">[docs]</a><span class="nd">@experimental</span>
@@ -569,8 +615,9 @@
 
 
 <span class="k">class</span> <span class="nc">_SentenceTransformerModelWrapper</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">task</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="o">=</span> <span class="n">task</span>
 
     <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sentences</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -582,24 +629,86 @@
 <span class="sd">                                        release without warning.</span>
 
 
-<span class="sd">        Returns</span>
+<span class="sd">        Returns:</span>
 <span class="sd">            Model predictions.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># When the input is a single string, it is transformed into a DataFrame with one column</span>
-        <span class="c1"># and row, but the encode function does not accept DataFrame input</span>
+        <span class="c1"># When the input is a single string or a dictionary, it is transformed into a DataFrame</span>
+        <span class="c1"># with one column and row, but the encode function does not accept DataFrame input</span>
+        <span class="n">convert_output_to_llm_v1_format</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">sentences</span><span class="p">)</span> <span class="o">==</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-            <span class="n">sentences</span> <span class="o">=</span> <span class="n">sentences</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="c1"># Wrap the output to OpenAI format only when the input is dict `{&quot;input&quot;: ... }`</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="ow">and</span> <span class="nb">list</span><span class="p">(</span><span class="n">sentences</span><span class="o">.</span><span class="n">columns</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">_LLM_V1_EMBEDDING_INPUT_KEY</span><span class="p">:</span>
+                <span class="n">convert_output_to_llm_v1_format</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">sentences</span> <span class="o">=</span> <span class="n">sentences</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">sentences</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="nb">list</span><span class="p">:</span>
+                <span class="n">sentences</span> <span class="o">=</span> <span class="n">sentences</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="c1"># The encode API has additional parameters that we can add as kwargs.</span>
         <span class="c1"># See https://www.sbert.net/docs/package_reference/SentenceTransformer.html#sentence_transformers.SentenceTransformer.encode</span>
         <span class="k">if</span> <span class="n">params</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">sentences</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span>
+                <span class="n">output_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">sentences</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
                     <span class="s2">&quot;Received invalid parameter value for `params` argument&quot;</span>
                 <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">sentences</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">output_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">sentences</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">convert_output_to_llm_v1_format</span><span class="p">:</span>
+            <span class="n">output_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">postprocess_output_for_llm_v1_embedding_task</span><span class="p">(</span><span class="n">sentences</span><span class="p">,</span> <span class="n">output_data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">output_data</span>
+
+    <span class="k">def</span> <span class="nf">postprocess_output_for_llm_v1_embedding_task</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">input_prompts</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span> <span class="n">output_tensers</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Wrap output data with usage information.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            .. code-block:: python</span>
+<span class="sd">                input_prompt = [&quot;hello world and hello mlflow&quot;]</span>
+<span class="sd">                output_embedding = [0.47137904, 0.4669448, ..., 0.69726706]</span>
+<span class="sd">                output_dicts = postprocess_output_for_llm_v1_embedding_task(</span>
+<span class="sd">                    input_prompt, output_embedding</span>
+<span class="sd">                )</span>
+<span class="sd">                assert output_dicts == [</span>
+<span class="sd">                    {</span>
+<span class="sd">                        &quot;object&quot;: &quot;list&quot;,</span>
+<span class="sd">                        &quot;data&quot;: [</span>
+<span class="sd">                            {</span>
+<span class="sd">                                &quot;object&quot;: &quot;embedding&quot;,</span>
+<span class="sd">                                &quot;index&quot;: 0,</span>
+<span class="sd">                                &quot;embedding&quot;: [0.47137904, 0.4669448, ..., 0.69726706],</span>
+<span class="sd">                            }</span>
+<span class="sd">                        ],</span>
+<span class="sd">                        &quot;usage&quot;: {&quot;prompt_tokens&quot;: 8, &quot;total_tokens&quot;: 8},</span>
+<span class="sd">                    }</span>
+<span class="sd">                ]</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            input_prompts: text input prompts</span>
+<span class="sd">            output_tensers: List of output tensors that contain the generated embeddings</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">             Dictionaries containing the output embedding and usage information for each</span>
+<span class="sd">             input prompt.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">prompt_tokens</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+            <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">(</span><span class="n">prompt</span><span class="p">)[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">])</span> <span class="k">for</span> <span class="n">prompt</span> <span class="ow">in</span> <span class="n">input_prompts</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;object&quot;</span><span class="p">:</span> <span class="s2">&quot;list&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;object&quot;</span><span class="p">:</span> <span class="s2">&quot;embedding&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="n">i</span><span class="p">,</span>
+                    <span class="s2">&quot;embedding&quot;</span><span class="p">:</span> <span class="n">tensor</span><span class="p">,</span>
+                <span class="p">}</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">tensor</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">output_tensers</span><span class="p">)</span>
+            <span class="p">],</span>
+            <span class="s2">&quot;usage&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;prompt_tokens&quot;</span><span class="p">:</span> <span class="n">prompt_tokens</span><span class="p">,</span> <span class="s2">&quot;total_tokens&quot;</span><span class="p">:</span> <span class="n">prompt_tokens</span><span class="p">},</span>
+        <span class="p">}</span>
 </pre></div>
 
               </div>

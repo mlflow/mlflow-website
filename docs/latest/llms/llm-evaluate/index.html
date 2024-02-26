@@ -282,7 +282,7 @@ requires OpenAI API key, if you don’t have an OpenAI key, you can set it up [h
     <span class="c1"># Wrap &quot;gpt-4&quot; as an MLflow model.</span>
     <span class="n">logged_model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">openai</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
         <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-4&quot;</span><span class="p">,</span>
-        <span class="n">task</span><span class="o">=</span><span class="n">openai</span><span class="o">.</span><span class="n">ChatCompletion</span><span class="p">,</span>
+        <span class="n">task</span><span class="o">=</span><span class="n">openai</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">completions</span><span class="p">,</span>
         <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
         <span class="n">messages</span><span class="o">=</span><span class="p">[</span>
             <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">system_prompt</span><span class="p">},</span>
@@ -543,13 +543,13 @@ we will use <a class="reference internal" href="../../python_api/mlflow.metrics.
 <p>This is very similar to creating custom traditional metrics, with the exception of returning a <a class="reference internal" href="../../python_api/mlflow.metrics.html#mlflow.metrics.MetricValue" title="mlflow.metrics.MetricValue"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.metrics.MetricValue()</span></code></a> instance.
 Basically you need to:</p>
 <ol class="arabic simple">
-<li><p>Implement a <code class="docutils literal notranslate"><span class="pre">eval_fn</span></code> to define your scoring logic, it must take in 3 args <code class="docutils literal notranslate"><span class="pre">predictions</span></code>, <code class="docutils literal notranslate"><span class="pre">targets</span></code> and <code class="docutils literal notranslate"><span class="pre">metrics</span></code>.
+<li><p>Implement a <code class="docutils literal notranslate"><span class="pre">eval_fn</span></code> to define your scoring logic, it must take in 2 args <code class="docutils literal notranslate"><span class="pre">predictions</span></code> and <code class="docutils literal notranslate"><span class="pre">targets</span></code>.
 <code class="docutils literal notranslate"><span class="pre">eval_fn</span></code> must return a <a class="reference internal" href="../../python_api/mlflow.metrics.html#mlflow.metrics.MetricValue" title="mlflow.metrics.MetricValue"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.metrics.MetricValue()</span></code></a> instance.</p></li>
 <li><p>Pass <code class="docutils literal notranslate"><span class="pre">eval_fn</span></code> and other arguments to <code class="docutils literal notranslate"><span class="pre">mlflow.metrics.make_metric</span></code> API to create the metric.</p></li>
 </ol>
 <p>The following code creates a dummy per-row metric called <code class="docutils literal notranslate"><span class="pre">&quot;over_10_chars&quot;</span></code>: if the model output is greater than 10,
 the score is “yes” otherwise “no”.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">eval_fn</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">metrics</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">eval_fn</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">targets</span><span class="p">):</span>
     <span class="n">scores</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">predictions</span><span class="p">)):</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">predictions</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">:</span>
@@ -565,6 +565,25 @@ the score is “yes” otherwise “no”.</p>
 <span class="c1"># Create an EvaluationMetric object.</span>
 <span class="n">passing_code_metric</span> <span class="o">=</span> <span class="n">make_metric</span><span class="p">(</span>
     <span class="n">eval_fn</span><span class="o">=</span><span class="n">eval_fn</span><span class="p">,</span> <span class="n">greater_is_better</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;over_10_chars&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>To create a custom metric that is dependent on other metrics, include those other metrics’ names as an argument after <code class="docutils literal notranslate"><span class="pre">predictions</span></code> and <code class="docutils literal notranslate"><span class="pre">targets</span></code>. This can be the name of a builtin metric or another custom metric.
+Ensure that you do not accidentally have any circular dependencies in your metrics, or the evaluation will fail.</p>
+<p>The following code creates a dummy per-row metric called <code class="docutils literal notranslate"><span class="pre">&quot;toxic_or_over_10_chars&quot;</span></code>: if the model output is greater than 10 or the toxicity score is greater than 0.5, the score is “yes” otherwise “no”.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">eval_fn</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">toxicity</span><span class="p">,</span> <span class="n">over_10_chars</span><span class="p">):</span>
+    <span class="n">scores</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">predictions</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">toxicity</span><span class="o">.</span><span class="n">scores</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.5</span> <span class="ow">or</span> <span class="n">over_10_chars</span><span class="o">.</span><span class="n">scores</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+            <span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;yes&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;no&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">MetricValue</span><span class="p">(</span><span class="n">scores</span><span class="o">=</span><span class="n">scores</span><span class="p">)</span>
+
+
+<span class="c1"># Create an EvaluationMetric object.</span>
+<span class="n">toxic_and_over_10_chars_metric</span> <span class="o">=</span> <span class="n">make_metric</span><span class="p">(</span>
+    <span class="n">eval_fn</span><span class="o">=</span><span class="n">eval_fn</span><span class="p">,</span> <span class="n">greater_is_better</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;toxic_or_over_10_chars&quot;</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -598,7 +617,7 @@ has its own <code class="docutils literal notranslate"><span class="pre">log_mod
     <span class="c1"># Wrap &quot;gpt-3.5-turbo&quot; as an MLflow model.</span>
     <span class="n">logged_model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">openai</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
         <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-3.5-turbo&quot;</span><span class="p">,</span>
-        <span class="n">task</span><span class="o">=</span><span class="n">openai</span><span class="o">.</span><span class="n">ChatCompletion</span><span class="p">,</span>
+        <span class="n">task</span><span class="o">=</span><span class="n">openai</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">completions</span><span class="p">,</span>
         <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
         <span class="n">messages</span><span class="o">=</span><span class="p">[</span>
             <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">system_prompt</span><span class="p">},</span>
@@ -644,7 +663,7 @@ up OpenAI authentication to run the code below.</p>
     <span class="n">answers</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">system_prompt</span> <span class="o">=</span> <span class="s2">&quot;Please answer the following question in formal language.&quot;</span>
     <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">inputs</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
-        <span class="n">completion</span> <span class="o">=</span> <span class="n">openai</span><span class="o">.</span><span class="n">ChatCompletion</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+        <span class="n">completion</span> <span class="o">=</span> <span class="n">openai</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">completions</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
             <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-3.5-turbo&quot;</span><span class="p">,</span>
             <span class="n">messages</span><span class="o">=</span><span class="p">[</span>
                 <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">system_prompt</span><span class="p">},</span>
