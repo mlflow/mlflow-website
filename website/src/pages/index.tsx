@@ -783,7 +783,7 @@ export default function Home(): JSX.Element {
           </h2>
         </div>
         <Grid>
-          {RELEASES.slice(3).map((release, idx) => (
+          {RELEASES.slice(0, 3).map((release, idx) => (
             <ReleaseNote release={release} key={idx} />
           ))}
         </Grid>
@@ -802,7 +802,7 @@ export default function Home(): JSX.Element {
         </div>
 
         <Grid>
-          {BLOGS.slice(3).map((blog, idx) => (
+          {BLOGS.slice(0, 3).map((blog, idx) => (
             <Blog blog={blog} key={idx} />
           ))}
         </Grid>
