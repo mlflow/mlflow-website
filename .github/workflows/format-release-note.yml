@@ -1,6 +1,6 @@
 name: Format Release Notes
 on:
-  pull_request:
+  pull_request_target:
     paths:
       - website/releases/**
 
@@ -81,6 +81,7 @@ jobs:
           fetch-depth: 300
           repository: ${{ github.event.pull_request.base.repo.full_name }}
           ref: ${{ github.event.pull_request.head.ref }}
+          token: ${{ secrets.MLFLOW_AUTOMATION_TOKEN }}
 
       - name: Download patch
         uses: actions/download-artifact@v4
@@ -89,8 +90,6 @@ jobs:
           path: /tmp
 
       - name: Apply patch and push
-        env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config user.name 'mlflow-automation'
           git config user.email 'mlflow-automation@users.noreply.github.com'
