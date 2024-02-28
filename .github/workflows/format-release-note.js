@@ -1,4 +1,4 @@
-const formatMarkdown = ({ core, filenames }) => {
+const formatMarkdown = ({ filenames }) => {
   const fs = require('fs');
 
   filenames

@@ -1,6 +1,6 @@
 name: Format Release Notes
 on:
-  pull_request:
+  pull_request_target:
     paths:
       - website/releases/**
 
@@ -56,7 +56,7 @@ jobs:
             const filenames = files.map(file => file.filename);
 
             const { formatMarkdown } = require(".github/workflows/format-release-note.js");
-            formatMarkdown({ core, filenames })
+            formatMarkdown({ filenames })
 
       - name: Create patch
         id: patch
@@ -81,6 +81,7 @@ jobs:
           fetch-depth: 300
           repository: ${{ github.event.pull_request.base.repo.full_name }}
           ref: ${{ github.event.pull_request.head.ref }}
+          token: ${{ secrets.MLFLOW_AUTOMATION_TOKEN }}
 
       - name: Download patch
         uses: actions/download-artifact@v4
@@ -95,4 +96,3 @@ jobs:
           git apply /tmp/${{ github.run_id }}.diff
           git commit -sam "Generate Links: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           git push
-          
