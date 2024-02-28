@@ -6,7 +6,6 @@ const formatMarkdown = ({ core, filenames }) => {
     .forEach(filename => {
       const content = fs.readFileSync(filename, 'utf8');
       const formatted = generateLinks(content);
-      core.info(formatted);
       fs.writeFileSync(filename, formatted, 'utf8');
     });
 }
