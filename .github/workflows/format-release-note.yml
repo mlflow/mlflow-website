@@ -1,0 +1,99 @@
+name: Format Release Notes
+on:
+  pull_request:
+    paths:
+      - website/releases/**
+
+permissions:
+  pull-requests: read
+
+defaults:
+  run:
+    shell: bash --noprofile --norc -exo pipefail {0}
+
+jobs:
+  # check that only maintainers have 
+  # contributed commits to this PR
+  check-maintainer:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.head.repo.full_name == "mlflow/mlflow-website"
+    
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: commits } = await github.rest.pulls.listCommits({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+            })
+
+            const committers = commits.map(commit => commit.author.login);
+            const { isMLflowMaintainer } = require(".github/workflows/is-mlflow-maintainer.js");
+            const allMaintainers = committers.every(isMLflowMaintainer)
+            if (!allMaintainers) {
+              core.setFailed("Only MLflow maintainers can trigger this workflow");
+            }
+
+  format:
+    runs-on: ubuntu-latest
+    needs: check-maintainer
+    outputs:
+      reformatted: ${{ steps.patch.outputs.reformatted }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Format
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const repo = context.repo;
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: repo.owner,
+              repo: repo.repo,
+              pull_number: prNumber,
+            });
+            const filenames = files.map(file => file.filename);
+
+            const { formatMarkdown } = require(".github/workflows/format-release-note.js");
+            formatMarkdown({ filenames })
+
+      - name: Create patch
+        id: patch
+        run: |
+          git diff > ${{ github.run_id }}.diff
+          reformatted=$([[ -s ${{ github.run_id }}.diff ]] && echo "true" || echo "false")
+          echo "reformatted=$reformatted" >> $GITHUB_OUTPUT
+
+      - name: Upload patch
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ github.run_id }}.diff
+          path: ${{ github.run_id }}.diff
+
+  push:
+    runs-on: ubuntu-latest
+    needs: [check-maintainer, format]
+    if: ${{ needs.format.outputs.reformatted == 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 300
+          repository: ${{ github.event.pull_request.base.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.ref }}
+          token: ${{ secrets.MLFLOW_AUTOMATION_TOKEN }}
+
+      - name: Download patch
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ github.run_id }}.diff
+          path: /tmp
+
+      - name: Apply patch and push
+        run: |
+          git config user.name 'mlflow-automation'
+          git config user.email 'mlflow-automation@users.noreply.github.com'
+          git apply /tmp/${{ github.run_id }}.diff
+          git commit -sam "Generate Links: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          git push
