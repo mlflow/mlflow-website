@@ -30,7 +30,7 @@ const generateLinks = (content) => {
 
   content = content.replace(
     usernameRegex,
-    "$1[@$2](https://www.github.com/$2)"
+    "$1[@$2](https://github.com/$2)"
   );
 
   return content
