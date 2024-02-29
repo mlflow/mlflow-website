@@ -2,10 +2,7 @@ import React from "react";
 import { BlogPostProvider } from "@docusaurus/theme-common/internal";
 import BlogPostItem from "@theme/BlogPostItem";
 import { BLOGS } from "@site/src/posts";
-import { RELEASES } from "@site/src/posts";
-import Blog from "@site/src/components/Blog";
-import Grid from "@site/src/components/Grid";
-import ReleaseNote from "@site/src/components/ReleaseNote";
+import BlogItem from "@site/src/components/BlogItem";
 
 export default function BlogPostItems({
   items,
@@ -16,13 +13,11 @@ export default function BlogPostItems({
   );
   if (isBlog) {
     return (
-      <Grid>
-        {isBlog
-          ? BLOGS.map((blog) => <Blog key={blog.id} blog={blog} />)
-          : RELEASES.map((release) => (
-              <ReleaseNote key={release.id} release={release} />
-            ))}
-      </Grid>
+      <>
+        {BLOGS.map((blog) => (
+          <BlogItem key={blog.id} blog={blog} />
+        ))}
+      </>
     );
   }
 
