@@ -25,7 +25,7 @@ const generateLinks = (content) => {
   // Replace PR numbers with markdown-styled links
   content = content.replace(
     prNumberRegex,
-    "$1[#$2](https://www.github.com/mlflow/mlflow/pull/$2)"
+    "$1[#$2](https://github.com/mlflow/mlflow/pull/$2)"
   );
 
   content = content.replace(
