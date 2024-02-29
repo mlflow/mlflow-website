@@ -209,11 +209,9 @@
 
 <span class="kn">from</span> <span class="nn">mlflow.data.dataset_source</span> <span class="kn">import</span> <span class="n">DatasetSource</span>
 <span class="kn">from</span> <span class="nn">mlflow.entities</span> <span class="kn">import</span> <span class="n">Dataset</span> <span class="k">as</span> <span class="n">DatasetEntity</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.annotations</span> <span class="kn">import</span> <span class="n">experimental</span>
 
 
-<div class="viewcode-block" id="Dataset"><a class="viewcode-back" href="../../../python_api/mlflow.data.html#mlflow.data.dataset.Dataset">[docs]</a><span class="nd">@experimental</span>
-<span class="k">class</span> <span class="nc">Dataset</span><span class="p">:</span>
+<div class="viewcode-block" id="Dataset"><a class="viewcode-back" href="../../../python_api/mlflow.data.html#mlflow.data.dataset.Dataset">[docs]</a><span class="k">class</span> <span class="nc">Dataset</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Represents a dataset for use with MLflow Tracking, including the name, digest (hash),</span>
 <span class="sd">    schema, and profile of the dataset as well as source information (e.g. the S3 bucket or</span>
@@ -244,19 +242,22 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">_to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Args:</span>
-<span class="sd">            base_dict: A string dictionary of base information about the</span>
-<span class="sd">                dataset, including: name, digest, source, and source</span>
-<span class="sd">                type.</span>
+<div class="viewcode-block" id="Dataset.to_dict"><a class="viewcode-back" href="../../../python_api/mlflow.data.html#mlflow.data.dataset.Dataset.to_dict">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create config dictionary for the dataset.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            A string dictionary containing the following fields: name,</span>
-<span class="sd">            digest, source, source type, schema (optional), profile</span>
-<span class="sd">            (optional).</span>
+<span class="sd">        Subclasses should override this method to provide additional fields in the config dict,</span>
+<span class="sd">        e.g., schema, profile, etc.</span>
+
+<span class="sd">        Returns a string dictionary containing the following fields: name, digest, source, source</span>
+<span class="sd">        type.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="s2">&quot;digest&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">digest</span><span class="p">,</span>
+            <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">to_json</span><span class="p">(),</span>
+            <span class="s2">&quot;source_type&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">_get_source_type</span><span class="p">(),</span>
+        <span class="p">}</span></div>
 
 <div class="viewcode-block" id="Dataset.to_json"><a class="viewcode-back" href="../../../python_api/mlflow.data.html#mlflow.data.dataset.Dataset.to_json">[docs]</a>    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -266,13 +267,8 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            A JSON string representation of the :py:class:`Dataset &lt;mlflow.data.dataset.Dataset&gt;`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">base_dict</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-            <span class="s2">&quot;digest&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">digest</span><span class="p">,</span>
-            <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">to_json</span><span class="p">(),</span>
-            <span class="s2">&quot;source_type&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">_get_source_type</span><span class="p">(),</span>
-        <span class="p">}</span>
-        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_to_dict</span><span class="p">(</span><span class="n">base_dict</span><span class="p">))</span></div>
+
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -320,7 +316,7 @@
     <span class="k">def</span> <span class="nf">_to_mlflow_entity</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DatasetEntity</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns:</span>
-<span class="sd">            A DatasetEntity instance representing the dataset.</span>
+<span class="sd">            A `mlflow.entities.Dataset` instance representing the dataset.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">dataset_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_json</span><span class="p">())</span>
         <span class="k">return</span> <span class="n">DatasetEntity</span><span class="p">(</span>

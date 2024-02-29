@@ -208,22 +208,13 @@
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
 
-<span class="kn">from</span> <span class="nn">mlflow.environment_variables</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">MLFLOW_TRACKING_AUTH</span><span class="p">,</span>
-    <span class="n">MLFLOW_TRACKING_AWS_SIGV4</span><span class="p">,</span>
-    <span class="n">MLFLOW_TRACKING_CLIENT_CERT_PATH</span><span class="p">,</span>
-    <span class="n">MLFLOW_TRACKING_INSECURE_TLS</span><span class="p">,</span>
-    <span class="n">MLFLOW_TRACKING_SERVER_CERT_PATH</span><span class="p">,</span>
-    <span class="n">MLFLOW_TRACKING_TOKEN</span><span class="p">,</span>
-    <span class="n">MLFLOW_TRACKING_URI</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">mlflow.environment_variables</span> <span class="kn">import</span> <span class="n">MLFLOW_TRACKING_URI</span>
 <span class="kn">from</span> <span class="nn">mlflow.store.db.db_types</span> <span class="kn">import</span> <span class="n">DATABASE_ENGINES</span>
 <span class="kn">from</span> <span class="nn">mlflow.store.tracking</span> <span class="kn">import</span> <span class="n">DEFAULT_LOCAL_FILE_AND_ARTIFACT_PATH</span>
 <span class="kn">from</span> <span class="nn">mlflow.store.tracking.file_store</span> <span class="kn">import</span> <span class="n">FileStore</span>
 <span class="kn">from</span> <span class="nn">mlflow.store.tracking.rest_store</span> <span class="kn">import</span> <span class="n">RestStore</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracking._tracking_service.registry</span> <span class="kn">import</span> <span class="n">TrackingStoreRegistry</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils</span> <span class="kn">import</span> <span class="n">rest_utils</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.credentials</span> <span class="kn">import</span> <span class="n">read_mlflow_creds</span>
+<span class="kn">from</span> <span class="nn">mlflow.utils.credentials</span> <span class="kn">import</span> <span class="n">get_default_host_creds</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.databricks_utils</span> <span class="kn">import</span> <span class="n">get_databricks_host_creds</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.file_utils</span> <span class="kn">import</span> <span class="n">path_to_local_file_uri</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.uri</span> <span class="kn">import</span> <span class="n">_DATABRICKS_UNITY_CATALOG_SCHEME</span>
@@ -341,23 +332,8 @@
     <span class="k">return</span> <span class="n">SqlAlchemyStore</span><span class="p">(</span><span class="n">store_uri</span><span class="p">,</span> <span class="n">artifact_uri</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_get_default_host_creds</span><span class="p">(</span><span class="n">store_uri</span><span class="p">):</span>
-    <span class="n">creds</span> <span class="o">=</span> <span class="n">read_mlflow_creds</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">rest_utils</span><span class="o">.</span><span class="n">MlflowHostCreds</span><span class="p">(</span>
-        <span class="n">host</span><span class="o">=</span><span class="n">store_uri</span><span class="p">,</span>
-        <span class="n">username</span><span class="o">=</span><span class="n">creds</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
-        <span class="n">password</span><span class="o">=</span><span class="n">creds</span><span class="o">.</span><span class="n">password</span><span class="p">,</span>
-        <span class="n">token</span><span class="o">=</span><span class="n">MLFLOW_TRACKING_TOKEN</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
-        <span class="n">aws_sigv4</span><span class="o">=</span><span class="n">MLFLOW_TRACKING_AWS_SIGV4</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
-        <span class="n">auth</span><span class="o">=</span><span class="n">MLFLOW_TRACKING_AUTH</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
-        <span class="n">ignore_tls_verification</span><span class="o">=</span><span class="n">MLFLOW_TRACKING_INSECURE_TLS</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
-        <span class="n">client_cert_path</span><span class="o">=</span><span class="n">MLFLOW_TRACKING_CLIENT_CERT_PATH</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
-        <span class="n">server_cert_path</span><span class="o">=</span><span class="n">MLFLOW_TRACKING_SERVER_CERT_PATH</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
-    <span class="p">)</span>
-
-
 <span class="k">def</span> <span class="nf">_get_rest_store</span><span class="p">(</span><span class="n">store_uri</span><span class="p">,</span> <span class="o">**</span><span class="n">_</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">RestStore</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">_get_default_host_creds</span><span class="p">,</span> <span class="n">store_uri</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">RestStore</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">get_default_host_creds</span><span class="p">,</span> <span class="n">store_uri</span><span class="p">))</span>
 
 
 <span class="k">def</span> <span class="nf">_get_databricks_rest_store</span><span class="p">(</span><span class="n">store_uri</span><span class="p">,</span> <span class="o">**</span><span class="n">_</span><span class="p">):</span>

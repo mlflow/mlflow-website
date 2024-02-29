@@ -210,6 +210,7 @@
 <span class="kn">import</span> <span class="nn">contextlib</span>
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">importlib</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
@@ -231,8 +232,6 @@
 <span class="kn">from</span> <span class="nn">mlflow.environment_variables</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">MLFLOW_DEFAULT_PREDICTION_DEVICE</span><span class="p">,</span>
     <span class="n">MLFLOW_HUGGINGFACE_DEVICE_MAP_STRATEGY</span><span class="p">,</span>
-    <span class="n">MLFLOW_HUGGINGFACE_DISABLE_ACCELERATE_FEATURES</span><span class="p">,</span>
-    <span class="n">MLFLOW_HUGGINGFACE_MODEL_MAX_SHARD_SIZE</span><span class="p">,</span>
     <span class="n">MLFLOW_HUGGINGFACE_USE_DEVICE_MAP</span><span class="p">,</span>
     <span class="n">MLFLOW_HUGGINGFACE_USE_LOW_CPU_MEM_USAGE</span><span class="p">,</span>
 <span class="p">)</span>
@@ -249,7 +248,15 @@
     <span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
     <span class="n">RESOURCE_DOES_NOT_EXIST</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span> <span class="nn">mlflow.store.artifact.artifact_repository_registry</span> <span class="kn">import</span> <span class="n">get_artifact_repository</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracking._model_registry</span> <span class="kn">import</span> <span class="n">DEFAULT_AWAIT_MAX_SLEEP_SECONDS</span>
+<span class="kn">from</span> <span class="nn">mlflow.tracking.artifact_utils</span> <span class="kn">import</span> <span class="n">_get_root_uri_and_artifact_path</span>
+<span class="kn">from</span> <span class="nn">mlflow.transformers.flavor_config</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">FlavorKey</span><span class="p">,</span>
+    <span class="n">build_flavor_config</span><span class="p">,</span>
+    <span class="n">update_flavor_conf_to_persist_pretrained_model</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">mlflow.transformers.hub_utils</span> <span class="kn">import</span> <span class="n">is_valid_hf_repo_id</span>
 <span class="kn">from</span> <span class="nn">mlflow.transformers.llm_inference_utils</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">_LLM_INFERENCE_TASK_CHAT</span><span class="p">,</span>
     <span class="n">_LLM_INFERENCE_TASK_KEY</span><span class="p">,</span>
@@ -261,10 +268,24 @@
     <span class="n">postprocess_output_for_llm_inference_task</span><span class="p">,</span>
     <span class="n">preprocess_llm_inference_params</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span> <span class="nn">mlflow.transformers.model_io</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_COMPONENTS_BINARY_DIR_NAME</span><span class="p">,</span>
+    <span class="n">_MODEL_BINARY_FILE_NAME</span><span class="p">,</span>
+    <span class="n">load_model_and_components_from_huggingface_hub</span><span class="p">,</span>
+    <span class="n">load_model_and_components_from_local</span><span class="p">,</span>
+    <span class="n">save_pipeline_pretrained_weights</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">mlflow.transformers.peft</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_PEFT_ADAPTOR_DIR_NAME</span><span class="p">,</span>
+    <span class="n">get_model_with_peft_adapter</span><span class="p">,</span>
+    <span class="n">get_peft_base_model</span><span class="p">,</span>
+    <span class="n">is_peft_model</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.transformers.signature</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">format_input_example_for_special_cases</span><span class="p">,</span>
     <span class="n">infer_or_get_default_signature</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span> <span class="nn">mlflow.transformers.torch_utils</span> <span class="kn">import</span> <span class="n">_TORCH_DTYPE_KEY</span><span class="p">,</span> <span class="n">_deserialize_torch_dtype</span>
 <span class="kn">from</span> <span class="nn">mlflow.types.utils</span> <span class="kn">import</span> <span class="n">_validate_input_dictionary_contains_only_strings_and_lists_of_strings</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.annotations</span> <span class="kn">import</span> <span class="n">experimental</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.autologging_utils</span> <span class="kn">import</span> <span class="p">(</span>
@@ -289,7 +310,8 @@
     <span class="n">_validate_env_arguments</span><span class="p">,</span>
     <span class="n">infer_pip_requirements_with_timeout</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.file_utils</span> <span class="kn">import</span> <span class="n">get_total_file_size</span><span class="p">,</span> <span class="n">write_to</span>
+<span class="kn">from</span> <span class="nn">mlflow.utils.file_utils</span> <span class="kn">import</span> <span class="n">TempDir</span><span class="p">,</span> <span class="n">get_total_file_size</span><span class="p">,</span> <span class="n">write_to</span>
+<span class="kn">from</span> <span class="nn">mlflow.utils.logging_utils</span> <span class="kn">import</span> <span class="n">suppress_logs</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.model_utils</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">_add_code_from_conf_to_system_path</span><span class="p">,</span>
     <span class="n">_download_artifact_from_uri</span><span class="p">,</span>
@@ -302,47 +324,32 @@
 
 <span class="c1"># The following import is only used for type hinting</span>
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">torch</span>
     <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+
+<span class="c1"># Transformers pipeline complains that PeftModel is not supported for any task type, even</span>
+<span class="c1"># when the wrapped model is supported. As MLflow require users to use pipeline for logging,</span>
+<span class="c1"># we should suppress that confusing error message.</span>
+<span class="n">_PEFT_PIPELINE_ERROR_MSG</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;The model &#39;PeftModel[^&#39;]*&#39; is not supported for&quot;</span><span class="p">)</span>
 
 <span class="n">FLAVOR_NAME</span> <span class="o">=</span> <span class="s2">&quot;transformers&quot;</span>
 
 <span class="n">_CARD_TEXT_FILE_NAME</span> <span class="o">=</span> <span class="s2">&quot;model_card.md&quot;</span>
 <span class="n">_CARD_DATA_FILE_NAME</span> <span class="o">=</span> <span class="s2">&quot;model_card_data.yaml&quot;</span>
-<span class="n">_COMPONENTS_BINARY_KEY</span> <span class="o">=</span> <span class="s2">&quot;components&quot;</span>
-<span class="n">_FEATURE_EXTRACTOR_KEY</span> <span class="o">=</span> <span class="s2">&quot;feature_extractor&quot;</span>
-<span class="n">_FEATURE_EXTRACTOR_TYPE_KEY</span> <span class="o">=</span> <span class="s2">&quot;feature_extractor_type&quot;</span>
-<span class="n">_FRAMEWORK_KEY</span> <span class="o">=</span> <span class="s2">&quot;framework&quot;</span>
-<span class="n">_IMAGE_PROCESSOR_KEY</span> <span class="o">=</span> <span class="s2">&quot;image_processor&quot;</span>
-<span class="n">_IMAGE_PROCESSOR_TYPE_KEY</span> <span class="o">=</span> <span class="s2">&quot;image_processor_type&quot;</span>
 <span class="n">_INFERENCE_CONFIG_BINARY_KEY</span> <span class="o">=</span> <span class="s2">&quot;inference_config.txt&quot;</span>
-<span class="n">_INSTANCE_TYPE_KEY</span> <span class="o">=</span> <span class="s2">&quot;instance_type&quot;</span>
 <span class="n">_LICENSE_FILE_NAME</span> <span class="o">=</span> <span class="s2">&quot;LICENSE.txt&quot;</span>
 <span class="n">_LICENSE_FILE_PATTERN</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;license(\.[a-z]+|$)&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
-<span class="n">_MODEL_KEY</span> <span class="o">=</span> <span class="s2">&quot;model&quot;</span>
-<span class="n">_MODEL_BINARY_KEY</span> <span class="o">=</span> <span class="s2">&quot;model_binary&quot;</span>
-<span class="n">_MODEL_BINARY_FILE_NAME</span> <span class="o">=</span> <span class="s2">&quot;model&quot;</span>
-<span class="n">_MODEL_PATH_OR_NAME_KEY</span> <span class="o">=</span> <span class="s2">&quot;source_model_name&quot;</span>
-<span class="n">_PIPELINE_MODEL_TYPE_KEY</span> <span class="o">=</span> <span class="s2">&quot;pipeline_model_type&quot;</span>
-<span class="n">_PROCESSOR_KEY</span> <span class="o">=</span> <span class="s2">&quot;processor&quot;</span>
-<span class="n">_PROCESSOR_TYPE_KEY</span> <span class="o">=</span> <span class="s2">&quot;processor_type&quot;</span>
-<span class="n">_PROMPT_TEMPLATE_KEY</span> <span class="o">=</span> <span class="s2">&quot;prompt_template&quot;</span>
+
 <span class="n">_SUPPORTED_RETURN_TYPES</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;pipeline&quot;</span><span class="p">,</span> <span class="s2">&quot;components&quot;</span><span class="p">}</span>
 <span class="c1"># The default device id for CPU is -1 and GPU IDs are ordinal starting at 0, as documented here:</span>
 <span class="c1"># https://huggingface.co/transformers/v4.7.0/main_classes/pipelines.html</span>
 <span class="n">_TRANSFORMERS_DEFAULT_CPU_DEVICE_ID</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
 <span class="n">_TRANSFORMERS_DEFAULT_GPU_DEVICE_ID</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="n">_TASK_KEY</span> <span class="o">=</span> <span class="s2">&quot;task&quot;</span>
-<span class="n">_TOKENIZER_KEY</span> <span class="o">=</span> <span class="s2">&quot;tokenizer&quot;</span>
-<span class="n">_TOKENIZER_TYPE_KEY</span> <span class="o">=</span> <span class="s2">&quot;tokenizer_type&quot;</span>
-<span class="n">_TORCH_DTYPE_KEY</span> <span class="o">=</span> <span class="s2">&quot;torch_dtype&quot;</span>
-<span class="n">_METADATA_PIPELINE_SCALAR_CONFIG_KEYS</span> <span class="o">=</span> <span class="p">{</span><span class="n">_FRAMEWORK_KEY</span><span class="p">}</span>
 <span class="n">_SUPPORTED_SAVE_KEYS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="n">_MODEL_KEY</span><span class="p">,</span>
-    <span class="n">_TOKENIZER_KEY</span><span class="p">,</span>
-    <span class="n">_FEATURE_EXTRACTOR_KEY</span><span class="p">,</span>
-    <span class="n">_IMAGE_PROCESSOR_KEY</span><span class="p">,</span>
-    <span class="n">_TORCH_DTYPE_KEY</span><span class="p">,</span>
+    <span class="n">FlavorKey</span><span class="o">.</span><span class="n">MODEL</span><span class="p">,</span>
+    <span class="n">FlavorKey</span><span class="o">.</span><span class="n">TOKENIZER</span><span class="p">,</span>
+    <span class="n">FlavorKey</span><span class="o">.</span><span class="n">FEATURE_EXTRACTOR</span><span class="p">,</span>
+    <span class="n">FlavorKey</span><span class="o">.</span><span class="n">IMAGE_PROCESSOR</span><span class="p">,</span>
+    <span class="n">FlavorKey</span><span class="o">.</span><span class="n">TORCH_DTYPE</span><span class="p">,</span>
 <span class="p">}</span>
 
 <span class="n">_SUPPORTED_PROMPT_TEMPLATING_TASK_TYPES</span> <span class="o">=</span> <span class="p">{</span>
@@ -359,32 +366,8 @@
     <span class="s2">&quot;`model_config` dict with `return_full_text` set to `True` when saving the model.&quot;</span>
 <span class="p">)</span>
 
+
 <span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">_model_packages</span><span class="p">(</span><span class="n">model</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Determines which pip libraries should be included based on the base model engine type.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        model: The model instance to be saved in order to provide the required underlying</span>
-<span class="sd">            deep learning execution framework dependency requirements.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        A list of strings representing the underlying engine-specific dependencies</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">engine</span> <span class="o">=</span> <span class="n">_get_engine_type</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">engine</span> <span class="o">==</span> <span class="s2">&quot;torch&quot;</span><span class="p">:</span>
-        <span class="n">packages</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;torch&quot;</span><span class="p">,</span> <span class="s2">&quot;torchvision&quot;</span><span class="p">]</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="kn">import</span> <span class="nn">accelerate</span>  <span class="c1"># noqa: F401</span>
-
-            <span class="n">packages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;accelerate&quot;</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-            <span class="k">pass</span>
-        <span class="k">return</span> <span class="n">packages</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">engine</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="get_default_pip_requirements"><a class="viewcode-back" href="../../python_api/mlflow.transformers.html#mlflow.transformers.get_default_pip_requirements">[docs]</a><span class="nd">@experimental</span>
@@ -400,29 +383,28 @@
 <span class="sd">        ``transformers`` flavor. Calls to :py:func:`save_model()` and :py:func:`log_model()`</span>
 <span class="sd">        produce a pip environment that contain these requirements at a minimum.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">packages</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;transformers&quot;</span><span class="p">]</span>
 
-    <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">FlaxPreTrainedModel</span><span class="p">,</span> <span class="n">PreTrainedModel</span><span class="p">,</span> <span class="n">TFPreTrainedModel</span>
-
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="p">(</span><span class="n">TFPreTrainedModel</span><span class="p">,</span> <span class="n">FlaxPreTrainedModel</span><span class="p">,</span> <span class="n">PreTrainedModel</span><span class="p">)):</span>
-        <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
-            <span class="s2">&quot;The supplied model type is unsupported. The model must be one of: &quot;</span>
-            <span class="s2">&quot;PreTrainedModel, TFPreTrainedModel, or FlaxPreTrainedModel&quot;</span><span class="p">,</span>
-            <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
-        <span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">base_reqs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;transformers&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">_model_packages</span><span class="p">(</span><span class="n">model</span><span class="p">)]</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">_get_pinned_requirement</span><span class="p">(</span><span class="n">module</span><span class="p">)</span> <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="n">base_reqs</span><span class="p">]</span>
+        <span class="n">engine</span> <span class="o">=</span> <span class="n">_get_engine_type</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+        <span class="n">packages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">_get_pinned_requirement</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;transformers&quot;</span><span class="p">,</span> <span class="s2">&quot;torch&quot;</span><span class="p">,</span> <span class="s2">&quot;torchvision&quot;</span><span class="p">,</span> <span class="s2">&quot;tensorflow&quot;</span><span class="p">]</span>
-        <span class="p">]</span>
+        <span class="n">packages</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;torch&quot;</span><span class="p">,</span> <span class="s2">&quot;tensorflow&quot;</span><span class="p">]</span>
         <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
             <span class="s2">&quot;Could not infer model execution engine type due to huggingface_hub not &quot;</span>
-            <span class="s2">&quot;being installed or unable to connect in online mode. Adding full &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;dependency chain: </span><span class="si">{</span><span class="n">dependencies</span><span class="si">}</span><span class="s2">. </span><span class="se">\n</span><span class="s2">Failure cause: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;being installed or unable to connect in online mode. Adding both Pytorch&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;and Tensorflow to requirements.</span><span class="se">\n</span><span class="s2">Failure cause: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="n">dependencies</span></div>
+
+    <span class="k">if</span> <span class="s2">&quot;torch&quot;</span> <span class="ow">in</span> <span class="n">packages</span><span class="p">:</span>
+        <span class="n">packages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;torchvision&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">find_spec</span><span class="p">(</span><span class="s2">&quot;accelerate&quot;</span><span class="p">):</span>
+            <span class="n">packages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;accelerate&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">is_peft_model</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+        <span class="n">packages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;peft&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="n">_get_pinned_requirement</span><span class="p">(</span><span class="n">module</span><span class="p">)</span> <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="n">packages</span><span class="p">]</span></div>
 
 
 <span class="k">def</span> <span class="nf">_validate_transformers_model_dict</span><span class="p">(</span><span class="n">transformers_model</span><span class="p">):</span>
@@ -439,12 +421,12 @@
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_SUPPORTED_SAVE_KEYS</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
                 <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="k">if</span> <span class="n">_MODEL_KEY</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">transformers_model</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">FlavorKey</span><span class="o">.</span><span class="n">MODEL</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">transformers_model</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;The &#39;transformers_model&#39; dictionary must have an entry for </span><span class="si">{</span><span class="n">_MODEL_KEY</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;The &#39;transformers_model&#39; dictionary must have an entry for </span><span class="si">{</span><span class="n">FlavorKey</span><span class="o">.</span><span class="n">MODEL</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
                 <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="n">model</span> <span class="o">=</span> <span class="n">transformers_model</span><span class="p">[</span><span class="n">_MODEL_KEY</span><span class="p">]</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">transformers_model</span><span class="p">[</span><span class="n">FlavorKey</span><span class="o">.</span><span class="n">MODEL</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">model</span> <span class="o">=</span> <span class="n">transformers_model</span><span class="o">.</span><span class="n">model</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;name_or_path&quot;</span><span class="p">):</span>
@@ -488,7 +470,8 @@
     <span class="n">model_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">example_no_conversion</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">prompt_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="n">save_pretrained</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>  <span class="c1"># pylint: disable=unused-argument</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Save a trained transformers model to a path on the local file system.</span>
@@ -666,6 +649,7 @@
 <span class="sd">                                    release without warning.</span>
 <span class="sd">        example_no_conversion: {{ example_no_conversion }}</span>
 <span class="sd">        prompt_template: {{ prompt_template }}</span>
+<span class="sd">        save_pretrained: {{ save_pretrained }}</span>
 <span class="sd">        kwargs: Optional additional configurations for transformers serialization.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -739,47 +723,65 @@
 
         <span class="n">_validate_prompt_template</span><span class="p">(</span><span class="n">prompt_template</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">mlflow_model</span><span class="o">.</span><span class="n">metadata</span><span class="p">:</span>
-            <span class="n">mlflow_model</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="n">_PROMPT_TEMPLATE_KEY</span><span class="p">]</span> <span class="o">=</span> <span class="n">prompt_template</span>
+            <span class="n">mlflow_model</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="n">FlavorKey</span><span class="o">.</span><span class="n">PROMPT_TEMPLATE</span><span class="p">]</span> <span class="o">=</span> <span class="n">prompt_template</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">mlflow_model</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="p">{</span><span class="n">_PROMPT_TEMPLATE_KEY</span><span class="p">:</span> <span class="n">prompt_template</span><span class="p">}</span>
+            <span class="n">mlflow_model</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="p">{</span><span class="n">FlavorKey</span><span class="o">.</span><span class="n">PROMPT_TEMPLATE</span><span class="p">:</span> <span class="n">prompt_template</span><span class="p">}</span>
 
-    <span class="n">flavor_conf</span> <span class="o">=</span> <span class="n">_generate_base_flavor_configuration</span><span class="p">(</span><span class="n">built_pipeline</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">is_peft_model</span><span class="p">(</span><span class="n">built_pipeline</span><span class="o">.</span><span class="n">model</span><span class="p">):</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;Overriding save_pretrained to False for PEFT models, following the Transformers &quot;</span>
+            <span class="s2">&quot;behavior. The PEFT adaptor and config will be saved, but the base model weights &quot;</span>
+            <span class="s2">&quot;will not and reference to the HuggingFace Hub repository will be logged instead.&quot;</span>
+        <span class="p">)</span>
+        <span class="c1"># This will only save PEFT adaptor weights and config, not the base model weights</span>
+        <span class="n">built_pipeline</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">save_pretrained</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">_PEFT_ADAPTOR_DIR_NAME</span><span class="p">))</span>
+        <span class="n">save_pretrained</span> <span class="o">=</span> <span class="kc">False</span>
 
-    <span class="n">components</span> <span class="o">=</span> <span class="n">_record_pipeline_components</span><span class="p">(</span><span class="n">built_pipeline</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">save_pretrained</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_valid_hf_repo_id</span><span class="p">(</span><span class="n">built_pipeline</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">name_or_path</span><span class="p">):</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;The save_pretrained parameter is set to False, but the specified model does not &quot;</span>
+            <span class="s2">&quot;have a valid HuggingFace Hub repository identifier. Therefore, the weights will &quot;</span>
+            <span class="s2">&quot;be saved to disk anyway.&quot;</span>
+        <span class="p">)</span>
+        <span class="n">save_pretrained</span> <span class="o">=</span> <span class="kc">True</span>
 
-    <span class="k">if</span> <span class="n">components</span><span class="p">:</span>
-        <span class="n">flavor_conf</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">components</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">processor</span><span class="p">:</span>
-        <span class="n">flavor_conf</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">_PROCESSOR_TYPE_KEY</span><span class="p">:</span> <span class="n">_get_instance_type</span><span class="p">(</span><span class="n">processor</span><span class="p">)})</span>
+    <span class="c1"># Create the flavor configuration</span>
+    <span class="n">flavor_conf</span> <span class="o">=</span> <span class="n">build_flavor_config</span><span class="p">(</span><span class="n">built_pipeline</span><span class="p">,</span> <span class="n">processor</span><span class="p">,</span> <span class="n">save_pretrained</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">llm_inference_task</span><span class="p">:</span>
-        <span class="n">flavor_conf</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">_LLM_INFERENCE_TASK_KEY</span><span class="p">:</span> <span class="n">task</span><span class="p">})</span>
+        <span class="n">flavor_conf</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">_LLM_INFERENCE_TASK_KEY</span><span class="p">:</span> <span class="n">llm_inference_task</span><span class="p">})</span>
         <span class="k">if</span> <span class="n">mlflow_model</span><span class="o">.</span><span class="n">metadata</span><span class="p">:</span>
-            <span class="n">mlflow_model</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="n">_METADATA_LLM_INFERENCE_TASK_KEY</span><span class="p">]</span> <span class="o">=</span> <span class="n">task</span>
+            <span class="n">mlflow_model</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="n">_METADATA_LLM_INFERENCE_TASK_KEY</span><span class="p">]</span> <span class="o">=</span> <span class="n">llm_inference_task</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">mlflow_model</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="p">{</span><span class="n">_METADATA_LLM_INFERENCE_TASK_KEY</span><span class="p">:</span> <span class="n">task</span><span class="p">}</span>
+            <span class="n">mlflow_model</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="p">{</span><span class="n">_METADATA_LLM_INFERENCE_TASK_KEY</span><span class="p">:</span> <span class="n">llm_inference_task</span><span class="p">}</span>
 
-    <span class="c1"># Save the model object</span>
-    <span class="n">built_pipeline</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">save_pretrained</span><span class="p">(</span>
-        <span class="n">save_directory</span><span class="o">=</span><span class="n">path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">_MODEL_BINARY_FILE_NAME</span><span class="p">),</span>
-        <span class="n">max_shard_size</span><span class="o">=</span><span class="n">MLFLOW_HUGGINGFACE_MODEL_MAX_SHARD_SIZE</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
+    <span class="n">mlflow_model</span><span class="o">.</span><span class="n">add_flavor</span><span class="p">(</span>
+        <span class="n">FLAVOR_NAME</span><span class="p">,</span>
+        <span class="n">transformers_version</span><span class="o">=</span><span class="n">transformers</span><span class="o">.</span><span class="n">__version__</span><span class="p">,</span>
+        <span class="n">code</span><span class="o">=</span><span class="n">code_dir_subpath</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">flavor_conf</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">model_config</span> <span class="ow">and</span> <span class="n">inference_config</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
-            <span class="s2">&quot;Using both `model_config` and `inference_config` is not allowed. Use `model_config` &quot;</span>
-            <span class="s2">&quot;to indicate any model configuration you need to use for inference.&quot;</span>
+    <span class="c1"># Flavor config should not be mutated after being added to MLModel</span>
+    <span class="n">flavor_conf</span> <span class="o">=</span> <span class="n">MappingProxyType</span><span class="p">(</span><span class="n">flavor_conf</span><span class="p">)</span>
+
+    <span class="c1"># Save pipeline model and components weights</span>
+    <span class="k">if</span> <span class="n">save_pretrained</span><span class="p">:</span>
+        <span class="n">save_pipeline_pretrained_weights</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">built_pipeline</span><span class="p">,</span> <span class="n">flavor_conf</span><span class="p">,</span> <span class="n">processor</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">repo</span> <span class="o">=</span> <span class="n">built_pipeline</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">name_or_path</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;Skipping saving pretrained model weights to disk as the save_pretrained is set to &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;False. The reference to HuggingFace Hub repository </span><span class="si">{</span><span class="n">repo</span><span class="si">}</span><span class="s2"> will be logged instead.&quot;</span>
         <span class="p">)</span>
 
-    <span class="c1"># Save the components explicitly to the components directory</span>
-    <span class="k">if</span> <span class="n">components</span><span class="p">:</span>
-        <span class="n">_save_components</span><span class="p">(</span>
-            <span class="n">root_path</span><span class="o">=</span><span class="n">path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">_COMPONENTS_BINARY_KEY</span><span class="p">),</span>
-            <span class="n">component_config</span><span class="o">=</span><span class="n">components</span><span class="p">,</span>
-            <span class="n">pipeline</span><span class="o">=</span><span class="n">built_pipeline</span><span class="p">,</span>
-            <span class="n">processor</span><span class="o">=</span><span class="n">processor</span><span class="p">,</span>
-            <span class="n">inference_config</span><span class="o">=</span><span class="n">inference_config</span><span class="p">,</span>
+    <span class="k">if</span> <span class="n">inference_config</span><span class="p">:</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;Indicating `inference_config` is deprecated and will be removed in a future version &quot;</span>
+            <span class="s2">&quot;of MLflow. Use `model_config` instead.&quot;</span>
+        <span class="p">)</span>
+        <span class="n">path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">_INFERENCE_CONFIG_BINARY_KEY</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">inference_config</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
         <span class="p">)</span>
 
     <span class="n">model_name</span> <span class="o">=</span> <span class="n">built_pipeline</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">name_or_path</span>
@@ -792,8 +794,6 @@
 
     <span class="c1"># Write the license information (or guidance) along with the model</span>
     <span class="n">_write_license_information</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">card_data</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
-
-    <span class="n">model_bin_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="n">_MODEL_BINARY_KEY</span><span class="p">:</span> <span class="n">_MODEL_BINARY_FILE_NAME</span><span class="p">}</span>
 
     <span class="c1"># Only allow a subset of task types to have a pyfunc definition.</span>
     <span class="c1"># Currently supported types are NLP-based language tasks which have a pipeline definition</span>
@@ -824,7 +824,6 @@
             <span class="n">python_env</span><span class="o">=</span><span class="n">_PYTHON_ENV_FILE_NAME</span><span class="p">,</span>
             <span class="n">code</span><span class="o">=</span><span class="n">code_dir_subpath</span><span class="p">,</span>
             <span class="n">model_config</span><span class="o">=</span><span class="n">model_config</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">model_bin_kwargs</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">processor</span><span class="p">:</span>
@@ -838,25 +837,26 @@
             <span class="sa">f</span><span class="s2">&quot;This model is unable to be used for pyfunc prediction because </span><span class="si">{</span><span class="n">reason</span><span class="si">}</span><span class="s2"> &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;The pyfunc flavor will not be added to the Model.&quot;</span>
         <span class="p">)</span>
-    <span class="n">flavor_conf</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">model_bin_kwargs</span><span class="p">)</span>
-    <span class="n">mlflow_model</span><span class="o">.</span><span class="n">add_flavor</span><span class="p">(</span>
-        <span class="n">FLAVOR_NAME</span><span class="p">,</span>
-        <span class="n">transformers_version</span><span class="o">=</span><span class="n">transformers</span><span class="o">.</span><span class="n">__version__</span><span class="p">,</span>
-        <span class="n">code</span><span class="o">=</span><span class="n">code_dir_subpath</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">flavor_conf</span><span class="p">,</span>
-    <span class="p">)</span>
+
     <span class="k">if</span> <span class="n">size</span> <span class="o">:=</span> <span class="n">get_total_file_size</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
         <span class="n">mlflow_model</span><span class="o">.</span><span class="n">model_size_bytes</span> <span class="o">=</span> <span class="n">size</span>
+
     <span class="n">mlflow_model</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">MLMODEL_FILE_NAME</span><span class="p">)))</span>
 
     <span class="k">if</span> <span class="n">conda_env</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">pip_requirements</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">default_reqs</span> <span class="o">=</span> <span class="n">get_default_pip_requirements</span><span class="p">(</span><span class="n">built_pipeline</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
-            <span class="c1"># Infer the pip requirements with a timeout to avoid hanging indefinitely at prediction</span>
-            <span class="n">inferred_reqs</span> <span class="o">=</span> <span class="n">infer_pip_requirements_with_timeout</span><span class="p">(</span>
-                <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="n">FLAVOR_NAME</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="n">default_reqs</span>
-            <span class="p">)</span>
-            <span class="n">default_reqs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">inferred_reqs</span><span class="p">)</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">default_reqs</span><span class="p">))</span>
+            <span class="c1"># NB: Skip inferring requirements for PEFT models to avoid loading the full pretrained</span>
+            <span class="c1"># model into memory. PEFT is mainly designed for fine-tuning large models under limited</span>
+            <span class="c1"># computational resources, so loading the full model is not preferred and can even crash</span>
+            <span class="c1"># the process due to OOM.</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">is_peft_model</span><span class="p">(</span><span class="n">built_pipeline</span><span class="o">.</span><span class="n">model</span><span class="p">):</span>
+                <span class="c1"># Infer the pip requirements with a timeout to avoid hanging at prediction</span>
+                <span class="n">inferred_reqs</span> <span class="o">=</span> <span class="n">infer_pip_requirements_with_timeout</span><span class="p">(</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="n">FLAVOR_NAME</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="n">default_reqs</span>
+                <span class="p">)</span>
+                <span class="n">default_reqs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">inferred_reqs</span><span class="p">)</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">default_reqs</span><span class="p">)</span>
+            <span class="n">default_reqs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">default_reqs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">default_reqs</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">conda_env</span><span class="p">,</span> <span class="n">pip_requirements</span><span class="p">,</span> <span class="n">pip_constraints</span> <span class="o">=</span> <span class="n">_process_pip_requirements</span><span class="p">(</span>
@@ -898,6 +898,7 @@
     <span class="n">model_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">example_no_conversion</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">prompt_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">save_pretrained</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1082,6 +1083,7 @@
 <span class="sd">                                    release without warning.</span>
 <span class="sd">        example_no_conversion: {{ example_no_conversion }}</span>
 <span class="sd">        prompt_template: {{ prompt_template }}</span>
+<span class="sd">        save_pretrained: {{ save_pretrained }}</span>
 <span class="sd">        kwargs: Additional arguments for :py:class:`mlflow.models.model.Model`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">Model</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
@@ -1104,6 +1106,7 @@
         <span class="n">model_config</span><span class="o">=</span><span class="n">model_config</span><span class="p">,</span>
         <span class="n">example_no_conversion</span><span class="o">=</span><span class="n">example_no_conversion</span><span class="p">,</span>
         <span class="n">prompt_template</span><span class="o">=</span><span class="n">prompt_template</span><span class="p">,</span>
+        <span class="n">save_pretrained</span><span class="o">=</span><span class="n">save_pretrained</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span></div>
 
@@ -1175,7 +1178,7 @@
 
     <span class="n">flavor_config</span> <span class="o">=</span> <span class="n">_get_flavor_configuration_from_uri</span><span class="p">(</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">FLAVOR_NAME</span><span class="p">,</span> <span class="n">_logger</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">return_type</span> <span class="o">==</span> <span class="s2">&quot;pipeline&quot;</span> <span class="ow">and</span> <span class="n">_PROCESSOR_TYPE_KEY</span> <span class="ow">in</span> <span class="n">flavor_config</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">return_type</span> <span class="o">==</span> <span class="s2">&quot;pipeline&quot;</span> <span class="ow">and</span> <span class="n">FlavorKey</span><span class="o">.</span><span class="n">PROCESSOR_TYPE</span> <span class="ow">in</span> <span class="n">flavor_config</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
             <span class="s2">&quot;This model has been saved with a processor. Processor objects are &quot;</span>
             <span class="s2">&quot;not compatible with Pipelines. Please load this model by specifying &quot;</span>
@@ -1186,6 +1189,97 @@
     <span class="n">_add_code_from_conf_to_system_path</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">,</span> <span class="n">flavor_config</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">_load_model</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">,</span> <span class="n">flavor_config</span><span class="p">,</span> <span class="n">return_type</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="persist_pretrained_model"><a class="viewcode-back" href="../../python_api/mlflow.transformers.html#mlflow.transformers.persist_pretrained_model">[docs]</a><span class="k">def</span> <span class="nf">persist_pretrained_model</span><span class="p">(</span><span class="n">model_uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Persist Transformers pretrained model weights to the artifacts directory of the specified</span>
+<span class="sd">    model_uri. This API is primary used for updating an MLflow Model that was logged or saved</span>
+<span class="sd">    with setting save_pretrained=False. Such models cannot be registered to Databricks Workspace</span>
+<span class="sd">    Model Registry, due to the full pretrained model weights being absent in the artifacts.</span>
+<span class="sd">    Transformers models saved in this mode store only the reference to the HuggingFace Hub</span>
+<span class="sd">    repository. This API will download the model weights from the HuggingFace Hub repository</span>
+<span class="sd">    and save them in the artifacts of the given model_uri so that the model can be registered</span>
+<span class="sd">    to Databricks Workspace Model Registry.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        model_uri: The URI of the existing MLflow Model of the Transformers flavor.</span>
+<span class="sd">            It must be logged/saved with save_pretrained=False.</span>
+
+<span class="sd">    Examples:</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        import mlflow</span>
+
+<span class="sd">        # Saving a model with save_pretrained=False</span>
+<span class="sd">        with mlflow.start_run() as run:</span>
+<span class="sd">            model = pipeline(&quot;question-answering&quot;, &quot;csarron/mobilebert-uncased-squad-v2&quot;)</span>
+<span class="sd">            mlflow.transformers.log_model(</span>
+<span class="sd">                transformers_model=model, artifact_path=&quot;pipeline&quot;, save_pretrained=False</span>
+<span class="sd">            )</span>
+
+<span class="sd">        # The model cannot be registered to the Model Registry as it is</span>
+<span class="sd">        try:</span>
+<span class="sd">            mlflow.register_model(f&quot;runs:/{run.info.run_id}/pipeline&quot;, &quot;qa_pipeline&quot;)</span>
+<span class="sd">        except MlflowException as e:</span>
+<span class="sd">            print(e.message)</span>
+
+<span class="sd">        # Use this API to persist the pretrained model weights</span>
+<span class="sd">        mlflow.transformers.persist_pretrained_model(f&quot;runs:/{run.info.run_id}/pipeline&quot;)</span>
+
+<span class="sd">        # Now the model can be registered to the Model Registry</span>
+<span class="sd">        mlflow.register_model(f&quot;runs:/{run.info.run_id}/pipeline&quot;, &quot;qa_pipeline&quot;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Check if the model weight already exists in the model artifact before downloading</span>
+    <span class="n">root_uri</span><span class="p">,</span> <span class="n">artifact_path</span> <span class="o">=</span> <span class="n">_get_root_uri_and_artifact_path</span><span class="p">(</span><span class="n">model_uri</span><span class="p">)</span>
+    <span class="n">artifact_repo</span> <span class="o">=</span> <span class="n">get_artifact_repository</span><span class="p">(</span><span class="n">root_uri</span><span class="p">)</span>
+
+    <span class="n">file_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">path</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">artifact_repo</span><span class="o">.</span><span class="n">list_artifacts</span><span class="p">(</span><span class="n">artifact_path</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="n">MLMODEL_FILE_NAME</span> <span class="ow">in</span> <span class="n">file_names</span> <span class="ow">and</span> <span class="n">_MODEL_BINARY_FILE_NAME</span> <span class="ow">in</span> <span class="n">file_names</span><span class="p">:</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;The full pretrained model weight already exists in the artifact directory of the &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;specified model_uri: </span><span class="si">{</span><span class="n">model_uri</span><span class="si">}</span><span class="s2">. No action is needed.&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="k">with</span> <span class="n">TempDir</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmp_dir</span><span class="p">:</span>
+        <span class="n">local_model_path</span> <span class="o">=</span> <span class="n">artifact_repo</span><span class="o">.</span><span class="n">download_artifacts</span><span class="p">(</span><span class="n">artifact_path</span><span class="p">,</span> <span class="n">dst_path</span><span class="o">=</span><span class="n">tmp_dir</span><span class="o">.</span><span class="n">path</span><span class="p">())</span>
+        <span class="n">pipeline</span> <span class="o">=</span> <span class="n">load_model</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">,</span> <span class="n">return_type</span><span class="o">=</span><span class="s2">&quot;pipeline&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Update MLModel flavor config</span>
+        <span class="n">mlmodel_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">,</span> <span class="n">MLMODEL_FILE_NAME</span><span class="p">)</span>
+        <span class="n">model_conf</span> <span class="o">=</span> <span class="n">Model</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">mlmodel_path</span><span class="p">)</span>
+        <span class="n">updated_flavor_conf</span> <span class="o">=</span> <span class="n">update_flavor_conf_to_persist_pretrained_model</span><span class="p">(</span>
+            <span class="n">model_conf</span><span class="o">.</span><span class="n">flavors</span><span class="p">[</span><span class="n">FLAVOR_NAME</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">model_conf</span><span class="o">.</span><span class="n">add_flavor</span><span class="p">(</span><span class="n">FLAVOR_NAME</span><span class="p">,</span> <span class="o">**</span><span class="n">updated_flavor_conf</span><span class="p">)</span>
+        <span class="n">model_conf</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">mlmodel_path</span><span class="p">)</span>
+
+        <span class="c1"># Save pretrained weights</span>
+        <span class="n">save_pipeline_pretrained_weights</span><span class="p">(</span>
+            <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">),</span> <span class="n">pipeline</span><span class="p">,</span> <span class="n">updated_flavor_conf</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Upload updated local artifacts to MLflow</span>
+        <span class="k">for</span> <span class="n">dir_to_upload</span> <span class="ow">in</span> <span class="p">(</span><span class="n">_MODEL_BINARY_FILE_NAME</span><span class="p">,</span> <span class="n">_COMPONENTS_BINARY_DIR_NAME</span><span class="p">):</span>
+            <span class="n">local_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">,</span> <span class="n">dir_to_upload</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">local_dir</span><span class="p">):</span>
+                <span class="k">continue</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">artifact_repo</span><span class="o">.</span><span class="n">log_artifacts</span><span class="p">(</span><span class="n">local_dir</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">artifact_path</span><span class="p">,</span> <span class="n">dir_to_upload</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="c1"># NB: log_artifacts method doesn&#39;t support rollback for partial uploads,</span>
+                <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Failed to upload </span><span class="si">{</span><span class="n">local_dir</span><span class="si">}</span><span class="s2"> to the existing model_uri due to </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">.&quot;</span>
+                    <span class="s2">&quot;Some other files may have been uploaded.&quot;</span>
+                <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+
+        <span class="c1"># Upload MLModel file</span>
+        <span class="n">artifact_repo</span><span class="o">.</span><span class="n">log_artifact</span><span class="p">(</span><span class="n">mlmodel_path</span><span class="p">,</span> <span class="n">artifact_path</span><span class="p">)</span>
+
+    <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The pretrained model has been successfully persisted in </span><span class="si">{</span><span class="n">model_uri</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span></div>
 
 
 <span class="k">def</span> <span class="nf">_is_model_distributed_in_memory</span><span class="p">(</span><span class="n">transformers_model</span><span class="p">):</span>
@@ -1222,41 +1316,17 @@
     <span class="k">return</span> <span class="n">is_gpu</span></div>
 
 
-<span class="k">def</span> <span class="nf">_try_load_model_with_device</span><span class="p">(</span><span class="n">model_instance</span><span class="p">,</span> <span class="n">model_path</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">conf</span><span class="p">):</span>
-    <span class="n">load_model_conf</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="c1"># Assume if torch_dtype was specified in the conf, then it must be with a</span>
-    <span class="c1"># pipeline for which it&#39;s compatible.</span>
-    <span class="k">if</span> <span class="n">_TORCH_DTYPE_KEY</span> <span class="ow">in</span> <span class="n">conf</span><span class="p">:</span>
-        <span class="n">load_model_conf</span><span class="p">[</span><span class="n">_TORCH_DTYPE_KEY</span><span class="p">]</span> <span class="o">=</span> <span class="n">conf</span><span class="p">[</span><span class="n">_TORCH_DTYPE_KEY</span><span class="p">]</span>
-
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">load_model_conf</span><span class="p">[</span><span class="s2">&quot;device&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">device</span>
-        <span class="n">model</span> <span class="o">=</span> <span class="n">model_instance</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="o">**</span><span class="n">load_model_conf</span><span class="p">)</span>
-    <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">,</span> <span class="ne">NotImplementedError</span><span class="p">):</span>
-        <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Could not specify device parameter for this pipeline type&quot;</span><span class="p">)</span>
-        <span class="n">load_model_conf</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;device&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="n">model</span> <span class="o">=</span> <span class="n">model_instance</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="o">**</span><span class="n">load_model_conf</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">model</span>
-
-
 <span class="k">def</span> <span class="nf">_load_model</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">flavor_config</span><span class="p">,</span> <span class="n">return_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Loads components from a locally serialized ``Pipeline`` object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">import</span> <span class="nn">transformers</span>
 
-    <span class="n">model_instance</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">transformers</span><span class="p">,</span> <span class="n">flavor_config</span><span class="p">[</span><span class="n">_PIPELINE_MODEL_TYPE_KEY</span><span class="p">])</span>
-    <span class="n">local_path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-    <span class="c1"># NB: Path resolution for models that were saved prior to 2.4.1 release when the pathing for</span>
-    <span class="c1">#     the saved pipeline or component artifacts was handled by duplicate entries for components</span>
-    <span class="c1">#     (artifacts/pipeline/* and artifacts/components/*) and pipelines were saved via the</span>
-    <span class="c1">#     &quot;artifacts/pipeline/*&quot; path. In order to load the older formats after the change, the</span>
-    <span class="c1">#     presence of the new path key is checked.</span>
-    <span class="n">model_path</span> <span class="o">=</span> <span class="n">local_path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">flavor_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">_MODEL_BINARY_KEY</span><span class="p">,</span> <span class="s2">&quot;pipeline&quot;</span><span class="p">))</span>
-
     <span class="n">conf</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;task&quot;</span><span class="p">:</span> <span class="n">flavor_config</span><span class="p">[</span><span class="n">_TASK_KEY</span><span class="p">],</span>
+        <span class="s2">&quot;task&quot;</span><span class="p">:</span> <span class="n">flavor_config</span><span class="p">[</span><span class="n">FlavorKey</span><span class="o">.</span><span class="n">TASK</span><span class="p">],</span>
     <span class="p">}</span>
+    <span class="k">if</span> <span class="n">framework</span> <span class="o">:=</span> <span class="n">flavor_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">FlavorKey</span><span class="o">.</span><span class="n">FRAMEWORK</span><span class="p">):</span>
+        <span class="n">conf</span><span class="p">[</span><span class="s2">&quot;framework&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">framework</span>
 
     <span class="k">if</span> <span class="n">device</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">MLFLOW_DEFAULT_PREDICTION_DEVICE</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
@@ -1280,75 +1350,44 @@
         <span class="n">conf</span><span class="p">[</span><span class="s2">&quot;device&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">device</span>
         <span class="n">accelerate_model_conf</span><span class="p">[</span><span class="s2">&quot;device&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">device</span>
 
-    <span class="k">if</span> <span class="n">_TORCH_DTYPE_KEY</span> <span class="ow">in</span> <span class="n">flavor_config</span> <span class="ow">or</span> <span class="n">_TORCH_DTYPE_KEY</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">_TORCH_DTYPE_KEY</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
-            <span class="n">dtype_val</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">_TORCH_DTYPE_KEY</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">dtype_val</span> <span class="o">=</span> <span class="n">_deserialize_torch_dtype</span><span class="p">(</span><span class="n">flavor_config</span><span class="p">[</span><span class="n">_TORCH_DTYPE_KEY</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">dtype_val</span> <span class="o">:=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">_TORCH_DTYPE_KEY</span><span class="p">)</span> <span class="ow">or</span> <span class="n">flavor_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">FlavorKey</span><span class="o">.</span><span class="n">TORCH_DTYPE</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dtype_val</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">dtype_val</span> <span class="o">=</span> <span class="n">_deserialize_torch_dtype</span><span class="p">(</span><span class="n">dtype_val</span><span class="p">)</span>
         <span class="n">conf</span><span class="p">[</span><span class="n">_TORCH_DTYPE_KEY</span><span class="p">]</span> <span class="o">=</span> <span class="n">dtype_val</span>
         <span class="n">accelerate_model_conf</span><span class="p">[</span><span class="n">_TORCH_DTYPE_KEY</span><span class="p">]</span> <span class="o">=</span> <span class="n">dtype_val</span>
 
     <span class="n">accelerate_model_conf</span><span class="p">[</span><span class="s2">&quot;low_cpu_mem_usage&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">MLFLOW_HUGGINGFACE_USE_LOW_CPU_MEM_USAGE</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">MLFLOW_HUGGINGFACE_DISABLE_ACCELERATE_FEATURES</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">model</span> <span class="o">=</span> <span class="n">model_instance</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="o">**</span><span class="n">accelerate_model_conf</span><span class="p">)</span>
-        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">,</span> <span class="ne">NotImplementedError</span><span class="p">,</span> <span class="ne">ImportError</span><span class="p">):</span>
-            <span class="c1"># NB: ImportError is caught here in the event that `accelerate` is not installed</span>
-            <span class="c1"># on the system, which will raise if `low_cpu_mem_usage` is set or the argument</span>
-            <span class="c1"># `device_map` is set and accelerate is not installed.</span>
-            <span class="n">model</span> <span class="o">=</span> <span class="n">_try_load_model_with_device</span><span class="p">(</span><span class="n">model_instance</span><span class="p">,</span> <span class="n">model_path</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">conf</span><span class="p">)</span>
+    <span class="c1"># Load model and components either from local or from HuggingFace Hub. We check for the</span>
+    <span class="c1"># presence of the model revision (a commit hash of the hub repository) that is only present</span>
+    <span class="c1"># in the model logged with `save_pretrained=False</span>
+    <span class="k">if</span> <span class="n">FlavorKey</span><span class="o">.</span><span class="n">MODEL_REVISION</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">flavor_config</span><span class="p">:</span>
+        <span class="n">model_and_components</span> <span class="o">=</span> <span class="n">load_model_and_components_from_local</span><span class="p">(</span>
+            <span class="n">path</span><span class="o">=</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">),</span>
+            <span class="n">flavor_conf</span><span class="o">=</span><span class="n">flavor_config</span><span class="p">,</span>
+            <span class="n">accelerate_conf</span><span class="o">=</span><span class="n">accelerate_model_conf</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
+        <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">model</span> <span class="o">=</span> <span class="n">_try_load_model_with_device</span><span class="p">(</span><span class="n">model_instance</span><span class="p">,</span> <span class="n">model_path</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">conf</span><span class="p">)</span>
-
-    <span class="n">conf</span><span class="p">[</span><span class="s2">&quot;model&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span>
-
-    <span class="k">if</span> <span class="n">_PROCESSOR_TYPE_KEY</span> <span class="ow">in</span> <span class="n">flavor_config</span><span class="p">:</span>
-        <span class="n">conf</span><span class="p">[</span><span class="n">_PROCESSOR_KEY</span><span class="p">]</span> <span class="o">=</span> <span class="n">_load_component</span><span class="p">(</span>
-            <span class="n">local_path</span><span class="p">,</span> <span class="n">_PROCESSOR_KEY</span><span class="p">,</span> <span class="n">flavor_config</span><span class="p">[</span><span class="n">_PROCESSOR_TYPE_KEY</span><span class="p">]</span>
+        <span class="n">model_and_components</span> <span class="o">=</span> <span class="n">load_model_and_components_from_huggingface_hub</span><span class="p">(</span>
+            <span class="n">flavor_conf</span><span class="o">=</span><span class="n">flavor_config</span><span class="p">,</span> <span class="n">accelerate_conf</span><span class="o">=</span><span class="n">accelerate_model_conf</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span>
         <span class="p">)</span>
 
-    <span class="k">for</span> <span class="n">component_key</span> <span class="ow">in</span> <span class="n">flavor_config</span><span class="p">[</span><span class="n">_COMPONENTS_BINARY_KEY</span><span class="p">]:</span>
-        <span class="n">component_type_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">component_key</span><span class="si">}</span><span class="s2">_type&quot;</span>
-        <span class="n">component_type</span> <span class="o">=</span> <span class="n">flavor_config</span><span class="p">[</span><span class="n">component_type_key</span><span class="p">]</span>
-        <span class="n">conf</span><span class="p">[</span><span class="n">component_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">_load_component</span><span class="p">(</span><span class="n">local_path</span><span class="p">,</span> <span class="n">component_key</span><span class="p">,</span> <span class="n">component_type</span><span class="p">)</span>
+    <span class="c1"># Load and apply PEFT adaptor if saved</span>
+    <span class="k">if</span> <span class="n">peft_adapter_dir</span> <span class="o">:=</span> <span class="n">flavor_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">FlavorKey</span><span class="o">.</span><span class="n">PEFT</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">model_and_components</span><span class="p">[</span><span class="n">FlavorKey</span><span class="o">.</span><span class="n">MODEL</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_model_with_peft_adapter</span><span class="p">(</span>
+            <span class="n">base_model</span><span class="o">=</span><span class="n">model_and_components</span><span class="p">[</span><span class="n">FlavorKey</span><span class="o">.</span><span class="n">MODEL</span><span class="p">],</span>
+            <span class="n">peft_adapter_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">peft_adapter_dir</span><span class="p">),</span>
+        <span class="p">)</span>
 
-    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">_METADATA_PIPELINE_SCALAR_CONFIG_KEYS</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">flavor_config</span><span class="p">:</span>
-            <span class="n">conf</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">flavor_config</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+    <span class="n">conf</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">conf</span><span class="p">,</span> <span class="o">**</span><span class="n">model_and_components</span><span class="p">}</span>
 
     <span class="k">if</span> <span class="n">return_type</span> <span class="o">==</span> <span class="s2">&quot;pipeline&quot;</span><span class="p">:</span>
         <span class="n">conf</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">transformers</span><span class="o">.</span><span class="n">pipeline</span><span class="p">(</span><span class="o">**</span><span class="n">conf</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">suppress_logs</span><span class="p">(</span><span class="s2">&quot;transformers.pipelines.base&quot;</span><span class="p">,</span> <span class="n">filter_regex</span><span class="o">=</span><span class="n">_PEFT_PIPELINE_ERROR_MSG</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">transformers</span><span class="o">.</span><span class="n">pipeline</span><span class="p">(</span><span class="o">**</span><span class="n">conf</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">return_type</span> <span class="o">==</span> <span class="s2">&quot;components&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">conf</span>
-
-
-<span class="k">def</span> <span class="nf">_deserialize_torch_dtype</span><span class="p">(</span><span class="n">dtype_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">dtype</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Convert the string-encoded `torch_dtype` pipeline argument back to the correct `torch.dtype`</span>
-<span class="sd">    instance value for applying to a loaded pipeline instance.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">torch</span>
-    <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
-            <span class="s2">&quot;Unable to determine if the value supplied by the argument &quot;</span>
-            <span class="s2">&quot;torch_dtype is valid since torch is not installed.&quot;</span><span class="p">,</span>
-            <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
-        <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
-
-    <span class="k">if</span> <span class="n">dtype_str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;torch.&quot;</span><span class="p">):</span>
-        <span class="n">dtype_str</span> <span class="o">=</span> <span class="n">dtype_str</span><span class="p">[</span><span class="mi">6</span><span class="p">:]</span>
-
-    <span class="n">dtype</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">torch</span><span class="p">,</span> <span class="n">dtype_str</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">dtype</span>
-
-    <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
-        <span class="sa">f</span><span class="s2">&quot;The value &#39;</span><span class="si">{</span><span class="n">dtype_str</span><span class="si">}</span><span class="s2">&#39; is not a valid torch.dtype&quot;</span><span class="p">,</span>
-        <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
-    <span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_fetch_model_card</span><span class="p">(</span><span class="n">model_name</span><span class="p">):</span>
@@ -1458,15 +1497,28 @@
 <span class="sd">    specified, use the transformers library pipeline component validation to force raising an</span>
 <span class="sd">    exception. The underlying Exception thrown in transformers is verbose enough for diagnosis.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">pipeline</span>
+    <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">FlaxPreTrainedModel</span><span class="p">,</span> <span class="n">PreTrainedModel</span><span class="p">,</span> <span class="n">TFPreTrainedModel</span><span class="p">,</span> <span class="n">pipeline</span>
+
+    <span class="n">model</span> <span class="o">=</span> <span class="n">model_dict</span><span class="p">[</span><span class="n">FlavorKey</span><span class="o">.</span><span class="n">MODEL</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span>
+        <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="p">(</span><span class="n">TFPreTrainedModel</span><span class="p">,</span> <span class="n">PreTrainedModel</span><span class="p">,</span> <span class="n">FlaxPreTrainedModel</span><span class="p">))</span>
+        <span class="ow">or</span> <span class="n">is_peft_model</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+    <span class="p">):</span>
+        <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+            <span class="s2">&quot;The supplied model type is unsupported. The model must be one of: &quot;</span>
+            <span class="s2">&quot;PreTrainedModel, TFPreTrainedModel, FlaxPreTrainedModel, or PeftModel&quot;</span><span class="p">,</span>
+            <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
+        <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">task</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">task</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">_LLM_INFERENCE_TASK_PREFIX</span><span class="p">):</span>
         <span class="kn">from</span> <span class="nn">transformers.pipelines</span> <span class="kn">import</span> <span class="n">get_task</span>
 
-        <span class="n">task</span> <span class="o">=</span> <span class="n">get_task</span><span class="p">(</span><span class="n">model_dict</span><span class="p">[</span><span class="n">_MODEL_KEY</span><span class="p">]</span><span class="o">.</span><span class="n">name_or_path</span><span class="p">)</span>
+        <span class="n">task</span> <span class="o">=</span> <span class="n">get_task</span><span class="p">(</span><span class="n">model_dict</span><span class="p">[</span><span class="n">FlavorKey</span><span class="o">.</span><span class="n">MODEL</span><span class="p">]</span><span class="o">.</span><span class="n">name_or_path</span><span class="p">)</span>
 
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">pipeline</span><span class="p">(</span><span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span> <span class="o">**</span><span class="n">model_dict</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">suppress_logs</span><span class="p">(</span><span class="s2">&quot;transformers.pipelines.base&quot;</span><span class="p">,</span> <span class="n">filter_regex</span><span class="o">=</span><span class="n">_PEFT_PIPELINE_ERROR_MSG</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">pipeline</span><span class="p">(</span><span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span> <span class="o">**</span><span class="n">model_dict</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
             <span class="s2">&quot;The provided model configuration cannot be created as a Pipeline. &quot;</span>
@@ -1474,129 +1526,6 @@
             <span class="s2">&quot;specified with the correct keys.&quot;</span><span class="p">,</span>
             <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
         <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
-
-
-<span class="k">def</span> <span class="nf">_record_pipeline_components</span><span class="p">(</span><span class="n">pipeline</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Utility for recording which components are present in either the generated pipeline iff the</span>
-<span class="sd">    supplied save object is not a pipeline or the components of the supplied pipeline object.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">components_conf</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">components</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">attr</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span>
-        <span class="p">(</span><span class="s2">&quot;feature_extractor&quot;</span><span class="p">,</span> <span class="n">_FEATURE_EXTRACTOR_TYPE_KEY</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">&quot;tokenizer&quot;</span><span class="p">,</span> <span class="n">_TOKENIZER_TYPE_KEY</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">&quot;image_processor&quot;</span><span class="p">,</span> <span class="n">_IMAGE_PROCESSOR_TYPE_KEY</span><span class="p">),</span>
-    <span class="p">]:</span>
-        <span class="n">component</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">component</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">components_conf</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">key</span><span class="p">:</span> <span class="n">_get_instance_type</span><span class="p">(</span><span class="n">component</span><span class="p">)})</span>
-            <span class="n">components</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">components</span><span class="p">:</span>
-        <span class="n">components_conf</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">_COMPONENTS_BINARY_KEY</span><span class="p">:</span> <span class="n">components</span><span class="p">})</span>
-    <span class="k">return</span> <span class="n">components_conf</span>
-
-
-<span class="k">def</span> <span class="nf">_save_components</span><span class="p">(</span>
-    <span class="n">root_path</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span>
-    <span class="n">component_config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
-    <span class="n">pipeline</span><span class="p">,</span>
-    <span class="n">processor</span><span class="p">,</span>
-    <span class="n">inference_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-<span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Saves non-model pipeline components.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">component_types</span> <span class="o">=</span> <span class="n">component_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">_COMPONENTS_BINARY_KEY</span><span class="p">,</span> <span class="p">[])</span>
-    <span class="k">for</span> <span class="n">component_name</span> <span class="ow">in</span> <span class="n">component_types</span><span class="p">:</span>
-        <span class="n">component</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">component_name</span><span class="p">)</span>
-        <span class="n">component</span><span class="o">.</span><span class="n">save_pretrained</span><span class="p">(</span><span class="n">root_path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">component_name</span><span class="p">))</span>
-    <span class="k">if</span> <span class="n">processor</span><span class="p">:</span>
-        <span class="n">processor</span><span class="o">.</span><span class="n">save_pretrained</span><span class="p">(</span><span class="n">root_path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">_PROCESSOR_KEY</span><span class="p">))</span>
-    <span class="k">if</span> <span class="n">inference_config</span><span class="p">:</span>
-        <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-            <span class="s2">&quot;Indicating `inference_config` is deprecated and will be removed in a future version &quot;</span>
-            <span class="s2">&quot;of MLflow. Use `model_config` instead.&quot;</span>
-        <span class="p">)</span>
-        <span class="n">root_path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">_INFERENCE_CONFIG_BINARY_KEY</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">inference_config</span><span class="p">))</span>
-
-
-<span class="k">def</span> <span class="nf">_load_component</span><span class="p">(</span><span class="n">root_path</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="n">component_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">component_type</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Loads an individual component object from local disk.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">transformers</span>
-
-    <span class="n">components_dir</span> <span class="o">=</span> <span class="n">root_path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">_COMPONENTS_BINARY_KEY</span><span class="p">)</span>
-    <span class="n">component_path</span> <span class="o">=</span> <span class="n">components_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">component_key</span><span class="p">)</span>
-    <span class="n">component_instance</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">transformers</span><span class="p">,</span> <span class="n">component_type</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">component_instance</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">component_path</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">_generate_base_flavor_configuration</span><span class="p">(</span><span class="n">pipeline</span><span class="p">:</span> <span class="n">Pipeline</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Generates the base flavor metadata needed for reconstructing a pipeline from saved</span>
-<span class="sd">    components. This is important because the ``Pipeline`` class does not have a loader</span>
-<span class="sd">    functionality. The serialization of a Pipeline saves the model, configurations, and</span>
-<span class="sd">    metadata for ``FeatureExtractor``s, ``Processor``s, and ``Tokenizer``s exclusively.</span>
-<span class="sd">    This function extracts key information from the submitted model object so that the precise</span>
-<span class="sd">    instance types can be loaded correctly.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">flavor_configuration</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="n">_TASK_KEY</span><span class="p">:</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">task</span><span class="p">,</span>
-        <span class="n">_INSTANCE_TYPE_KEY</span><span class="p">:</span> <span class="n">_get_instance_type</span><span class="p">(</span><span class="n">pipeline</span><span class="p">),</span>
-        <span class="n">_MODEL_PATH_OR_NAME_KEY</span><span class="p">:</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">name_or_path</span><span class="p">,</span>
-        <span class="n">_PIPELINE_MODEL_TYPE_KEY</span><span class="p">:</span> <span class="n">_get_instance_type</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">model</span><span class="p">),</span>
-    <span class="p">}</span>
-
-    <span class="c1"># Extract and add to the configuration the scalar serializable arguments for pipeline args</span>
-    <span class="k">for</span> <span class="n">arg_key</span> <span class="ow">in</span> <span class="n">_METADATA_PIPELINE_SCALAR_CONFIG_KEYS</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">entry</span> <span class="o">:=</span> <span class="n">_get_scalar_argument_from_pipeline</span><span class="p">(</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">arg_key</span><span class="p">):</span>
-            <span class="n">flavor_configuration</span><span class="p">[</span><span class="n">arg_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">entry</span>
-
-    <span class="c1"># Extract a serialized representation of torch_dtype if provided</span>
-    <span class="k">if</span> <span class="n">torch_dtype</span> <span class="o">:=</span> <span class="n">_extract_torch_dtype_if_set</span><span class="p">(</span><span class="n">pipeline</span><span class="p">):</span>
-        <span class="c1"># Convert the torch dtype and back to standardize the string representation</span>
-        <span class="n">flavor_configuration</span><span class="p">[</span><span class="n">_TORCH_DTYPE_KEY</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">torch_dtype</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">flavor_configuration</span>
-
-
-<span class="k">def</span> <span class="nf">_get_scalar_argument_from_pipeline</span><span class="p">(</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">arg_key</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Retrieve provided pipeline arguments for the purposes of instantiating a pipeline object upon</span>
-<span class="sd">    loading.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">arg_key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">_extract_torch_dtype_if_set</span><span class="p">(</span><span class="n">pipeline</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">dtype</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Extract the torch datatype argument if set and return as a string encoded value.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">torch_dtype</span> <span class="o">:=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">_TORCH_DTYPE_KEY</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
-        <span class="c1"># Torch dtype value may be a string or a torch.dtype instance</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">torch_dtype</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">torch_dtype</span> <span class="o">=</span> <span class="n">_deserialize_torch_dtype</span><span class="p">(</span><span class="n">torch_dtype</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">torch_dtype</span>
-
-    <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">torch</span>
-    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-        <span class="c1"># If torch is not installed, safe to assume the model doesn&#39;t have a custom torch_dtype</span>
-        <span class="k">return</span> <span class="kc">None</span>
-
-    <span class="c1"># Transformers pipeline doesn&#39;t inherit underlying model&#39;s dtype, so we have to also check</span>
-    <span class="c1"># the model&#39;s dtype.</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">model</span>
-    <span class="n">model_dtype</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">_TORCH_DTYPE_KEY</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;dtype&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-
-    <span class="c1"># However, we should not extract dtype from parameters if it&#39;s default one (float32),</span>
-    <span class="c1"># to avoid setting torch_dtype for the model that doesn&#39;t support it.</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_dtype</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="n">model_dtype</span> <span class="o">=</span> <span class="n">_deserialize_torch_dtype</span><span class="p">(</span><span class="n">model_dtype</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">model_dtype</span> <span class="k">if</span> <span class="n">model_dtype</span> <span class="o">!=</span> <span class="n">torch</span><span class="o">.</span><span class="n">float32</span> <span class="k">else</span> <span class="kc">None</span>
 
 
 <span class="k">def</span> <span class="nf">_validate_llm_inference_task_type</span><span class="p">(</span><span class="n">llm_inference_task</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">:</span> <span class="n">Pipeline</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -1622,6 +1551,9 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">FlaxPreTrainedModel</span><span class="p">,</span> <span class="n">PreTrainedModel</span><span class="p">,</span> <span class="n">TFPreTrainedModel</span>
 
+    <span class="k">if</span> <span class="n">is_peft_model</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">get_peft_base_model</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+
     <span class="k">for</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__mro__</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">TFPreTrainedModel</span><span class="p">):</span>
             <span class="k">return</span> <span class="s2">&quot;tensorflow&quot;</span>
@@ -1629,14 +1561,6 @@
             <span class="k">return</span> <span class="s2">&quot;torch&quot;</span>
         <span class="k">elif</span> <span class="nb">issubclass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">FlaxPreTrainedModel</span><span class="p">):</span>
             <span class="k">return</span> <span class="s2">&quot;flax&quot;</span>
-
-
-<span class="k">def</span> <span class="nf">_get_instance_type</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Utility for extracting the saved object type or, if the `base` argument is set to `True`,</span>
-<span class="sd">    the base ABC type of the model.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
 
 
 <span class="k">def</span> <span class="nf">_should_add_pyfunc_to_model</span><span class="p">(</span><span class="n">pipeline</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
@@ -1706,7 +1630,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">local_path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
     <span class="n">flavor_configuration</span> <span class="o">=</span> <span class="n">_get_flavor_configuration</span><span class="p">(</span><span class="n">local_path</span><span class="p">,</span> <span class="n">FLAVOR_NAME</span><span class="p">)</span>
-    <span class="n">model_config</span> <span class="o">=</span> <span class="n">_get_model_config</span><span class="p">(</span><span class="n">local_path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">_COMPONENTS_BINARY_KEY</span><span class="p">),</span> <span class="n">model_config</span><span class="p">)</span>
+    <span class="n">model_config</span> <span class="o">=</span> <span class="n">_get_model_config</span><span class="p">(</span><span class="n">local_path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">_COMPONENTS_BINARY_DIR_NAME</span><span class="p">),</span> <span class="n">model_config</span><span class="p">)</span>
     <span class="n">prompt_template</span> <span class="o">=</span> <span class="n">_get_prompt_template</span><span class="p">(</span><span class="n">local_path</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">_TransformersWrapper</span><span class="p">(</span>
@@ -2383,7 +2307,7 @@
             <span class="c1"># that can be set for these generator pipelines. It is off by default (False).</span>
             <span class="k">if</span> <span class="p">(</span>
                 <span class="ow">not</span> <span class="n">include_prompt</span>
-                <span class="ow">and</span> <span class="n">flavor_config</span><span class="p">[</span><span class="n">_INSTANCE_TYPE_KEY</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_supported_custom_generator_types</span>
+                <span class="ow">and</span> <span class="n">flavor_config</span><span class="p">[</span><span class="n">FlavorKey</span><span class="o">.</span><span class="n">INSTANCE_TYPE</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_supported_custom_generator_types</span>
                 <span class="ow">and</span> <span class="n">data_out</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">data_in</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="p">):</span>
                 <span class="c1"># If the user has indicated to not preserve the prompt input in the response,</span>
@@ -3036,7 +2960,7 @@
 
     <span class="n">model_conf</span> <span class="o">=</span> <span class="n">Model</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">model_path</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">model_conf</span><span class="o">.</span><span class="n">metadata</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">model_conf</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">_PROMPT_TEMPLATE_KEY</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">model_conf</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">FlavorKey</span><span class="o">.</span><span class="n">PROMPT_TEMPLATE</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="kc">None</span>
 

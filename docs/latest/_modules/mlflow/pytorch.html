@@ -227,7 +227,6 @@
 
 <span class="kn">import</span> <span class="nn">mlflow</span>
 <span class="kn">from</span> <span class="nn">mlflow</span> <span class="kn">import</span> <span class="n">pyfunc</span>
-<span class="kn">from</span> <span class="nn">mlflow.client</span> <span class="kn">import</span> <span class="n">MlflowClient</span>
 <span class="kn">from</span> <span class="nn">mlflow.environment_variables</span> <span class="kn">import</span> <span class="n">MLFLOW_DEFAULT_PREDICTION_DEVICE</span>
 <span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
 <span class="kn">from</span> <span class="nn">mlflow.ml_package_versions</span> <span class="kn">import</span> <span class="n">_ML_PACKAGE_VERSIONS</span>
@@ -240,6 +239,7 @@
 <span class="kn">from</span> <span class="nn">mlflow.tracking._model_registry</span> <span class="kn">import</span> <span class="n">DEFAULT_AWAIT_MAX_SLEEP_SECONDS</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracking.artifact_utils</span> <span class="kn">import</span> <span class="n">_download_artifact_from_uri</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.autologging_utils</span> <span class="kn">import</span> <span class="n">autologging_integration</span><span class="p">,</span> <span class="n">safe_patch</span>
+<span class="kn">from</span> <span class="nn">mlflow.utils.checkpoint_utils</span> <span class="kn">import</span> <span class="n">download_checkpoint_artifact</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.docstring_utils</span> <span class="kn">import</span> <span class="n">LOG_MODEL_PARAM_DOCS</span><span class="p">,</span> <span class="n">format_docstring</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.environment</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">_CONDA_ENV_FILE_NAME</span><span class="p">,</span>
@@ -311,7 +311,7 @@
 <span class="sd">    .. code-block:: python</span>
 <span class="sd">        :caption: Example</span>
 
-<span class="sd">        import mlflow.pytorch</span>
+<span class="sd">        import mlflow</span>
 
 <span class="sd">        # Log PyTorch model</span>
 <span class="sd">        with mlflow.start_run() as run:</span>
@@ -1362,15 +1362,16 @@
 <span class="sd">    .. code-block:: python</span>
 <span class="sd">        :caption: Example</span>
 
-<span class="sd">        import mlflow.pytorch</span>
+<span class="sd">        import mlflow</span>
 
 <span class="sd">        mlflow.pytorch.autolog(checkpoint=True)</span>
 
 <span class="sd">        model = MyLightningModuleNet()  # A custom-pytorch lightning model</span>
+<span class="sd">        train_loader = create_train_dataset_loader()</span>
 <span class="sd">        trainer = Trainer()</span>
 
 <span class="sd">        with mlflow.start_run() as run:</span>
-<span class="sd">            trainer.fit(net)</span>
+<span class="sd">            trainer.fit(model, train_loader)</span>
 
 <span class="sd">        run_id = run.info.run_id</span>
 
@@ -1380,39 +1381,11 @@
 <span class="sd">        # load history checkpoint model logged in second epoch</span>
 <span class="sd">        checkpoint_model = mlflow.pytorch.load_checkpoint(MyLightningModuleNet, run_id, epoch=2)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">mlflow.utils.mlflow_tags</span> <span class="kn">import</span> <span class="n">LATEST_CHECKPOINT_ARTIFACT_TAG_KEY</span>
-
-    <span class="n">client</span> <span class="o">=</span> <span class="n">MlflowClient</span><span class="p">()</span>
-
-    <span class="k">if</span> <span class="n">run_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">run</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">active_run</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">run</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
-                <span class="s2">&quot;There is no active run, please provide the &#39;run_id&#39; for &quot;</span> <span class="s2">&quot;&#39;load_checkpoint&#39; call.&quot;</span>
-            <span class="p">)</span>
-        <span class="n">run_id</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">run_id</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">run</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_run</span><span class="p">(</span><span class="n">run_id</span><span class="p">)</span>
-
-    <span class="n">latest_checkpoint_artifact_path</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">LATEST_CHECKPOINT_ARTIFACT_TAG_KEY</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">latest_checkpoint_artifact_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="s2">&quot;There is no logged checkpoint artifact in the current run.&quot;</span><span class="p">)</span>
-
-    <span class="n">checkpoint_filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">latest_checkpoint_artifact_path</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">epoch</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">global_step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
-            <span class="s2">&quot;Only one of &#39;epoch&#39; and &#39;global_step&#39; can be set for &#39;load_checkpoint&#39;.&quot;</span>
+    <span class="k">with</span> <span class="n">TempDir</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmp_dir</span><span class="p">:</span>
+        <span class="n">downloaded_checkpoint_filepath</span> <span class="o">=</span> <span class="n">download_checkpoint_artifact</span><span class="p">(</span>
+            <span class="n">run_id</span><span class="o">=</span><span class="n">run_id</span><span class="p">,</span> <span class="n">epoch</span><span class="o">=</span><span class="n">epoch</span><span class="p">,</span> <span class="n">global_step</span><span class="o">=</span><span class="n">global_step</span><span class="p">,</span> <span class="n">dst_path</span><span class="o">=</span><span class="n">tmp_dir</span><span class="o">.</span><span class="n">path</span><span class="p">()</span>
         <span class="p">)</span>
-    <span class="k">elif</span> <span class="n">global_step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">checkpoint_artifact_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;checkpoints/global_step_</span><span class="si">{</span><span class="n">global_step</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">checkpoint_filename</span><span class="si">}</span><span class="s2">&quot;</span>
-    <span class="k">elif</span> <span class="n">epoch</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">checkpoint_artifact_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;checkpoints/epoch_</span><span class="si">{</span><span class="n">epoch</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">checkpoint_filename</span><span class="si">}</span><span class="s2">&quot;</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">checkpoint_artifact_path</span> <span class="o">=</span> <span class="n">latest_checkpoint_artifact_path</span>
-
-    <span class="n">downloaded_checkpoint_filepath</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">download_artifacts</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">checkpoint_artifact_path</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">model_class</span><span class="o">.</span><span class="n">load_from_checkpoint</span><span class="p">(</span><span class="n">downloaded_checkpoint_filepath</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">model_class</span><span class="o">.</span><span class="n">load_from_checkpoint</span><span class="p">(</span><span class="n">downloaded_checkpoint_filepath</span><span class="p">)</span></div>
 
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>

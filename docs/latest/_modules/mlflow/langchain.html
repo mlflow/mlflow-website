@@ -218,8 +218,10 @@
 <span class="kn">import</span> <span class="nn">functools</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
+<span class="kn">import</span> <span class="nn">cloudpickle</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">yaml</span>
 <span class="kn">from</span> <span class="nn">packaging.version</span> <span class="kn">import</span> <span class="n">Version</span>
@@ -244,6 +246,7 @@
     <span class="n">_save_base_lcs</span><span class="p">,</span>
     <span class="n">_validate_and_wrap_lc_model</span><span class="p">,</span>
     <span class="n">lc_runnables_types</span><span class="p">,</span>
+    <span class="n">register_pydantic_v1_serializer_cm</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">Model</span><span class="p">,</span> <span class="n">ModelInputExample</span><span class="p">,</span> <span class="n">ModelSignature</span><span class="p">,</span> <span class="n">get_model_info</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.model</span> <span class="kn">import</span> <span class="n">MLMODEL_FILE_NAME</span>
@@ -292,7 +295,9 @@
 <span class="sd">        Calls to :func:`save_model()` and :func:`log_model()` produce a pip environment</span>
 <span class="sd">        that, at a minimum, contains these requirements.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="p">[</span><span class="n">_get_pinned_requirement</span><span class="p">(</span><span class="s2">&quot;langchain&quot;</span><span class="p">)]</span></div>
+    <span class="c1"># pin pydantic and cloudpickle version as they are used in langchain</span>
+    <span class="c1"># model saving and loading</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">_get_pinned_requirement</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;langchain&quot;</span><span class="p">,</span> <span class="s2">&quot;pydantic&quot;</span><span class="p">,</span> <span class="s2">&quot;cloudpickle&quot;</span><span class="p">]))</span></div>
 
 
 <div class="viewcode-block" id="get_default_conda_env"><a class="viewcode-back" href="../../python_api/mlflow.langchain.html#mlflow.langchain.get_default_conda_env">[docs]</a><span class="k">def</span> <span class="nf">get_default_conda_env</span><span class="p">():</span>
@@ -664,10 +669,18 @@
 
 
 <span class="k">def</span> <span class="nf">_save_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">loader_fn</span><span class="p">,</span> <span class="n">persist_dir</span><span class="p">):</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">lc_runnables_types</span><span class="p">()):</span>
-        <span class="k">return</span> <span class="n">_save_runnables</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">loader_fn</span><span class="o">=</span><span class="n">loader_fn</span><span class="p">,</span> <span class="n">persist_dir</span><span class="o">=</span><span class="n">persist_dir</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">_save_base_lcs</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">loader_fn</span><span class="p">,</span> <span class="n">persist_dir</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">Version</span><span class="p">(</span><span class="n">cloudpickle</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">Version</span><span class="p">(</span><span class="s2">&quot;2.1.0&quot;</span><span class="p">):</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;If you are constructing a custom LangChain model, &quot;</span>
+            <span class="s2">&quot;please upgrade cloudpickle to version 2.1.0 or later &quot;</span>
+            <span class="s2">&quot;using `pip install cloudpickle&gt;=2.1.0` &quot;</span>
+            <span class="s2">&quot;to ensure the model can be loaded correctly.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">with</span> <span class="n">register_pydantic_v1_serializer_cm</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">lc_runnables_types</span><span class="p">()):</span>
+            <span class="k">return</span> <span class="n">_save_runnables</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">loader_fn</span><span class="o">=</span><span class="n">loader_fn</span><span class="p">,</span> <span class="n">persist_dir</span><span class="o">=</span><span class="n">persist_dir</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">_save_base_lcs</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">loader_fn</span><span class="p">,</span> <span class="n">persist_dir</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_load_model</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">,</span> <span class="n">flavor_conf</span><span class="p">):</span>
@@ -675,15 +688,16 @@
     <span class="c1"># of supported types, we define _MODEL_LOAD_KEY to ensure</span>
     <span class="c1"># which load function to use</span>
     <span class="n">model_load_fn</span> <span class="o">=</span> <span class="n">flavor_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">_MODEL_LOAD_KEY</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">model_load_fn</span> <span class="o">==</span> <span class="n">_RUNNABLE_LOAD_KEY</span><span class="p">:</span>
-        <span class="n">model</span> <span class="o">=</span> <span class="n">_load_runnables</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">,</span> <span class="n">flavor_conf</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">model_load_fn</span> <span class="o">==</span> <span class="n">_BASE_LOAD_KEY</span><span class="p">:</span>
-        <span class="n">model</span> <span class="o">=</span> <span class="n">_load_base_lcs</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">,</span> <span class="n">flavor_conf</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">MlflowException</span><span class="p">(</span>
-            <span class="s2">&quot;Failed to load LangChain model. Unknown model type: &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">flavor_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">_MODEL_TYPE_KEY</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="p">)</span>
+    <span class="k">with</span> <span class="n">register_pydantic_v1_serializer_cm</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">model_load_fn</span> <span class="o">==</span> <span class="n">_RUNNABLE_LOAD_KEY</span><span class="p">:</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="n">_load_runnables</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">,</span> <span class="n">flavor_conf</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">model_load_fn</span> <span class="o">==</span> <span class="n">_BASE_LOAD_KEY</span><span class="p">:</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="n">_load_base_lcs</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">,</span> <span class="n">flavor_conf</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">MlflowException</span><span class="p">(</span>
+                <span class="s2">&quot;Failed to load LangChain model. Unknown model type: &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">flavor_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">_MODEL_TYPE_KEY</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
     <span class="c1"># To avoid double logging, we set model_logged to True</span>
     <span class="c1"># when the model is loaded</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">autologging_is_disabled</span><span class="p">(</span><span class="n">FLAVOR_NAME</span><span class="p">):</span>
@@ -771,7 +785,7 @@
             <span class="k">return</span> <span class="n">data</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="n">orient</span><span class="o">=</span><span class="s2">&quot;records&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">_convert_ndarray_to_list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="n">orient</span><span class="o">=</span><span class="s2">&quot;records&quot;</span><span class="p">))</span>
 
         <span class="n">data</span> <span class="o">=</span> <span class="n">_convert_ndarray_to_list</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lc_model</span><span class="p">,</span> <span class="n">lc_runnables_types</span><span class="p">()):</span>

@@ -204,9 +204,11 @@
                 
   <h1>Source code for mlflow.tensorflow.callback</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">tensorflow</span> <span class="kn">import</span> <span class="n">keras</span>
+<span class="kn">from</span> <span class="nn">tensorflow.keras.callbacks</span> <span class="kn">import</span> <span class="n">Callback</span>
 
 <span class="kn">from</span> <span class="nn">mlflow</span> <span class="kn">import</span> <span class="n">log_metrics</span><span class="p">,</span> <span class="n">log_params</span><span class="p">,</span> <span class="n">log_text</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.autologging_utils</span> <span class="kn">import</span> <span class="n">ExceptionSafeClass</span>
+<span class="kn">from</span> <span class="nn">mlflow.utils.checkpoint_utils</span> <span class="kn">import</span> <span class="n">MlflowModelCheckpointCallbackBase</span>
 
 
 <div class="viewcode-block" id="MLflowCallback"><a class="viewcode-back" href="../../../python_api/mlflow.tensorflow.html#mlflow.tensorflow.MLflowCallback">[docs]</a><span class="k">class</span> <span class="nc">MLflowCallback</span><span class="p">(</span><span class="n">keras</span><span class="o">.</span><span class="n">callbacks</span><span class="o">.</span><span class="n">Callback</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">ExceptionSafeClass</span><span class="p">):</span>
@@ -306,6 +308,134 @@
             <span class="k">return</span>
         <span class="n">metrics</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;validation_&quot;</span> <span class="o">+</span> <span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">logs</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
         <span class="n">log_metrics</span><span class="p">(</span><span class="n">metrics</span><span class="p">,</span> <span class="n">synchronous</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div></div>
+
+
+<span class="k">class</span> <span class="nc">MlflowModelCheckpointCallback</span><span class="p">(</span><span class="n">Callback</span><span class="p">,</span> <span class="n">MlflowModelCheckpointCallbackBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Callback for automatic Keras model checkpointing to MLflow.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        monitor: In automatic model checkpointing, the metric name to monitor if</span>
+<span class="sd">            you set `model_checkpoint_save_best_only` to True.</span>
+<span class="sd">        save_best_only: If True, automatic model checkpointing only saves when</span>
+<span class="sd">            the model is considered the &quot;best&quot; model according to the quantity</span>
+<span class="sd">            monitored and previous checkpoint model is overwritten.</span>
+<span class="sd">        mode: one of {&quot;min&quot;, &quot;max&quot;}. In automatic model checkpointing,</span>
+<span class="sd">            if save_best_only=True, the decision to overwrite the current save file is made</span>
+<span class="sd">            based on either the maximization or the minimization of the monitored quantity.</span>
+<span class="sd">        save_weights_only: In automatic model checkpointing, if True, then</span>
+<span class="sd">            only the model’s weights will be saved. Otherwise, the optimizer states,</span>
+<span class="sd">            lr-scheduler states, etc are added in the checkpoint too.</span>
+<span class="sd">        save_freq: `&quot;epoch&quot;` or integer. When using `&quot;epoch&quot;`, the callback</span>
+<span class="sd">            saves the model after each epoch. When using integer, the callback</span>
+<span class="sd">            saves the model at end of this many batches. Note that if the saving isn&#39;t</span>
+<span class="sd">            aligned to epochs, the monitored metric may potentially be less reliable (it</span>
+<span class="sd">            could reflect as little as 1 batch, since the metrics get reset</span>
+<span class="sd">            every epoch). Defaults to `&quot;epoch&quot;`.</span>
+
+<span class="sd">    .. code-block:: python</span>
+<span class="sd">        :caption: Example</span>
+
+<span class="sd">        from tensorflow import keras</span>
+<span class="sd">        import tensorflow as tf</span>
+<span class="sd">        import mlflow</span>
+<span class="sd">        import numpy as np</span>
+<span class="sd">        from mlflow.tensorflow import MlflowModelCheckpointCallback</span>
+
+<span class="sd">        # Prepare data for a 2-class classification.</span>
+<span class="sd">        data = tf.random.uniform([8, 28, 28, 3])</span>
+<span class="sd">        label = tf.convert_to_tensor(np.random.randint(2, size=8))</span>
+
+<span class="sd">        model = keras.Sequential(</span>
+<span class="sd">            [</span>
+<span class="sd">                keras.Input([28, 28, 3]),</span>
+<span class="sd">                keras.layers.Flatten(),</span>
+<span class="sd">                keras.layers.Dense(2),</span>
+<span class="sd">            ]</span>
+<span class="sd">        )</span>
+
+<span class="sd">        model.compile(</span>
+<span class="sd">            loss=keras.losses.SparseCategoricalCrossentropy(from_logits=True),</span>
+<span class="sd">            optimizer=keras.optimizers.Adam(0.001),</span>
+<span class="sd">            metrics=[keras.metrics.SparseCategoricalAccuracy()],</span>
+<span class="sd">        )</span>
+
+<span class="sd">        mlflow_checkpoint_callback = MlflowModelCheckpointCallback(</span>
+<span class="sd">            monitor=&quot;sparse_categorical_accuracy&quot;,</span>
+<span class="sd">            mode=&quot;max&quot;,</span>
+<span class="sd">            save_best_only=True,</span>
+<span class="sd">            save_weights_only=False,</span>
+<span class="sd">            save_freq=&quot;epoch&quot;,</span>
+<span class="sd">        )</span>
+
+<span class="sd">        with mlflow.start_run() as run:</span>
+<span class="sd">            model.fit(</span>
+<span class="sd">                data,</span>
+<span class="sd">                label,</span>
+<span class="sd">                batch_size=4,</span>
+<span class="sd">                epochs=2,</span>
+<span class="sd">                callbacks=[mlflow_checkpoint_callback],</span>
+<span class="sd">            )</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">monitor</span><span class="o">=</span><span class="s2">&quot;val_loss&quot;</span><span class="p">,</span>
+        <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;min&quot;</span><span class="p">,</span>
+        <span class="n">save_best_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">save_weights_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">save_freq</span><span class="o">=</span><span class="s2">&quot;epoch&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">Callback</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">MlflowModelCheckpointCallbackBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">checkpoint_file_suffix</span><span class="o">=</span><span class="s2">&quot;.h5&quot;</span><span class="p">,</span>
+            <span class="n">monitor</span><span class="o">=</span><span class="n">monitor</span><span class="p">,</span>
+            <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span>
+            <span class="n">save_best_only</span><span class="o">=</span><span class="n">save_best_only</span><span class="p">,</span>
+            <span class="n">save_weights_only</span><span class="o">=</span><span class="n">save_weights_only</span><span class="p">,</span>
+            <span class="n">save_freq</span><span class="o">=</span><span class="n">save_freq</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_epoch</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_batch_seen</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">global_step</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">global_step_last_saving</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">save_checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_weights_only</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">save_weights</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">on_epoch_begin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">logs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_epoch</span> <span class="o">=</span> <span class="n">epoch</span>
+
+    <span class="k">def</span> <span class="nf">on_train_batch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">logs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># Note that `on_train_batch_end` might be invoked by every N train steps,</span>
+        <span class="c1"># (controlled by `steps_per_execution` argument in `model.comple` method).</span>
+        <span class="c1"># the following logic is similar to</span>
+        <span class="c1"># https://github.com/keras-team/keras/blob/e6e62405fa1b4444102601636d871610d91e5783/keras/callbacks/model_checkpoint.py#L212</span>
+        <span class="n">add_batches</span> <span class="o">=</span> <span class="n">batch</span> <span class="o">+</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">batch</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_batch_seen</span> <span class="k">else</span> <span class="n">batch</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_batch_seen</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_batch_seen</span> <span class="o">=</span> <span class="n">batch</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">global_step</span> <span class="o">+=</span> <span class="n">add_batches</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_freq</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">global_step</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">global_step_last_saving</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_freq</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">check_and_save_checkpoint_if_needed</span><span class="p">(</span>
+                    <span class="n">current_epoch</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">current_epoch</span><span class="p">,</span>
+                    <span class="n">global_step</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">global_step</span><span class="p">,</span>
+                    <span class="n">metric_dict</span><span class="o">=</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">logs</span><span class="o">.</span><span class="n">items</span><span class="p">()},</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">global_step_last_saving</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">global_step</span>
+
+    <span class="k">def</span> <span class="nf">on_epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">logs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_freq</span> <span class="o">==</span> <span class="s2">&quot;epoch&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check_and_save_checkpoint_if_needed</span><span class="p">(</span>
+                <span class="n">current_epoch</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">current_epoch</span><span class="p">,</span>
+                <span class="n">global_step</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">global_step</span><span class="p">,</span>
+                <span class="n">metric_dict</span><span class="o">=</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">logs</span><span class="o">.</span><span class="n">items</span><span class="p">()},</span>
+            <span class="p">)</span>
 </pre></div>
 
               </div>

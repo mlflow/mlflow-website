@@ -143,23 +143,30 @@
 <li class="toctree-l1"><a class="reference internal" href="cli.html">Command-Line Interface</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Search Runs</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#search-runs-on-mlflow-ui">Search Runs on MLflow UI</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#creating-a-few-mlflow-runs-before-start">Creating a Few MLflow Runs before Start</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#search-query-syntax">Search Query Syntax</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#handling-special-characters-in-mlflow-field">Handling Special Characters in MLflow Field</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#search-query-by-different-mlflow-fields">Search Query by Different MLflow Fields</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#searching-by-metrics">Searching By Metrics</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#searching-by-params">Searching By Params</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#searching-by-tags">Searching By Tags</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#searching-by-dataset-information">Searching By Dataset Information</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#searching-by-run-s-metadata">Searching By Run’s Metadata</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#create-example-mlflow-runs">Create Example MLflow Runs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#search-query-example">Search Query Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#search-query-syntax-deep-dive">Search Query Syntax Deep Dive</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example-queries">Example Queries</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#searching-by-metrics">1 - Searching By Metrics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#searching-by-params">2 - Searching By Params</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#searching-by-tags">3 - Searching By Tags</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#searching-by-dataset-information">4 - Searching By Dataset Information</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#searching-by-run-s-metadata">5 - Searching By Run’s Metadata</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#searching-over-a-set">6 - Searching over a Set</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#chained-queries">7 - Chained Queries</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#non-none-queries">8 - Non-None Queries</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#programmatically-searching-runs">Programmatically Searching Runs</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#python">Python</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#python">Python</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#complex-filter">1 - Complex Filter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#run-view-type">2 - <cite>run_view_type</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ordering">2 - Ordering</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#searching-all-experiments">3 - Searching All Experiments</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#r">R</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#java">Java</a></li>
 </ul>
@@ -223,30 +230,40 @@
               <div itemprop="articleBody">
                 
   <div class="section" id="search-runs">
-<span id="id1"></span><h1>Search Runs<a class="headerlink" href="#search-runs" title="Permalink to this headline"> </a></h1>
-<p>This guide will walk you through how to search your MLflow runs through MLflow UI and Python API.</p>
+<h1>Search Runs<a class="headerlink" href="#search-runs" title="Permalink to this headline"> </a></h1>
+<p>This guide will walk you through how to search your MLflow runs through the MLflow UI and Python API.
+This resource will be valuable if you’re interested in querying specific runs based on their metrics,
+params, tags, dataset information, or run metadata.</p>
+<p>In short, you can leverage SQL-like syntax to filter your runs based on a variety of conditions.
+Note that the <code class="docutils literal notranslate"><span class="pre">OR</span></code> keyword is not supported and there are a few other differences from SQL
+mentioned below, but despite these limitations, the run search functionality is quite powerful.</p>
 <div class="section" id="search-runs-on-mlflow-ui">
 <h2>Search Runs on MLflow UI<a class="headerlink" href="#search-runs-on-mlflow-ui" title="Permalink to this headline"> </a></h2>
-<p>MLflow UI provides a search bar to search your MLflow runs, which can be found in the experiment view, as shown
-by the screenshot:</p>
-<div class="figure align-center">
-<a class="reference internal image-reference" href="_images/run_search_bar.png"><img alt="Run search bar" src="_images/run_search_bar.png" style="width: 90%;" /></a>
-</div>
-<div class="section" id="creating-a-few-mlflow-runs-before-start">
-<h3>Creating a Few MLflow Runs before Start<a class="headerlink" href="#creating-a-few-mlflow-runs-before-start" title="Permalink to this headline"> </a></h3>
-<p>To better understand how to write queries to fetch MLflow runs, we provide a script to create a series of MLflow
-runs so that you can run the example queries to see the actual effect. This step is optional, but we encourage
-doing it if this is the first time you read this guide.</p>
-<p>First let’s start a local MLflow UI service by running:</p>
+<p>The MLflow UI provides a powerful search interface that allows you to filter runs. Below we’ll…</p>
+<ol class="arabic simple">
+<li><p>Create example MLflow runs</p></li>
+<li><p>Look at a simple querying example</p></li>
+<li><p>Deep dive into query syntax</p></li>
+<li><p>Provide a variety of example queries</p></li>
+</ol>
+<div class="section" id="create-example-mlflow-runs">
+<h3>Create Example MLflow Runs<a class="headerlink" href="#create-example-mlflow-runs" title="Permalink to this headline"> </a></h3>
+<p>First, let’s create some example MLflow runs. This documentation is based on experiments created
+with the below script. If you don’t want to interactively explore this on your machine, skip
+this section.</p>
+<p>Before running the script, let’s simply start the MLflow UI on a local host.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mlflow<span class="w"> </span>ui
 </pre></div>
 </div>
-<p>Then paste the following code to a local pythnon file, e.g., <code class="docutils literal notranslate"><span class="pre">~/create_testing_runs.py</span></code>, and execute it.</p>
+<p>Let’s visit <code class="docutils literal notranslate"><span class="pre">http://localhost:5000/</span></code> in our web browser. After doing so, you’ll notice that we don’t
+have any experiments or models. Let’s resolve this by creating a few MLflow runs via the script
+below.</p>
+<p>Note that when you run this script, you’ll want to do so from the same directory that you ran
+the <code class="docutils literal notranslate"><span class="pre">mlflow</span> <span class="pre">ui</span></code> command.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="n">mlflow</span><span class="o">.</span><span class="n">set_tracking_uri</span><span class="p">(</span><span class="s2">&quot;http://127.0.0.1:5000&quot;</span><span class="p">)</span>
-<span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s2">&quot;/search-run-guide&quot;</span><span class="p">)</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s2">&quot;search-run-guide&quot;</span><span class="p">)</span>
 
 <span class="n">accuracy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
 <span class="n">loss</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.1</span><span class="p">)</span>
@@ -257,7 +274,6 @@ doing it if this is the first time you read this guide.</p>
 <span class="n">learning_rate</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.001</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">]</span> <span class="o">*</span> <span class="mi">5</span>
 <span class="n">model</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;GPT-2&quot;</span><span class="p">,</span> <span class="s2">&quot;GPT-3&quot;</span><span class="p">,</span> <span class="s2">&quot;GPT-3.5&quot;</span><span class="p">,</span> <span class="s2">&quot;GPT-4&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="mi">6</span>
 
-<span class="n">mlflow_user</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Monkey D Luffy&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">+</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="mi">7</span>
 <span class="n">task</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;classification&quot;</span><span class="p">,</span> <span class="s2">&quot;regression&quot;</span><span class="p">,</span> <span class="s2">&quot;causal lm&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="mi">7</span>
 <span class="n">environment</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;notebook&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">5</span> <span class="o">+</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="mi">5</span>
 
@@ -300,62 +316,147 @@ doing it if this is the first time you read this guide.</p>
         <span class="n">mlflow</span><span class="o">.</span><span class="n">log_input</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">dataset_context</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
 </pre></div>
 </div>
-<p>The code above creates 10 MLflow runs with different metrics, params, tags and dataset information. After execution,
-you should find all these runs under the experiment “/search-run-guide”, as shown by the screenshot:</p>
+<p>The code above creates 10 MLflow runs with different metrics, params, tags and dataset information.
+After successful execution, if you return to the MLflow UI in your browser, you should find all of
+these runs under the experiment “search-run-guide”, as shown by the following screenshot:</p>
 <div class="figure align-center">
 <a class="reference internal image-reference" href="_images/created_mlflow_runs.png"><img alt="testing runs" src="_images/created_mlflow_runs.png" style="width: 90%;" /></a>
 </div>
+<p>In real-world production deployments of MLflow, it’s common to have thousands or even hundreds of thousands of
+runs. In such cases, it’s important to be able to filter and search for runs based on specific criteria.</p>
 </div>
-<div class="section" id="search-query-syntax">
-<span id="search-runs-syntax"></span><h3>Search Query Syntax<a class="headerlink" href="#search-query-syntax" title="Permalink to this headline"> </a></h3>
-<p>You need to write search queries to fetch your MLflow runs. The query must be a condition or a few conditions
-concatenated by <code class="docutils literal notranslate"><span class="pre">and</span></code>. At a high level, the syntax is similar to SQL WHERE clause without supporting <code class="docutils literal notranslate"><span class="pre">or</span></code> keyword.
-For example, below is a query to search for all runs that have logged a <code class="docutils literal notranslate"><span class="pre">loss</span></code> metric smaller than <code class="docutils literal notranslate"><span class="pre">1</span></code> to
-MLflow.</p>
-<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="n">metric</span><span class="p">.</span><span class="n">loss</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">1</span>
+<div class="section" id="search-query-example">
+<span id="search-runs-syntax"></span><h3>Search Query Example<a class="headerlink" href="#search-query-example" title="Permalink to this headline"> </a></h3>
+<p>In order to filter your MLflow runs, you will need to write <strong>search queries</strong>, which are pseudo-SQL
+conditions expressed in a distinct syntax.</p>
+<p>To showcase this functionality, let’s look at the below code examples.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="n">all_runs</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">search_runs</span><span class="p">(</span><span class="n">search_all_experiments</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">all_runs</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Briefly a search condition consists of 3 parts:</p>
-<ul class="simple">
-<li><p>An MLflow field on the left side, which can be some metric, param, tag, dataset or MLflow run metadata, e.g.,
-<code class="docutils literal notranslate"><span class="pre">metric.loss</span></code> or <code class="docutils literal notranslate"><span class="pre">param.batch_size</span></code>.</p></li>
-<li><p>A comparator in the middle, we support 3 types of comparators:</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">Output</span><a class="headerlink" href="#id1" title="Permalink to this code"> </a></div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>                             run_id  ... tags.mlflow.user
+0  5984a3488161440f92de9847e846b342  ...     michael.berk
+1  41160f238a5841998dda263794b26067  ...     michael.berk
+2  babe221a676b4fa4b204f8240f2c4f14  ...     michael.berk
+3  45eb4f02c5a1461aa6098fa550233be6  ...     michael.berk
+4  1c7c459486c44b23bb016028aee1f153  ...     michael.berk
+5  4453f59f1ab04491bb9582d8cba5f437  ...     michael.berk
+6  22db81f070f6413588641c8c343cdd72  ...     michael.berk
+7  c3680e37d0fa44eb9c9fb7828f6b5481  ...     michael.berk
+8  67973142b9c0470d8d764ada07c5a988  ...     michael.berk
+9  59853d5f17f946218f63de1dc82de07b  ...     michael.berk
+
+[10 rows x 19 columns]
+</pre></div>
+</div>
+</div>
+<p>Second, let’s try filtering the runs for our really bad models: <code class="docutils literal notranslate"><span class="pre">metrics.loss</span> <span class="pre">&gt;</span> <span class="pre">0.8</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="n">bad_runs</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">search_runs</span><span class="p">(</span>
+    <span class="n">filter_string</span><span class="o">=</span><span class="s2">&quot;metrics.loss &gt; 0.8&quot;</span><span class="p">,</span> <span class="n">search_all_experiments</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">bad_runs</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">Output</span><a class="headerlink" href="#id2" title="Permalink to this code"> </a></div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>                             run_id  ... tags.mlflow.source.name
+0  67973142b9c0470d8d764ada07c5a988  ...               delete.py
+1  59853d5f17f946218f63de1dc82de07b  ...               delete.py
+
+[2 rows x 19 columns]
+</pre></div>
+</div>
+</div>
+<p>You’ll notice that we now are displaying 2 runs instead of 10. Pretty easy, right?</p>
+<p>Now let’s go over the search query syntax in more detail.</p>
+</div>
+<div class="section" id="search-query-syntax-deep-dive">
+<h3>Search Query Syntax Deep Dive<a class="headerlink" href="#search-query-syntax-deep-dive" title="Permalink to this headline"> </a></h3>
+<p>As noted above, MLflow search syntax is similar to SQL with a few notable exceptions.</p>
 <ul>
-<li><p>Numeric comparators: <code class="docutils literal notranslate"><span class="pre">=</span></code>, <code class="docutils literal notranslate"><span class="pre">!=</span></code>, <code class="docutils literal notranslate"><span class="pre">&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">&gt;=</span></code>, <code class="docutils literal notranslate"><span class="pre">&lt;</span></code>, and <code class="docutils literal notranslate"><span class="pre">&lt;=</span></code>.</p></li>
-<li><p>String comparators: <code class="docutils literal notranslate"><span class="pre">=</span></code>, <code class="docutils literal notranslate"><span class="pre">!=</span></code>, <code class="docutils literal notranslate"><span class="pre">LIKE</span></code> and <code class="docutils literal notranslate"><span class="pre">ILIKE</span></code>. String comparators are case sensitive except <code class="docutils literal notranslate"><span class="pre">ILIKE</span></code>
-which is case insensitive.</p></li>
-<li><p>Set comparators: <code class="docutils literal notranslate"><span class="pre">IN</span></code>, which only supports searching by dataset and run metadata, and is case sensitive.</p></li>
+<li><p>The SQL <code class="docutils literal notranslate"><span class="pre">OR</span></code> keyword is not supported.</p></li>
+<li><p>For fields that contain special characters or start with numbers, you need to wrap them in double quotes.</p>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="gd">- Bad:  metrics.cross-entropy-loss &lt; 0.5</span>
+<span class="gi">+ Good: metrics.&quot;cross-entropy-loss&quot; &lt; 0.5</span>
+
+<span class="gd">- Bad:  params.1st_iteration_timestamp = &quot;2022-01-01&quot;</span>
+<span class="gi">+ Good: params.&quot;1st_iteration_timestamp&quot; = &quot;2022-01-01&quot;</span>
+</pre></div>
+</div>
+</li>
+<li><p>For the SQL <code class="docutils literal notranslate"><span class="pre">IN</span></code> keyword, you must surround the values of your list with single quotes.</p>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="gd">- Bad:  attributes.run_id IN (&quot;5984a3488161440f92de9847e846b342&quot;, &quot;babe221a676b4fa4b204f8240f2c4f14&quot;)</span>
+<span class="gi">+ Good: attributes.run_id IN (&#39;5984a3488161440f92de9847e846b342&#39;, &#39;babe221a676b4fa4b204f8240f2c4f14&#39;)</span>
+</pre></div>
+</div>
+</li>
+<li><p>For the SQL <code class="docutils literal notranslate"><span class="pre">IN</span></code> keyword, you can only search the following fields:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">datasets.name</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">datasets.digest</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">datasets.context</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">attributes.run_id</span></code></p></li>
 </ul>
 </li>
-<li><p>A reference value on the right side.</p></li>
+<li><p>Non-None conditions for numeric fields are not supported e.g. <code class="docutils literal notranslate"><span class="pre">metrics.accuracy</span> <span class="pre">!=</span> <span class="pre">&quot;None&quot;</span></code> will fail.</p></li>
 </ul>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>There is a caveat that using <code class="docutils literal notranslate"><span class="pre">IN</span></code> requires wrapping string with single quotes, e.g.,
-<code class="docutils literal notranslate"><span class="pre">params.&quot;learning</span> <span class="pre">rate&quot;</span> <span class="pre">IN</span> <span class="pre">('0.001',</span> <span class="pre">'0.01')</span></code>. <code class="docutils literal notranslate"><span class="pre">params.&quot;learning_rate&quot;</span> <span class="pre">IN</span> <span class="pre">(&quot;0.001&quot;,</span> <span class="pre">&quot;0.01&quot;)</span></code> will throw an error.</p>
-</div>
-<div class="section" id="handling-special-characters-in-mlflow-field">
-<h4>Handling Special Characters in MLflow Field<a class="headerlink" href="#handling-special-characters-in-mlflow-field" title="Permalink to this headline"> </a></h4>
-<p>It’s common that your MLflow field contains special characters such as hyphen, space, period, and so on. In those
-cases, you will need to wrap it by double quotes. The same rule applies when your field starts with numbers.
-For example if you ever logged something by <code class="docutils literal notranslate"><span class="pre">mlflow.log_metric(&quot;cross-entropy-loss&quot;,</span> <span class="pre">0.15)</span></code>, then your query will be
-similar to:</p>
-<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="n">metric</span><span class="p">.</span><span class="ss">&quot;cross-entropy-loss&quot;</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">5</span>
+<p>Other than the that, the syntax should be intuitive to anyone who has used SQL. To assemble
+a single search condition, you must assemble an inequality using the following components…</p>
+<ol class="arabic simple">
+<li><p><strong>An MLflow field</strong>: a metric, param, tag, dataset or run metadata.</p></li>
+<li><p><strong>A comparator</strong>: an inequality operator.</p></li>
+</ol>
+<blockquote>
+<div><ul>
+<li><p>For numerics, MLflow supports <code class="docutils literal notranslate"><span class="pre">=</span></code>, <code class="docutils literal notranslate"><span class="pre">!=</span></code>, <code class="docutils literal notranslate"><span class="pre">&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">&gt;=</span></code>, <code class="docutils literal notranslate"><span class="pre">&lt;</span></code>, and <code class="docutils literal notranslate"><span class="pre">&lt;=</span></code>. Examples include:</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="n">metrics</span><span class="p">.</span><span class="n">accuracy</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">72</span>
+<span class="n">metrics</span><span class="p">.</span><span class="n">loss</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">15</span>
+<span class="n">metrics</span><span class="p">.</span><span class="n">accuracy</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">15</span>
 </pre></div>
 </div>
-<p>Now we have learned the syntax, let’s dive into how to search runs by different categories of MLflow fields.</p>
+</li>
+<li><p>For strings, MLflow supports <code class="docutils literal notranslate"><span class="pre">=</span></code>, <code class="docutils literal notranslate"><span class="pre">!=</span></code>, <code class="docutils literal notranslate"><span class="pre">LIKE</span></code> (case-sensitive) and <code class="docutils literal notranslate"><span class="pre">ILIKE</span></code> (case-insensitive). Examples include:</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="n">params</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ss">&quot;GPT-3&quot;</span>
+<span class="n">params</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="ss">&quot;GPT%&quot;</span>
+<span class="n">params</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="k">ILIKE</span><span class="w"> </span><span class="ss">&quot;gpt%&quot;</span>
+</pre></div>
 </div>
+</li>
+<li><p>For sets, MLflow supports <code class="docutils literal notranslate"><span class="pre">IN</span></code>. Examples include:</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="n">datasets</span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="s1">&#39;custom&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;also custom&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;another custom name&#39;</span><span class="p">)</span>
+<span class="n">datasets</span><span class="p">.</span><span class="n">digest</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="s1">&#39;s8ds293b&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;jks834s2&#39;</span><span class="p">)</span>
+<span class="n">attributes</span><span class="p">.</span><span class="n">run_id</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="s1">&#39;5984a3488161440f92de9847e846b342&#39;</span><span class="p">)</span>
+</pre></div>
 </div>
-<div class="section" id="search-query-by-different-mlflow-fields">
-<h3>Search Query by Different MLflow Fields<a class="headerlink" href="#search-query-by-different-mlflow-fields" title="Permalink to this headline"> </a></h3>
+</li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="3">
+<li><p><strong>A reference value</strong>: a numeric value, string, or set of strings.</p></li>
+</ol>
+<p>Let’s look at some more examples.</p>
+</div>
+<div class="section" id="example-queries">
+<h3>Example Queries<a class="headerlink" href="#example-queries" title="Permalink to this headline"> </a></h3>
 <p>In this section we will go over how to search by different categories of MLflow fields. For each category we provide
-a few sample queries, if you have executed the run creation script we provided, these queries should fetch certain runs.</p>
+a few sample queries. If you have executed the run creation script we provided, these queries should fetch certain runs
+but sometimes require modification for run-specific information, such as <code class="docutils literal notranslate"><span class="pre">start_time</span></code>.</p>
 <div class="section" id="searching-by-metrics">
-<h4>Searching By Metrics<a class="headerlink" href="#searching-by-metrics" title="Permalink to this headline"> </a></h4>
-<p>Searching by metrics requires you to write queries with key <code class="docutils literal notranslate"><span class="pre">metrics.{metric_name}</span></code>, where <code class="docutils literal notranslate"><span class="pre">metric_name</span></code> are the metrics
-you logged to MLflow through <code class="docutils literal notranslate"><span class="pre">mlflow.log_metric</span></code> or <code class="docutils literal notranslate"><span class="pre">mlflow.log_metrics</span></code>. If you use autologging, you may need to look
-up what metrics are logged by looking into a sample run. See below for sample queries.</p>
+<h4>1 - Searching By Metrics<a class="headerlink" href="#searching-by-metrics" title="Permalink to this headline"> </a></h4>
+<p>Metrics are quantitative measures typically used to evaluate the model’s performance during
+or after training. Metrics can include values like accuracy, precision, recall, F1 score, etc., and
+can change over time as the model trains. They are logged manually via <code class="docutils literal notranslate"><span class="pre">mlflow.log_metric</span></code> or
+<code class="docutils literal notranslate"><span class="pre">mlflow.log_metrics</span></code> or automatically via autologging.</p>
+<p>To search for runs by filtering on metrics, you must include the <code class="docutils literal notranslate"><span class="pre">metrics</span></code> prefix in the left
+side of the inequality. Note that they are <strong>stored as numbers</strong>, so you must use numeric comparators.</p>
 <div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="n">metrics</span><span class="p">.</span><span class="n">accuracy</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">72</span>
+<span class="n">metrics</span><span class="p">.</span><span class="ss">&quot;accuracy&quot;</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">72</span>
 <span class="n">metrics</span><span class="p">.</span><span class="n">loss</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">15</span>
 <span class="n">metrics</span><span class="p">.</span><span class="ss">&quot;log-scale-loss&quot;</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">0</span>
 <span class="n">metrics</span><span class="p">.</span><span class="ss">&quot;f1 score&quot;</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">5</span>
@@ -364,63 +465,122 @@ up what metrics are logged by looking into a sample run. See below for sample qu
 </div>
 </div>
 <div class="section" id="searching-by-params">
-<h4>Searching By Params<a class="headerlink" href="#searching-by-params" title="Permalink to this headline"> </a></h4>
-<p>Searching by params requires you to write queries with key <code class="docutils literal notranslate"><span class="pre">params.{param_name}</span></code>, where <code class="docutils literal notranslate"><span class="pre">param_name</span></code> are the params
-you logged to MLflow through <code class="docutils literal notranslate"><span class="pre">mlflow.log_param</span></code> or <code class="docutils literal notranslate"><span class="pre">mlflow.log_params</span></code>. In additions, the value to be compared must be
-a string, because MLflow params are logged in string format. See below for sample queries.</p>
+<h4>2 - Searching By Params<a class="headerlink" href="#searching-by-params" title="Permalink to this headline"> </a></h4>
+<p>Params are strings that typically represent the configuration aspects of the model. Parameters can include values
+like learning rate, batch size, and number of epochs. They are logged manually via <code class="docutils literal notranslate"><span class="pre">mlflow.log_param</span></code>
+or <code class="docutils literal notranslate"><span class="pre">mlflow.log_params</span></code> or automatically via autologging.</p>
+<p>To search for runs by filtering on params, you must include the <code class="docutils literal notranslate"><span class="pre">params</span></code> prefix in the left
+side of the inequality. Note that they are <strong>stored as strings</strong>, so you must use string
+comparators, such as <code class="docutils literal notranslate"><span class="pre">=</span></code> and <code class="docutils literal notranslate"><span class="pre">!=</span></code>.</p>
 <div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="n">params</span><span class="p">.</span><span class="n">batch_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ss">&quot;2&quot;</span>
 <span class="n">params</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="ss">&quot;GPT%&quot;</span>
+<span class="n">params</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="k">ILIKE</span><span class="w"> </span><span class="ss">&quot;gPt%&quot;</span>
 <span class="n">params</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="ss">&quot;GPT%&quot;</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">params</span><span class="p">.</span><span class="n">batch_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ss">&quot;2&quot;</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="searching-by-tags">
-<span id="mlflow-tags"></span><h4>Searching By Tags<a class="headerlink" href="#searching-by-tags" title="Permalink to this headline"> </a></h4>
-<p>Searching by params requires you to write queries with key <code class="docutils literal notranslate"><span class="pre">tags.{tag_name}</span></code>, where <code class="docutils literal notranslate"><span class="pre">tag_name</span></code> are the tags you logged
-to MLflow through <code class="docutils literal notranslate"><span class="pre">mlflow.set_tag</span></code>, <code class="docutils literal notranslate"><span class="pre">mlflow.set_tags</span></code> or the UI. In additions, system tags such as <code class="docutils literal notranslate"><span class="pre">mlflow.user</span></code> are
-automatically logged, you can find the full list <a class="reference external" href="https://mlflow.org/docs/latest/tracking/tracking-api.html#system-tags">here</a>.
-and these tags’ value cannot be customized. The value to be compared must be a string, because MLflow tags are logged in
-string format. See below for sample queries.</p>
-<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="n">tags</span><span class="p">.</span><span class="n">task</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="s1">&#39;classification&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;regression&#39;</span><span class="p">)</span>
-<span class="n">tags</span><span class="p">.</span><span class="ss">&quot;environment&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="ss">&quot;notebook&quot;</span>
-<span class="o">#</span><span class="w"> </span><span class="n">Change</span><span class="w"> </span><span class="n">this</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="k">match</span><span class="w"> </span><span class="n">your</span><span class="w"> </span><span class="k">user</span><span class="w"> </span><span class="n">name</span><span class="p">.</span>
-<span class="n">tags</span><span class="p">.</span><span class="ss">&quot;mlflow.user&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="ss">&quot;Monkey D Luffy&quot;</span>
+<span id="mlflow-tags"></span><h4>3 - Searching By Tags<a class="headerlink" href="#searching-by-tags" title="Permalink to this headline"> </a></h4>
+<p>Tags are metadata that typically provide additional context about the run. Tags can include values
+like user name, team, etc. They are logged manually via <code class="docutils literal notranslate"><span class="pre">mlflow.set_tag</span></code>
+or <code class="docutils literal notranslate"><span class="pre">mlflow.set_tags</span></code>. In addition, <a class="reference external" href="https://mlflow.org/docs/latest/tracking/tracking-api.html#system-tags">system tags</a>,
+such as <code class="docutils literal notranslate"><span class="pre">mlflow.user</span></code>, are automatically logged.</p>
+<p>To search for runs by filtering on tags, you must include the <code class="docutils literal notranslate"><span class="pre">tags</span></code> or <code class="docutils literal notranslate"><span class="pre">mlflow</span></code> prefixes in
+the left side of the inequality. Note that tags are <strong>stored as strings</strong>, so you must use string
+comparators, such as <code class="docutils literal notranslate"><span class="pre">=</span></code> and <code class="docutils literal notranslate"><span class="pre">!=</span></code>.</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="n">tags</span><span class="p">.</span><span class="ss">&quot;environment&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ss">&quot;notebook&quot;</span>
+<span class="n">tags</span><span class="p">.</span><span class="n">environment</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ss">&quot;notebook&quot;</span>
+<span class="n">tags</span><span class="p">.</span><span class="n">task</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ss">&quot;Classification&quot;</span>
+<span class="n">tags</span><span class="p">.</span><span class="n">task</span><span class="w"> </span><span class="k">ILIKE</span><span class="w"> </span><span class="ss">&quot;classif%&quot;</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="searching-by-dataset-information">
-<h4>Searching By Dataset Information<a class="headerlink" href="#searching-by-dataset-information" title="Permalink to this headline"> </a></h4>
-<p>Searching by params requires you to write queries with key <code class="docutils literal notranslate"><span class="pre">datasets.{param_name}</span></code>, and there are 3 fields you can filter
-by:</p>
+<h4>4 - Searching By Dataset Information<a class="headerlink" href="#searching-by-dataset-information" title="Permalink to this headline"> </a></h4>
+<p>Datasets represent data used in model training or evaluation, including features, targets,
+predictions, and metadata such as the dataset’s name, digest (hash) schema, profile, and source.
+They are logged via <code class="docutils literal notranslate"><span class="pre">mlflow.log_input</span></code> or automatically via autologging.</p>
+<p>To search for runs by filtering on dataset information, you must filter on one of the below fields</p>
 <ol class="arabic simple">
-<li><p>Dataset name <code class="docutils literal notranslate"><span class="pre">datasets.name</span></code>, which is the dataset’s name.</p></li>
-<li><p>Dataset digest <code class="docutils literal notranslate"><span class="pre">datasets.digest</span></code>, which is a unique identifier for the dataset.</p></li>
-<li><p>Dataset context <code class="docutils literal notranslate"><span class="pre">datasets.context</span></code>, which represents if the dataset is used for train, evaluation or test.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">datasets.name</span></code>, which is the dataset’s name.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">datasets.digest</span></code>, which is a unique identifier for the dataset.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">datasets.context</span></code>, which represents if the dataset is used for train, evaluation or test.</p></li>
 </ol>
-<p>Please note that the value to compare must be string.</p>
-<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="n">datasets</span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="k">like</span><span class="w"> </span><span class="ss">&quot;custom&quot;</span>
+<p>Note that dataset information is <strong>stored as strings</strong>, so you must use string comparators, such as <code class="docutils literal notranslate"><span class="pre">=</span></code> and <code class="docutils literal notranslate"><span class="pre">!=</span></code>.
+Also note that datasets support set comparators, such as <code class="docutils literal notranslate"><span class="pre">IN</span></code>.</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="n">datasets</span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="ss">&quot;custom&quot;</span>
 <span class="n">datasets</span><span class="p">.</span><span class="n">digest</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="s1">&#39;s8ds293b&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;jks834s2&#39;</span><span class="p">)</span>
-<span class="n">datasets</span><span class="p">.</span><span class="n">context</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="ss">&quot;train&quot;</span>
+<span class="n">datasets</span><span class="p">.</span><span class="n">context</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ss">&quot;train&quot;</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="searching-by-run-s-metadata">
-<h4>Searching By Run’s Metadata<a class="headerlink" href="#searching-by-run-s-metadata" title="Permalink to this headline"> </a></h4>
-<p>Searching by MLflow run’s metadata requires you to write queries with key <code class="docutils literal notranslate"><span class="pre">attributes.{attribute_name}</span></code>, where
-<code class="docutils literal notranslate"><span class="pre">attribute_name</span></code> must be one attribute contained in <a class="reference internal" href="python_api/mlflow.entities.html#mlflow.entities.RunInfo" title="mlflow.entities.RunInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.entities.RunInfo</span></code></a>: <code class="docutils literal notranslate"><span class="pre">run_id</span></code>, <code class="docutils literal notranslate"><span class="pre">run_name</span></code>,
-<code class="docutils literal notranslate"><span class="pre">status</span></code>, <code class="docutils literal notranslate"><span class="pre">artifact_uri</span></code>, <code class="docutils literal notranslate"><span class="pre">user_id</span></code>, <code class="docutils literal notranslate"><span class="pre">start_time</span></code> and <code class="docutils literal notranslate"><span class="pre">end_time</span></code>. The <code class="docutils literal notranslate"><span class="pre">run_id</span></code>, <code class="docutils literal notranslate"><span class="pre">run_name</span></code>, <code class="docutils literal notranslate"><span class="pre">status</span></code>,
-<code class="docutils literal notranslate"><span class="pre">user_id</span></code> and <code class="docutils literal notranslate"><span class="pre">artifact_uri</span></code> attributes have string values, while <code class="docutils literal notranslate"><span class="pre">start_time</span></code> and <code class="docutils literal notranslate"><span class="pre">end_time</span></code> are numeric.
-Other fields in <code class="docutils literal notranslate"><span class="pre">mlflow.entities.RunInfo</span></code> are not searchable. See below for sample queries, and please note that
-you need to customize the compared value to match your MLflow runs, as some metadata are automatically created.</p>
+<h4>5 - Searching By Run’s Metadata<a class="headerlink" href="#searching-by-run-s-metadata" title="Permalink to this headline"> </a></h4>
+<p>Run metadata are a variety of user-specified and system-generated attributes that provide additional context about the run.</p>
+<p>To search for runs by filtering on the metadata of runs, you must include the <code class="docutils literal notranslate"><span class="pre">attributes</span></code> prefix in the left
+side of the inequality. Note that run metadata can be either a string or a numeric depending on the
+attribute, so you must use the appropriate comparator. For a complete list of attributes, see
+<a class="reference internal" href="python_api/mlflow.entities.html#mlflow.entities.RunInfo" title="mlflow.entities.RunInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.entities.RunInfo</span></code></a>, however note that not all fields in the RunInfo object are
+searchable.</p>
+<p>To search for runs by filtering on tags, you must include the <code class="docutils literal notranslate"><span class="pre">tags</span></code> or <code class="docutils literal notranslate"><span class="pre">mlflow</span></code> prefixes in
+the left side of the inequality. Note that tags are <strong>stored as strings</strong>, so you must use string
+comparators, such as <code class="docutils literal notranslate"><span class="pre">=</span></code> and <code class="docutils literal notranslate"><span class="pre">!=</span></code>.</p>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">Examples for Strings</span><a class="headerlink" href="#id3" title="Permalink to this code"> </a></div>
 <div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="n">attributes</span><span class="p">.</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;ACTIVE&#39;</span>
-<span class="n">attributes</span><span class="p">.</span><span class="n">user_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;user1&#39;</span>
+<span class="n">attributes</span><span class="p">.</span><span class="n">user_id</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">&#39;user1&#39;</span>
 <span class="n">attributes</span><span class="p">.</span><span class="n">run_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;my-run&#39;</span>
 <span class="n">attributes</span><span class="p">.</span><span class="n">run_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;a1b2c3d4&#39;</span>
 <span class="n">attributes</span><span class="p">.</span><span class="n">run_id</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="s1">&#39;a1b2c3d4&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;e5f6g7h8&#39;</span><span class="p">)</span>
-
-<span class="o">#</span><span class="w"> </span><span class="n">Compared</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="o">`</span><span class="n">start_time</span><span class="o">`</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="o">`</span><span class="n">end_time</span><span class="o">`</span><span class="w"> </span><span class="k">are</span><span class="w"> </span><span class="n">unix</span><span class="w"> </span><span class="k">timestamp</span><span class="p">.</span>
-<span class="n">attributes</span><span class="p">.</span><span class="n">start_time</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">1664067852747</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">Examples for Numerics</span><a class="headerlink" href="#id4" title="Permalink to this code"> </a></div>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="n">attributes</span><span class="p">.</span><span class="n">start_time</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">1664067852747</span>
 <span class="n">attributes</span><span class="p">.</span><span class="n">end_time</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">1664067852747</span>
+<span class="n">attributes</span><span class="p">.</span><span class="n">created</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1664067852747</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="searching-over-a-set">
+<h4>6 - Searching over a Set<a class="headerlink" href="#searching-over-a-set" title="Permalink to this headline"> </a></h4>
+<p>You can search for runs by filtering on a set of acceptable values via the <code class="docutils literal notranslate"><span class="pre">IN</span></code> keyword. As noted
+above, this is only supported for the following fields:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">datasets.{any_attribute}</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">attributes.run_id</span></code></p></li>
+</ul>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="n">datasets</span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="s1">&#39;custom&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;also custom&#39;</span><span class="p">)</span>
+<span class="n">datasets</span><span class="p">.</span><span class="n">digest</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="s1">&#39;s8ds293b&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;jks834s2&#39;</span><span class="p">)</span>
+<span class="n">attributes</span><span class="p">.</span><span class="n">run_id</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="s1">&#39;a1b2c3d4&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;e5f6g7h8&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="chained-queries">
+<h4>7 - Chained Queries<a class="headerlink" href="#chained-queries" title="Permalink to this headline"> </a></h4>
+<p>You can chain multiple queries together using the <code class="docutils literal notranslate"><span class="pre">AND</span></code> keyword. For example, to search for runs
+with a variety of conditions, you can use the following queries:</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="n">metrics</span><span class="p">.</span><span class="n">accuracy</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">72</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">metrics</span><span class="p">.</span><span class="n">loss</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">15</span>
+<span class="n">metrics</span><span class="p">.</span><span class="n">accuracy</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">72</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">metrics</span><span class="p">.</span><span class="n">batch_size</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span>
+<span class="n">metrics</span><span class="p">.</span><span class="n">accuracy</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">72</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">metrics</span><span class="p">.</span><span class="n">batch_size</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">attributes</span><span class="p">.</span><span class="n">run_id</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="s1">&#39;a1b2c3d4&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;e5f6g7h8&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You can also apply multiple conditions on the same field, for example searching for all loss metrics
+<code class="docutils literal notranslate"><span class="pre">BETWEEEN</span></code> 0.1 and 0.15, inclusive:</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="n">metrics</span><span class="p">.</span><span class="n">loss</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">15</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">metrics</span><span class="p">.</span><span class="n">loss</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">1</span>
+</pre></div>
+</div>
+<p>Finally, before moving on it’s important to revisit that that you cannot use the <code class="docutils literal notranslate"><span class="pre">OR</span></code> keyword in
+your queries.</p>
+</div>
+<div class="section" id="non-none-queries">
+<h4>8 - Non-None Queries<a class="headerlink" href="#non-none-queries" title="Permalink to this headline"> </a></h4>
+<p>To search for runs where a field (only type string is supported) is not null, use the
+<code class="docutils literal notranslate"><span class="pre">field</span> <span class="pre">!=</span> <span class="pre">&quot;None&quot;</span></code> syntax. For example, to search for runs where the batch_size is not null, you
+can use the following query:</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="n">params</span><span class="p">.</span><span class="n">batch_size</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="ss">&quot;None&quot;</span>
 </pre></div>
 </div>
 </div>
@@ -428,65 +588,114 @@ you need to customize the compared value to match your MLflow runs, as some meta
 </div>
 <div class="section" id="programmatically-searching-runs">
 <h2>Programmatically Searching Runs<a class="headerlink" href="#programmatically-searching-runs" title="Permalink to this headline"> </a></h2>
-<p>The MLflow UI supports searching runs contained within the current experiment. To search runs across
-multiple experiments, use one of the client APIs.</p>
+<p>When scaling out to large production systems, typically you’ll want to interact with your runs
+outside the MLflow UI. This can be done programmatically using the MLflow client APIs.</p>
 <div class="section" id="python">
 <h3>Python<a class="headerlink" href="#python" title="Permalink to this headline"> </a></h3>
-<p>Use the <a class="reference internal" href="python_api/mlflow.client.html#mlflow.client.MlflowClient.search_runs" title="mlflow.client.MlflowClient.search_runs"><code class="xref py py-func docutils literal notranslate"><span class="pre">MlflowClient.search_runs()</span></code></a> or <a class="reference internal" href="python_api/mlflow.html#mlflow.search_runs" title="mlflow.search_runs"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.search_runs()</span></code></a> API to
-search programmatically. You can specify the list of columns to order by
-(for example, “metrics.rmse”) in the <code class="docutils literal notranslate"><span class="pre">order_by</span></code> column. The column can contain an
-optional <code class="docutils literal notranslate"><span class="pre">DESC</span></code> or <code class="docutils literal notranslate"><span class="pre">ASC</span></code> value; the default is <code class="docutils literal notranslate"><span class="pre">ASC</span></code>. The default ordering is to sort by
-<code class="docutils literal notranslate"><span class="pre">start_time</span> <span class="pre">DESC</span></code>, then <code class="docutils literal notranslate"><span class="pre">run_id</span></code>.</p>
-<p>The <a class="reference internal" href="python_api/mlflow.html#mlflow.search_runs" title="mlflow.search_runs"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.search_runs()</span></code></a> API can be used to search for runs within specific experiments which
-can be identified by experiment IDs or experiment names, but not both at the same time.</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Using both <code class="docutils literal notranslate"><span class="pre">experiment_ids</span></code> and <code class="docutils literal notranslate"><span class="pre">experiment_names</span></code> in the same call will result
-in error unless one of them is <code class="docutils literal notranslate"><span class="pre">None</span></code> or <code class="docutils literal notranslate"><span class="pre">[]</span></code></p>
+<p><a class="reference internal" href="python_api/mlflow.client.html#mlflow.client.MlflowClient.search_runs" title="mlflow.client.MlflowClient.search_runs"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.client.MlflowClient.search_runs()</span></code></a> or <a class="reference internal" href="python_api/mlflow.html#mlflow.search_runs" title="mlflow.search_runs"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.search_runs()</span></code></a>
+take the same arguments as the above UI examples and more! They return all the runs that
+match the specified filters. Your best resource is the dosctrings for each of these functions, but
+here are some useful examples.</p>
+<div class="section" id="complex-filter">
+<h4>1 - Complex Filter<a class="headerlink" href="#complex-filter" title="Permalink to this headline"> </a></h4>
+<p>Python provides powerful ways to build these queries programmatically. Some tips:</p>
+<ul class="simple">
+<li><p>For complex filters, specifically those with both single and double quotes, use multi-line strings or <cite>\”</cite> to escape the quotes.</p></li>
+<li><p>When working with lists, use the <code class="docutils literal notranslate"><span class="pre">.join()</span></code> method to concatenate the list elements with a delimiter.</p></li>
+<li><p>It’s often most concise to use the fluent APIs, so below we demo only with the fluent API.</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="n">run_ids</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;22db81f070f6413588641c8c343cdd72&quot;</span><span class="p">,</span> <span class="s2">&quot;c3680e37d0fa44eb9c9fb7828f6b5481&quot;</span><span class="p">]</span>
+<span class="n">run_id_condition</span> <span class="o">=</span> <span class="s2">&quot;&#39;&quot;</span> <span class="o">+</span> <span class="s2">&quot;&#39;,&#39;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">run_ids</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span>
+
+<span class="n">complex_filter</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">attributes.run_id IN (</span><span class="si">{</span><span class="n">run_id_condition</span><span class="si">}</span><span class="s2">)</span>
+<span class="s2">  AND metrics.loss &gt; 0.3</span>
+<span class="s2">  AND metrics.&quot;f1 score&quot; &lt; 0.5</span>
+<span class="s2">  AND params.model LIKE &quot;GPT%&quot;</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="n">runs_with_complex_filter</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">search_runs</span><span class="p">(</span>
+    <span class="n">experiment_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;search-run-guide&quot;</span><span class="p">],</span>
+    <span class="n">filter_string</span><span class="o">=</span><span class="n">complex_filter</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">runs_with_complex_filter</span><span class="p">)</span>
+</pre></div>
 </div>
-<p>For example, if you’d like to identify the best <cite>active</cite> run from experiment ID 0 by accuracy, use:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow</span> <span class="kn">import</span> <span class="n">MlflowClient</span>
+<p>The output will be a pandas DataFrame with the runs that match the specified filters, as shown below.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>                              run_id  ... tags.mlflow.runName
+0  22db81f070f6413588641c8c343cdd72  ...   orderly-quail-568
+1  c3680e37d0fa44eb9c9fb7828f6b5481  ...    melodic-lynx-301
+
+[2 rows x 19 columns]
+</pre></div>
+</div>
+</div>
+<div class="section" id="run-view-type">
+<h4>2 - <cite>run_view_type</cite><a class="headerlink" href="#run-view-type" title="Permalink to this headline"> </a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">run_view_type</span></code> parameter exposes additional filtering options, as noted in the
+<a class="reference internal" href="python_api/mlflow.entities.html#mlflow.entities.ViewType" title="mlflow.entities.ViewType"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.entities.ViewType</span></code></a> enum. For example, if you want to filter only active runs,
+which is a dropdown in the UI, simply pass <code class="docutils literal notranslate"><span class="pre">run_view_type=ViewType.ACTIVE_ONLY</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
 <span class="kn">from</span> <span class="nn">mlflow.entities</span> <span class="kn">import</span> <span class="n">ViewType</span>
 
-<span class="n">run</span> <span class="o">=</span> <span class="n">MlflowClient</span><span class="p">()</span><span class="o">.</span><span class="n">search_runs</span><span class="p">(</span>
-    <span class="n">experiment_ids</span><span class="o">=</span><span class="s2">&quot;0&quot;</span><span class="p">,</span>
-    <span class="n">filter_string</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+<span class="n">active_runs</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">search_runs</span><span class="p">(</span>
+    <span class="n">experiment_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;search-run-guide&quot;</span><span class="p">],</span>
+    <span class="n">run_view_type</span><span class="o">=</span><span class="n">ViewType</span><span class="o">.</span><span class="n">ACTIVE_ONLY</span><span class="p">,</span>
+    <span class="n">order_by</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;metrics.accuracy DESC&quot;</span><span class="p">],</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="ordering">
+<h4>2 - Ordering<a class="headerlink" href="#ordering" title="Permalink to this headline"> </a></h4>
+<p>Another useful feature that is available in the search API is allowing for ordering of the returned search results. You can specify a list of columns of interest along with
+<code class="docutils literal notranslate"><span class="pre">DESC</span></code> or <code class="docutils literal notranslate"><span class="pre">ASC</span></code> in the <code class="docutils literal notranslate"><span class="pre">order_by</span></code> kwarg. Note that the <code class="docutils literal notranslate"><span class="pre">DESC</span></code> or <code class="docutils literal notranslate"><span class="pre">ASC</span></code> value is optional,
+so when the value is not provided, the default is <code class="docutils literal notranslate"><span class="pre">ASC</span></code>. Also note that the default ordering when
+the <code class="docutils literal notranslate"><span class="pre">order_by</span></code> parameter is omitted is to sort by <code class="docutils literal notranslate"><span class="pre">start_time</span> <span class="pre">DESC</span></code>, then <code class="docutils literal notranslate"><span class="pre">run_id</span> <span class="pre">ASC</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">from</span> <span class="nn">mlflow.entities</span> <span class="kn">import</span> <span class="n">ViewType</span>
+
+<span class="n">active_runs_ordered_by_accuracy</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">search_runs</span><span class="p">(</span>
+    <span class="n">experiment_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;search-run-guide&quot;</span><span class="p">],</span>
+    <span class="n">run_view_type</span><span class="o">=</span><span class="n">ViewType</span><span class="o">.</span><span class="n">ACTIVE_ONLY</span><span class="p">,</span>
+    <span class="n">order_by</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;metrics.accuracy DESC&quot;</span><span class="p">],</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>A common use case is getting the top <cite>n</cite> results, for example, the top 5 runs by accuracy. When
+combined with the <code class="docutils literal notranslate"><span class="pre">max_results</span></code> parameter, you can get the top <code class="docutils literal notranslate"><span class="pre">n</span></code> that match your query.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">from</span> <span class="nn">mlflow.entities</span> <span class="kn">import</span> <span class="n">ViewType</span>
+
+<span class="n">highest_accuracy_run</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">search_runs</span><span class="p">(</span>
+    <span class="n">experiment_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;search-run-guide&quot;</span><span class="p">],</span>
     <span class="n">run_view_type</span><span class="o">=</span><span class="n">ViewType</span><span class="o">.</span><span class="n">ACTIVE_ONLY</span><span class="p">,</span>
     <span class="n">max_results</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">order_by</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;metrics.accuracy DESC&quot;</span><span class="p">],</span>
 <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 </pre></div>
 </div>
-<p>To get all active runs from experiments IDs 3, 4, and 17 that used a CNN model
-with 10 layers and had a prediction accuracy of 94.5% or higher, use:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow</span> <span class="kn">import</span> <span class="n">MlflowClient</span>
-<span class="kn">from</span> <span class="nn">mlflow.entities</span> <span class="kn">import</span> <span class="n">ViewType</span>
-
-<span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;params.model = &#39;CNN&#39; and params.layers = &#39;10&#39; and metrics.`prediction accuracy` &gt;= 0.945&quot;</span>
-<span class="n">runs</span> <span class="o">=</span> <span class="n">MlflowClient</span><span class="p">()</span><span class="o">.</span><span class="n">search_runs</span><span class="p">(</span>
-    <span class="n">experiment_ids</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;3&quot;</span><span class="p">,</span> <span class="s2">&quot;4&quot;</span><span class="p">,</span> <span class="s2">&quot;17&quot;</span><span class="p">],</span>
-    <span class="n">filter_string</span><span class="o">=</span><span class="n">query</span><span class="p">,</span>
-    <span class="n">run_view_type</span><span class="o">=</span><span class="n">ViewType</span><span class="o">.</span><span class="n">ACTIVE_ONLY</span><span class="p">,</span>
-<span class="p">)</span>
-</pre></div>
 </div>
-<p>To search all known experiments for any MLflow runs created using the Inception model architecture:</p>
+<div class="section" id="searching-all-experiments">
+<h4>3 - Searching All Experiments<a class="headerlink" href="#searching-all-experiments" title="Permalink to this headline"> </a></h4>
+<p>Now you might be wondering how to search all experiments. It’s as simple as specifying
+<code class="docutils literal notranslate"><span class="pre">search_all_experiments=True</span></code> and omitting the <code class="docutils literal notranslate"><span class="pre">experiment_ids</span></code> parameter.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
 <span class="kn">from</span> <span class="nn">mlflow.entities</span> <span class="kn">import</span> <span class="n">ViewType</span>
 
-<span class="n">all_experiments</span> <span class="o">=</span> <span class="p">[</span><span class="n">exp</span><span class="o">.</span><span class="n">experiment_id</span> <span class="k">for</span> <span class="n">exp</span> <span class="ow">in</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">search_experiments</span><span class="p">()]</span>
-<span class="n">runs</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">search_runs</span><span class="p">(</span>
-    <span class="n">experiment_ids</span><span class="o">=</span><span class="n">all_experiments</span><span class="p">,</span>
-    <span class="n">filter_string</span><span class="o">=</span><span class="s2">&quot;params.model = &#39;Inception&#39;&quot;</span><span class="p">,</span>
+<span class="n">model_of_interest</span> <span class="o">=</span> <span class="s2">&quot;GPT-4&quot;</span>
+<span class="n">gpt_4_runs_global</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">search_runs</span><span class="p">(</span>
+    <span class="n">filter_string</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;params.model = &#39;</span><span class="si">{</span><span class="n">model_of_interest</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">,</span>
     <span class="n">run_view_type</span><span class="o">=</span><span class="n">ViewType</span><span class="o">.</span><span class="n">ALL</span><span class="p">,</span>
+    <span class="n">search_all_experiments</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
-<p>To get all runs from the experiment named “Social NLP Experiments”, use:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
-
-<span class="n">runs</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">search_runs</span><span class="p">(</span><span class="n">experiment_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Social NLP Experiments&quot;</span><span class="p">])</span>
-</pre></div>
+<p>Finally, there are additioanl useful features in the
+<a class="reference internal" href="python_api/mlflow.client.html#mlflow.client.MlflowClient.search_runs" title="mlflow.client.MlflowClient.search_runs"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.client.MlflowClient.search_runs()</span></code></a> or <a class="reference internal" href="python_api/mlflow.html#mlflow.search_runs" title="mlflow.search_runs"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.search_runs()</span></code></a> methods, so be sure to
+check out the documentation for more details.</p>
 </div>
 </div>
 <div class="section" id="r">
