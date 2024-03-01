@@ -218,7 +218,7 @@
 <span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
 <span class="kn">from</span> <span class="nn">decimal</span> <span class="kn">import</span> <span class="n">Decimal</span>
 <span class="kn">from</span> <span class="nn">types</span> <span class="kn">import</span> <span class="n">FunctionType</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">import</span> <span class="nn">mlflow</span>
 <span class="kn">from</span> <span class="nn">mlflow.data.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
@@ -628,9 +628,52 @@
     <span class="k">return</span> <span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&gt;</span><span class="si">{</span><span class="n">array</span><span class="o">.</span><span class="n">size</span><span class="si">}</span><span class="s2">Q&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">array</span><span class="p">)</span>
 
 
+<span class="k">def</span> <span class="nf">_is_empty_list_or_array</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="kc">False</span>
+
+
+<span class="k">def</span> <span class="nf">_is_array_has_dict</span><span class="p">(</span><span class="n">nd_array</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">_is_empty_list_or_array</span><span class="p">(</span><span class="n">nd_array</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="c1"># It is less likely the array or list contains heterogeneous elements, so just checking the</span>
+    <span class="c1"># first element to avoid performance overhead.</span>
+    <span class="n">elm</span> <span class="o">=</span> <span class="n">nd_array</span><span class="o">.</span><span class="n">item</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">elm</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="n">_is_array_has_dict</span><span class="p">(</span><span class="n">elm</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">elm</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">return</span> <span class="kc">False</span>
+
+
+<span class="k">def</span> <span class="nf">_hash_array_of_dict_as_bytes</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="c1"># NB: If an array or list contains dictionary element, it can&#39;t be hashed with</span>
+    <span class="c1"># pandas.util.hash_array. Hence we need to manually hash the elements here. This is</span>
+    <span class="c1"># particularly for the LLM use case where the input can be a list of dictionary</span>
+    <span class="c1"># (chat/completion payloads), so doesn&#39;t handle more complex case like nested lists.</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">elm</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">elm</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+            <span class="n">result</span> <span class="o">+=</span> <span class="n">_hash_array_of_dict_as_bytes</span><span class="p">(</span><span class="n">elm</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">elm</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">result</span> <span class="o">+=</span> <span class="n">_hash_dict_as_bytes</span><span class="p">(</span><span class="n">elm</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">+=</span> <span class="n">_hash_data_as_bytes</span><span class="p">(</span><span class="n">elm</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+
 <span class="k">def</span> <span class="nf">_hash_ndarray_as_bytes</span><span class="p">(</span><span class="n">nd_array</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">nd_array</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
         <span class="n">nd_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">nd_array</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">_is_array_has_dict</span><span class="p">(</span><span class="n">nd_array</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_hash_array_of_dict_as_bytes</span><span class="p">(</span><span class="n">nd_array</span><span class="p">)</span>
+
     <span class="k">return</span> <span class="n">_hash_uint64_ndarray_as_bytes</span><span class="p">(</span>
         <span class="n">pd</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">hash_array</span><span class="p">(</span><span class="n">nd_array</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="s2">&quot;C&quot;</span><span class="p">))</span>
     <span class="p">)</span> <span class="o">+</span> <span class="n">_hash_uint64_ndarray_as_bytes</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">nd_array</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint64&quot;</span><span class="p">))</span>
@@ -1343,7 +1386,13 @@
         <span class="kn">from</span> <span class="nn">pyspark.sql</span> <span class="kn">import</span> <span class="n">DataFrame</span> <span class="k">as</span> <span class="n">SparkDataFrame</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">targets</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">targets</span><span class="p">))</span>
+        <span class="c1"># If the list is flat, we assume each element is an independent sample.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">[[</span><span class="n">elm</span><span class="p">]</span> <span class="k">for</span> <span class="n">elm</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">targets</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">targets</span><span class="p">)</span> <span class="k">if</span> <span class="n">targets</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="p">)</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">targets</span><span class="o">=</span><span class="n">targets</span><span class="p">)</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
@@ -1450,6 +1499,70 @@
     <span class="k">return</span> <span class="n">_PythonModelPyfuncWrapper</span><span class="p">(</span><span class="n">python_model</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 
+<span class="k">def</span> <span class="nf">_is_model_deployment_endpoint_uri</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="kn">from</span> <span class="nn">mlflow.metrics.genai.model_utils</span> <span class="kn">import</span> <span class="n">_parse_model_uri</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">schema</span><span class="p">,</span> <span class="n">path</span> <span class="o">=</span> <span class="n">_parse_model_uri</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">schema</span> <span class="o">==</span> <span class="s2">&quot;endpoints&quot;</span>
+    <span class="k">except</span> <span class="n">MlflowException</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+
+<span class="k">def</span> <span class="nf">_get_model_from_deployment_endpoint_uri</span><span class="p">(</span>
+    <span class="n">endpoint_uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">mlflow.metrics.genai.model_utils</span> <span class="kn">import</span> <span class="n">_call_deployments_api</span><span class="p">,</span> <span class="n">_parse_model_uri</span>
+    <span class="kn">from</span> <span class="nn">mlflow.pyfunc.model</span> <span class="kn">import</span> <span class="n">_PythonModelPyfuncWrapper</span>
+
+    <span class="k">class</span> <span class="nc">ModelFromDeploymentEndpoint</span><span class="p">(</span><span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">PythonModel</span><span class="p">):</span>
+        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span> <span class="o">=</span> <span class="n">endpoint</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">params</span>
+
+        <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">model_input</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">model_input</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;The number of input columns must be 1, but got </span><span class="si">{</span><span class="n">model_input</span><span class="o">.</span><span class="n">columns</span><span class="si">}</span><span class="s2">. &quot;</span>
+                    <span class="s2">&quot;Multi-column input is not supported for evaluating an MLflow Deployments &quot;</span>
+                    <span class="s2">&quot;endpoint. Please include the input text or payload in a single column.&quot;</span><span class="p">,</span>
+                    <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="n">input_column</span> <span class="o">=</span> <span class="n">model_input</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="n">predictions</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">model_input</span><span class="p">[</span><span class="n">input_column</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="c1"># If the input data is a string, we will construct the request payload from it.</span>
+                    <span class="n">prediction</span> <span class="o">=</span> <span class="n">_call_deployments_api</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                    <span class="c1"># If the input data is a dictionary, we will directly use it as the request</span>
+                    <span class="c1"># payload, with adding the inference parameters if provided.</span>
+                    <span class="n">prediction</span> <span class="o">=</span> <span class="n">_call_deployments_api</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="n">wrap_payload</span><span class="o">=</span><span class="kc">False</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Invalid input column type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s2">. The input data must be either &quot;</span>
+                        <span class="s2">&quot;a string or a dictionary contains the request payload for evaluating an &quot;</span>
+                        <span class="s2">&quot;MLflow Deployments endpoint.&quot;</span><span class="p">,</span>
+                        <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
+                    <span class="p">)</span>
+
+                <span class="n">predictions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">predictions</span><span class="p">)</span>
+
+    <span class="n">prefix</span><span class="p">,</span> <span class="n">endpoint</span> <span class="o">=</span> <span class="n">_parse_model_uri</span><span class="p">(</span><span class="n">endpoint_uri</span><span class="p">)</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="n">params</span> <span class="ow">or</span> <span class="p">{}</span>
+
+    <span class="n">python_model</span> <span class="o">=</span> <span class="n">ModelFromDeploymentEndpoint</span><span class="p">(</span><span class="n">endpoint</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_PythonModelPyfuncWrapper</span><span class="p">(</span><span class="n">python_model</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+
 <div class="viewcode-block" id="evaluate"><a class="viewcode-back" href="../../../../python_api/mlflow.models.html#mlflow.evaluate">[docs]</a><span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span>
     <span class="n">model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1469,6 +1582,7 @@
     <span class="n">env_manager</span><span class="o">=</span><span class="s2">&quot;local&quot;</span><span class="p">,</span>
     <span class="n">model_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">baseline_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">inference_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Evaluate the model performance on given data and selected metrics.</span>
@@ -1696,6 +1810,7 @@
 
 <span class="sd">            - A pyfunc model instance</span>
 <span class="sd">            - A URI referring to a pyfunc model</span>
+<span class="sd">            - A URI referring to an MLflow Deployments endpoint e.g. ``&quot;endpoints:/my-chat&quot;``</span>
 <span class="sd">            - A callable function: This function should be able to take in model input and</span>
 <span class="sd">              return predictions. It should follow the signature of the</span>
 <span class="sd">              :py:func:`predict &lt;mlflow.pyfunc.PyFuncModel.predict&gt;` method. Here&#39;s an example</span>
@@ -1783,6 +1898,10 @@
 <span class="sd">                ``&#39;question-answering&#39;``, ``&#39;text-summarization&#39;``, ``&#39;text&#39;``, and</span>
 <span class="sd">                ``&#39;retriever&#39;`` are experimental and may be changed or removed in a</span>
 <span class="sd">                future release.</span>
+
+<span class="sd">        inference_params: (Optional) A dictionary of inference parameters to be passed to the model</span>
+<span class="sd">            when making predictions, such as ``{&quot;max_tokens&quot;: 100}``. This is only used when</span>
+<span class="sd">            the ``model`` is an MLflow Deployments endpoint URI e.g. ``&quot;endpoints:/my-chat&quot;``</span>
 
 <span class="sd">        dataset_path: (Optional) The path where the data is stored. Must not contain double</span>
 <span class="sd">            quotes (``“``). If specified, the path is logged to the ``mlflow.datasets``</span>
@@ -1972,6 +2091,16 @@
     <span class="kn">from</span> <span class="nn">mlflow.pyfunc</span> <span class="kn">import</span> <span class="n">PyFuncModel</span><span class="p">,</span> <span class="n">_load_model_or_server</span><span class="p">,</span> <span class="n">_ServedPyFuncModel</span>
     <span class="kn">from</span> <span class="nn">mlflow.utils</span> <span class="kn">import</span> <span class="n">env_manager</span> <span class="k">as</span> <span class="n">_EnvManager</span>
 
+    <span class="c1"># Inference params are currently only supported for passing a deployment endpoint as the model.</span>
+    <span class="c1"># TODO: We should support inference_params for other model types</span>
+
+    <span class="k">if</span> <span class="n">inference_params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_is_model_deployment_endpoint_uri</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+            <span class="n">message</span><span class="o">=</span><span class="s2">&quot;The inference_params argument can only be specified when the model &quot;</span>
+            <span class="s2">&quot;is an MLflow Deployments endpoint URI like `endpoints:/my-chat`&quot;</span><span class="p">,</span>
+            <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
+        <span class="p">)</span>
+
     <span class="k">if</span> <span class="n">evaluator_config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">col_mapping</span> <span class="o">=</span> <span class="n">evaluator_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;col_mapping&quot;</span><span class="p">,</span> <span class="p">{})</span>
 
@@ -2046,7 +2175,10 @@
             <span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="n">model</span> <span class="o">=</span> <span class="n">_load_model_or_server</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">env_manager</span><span class="p">,</span> <span class="n">model_config</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">_is_model_deployment_endpoint_uri</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="n">_get_model_from_deployment_endpoint_uri</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">inference_params</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="n">_load_model_or_server</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">env_manager</span><span class="p">,</span> <span class="n">model_config</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">env_manager</span> <span class="o">!=</span> <span class="n">_EnvManager</span><span class="o">.</span><span class="n">LOCAL</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
             <span class="n">message</span><span class="o">=</span><span class="s2">&quot;The model argument must be a string URI referring to an MLflow model when a &quot;</span>
@@ -2096,7 +2228,8 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
             <span class="n">message</span><span class="o">=</span><span class="s2">&quot;The model argument must be a string URI referring to an MLflow model, &quot;</span>
-            <span class="s2">&quot;an instance of `mlflow.pyfunc.PyFuncModel`, a function, or None.&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;an MLflow Deployments endpoint URI, an instance of `mlflow.pyfunc.PyFuncModel`, &quot;</span>
+            <span class="s2">&quot;a function, or None.&quot;</span><span class="p">,</span>
             <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
         <span class="p">)</span>
 
