@@ -489,8 +489,33 @@
     <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">python_model</span><span class="p">):</span>
         <span class="n">python_model</span> <span class="o">=</span> <span class="n">_FunctionPythonModel</span><span class="p">(</span><span class="n">python_model</span><span class="p">,</span> <span class="n">hints</span><span class="p">,</span> <span class="n">signature</span><span class="p">)</span>
     <span class="n">saved_python_model_subpath</span> <span class="o">=</span> <span class="s2">&quot;python_model.pkl&quot;</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">saved_python_model_subpath</span><span class="p">),</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">out</span><span class="p">:</span>
-        <span class="n">cloudpickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">python_model</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">saved_python_model_subpath</span><span class="p">),</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">out</span><span class="p">:</span>
+            <span class="n">cloudpickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">python_model</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="c1"># cloudpickle sometimes raises TypeError instead of PicklingError.</span>
+        <span class="c1"># catching generic Exception and checking message to handle both cases.</span>
+        <span class="k">if</span> <span class="s2">&quot;cannot pickle&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                <span class="s2">&quot;Failed to serialize Python model. Please audit your &quot;</span>
+                <span class="s2">&quot;class variables (e.g. in `__init__()`) for any &quot;</span>
+                <span class="s2">&quot;unpicklable objects. If you&#39;re trying to save an external model &quot;</span>
+                <span class="s2">&quot;in your custom pyfunc, Please use the `artifacts` parameter &quot;</span>
+                <span class="s2">&quot;in `mlflow.pyfunc.save_model()`, and load your external model &quot;</span>
+                <span class="s2">&quot;in the `load_context()` method instead. For example:</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;class MyModel(mlflow.pyfunc.PythonModel):</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;    def load_context(self, context):</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;        model_path = context.artifacts[&#39;my_model_path&#39;]</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;        // custom load logic here</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;        self.model = load_model(model_path)</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;For more information, see our full tutorial at: &quot;</span>
+                <span class="s2">&quot;https://mlflow.org/docs/latest/traditional-ml/creating-custom-pyfunc/index.html&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Full serialization error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span> <span class="kn">from</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">e</span>
+
     <span class="n">custom_model_config_kwargs</span><span class="p">[</span><span class="n">CONFIG_KEY_PYTHON_MODEL</span><span class="p">]</span> <span class="o">=</span> <span class="n">saved_python_model_subpath</span>
 
     <span class="k">if</span> <span class="n">artifacts</span><span class="p">:</span>
