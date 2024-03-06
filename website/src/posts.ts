@@ -27,6 +27,48 @@ export type Release = {
 // Sort by date descending
 export const BLOGS: Blog[] = [
   {
+    title:
+      "Announcing MLflow Enhancements - Deep Learning with MLflow (Part 1)",
+    path: "/blog/Deep Learning",
+    tags: ["Deep Learning"],
+    authors: [
+      {
+        name: "Abe Omorogbe",
+        title: "Product Manager, ML at Databricks",
+        url: "https://www.linkedin.com/in/abeomor/",
+        image_url:
+          "https://media.licdn.com/dms/image/D4E03AQG-dAkLO2hx_Q/profile-displayphoto-shrink_400_400/0/1693252025753?e=1711584000&v=beta&t=02Bl1a73vp7Zpt8ZXSK_BRDF6DIZWAx1l8oSgkWNa5g",
+      },
+      {
+        name: "Hubert Zub",
+        title: "Software Engineer at Databricks",
+        url: "https://www.linkedin.com/in/hubert-zub/",
+        image_url:
+          "https://media.licdn.com/dms/image/C4E03AQH2q6i7fLAYEw/profile-displayphoto-shrink_800_800/0/1517560421922?e=1715212800&v=beta&t=a6pvZTLbC3HlDjdI8lX-hK4yKPjTFekVvJGV10KzVoU",
+      },
+      {
+        name: "Yun Park",
+        title: "Software Engineer at Databricks",
+        url: "https://www.linkedin.com/in/yunpark93/",
+        image_url:
+          "https://media.licdn.com/dms/image/C4D03AQF9NjjBjOdjEg/profile-displayphoto-shrink_800_800/0/1667935373916?e=1715212800&v=beta&t=ULRs--IrSYz7AFpNnkd2xMwVxrSQ32uxf_E5OM8PBnc",
+      },
+      {
+        name: "Chen Qian",
+        title: "Software Engineer at Databricks",
+        url: "https://www.linkedin.com/in/thomas-chen-qian/",
+        image_url:
+          "https://media.licdn.com/dms/image/D5603AQGD9D1GpNtxyA/profile-displayphoto-shrink_800_800/0/1690907771716?e=1715212800&v=beta&t=Tk5aCWH8gpLjPNlvWhsr_xeSgVh3xMc9nl-SSaPnt0s",
+      },
+      {
+        name: "Jesse Chan",
+        title: "Software Engineer at Databricks",
+      },
+    ],
+    date: "2024-03-05",
+    thumbnail: "img/blog/dl-chart-grouping.gif",
+  },
+  {
     title: "2023 Year in Review",
     path: "/blog/mlflow-year-in-review",
     tags: ["MLflow", "2023", "Linux Foundation"],
