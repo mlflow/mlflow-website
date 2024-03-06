@@ -32,7 +32,7 @@ logging of system metrics.
 
 ### System Metrics
 
-This feature allows you to monitor system metrics and identify any hardware issues that might be impacting performance.
+This feature allows you to [monitor system metrics](https://mlflow.org/docs/latest/system-metrics/index.html?highlight=system) and identify any hardware issues that might be impacting performance.
 Metrics such as CPU utilization, Memory usage, disk usage etc., from all nodes in your cluster can now be logged and visualized within the MLflow UI.
 
 ![System Metrics](system-metrics.png)
@@ -165,5 +165,4 @@ rf.fit(X_train, y_train)
 
 ## Feedback
 
-We value your input! Our feature prioritization is guided by feedback from the MLflow late 2023 survey. Look out for our next survey
-later this year, and by participating, you can help ensure that the features you want most are implemented in MLflow.
+We value your input! Our [feature roadmap](https://github.com/orgs/mlflow/projects/4) prioritization is guided by feedback from the [MLflow late 2023 survey](https://www.linkedin.com/feed/update/urn:li:activity:7128154257924513793), [GitHub Issues](https://github.com/mlflow/mlflow) and [Slack](https://mlflow-users.slack.com/join/shared_invite/zt-1iffrtbly-UNU8hV03aV8feUeGmqf_uA#/shared-invite/email). Look out for our next survey later this year, by participating you can help ensure that the features you want are implemented in MLflow. You can also create an [issue on GitHub](https://github.com/mlflow/mlflow) or join our [Slack](https://mlflow-users.slack.com/join/shared_invite/zt-1iffrtbly-UNU8hV03aV8feUeGmqf_uA#/shared-invite/email).
