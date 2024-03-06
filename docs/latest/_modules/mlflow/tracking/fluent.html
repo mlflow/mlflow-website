@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mlflow.tracking.fluent &mdash; MLflow 2.10.3.dev0 documentation</title>
+  <title>mlflow.tracking.fluent &mdash; MLflow 2.11.1.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -56,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="MLflow 2.10.3.dev0 documentation" href="../../../index.html"/>
+    <link rel="top" title="MLflow 2.11.1.dev0 documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
   
@@ -87,7 +87,7 @@
     <a href="../../../index.html" class="wy-nav-top-logo"
       ><img src="../../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.10.3.dev0</span>
+    <span class="version">2.11.1.dev0</span>
   </li>
 </ul>
   </nav>
@@ -1418,31 +1418,45 @@
     <span class="n">MlflowClient</span><span class="p">()</span><span class="o">.</span><span class="n">log_figure</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">figure</span><span class="p">,</span> <span class="n">artifact_file</span><span class="p">,</span> <span class="n">save_kwargs</span><span class="o">=</span><span class="n">save_kwargs</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="log_image"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.log_image">[docs]</a><span class="k">def</span> <span class="nf">log_image</span><span class="p">(</span><span class="n">image</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;numpy.ndarray&quot;</span><span class="p">,</span> <span class="s2">&quot;PIL.Image.Image&quot;</span><span class="p">],</span> <span class="n">artifact_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="log_image"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.log_image">[docs]</a><span class="k">def</span> <span class="nf">log_image</span><span class="p">(</span>
+    <span class="n">image</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;numpy.ndarray&quot;</span><span class="p">,</span> <span class="s2">&quot;PIL.Image.Image&quot;</span><span class="p">],</span>
+    <span class="n">artifact_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">step</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">timestamp</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Log an image as an artifact. The following image objects are supported:</span>
+<span class="sd">    Logs an image in MLflow, supporting two use cases:</span>
 
-<span class="sd">    - `numpy.ndarray`_</span>
-<span class="sd">    - `PIL.Image.Image`_</span>
+<span class="sd">    1. Time-stepped image logging: ideal for tracking changes or progressions through iterative</span>
+<span class="sd">        processes (e.g., during model training phases).</span>
+<span class="sd">        - Usage: `log_image(image, key=key, step=step, timestamp=timestamp)`</span>
+<span class="sd">    2. Artifact file image logging: best suited for static image logging where the image</span>
+<span class="sd">        is saved directly as a file artifact.</span>
+<span class="sd">        - Usage: `log_image(image, artifact_file)`</span>
 
-<span class="sd">    .. _numpy.ndarray:</span>
-<span class="sd">        https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html</span>
+<span class="sd">    The following image formats are supported:</span>
+<span class="sd">        - `numpy.ndarray`_</span>
+<span class="sd">        - `PIL.Image.Image`_</span>
 
-<span class="sd">    .. _PIL.Image.Image:</span>
-<span class="sd">        https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Image</span>
+<span class="sd">        .. _numpy.ndarray:</span>
+<span class="sd">            https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html</span>
+
+<span class="sd">        .. _PIL.Image.Image:</span>
+<span class="sd">            https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Image</span>
 
 <span class="sd">    Numpy array support</span>
-<span class="sd">        - data type (( ) represents a valid value range):</span>
+<span class="sd">        - data types:</span>
 
-<span class="sd">            - bool</span>
-<span class="sd">            - integer (0 ~ 255)</span>
-<span class="sd">            - unsigned integer (0 ~ 255)</span>
-<span class="sd">            - float (0.0 ~ 1.0)</span>
+<span class="sd">            - bool (useful for logging image masks)</span>
+<span class="sd">            - integer [0, 255]</span>
+<span class="sd">            - unsigned integer [0, 255]</span>
+<span class="sd">            - float [0.0, 1.0]</span>
 
 <span class="sd">            .. warning::</span>
 
-<span class="sd">                - Out-of-range integer values will be **clipped** to [0, 255].</span>
-<span class="sd">                - Out-of-range float values will be **clipped** to [0, 1].</span>
+<span class="sd">                - Out-of-range integer values will raise ValueError.</span>
+<span class="sd">                - Out-of-range float values will raise ValueError.</span>
 
 <span class="sd">        - shape (H: height, W: width):</span>
 
@@ -1452,13 +1466,41 @@
 <span class="sd">            - H x W x 4 (an RGBA channel order is assumed)</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        image: Image to log.</span>
-<span class="sd">        artifact_file: The run-relative artifact file path in posixpath format to which</span>
-<span class="sd">            the image is saved (e.g. &quot;dir/image.png&quot;).</span>
+<span class="sd">        run_id: String ID of run.</span>
+<span class="sd">        image: The image object to be logged.</span>
+<span class="sd">        artifact_file: Specifies the path, in POSIX format, where the image</span>
+<span class="sd">            will be stored as an artifact relative to the run&#39;s root directory (for</span>
+<span class="sd">            example, &quot;dir/image.png&quot;). This parameter is kept for backward compatibility</span>
+<span class="sd">            and should not be used together with `key`, `step`, or `timestamp`.</span>
+<span class="sd">        key: Image name for time-stepped image logging.</span>
+<span class="sd">        step: Integer training step (iteration) at which the image was saved.</span>
+<span class="sd">            Defaults to 0.</span>
+<span class="sd">        timestamp: Time when this image was saved. Defaults to the current system time.</span>
 
 <span class="sd">    .. code-block:: python</span>
-<span class="sd">        :test:</span>
-<span class="sd">        :caption: Numpy Example</span>
+<span class="sd">        :caption: Time-stepped image logging numpy example</span>
+
+<span class="sd">        import mlflow</span>
+<span class="sd">        import numpy as np</span>
+
+<span class="sd">        image = np.random.randint(0, 256, size=(100, 100, 3), dtype=np.uint8)</span>
+
+<span class="sd">        with mlflow.start_run():</span>
+<span class="sd">            mlflow.log_image(image, key=&quot;dogs&quot;, step=3)</span>
+
+<span class="sd">    .. code-block:: python</span>
+<span class="sd">        :caption: Time-stepped image logging pillow example</span>
+
+<span class="sd">        import mlflow</span>
+<span class="sd">        from PIL import Image</span>
+
+<span class="sd">        image = Image.new(&quot;RGB&quot;, (100, 100))</span>
+
+<span class="sd">        with mlflow.start_run():</span>
+<span class="sd">            mlflow.log_image(image, key=&quot;dogs&quot;, step=3)</span>
+
+<span class="sd">    .. code-block:: python</span>
+<span class="sd">        :caption: Legacy artifact file image logging numpy example</span>
 
 <span class="sd">        import mlflow</span>
 <span class="sd">        import numpy as np</span>
@@ -1469,8 +1511,7 @@
 <span class="sd">            mlflow.log_image(image, &quot;image.png&quot;)</span>
 
 <span class="sd">    .. code-block:: python</span>
-<span class="sd">        :test:</span>
-<span class="sd">        :caption: Pillow Example</span>
+<span class="sd">        :caption: Legacy artifact file image logging pillow example</span>
 
 <span class="sd">        import mlflow</span>
 <span class="sd">        from PIL import Image</span>
@@ -1481,7 +1522,7 @@
 <span class="sd">            mlflow.log_image(image, &quot;image.png&quot;)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">run_id</span> <span class="o">=</span> <span class="n">_get_or_start_run</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">run_id</span>
-    <span class="n">MlflowClient</span><span class="p">()</span><span class="o">.</span><span class="n">log_image</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">artifact_file</span><span class="p">)</span></div>
+    <span class="n">MlflowClient</span><span class="p">()</span><span class="o">.</span><span class="n">log_image</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">artifact_file</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="log_table"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.log_table">[docs]</a><span class="nd">@experimental</span>
@@ -2484,7 +2525,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../../',
-      VERSION:'2.10.3.dev0',
+      VERSION:'2.11.1.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',
