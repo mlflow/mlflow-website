@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mlflow.langchain &mdash; MLflow 2.11.1.dev0 documentation</title>
+  <title>mlflow.langchain &mdash; MLflow 2.11.2.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -56,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="MLflow 2.11.1.dev0 documentation" href="../../index.html"/>
+    <link rel="top" title="MLflow 2.11.2.dev0 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
@@ -87,7 +87,7 @@
     <a href="../../index.html" class="wy-nav-top-logo"
       ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.11.1.dev0</span>
+    <span class="version">2.11.2.dev0</span>
   </li>
 </ul>
   </nav>
@@ -214,6 +214,7 @@
 <span class="sd">.. _LangChain:</span>
 <span class="sd">    https://python.langchain.com/en/latest/index.html</span>
 <span class="sd">&quot;&quot;&quot;</span>
+
 <span class="kn">import</span> <span class="nn">contextlib</span>
 <span class="kn">import</span> <span class="nn">functools</span>
 <span class="kn">import</span> <span class="nn">logging</span>
@@ -240,7 +241,10 @@
 <span class="kn">from</span> <span class="nn">mlflow.langchain.runnables</span> <span class="kn">import</span> <span class="n">_load_runnables</span><span class="p">,</span> <span class="n">_save_runnables</span>
 <span class="kn">from</span> <span class="nn">mlflow.langchain.utils</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">_BASE_LOAD_KEY</span><span class="p">,</span>
+    <span class="n">_MODEL_DATA_FOLDER_NAME</span><span class="p">,</span>
+    <span class="n">_MODEL_DATA_PKL_FILE_NAME</span><span class="p">,</span>
     <span class="n">_MODEL_LOAD_KEY</span><span class="p">,</span>
+    <span class="n">_PERSIST_DIR_NAME</span><span class="p">,</span>
     <span class="n">_RUNNABLE_LOAD_KEY</span><span class="p">,</span>
     <span class="n">_load_base_lcs</span><span class="p">,</span>
     <span class="n">_save_base_lcs</span><span class="p">,</span>
@@ -286,6 +290,9 @@
 
 <span class="n">FLAVOR_NAME</span> <span class="o">=</span> <span class="s2">&quot;langchain&quot;</span>
 <span class="n">_MODEL_TYPE_KEY</span> <span class="o">=</span> <span class="s2">&quot;model_type&quot;</span>
+
+
+<span class="n">model_data_artifact_paths</span> <span class="o">=</span> <span class="p">[</span><span class="n">_MODEL_DATA_FOLDER_NAME</span><span class="p">,</span> <span class="n">_MODEL_DATA_PKL_FILE_NAME</span><span class="p">,</span> <span class="n">_PERSIST_DIR_NAME</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="get_default_pip_requirements"><a class="viewcode-back" href="../../python_api/mlflow.langchain.html#mlflow.langchain.get_default_pip_requirements">[docs]</a><span class="k">def</span> <span class="nf">get_default_pip_requirements</span><span class="p">():</span>
@@ -392,6 +399,9 @@
 <span class="sd">            Here is the code snippet for logging a RetrievalQA chain with `loader_fn`</span>
 <span class="sd">            and `persist_dir`:</span>
 
+<span class="sd">            .. Note:: In langchain_community &gt;= 0.0.27, loading pickled data requires providing the</span>
+<span class="sd">                ``allow_dangerous_deserialization`` argument.</span>
+
 <span class="sd">            .. code-block:: python</span>
 
 <span class="sd">                qa = RetrievalQA.from_llm(llm=OpenAI(), retriever=db.as_retriever())</span>
@@ -399,7 +409,13 @@
 
 <span class="sd">                def load_retriever(persist_directory):</span>
 <span class="sd">                    embeddings = OpenAIEmbeddings()</span>
-<span class="sd">                    vectorstore = FAISS.load_local(persist_directory, embeddings)</span>
+<span class="sd">                    vectorstore = FAISS.load_local(</span>
+<span class="sd">                        persist_directory,</span>
+<span class="sd">                        embeddings,</span>
+<span class="sd">                        # you may need to add the line below</span>
+<span class="sd">                        # for langchain_community &gt;= 0.0.27</span>
+<span class="sd">                        allow_dangerous_deserialization=True,</span>
+<span class="sd">                    )</span>
 <span class="sd">                    return vectorstore.as_retriever()</span>
 
 
@@ -617,6 +633,9 @@
 <span class="sd">            Here is the code snippet for logging a RetrievalQA chain with `loader_fn`</span>
 <span class="sd">            and `persist_dir`:</span>
 
+<span class="sd">            .. Note:: In langchain_community &gt;= 0.0.27, loading pickled data requires providing the</span>
+<span class="sd">                ``allow_dangerous_deserialization`` argument.</span>
+
 <span class="sd">            .. code-block:: python</span>
 
 <span class="sd">                qa = RetrievalQA.from_llm(llm=OpenAI(), retriever=db.as_retriever())</span>
@@ -624,7 +643,13 @@
 
 <span class="sd">                def load_retriever(persist_directory):</span>
 <span class="sd">                    embeddings = OpenAIEmbeddings()</span>
-<span class="sd">                    vectorstore = FAISS.load_local(persist_directory, embeddings)</span>
+<span class="sd">                    vectorstore = FAISS.load_local(</span>
+<span class="sd">                        persist_directory,</span>
+<span class="sd">                        embeddings,</span>
+<span class="sd">                        # you may need to add the line below</span>
+<span class="sd">                        # for langchain_community &gt;= 0.0.27</span>
+<span class="sd">                        allow_dangerous_deserialization=True,</span>
+<span class="sd">                    )</span>
 <span class="sd">                    return vectorstore.as_retriever()</span>
 
 
@@ -1020,7 +1045,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../',
-      VERSION:'2.11.1.dev0',
+      VERSION:'2.11.2.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

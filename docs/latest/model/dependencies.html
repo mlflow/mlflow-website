@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Managing Dependencies in MLflow Models &mdash; MLflow 2.11.1.dev0 documentation</title>
+  <title>Managing Dependencies in MLflow Models &mdash; MLflow 2.11.2.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -56,7 +56,7 @@
         <link rel="index" title="Index"
               href="../genindex.html"/>
         <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="MLflow 2.11.1.dev0 documentation" href="../index.html"/>
+    <link rel="top" title="MLflow 2.11.2.dev0 documentation" href="../index.html"/>
         <link rel="up" title="MLflow Models" href="../models.html"/>
         <link rel="next" title="MLflow Model Signatures and Input Examples Guide" href="/signatures.html"/>
         <link rel="prev" title="MLflow Models" href="/../models.html"/> 
@@ -89,7 +89,7 @@
     <a href="../index.html" class="wy-nav-top-logo"
       ><img src="../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.11.1.dev0</span>
+    <span class="version">2.11.2.dev0</span>
   </li>
 </ul>
   </nav>
@@ -485,8 +485,6 @@ This way, MLflow will copy the entire <code class="docutils literal notranslate"
         <span class="n">input_example</span><span class="o">=</span><span class="n">input_data</span><span class="p">,</span>
         <span class="n">code_paths</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;src&quot;</span><span class="p">],</span>  <span class="c1"># the whole /src directory will be saved at code/src</span>
     <span class="p">)</span>
-
-<span class="c1"># =&gt; This will work</span>
 </pre></div>
 </div>
 <div class="admonition warning">
@@ -541,7 +539,14 @@ Please refer to <a class="reference internal" href="../python_api/mlflow.models.
 </div>
 </div></div>
 <p>Using the <a class="reference internal" href="../python_api/mlflow.models.html#mlflow.models.predict" title="mlflow.models.predict"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.models.predict()</span></code></a> API is convenient for testing your model and inference environment quickly.
-However, it may not be a perfect simulation of the serving because it does not start the online inference server.</p>
+However, it may not be a perfect simulation of the serving because it does not start the online inference server. That
+said, it’s a great way to test whether your prediction inputs are correctly formatted.</p>
+<p>Formatting is subject to the types supported by the <code class="docutils literal notranslate"><span class="pre">predict()</span></code> method of your logged model. If the model was logged with a
+signature, the input data should be viewable from the MLflow UI or via <a class="reference internal" href="../python_api/mlflow.models.html#mlflow.models.get_model_info" title="mlflow.models.get_model_info"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.models.get_model_info()</span></code></a>,
+which has the field <code class="docutils literal notranslate"><span class="pre">signature</span></code>.</p>
+<p>More generally, MLflow has the ability to support a variety of flavor-specfic input types, such as a tensorflow tensor.
+MLflow also supports types that are not specific to a given flavor, such as a pandas DataFrame, numpy ndarray, python Dict,
+python List, scipy.sparse matrix, and spark data frame.</p>
 </div>
 <div class="section" id="testing-online-inference-endpoint-with-a-virtual-environment">
 <h3>Testing online inference endpoint with a virtual environment<a class="headerlink" href="#testing-online-inference-endpoint-with-a-virtual-environment" title="Permalink to this headline"> </a></h3>
@@ -582,7 +587,7 @@ curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </spa
 <div class="section" id="troubleshooting">
 <span id="model-dependencies-troubleshooting"></span><h2><a class="toc-backref" href="#id10">Troubleshooting</a><a class="headerlink" href="#troubleshooting" title="Permalink to this headline"> </a></h2>
 <div class="section" id="how-to-fix-dependency-errors-when-serving-my-model">
-<span id="how-to-fix-dependency-errors-in-model"></span><h3>How to fix dependency errors when serving my model?<a class="headerlink" href="#how-to-fix-dependency-errors-when-serving-my-model" title="Permalink to this headline"> </a></h3>
+<span id="how-to-fix-dependency-errors-in-model"></span><h3>How to Fix Dependency Errors when Serving my Model<a class="headerlink" href="#how-to-fix-dependency-errors-when-serving-my-model" title="Permalink to this headline"> </a></h3>
 <p>One of the most common issues experienced during model deployment centers around dependency issues. When logging or saving your model, MLflow tries to infer the
 model dependencies and save them as part of the MLflow Model metadata. However, this might not always be complete and miss some dependencies e.g. [extras] dependencies
 for certain libraries. This can cause errors when serving your model, such as “ModuleNotFoundError” or “ImportError”. Below are some steps that can help to diagnose
@@ -611,21 +616,26 @@ actually needing to re-log the model repeatedly while troubleshooting the instal
 <div aria-label="Tabbed content" role="tablist"><button aria-controls="panel-1-UHl0aG9u" aria-selected="true" class="sphinx-tabs-tab code-tab group-tab" id="tab-1-UHl0aG9u" name="UHl0aG9u" role="tab" tabindex="0">Python</button><button aria-controls="panel-1-QmFzaA==" aria-selected="false" class="sphinx-tabs-tab code-tab group-tab" id="tab-1-QmFzaA==" name="QmFzaA==" role="tab" tabindex="-1">Bash</button></div><div aria-labelledby="tab-1-UHl0aG9u" class="sphinx-tabs-panel code-tab group-tab" id="panel-1-UHl0aG9u" name="UHl0aG9u" role="tabpanel" tabindex="0"><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
 
 <span class="n">mlflow</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span>
-    <span class="n">model_uri</span><span class="o">=</span><span class="s2">&quot;runs:/&lt;run_id&gt;/model&quot;</span><span class="p">,</span>
+    <span class="n">model_uri</span><span class="o">=</span><span class="s2">&quot;runs:/&lt;run_id&gt;/&lt;model_path&gt;&quot;</span><span class="p">,</span>
     <span class="n">input_data</span><span class="o">=&lt;</span><span class="n">input_data</span><span class="o">&gt;</span><span class="p">,</span>
     <span class="n">pip_requirements_override</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;opencv-python==4.8.0&quot;</span><span class="p">],</span>
 <span class="p">)</span>
 </pre></div>
 </div>
 </div><div aria-labelledby="tab-1-QmFzaA==" class="sphinx-tabs-panel code-tab group-tab" hidden="true" id="panel-1-QmFzaA==" name="QmFzaA==" role="tabpanel" tabindex="0"><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mlflow<span class="w"> </span>models<span class="w"> </span>predict<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>-m<span class="w"> </span>runs:/&lt;run_id&gt;/model<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>-i<span class="w"> </span>&lt;input_path&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-m<span class="w"> </span>runs:/&lt;run_id&gt;/&lt;model_path&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-I<span class="w"> </span>&lt;input_path&gt;<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--pip-requirements-override<span class="w"> </span>opencv-python<span class="o">==</span><span class="m">4</span>.8.0
 </pre></div>
 </div>
 </div></div>
 <p>The specified dependencies will be installed to the virtual environment in addition to (or instead of) the dependencies
 defined in the model metadata. Since this doesn’t mutate the model, you can iterate quickly and safely to find the correct dependencies.</p>
+<p>Note that for <code class="docutils literal notranslate"><span class="pre">input_data</span></code> parameter in the python implementation, the function takes a Python object that is supported by your
+model’s <code class="docutils literal notranslate"><span class="pre">predict()</span></code> function. Some examples may include flavor-specific input types, such as a
+tensorflow tensor, or more generic types such as a pandas DataFrame, numpy ndarray, python Dict, or
+python List. When working with the CLI, we cannot pass python objects and instead look to pass the path
+to a CSV or JSON file containing the input payload.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">pip-requirements-override</span></code> option is available since MLflow 2.10.0.</p>
@@ -645,10 +655,15 @@ To do so, specify the <code class="docutils literal notranslate"><span class="pr
 <span class="p">)</span>
 </pre></div>
 </div>
+<p>Note that you can also leverage the CLI to update model dependencies in-place and thereby avoid
+re-logging the model.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mlflow<span class="w"> </span>models<span class="w"> </span>update-pip-requirements<span class="w"> </span>-m<span class="w"> </span>runs:/&lt;run_id&gt;/&lt;model_path&gt;<span class="w"> </span>add<span class="w"> </span><span class="s2">&quot;opencv-python==4.8.0&quot;</span>
+</pre></div>
+</div>
 </div>
 </div>
 <div class="section" id="how-to-migrate-anaconda-dependency-for-license-change">
-<h3>How to migrate Anaconda Dependency for License Change<a class="headerlink" href="#how-to-migrate-anaconda-dependency-for-license-change" title="Permalink to this headline"> </a></h3>
+<h3>How to Migrate Anaconda Dependency for License Change<a class="headerlink" href="#how-to-migrate-anaconda-dependency-for-license-change" title="Permalink to this headline"> </a></h3>
 <p>Anaconda Inc. updated their <a class="reference external" href="https://www.anaconda.com/terms-of-service">terms of service</a> for anaconda.org channels. Based on the new terms of service you may require a commercial license if you rely on Anaconda’s packaging and distribution. See <a class="reference external" href="https://www.anaconda.com/blog/anaconda-commercial-edition-faq">Anaconda Commercial Edition FAQ</a> for more information. Your use of any Anaconda channels is governed by their terms of service.</p>
 <p>MLflow models logged before <a class="reference external" href="https://mlflow.org/news/2021/06/18/1.18.0-release/index.html">v1.18</a> were by default logged with the conda <code class="docutils literal notranslate"><span class="pre">defaults</span></code> channel (<a class="reference external" href="https://repo.anaconda.com/pkgs/">https://repo.anaconda.com/pkgs/</a>) as a dependency. Because of this license change, MLflow has stopped the use of the <code class="docutils literal notranslate"><span class="pre">defaults</span></code> channel for models logged using MLflow v1.18 and above. The default channel logged is now <code class="docutils literal notranslate"><span class="pre">conda-forge</span></code>, which points at the community managed <a class="reference external" href="https://conda-forge.org/">https://conda-forge.org/</a>.</p>
 <p>If you logged a model before MLflow v1.18 without excluding the <code class="docutils literal notranslate"><span class="pre">defaults</span></code> channel from the conda environment for the model, that model may have a dependency on the <code class="docutils literal notranslate"><span class="pre">defaults</span></code> channel that you may not have intended.
@@ -709,7 +724,7 @@ To manually confirm whether a model has this dependency, you can examine the <co
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../',
-      VERSION:'2.11.1.dev0',
+      VERSION:'2.11.2.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

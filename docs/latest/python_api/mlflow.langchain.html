@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mlflow.langchain &mdash; MLflow 2.11.1.dev0 documentation</title>
+  <title>mlflow.langchain &mdash; MLflow 2.11.2.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -56,7 +56,7 @@
         <link rel="index" title="Index"
               href="../genindex.html"/>
         <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="MLflow 2.11.1.dev0 documentation" href="../index.html"/>
+    <link rel="top" title="MLflow 2.11.2.dev0 documentation" href="../index.html"/>
         <link rel="up" title="Python API" href="index.html"/>
         <link rel="next" title="mlflow.lightgbm" href="/mlflow.lightgbm.html"/>
         <link rel="prev" title="mlflow.keras" href="/mlflow.keras.html"/> 
@@ -88,7 +88,7 @@
     <a href="../index.html" class="wy-nav-top-logo"
       ><img src="../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.11.1.dev0</span>
+    <span class="version">2.11.2.dev0</span>
   </li>
 </ul>
   </nav>
@@ -170,6 +170,7 @@
 <li class="toctree-l2"><a class="reference internal" href="mlflow.paddle.html">mlflow.paddle</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.pmdarima.html">mlflow.pmdarima</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.projects.html">mlflow.projects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mlflow.promptflow.html">mlflow.promptflow</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.prophet.html">mlflow.prophet</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.pyfunc.html">mlflow.pyfunc</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.pyspark.ml.html">mlflow.pyspark.ml</a></li>
@@ -505,12 +506,23 @@ serialized by LangChain. MLflow logs the content in this directory as
 artifacts in the subdirectory named <cite>persist_dir_data</cite>.</p>
 <p>Here is the code snippet for logging a RetrievalQA chain with <cite>loader_fn</cite>
 and <cite>persist_dir</cite>:</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In langchain_community &gt;= 0.0.27, loading pickled data requires providing the
+<code class="docutils literal notranslate"><span class="pre">allow_dangerous_deserialization</span></code> argument.</p>
+</div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">qa</span> <span class="o">=</span> <span class="n">RetrievalQA</span><span class="o">.</span><span class="n">from_llm</span><span class="p">(</span><span class="n">llm</span><span class="o">=</span><span class="n">OpenAI</span><span class="p">(),</span> <span class="n">retriever</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">as_retriever</span><span class="p">())</span>
 
 
 <span class="k">def</span> <span class="nf">load_retriever</span><span class="p">(</span><span class="n">persist_directory</span><span class="p">):</span>
     <span class="n">embeddings</span> <span class="o">=</span> <span class="n">OpenAIEmbeddings</span><span class="p">()</span>
-    <span class="n">vectorstore</span> <span class="o">=</span> <span class="n">FAISS</span><span class="o">.</span><span class="n">load_local</span><span class="p">(</span><span class="n">persist_directory</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">)</span>
+    <span class="n">vectorstore</span> <span class="o">=</span> <span class="n">FAISS</span><span class="o">.</span><span class="n">load_local</span><span class="p">(</span>
+        <span class="n">persist_directory</span><span class="p">,</span>
+        <span class="n">embeddings</span><span class="p">,</span>
+        <span class="c1"># you may need to add the line below</span>
+        <span class="c1"># for langchain_community &gt;= 0.0.27</span>
+        <span class="n">allow_dangerous_deserialization</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="k">return</span> <span class="n">vectorstore</span><span class="o">.</span><span class="n">as_retriever</span><span class="p">()</span>
 
 
@@ -672,12 +684,23 @@ serialized by LangChain. MLflow logs the content in this directory as
 artifacts in the subdirectory named <cite>persist_dir_data</cite>.</p>
 <p>Here is the code snippet for logging a RetrievalQA chain with <cite>loader_fn</cite>
 and <cite>persist_dir</cite>:</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In langchain_community &gt;= 0.0.27, loading pickled data requires providing the
+<code class="docutils literal notranslate"><span class="pre">allow_dangerous_deserialization</span></code> argument.</p>
+</div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">qa</span> <span class="o">=</span> <span class="n">RetrievalQA</span><span class="o">.</span><span class="n">from_llm</span><span class="p">(</span><span class="n">llm</span><span class="o">=</span><span class="n">OpenAI</span><span class="p">(),</span> <span class="n">retriever</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">as_retriever</span><span class="p">())</span>
 
 
 <span class="k">def</span> <span class="nf">load_retriever</span><span class="p">(</span><span class="n">persist_directory</span><span class="p">):</span>
     <span class="n">embeddings</span> <span class="o">=</span> <span class="n">OpenAIEmbeddings</span><span class="p">()</span>
-    <span class="n">vectorstore</span> <span class="o">=</span> <span class="n">FAISS</span><span class="o">.</span><span class="n">load_local</span><span class="p">(</span><span class="n">persist_directory</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">)</span>
+    <span class="n">vectorstore</span> <span class="o">=</span> <span class="n">FAISS</span><span class="o">.</span><span class="n">load_local</span><span class="p">(</span>
+        <span class="n">persist_directory</span><span class="p">,</span>
+        <span class="n">embeddings</span><span class="p">,</span>
+        <span class="c1"># you may need to add the line below</span>
+        <span class="c1"># for langchain_community &gt;= 0.0.27</span>
+        <span class="n">allow_dangerous_deserialization</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="k">return</span> <span class="n">vectorstore</span><span class="o">.</span><span class="n">as_retriever</span><span class="p">()</span>
 
 
@@ -741,7 +764,7 @@ compatibility.</p></li>
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../',
-      VERSION:'2.11.1.dev0',
+      VERSION:'2.11.2.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

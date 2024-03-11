@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mlflow.models.model &mdash; MLflow 2.11.1.dev0 documentation</title>
+  <title>mlflow.models.model &mdash; MLflow 2.11.2.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -56,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="MLflow 2.11.1.dev0 documentation" href="../../../index.html"/>
+    <link rel="top" title="MLflow 2.11.2.dev0 documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
   
@@ -87,7 +87,7 @@
     <a href="../../../index.html" class="wy-nav-top-logo"
       ><img src="../../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.11.1.dev0</span>
+    <span class="version">2.11.2.dev0</span>
   </li>
 </ul>
   </nav>
@@ -204,6 +204,7 @@
 <span></span><span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">uuid</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
@@ -227,6 +228,7 @@
 <span class="kn">from</span> <span class="nn">mlflow.utils.docstring_utils</span> <span class="kn">import</span> <span class="n">LOG_MODEL_PARAM_DOCS</span><span class="p">,</span> <span class="n">format_docstring</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.environment</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">_CONDA_ENV_FILE_NAME</span><span class="p">,</span>
+    <span class="n">_PYTHON_ENV_FILE_NAME</span><span class="p">,</span>
     <span class="n">_REQUIREMENTS_FILE_NAME</span><span class="p">,</span>
     <span class="n">_add_or_overwrite_requirements</span><span class="p">,</span>
     <span class="n">_get_requirements_from_file</span><span class="p">,</span>
@@ -810,12 +812,48 @@
 <span class="sd">            A :py:class:`ModelInfo &lt;mlflow.models.model.ModelInfo&gt;` instance that contains the</span>
 <span class="sd">            metadata of the logged model.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">mlflow.models.wheeled_model</span> <span class="kn">import</span> <span class="n">_ORIGINAL_REQ_FILE_NAME</span><span class="p">,</span> <span class="n">WheeledModel</span>
+
         <span class="k">with</span> <span class="n">TempDir</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmp</span><span class="p">:</span>
             <span class="n">local_path</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="s2">&quot;model&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">run_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">run_id</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">tracking</span><span class="o">.</span><span class="n">fluent</span><span class="o">.</span><span class="n">_get_or_start_run</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">run_id</span>
             <span class="n">mlflow_model</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">artifact_path</span><span class="o">=</span><span class="n">artifact_path</span><span class="p">,</span> <span class="n">run_id</span><span class="o">=</span><span class="n">run_id</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">)</span>
             <span class="n">flavor</span><span class="o">.</span><span class="n">save_model</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">local_path</span><span class="p">,</span> <span class="n">mlflow_model</span><span class="o">=</span><span class="n">mlflow_model</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+            <span class="c1"># Copy model metadata files to a sub-directory &#39;metadata&#39;,</span>
+            <span class="c1"># For UC sharing use-cases.</span>
+            <span class="n">metadata_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">local_path</span><span class="p">,</span> <span class="s2">&quot;metadata&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">flavor</span><span class="p">,</span> <span class="n">WheeledModel</span><span class="p">):</span>
+                <span class="c1"># wheeled model updates several metadata files in original model directory</span>
+                <span class="c1"># copy these updated metadata files to the &#39;metadata&#39; subdirectory</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">metadata_path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">file_name</span> <span class="ow">in</span> <span class="p">[</span>
+                    <span class="n">MLMODEL_FILE_NAME</span><span class="p">,</span>
+                    <span class="n">_CONDA_ENV_FILE_NAME</span><span class="p">,</span>
+                    <span class="n">_REQUIREMENTS_FILE_NAME</span><span class="p">,</span>
+                    <span class="n">_PYTHON_ENV_FILE_NAME</span><span class="p">,</span>
+                    <span class="n">_ORIGINAL_REQ_FILE_NAME</span><span class="p">,</span>
+                <span class="p">]:</span>
+                    <span class="n">src_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">local_path</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+                    <span class="n">dest_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">metadata_path</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+                    <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">src_file_path</span><span class="p">,</span> <span class="n">dest_file_path</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Copy metadata files to the &#39;metadata&#39; subdirectory</span>
+                <span class="n">model_data_subpaths</span> <span class="o">=</span> <span class="n">flavor</span><span class="o">.</span><span class="n">model_data_artifact_paths</span>
+                <span class="n">non_metadata_subpaths</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;code&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">model_data_subpaths</span><span class="p">]</span>
+                <span class="n">subpaths_list</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">local_path</span><span class="p">)</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">metadata_path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">subpath_name</span> <span class="ow">in</span> <span class="n">subpaths_list</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">subpath_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">non_metadata_subpaths</span><span class="p">:</span>
+                        <span class="n">src_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">local_path</span><span class="p">,</span> <span class="n">subpath_name</span><span class="p">)</span>
+                        <span class="n">dest_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">metadata_path</span><span class="p">,</span> <span class="n">subpath_name</span><span class="p">)</span>
+
+                        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">src_file_path</span><span class="p">):</span>
+                            <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">src_file_path</span><span class="p">,</span> <span class="n">dest_file_path</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">shutil</span><span class="o">.</span><span class="n">copytree</span><span class="p">(</span><span class="n">src_file_path</span><span class="p">,</span> <span class="n">dest_file_path</span><span class="p">)</span>
+
             <span class="n">tracking_uri</span> <span class="o">=</span> <span class="n">_resolve_tracking_uri</span><span class="p">()</span>
             <span class="c1"># We check signature presence here as some flavors have a default signature as a</span>
             <span class="c1"># fallback when not provided by user, which is set during flavor&#39;s save_model() call.</span>
@@ -1039,7 +1077,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../../',
-      VERSION:'2.11.1.dev0',
+      VERSION:'2.11.2.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',
