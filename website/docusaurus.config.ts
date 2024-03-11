@@ -101,6 +101,10 @@ const config: Config = {
             from: "/blog/2023/10/31/mlflow-docs-overhaul",
             to: "/blog/mlflow-docs-overhaul",
           },
+          {
+            from: "/blog/Deep Learning",
+            to: "/blog/deep-learning-part-1",
+          },
         ],
       },
     ],

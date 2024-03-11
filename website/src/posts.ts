@@ -29,7 +29,7 @@ export const BLOGS: Blog[] = [
   {
     title:
       "Announcing MLflow Enhancements - Deep Learning with MLflow (Part 1)",
-    path: "/blog/Deep Learning",
+    path: "/blog/deep-learning-part-1",
     tags: ["Deep Learning"],
     authors: [
       {

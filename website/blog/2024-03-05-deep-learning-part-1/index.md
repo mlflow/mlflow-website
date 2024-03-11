@@ -1,7 +1,7 @@
 ---
 title: Announcing MLflow Enhancements - Deep Learning with MLflow (Part 1)
 description: Highlighting the recent improvements in MLflow for Deep Learning workflows
-slug: Deep Learning
+slug: deep-learning-part-1
 authors: [abe-omorogbe, hubert-zub, yun-park, chen-qian, jesse-chan]
 tags: [Deep Learning]
 thumbnail: img/blog/dl-chart-grouping.gif
