@@ -12,13 +12,26 @@ thumbnail: img/blog/dl-chart-grouping.gif
 In the realm of deep learning, finetuning of pre-trained Large Language Models (LLMs) on private datasets stands as a critical application. This practice is not only common but also essential for developing specialized models, particularly for tasks like custom Named Entity Recognition (NER). In such scenarios, tools like MLflow are invaluable. They ensure that every aspect of the training process - metrics, parameters, and artifacts - are reproducibly tracked, logged, analyzed, compared, and shared. In this tutorial we are going to be using [MLflow 2.11](https://mlflow.org/releases/2.11.0) and [the new MLflow Deep Learning features](https://mlflow.org/blog/deep-learning-part-1) to track all the important aspects of this project.
 
 
-# Use Case: Fine Tuning Llama2-7B for NER 
+# Use Case: Fine Tuning Llama2-7B for NER on Restaurant data
 
-A prime example of this application is the finetuning of an Llama2-7B pre-trained model for instruction following. The goal is to extract structured information from unstructured text, a task central to NER.  Selecting the Llama2 7B model is a strategic decision. Its size strikes a perfect balance, having a large enough parameter count to handle intricate tasks while remaining compact enough for fine tuning on a modest cluster of less powerful GPUs like Nvidia T4s, thanks to Parameter Efficient Fine Tuning (PEFT) methods. Additionally, it can be finetuned on a single A100 GPU utilizing PEFT techniques quite easily.
+Let's consider fine-tuning a Llama2-7B model for following instructions embedded within text. This is a specific example of how Parameter-Efficient Fine-Tuning (PEFT) can be applied for real-world tasks. The goal here is to  extract structured information based on instructions, which goes beyond simple Named Entity Recognition (NER).
 
-![](NER.png)
+Imagine a scenario where the instruction is: `The Punter is an expensive Chinese coffee shop located near Café Sicilia.` The model, after fine-tuning, would then process the unstructured text of the sentence and identify the entities, presenting them in a structured format like a list. 
 
-[Named Entity Recognition ](https://www.turing.com/kb/a-comprehensive-guide-to-named-entity-recognition)example
+Example of extracting information from `The Punter is an expensive Chinese coffee shop located near Café Sicilia.`: 
+```python
+Business name: The Punter
+Cusine: Chinese
+descriptor: expensive
+location: Café Sicilia
+```
+
+The Llama2-7B model's size is strategically chosen. It has enough parameters (complexity) to handle intricate tasks like understanding instructions within text, but remains  compact enough for fine-tuning on even a modest cluster of less powerful GPUs like Nvidia T4s, thanks to PEFT methods. It can even be fine-tuned on a single high-end A100 GPU with PEFT.
+
+PEFT techniques focus on keeping the pre-trained model parameters frozen and only training a small number of additional layers for the specific task. This saves memory and training time.
+
+Overall, fine-tuning Llama2-7B with PEFT is a promising approach for instruction following tasks and similar applications that require working with large models on limited resources.
+
 
 
 # Setting Up MLflow for Fine tuning
@@ -26,6 +39,8 @@ A prime example of this application is the finetuning of an Llama2-7B pre-traine
 The code provided below illustrates the setup for Fine tuning, augmented with MLflow integration. We have marked the sections used for MLflow tracking. At the beginning of the functions, MLflow is configured, initiating a run that automatically logs the experiment. The details of  `callback.py` will be discussed in a later section.
 
 This example demonstrates how to set up a fine tuning job on Databricks. A similar setup can be achieved on any platform capable of supporting this type of workload.
+
+We are using the [e2e_nlg](https://huggingface.co/datasets/e2e_nlg) dataset as it is a great dataset is used for training end-to-end, data-driven natural language generation systems in the restaurant domain
 
 ```bash
 !export DATABRICKS_TOKEN && export DATABRICKS_HOST && export MLFLOW_EXPERIMENT_NAME && export MLFLOW_FLATTEN_PARAMS &&  \
@@ -106,20 +121,20 @@ The custom callback gracefully saves the model checkpoints during the finetuning
 
 ## Scaling and Platform Considerations for Training
 
-To effectively scale the finetuning of your training, it's essential to select the right platform infrastructure that offers the necessary compute resources. Platforms like Databricks and other cloud services provide options for both single-node multi-GPU finetuning and multi-node multi-GPU training, which are crucial for scaling your processes. Coupled with efficient library management on the Databricks platform, these resources can significantly streamline the development process.
+To effectively scale the finetuning of your training, it's essential to select the right platform infrastructure that offers the necessary compute resources. Platforms like Databricks provide options for both single-node multi-GPU finetuning and multi-node multi-GPU training, which are crucial for scaling your processes. Coupled with efficient library management on the Databricks platform, these resources can significantly streamline the development process.
 
 
 # Visualization and Sharing Capabilities on MLflow
 
 One of the most powerful features of MLFlow is its [newly introduced visualization capabilities](https://mlflow.org/blog/deep-learning-part-1). These tools enable users to make comparisons across different runs and artifacts. Such visualizations can be integrated into dashboards, facilitating easy sharing with both internal and external stakeholders. Additionally, the centralized storage of metadata allows for effective analysis of performance metrics, like identifying minima and maxima in model performance.
 
-![](mlflow_run_details.png)
-
-Run Details
-
 ![](deep_learning_charts_view.png)
 
 Visualizing and comparing curve with MLflow and grouping charts
+
+![](mlflow_run_details.png)
+
+Run Details
 
 ![](deep_learning_logged_model.png)
 
@@ -141,6 +156,16 @@ With your training process meticulously tracked and logged by MLflow, you have t
 
 In our example, we focus on the model checkpoint from the 900th epoch. We'll demonstrate how to test this model using a specific prompt and set parameters.
 
+Example using the instruction `The Restaurant Gymkhana near Marlybenone station has a high customer star rating and offers a unique Indian cuisines`
+
+Output Before Finetuning:
+
+```
+['Organization[Restaurant Gymkhana], Location[Marlybenone], Nationality[Indian], Food[cuisines]']
+```
+
+Output After 900 epochs of Fine Tuning:
+
 ```python
 import mlflow
 
@@ -148,11 +173,15 @@ loaded_model = mlflow.pyfunc.load_model(f"runs:/4b32ccd588794530bd66fd3557c4d42c
 
 # Make a prediction using the loaded model
 loaded_model.predict(
-    {"prompt": "check out Gaucho , near convent garden cost $50 for 2, nice columbian dishes",
+    {"prompt": "The Restaurant Gymkhana near Marlybenone station has a high customer star rating and offers a unique Indian cuisines",
      "temperature": 0.4,
      "max_tokens": 128,
     }
 )
+```
+
+```
+['name[Gymkhana], eatType[restaurant], food[Indian], customer rating[high] near[Marlybenone] near[station]']
 ```
 
 # Summary
@@ -171,7 +200,7 @@ Notebook: [Fine Tuning LLMs with MLflow: Deep Learning with MLflow](https://gith
 Dive into the latest MLflow updates today and enhance the way you manage your machine learning projects! With our newest enhancements, including advanced metric aggregation, automatic capturing of system metrics, intuitive feature grouping, and streamlined search capabilities, MLflow is here to elevate your data science workflow to new heights. [Get started now with MLflow's cutting-edge tools and features. ](https://mlflow.org/releases/2.11.0)
 
 ```bash
-pip install mlflow==2.11
+pip install mlflow==2.11.*
 
 mlflow ui --port 8080
 ```
