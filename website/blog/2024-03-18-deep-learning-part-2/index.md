@@ -14,19 +14,19 @@ In the realm of deep learning, finetuning of pre-trained Large Language Models (
 
 # Use Case: Fine Tuning Llama2-7B for NER on Restaurant data
 
-Let's consider fine-tuning a Llama2-7B model for following instructions embedded within text. This is a specific example of how Parameter-Efficient Fine-Tuning (PEFT) can be applied for real-world tasks. The goal here is to  extract structured information based on instructions, which goes beyond simple Named Entity Recognition (NER).
+Let's consider the use case of fine-tuning a Llama2-7B model for use as a tool for extracting instructive contexts that are embedded within bodies of text. This is a specific example of how Parameter-Efficient Fine-Tuning (PEFT) can be applied for real-world tasks. The goal here is to  extract structured information based on instructions, which goes beyond simple Named Entity Recognition (NER).
 
 Imagine a scenario where the instruction is: `The Punter is an expensive Chinese coffee shop located near Café Sicilia.` The model, after fine-tuning, would then process the unstructured text of the sentence and identify the entities, presenting them in a structured format like a list. 
 
 Example of extracting information from `The Punter is an expensive Chinese coffee shop located near Café Sicilia.`: 
 ```python
 Business name: The Punter
-Cusine: Chinese
+Cuisine: Chinese
 descriptor: expensive
 location: Café Sicilia
 ```
 
-The Llama2-7B model's size is strategically chosen. It has enough parameters (complexity) to handle intricate tasks like understanding instructions within text, but remains  compact enough for fine-tuning on even a modest cluster of less powerful GPUs like Nvidia T4s, thanks to PEFT methods. It can even be fine-tuned on a single high-end A100 GPU with PEFT.
+The Llama2-7B model's size is strategically chosen. It has enough parameters (complexity) to handle intricate tasks like understanding instructions within text, but remains compact enough for fine-tuning on even a modest cluster of less powerful GPUs like Nvidia T4s, thanks to the PEFT methodology. It can even be fine-tuned on a single high-end A100 GPU with PEFT.
 
 PEFT techniques focus on keeping the pre-trained model parameters frozen and only training a small number of additional layers for the specific task. This saves memory and training time.
 
@@ -78,7 +78,7 @@ The diagram below is a visualization of how finetuning and MLflow fit together.
 
 ![](finetune_with_MLflow.png)
 
-Using MLflow while fine tuning ML model in Databricks
+Using MLflow while fine tuning a DL model in Databricks
 
 
 # The Importance of Logging
