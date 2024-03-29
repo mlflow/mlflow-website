@@ -4,7 +4,6 @@ about: Propose new blog post content
 title: "[BLOG]"
 labels: ''
 assignees: BenWilson2
-
 ---
 
 ## Summary
