@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mlflow.sagemaker &mdash; MLflow 2.11.2.dev0 documentation</title>
+  <title>mlflow.sagemaker &mdash; MLflow 2.11.4.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -56,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="MLflow 2.11.2.dev0 documentation" href="../../index.html"/>
+    <link rel="top" title="MLflow 2.11.4.dev0 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
@@ -87,7 +87,7 @@
     <a href="../../index.html" class="wy-nav-top-logo"
       ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.11.2.dev0</span>
+    <span class="version">2.11.4.dev0</span>
   </li>
 </ul>
   </nav>
@@ -1558,16 +1558,42 @@
     <span class="k">return</span> <span class="n">deployment_config</span>
 
 
+<span class="k">def</span> <span class="nf">_truncate_name</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">max_length</span><span class="p">):</span>
+    <span class="c1"># NB: Sagemaker prevents the registration of models and configurations whose names</span>
+    <span class="c1"># exceed 63 characters in length. For reference:</span>
+    <span class="c1"># https://docs.aws.amazon.com/sagemaker/latest/APIReference/API_Model.html</span>
+    <span class="c1"># https://docs.aws.amazon.com/sagemaker/latest/APIReference/API_TransformJob.html</span>
+    <span class="c1"># https://docs.aws.amazon.com/sagemaker/latest/APIReference/API_ModelConfiguration.html</span>
+    <span class="c1"># This function middle-truncates the name provided to</span>
+    <span class="c1"># ensure that the least critical name information is not lost</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">max_length</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">name</span>
+    <span class="n">available_length</span> <span class="o">=</span> <span class="n">max_length</span> <span class="o">-</span> <span class="mi">3</span>
+    <span class="n">start_len</span> <span class="o">=</span> <span class="n">available_length</span> <span class="o">//</span> <span class="mi">2</span>
+    <span class="n">end_len</span> <span class="o">=</span> <span class="n">available_length</span> <span class="o">-</span> <span class="n">start_len</span>
+    <span class="n">truncated_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="p">[:</span><span class="n">start_len</span><span class="p">]</span><span class="si">}</span><span class="s2">---</span><span class="si">{</span><span class="n">name</span><span class="p">[</span><span class="o">-</span><span class="n">end_len</span><span class="p">:]</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Truncated name </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">truncated_name</span><span class="si">}</span><span class="s2"> to coerce total character counts to &lt; 64&quot;</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">truncated_name</span>
+
+
+<span class="k">def</span> <span class="nf">_get_unique_name</span><span class="p">(</span><span class="n">base_name</span><span class="p">,</span> <span class="n">unique_suffix</span><span class="p">,</span> <span class="n">unique_id_length</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
+    <span class="n">unique_resource_string</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">unique_suffix</span><span class="si">}{</span><span class="n">get_unique_resource_id</span><span class="p">(</span><span class="n">unique_id_length</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">max_length</span> <span class="o">=</span> <span class="mi">63</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_resource_string</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_truncate_name</span><span class="p">(</span><span class="n">base_name</span><span class="p">,</span> <span class="n">max_length</span><span class="p">)</span> <span class="o">+</span> <span class="n">unique_resource_string</span>
+
+
 <span class="k">def</span> <span class="nf">_get_sagemaker_model_name</span><span class="p">(</span><span class="n">endpoint_name</span><span class="p">):</span>
-    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">endpoint_name</span><span class="si">}</span><span class="s2">-model-</span><span class="si">{</span><span class="n">get_unique_resource_id</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">return</span> <span class="n">_get_unique_name</span><span class="p">(</span><span class="n">endpoint_name</span><span class="p">,</span> <span class="s2">&quot;-model-&quot;</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_get_sagemaker_transform_model_name</span><span class="p">(</span><span class="n">job_name</span><span class="p">):</span>
-    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">job_name</span><span class="si">}</span><span class="s2">-model-</span><span class="si">{</span><span class="n">get_unique_resource_id</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">return</span> <span class="n">_get_unique_name</span><span class="p">(</span><span class="n">job_name</span><span class="p">,</span> <span class="s2">&quot;-model-&quot;</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_get_sagemaker_config_name</span><span class="p">(</span><span class="n">endpoint_name</span><span class="p">):</span>
-    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">endpoint_name</span><span class="si">}</span><span class="s2">-config-</span><span class="si">{</span><span class="n">get_unique_resource_id</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">return</span> <span class="n">_get_unique_name</span><span class="p">(</span><span class="n">endpoint_name</span><span class="p">,</span> <span class="s2">&quot;-config-&quot;</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_get_sagemaker_config_tags</span><span class="p">(</span><span class="n">endpoint_name</span><span class="p">):</span>
@@ -3222,7 +3248,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../',
-      VERSION:'2.11.2.dev0',
+      VERSION:'2.11.4.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

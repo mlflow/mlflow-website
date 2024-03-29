@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Sentence Transformers within MLflow &mdash; MLflow 2.11.2.dev0 documentation</title>
+  <title>Sentence Transformers within MLflow &mdash; MLflow 2.11.4.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -56,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="MLflow 2.11.2.dev0 documentation" href="../../../index.html"/>
+    <link rel="top" title="MLflow 2.11.4.dev0 documentation" href="../../../index.html"/>
         <link rel="up" title="MLflow Sentence-Transformers Flavor" href="../index.html"/>
         <link rel="next" title="MLflow LangChain Flavor" href="/../../langchain/index.html"/>
         <link rel="prev" title="Introduction to Advanced Semantic Similarity Analysis with Sentence Transformers and MLflow" href="/../tutorials/semantic-similarity/semantic-similarity-sentence-transformers.html"/> 
@@ -88,7 +88,7 @@
     <a href="../../../index.html" class="wy-nav-top-logo"
       ><img src="../../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.11.2.dev0</span>
+    <span class="version">2.11.4.dev0</span>
   </li>
 </ul>
   </nav>
@@ -267,6 +267,38 @@ and batch inference by adapting the required data structures for <code class="do
 </pre></div>
 </div>
 </div>
+<div class="section" id="saving-sentence-transformers-models-with-an-openai-compatible-inference-interface">
+<h2>Saving Sentence Transformers Models with an OpenAI-Compatible Inference Interface<a class="headerlink" href="#saving-sentence-transformers-models-with-an-openai-compatible-inference-interface" title="Permalink to this headline"> </a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This feature is only available in MLflow 2.11.0 and above.</p>
+</div>
+<p>MLflow’s <code class="docutils literal notranslate"><span class="pre">sentence_transformers</span></code> flavor allows you to pass in the <code class="docutils literal notranslate"><span class="pre">task</span></code> param with the string value <code class="docutils literal notranslate"><span class="pre">&quot;llm/v1/embeddings&quot;</span></code>
+when saving a model with <a class="reference internal" href="../../../python_api/mlflow.sentence_transformers.html#mlflow.sentence_transformers.save_model" title="mlflow.sentence_transformers.save_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.sentence_transformers.save_model()</span></code></a> and <a class="reference internal" href="../../../python_api/mlflow.sentence_transformers.html#mlflow.sentence_transformers.log_model" title="mlflow.sentence_transformers.log_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.sentence_transformers.log_model()</span></code></a>.</p>
+<p>For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">from</span> <span class="nn">sentence_transformers</span> <span class="kn">import</span> <span class="n">SentenceTransformer</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">SentenceTransformer</span><span class="p">(</span><span class="s2">&quot;all-MiniLM-L6-v2&quot;</span><span class="p">)</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">sentence_transformers</span><span class="o">.</span><span class="n">save_model</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s2">&quot;path/to/save/directory&quot;</span><span class="p">,</span> <span class="n">task</span><span class="o">=</span><span class="s2">&quot;llm/v1/embeddings&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>When <code class="docutils literal notranslate"><span class="pre">task</span></code> is set as <code class="docutils literal notranslate"><span class="pre">&quot;llm/v1/embeddings&quot;</span></code>, MLflow handles the following for you:</p>
+<ul class="simple">
+<li><p>Setting an embeddings compatible signature for the model</p></li>
+<li><p>Performing data pre- and post-processing to ensure the inputs and outputs conform to
+the <a class="reference external" href="https://mlflow.org/docs/latest/llms/deployments/index.html#embeddings">Embeddings API spec</a>,
+which is compatible with OpenAI’s API spec.</p></li>
+</ul>
+<p>Note that these modifications only apply when the model is loaded with <a class="reference internal" href="../../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.load_model" title="mlflow.pyfunc.load_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.pyfunc.load_model()</span></code></a> (e.g. when
+serving the model with the <code class="docutils literal notranslate"><span class="pre">mlflow</span> <span class="pre">models</span> <span class="pre">serve</span></code> CLI tool). If you want to load just the base pipeline, you can
+always do so via <a class="reference internal" href="../../../python_api/mlflow.sentence_transformers.html#mlflow.sentence_transformers.load_model" title="mlflow.sentence_transformers.load_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.sentence_transformers.load_model()</span></code></a>.</p>
+<p>Aside from the <code class="docutils literal notranslate"><span class="pre">sentence-transformers</span></code> flavor, the <code class="docutils literal notranslate"><span class="pre">transformers</span></code> flavor also support OpenAI-compatible inference interface (<code class="docutils literal notranslate"><span class="pre">&quot;llm/v1/chat&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;llm/v1/completions&quot;</span></code>). Refer to
+<a class="reference external" href="https://mlflow.org/docs/latest/llms/transformers/guide/index.html#saving-transformer-pipelines-with-an-openai-compatible-inference-interface">the Transformers flavor guide</a> for more information.</p>
+</div>
 <div class="section" id="custom-python-function-implementation">
 <h2>Custom Python Function Implementation<a class="headerlink" href="#custom-python-function-implementation" title="Permalink to this headline"> </a></h2>
 <p>In addition to using pre-built models, you can create custom Python functions with the <cite>sentence_transformers</cite> flavor. Here’s an example of a custom
@@ -373,7 +405,7 @@ implementation for comparing the similarity between text documents:</p>
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../../',
-      VERSION:'2.11.2.dev0',
+      VERSION:'2.11.4.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

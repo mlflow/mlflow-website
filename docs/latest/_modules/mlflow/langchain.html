@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mlflow.langchain &mdash; MLflow 2.11.2.dev0 documentation</title>
+  <title>mlflow.langchain &mdash; MLflow 2.11.4.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -56,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="MLflow 2.11.2.dev0 documentation" href="../../index.html"/>
+    <link rel="top" title="MLflow 2.11.4.dev0 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
@@ -87,7 +87,7 @@
     <a href="../../index.html" class="wy-nav-top-logo"
       ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.11.2.dev0</span>
+    <span class="version">2.11.4.dev0</span>
   </li>
 </ul>
   </nav>
@@ -220,6 +220,7 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">cloudpickle</span>
@@ -234,6 +235,7 @@
     <span class="n">_update_langchain_model_config</span><span class="p">,</span>
     <span class="n">patched_inference</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span> <span class="nn">mlflow.langchain._rag_utils</span> <span class="kn">import</span> <span class="n">_CODE_CONFIG</span><span class="p">,</span> <span class="n">_set_config_path</span>
 <span class="kn">from</span> <span class="nn">mlflow.langchain.databricks_dependencies</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">_DATABRICKS_DEPENDENCY_KEY</span><span class="p">,</span>
     <span class="n">_detect_databricks_dependencies</span><span class="p">,</span>
@@ -279,7 +281,9 @@
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.file_utils</span> <span class="kn">import</span> <span class="n">get_total_file_size</span><span class="p">,</span> <span class="n">write_to</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.model_utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">FLAVOR_CONFIG_CODE</span><span class="p">,</span>
     <span class="n">_add_code_from_conf_to_system_path</span><span class="p">,</span>
+    <span class="n">_add_code_to_system_path</span><span class="p">,</span>
     <span class="n">_get_flavor_configuration</span><span class="p">,</span>
     <span class="n">_validate_and_copy_code_paths</span><span class="p">,</span>
     <span class="n">_validate_and_prepare_target_save_path</span><span class="p">,</span>
@@ -292,7 +296,11 @@
 <span class="n">_MODEL_TYPE_KEY</span> <span class="o">=</span> <span class="s2">&quot;model_type&quot;</span>
 
 
-<span class="n">model_data_artifact_paths</span> <span class="o">=</span> <span class="p">[</span><span class="n">_MODEL_DATA_FOLDER_NAME</span><span class="p">,</span> <span class="n">_MODEL_DATA_PKL_FILE_NAME</span><span class="p">,</span> <span class="n">_PERSIST_DIR_NAME</span><span class="p">]</span>
+<span class="n">model_data_artifact_paths</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">_MODEL_DATA_FOLDER_NAME</span><span class="p">,</span>
+    <span class="n">_MODEL_DATA_PKL_FILE_NAME</span><span class="p">,</span>
+    <span class="n">_PERSIST_DIR_NAME</span><span class="p">,</span>
+<span class="p">]</span>
 
 
 <div class="viewcode-block" id="get_default_pip_requirements"><a class="viewcode-back" href="../../python_api/mlflow.langchain.html#mlflow.langchain.get_default_pip_requirements">[docs]</a><span class="k">def</span> <span class="nf">get_default_pip_requirements</span><span class="p">():</span>
@@ -439,7 +447,30 @@
 
     <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
     <span class="n">_validate_and_prepare_target_save_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-    <span class="n">code_dir_subpath</span> <span class="o">=</span> <span class="n">_validate_and_copy_code_paths</span><span class="p">(</span><span class="n">code_paths</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+    <span class="n">formatted_code_path</span> <span class="o">=</span> <span class="n">code_paths</span><span class="p">[:]</span> <span class="k">if</span> <span class="n">code_paths</span> <span class="k">else</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lc_model</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="c1"># The LangChain model is defined as Python code located in the file at the path</span>
+        <span class="c1"># specified by `lc_model`. Verify that the path exists and, if so, copy it to the</span>
+        <span class="c1"># model directory along with any other specified code modules</span>
+
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">lc_model</span><span class="p">):</span>
+            <span class="n">formatted_code_path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lc_model</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;If the </span><span class="si">{</span><span class="n">lc_model</span><span class="si">}</span><span class="s2"> is a string, it must be a valid python &quot;</span>
+                <span class="s2">&quot;file path containing the code for defining the chain instance.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">code_paths</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
+                <span class="s2">&quot;When the model is a string, and if the code_paths are specified, &quot;</span>
+                <span class="s2">&quot;it should contain only one path.&quot;</span>
+                <span class="s2">&quot;This config path is used to set config.yml file path &quot;</span>
+                <span class="s2">&quot;for the model. This path should be passed in via the code_paths. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Current code paths: </span><span class="si">{</span><span class="n">code_paths</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+    <span class="n">code_dir_subpath</span> <span class="o">=</span> <span class="n">_validate_and_copy_code_paths</span><span class="p">(</span><span class="n">formatted_code_path</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">signature</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">input_example</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -485,7 +516,23 @@
     <span class="k">if</span> <span class="n">metadata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">mlflow_model</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">metadata</span>
 
-    <span class="n">model_data_kwargs</span> <span class="o">=</span> <span class="n">_save_model</span><span class="p">(</span><span class="n">lc_model</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">loader_fn</span><span class="p">,</span> <span class="n">persist_dir</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lc_model</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">model_data_kwargs</span> <span class="o">=</span> <span class="n">_save_model</span><span class="p">(</span><span class="n">lc_model</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">loader_fn</span><span class="p">,</span> <span class="n">persist_dir</span><span class="p">)</span>
+        <span class="n">flavor_conf</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">_MODEL_TYPE_KEY</span><span class="p">:</span> <span class="n">lc_model</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">model_data_kwargs</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># If the model is a string, we expect the code_path which is ideally config.yml</span>
+        <span class="c1"># would be used in the model. We set the code_path here so it can be set</span>
+        <span class="c1"># globally when the model is loaded with the local path. So the consumer</span>
+        <span class="c1"># can use that path instead of the config.yml path when the model is loaded</span>
+        <span class="n">flavor_conf</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">{</span><span class="n">_CODE_CONFIG</span><span class="p">:</span> <span class="n">code_paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]}</span>
+            <span class="k">if</span> <span class="n">code_paths</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">code_paths</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">1</span>
+            <span class="k">else</span> <span class="p">{</span><span class="n">_CODE_CONFIG</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
+        <span class="p">)</span>
+        <span class="n">model_data_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="n">pyfunc</span><span class="o">.</span><span class="n">add_to_model</span><span class="p">(</span>
         <span class="n">mlflow_model</span><span class="p">,</span>
@@ -495,13 +542,21 @@
         <span class="n">code</span><span class="o">=</span><span class="n">code_dir_subpath</span><span class="p">,</span>
         <span class="o">**</span><span class="n">model_data_kwargs</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">flavor_conf</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="n">_MODEL_TYPE_KEY</span><span class="p">:</span> <span class="n">lc_model</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">model_data_kwargs</span><span class="p">,</span>
-    <span class="p">}</span>
 
     <span class="k">if</span> <span class="n">Version</span><span class="p">(</span><span class="n">langchain</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">Version</span><span class="p">(</span><span class="s2">&quot;0.0.311&quot;</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">databricks_dependency</span> <span class="o">:=</span> <span class="n">_detect_databricks_dependencies</span><span class="p">(</span><span class="n">lc_model</span><span class="p">):</span>
+        <span class="n">checker_model</span> <span class="o">=</span> <span class="n">lc_model</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lc_model</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="c1"># If the model is a string, we are adding the model code path to the system path</span>
+            <span class="c1"># so it can be loaded correctly.</span>
+            <span class="n">_add_code_to_system_path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">lc_model</span><span class="p">))</span>
+            <span class="p">(</span>
+                <span class="n">_load_code_model</span><span class="p">(</span><span class="n">code_paths</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">code_paths</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">code_paths</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">1</span>
+                <span class="k">else</span> <span class="n">_load_code_model</span><span class="p">()</span>
+            <span class="p">)</span>
+            <span class="n">checker_model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">langchain</span><span class="o">.</span><span class="n">_rag_utils</span><span class="o">.</span><span class="n">__databricks_rag_chain__</span>
+
+        <span class="k">if</span> <span class="n">databricks_dependency</span> <span class="o">:=</span> <span class="n">_detect_databricks_dependencies</span><span class="p">(</span><span class="n">checker_model</span><span class="p">):</span>
             <span class="n">flavor_conf</span><span class="p">[</span><span class="n">_DATABRICKS_DEPENDENCY_KEY</span><span class="p">]</span> <span class="o">=</span> <span class="n">databricks_dependency</span>
 
     <span class="n">mlflow_model</span><span class="o">.</span><span class="n">add_flavor</span><span class="p">(</span>
@@ -752,12 +807,9 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            Model predictions.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">messages</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_messages</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="kn">from</span> <span class="nn">mlflow.langchain.api_request_parallel_processor</span> <span class="kn">import</span> <span class="n">process_api_requests</span>
 
-        <span class="n">return_first_element</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lc_model</span><span class="p">,</span> <span class="n">lc_runnables_types</span><span class="p">())</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
-            <span class="n">data</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span>
-        <span class="p">)</span>
+        <span class="n">messages</span><span class="p">,</span> <span class="n">return_first_element</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_messages</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="n">results</span> <span class="o">=</span> <span class="n">process_api_requests</span><span class="p">(</span><span class="n">lc_model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lc_model</span><span class="p">,</span> <span class="n">requests</span><span class="o">=</span><span class="n">messages</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">return_first_element</span> <span class="k">else</span> <span class="n">results</span>
 
@@ -781,12 +833,9 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            Model predictions.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">messages</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_messages</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="kn">from</span> <span class="nn">mlflow.langchain.api_request_parallel_processor</span> <span class="kn">import</span> <span class="n">process_api_requests</span>
 
-        <span class="n">return_first_element</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lc_model</span><span class="p">,</span> <span class="n">lc_runnables_types</span><span class="p">())</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
-            <span class="n">data</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span>
-        <span class="p">)</span>
+        <span class="n">messages</span><span class="p">,</span> <span class="n">return_first_element</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_messages</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="n">results</span> <span class="o">=</span> <span class="n">process_api_requests</span><span class="p">(</span>
             <span class="n">lc_model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lc_model</span><span class="p">,</span>
             <span class="n">requests</span><span class="o">=</span><span class="n">messages</span><span class="p">,</span>
@@ -796,6 +845,14 @@
         <span class="k">return</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">return_first_element</span> <span class="k">else</span> <span class="n">results</span>
 
     <span class="k">def</span> <span class="nf">_prepare_messages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return:</span>
+<span class="sd">            A tuple of 1. ``preprocessed_data`` (list) and 2. `return_first_element`` (bool).</span>
+<span class="sd">            If ``return_first_element`` is True, only the first element of the inference</span>
+<span class="sd">            result should be returned. If ``return_first_element`` is False, the whole</span>
+<span class="sd">            inference result should be returned.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="c1"># numpy array is not json serializable, so we convert it to list</span>
         <span class="c1"># then send it to the model</span>
         <span class="k">def</span> <span class="nf">_convert_ndarray_to_list</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
@@ -810,18 +867,21 @@
             <span class="k">return</span> <span class="n">data</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">_convert_ndarray_to_list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="n">orient</span><span class="o">=</span><span class="s2">&quot;records&quot;</span><span class="p">))</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="n">orient</span><span class="o">=</span><span class="s2">&quot;records&quot;</span><span class="p">)</span>
 
         <span class="n">data</span> <span class="o">=</span> <span class="n">_convert_ndarray_to_list</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lc_model</span><span class="p">,</span> <span class="n">lc_runnables_types</span><span class="p">()):</span>
-            <span class="k">return</span> <span class="p">[</span><span class="n">data</span><span class="p">]</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
-            <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">)</span>
-        <span class="p">):</span>
-            <span class="k">return</span> <span class="n">data</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="c1"># if the input data is not a list (i.e. single input),</span>
+            <span class="c1"># we still need to convert it to a one-element list `[data]`</span>
+            <span class="c1"># because `process_api_requests` only accepts list as valid input.</span>
+            <span class="c1"># and in this case,</span>
+            <span class="c1"># we should return the first element of the inference result</span>
+            <span class="c1"># because we change input `data` to `[data]`</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">data</span><span class="p">],</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="kc">False</span>
         <span class="k">raise</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
-            <span class="s2">&quot;Input must be a pandas DataFrame or a list of strings &quot;</span>
-            <span class="s2">&quot;or a list of dictionaries &quot;</span>
+            <span class="s2">&quot;Input must be a pandas DataFrame or a list &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;for model </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">lc_model</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
 
@@ -905,7 +965,21 @@
 <span class="k">def</span> <span class="nf">_load_model_from_local_fs</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">):</span>
     <span class="n">flavor_conf</span> <span class="o">=</span> <span class="n">_get_flavor_configuration</span><span class="p">(</span><span class="n">model_path</span><span class="o">=</span><span class="n">local_model_path</span><span class="p">,</span> <span class="n">flavor_name</span><span class="o">=</span><span class="n">FLAVOR_NAME</span><span class="p">)</span>
     <span class="n">_add_code_from_conf_to_system_path</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">,</span> <span class="n">flavor_conf</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">_load_model</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">,</span> <span class="n">flavor_conf</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">_CODE_CONFIG</span> <span class="ow">in</span> <span class="n">flavor_conf</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">flavor_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">_CODE_CONFIG</span><span class="p">)</span>
+        <span class="n">flavor_code_config</span> <span class="o">=</span> <span class="n">flavor_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">FLAVOR_CONFIG_CODE</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">code_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="n">local_model_path</span><span class="p">,</span>
+                <span class="n">flavor_code_config</span><span class="p">,</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="p">)),</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">code_path</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="n">_load_code_model</span><span class="p">(</span><span class="n">code_path</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_load_model</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">,</span> <span class="n">flavor_conf</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="load_model"><a class="viewcode-back" href="../../python_api/mlflow.langchain.html#mlflow.langchain.load_model">[docs]</a><span class="nd">@experimental</span>
@@ -933,6 +1007,25 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">local_model_path</span> <span class="o">=</span> <span class="n">_download_artifact_from_uri</span><span class="p">(</span><span class="n">artifact_uri</span><span class="o">=</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">output_path</span><span class="o">=</span><span class="n">dst_path</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">_load_model_from_local_fs</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">)</span></div>
+
+
+<span class="nd">@contextmanager</span>
+<span class="k">def</span> <span class="nf">_config_path_context</span><span class="p">(</span><span class="n">code_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="n">_set_config_path</span><span class="p">(</span><span class="n">code_path</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">yield</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">_set_config_path</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_load_code_model</span><span class="p">(</span><span class="n">code_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">_config_path_context</span><span class="p">(</span><span class="n">code_path</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">chain</span>  <span class="c1"># noqa: F401</span>
+        <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">MlflowException</span><span class="p">(</span><span class="s2">&quot;Failed to import LangChain model.&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+
+    <span class="k">return</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">langchain</span><span class="o">.</span><span class="n">_rag_utils</span><span class="o">.</span><span class="n">__databricks_rag_chain__</span>
 
 
 <div class="viewcode-block" id="autolog"><a class="viewcode-back" href="../../python_api/mlflow.langchain.html#mlflow.langchain.autolog">[docs]</a><span class="nd">@experimental</span>
@@ -1002,11 +1095,19 @@
         <span class="k">for</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="n">classes</span><span class="p">:</span>
             <span class="c1"># If runnable also contains loader_fn and persist_dir, warn</span>
             <span class="c1"># BaseRetrievalQA, BaseRetriever, ...</span>
-            <span class="n">safe_patch</span><span class="p">(</span><span class="n">FLAVOR_NAME</span><span class="p">,</span> <span class="bp">cls</span><span class="p">,</span> <span class="s2">&quot;invoke&quot;</span><span class="p">,</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">patched_inference</span><span class="p">,</span> <span class="s2">&quot;invoke&quot;</span><span class="p">))</span>
+            <span class="n">safe_patch</span><span class="p">(</span>
+                <span class="n">FLAVOR_NAME</span><span class="p">,</span>
+                <span class="bp">cls</span><span class="p">,</span>
+                <span class="s2">&quot;invoke&quot;</span><span class="p">,</span>
+                <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">patched_inference</span><span class="p">,</span> <span class="s2">&quot;invoke&quot;</span><span class="p">),</span>
+            <span class="p">)</span>
 
         <span class="k">for</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="p">[</span><span class="n">AgentExecutor</span><span class="p">,</span> <span class="n">Chain</span><span class="p">]:</span>
             <span class="n">safe_patch</span><span class="p">(</span>
-                <span class="n">FLAVOR_NAME</span><span class="p">,</span> <span class="bp">cls</span><span class="p">,</span> <span class="s2">&quot;__call__&quot;</span><span class="p">,</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">patched_inference</span><span class="p">,</span> <span class="s2">&quot;__call__&quot;</span><span class="p">)</span>
+                <span class="n">FLAVOR_NAME</span><span class="p">,</span>
+                <span class="bp">cls</span><span class="p">,</span>
+                <span class="s2">&quot;__call__&quot;</span><span class="p">,</span>
+                <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">patched_inference</span><span class="p">,</span> <span class="s2">&quot;__call__&quot;</span><span class="p">),</span>
             <span class="p">)</span>
 
         <span class="n">safe_patch</span><span class="p">(</span>
@@ -1045,7 +1146,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../',
-      VERSION:'2.11.2.dev0',
+      VERSION:'2.11.4.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

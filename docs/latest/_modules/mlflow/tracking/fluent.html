@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mlflow.tracking.fluent &mdash; MLflow 2.11.2.dev0 documentation</title>
+  <title>mlflow.tracking.fluent &mdash; MLflow 2.11.4.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -56,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="MLflow 2.11.2.dev0 documentation" href="../../../index.html"/>
+    <link rel="top" title="MLflow 2.11.4.dev0 documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
   
@@ -87,7 +87,7 @@
     <a href="../../../index.html" class="wy-nav-top-logo"
       ><img src="../../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.11.2.dev0</span>
+    <span class="version">2.11.4.dev0</span>
   </li>
 </ul>
   </nav>
@@ -214,6 +214,7 @@
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
+<span class="kn">import</span> <span class="nn">mlflow</span>
 <span class="kn">from</span> <span class="nn">mlflow.data.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
 <span class="kn">from</span> <span class="nn">mlflow.entities</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">DatasetInput</span><span class="p">,</span>
@@ -436,7 +437,7 @@
 <span class="sd">            environment variable, ``MLFLOW_EXPERIMENT_ID`` environment variable,</span>
 <span class="sd">            or the default experiment as defined by the tracking server.</span>
 <span class="sd">        run_name: Name of new run. Used only when ``run_id`` is unspecified. If a new run is</span>
-<span class="sd">            created and ``run_name`` is not specified, a unique name will be generated for the run.</span>
+<span class="sd">            created and ``run_name`` is not specified, a random name will be generated for the run.</span>
 <span class="sd">        nested: Controls whether run is nested in parent run. ``True`` creates a nested run.</span>
 <span class="sd">        tags: An optional dictionary of string keys and values to set as tags on the run.</span>
 <span class="sd">            If a run is being resumed, these tags are set on the resumed run. If a new run is</span>
@@ -1419,7 +1420,7 @@
 
 
 <div class="viewcode-block" id="log_image"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.log_image">[docs]</a><span class="k">def</span> <span class="nf">log_image</span><span class="p">(</span>
-    <span class="n">image</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;numpy.ndarray&quot;</span><span class="p">,</span> <span class="s2">&quot;PIL.Image.Image&quot;</span><span class="p">],</span>
+    <span class="n">image</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;numpy.ndarray&quot;</span><span class="p">,</span> <span class="s2">&quot;PIL.Image.Image&quot;</span><span class="p">,</span> <span class="s2">&quot;mlflow.Image&quot;</span><span class="p">],</span>
     <span class="n">artifact_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">step</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1428,12 +1429,17 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Logs an image in MLflow, supporting two use cases:</span>
 
-<span class="sd">    1. Time-stepped image logging: ideal for tracking changes or progressions through iterative</span>
-<span class="sd">        processes (e.g., during model training phases).</span>
-<span class="sd">        - Usage: `log_image(image, key=key, step=step, timestamp=timestamp)`</span>
-<span class="sd">    2. Artifact file image logging: best suited for static image logging where the image</span>
-<span class="sd">        is saved directly as a file artifact.</span>
-<span class="sd">        - Usage: `log_image(image, artifact_file)`</span>
+<span class="sd">    1. Time-stepped image logging:</span>
+<span class="sd">        Ideal for tracking changes or progressions through iterative processes (e.g.,</span>
+<span class="sd">        during model training phases).</span>
+
+<span class="sd">        - Usage: :code:`log_image(image, key=key, step=step, timestamp=timestamp)`</span>
+
+<span class="sd">    2. Artifact file image logging:</span>
+<span class="sd">        Best suited for static image logging where the image is saved directly as a file</span>
+<span class="sd">        artifact.</span>
+
+<span class="sd">        - Usage: :code:`log_image(image, artifact_file)`</span>
 
 <span class="sd">    The following image formats are supported:</span>
 <span class="sd">        - `numpy.ndarray`_</span>
@@ -1444,6 +1450,8 @@
 
 <span class="sd">        .. _PIL.Image.Image:</span>
 <span class="sd">            https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Image</span>
+
+<span class="sd">        - :class:`mlflow.Image`: An MLflow wrapper around PIL image for convenient image logging.</span>
 
 <span class="sd">    Numpy array support</span>
 <span class="sd">        - data types:</span>
@@ -1472,7 +1480,9 @@
 <span class="sd">            will be stored as an artifact relative to the run&#39;s root directory (for</span>
 <span class="sd">            example, &quot;dir/image.png&quot;). This parameter is kept for backward compatibility</span>
 <span class="sd">            and should not be used together with `key`, `step`, or `timestamp`.</span>
-<span class="sd">        key: Image name for time-stepped image logging.</span>
+<span class="sd">        key: Image name for time-stepped image logging. This string may only contain</span>
+<span class="sd">            alphanumerics, underscores (_), dashes (-), periods (.), spaces ( ), and</span>
+<span class="sd">            slashes (/).</span>
 <span class="sd">        step: Integer training step (iteration) at which the image was saved.</span>
 <span class="sd">            Defaults to 0.</span>
 <span class="sd">        timestamp: Time when this image was saved. Defaults to the current system time.</span>
@@ -1498,6 +1508,19 @@
 
 <span class="sd">        with mlflow.start_run():</span>
 <span class="sd">            mlflow.log_image(image, key=&quot;dogs&quot;, step=3)</span>
+
+<span class="sd">    .. code-block:: python</span>
+<span class="sd">        :caption: Time-stepped image logging with mlflow.Image example</span>
+
+<span class="sd">        import mlflow</span>
+<span class="sd">        from PIL import Image</span>
+
+<span class="sd">        # If you have a preexisting saved image</span>
+<span class="sd">        Image.new(&quot;RGB&quot;, (100, 100)).save(&quot;image.png&quot;)</span>
+
+<span class="sd">        image = mlflow.Image(&quot;image.png&quot;)</span>
+<span class="sd">        with mlflow.start_run() as run:</span>
+<span class="sd">            mlflow.log_image(run.info.run_id, image, key=&quot;dogs&quot;, step=3)</span>
 
 <span class="sd">    .. code-block:: python</span>
 <span class="sd">        :caption: Legacy artifact file image logging numpy example</span>
@@ -2525,7 +2548,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../../',
-      VERSION:'2.11.2.dev0',
+      VERSION:'2.11.4.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mlflow.tracking.client &mdash; MLflow 2.11.2.dev0 documentation</title>
+  <title>mlflow.tracking.client &mdash; MLflow 2.11.4.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -56,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="MLflow 2.11.2.dev0 documentation" href="../../../index.html"/>
+    <link rel="top" title="MLflow 2.11.4.dev0 documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
   
@@ -87,7 +87,7 @@
     <a href="../../../index.html" class="wy-nav-top-logo"
       ><img src="../../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.11.2.dev0</span>
+    <span class="version">2.11.4.dev0</span>
   </li>
 </ul>
   </nav>
@@ -211,6 +211,7 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">posixpath</span>
+<span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
 <span class="kn">import</span> <span class="nn">urllib</span>
@@ -241,6 +242,7 @@
 <span class="kn">from</span> <span class="nn">mlflow.tracking._tracking_service</span> <span class="kn">import</span> <span class="n">utils</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracking._tracking_service.client</span> <span class="kn">import</span> <span class="n">TrackingServiceClient</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracking.artifact_utils</span> <span class="kn">import</span> <span class="n">_upload_artifacts_to_databricks</span>
+<span class="kn">from</span> <span class="nn">mlflow.tracking.multimedia</span> <span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">compress_image_size</span><span class="p">,</span> <span class="n">convert_to_pil_image</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracking.registry</span> <span class="kn">import</span> <span class="n">UnsupportedModelRegistryStoreURIException</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.annotations</span> <span class="kn">import</span> <span class="n">deprecated</span><span class="p">,</span> <span class="n">experimental</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.async_logging.run_operations</span> <span class="kn">import</span> <span class="n">RunOperations</span>
@@ -1625,7 +1627,7 @@
 <div class="viewcode-block" id="MlflowClient.log_image"><a class="viewcode-back" href="../../../python_api/mlflow.client.html#mlflow.client.MlflowClient.log_image">[docs]</a>    <span class="k">def</span> <span class="nf">log_image</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">image</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;numpy.ndarray&quot;</span><span class="p">,</span> <span class="s2">&quot;PIL.Image.Image&quot;</span><span class="p">],</span>
+        <span class="n">image</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;numpy.ndarray&quot;</span><span class="p">,</span> <span class="s2">&quot;PIL.Image.Image&quot;</span><span class="p">,</span> <span class="s2">&quot;mlflow.Image&quot;</span><span class="p">],</span>
         <span class="n">artifact_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">step</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1634,12 +1636,17 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Logs an image in MLflow, supporting two use cases:</span>
 
-<span class="sd">        1. Time-stepped image logging: ideal for tracking changes or progressions through iterative</span>
-<span class="sd">            processes (e.g., during model training phases).</span>
-<span class="sd">            - Usage: `log_image(image, key=key, step=step, timestamp=timestamp)`</span>
-<span class="sd">        2. Artifact file image logging: best suited for static image logging where the image</span>
-<span class="sd">            is saved directly as a file artifact.</span>
-<span class="sd">            - Usage: `log_image(image, artifact_file)`</span>
+<span class="sd">        1. Time-stepped image logging:</span>
+<span class="sd">            Ideal for tracking changes or progressions through iterative processes (e.g.,</span>
+<span class="sd">            during model training phases).</span>
+
+<span class="sd">            - Usage: :code:`log_image(image, key=key, step=step, timestamp=timestamp)`</span>
+
+<span class="sd">        2. Artifact file image logging:</span>
+<span class="sd">            Best suited for static image logging where the image is saved directly as a file</span>
+<span class="sd">            artifact.</span>
+
+<span class="sd">            - Usage: :code:`log_image(image, artifact_file)`</span>
 
 <span class="sd">        The following image formats are supported:</span>
 <span class="sd">            - `numpy.ndarray`_</span>
@@ -1650,6 +1657,9 @@
 
 <span class="sd">            .. _PIL.Image.Image:</span>
 <span class="sd">                https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Image</span>
+
+<span class="sd">            - :class:`mlflow.Image`: An MLflow wrapper around PIL image for convenient image</span>
+<span class="sd">              logging.</span>
 
 <span class="sd">        Numpy array support</span>
 <span class="sd">            - data types:</span>
@@ -1678,7 +1688,9 @@
 <span class="sd">                will be stored as an artifact relative to the run&#39;s root directory (for</span>
 <span class="sd">                example, &quot;dir/image.png&quot;). This parameter is kept for backward compatibility</span>
 <span class="sd">                and should not be used together with `key`, `step`, or `timestamp`.</span>
-<span class="sd">            key: Image name for time-stepped image logging.</span>
+<span class="sd">            key: Image name for time-stepped image logging. This string may only contain</span>
+<span class="sd">                alphanumerics, underscores (_), dashes (-), periods (.), spaces ( ), and</span>
+<span class="sd">                slashes (/).</span>
 <span class="sd">            step: Integer training step (iteration) at which the image was saved.</span>
 <span class="sd">                Defaults to 0.</span>
 <span class="sd">            timestamp: Time when this image was saved. Defaults to the current system time.</span>
@@ -1701,6 +1713,20 @@
 <span class="sd">            from PIL import Image</span>
 
 <span class="sd">            image = Image.new(&quot;RGB&quot;, (100, 100))</span>
+<span class="sd">            with mlflow.start_run() as run:</span>
+<span class="sd">                client = mlflow.MlflowClient()</span>
+<span class="sd">                client.log_image(run.info.run_id, image, key=&quot;dogs&quot;, step=3)</span>
+
+<span class="sd">        .. code-block:: python</span>
+<span class="sd">            :caption: Time-stepped image logging with mlflow.Image example</span>
+
+<span class="sd">            import mlflow</span>
+<span class="sd">            from PIL import Image</span>
+
+<span class="sd">            # Saving an image to retrieve later.</span>
+<span class="sd">            Image.new(&quot;RGB&quot;, (100, 100)).save(&quot;image.png&quot;)</span>
+
+<span class="sd">            image = mlflow.Image(&quot;image.png&quot;)</span>
 <span class="sd">            with mlflow.start_run() as run:</span>
 <span class="sd">                client = mlflow.MlflowClient()</span>
 <span class="sd">                client.log_image(run.info.run_id, image, key=&quot;dogs&quot;, step=3)</span>
@@ -1739,16 +1765,61 @@
                 <span class="s2">&quot;`key` to log dynamic image charts or `artifact_file` for saving static images. &quot;</span>
             <span class="p">)</span>
 
+        <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+        <span class="c1"># Convert image type to PIL if its a numpy array</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="n">image</span> <span class="o">=</span> <span class="n">convert_to_pil_image</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">Image</span><span class="p">):</span>
+            <span class="n">image</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">to_pil</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Import PIL and check if the image is a PIL image</span>
+            <span class="kn">import</span> <span class="nn">PIL</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">PIL</span><span class="o">.</span><span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Unsupported image object type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">image</span><span class="p">)</span><span class="si">}</span><span class="s2">. &quot;</span>
+                    <span class="s2">&quot;`image` must be one of numpy.ndarray, &quot;</span>
+                    <span class="s2">&quot;PIL.Image.Image, and mlflow.Image.&quot;</span>
+                <span class="p">)</span>
+
         <span class="k">if</span> <span class="n">artifact_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_log_image_as_artifact</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">artifact_file</span><span class="p">)</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_artifact_helper</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">artifact_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">tmp_path</span><span class="p">:</span>
+                <span class="n">image</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">)</span>
 
         <span class="k">elif</span> <span class="n">key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Check image key for invalid characters</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^[a-zA-Z0-9_\-./ ]+$&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;The `key` parameter may only contain alphanumerics, underscores (_), &quot;</span>
+                    <span class="s2">&quot;dashes (-), periods (.), spaces ( ), and slashes (/).&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;The provided key `</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">` contains invalid characters.&quot;</span>
+                <span class="p">)</span>
+
             <span class="n">step</span> <span class="o">=</span> <span class="n">step</span> <span class="ow">or</span> <span class="mi">0</span>
             <span class="n">timestamp</span> <span class="o">=</span> <span class="n">timestamp</span> <span class="ow">or</span> <span class="n">get_current_time_millis</span><span class="p">()</span>
-            <span class="n">filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;images/</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_step_</span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="n">image_filepath</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">.png&quot;</span>
+
+            <span class="c1"># Sanitize key to use in filename (replace / with # to avoid subdirectories)</span>
+            <span class="n">sanitized_key</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;#&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+            <span class="n">filename_uuid</span> <span class="o">=</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;images/</span><span class="si">{</span><span class="n">sanitized_key</span><span class="si">}</span><span class="s2">%step%</span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2">%timestamp%</span><span class="si">{</span><span class="n">timestamp</span><span class="si">}</span><span class="s2">%</span><span class="si">{</span><span class="n">filename_uuid</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">uncompressed_filename</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;images/</span><span class="si">{</span><span class="n">sanitized_key</span><span class="si">}</span><span class="s2">%step%</span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2">%timestamp%</span><span class="si">{</span><span class="n">timestamp</span><span class="si">}</span><span class="s2">%</span><span class="si">{</span><span class="n">filename_uuid</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="n">compressed_filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">uncompressed_filename</span><span class="si">}</span><span class="s2">%compressed&quot;</span>
+
+            <span class="c1"># Save full-resolution image</span>
+            <span class="n">image_filepath</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">uncompressed_filename</span><span class="si">}</span><span class="s2">.png&quot;</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_artifact_helper</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">image_filepath</span><span class="p">)</span> <span class="k">as</span> <span class="n">tmp_path</span><span class="p">:</span>
+                <span class="n">image</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">)</span>
+
+            <span class="c1"># Save compressed image</span>
+            <span class="n">compressed_image_filepath</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">compressed_filename</span><span class="si">}</span><span class="s2">.webp&quot;</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_artifact_helper</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">compressed_image_filepath</span><span class="p">)</span> <span class="k">as</span> <span class="n">tmp_path</span><span class="p">:</span>
+                <span class="n">compress_image_size</span><span class="p">(</span><span class="n">image</span><span class="p">)</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">)</span>
+
+            <span class="c1"># Save metadata file</span>
             <span class="n">metadata_filepath</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">.json&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_log_image_as_artifact</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">image_filepath</span><span class="p">)</span>
             <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_artifact_helper</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">metadata_filepath</span><span class="p">)</span> <span class="k">as</span> <span class="n">tmp_path</span><span class="p">:</span>
                 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">,</span> <span class="s2">&quot;w+&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                     <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span>
@@ -1760,97 +1831,6 @@
                         <span class="p">},</span>
                         <span class="n">f</span><span class="p">,</span>
                     <span class="p">)</span></div>
-
-    <span class="k">def</span> <span class="nf">_log_image_as_artifact</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">image</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;numpy.ndarray&quot;</span><span class="p">,</span> <span class="s2">&quot;PIL.Image.Image&quot;</span><span class="p">],</span>
-        <span class="n">artifact_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">def</span> <span class="nf">_is_pillow_image</span><span class="p">(</span><span class="n">image</span><span class="p">):</span>
-            <span class="kn">from</span> <span class="nn">PIL.Image</span> <span class="kn">import</span> <span class="n">Image</span>
-
-            <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">Image</span><span class="p">)</span>
-
-        <span class="k">def</span> <span class="nf">_is_numpy_array</span><span class="p">(</span><span class="n">image</span><span class="p">):</span>
-            <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-
-            <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
-
-        <span class="k">def</span> <span class="nf">_normalize_to_uint8</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-            <span class="c1"># Based on: https://github.com/matplotlib/matplotlib/blob/06567e021f21be046b6d6dcf00380c1cb9adaf3c/lib/matplotlib/image.py#L684</span>
-
-            <span class="n">is_int</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">)</span>
-            <span class="n">low</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="n">high</span> <span class="o">=</span> <span class="mi">255</span> <span class="k">if</span> <span class="n">is_int</span> <span class="k">else</span> <span class="mi">1</span>
-            <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">low</span> <span class="ow">or</span> <span class="n">x</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">high</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">is_int</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                        <span class="s2">&quot;Integer pixel values out of acceptable range [0, 255]. &quot;</span>
-                        <span class="sa">f</span><span class="s2">&quot;Found minimum value </span><span class="si">{</span><span class="n">x</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">}</span><span class="s2"> and maximum value </span><span class="si">{</span><span class="n">x</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">}</span><span class="s2">. &quot;</span>
-                        <span class="s2">&quot;Ensure all pixel values are within the specified range.&quot;</span>
-                    <span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                        <span class="s2">&quot;Float pixel values out of acceptable range [0.0, 1.0]. &quot;</span>
-                        <span class="sa">f</span><span class="s2">&quot;Found minimum value </span><span class="si">{</span><span class="n">x</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">}</span><span class="s2"> and maximum value </span><span class="si">{</span><span class="n">x</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">}</span><span class="s2">. &quot;</span>
-                        <span class="s2">&quot;Ensure all pixel values are within the specified range.&quot;</span>
-                    <span class="p">)</span>
-
-            <span class="c1"># float or bool</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">is_int</span><span class="p">:</span>
-                <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="mi">255</span>
-
-            <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
-
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_artifact_helper</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">artifact_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">tmp_path</span><span class="p">:</span>
-            <span class="k">if</span> <span class="s2">&quot;PIL&quot;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span> <span class="ow">and</span> <span class="n">_is_pillow_image</span><span class="p">(</span><span class="n">image</span><span class="p">):</span>
-                <span class="n">image</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="s2">&quot;numpy&quot;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span> <span class="ow">and</span> <span class="n">_is_numpy_array</span><span class="p">(</span><span class="n">image</span><span class="p">):</span>
-                <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-
-                <span class="k">try</span><span class="p">:</span>
-                    <span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
-                <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-                        <span class="s2">&quot;`log_image` requires Pillow to serialize a numpy array as an image. &quot;</span>
-                        <span class="s2">&quot;Please install it via: pip install Pillow&quot;</span>
-                    <span class="p">)</span> <span class="kn">from</span> <span class="nn">exc</span>
-
-                <span class="c1"># Ref.: https://numpy.org/doc/stable/reference/generated/numpy.dtype.kind.html#numpy-dtype-kind</span>
-                <span class="n">valid_data_types</span> <span class="o">=</span> <span class="p">{</span>
-                    <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="s2">&quot;bool&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;i&quot;</span><span class="p">:</span> <span class="s2">&quot;signed integer&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;u&quot;</span><span class="p">:</span> <span class="s2">&quot;unsigned integer&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;f&quot;</span><span class="p">:</span> <span class="s2">&quot;floating&quot;</span><span class="p">,</span>
-                <span class="p">}</span>
-
-                <span class="k">if</span> <span class="n">image</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">kind</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_data_types</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;Invalid array data type: &#39;</span><span class="si">{</span><span class="n">image</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
-                        <span class="sa">f</span><span class="s2">&quot;Must be one of </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">valid_data_types</span><span class="o">.</span><span class="n">values</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span>
-                    <span class="p">)</span>
-
-                <span class="k">if</span> <span class="n">image</span><span class="o">.</span><span class="n">ndim</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;`image` must be a 2D or 3D array but got a </span><span class="si">{</span><span class="n">image</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s2">D array&quot;</span>
-                    <span class="p">)</span>
-
-                <span class="k">if</span> <span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]):</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;Invalid channel length: </span><span class="si">{</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="si">}</span><span class="s2">. Must be one of [1, 3, 4]&quot;</span>
-                    <span class="p">)</span>
-
-                <span class="c1"># squeeze a 3D grayscale image since `Image.fromarray` doesn&#39;t accept it.</span>
-                <span class="k">if</span> <span class="n">image</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">and</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                    <span class="n">image</span> <span class="o">=</span> <span class="n">image</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span>
-
-                <span class="n">image</span> <span class="o">=</span> <span class="n">_normalize_to_uint8</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
-
-                <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">image</span><span class="p">)</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">)</span>
-
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported image object type: &#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">image</span><span class="p">)</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_check_artifact_file_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">artifact_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if the artifact_file contains any forbidden characters.</span>
@@ -1893,11 +1873,11 @@
 <span class="sd">                &quot;outputs&quot;: [&quot;MLflow is ...&quot;, &quot;Databricks is ...&quot;],</span>
 <span class="sd">                &quot;toxicity&quot;: [0.0, 0.0],</span>
 <span class="sd">            }</span>
-<span class="sd">            client = MlflowClient()</span>
-<span class="sd">            run = client.create_run(experiment_id=&quot;0&quot;)</span>
-<span class="sd">            client.log_table(</span>
-<span class="sd">                run.info.run_id, data=table_dict, artifact_file=&quot;qabot_eval_results.json&quot;</span>
-<span class="sd">            )</span>
+<span class="sd">            with mlflow.start_run() as run:</span>
+<span class="sd">                client = MlflowClient()</span>
+<span class="sd">                client.log_table(</span>
+<span class="sd">                    run.info.run_id, data=table_dict, artifact_file=&quot;qabot_eval_results.json&quot;</span>
+<span class="sd">                )</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :test:</span>
@@ -1913,9 +1893,27 @@
 <span class="sd">                &quot;toxicity&quot;: [0.0, 0.0],</span>
 <span class="sd">            }</span>
 <span class="sd">            df = pd.DataFrame.from_dict(table_dict)</span>
-<span class="sd">            client = MlflowClient()</span>
-<span class="sd">            run = client.create_run(experiment_id=&quot;0&quot;)</span>
-<span class="sd">            client.log_table(run.info.run_id, data=df, artifact_file=&quot;qabot_eval_results.json&quot;)</span>
+<span class="sd">            with mlflow.start_run() as run:</span>
+<span class="sd">                client = MlflowClient()</span>
+<span class="sd">                client.log_table(run.info.run_id, data=df, artifact_file=&quot;qabot_eval_results.json&quot;)</span>
+
+<span class="sd">        .. code-block:: python</span>
+<span class="sd">            :test:</span>
+<span class="sd">            :caption: Image Column Example</span>
+
+<span class="sd">            import mlflow</span>
+<span class="sd">            import pandas as pd</span>
+<span class="sd">            from mlflow import MlflowClient</span>
+
+<span class="sd">            image = mlflow.Image([[1, 2, 3]])</span>
+<span class="sd">            table_dict = {</span>
+<span class="sd">                &quot;inputs&quot;: [&quot;Show me a dog&quot;, &quot;Show me a cat&quot;],</span>
+<span class="sd">                &quot;outputs&quot;: [image, image],</span>
+<span class="sd">            }</span>
+<span class="sd">            df = pd.DataFrame.from_dict(table_dict)</span>
+<span class="sd">            with mlflow.start_run() as run:</span>
+<span class="sd">                client = MlflowClient()</span>
+<span class="sd">                client.log_table(run.info.run_id, data=df, artifact_file=&quot;image_gen.json&quot;)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
@@ -1932,6 +1930,54 @@
             <span class="c1"># for data like {&quot;inputs&quot;: &quot;What is MLflow?&quot;}</span>
             <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
                 <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">data</span><span class="p">])</span>
+
+        <span class="c1"># Check if the column is a `PIL.Image.Image` or `mlflow.Image` object</span>
+        <span class="c1"># and save filepath</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;object&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+
+            <span class="k">def</span> <span class="nf">process_image</span><span class="p">(</span><span class="n">image</span><span class="p">):</span>
+                <span class="c1"># remove extension from artifact_file</span>
+                <span class="n">table_name</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">artifact_file</span><span class="p">)</span>
+                <span class="c1"># save image to path</span>
+                <span class="n">filepath</span> <span class="o">=</span> <span class="n">posixpath</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;table_images&quot;</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()))</span>
+                <span class="n">image_filepath</span> <span class="o">=</span> <span class="n">filepath</span> <span class="o">+</span> <span class="s2">&quot;.png&quot;</span>
+                <span class="n">compressed_image_filepath</span> <span class="o">=</span> <span class="n">filepath</span> <span class="o">+</span> <span class="s2">&quot;.webp&quot;</span>
+                <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_artifact_helper</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">image_filepath</span><span class="p">)</span> <span class="k">as</span> <span class="n">artifact_path</span><span class="p">:</span>
+                    <span class="n">image</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">artifact_path</span><span class="p">)</span>
+
+                <span class="c1"># save compressed image to path</span>
+                <span class="n">compressed_image</span> <span class="o">=</span> <span class="n">compress_image_size</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+
+                <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_artifact_helper</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">compressed_image_filepath</span><span class="p">)</span> <span class="k">as</span> <span class="n">artifact_path</span><span class="p">:</span>
+                    <span class="n">compressed_image</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">artifact_path</span><span class="p">)</span>
+
+                <span class="c1"># return a dictionary object indicating its an image path</span>
+                <span class="k">return</span> <span class="p">{</span>
+                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;image&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;filepath&quot;</span><span class="p">:</span> <span class="n">image_filepath</span><span class="p">,</span>
+                    <span class="s2">&quot;compressed_filepath&quot;</span><span class="p">:</span> <span class="n">compressed_image_filepath</span><span class="p">,</span>
+                <span class="p">}</span>
+
+            <span class="k">def</span> <span class="nf">check_is_image_object</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+                <span class="k">return</span> <span class="p">(</span>
+                    <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;save&quot;</span><span class="p">)</span>
+                    <span class="ow">and</span> <span class="nb">callable</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;save&quot;</span><span class="p">))</span>
+                    <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;resize&quot;</span><span class="p">)</span>
+                    <span class="ow">and</span> <span class="nb">callable</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;resize&quot;</span><span class="p">))</span>
+                    <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;size&quot;</span><span class="p">)</span>
+                <span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="n">isImage</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">check_is_image_object</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">isImage</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">isImage</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Column `</span><span class="si">{</span><span class="n">column</span><span class="si">}</span><span class="s2">` contains a mix of images and non-images. &quot;</span>
+                        <span class="s2">&quot;Please ensure that all elements in the column are of the same type.&quot;</span>
+                    <span class="p">)</span>
+                <span class="k">elif</span> <span class="nb">all</span><span class="p">(</span><span class="n">isImage</span><span class="p">):</span>
+                    <span class="c1"># Save files to artifact storage</span>
+                    <span class="n">data</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">process_image</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+
         <span class="n">norm_path</span> <span class="o">=</span> <span class="n">posixpath</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">artifact_file</span><span class="p">)</span>
         <span class="n">artifact_dir</span> <span class="o">=</span> <span class="n">posixpath</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">norm_path</span><span class="p">)</span>
         <span class="n">artifact_dir</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">artifact_dir</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="k">else</span> <span class="n">artifact_dir</span>
@@ -4152,7 +4198,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../../',
-      VERSION:'2.11.2.dev0',
+      VERSION:'2.11.4.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

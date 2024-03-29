@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mlflow.pyfunc &mdash; MLflow 2.11.2.dev0 documentation</title>
+  <title>mlflow.pyfunc &mdash; MLflow 2.11.4.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -56,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="MLflow 2.11.2.dev0 documentation" href="../../index.html"/>
+    <link rel="top" title="MLflow 2.11.4.dev0 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
@@ -87,7 +87,7 @@
     <a href="../../index.html" class="wy-nav-top-logo"
       ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.11.2.dev0</span>
+    <span class="version">2.11.4.dev0</span>
   </li>
 </ul>
   </nav>
@@ -227,14 +227,79 @@
 <span class="sd">&lt;mlflow.pyfunc.PyFuncModel.predict&gt;` method, which has the following signature::</span>
 
 <span class="sd">  predict(</span>
-<span class="sd">    model_input: [pandas.DataFrame, numpy.ndarray, scipy.sparse.(csc.csc_matrix | csr.csr_matrix),</span>
+<span class="sd">    model_input: [pandas.DataFrame, numpy.ndarray, scipy.sparse.(csc_matrix | csr_matrix),</span>
 <span class="sd">    List[Any], Dict[str, Any], pyspark.sql.DataFrame]</span>
-<span class="sd">  ) -&gt; [numpy.ndarray | pandas.(Series | DataFrame) | List | pyspark.sql.DataFrame]</span>
+<span class="sd">  ) -&gt; [numpy.ndarray | pandas.(Series | DataFrame) | List | Dict | pyspark.sql.DataFrame]</span>
 
 <span class="sd">All PyFunc models will support `pandas.DataFrame` as input and PyFunc deep learning models will</span>
 <span class="sd">also support tensor inputs in the form of Dict[str, numpy.ndarray] (named tensors) and</span>
 <span class="sd">`numpy.ndarrays` (unnamed tensors).</span>
 
+<span class="sd">Here are some examples of supported inference types, assuming we have the correct ``model`` object</span>
+<span class="sd">loaded.</span>
+
+<span class="sd">.. list-table::</span>
+<span class="sd">    :widths: 30 70</span>
+<span class="sd">    :header-rows: 1</span>
+<span class="sd">    :class: wrap-table</span>
+
+<span class="sd">    * - Input Type</span>
+<span class="sd">      - Example</span>
+<span class="sd">    * - ``pandas.DataFrame``</span>
+<span class="sd">      -</span>
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            import pandas as pd</span>
+
+<span class="sd">            x_new = pd.DataFrame(dict(x1=[1,2,3], x2=[4,5,6]))</span>
+<span class="sd">            model.predict(x_new)</span>
+
+<span class="sd">    * - ``numpy.ndarray``</span>
+<span class="sd">      -</span>
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            import numpy as np</span>
+
+<span class="sd">            x_new = np.array([[1, 4] [2, 5], [3, 6]])</span>
+<span class="sd">            model.predict(x_new)</span>
+
+<span class="sd">    * - ``scipy.sparse.csc_matrix`` or ``scipy.sparse.csr_matrix``</span>
+<span class="sd">      -</span>
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            import scipy</span>
+
+<span class="sd">            x_new = scipy.sparse.csc_matrix([[1, 2, 3], [4, 5, 6]])</span>
+<span class="sd">            model.predict(x_new)</span>
+
+<span class="sd">            x_new = scipy.sparse.csr_matrix([[1, 2, 3], [4, 5, 6]])</span>
+<span class="sd">            model.predict(x_new)</span>
+
+<span class="sd">    * - python ``List``</span>
+<span class="sd">      -</span>
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            x_new = [[1, 4], [2, 5], [3, 6]]</span>
+<span class="sd">            model.predict(x_new)</span>
+
+<span class="sd">    * - python ``Dict``</span>
+<span class="sd">      -</span>
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            x_new = dict(x1=[1, 2, 3], x2=[4, 5, 6])</span>
+<span class="sd">            model.predict(x_new)</span>
+
+<span class="sd">    * - ``pyspark.sql.DataFrame``</span>
+<span class="sd">      -</span>
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            from pyspark.sql import SparkSession</span>
+
+<span class="sd">            spark = SparkSession.builder.getOrCreate()</span>
+
+<span class="sd">            data = [(1,4), (2,5), (3,6)]  # List of tuples</span>
+<span class="sd">            x_new = spark.createDataFrame(data, [&quot;x1&quot;,&quot;x2&quot;])  # Specify column name</span>
+<span class="sd">            model.predict(x_new)</span>
 
 <span class="sd">.. _pyfunc-filesystem-format:</span>
 
@@ -275,9 +340,9 @@
 
 <span class="sd">          predict(</span>
 <span class="sd">            model_input: [pandas.DataFrame, numpy.ndarray,</span>
-<span class="sd">            scipy.sparse.(csc.csc_matrix | csr.csr_matrix), List[Any], Dict[str, Any]],</span>
+<span class="sd">            scipy.sparse.(csc_matrix | csr_matrix), List[Any], Dict[str, Any]],</span>
 <span class="sd">            pyspark.sql.DataFrame</span>
-<span class="sd">          ) -&gt; [numpy.ndarray | pandas.(Series | DataFrame) | List | pyspark.sql.DataFrame]</span>
+<span class="sd">          ) -&gt; [numpy.ndarray | pandas.(Series | DataFrame) | List | Dict | pyspark.sql.DataFrame]</span>
 
 <span class="sd">- code [optional]:</span>
 <span class="sd">        Relative path to a directory containing the code packaged with this model.</span>
@@ -409,6 +474,108 @@
 <span class="sd">- If you have already collected all of your model data in a single location, the second</span>
 <span class="sd">  workflow allows it to be saved in MLflow format directly, without enumerating constituent</span>
 <span class="sd">  artifacts.</span>
+
+<span class="sd">******************************************</span>
+<span class="sd">Function-based Model vs Class-based Model</span>
+<span class="sd">******************************************</span>
+
+<span class="sd">When creating custom PyFunc models, you can choose between two different interfaces:</span>
+<span class="sd">a function-based model and a class-based model. In short, a function-based model is simply a</span>
+<span class="sd">python function that does not take additional params. The class-based model, on the other hand,</span>
+<span class="sd">is subclass of ``PythonModel`` that supports several required and optional</span>
+<span class="sd">methods. If your use case is simple and fits within a single predict function, a funcion-based</span>
+<span class="sd">approach is recommended. If you need more power, such as custom serialization, custom data</span>
+<span class="sd">processing, or to override additional methods, you should use the class-based implementation.</span>
+
+<span class="sd">Before looking at code examples, it&#39;s important to note that both methods are serialized via</span>
+<span class="sd">`cloudpickle &lt;https://github.com/cloudpipe/cloudpickle&gt;`_. cloudpickle can serialize Python</span>
+<span class="sd">functions, lambda functions, and locally defined classes and functions inside other functions. This</span>
+<span class="sd">makes cloudpickle especially useful for parallel and distributed computing where code objects need</span>
+<span class="sd">to be sent over network to execute on remote workers, which is a common deployment paradigm for</span>
+<span class="sd">MLflow.</span>
+
+<span class="sd">That said, cloudpickle has some limitations.</span>
+
+<span class="sd">- **Environment Dependency**: cloudpickle does not capture the full execution environment, so in</span>
+<span class="sd">  MLflow we must pass ``pip_requirements``, ``extra_pip_requirements``, or an ``input_example``,</span>
+<span class="sd">  the latter of which is used to infer environment dependencies. For more, refer to</span>
+<span class="sd">  `the model dependency docs &lt;https://mlflow.org/docs/latest/model/dependencies.html&gt;`_.</span>
+
+<span class="sd">- **Object Support**: cloudpickle does not serialize objects outside of the Python data model.</span>
+<span class="sd">  Some relevant examples include raw files and database connections. If your program depends on</span>
+<span class="sd">  these, be sure to log ways to reference these objects along with your model.</span>
+
+<span class="sd">Function-based Model</span>
+<span class="sd">####################</span>
+<span class="sd">If you&#39;re looking to serialize a simple python function without additional dependent methods, you</span>
+<span class="sd">can simply log a predict method via the keyword argument ``python_model``.</span>
+
+<span class="sd">.. note::</span>
+
+<span class="sd">    Function-based model only supports a function with a single input argument. If you would like</span>
+<span class="sd">    to pass more arguments or additional inference parameters, please use the class-based model</span>
+<span class="sd">    below.</span>
+
+<span class="sd">.. code-block:: python</span>
+
+<span class="sd">    import mlflow</span>
+<span class="sd">    import pandas as pd</span>
+
+<span class="sd">    # Define a simple function to log</span>
+<span class="sd">    def predict(model_input):</span>
+<span class="sd">        return model_input.apply(lambda x: x * 2)</span>
+
+<span class="sd">    # Save the function as a model</span>
+<span class="sd">    with mlflow.start_run():</span>
+<span class="sd">        mlflow.pyfunc.log_model(&quot;model&quot;, python_model=predict, pip_requirements=[&quot;pandas&quot;])</span>
+<span class="sd">        run_id = mlflow.active_run().info.run_id</span>
+
+<span class="sd">    # Load the model from the tracking server and perform inference</span>
+<span class="sd">    model = mlflow.pyfunc.load_model(f&quot;runs:/{run_id}/model&quot;)</span>
+<span class="sd">    x_new = pd.Series([1,2,3])</span>
+
+<span class="sd">    prediction = model.predict(x_new)</span>
+<span class="sd">    print(prediction)</span>
+
+
+<span class="sd">Class-based Model</span>
+<span class="sd">#################</span>
+<span class="sd">If you&#39;re looking to serialize a more complex object, for instance a class that handles</span>
+<span class="sd">preprocessing, complex prediction logic, or custom serialization, you should subclass the</span>
+<span class="sd">``PythonModel`` class. MLflow has tutorials on building custom PyFunc models, as shown</span>
+<span class="sd">`here &lt;https://mlflow.org/docs/latest/traditional-ml/creating-custom-pyfunc/index.html&gt;`_,</span>
+<span class="sd">so instead of duplicating that information, in this example we&#39;ll recreate the above functionality</span>
+<span class="sd">to highlight the differences. Note that this PythonModel implementation is overly complex and</span>
+<span class="sd">we would recommend using the functional-based Model instead for this simple case.</span>
+
+<span class="sd">.. code-block:: python</span>
+
+<span class="sd">    import mlflow</span>
+<span class="sd">    import pandas as pd</span>
+
+<span class="sd">    class MyModel(mlflow.pyfunc.PythonModel):</span>
+<span class="sd">        def predict(self, context, model_input, params=None):</span>
+<span class="sd">            return [x*2 for x in model_input]</span>
+
+<span class="sd">    # Save the function as a model</span>
+<span class="sd">    with mlflow.start_run():</span>
+<span class="sd">        mlflow.pyfunc.log_model(&quot;model&quot;, python_model=MyModel(), pip_requirements=[&quot;pandas&quot;])</span>
+<span class="sd">        run_id = mlflow.active_run().info.run_id</span>
+
+<span class="sd">    # Load the model from the tracking server and perform inference</span>
+<span class="sd">    model = mlflow.pyfunc.load_model(f&quot;runs:/{run_id}/model&quot;)</span>
+<span class="sd">    x_new = pd.Series([1, 2, 3])</span>
+
+<span class="sd">    print(f&quot;Prediction:\n\t{model.predict(x_new)}&quot;)</span>
+
+<span class="sd">The primary difference between the this implementation and the function-based implementation above</span>
+<span class="sd">is that the predict method is wrapped with a class, has the ``self`` parameter,</span>
+<span class="sd">and has the ``params`` parameter that defaults to None. Note that function-based models don&#39;t</span>
+<span class="sd">support additional params.</span>
+
+<span class="sd">In summary, use the function-based Model when you have a simple function to serialize.</span>
+<span class="sd">If you need more power, use  the class-based model.</span>
+
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">collections</span>
@@ -678,7 +845,7 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            data: Model input as one of pandas.DataFrame, numpy.ndarray,</span>
-<span class="sd">                scipy.sparse.(csc.csc_matrix | csr.csr_matrix), List[Any], or</span>
+<span class="sd">                scipy.sparse.(csc_matrix | csr_matrix), List[Any], or</span>
 <span class="sd">                Dict[str, numpy.ndarray].</span>
 <span class="sd">                For model signatures with tensor spec inputs</span>
 <span class="sd">                (e.g. the Tensorflow core / Keras model), the input data type must be one of</span>
@@ -2652,7 +2819,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../',
-      VERSION:'2.11.2.dev0',
+      VERSION:'2.11.4.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',
