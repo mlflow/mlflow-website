@@ -16,11 +16,11 @@ PRs that are filed without a linked Blog Post Submission issue and a subsequent 
 
 ## Acknowledgements
 
-[ ] I have read through the [contributing guide](https://github.com/mlflow/mlflow-website/blob/main/CONTRIBUTING.md)
+- [ ] I have read through the [contributing guide](https://github.com/mlflow/mlflow-website/blob/main/CONTRIBUTING.md)
 
-[ ] I have configured my local development environment so that I can build a local instance of the MLflow website by following the [development guide](https://github.com/mlflow/mlflow-website/blob/main/DEVELOPMENT_GUIDE.md)
+- [ ] I have configured my local development environment so that I can build a local instance of the MLflow website by following the [development guide](https://github.com/mlflow/mlflow-website/blob/main/DEVELOPMENT_GUIDE.md)
 
-[ ] I have verified that there are no legal considerations associated with the nature of the blog post, its content, or references to organizations, ideas, or individuals contained within my post. If I mention a particular organization, idea, or person, I will provide evidence of consent to post by any organization or individual that is mentioned prior to filing my PR. 
+- [ ] I have verified that there are no legal considerations associated with the nature of the blog post, its content, or references to organizations, ideas, or individuals contained within my post. If I mention a particular organization, idea, or person, I will provide evidence of consent to post by any organization or individual that is mentioned prior to filing my PR. 
 
 ## Proposed Title
 
