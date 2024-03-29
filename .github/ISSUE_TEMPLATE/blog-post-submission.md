@@ -32,15 +32,15 @@ PRs that are filed without a linked Blog Post Submission issue and a subsequent 
 
 ## Topics Covered in Blog
 
-[ ] GenAI
-[ ] Model Tracking and Management
-[ ] Model Deployment
-[ ] Model Training
-[ ] MLflow Service Deployment
-[ ] MLflow Core Features
-[ ] Custom Model Development
-[ ] Integrated Model usage
-[ ] MLflow UI
-[ ] Other: < please fill in >
+- [ ] GenAI
+- [ ] Model Tracking and Management
+- [ ] Model Deployment
+- [ ] Model Training
+- [ ] MLflow Service Deployment
+- [ ] MLflow Core Features
+- [ ] Custom Model Development
+- [ ] Integrated Model usage
+- [ ] MLflow UI
+- [ ] Other: < please fill in >
 
 Thank you for your proposal! An MLflow Maintainer will reach out to you with next steps!
