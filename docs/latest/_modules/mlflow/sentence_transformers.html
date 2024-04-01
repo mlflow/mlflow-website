@@ -204,6 +204,7 @@
 <span></span><span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">pathlib</span>
+<span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -251,10 +252,18 @@
 <span class="kn">from</span> <span class="nn">mlflow.utils.requirements_utils</span> <span class="kn">import</span> <span class="n">_get_pinned_requirement</span>
 
 <span class="n">FLAVOR_NAME</span> <span class="o">=</span> <span class="s2">&quot;sentence_transformers&quot;</span>
+<span class="n">_TRANSFORMER_SOURCE_MODEL_NAME_KEY</span> <span class="o">=</span> <span class="s2">&quot;source_model_name&quot;</span>
+<span class="n">_TRANSFORMER_MODEL_TYPE_KEY</span> <span class="o">=</span> <span class="s2">&quot;pipeline_model_type&quot;</span>
+
 <span class="n">SENTENCE_TRANSFORMERS_DATA_PATH</span> <span class="o">=</span> <span class="s2">&quot;model.sentence_transformer&quot;</span>
 <span class="n">_INFERENCE_CONFIG_PATH</span> <span class="o">=</span> <span class="s2">&quot;inference_config&quot;</span>
 <span class="n">_LLM_INFERENCE_TASK_EMBEDDING</span> <span class="o">=</span> <span class="s2">&quot;llm/v1/embeddings&quot;</span>
 <span class="n">_LLM_V1_EMBEDDING_INPUT_KEY</span> <span class="o">=</span> <span class="s2">&quot;input&quot;</span>
+
+<span class="c1"># Patterns to extract HuggingFace model repository name from the local snapshot path.</span>
+<span class="c1"># The path format would be like /path/to/{username}_{modelname}, where user name can</span>
+<span class="c1"># only contain number, letters, and dashes.</span>
+<span class="n">_LOCAL_SNAPSHOT_PATH_PATTERN</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/([0-9a-zA-Z-]+)_([^\/]+)/$&quot;</span><span class="p">)</span>
 
 <span class="n">model_data_artifact_paths</span> <span class="o">=</span> <span class="p">[</span><span class="n">SENTENCE_TRANSFORMERS_DATA_PATH</span><span class="p">]</span>
 
@@ -409,10 +418,12 @@
         <span class="n">model_config</span><span class="o">=</span><span class="n">model_config</span><span class="p">,</span>
         <span class="n">code</span><span class="o">=</span><span class="n">code_dir_subpath</span><span class="p">,</span>
     <span class="p">)</span>
+
     <span class="n">mlflow_model</span><span class="o">.</span><span class="n">add_flavor</span><span class="p">(</span>
         <span class="n">FLAVOR_NAME</span><span class="p">,</span>
         <span class="n">sentence_transformers_version</span><span class="o">=</span><span class="n">sentence_transformers</span><span class="o">.</span><span class="n">__version__</span><span class="p">,</span>
         <span class="n">code</span><span class="o">=</span><span class="n">code_dir_subpath</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">_get_transformers_model_metadata</span><span class="p">(</span><span class="n">model</span><span class="p">),</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">size</span> <span class="o">:=</span> <span class="n">get_total_file_size</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
         <span class="n">mlflow_model</span><span class="o">.</span><span class="n">model_size_bytes</span> <span class="o">=</span> <span class="n">size</span>
@@ -443,6 +454,46 @@
     <span class="n">write_to</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">_REQUIREMENTS_FILE_NAME</span><span class="p">)),</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pip_requirements</span><span class="p">))</span>
 
     <span class="n">_PythonEnv</span><span class="o">.</span><span class="n">current</span><span class="p">()</span><span class="o">.</span><span class="n">to_yaml</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">_PYTHON_ENV_FILE_NAME</span><span class="p">)))</span></div>
+
+
+<span class="k">def</span> <span class="nf">_get_transformers_model_metadata</span><span class="p">(</span><span class="n">model</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extract metadata about the underlying Transformers model, such as the model class name</span>
+<span class="sd">    and the repository id.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        model: A SentenceTransformer model instance.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A dictionary containing metadata about the Transformers model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">sentence_transformers.models</span> <span class="kn">import</span> <span class="n">Transformer</span>
+
+    <span class="c1"># NB: We assume the SentenceTransformer model contains only up to one Transformer model.</span>
+    <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">modules</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">Transformer</span><span class="p">):</span>
+            <span class="n">model_instance</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">auto_model</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="n">_TRANSFORMER_SOURCE_MODEL_NAME_KEY</span><span class="p">:</span> <span class="n">_get_transformers_model_name</span><span class="p">(</span>
+                    <span class="n">model_instance</span><span class="o">.</span><span class="n">name_or_path</span>
+                <span class="p">),</span>
+                <span class="n">_TRANSFORMER_MODEL_TYPE_KEY</span><span class="p">:</span> <span class="n">model_instance</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+            <span class="p">}</span>
+    <span class="k">return</span> <span class="p">{}</span>
+
+
+<span class="k">def</span> <span class="nf">_get_transformers_model_name</span><span class="p">(</span><span class="n">model_name_or_path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extract the Transformers model name from name_or_path attribute of a Transformer model.</span>
+
+<span class="sd">    Normally the name_or_path attribute just points to the model name, but in Sentence</span>
+<span class="sd">    Transformers &lt; 2.3.0, the library loads the Transformers model after local snapshot</span>
+<span class="sd">    download, so the name_or_path attribute points to the local filepath.</span>
+<span class="sd">    https://github.com/UKPLab/sentence-transformers/commit/9db0f205adcf315d16961fea7e9e6906cb950d43</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">m</span> <span class="o">:=</span> <span class="n">_LOCAL_SNAPSHOT_PATH_PATTERN</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">model_name_or_path</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">return</span> <span class="n">model_name_or_path</span>
 
 
 <div class="viewcode-block" id="log_model"><a class="viewcode-back" href="../../python_api/mlflow.sentence_transformers.html#mlflow.sentence_transformers.log_model">[docs]</a><span class="nd">@experimental</span>
