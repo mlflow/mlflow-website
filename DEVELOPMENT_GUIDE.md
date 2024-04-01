@@ -2,7 +2,7 @@
 
 This guide covers the general setup requirements that are needed to contribute to the MLflow website.
 
-The core of the MLflow website is powered by [Docusaurus](https://docusaurus.io/), a REACT-based static website generator framework.
+The core of the MLflow website is powered by [Docusaurus](https://docusaurus.io/).
 
 ## Fork this repo
 
@@ -15,81 +15,13 @@ need to ensure that you have a compatible version of Node.js installed on your s
 
 ### Node.js setup
 
-The easiest way to get started with Node is to use the [Node Version Manager (nvm)](https://github.com/nvm-sh/nvm). `nvm` will allow you to seamlessly manage
-different deployments of Node.js, offering simple command line tool access to switch between versions.
+We highly recommend using [Node Version Manager (nvm)](https://github.com/nvm-sh/nvm) to manage your Node.js environment. You can follow the instructions [here](https://github.com/nvm-sh/nvm?tab=readme-ov-file#installing-and-updating) to get `nvm` setup on your machine.
 
-> Note: on OSX, you will need to have the Xcode command line tools installed before installing `nvm`. These can be directly installed from [Apple Developer Resources](https://developer.apple.com/xcode/resources/).
-
-Installation of `nvm` can be done directly via a `curl` (alternatively, you can use `wget`) command:
-
-```bash
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-```
-
-Once nvm is installed, you can download and install a version of node that is supported with Docusaurus.
-
-```bash
-nvm ls
-```
-
-An example output of running the listing command is:
-
-```bash
-➜ nvm ls
-->     v16.20.2
-       v20.11.0
-         system
-default -> 16 (-> v16.20.2)
-iojs -> N/A (default)
-unstable -> N/A (default)
-node -> stable (-> v20.11.0) (default)
-stable -> 20.11 (-> v20.11.0) (default)
-lts/* -> lts/iron (-> v20.11.0)
-lts/argon -> v4.9.1 (-> N/A)
-lts/boron -> v6.17.1 (-> N/A)
-lts/carbon -> v8.17.0 (-> N/A)
-lts/dubnium -> v10.24.1 (-> N/A)
-lts/erbium -> v12.22.12 (-> N/A)
-lts/fermium -> v14.21.3 (-> N/A)
-lts/gallium -> v16.20.2
-lts/hydrogen -> v18.19.0 (-> N/A)
-lts/iron -> v20.11.0
-```
-
-In order to download a version of node using nvm that meets the `node>=18` requirements, you can:
-
-```bash
-nvm install lts/iron
-```
-This will fetch, per the list above, node `v20.12.0`.
-
-```bash
-➜ nvm install lts/iron
-Downloading and installing node v20.12.0...
-Downloading https://nodejs.org/dist/v20.12.0/node-v20.12.0-darwin-arm64.tar.xz...
-############################################################################################################################################################ 100.0%
-Computing checksum with sha256sum
-Checksums matched!
-Now using node v20.12.0 (npm v10.5.0)
-(mlflow-dev-env)
-```
-
-Once you have node installed, you can activate this new version by running:
-
-```bash
-➜ nvm use v20.12.0
-Now using node v20.12.0 (npm v10.5.0)
-```
+Once you have `nvm` installed, you will need to ensure that you have a Node.js version that is `v18` or later. You can follow the instructions in [this guide](https://nodesource.com/blog/installing-node-js-tutorial-using-nvm-on-mac-os-x-and-ubuntu/) to install and activate an appropriate version.
 
 ### Yarn setup
 
-With the above steps completed, nvm will have acquired both node and `npm` (The Node package manager).
-
-We'll use `npm` to install `yarn` so that we can do active development, build a static version of the website, and compile the blog markdown content into renderable `.tsx` files.
-
-```bash
-npm install --global yarn
-```
+With the above steps completed, nvm will have acquired both node and `npm` (The Node package manager). To install `yarn`, follow either [this guide](https://yarnpkg.com/getting-started/install) or the legacy npm-based [guide here](https://classic.yarnpkg.com/lang/en/docs/install/#mac-stable) to ensure that you have yarn installed on your system.
 
 ## Building your development environment
 
@@ -128,31 +60,7 @@ To enable live preview, simply run:
 yarn start
 ```
 
-This will initialize the local development server:
-
-```bash
-➜ yarn start
-yarn run v1.22.19
-$ docusaurus start
-
-    ---------------------------------------------------------------------------------------------------------------------------
-
-                                                  Update available 3.0.1 → 3.1.1
-
-                        To upgrade Docusaurus packages with the latest version, run the following command:
-        `yarn upgrade @docusaurus/core@latest @docusaurus/plugin-client-redirects@latest @docusaurus/preset-classic@latest
-                   @docusaurus/module-type-aliases@latest @docusaurus/tsconfig@latest @docusaurus/types@latest`
-
-    ---------------------------------------------------------------------------------------------------------------------------
-
-[INFO] Starting the development server...
-[SUCCESS] Docusaurus website is running at: http://localhost:3000/
-
-✔ Client
-  Compiled successfully in 7.20s
-
-client (webpack 5.89.0) compiled successfully
-```
+This will initialize the local development server, providing a local url that can be opened for live feedback as you make changes.
 
 ### Blog development
 
@@ -162,7 +70,7 @@ Our blogs are written in markdown format, which is compiled to typescript files 
 transpile stage, in order to validate the formatting and structure of your blog (and the correct rendering of images or other)
 embedded content, you will have to compile your work in progress before building the site locally for verification.
 
-To compile the blog content into the required `.tsx` files, you can run:
+To compile the blog content into the required `.tsx` files (for linking your blog to the navigation components within the site), you can run:
 
 ```bash
 yarn compile
