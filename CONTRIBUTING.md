@@ -44,9 +44,11 @@ We welcome submissions on a wide range of topics, including but not limited to:
 
 ### Length
 
-Aim for a rendered page length between 3 and 8 pages, including code examples and images.
+Aim for a **rendered page length** between 3 and 8 pages, including code examples and images.
 
-When estimating the total length of your blog, ensure that you are evaluating the final rendered blog (locally, using the guidance in [the development guide](DEVELOPMENT_GUIDE.md)) in a browser window set at 100% zoom at a 1080p resolution.
+#### How to determine blog post length
+
+When estimating the total length of your blog, ensure that you are evaluating the final rendered blog (built locally, using `yarn`, abiding by the guidance in [the development guide](DEVELOPMENT_GUIDE.md)) in a browser window set at 100% zoom at a 1080p resolution.
 
 ### Tone
 
@@ -138,6 +140,8 @@ For posted images, include alt text so that screen readers can effectively descr
 ### First time Contributors
 
 If it's your first time contributing to the MLflow Blog, ensure that you enter a unique entry for yourself (and co-authors, if applicable) within the [authors](website/blog/authors.yml) YAML file. We parse from this collection to populate the links to the authors (including a headshot) so that readers can communicate with you about your contribution. Please ensure that the entries are correct and render well when developing your generated blog locally.
+
+Part of this rendering involves a headshot that is resolvable through a public accessible site. Most contributors choose to use their LinkedIn headshot photo.
 
 ## Thank You
 
