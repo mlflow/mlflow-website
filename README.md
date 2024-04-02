@@ -4,7 +4,7 @@ This repository contains the source code for the [MLflow website](https://mlflow
 
 ## Blog Contributions
 
-If you're looking to get a great tutorial, use case, or cover the usage of advanced components within MLflow, head on over to our [Contributing Guide](CONTRIBUTING_GUIDE.md) to review the blog submission process, authorship guidelines, and helpful tips for developing blog content for MLflow.
+If you're looking to get a great tutorial, use case, or cover the usage of advanced components within MLflow, head on over to our [Contributing Guide](CCONTRIBUTING.md) to review the blog submission process, authorship guidelines, and helpful tips for developing blog content for MLflow.
 
 ## Development
 
