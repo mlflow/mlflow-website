@@ -711,12 +711,12 @@ Test accuracy:  0.98
 </div>
 <div class="section" id="Log-with-MLflow-Callback">
 <h3>Log with MLflow Callback<a class="headerlink" href="#Log-with-MLflow-Callback" title="Permalink to this headline"> </a></h3>
-<p>Auto logging is powerful and convenient, but if you are looking for a more native way as Tensorflow pipelines, you can use <code class="docutils literal notranslate"><span class="pre">mlflow.tensorflow.MLflowCallback</span></code> inside <code class="docutils literal notranslate"><span class="pre">model.fit()</span></code>, it will log: - Your model configuration, layers, hyperparameters and so on. - The training stats, including losses and metrics configured with <code class="docutils literal notranslate"><span class="pre">model.compile()</span></code>.</p>
+<p>Auto logging is powerful and convenient, but if you are looking for a more native way as Tensorflow pipelines, you can use <code class="docutils literal notranslate"><span class="pre">mlflow.tensorflow.MllflowCallback</span></code> inside <code class="docutils literal notranslate"><span class="pre">model.fit()</span></code>, it will log: - Your model configuration, layers, hyperparameters and so on. - The training stats, including losses and metrics configured with <code class="docutils literal notranslate"><span class="pre">model.compile()</span></code>.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
 </pre></div>
 </div>
-<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.tensorflow</span> <span class="kn">import</span> <span class="n">MLflowCallback</span>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.tensorflow</span> <span class="kn">import</span> <span class="n">MlflowCallback</span>
 
 <span class="c1"># Turn off autologging.</span>
 <span class="n">mlflow</span><span class="o">.</span><span class="n">tensorflow</span><span class="o">.</span><span class="n">autolog</span><span class="p">(</span><span class="n">disable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -725,7 +725,7 @@ Test accuracy:  0.98
     <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
         <span class="n">x</span><span class="o">=</span><span class="n">train_ds</span><span class="p">,</span>
         <span class="n">epochs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-        <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">MLflowCallback</span><span class="p">(</span><span class="n">run</span><span class="p">)],</span>
+        <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">MlflowCallback</span><span class="p">(</span><span class="n">run</span><span class="p">)],</span>
     <span class="p">)</span>
 </pre></div>
 </div>
@@ -745,7 +745,7 @@ Epoch 2/2
 </div>
 <div class="section" id="Customize-the-MLflow-Callback">
 <h3>Customize the MLflow Callback<a class="headerlink" href="#Customize-the-MLflow-Callback" title="Permalink to this headline"> </a></h3>
-<p>If you want to add extra logging logic, you can customize the MLflow callback. You can either subclass from <code class="docutils literal notranslate"><span class="pre">keras.callbacks.Callback</span></code> and write everything from scratch or subclass from <code class="docutils literal notranslate"><span class="pre">mlflow.tensorflow.MLflowCallback</span></code> to add you custom logging logic.</p>
+<p>If you want to add extra logging logic, you can customize the MLflow callback. You can either subclass from <code class="docutils literal notranslate"><span class="pre">keras.callbacks.Callback</span></code> and write everything from scratch or subclass from <code class="docutils literal notranslate"><span class="pre">mlflow.tensorflow.MllflowCallback</span></code> to add you custom logging logic.</p>
 <p>Let’s look at an example that we want to replace the loss with its log value to log to MLflow.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
@@ -754,8 +754,8 @@ Epoch 2/2
 <div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
 
 
-<span class="c1"># Create our own callback by subclassing `MLflowCallback`.</span>
-<span class="k">class</span> <span class="nc">MLflowCustomCallback</span><span class="p">(</span><span class="n">MLflowCallback</span><span class="p">):</span>
+<span class="c1"># Create our own callback by subclassing `MlflowCallback`.</span>
+<span class="k">class</span> <span class="nc">MlflowCustomCallback</span><span class="p">(</span><span class="n">MlflowCallback</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">on_epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">logs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_every_epoch</span><span class="p">:</span>
             <span class="k">return</span>
@@ -776,7 +776,7 @@ Epoch 2/2
     <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
         <span class="n">x</span><span class="o">=</span><span class="n">train_ds</span><span class="p">,</span>
         <span class="n">epochs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-        <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">MLflowCustomCallback</span><span class="p">(</span><span class="n">run</span><span class="p">)],</span>
+        <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">MlflowCustomCallback</span><span class="p">(</span><span class="n">run</span><span class="p">)],</span>
     <span class="p">)</span>
 </pre></div>
 </div>
@@ -797,7 +797,7 @@ Epoch 2/2
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-2023/11/15 01:57:50 WARNING mlflow.utils.autologging_utils: Encountered unexpected error during tensorflow autologging: MLflow autologging must be turned off if an `MLflowCallback` is explicitly added to the callback list. You are creating an `MLflowCallback` while having autologging enabled. Please either call `mlflow.tensorflow.autolog(disable=True)` to disable autologging or remove `MLflowCallback` from the callback list.
+2023/11/15 01:57:50 WARNING mlflow.utils.autologging_utils: Encountered unexpected error during tensorflow autologging: MLflow autologging must be turned off if an `MllflowCallback` is explicitly added to the callback list. You are creating an `MllflowCallback` while having autologging enabled. Please either call `mlflow.tensorflow.autolog(disable=True)` to disable autologging or remove `MllflowCallback` from the callback list.
 </pre></div></div>
 </div>
 <p>Going to your Databricks CE page, you should find the <code class="docutils literal notranslate"><span class="pre">log_loss</span></code> is replacing the <code class="docutils literal notranslate"><span class="pre">loss</span></code> metric, similar to what is shown in the screenshot below.</p>

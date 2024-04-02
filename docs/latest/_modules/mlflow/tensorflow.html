@@ -232,7 +232,7 @@
 <span class="kn">from</span> <span class="nn">mlflow.models.model</span> <span class="kn">import</span> <span class="n">MLMODEL_FILE_NAME</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.signature</span> <span class="kn">import</span> <span class="n">_infer_signature_from_input_example</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.utils</span> <span class="kn">import</span> <span class="n">_save_example</span>
-<span class="kn">from</span> <span class="nn">mlflow.tensorflow.callback</span> <span class="kn">import</span> <span class="n">MLflowCallback</span><span class="p">,</span> <span class="n">MlflowModelCheckpointCallback</span>  <span class="c1"># noqa: F401</span>
+<span class="kn">from</span> <span class="nn">mlflow.tensorflow.callback</span> <span class="kn">import</span> <span class="n">MlflowCallback</span><span class="p">,</span> <span class="n">MlflowModelCheckpointCallback</span>  <span class="c1"># noqa: F401</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracking._model_registry</span> <span class="kn">import</span> <span class="n">DEFAULT_AWAIT_MAX_SLEEP_SECONDS</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracking.artifact_utils</span> <span class="kn">import</span> <span class="n">_download_artifact_from_uri</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracking.context</span> <span class="kn">import</span> <span class="n">registry</span> <span class="k">as</span> <span class="n">context_registry</span>
@@ -299,6 +299,9 @@
 <span class="n">_TF2MODEL_SUBPATH</span> <span class="o">=</span> <span class="s2">&quot;tf2model&quot;</span>
 
 <span class="n">model_data_artifact_paths</span> <span class="o">=</span> <span class="p">[</span><span class="n">_KERAS_MODEL_DATA_PATH</span><span class="p">,</span> <span class="n">_TF2MODEL_SUBPATH</span><span class="p">]</span>
+
+
+<span class="n">MLflowCallback</span> <span class="o">=</span> <span class="n">MlflowCallback</span>  <span class="c1"># for backwards compatibility</span>
 
 
 <div class="viewcode-block" id="get_default_pip_requirements"><a class="viewcode-back" href="../../python_api/mlflow.tensorflow.html#mlflow.tensorflow.get_default_pip_requirements">[docs]</a><span class="k">def</span> <span class="nf">get_default_pip_requirements</span><span class="p">(</span><span class="n">include_cloudpickle</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -1138,16 +1141,16 @@
 <span class="sd">    input list, and returns the new list and appropriate log directory.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">mlflow.tensorflow.autologging</span> <span class="kn">import</span> <span class="n">_TensorBoard</span>
-    <span class="kn">from</span> <span class="nn">mlflow.tensorflow.callback</span> <span class="kn">import</span> <span class="n">MLflowCallback</span><span class="p">,</span> <span class="n">MlflowModelCheckpointCallback</span>
+    <span class="kn">from</span> <span class="nn">mlflow.tensorflow.callback</span> <span class="kn">import</span> <span class="n">MlflowCallback</span><span class="p">,</span> <span class="n">MlflowModelCheckpointCallback</span>
 
     <span class="n">tb</span> <span class="o">=</span> <span class="n">_get_tensorboard_callback</span><span class="p">(</span><span class="n">callbacks</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">callback</span> <span class="ow">in</span> <span class="n">callbacks</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">callback</span><span class="p">,</span> <span class="n">MLflowCallback</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">callback</span><span class="p">,</span> <span class="n">MlflowCallback</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
-                <span class="s2">&quot;MLflow autologging must be turned off if an `MLflowCallback` is explicitly added &quot;</span>
-                <span class="s2">&quot;to the callback list. You are creating an `MLflowCallback` while having &quot;</span>
+                <span class="s2">&quot;MLflow autologging must be turned off if an `MlflowCallback` is explicitly added &quot;</span>
+                <span class="s2">&quot;to the callback list. You are creating an `MlflowCallback` while having &quot;</span>
                 <span class="s2">&quot;autologging enabled. Please either call `mlflow.tensorflow.autolog(disable=True)` &quot;</span>
-                <span class="s2">&quot;to disable autologging or remove `MLflowCallback` from the callback list. &quot;</span>
+                <span class="s2">&quot;to disable autologging or remove `MlflowCallback` from the callback list. &quot;</span>
             <span class="p">)</span>
     <span class="k">if</span> <span class="n">tb</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">log_dir</span> <span class="o">=</span> <span class="n">_TensorBoardLogDir</span><span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span> <span class="n">is_temp</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -1156,7 +1159,7 @@
         <span class="n">log_dir</span> <span class="o">=</span> <span class="n">_TensorBoardLogDir</span><span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="n">tb</span><span class="o">.</span><span class="n">log_dir</span><span class="p">,</span> <span class="n">is_temp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="n">callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-        <span class="n">MLflowCallback</span><span class="p">(</span>
+        <span class="n">MlflowCallback</span><span class="p">(</span>
             <span class="n">log_every_epoch</span><span class="o">=</span><span class="n">log_every_epoch</span><span class="p">,</span>
             <span class="n">log_every_n_steps</span><span class="o">=</span><span class="n">log_every_n_steps</span><span class="p">,</span>
         <span class="p">)</span>
@@ -1253,8 +1256,8 @@
 <span class="sd">    &lt;https://www.mlflow.org/docs/latest/tracking.html#tensorflow-and-keras-experimental&gt;`_.</span>
 
 <span class="sd">    Note that autologging cannot be used together with explicit MLflow callback, i.e.,</span>
-<span class="sd">    `mlflow.tensorflow.MLflowCallback`, because it will cause the same metrics to be logged twice.</span>
-<span class="sd">    If you want to include `mlflow.tensorflow.MLflowCallback` in the callback list, please turn off</span>
+<span class="sd">    `mlflow.tensorflow.MlflowCallback`, because it will cause the same metrics to be logged twice.</span>
+<span class="sd">    If you want to include `mlflow.tensorflow.MlflowCallback` in the callback list, please turn off</span>
 <span class="sd">    autologging by calling `mlflow.tensorflow.autolog(disable=True)`.</span>
 
 <span class="sd">    Args:</span>
