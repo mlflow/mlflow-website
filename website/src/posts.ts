@@ -36,29 +36,25 @@ export const BLOGS: Blog[] = [
         name: "Abe Omorogbe",
         title: "Product Manager, ML at Databricks",
         url: "https://www.linkedin.com/in/abeomor/",
-        image_url:
-          "https://media.licdn.com/dms/image/D4E03AQG-dAkLO2hx_Q/profile-displayphoto-shrink_400_400/0/1693252025753?e=1711584000&v=beta&t=02Bl1a73vp7Zpt8ZXSK_BRDF6DIZWAx1l8oSgkWNa5g",
+        image_url: "/img/authors/abe.png",
       },
       {
         name: "Hubert Zub",
         title: "Software Engineer at Databricks",
         url: "https://www.linkedin.com/in/hubert-zub/",
-        image_url:
-          "https://media.licdn.com/dms/image/C4E03AQH2q6i7fLAYEw/profile-displayphoto-shrink_800_800/0/1517560421922?e=1715212800&v=beta&t=a6pvZTLbC3HlDjdI8lX-hK4yKPjTFekVvJGV10KzVoU",
+        image_url: "/img/authors/hubert.png",
       },
       {
         name: "Yun Park",
         title: "Software Engineer at Databricks",
         url: "https://www.linkedin.com/in/yunpark93/",
-        image_url:
-          "https://media.licdn.com/dms/image/C4D03AQF9NjjBjOdjEg/profile-displayphoto-shrink_800_800/0/1667935373916?e=1715212800&v=beta&t=ULRs--IrSYz7AFpNnkd2xMwVxrSQ32uxf_E5OM8PBnc",
+        image_url: "/img/authors/yun.png",
       },
       {
         name: "Chen Qian",
         title: "Software Engineer at Databricks",
         url: "https://www.linkedin.com/in/thomas-chen-qian/",
-        image_url:
-          "https://media.licdn.com/dms/image/D5603AQGD9D1GpNtxyA/profile-displayphoto-shrink_800_800/0/1690907771716?e=1715212800&v=beta&t=Tk5aCWH8gpLjPNlvWhsr_xeSgVh3xMc9nl-SSaPnt0s",
+        image_url: "/img/authors/chen.png",
       },
       {
         name: "Jesse Chan",
@@ -77,8 +73,7 @@ export const BLOGS: Blog[] = [
         name: "Carly Akerly",
         title: "OSS Marketing Consultant at The Linux Foundation",
         url: "https://www.linkedin.com/in/carlyakerly/",
-        image_url:
-          "https://media.licdn.com/dms/image/D4E03AQGccXoDMQGe8w/profile-displayphoto-shrink_400_400/0/1707268516995?e=1713398400&v=beta&t=AMO6IRfMLpVEiZ-RDBK8t68H1cPpBGpoQA9CBj8FwUQ",
+        image_url: "/img/authors/carly.png",
       },
     ],
     date: "2024-01-26",
@@ -93,8 +88,7 @@ export const BLOGS: Blog[] = [
         name: "Abe Omorogbe",
         title: "Product Manager, ML at Databricks",
         url: "https://www.linkedin.com/in/abeomor/",
-        image_url:
-          "https://media.licdn.com/dms/image/D4E03AQG-dAkLO2hx_Q/profile-displayphoto-shrink_400_400/0/1693252025753?e=1711584000&v=beta&t=02Bl1a73vp7Zpt8ZXSK_BRDF6DIZWAx1l8oSgkWNa5g",
+        image_url: "/img/authors/abe.png",
       },
     ],
     date: "2024-01-25",
@@ -109,7 +103,7 @@ export const BLOGS: Blog[] = [
         name: "Daniel Liden",
         title: "Developer Advocate at Databricks",
         url: "https://www.linkedin.com/in/danielliden",
-        image_url: "https://github.com/djliden.png",
+        image_url: "/img/authors/daniel_liden.png",
       },
     ],
     date: "2024-01-23",
@@ -140,7 +134,7 @@ export const BLOGS: Blog[] = [
         name: "Daniel Liden",
         title: "Developer Advocate at Databricks",
         url: "https://www.linkedin.com/in/danielliden",
-        image_url: "https://github.com/djliden.png",
+        image_url: "/img/authors/daniel_liden.png",
       },
     ],
     date: "2023-11-30",
