@@ -217,8 +217,11 @@
 
 <span class="kn">import</span> <span class="nn">contextlib</span>
 <span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">importlib.util</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">uuid</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
@@ -235,7 +238,7 @@
     <span class="n">_update_langchain_model_config</span><span class="p">,</span>
     <span class="n">patched_inference</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.langchain._rag_utils</span> <span class="kn">import</span> <span class="n">_CODE_CONFIG</span><span class="p">,</span> <span class="n">_set_config_path</span>
+<span class="kn">from</span> <span class="nn">mlflow.langchain._rag_utils</span> <span class="kn">import</span> <span class="n">_CODE_CONFIG</span><span class="p">,</span> <span class="n">_CODE_PATH</span><span class="p">,</span> <span class="n">_set_config_path</span>
 <span class="kn">from</span> <span class="nn">mlflow.langchain.databricks_dependencies</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">_DATABRICKS_DEPENDENCY_KEY</span><span class="p">,</span>
     <span class="n">_detect_databricks_dependencies</span><span class="p">,</span>
@@ -261,7 +264,7 @@
 <span class="kn">from</span> <span class="nn">mlflow.tracking._model_registry</span> <span class="kn">import</span> <span class="n">DEFAULT_AWAIT_MAX_SLEEP_SECONDS</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracking.artifact_utils</span> <span class="kn">import</span> <span class="n">_download_artifact_from_uri</span>
 <span class="kn">from</span> <span class="nn">mlflow.types.schema</span> <span class="kn">import</span> <span class="n">ColSpec</span><span class="p">,</span> <span class="n">DataType</span><span class="p">,</span> <span class="n">Schema</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.annotations</span> <span class="kn">import</span> <span class="n">experimental</span>
+<span class="kn">from</span> <span class="nn">mlflow.utils.annotations</span> <span class="kn">import</span> <span class="n">deprecated</span><span class="p">,</span> <span class="n">experimental</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.autologging_utils</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">autologging_integration</span><span class="p">,</span>
     <span class="n">autologging_is_disabled</span><span class="p">,</span>
@@ -283,7 +286,6 @@
 <span class="kn">from</span> <span class="nn">mlflow.utils.model_utils</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">FLAVOR_CONFIG_CODE</span><span class="p">,</span>
     <span class="n">_add_code_from_conf_to_system_path</span><span class="p">,</span>
-    <span class="n">_add_code_to_system_path</span><span class="p">,</span>
     <span class="n">_get_flavor_configuration</span><span class="p">,</span>
     <span class="n">_validate_and_copy_code_paths</span><span class="p">,</span>
     <span class="n">_validate_and_prepare_target_save_path</span><span class="p">,</span>
@@ -528,9 +530,9 @@
         <span class="c1"># globally when the model is loaded with the local path. So the consumer</span>
         <span class="c1"># can use that path instead of the config.yml path when the model is loaded</span>
         <span class="n">flavor_conf</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="p">{</span><span class="n">_CODE_CONFIG</span><span class="p">:</span> <span class="n">code_paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]}</span>
+            <span class="p">{</span><span class="n">_CODE_CONFIG</span><span class="p">:</span> <span class="n">code_paths</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">_CODE_PATH</span><span class="p">:</span> <span class="n">lc_model</span><span class="p">}</span>
             <span class="k">if</span> <span class="n">code_paths</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">code_paths</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">1</span>
-            <span class="k">else</span> <span class="p">{</span><span class="n">_CODE_CONFIG</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
+            <span class="k">else</span> <span class="p">{</span><span class="n">_CODE_CONFIG</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="n">_CODE_PATH</span><span class="p">:</span> <span class="n">lc_model</span><span class="p">}</span>
         <span class="p">)</span>
         <span class="n">model_data_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
 
@@ -546,15 +548,11 @@
     <span class="k">if</span> <span class="n">Version</span><span class="p">(</span><span class="n">langchain</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">Version</span><span class="p">(</span><span class="s2">&quot;0.0.311&quot;</span><span class="p">):</span>
         <span class="n">checker_model</span> <span class="o">=</span> <span class="n">lc_model</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lc_model</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="c1"># If the model is a string, we are adding the model code path to the system path</span>
-            <span class="c1"># so it can be loaded correctly.</span>
-            <span class="n">_add_code_to_system_path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">lc_model</span><span class="p">))</span>
-            <span class="p">(</span>
-                <span class="n">_load_code_model</span><span class="p">(</span><span class="n">code_paths</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">checker_model</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">_load_model_code_path</span><span class="p">(</span><span class="n">lc_model</span><span class="p">,</span> <span class="n">code_paths</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
                 <span class="k">if</span> <span class="n">code_paths</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">code_paths</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">1</span>
-                <span class="k">else</span> <span class="n">_load_code_model</span><span class="p">()</span>
+                <span class="k">else</span> <span class="n">_load_model_code_path</span><span class="p">(</span><span class="n">lc_model</span><span class="p">)</span>
             <span class="p">)</span>
-            <span class="n">checker_model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">langchain</span><span class="o">.</span><span class="n">_rag_utils</span><span class="o">.</span><span class="n">__databricks_rag_chain__</span>
 
         <span class="k">if</span> <span class="n">databricks_dependency</span> <span class="o">:=</span> <span class="n">_detect_databricks_dependencies</span><span class="p">(</span><span class="n">checker_model</span><span class="p">):</span>
             <span class="n">flavor_conf</span><span class="p">[</span><span class="n">_DATABRICKS_DEPENDENCY_KEY</span><span class="p">]</span> <span class="o">=</span> <span class="n">databricks_dependency</span>
@@ -964,21 +962,28 @@
 
 <span class="k">def</span> <span class="nf">_load_model_from_local_fs</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">):</span>
     <span class="n">flavor_conf</span> <span class="o">=</span> <span class="n">_get_flavor_configuration</span><span class="p">(</span><span class="n">model_path</span><span class="o">=</span><span class="n">local_model_path</span><span class="p">,</span> <span class="n">flavor_name</span><span class="o">=</span><span class="n">FLAVOR_NAME</span><span class="p">)</span>
-    <span class="n">_add_code_from_conf_to_system_path</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">,</span> <span class="n">flavor_conf</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">_CODE_CONFIG</span> <span class="ow">in</span> <span class="n">flavor_conf</span><span class="p">:</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">flavor_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">_CODE_CONFIG</span><span class="p">)</span>
         <span class="n">flavor_code_config</span> <span class="o">=</span> <span class="n">flavor_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">FLAVOR_CONFIG_CODE</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">code_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">config_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
                 <span class="n">local_model_path</span><span class="p">,</span>
                 <span class="n">flavor_code_config</span><span class="p">,</span>
-                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="p">)),</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">path</span><span class="p">),</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">code_path</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">config_path</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="k">return</span> <span class="n">_load_code_model</span><span class="p">(</span><span class="n">code_path</span><span class="p">)</span>
+        <span class="n">flavor_code_path</span> <span class="o">=</span> <span class="n">flavor_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">_CODE_PATH</span><span class="p">,</span> <span class="s2">&quot;chain.py&quot;</span><span class="p">)</span>
+        <span class="n">code_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">local_model_path</span><span class="p">,</span>
+            <span class="n">flavor_code_config</span><span class="p">,</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">flavor_code_path</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">_load_model_code_path</span><span class="p">(</span><span class="n">code_path</span><span class="p">,</span> <span class="n">config_path</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
+        <span class="n">_add_code_from_conf_to_system_path</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">,</span> <span class="n">flavor_conf</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">_load_model</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">,</span> <span class="n">flavor_conf</span><span class="p">)</span>
 
 
@@ -1018,14 +1023,39 @@
         <span class="n">_set_config_path</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_load_code_model</span><span class="p">(</span><span class="n">code_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-    <span class="k">with</span> <span class="n">_config_path_context</span><span class="p">(</span><span class="n">code_path</span><span class="p">):</span>
+<span class="c1"># In the Python&#39;s module caching mechanism, which by default, prevents the</span>
+<span class="c1"># re-importation of previously loaded modules. This is particularly</span>
+<span class="c1"># problematic in contexts where it&#39;s necessary to reload a module (in this case,</span>
+<span class="c1"># the `model code path` module) multiple times within the same Python</span>
+<span class="c1"># runtime environment.</span>
+<span class="c1"># The issue at hand arises from the desire to import the `model code path` module</span>
+<span class="c1"># multiple times during a single runtime session. Normally, once a module is</span>
+<span class="c1"># imported, it&#39;s added to `sys.modules`, and subsequent import attempts retrieve</span>
+<span class="c1"># the cached module rather than re-importing it.</span>
+<span class="c1"># To address this, the function dynamically imports the `model code path` module</span>
+<span class="c1"># under unique, dynamically generated module names. This is achieved by creating</span>
+<span class="c1"># a unique name for each import using a combination of the original module name</span>
+<span class="c1"># and a randomly generated UUID. This approach effectively bypasses the caching</span>
+<span class="c1"># mechanism, as each import is considered as a separate module by the Python interpreter.</span>
+<span class="k">def</span> <span class="nf">_load_model_code_path</span><span class="p">(</span><span class="n">code_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">config_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">_config_path_context</span><span class="p">(</span><span class="n">config_path</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="kn">import</span> <span class="nn">chain</span>  <span class="c1"># noqa: F401</span>
+            <span class="n">new_module_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;code_model_</span><span class="si">{</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">spec</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spec_from_file_location</span><span class="p">(</span><span class="n">new_module_name</span><span class="p">,</span> <span class="n">code_path</span><span class="p">)</span>
+            <span class="n">module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">module_from_spec</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">new_module_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">module</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">loader</span><span class="o">.</span><span class="n">exec_module</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">MlflowException</span><span class="p">(</span><span class="s2">&quot;Failed to import LangChain model.&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
 
     <span class="k">return</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">langchain</span><span class="o">.</span><span class="n">_rag_utils</span><span class="o">.</span><span class="n">__databricks_rag_chain__</span>
+
+
+<span class="c1"># TODO: We are keeping this method even though it is private because</span>
+<span class="c1"># rag studio is explicitly monkey patching it. Will remove soon.</span>
+<span class="nd">@deprecated</span><span class="p">(</span><span class="n">alternative</span><span class="o">=</span><span class="s2">&quot;mlflow.langchain._load_model_code_path&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_load_code_model</span><span class="p">(</span><span class="n">config_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">pass</span>
 
 
 <div class="viewcode-block" id="autolog"><a class="viewcode-back" href="../../python_api/mlflow.langchain.html#mlflow.langchain.autolog">[docs]</a><span class="nd">@experimental</span>

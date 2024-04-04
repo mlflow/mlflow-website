@@ -218,6 +218,7 @@
 <span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
 <span class="kn">from</span> <span class="nn">mlflow.protos.databricks_pb2</span> <span class="kn">import</span> <span class="n">INVALID_PARAMETER_VALUE</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils</span> <span class="kn">import</span> <span class="n">PYTHON_VERSION</span><span class="p">,</span> <span class="n">insecure_hash</span>
+<span class="kn">from</span> <span class="nn">mlflow.utils.os</span> <span class="kn">import</span> <span class="n">is_windows</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.process</span> <span class="kn">import</span> <span class="n">_exec_cmd</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.requirements_utils</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">_infer_requirements</span><span class="p">,</span>
@@ -247,8 +248,6 @@
     <span class="sa">r</span><span class="s2">&quot;(?P&lt;operator&gt;&lt;|&gt;|&lt;=|&gt;=|=|==|!=)?&quot;</span>
     <span class="sa">r</span><span class="s2">&quot;(?P&lt;version&gt;[\d.]+)?$&quot;</span>
 <span class="p">)</span>
-
-<span class="n">_IS_UNIX</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;nt&quot;</span>
 
 
 <span class="k">class</span> <span class="nc">_PythonEnv</span><span class="p">:</span>
@@ -601,7 +600,7 @@
 <span class="k">def</span> <span class="nf">infer_pip_requirements_with_timeout</span><span class="p">(</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">flavor</span><span class="p">,</span> <span class="n">fallback</span><span class="p">):</span>
     <span class="n">timeout</span> <span class="o">=</span> <span class="n">MLFLOW_INPUT_EXAMPLE_INFERENCE_TIMEOUT</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
 
-    <span class="k">if</span> <span class="n">timeout</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_IS_UNIX</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">timeout</span> <span class="ow">and</span> <span class="n">is_windows</span><span class="p">():</span>
         <span class="n">timeout</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
             <span class="s2">&quot;On Windows, timeout is not supported for model requirement inference. Therefore, &quot;</span>
@@ -1053,10 +1052,10 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="n">command</span> <span class="o">=</span> <span class="p">[</span><span class="n">command</span><span class="p">]</span>
 
-        <span class="n">separator</span> <span class="o">=</span> <span class="s2">&quot; &amp;&amp; &quot;</span> <span class="k">if</span> <span class="n">_IS_UNIX</span> <span class="k">else</span> <span class="s2">&quot; &amp; &quot;</span>
+        <span class="n">separator</span> <span class="o">=</span> <span class="s2">&quot; &amp;&amp; &quot;</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">is_windows</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot; &amp; &quot;</span>
 
         <span class="n">command</span> <span class="o">=</span> <span class="n">separator</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_activate_cmd</span> <span class="o">+</span> <span class="n">command</span><span class="p">))</span>
-        <span class="n">command</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;bash&quot;</span><span class="p">,</span> <span class="s2">&quot;-c&quot;</span><span class="p">,</span> <span class="n">command</span><span class="p">]</span> <span class="k">if</span> <span class="n">_IS_UNIX</span> <span class="k">else</span> <span class="p">[</span><span class="s2">&quot;cmd&quot;</span><span class="p">,</span> <span class="s2">&quot;/c&quot;</span><span class="p">,</span> <span class="n">command</span><span class="p">]</span>
+        <span class="n">command</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;bash&quot;</span><span class="p">,</span> <span class="s2">&quot;-c&quot;</span><span class="p">,</span> <span class="n">command</span><span class="p">]</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">is_windows</span><span class="p">()</span> <span class="k">else</span> <span class="p">[</span><span class="s2">&quot;cmd&quot;</span><span class="p">,</span> <span class="s2">&quot;/c&quot;</span><span class="p">,</span> <span class="n">command</span><span class="p">]</span>
         <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;=== Running command &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="n">command</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">_exec_cmd</span><span class="p">(</span>
             <span class="n">command</span><span class="p">,</span>
