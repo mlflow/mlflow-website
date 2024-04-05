@@ -9,7 +9,7 @@ interface AmbassadorCardProps {
   img: string;
 }
 
-export const createAmbassadorCard = ({
+export const AmbassadorCard = ({
   title,
   role,
   company,

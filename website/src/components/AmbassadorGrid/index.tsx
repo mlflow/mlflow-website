@@ -1,5 +1,5 @@
 import React from "react";
-import { createAmbassadorCard } from "../AmbassadorCard";
+import { AmbassadorCard } from "../AmbassadorCard";
 import ambassadors from "../../pages/ambassadors.json";
 
 const AmbassadorGrid = () => (
@@ -10,17 +10,8 @@ const AmbassadorGrid = () => (
       gap: "20px",
     }}
   >
-    {ambassadors.map((ambassador, index) => (
-      <React.Fragment key={index}>
-        {createAmbassadorCard({
-          title: ambassador.title,
-          role: ambassador.role,
-          company: ambassador.company,
-          companyLink: ambassador.companyLink,
-          personalLink: ambassador.personalLink,
-          img: ambassador.img,
-        })}
-      </React.Fragment>
+    {ambassadors.map((ambassador) => (
+      <AmbassadorCard {...ambassador} />
     ))}
   </div>
 );
