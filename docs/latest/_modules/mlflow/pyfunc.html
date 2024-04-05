@@ -825,7 +825,13 @@
 <span class="sd">    ``model_meta`` contains model metadata loaded from the MLmodel file.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_meta</span><span class="p">:</span> <span class="n">Model</span><span class="p">,</span> <span class="n">model_impl</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">predict_fn</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;predict&quot;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">model_meta</span><span class="p">:</span> <span class="n">Model</span><span class="p">,</span>
+        <span class="n">model_impl</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+        <span class="n">predict_fn</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;predict&quot;</span><span class="p">,</span>
+        <span class="n">predict_stream_fn</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">model_impl</span><span class="p">,</span> <span class="n">predict_fn</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Model implementation is missing required </span><span class="si">{</span><span class="n">predict_fn</span><span class="si">}</span><span class="s2"> method.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">model_meta</span><span class="p">:</span>
@@ -833,6 +839,39 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_model_meta</span> <span class="o">=</span> <span class="n">model_meta</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_model_impl</span> <span class="o">=</span> <span class="n">model_impl</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_predict_fn</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model_impl</span><span class="p">,</span> <span class="n">predict_fn</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">predict_stream_fn</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">model_impl</span><span class="p">,</span> <span class="n">predict_stream_fn</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Model implementation is missing required </span><span class="si">{</span><span class="n">predict_stream_fn</span><span class="si">}</span><span class="s2"> method.&quot;</span>
+                <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_predict_stream_fn</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model_impl</span><span class="p">,</span> <span class="n">predict_stream_fn</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_predict_stream_fn</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">_validate_prediction_input</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">PyFuncInput</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PyFuncInput</span><span class="p">:</span>
+        <span class="n">input_schema</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get_input_schema</span><span class="p">()</span>
+        <span class="n">flavor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loader_module</span>
+        <span class="k">if</span> <span class="n">input_schema</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">_enforce_schema</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">input_schema</span><span class="p">,</span> <span class="n">flavor</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="c1"># Include error in message for backwards compatibility</span>
+                <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Failed to enforce schema of data &#39;</span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">&#39; &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;with schema &#39;</span><span class="si">{</span><span class="n">input_schema</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+
+        <span class="n">params</span> <span class="o">=</span> <span class="n">_validate_params</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">)</span>
+        <span class="n">_log_warning_if_params_not_in_predict_signature</span><span class="p">(</span><span class="n">_logger</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">HAS_PYSPARK</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">SparkDataFrame</span><span class="p">):</span>
+            <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;Input data is a Spark DataFrame. Note that behaviour for &quot;</span>
+                <span class="s2">&quot;Spark DataFrames is model dependent.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">params</span>
 
 <div class="viewcode-block" id="PyFuncModel.predict"><a class="viewcode-back" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PyFuncModel.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">PyFuncInput</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PyFuncOutput</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -865,30 +904,22 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            Model predictions as one of pandas.DataFrame, pandas.Series, numpy.ndarray or list.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">input_schema</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get_input_schema</span><span class="p">()</span>
-        <span class="n">flavor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loader_module</span>
-        <span class="k">if</span> <span class="n">input_schema</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">data</span> <span class="o">=</span> <span class="n">_enforce_schema</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">input_schema</span><span class="p">,</span> <span class="n">flavor</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="c1"># Include error in message for backwards compatibility</span>
-                <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Failed to enforce schema of data &#39;</span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">&#39; &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;with schema &#39;</span><span class="si">{</span><span class="n">input_schema</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-                <span class="p">)</span>
 
-        <span class="n">params</span> <span class="o">=</span> <span class="n">_validate_params</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">)</span>
-
+        <span class="n">data</span><span class="p">,</span> <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_prediction_input</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_predict_fn</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;params&quot;</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_fn</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
-        <span class="n">_log_warning_if_params_not_in_predict_signature</span><span class="p">(</span><span class="n">_logger</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">HAS_PYSPARK</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">SparkDataFrame</span><span class="p">):</span>
-            <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="s2">&quot;Input data is a Spark DataFrame. Note that behaviour for &quot;</span>
-                <span class="s2">&quot;Spark DataFrames is model dependent.&quot;</span>
-            <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_fn</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PyFuncModel.predict_stream"><a class="viewcode-back" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PyFuncModel.predict_stream">[docs]</a>    <span class="k">def</span> <span class="nf">predict_stream</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">PyFuncInput</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">PyFuncOutput</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_stream_fn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="s2">&quot;This model does not support predict_stream method.&quot;</span><span class="p">)</span>
+
+        <span class="n">data</span><span class="p">,</span> <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_prediction_input</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_predict_fn</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;params&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_stream_fn</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_stream_fn</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PyFuncModel.unwrap_python_model"><a class="viewcode-back" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PyFuncModel.unwrap_python_model">[docs]</a>    <span class="nd">@experimental</span>
     <span class="k">def</span> <span class="nf">unwrap_python_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1073,7 +1104,15 @@
             <span class="p">)</span> <span class="kn">from</span> <span class="kc">None</span>
         <span class="k">raise</span> <span class="n">e</span>
     <span class="n">predict_fn</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;predict_fn&quot;</span><span class="p">,</span> <span class="s2">&quot;predict&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">PyFuncModel</span><span class="p">(</span><span class="n">model_meta</span><span class="o">=</span><span class="n">model_meta</span><span class="p">,</span> <span class="n">model_impl</span><span class="o">=</span><span class="n">model_impl</span><span class="p">,</span> <span class="n">predict_fn</span><span class="o">=</span><span class="n">predict_fn</span><span class="p">)</span></div>
+    <span class="n">streamable</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;streamable&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="n">predict_stream_fn</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;predict_stream_fn&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">streamable</span> <span class="k">else</span> <span class="kc">None</span>
+
+    <span class="k">return</span> <span class="n">PyFuncModel</span><span class="p">(</span>
+        <span class="n">model_meta</span><span class="o">=</span><span class="n">model_meta</span><span class="p">,</span>
+        <span class="n">model_impl</span><span class="o">=</span><span class="n">model_impl</span><span class="p">,</span>
+        <span class="n">predict_fn</span><span class="o">=</span><span class="n">predict_fn</span><span class="p">,</span>
+        <span class="n">predict_stream_fn</span><span class="o">=</span><span class="n">predict_stream_fn</span><span class="p">,</span>
+    <span class="p">)</span></div>
 
 
 <span class="k">class</span> <span class="nc">_ServedPyFuncModel</span><span class="p">(</span><span class="n">PyFuncModel</span><span class="p">):</span>
