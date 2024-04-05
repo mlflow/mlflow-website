@@ -11,7 +11,7 @@ const AmbassadorGrid = () => (
     }}
   >
     {ambassadors.map((ambassador) => (
-      <AmbassadorCard {...ambassador} />
+      <AmbassadorCard key={ambassador.title} {...ambassador} />
     ))}
   </div>
 );
