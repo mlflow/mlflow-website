@@ -1,18 +1,16 @@
+import React from "react";
 import styles from "./styles.module.css";
 import ArrowText from "../ArrowText";
 import clsx from "clsx";
 
-const LearnCard = ({
-  title,
-  content,
-  href,
-  img,
-}: {
+interface LearnCardProps {
   title: string;
-  content: string;
+  content: React.ReactNode;
   href: string;
   img?: string;
-}) => {
+}
+
+const LearnCard: React.FC<LearnCardProps> = ({ title, content, href, img }) => {
   return (
     <a href={href} className={clsx("card", styles.card, styles.a)}>
       <div className={clsx("card__body", styles.cardBody)}>
