@@ -589,6 +589,7 @@
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
 <span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">lru_cache</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
@@ -625,7 +626,6 @@
     <span class="n">RESOURCE_DOES_NOT_EXIST</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.pyfunc.model</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">_SAVED_PYTHON_MODEL_SUBPATH</span><span class="p">,</span>
     <span class="n">ChatModel</span><span class="p">,</span>
     <span class="n">PythonModel</span><span class="p">,</span>
     <span class="n">PythonModelContext</span><span class="p">,</span>
@@ -654,7 +654,7 @@
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils</span> <span class="kn">import</span> <span class="n">env_manager</span> <span class="k">as</span> <span class="n">_EnvManager</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils._spark_utils</span> <span class="kn">import</span> <span class="n">modified_environ</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.annotations</span> <span class="kn">import</span> <span class="n">deprecated</span><span class="p">,</span> <span class="n">experimental</span>
+<span class="kn">from</span> <span class="nn">mlflow.utils.annotations</span> <span class="kn">import</span> <span class="n">deprecated</span><span class="p">,</span> <span class="n">developer_stable</span><span class="p">,</span> <span class="n">experimental</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.databricks_utils</span> <span class="kn">import</span> <span class="n">is_in_databricks_runtime</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.docstring_utils</span> <span class="kn">import</span> <span class="n">LOG_MODEL_PARAM_DOCS</span><span class="p">,</span> <span class="n">format_docstring</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.environment</span> <span class="kn">import</span> <span class="p">(</span>
@@ -703,11 +703,6 @@
 <span class="n">MODEL_CONFIG</span> <span class="o">=</span> <span class="s2">&quot;config&quot;</span>
 
 <span class="n">_MODEL_DATA_SUBPATH</span> <span class="o">=</span> <span class="s2">&quot;data&quot;</span>
-
-<span class="n">model_data_artifact_paths</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="n">_MODEL_DATA_SUBPATH</span><span class="p">,</span>
-    <span class="n">_SAVED_PYTHON_MODEL_SUBPATH</span><span class="p">,</span>
-<span class="p">]</span>
 
 
 <div class="viewcode-block" id="EnvType"><a class="viewcode-back" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.EnvType">[docs]</a><span class="k">class</span> <span class="nc">EnvType</span><span class="p">:</span>
@@ -837,7 +832,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">model_meta</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="s2">&quot;Model is missing metadata.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_model_meta</span> <span class="o">=</span> <span class="n">model_meta</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_model_impl</span> <span class="o">=</span> <span class="n">model_impl</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__model_impl</span> <span class="o">=</span> <span class="n">model_impl</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_predict_fn</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model_impl</span><span class="p">,</span> <span class="n">predict_fn</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">predict_stream_fn</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">model_impl</span><span class="p">,</span> <span class="n">predict_stream_fn</span><span class="p">):</span>
@@ -847,6 +842,16 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_predict_stream_fn</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model_impl</span><span class="p">,</span> <span class="n">predict_stream_fn</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_predict_stream_fn</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@developer_stable</span>
+    <span class="k">def</span> <span class="nf">_model_impl</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The underlying model implementation object.</span>
+
+<span class="sd">        NOTE: This is a stable developer API.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__model_impl</span>
 
     <span class="k">def</span> <span class="nf">_validate_prediction_input</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">PyFuncInput</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
@@ -2240,7 +2245,8 @@
     <span class="n">path</span><span class="p">,</span>
     <span class="n">loader_module</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">data_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">code_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">code_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># deprecated</span>
+    <span class="n">code_paths</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">conda_env</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">mlflow_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">python_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -2281,9 +2287,9 @@
 <span class="sd">            - One or more of the files specified by the ``code_path`` parameter.</span>
 
 <span class="sd">        data_path: Path to a file or directory containing model data.</span>
-<span class="sd">        code_path: A list of local filesystem paths to Python file dependencies (or directories</span>
-<span class="sd">            containing file dependencies). These files are *prepended* to the system</span>
-<span class="sd">            path before the model is loaded.</span>
+<span class="sd">        code_path: **Deprecated** The legacy argument for defining dependent code. This argument is</span>
+<span class="sd">            replaced by ``code_paths`` and will be removed in a future version of MLflow.</span>
+<span class="sd">        code_paths: {{ code_paths }}</span>
 <span class="sd">        conda_env: {{ conda_env }}</span>
 <span class="sd">        mlflow_model: :py:mod:`mlflow.models.Model` configuration to which to add the</span>
 <span class="sd">            **python_function** flavor.</span>
@@ -2412,9 +2418,23 @@
     <span class="n">mlflow_model</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="n">mlflow_model</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;save_model() got unexpected keyword arguments: </span><span class="si">{</span><span class="n">kwargs</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">code_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">code_paths</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+            <span class="s2">&quot;Both `code_path` and `code_paths` have been specified, which is not permitted.&quot;</span>
+        <span class="p">)</span>
     <span class="k">if</span> <span class="n">code_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">code_path</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Argument code_path should be a list, not </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">code_path</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># Alias for `code_path` deprecation</span>
+        <span class="n">code_paths</span> <span class="o">=</span> <span class="n">code_path</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;The `code_path` argument is replaced by `code_paths` and is deprecated &quot;</span>
+            <span class="s2">&quot;as of MLflow version 2.12.0. This argument will be removed in a future &quot;</span>
+            <span class="s2">&quot;release of MLflow.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">code_paths</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">code_paths</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Argument code_path should be a list, not </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">code_paths</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="n">first_argument_set</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;loader_module&quot;</span><span class="p">:</span> <span class="n">loader_module</span><span class="p">,</span>
@@ -2520,7 +2540,7 @@
             <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
             <span class="n">loader_module</span><span class="o">=</span><span class="n">loader_module</span><span class="p">,</span>
             <span class="n">data_path</span><span class="o">=</span><span class="n">data_path</span><span class="p">,</span>
-            <span class="n">code_paths</span><span class="o">=</span><span class="n">code_path</span><span class="p">,</span>
+            <span class="n">code_paths</span><span class="o">=</span><span class="n">code_paths</span><span class="p">,</span>
             <span class="n">conda_env</span><span class="o">=</span><span class="n">conda_env</span><span class="p">,</span>
             <span class="n">mlflow_model</span><span class="o">=</span><span class="n">mlflow_model</span><span class="p">,</span>
             <span class="n">pip_requirements</span><span class="o">=</span><span class="n">pip_requirements</span><span class="p">,</span>
@@ -2535,7 +2555,7 @@
             <span class="n">python_model</span><span class="o">=</span><span class="n">python_model</span><span class="p">,</span>
             <span class="n">artifacts</span><span class="o">=</span><span class="n">artifacts</span><span class="p">,</span>
             <span class="n">conda_env</span><span class="o">=</span><span class="n">conda_env</span><span class="p">,</span>
-            <span class="n">code_paths</span><span class="o">=</span><span class="n">code_path</span><span class="p">,</span>
+            <span class="n">code_paths</span><span class="o">=</span><span class="n">code_paths</span><span class="p">,</span>
             <span class="n">mlflow_model</span><span class="o">=</span><span class="n">mlflow_model</span><span class="p">,</span>
             <span class="n">pip_requirements</span><span class="o">=</span><span class="n">pip_requirements</span><span class="p">,</span>
             <span class="n">extra_pip_requirements</span><span class="o">=</span><span class="n">extra_pip_requirements</span><span class="p">,</span>
@@ -2548,7 +2568,8 @@
     <span class="n">artifact_path</span><span class="p">,</span>
     <span class="n">loader_module</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">data_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">code_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">code_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># deprecated</span>
+    <span class="n">code_paths</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">conda_env</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">python_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">artifacts</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -2585,9 +2606,9 @@
 <span class="sd">            - One or more of the files specified by the ``code_path`` parameter.</span>
 
 <span class="sd">        data_path: Path to a file or directory containing model data.</span>
-<span class="sd">        code_path: A list of local filesystem paths to Python file dependencies (or directories</span>
-<span class="sd">            containing file dependencies). These files are *prepended* to the system</span>
-<span class="sd">            path before the model is loaded.</span>
+<span class="sd">        code_path: **Deprecated** The legacy argument for defining dependent code. This argument is</span>
+<span class="sd">            replaced by ``code_paths`` and will be removed in a future version of MLflow.</span>
+<span class="sd">        code_paths: {{ code_paths }}</span>
 <span class="sd">        conda_env: {{ conda_env }}</span>
 <span class="sd">        python_model:</span>
 <span class="sd">            An instance of a subclass of :class:`~PythonModel` or a callable object with a single</span>
@@ -2724,7 +2745,8 @@
         <span class="n">flavor</span><span class="o">=</span><span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="p">,</span>
         <span class="n">loader_module</span><span class="o">=</span><span class="n">loader_module</span><span class="p">,</span>
         <span class="n">data_path</span><span class="o">=</span><span class="n">data_path</span><span class="p">,</span>
-        <span class="n">code_path</span><span class="o">=</span><span class="n">code_path</span><span class="p">,</span>
+        <span class="n">code_path</span><span class="o">=</span><span class="n">code_path</span><span class="p">,</span>  <span class="c1"># deprecated</span>
+        <span class="n">code_paths</span><span class="o">=</span><span class="n">code_paths</span><span class="p">,</span>
         <span class="n">python_model</span><span class="o">=</span><span class="n">python_model</span><span class="p">,</span>
         <span class="n">artifacts</span><span class="o">=</span><span class="n">artifacts</span><span class="p">,</span>
         <span class="n">conda_env</span><span class="o">=</span><span class="n">conda_env</span><span class="p">,</span>

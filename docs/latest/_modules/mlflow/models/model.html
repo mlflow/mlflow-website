@@ -260,6 +260,12 @@
 <span class="p">)</span>
 <span class="c1"># NOTE: The _MLFLOW_VERSION_KEY constant is considered @developer_stable</span>
 <span class="n">_MLFLOW_VERSION_KEY</span> <span class="o">=</span> <span class="s2">&quot;mlflow_version&quot;</span>
+<span class="n">METADATA_FILES</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">MLMODEL_FILE_NAME</span><span class="p">,</span>
+    <span class="n">_CONDA_ENV_FILE_NAME</span><span class="p">,</span>
+    <span class="n">_REQUIREMENTS_FILE_NAME</span><span class="p">,</span>
+    <span class="n">_PYTHON_ENV_FILE_NAME</span><span class="p">,</span>
+<span class="p">]</span>
 
 
 <div class="viewcode-block" id="ModelInfo"><a class="viewcode-back" href="../../../python_api/mlflow.models.html#mlflow.models.ModelInfo">[docs]</a><span class="k">class</span> <span class="nc">ModelInfo</span><span class="p">:</span>
@@ -828,31 +834,20 @@
                 <span class="c1"># wheeled model updates several metadata files in original model directory</span>
                 <span class="c1"># copy these updated metadata files to the &#39;metadata&#39; subdirectory</span>
                 <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">metadata_path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">file_name</span> <span class="ow">in</span> <span class="p">[</span>
-                    <span class="n">MLMODEL_FILE_NAME</span><span class="p">,</span>
-                    <span class="n">_CONDA_ENV_FILE_NAME</span><span class="p">,</span>
-                    <span class="n">_REQUIREMENTS_FILE_NAME</span><span class="p">,</span>
-                    <span class="n">_PYTHON_ENV_FILE_NAME</span><span class="p">,</span>
+                <span class="k">for</span> <span class="n">file_name</span> <span class="ow">in</span> <span class="n">METADATA_FILES</span> <span class="o">+</span> <span class="p">[</span>
                     <span class="n">_ORIGINAL_REQ_FILE_NAME</span><span class="p">,</span>
                 <span class="p">]:</span>
                     <span class="n">src_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">local_path</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
-                    <span class="n">dest_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">metadata_path</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
-                    <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">src_file_path</span><span class="p">,</span> <span class="n">dest_file_path</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">flavor</span><span class="p">,</span> <span class="s2">&quot;model_data_artifact_paths&quot;</span><span class="p">):</span>
-                <span class="c1"># Copy metadata files to the &#39;metadata&#39; subdirectory</span>
-                <span class="n">model_data_subpaths</span> <span class="o">=</span> <span class="n">flavor</span><span class="o">.</span><span class="n">model_data_artifact_paths</span>
-                <span class="n">non_metadata_subpaths</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;code&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">model_data_subpaths</span><span class="p">]</span>
-                <span class="n">subpaths_list</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">local_path</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">src_file_path</span><span class="p">):</span>
+                        <span class="n">dest_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">metadata_path</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+                        <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">src_file_path</span><span class="p">,</span> <span class="n">dest_file_path</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
                 <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">metadata_path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">subpath_name</span> <span class="ow">in</span> <span class="n">subpaths_list</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">subpath_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">non_metadata_subpaths</span><span class="p">:</span>
-                        <span class="n">src_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">local_path</span><span class="p">,</span> <span class="n">subpath_name</span><span class="p">)</span>
-                        <span class="n">dest_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">metadata_path</span><span class="p">,</span> <span class="n">subpath_name</span><span class="p">)</span>
-
-                        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">src_file_path</span><span class="p">):</span>
-                            <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">src_file_path</span><span class="p">,</span> <span class="n">dest_file_path</span><span class="p">)</span>
-                        <span class="k">else</span><span class="p">:</span>
-                            <span class="n">shutil</span><span class="o">.</span><span class="n">copytree</span><span class="p">(</span><span class="n">src_file_path</span><span class="p">,</span> <span class="n">dest_file_path</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">file_name</span> <span class="ow">in</span> <span class="n">METADATA_FILES</span><span class="p">:</span>
+                    <span class="n">src_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">local_path</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">src_file_path</span><span class="p">):</span>
+                        <span class="n">dest_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">metadata_path</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+                        <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">src_file_path</span><span class="p">,</span> <span class="n">dest_file_path</span><span class="p">)</span>
 
             <span class="n">tracking_uri</span> <span class="o">=</span> <span class="n">_resolve_tracking_uri</span><span class="p">()</span>
             <span class="c1"># We check signature presence here as some flavors have a default signature as a</span>

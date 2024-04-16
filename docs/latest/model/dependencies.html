@@ -390,7 +390,7 @@ test your model in a virtual environment. Please refer to <a class="reference in
 <h2><a class="toc-backref" href="#id8">Saving Extra Code with an MLflow Model</a><a class="headerlink" href="#saving-extra-code-with-an-mlflow-model" title="Permalink to this headline"> </a></h2>
 <p>MLflow also supports saving your custom Python code as dependencies to the model. This is particularly useful
 when you want to deploy your custom modules that are required for prediction with the model.
-To do so, specify <strong>code_path</strong> when logging the model. For example, if you have the following file structure in your project:</p>
+To do so, specify <strong>code_paths</strong> when logging the model. For example, if you have the following file structure in your project:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>my_project/
 ├── utils.py
 └── train.py
@@ -430,10 +430,10 @@ To do so, specify <strong>code_path</strong> when logging the model. For example
 </pre></div>
 </div>
 <p>When MLflow loads the model for serving, the <code class="docutils literal notranslate"><span class="pre">code</span></code> directory will be added to the system path so that you can use the module in your model
-code like <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">utils</span> <span class="pre">import</span> <span class="pre">my_func</span></code>. You can also specify a directory path as <code class="docutils literal notranslate"><span class="pre">code_path</span></code> to save multiple files under the directory:</p>
-<div class="section" id="caveats-of-code-path-option">
-<h3>Caveats of <code class="docutils literal notranslate"><span class="pre">code_path</span></code> Option<a class="headerlink" href="#caveats-of-code-path-option" title="Permalink to this headline"> </a></h3>
-<p>When using the <code class="docutils literal notranslate"><span class="pre">code_path</span></code> option, please be aware of the limitation that the specified file or directory <strong>must be in the same directory as your model script</strong>.
+code like <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">utils</span> <span class="pre">import</span> <span class="pre">my_func</span></code>. You can also specify a directory path as <code class="docutils literal notranslate"><span class="pre">code_paths</span></code> to save multiple files under the directory:</p>
+<div class="section" id="caveats-of-code-paths-option">
+<h3>Caveats of <code class="docutils literal notranslate"><span class="pre">code_paths</span></code> Option<a class="headerlink" href="#caveats-of-code-paths-option" title="Permalink to this headline"> </a></h3>
+<p>When using the <code class="docutils literal notranslate"><span class="pre">code_paths</span></code> option, please be aware of the limitation that the specified file or directory <strong>must be in the same directory as your model script</strong>.
 If the specified file or directory is in a parent or child directory like <code class="docutils literal notranslate"><span class="pre">my_project/src/utils.py</span></code>, model serving will fail with <code class="docutils literal notranslate"><span class="pre">ModuleNotFoundError</span></code>.
 For example, let’s say that you have the following file structure in your project</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>my_project/
@@ -468,7 +468,7 @@ For example, let’s say that you have the following file structure in your proj
 it does <strong>not</strong> preserve the relative paths that they were originally residing within. For instance, in the above example, MLflow will copy <code class="docutils literal notranslate"><span class="pre">utils.py</span></code> to <code class="docutils literal notranslate"><span class="pre">code/utils.py</span></code>, not
 <code class="docutils literal notranslate"><span class="pre">code/src/utils.py</span></code>. As a result, it has to be imported as <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">utils</span> <span class="pre">import</span> <span class="pre">my_func</span></code>, instead of <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">src.utils</span> <span class="pre">import</span> <span class="pre">my_func</span></code>.
 However, this may not be pleasant, as the import path is different from the original training script.</p>
-<p>To workaround this issue, the <code class="docutils literal notranslate"><span class="pre">code_path</span></code> should specify the parent directory, which is <code class="docutils literal notranslate"><span class="pre">code_path=[&quot;src&quot;]</span></code> in this example.
+<p>To workaround this issue, the <code class="docutils literal notranslate"><span class="pre">code_paths</span></code> should specify the parent directory, which is <code class="docutils literal notranslate"><span class="pre">code_paths=[&quot;src&quot;]</span></code> in this example.
 This way, MLflow will copy the entire <code class="docutils literal notranslate"><span class="pre">src/</span></code> directory under <code class="docutils literal notranslate"><span class="pre">code/</span></code> and your model code will be able to import <code class="docutils literal notranslate"><span class="pre">src.utils</span></code>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyModel</span><span class="p">(</span><span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">PythonModel</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">model_input</span><span class="p">):</span>
@@ -489,12 +489,12 @@ This way, MLflow will copy the entire <code class="docutils literal notranslate"
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>By the same reason, <code class="docutils literal notranslate"><span class="pre">code_path</span></code> option doesn’t handle the relative import like <code class="docutils literal notranslate"><span class="pre">code_path=[&quot;../src&quot;]</span></code>.</p>
+<p>By the same reason, the <code class="docutils literal notranslate"><span class="pre">code_paths</span></code> option doesn’t handle the relative import of <code class="docutils literal notranslate"><span class="pre">code_paths=[&quot;../src&quot;]</span></code>.</p>
 </div>
 </div>
 <div class="section" id="recommended-project-structure">
 <h3>Recommended Project Structure<a class="headerlink" href="#recommended-project-structure" title="Permalink to this headline"> </a></h3>
-<p>With this limitation for <code class="docutils literal notranslate"><span class="pre">code_path</span></code> in mind, the recommended project structure looks like the following:</p>
+<p>With this limitation for <code class="docutils literal notranslate"><span class="pre">code_paths</span></code> in mind, the recommended project structure looks like the following:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>my_project/
 |-- model.py # Defines the custom pyfunc model
 |── train.py # Trains and logs the model
@@ -506,7 +506,7 @@ This way, MLflow will copy the entire <code class="docutils literal notranslate"
     └── ...
 </pre></div>
 </div>
-<p>Then you can log the model with <code class="docutils literal notranslate"><span class="pre">code_paths=[&quot;core&quot;]</span></code> to include the required modules for prediction, while excluding the helper modules
+<p>This way you can log the model with <code class="docutils literal notranslate"><span class="pre">code_paths=[&quot;core&quot;]</span></code> to include the required modules for prediction, while excluding the helper modules
 that are only used for development.</p>
 </div>
 </div>

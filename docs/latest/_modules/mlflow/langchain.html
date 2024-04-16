@@ -247,15 +247,13 @@
 <span class="kn">from</span> <span class="nn">mlflow.langchain.runnables</span> <span class="kn">import</span> <span class="n">_load_runnables</span><span class="p">,</span> <span class="n">_save_runnables</span>
 <span class="kn">from</span> <span class="nn">mlflow.langchain.utils</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">_BASE_LOAD_KEY</span><span class="p">,</span>
-    <span class="n">_MODEL_DATA_FOLDER_NAME</span><span class="p">,</span>
-    <span class="n">_MODEL_DATA_PKL_FILE_NAME</span><span class="p">,</span>
     <span class="n">_MODEL_LOAD_KEY</span><span class="p">,</span>
-    <span class="n">_PERSIST_DIR_NAME</span><span class="p">,</span>
     <span class="n">_RUNNABLE_LOAD_KEY</span><span class="p">,</span>
     <span class="n">_load_base_lcs</span><span class="p">,</span>
     <span class="n">_save_base_lcs</span><span class="p">,</span>
     <span class="n">_validate_and_wrap_lc_model</span><span class="p">,</span>
     <span class="n">lc_runnables_types</span><span class="p">,</span>
+    <span class="n">patch_langchain_type_to_cls_dict</span><span class="p">,</span>
     <span class="n">register_pydantic_v1_serializer_cm</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">Model</span><span class="p">,</span> <span class="n">ModelInputExample</span><span class="p">,</span> <span class="n">ModelSignature</span><span class="p">,</span> <span class="n">get_model_info</span>
@@ -297,13 +295,6 @@
 
 <span class="n">FLAVOR_NAME</span> <span class="o">=</span> <span class="s2">&quot;langchain&quot;</span>
 <span class="n">_MODEL_TYPE_KEY</span> <span class="o">=</span> <span class="s2">&quot;model_type&quot;</span>
-
-
-<span class="n">model_data_artifact_paths</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="n">_MODEL_DATA_FOLDER_NAME</span><span class="p">,</span>
-    <span class="n">_MODEL_DATA_PKL_FILE_NAME</span><span class="p">,</span>
-    <span class="n">_PERSIST_DIR_NAME</span><span class="p">,</span>
-<span class="p">]</span>
 
 
 <div class="viewcode-block" id="get_default_pip_requirements"><a class="viewcode-back" href="../../python_api/mlflow.langchain.html#mlflow.langchain.get_default_pip_requirements">[docs]</a><span class="k">def</span> <span class="nf">get_default_pip_requirements</span><span class="p">():</span>
@@ -355,9 +346,7 @@
 <span class="sd">            or `RunnableSequence &lt;https://python.langchain.com/docs/modules/chains/foundational/sequential_chains#using-lcel&gt;`_.</span>
 <span class="sd">        path: Local path where the serialized model (as YAML) is to be saved.</span>
 <span class="sd">        conda_env: {{ conda_env }}</span>
-<span class="sd">        code_paths: A list of local filesystem paths to Python file dependencies (or directories</span>
-<span class="sd">            containing file dependencies). These files are *prepended* to the system</span>
-<span class="sd">            path when the model is loaded.</span>
+<span class="sd">        code_paths: {{ code_paths }}</span>
 <span class="sd">        mlflow_model: :py:mod:`mlflow.models.Model` this flavor is being added to.</span>
 <span class="sd">        signature: :py:class:`ModelSignature &lt;mlflow.models.ModelSignature&gt;`</span>
 <span class="sd">            describes model input and output :py:class:`Schema &lt;mlflow.types.Schema&gt;`.</span>
@@ -628,9 +617,7 @@
 <span class="sd">            `retriever &lt;https://python.langchain.com/docs/modules/data_connection/retrievers/&gt;`_.</span>
 <span class="sd">        artifact_path: Run-relative artifact path.</span>
 <span class="sd">        conda_env: {{ conda_env }}</span>
-<span class="sd">        code_paths: A list of local filesystem paths to Python file dependencies (or directories</span>
-<span class="sd">            containing file dependencies). These files are *prepended* to the system</span>
-<span class="sd">            path when the model is loaded.</span>
+<span class="sd">        code_paths: {{ code_paths }}</span>
 <span class="sd">        registered_model_name: This argument may change or be removed in a</span>
 <span class="sd">            future release without warning. If given, create a model</span>
 <span class="sd">            version under ``registered_model_name``, also creating a</span>
@@ -871,8 +858,14 @@
 <span class="sd">        and `return_first_element` means if True, we should return the first element</span>
 <span class="sd">        of inference result, otherwise we should return the whole inference result.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># This handels spark_udf inputs and input_example inputs</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="n">orient</span><span class="o">=</span><span class="s2">&quot;records&quot;</span><span class="p">)</span>
+            <span class="c1"># if the data only contains a single key as 0, we assume the input</span>
+            <span class="c1"># is either a string or list of strings</span>
+            <span class="k">if</span> <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s2">&quot;list&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="n">orient</span><span class="o">=</span><span class="s2">&quot;records&quot;</span><span class="p">)</span>
 
         <span class="n">data</span> <span class="o">=</span> <span class="n">_convert_ndarray_to_list</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
@@ -1052,7 +1045,8 @@
         <span class="k">return</span> <span class="n">_load_model_code_path</span><span class="p">(</span><span class="n">code_path</span><span class="p">,</span> <span class="n">config_path</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">_add_code_from_conf_to_system_path</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">,</span> <span class="n">flavor_conf</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">_load_model</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">,</span> <span class="n">flavor_conf</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">patch_langchain_type_to_cls_dict</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">_load_model</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">,</span> <span class="n">flavor_conf</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="load_model"><a class="viewcode-back" href="../../python_api/mlflow.langchain.html#mlflow.langchain.load_model">[docs]</a><span class="nd">@experimental</span>

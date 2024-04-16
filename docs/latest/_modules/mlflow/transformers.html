@@ -273,7 +273,6 @@
 <span class="kn">from</span> <span class="nn">mlflow.transformers.model_io</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">_COMPONENTS_BINARY_DIR_NAME</span><span class="p">,</span>
     <span class="n">_MODEL_BINARY_FILE_NAME</span><span class="p">,</span>
-    <span class="n">_PROCESSOR_BINARY_DIR_NAME</span><span class="p">,</span>
     <span class="n">load_model_and_components_from_huggingface_hub</span><span class="p">,</span>
     <span class="n">load_model_and_components_from_local</span><span class="p">,</span>
     <span class="n">save_pipeline_pretrained_weights</span><span class="p">,</span>
@@ -327,6 +326,7 @@
 
 <span class="c1"># The following import is only used for type hinting</span>
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">torch</span>
     <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">Pipeline</span>
 
 <span class="c1"># Transformers pipeline complains that PeftModel is not supported for any task type, even</span>
@@ -371,14 +371,6 @@
 
 
 <span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
-
-
-<span class="n">model_data_artifact_paths</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="n">_MODEL_BINARY_FILE_NAME</span><span class="p">,</span>
-    <span class="n">_COMPONENTS_BINARY_DIR_NAME</span><span class="p">,</span>
-    <span class="n">_PROCESSOR_BINARY_DIR_NAME</span><span class="p">,</span>
-    <span class="n">_PEFT_ADAPTOR_DIR_NAME</span><span class="p">,</span>
-<span class="p">]</span>
 
 
 <div class="viewcode-block" id="get_default_pip_requirements"><a class="viewcode-back" href="../../python_api/mlflow.transformers.html#mlflow.transformers.get_default_pip_requirements">[docs]</a><span class="nd">@experimental</span>
@@ -468,6 +460,7 @@
     <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">processor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">task</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">torch_dtype</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">dtype</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">model_card</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">inference_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">code_paths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -613,9 +606,7 @@
 <span class="sd">                    model_config=model_config,</span>
 <span class="sd">                )</span>
 
-<span class="sd">        code_paths: A list of local filesystem paths to Python file dependencies (or directories</span>
-<span class="sd">            containing file dependencies). These files are *prepended* to the system</span>
-<span class="sd">            path when the model is loaded.</span>
+<span class="sd">        code_paths: {{ code_paths }}</span>
 <span class="sd">        mlflow_model: An MLflow model object that specifies the flavor that this model is being</span>
 <span class="sd">            added to.</span>
 <span class="sd">        signature: A Model Signature object that describes the input and output Schema of the</span>
@@ -783,7 +774,7 @@
         <span class="n">save_pretrained</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="c1"># Create the flavor configuration</span>
-    <span class="n">flavor_conf</span> <span class="o">=</span> <span class="n">build_flavor_config</span><span class="p">(</span><span class="n">built_pipeline</span><span class="p">,</span> <span class="n">processor</span><span class="p">,</span> <span class="n">save_pretrained</span><span class="p">)</span>
+    <span class="n">flavor_conf</span> <span class="o">=</span> <span class="n">build_flavor_config</span><span class="p">(</span><span class="n">built_pipeline</span><span class="p">,</span> <span class="n">processor</span><span class="p">,</span> <span class="n">torch_dtype</span><span class="p">,</span> <span class="n">save_pretrained</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">llm_inference_task</span><span class="p">:</span>
         <span class="n">flavor_conf</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">_LLM_INFERENCE_TASK_KEY</span><span class="p">:</span> <span class="n">llm_inference_task</span><span class="p">})</span>
@@ -921,6 +912,7 @@
     <span class="n">artifact_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">processor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">task</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">torch_dtype</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">dtype</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">model_card</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">inference_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">code_paths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1000,6 +992,10 @@
 <span class="sd">            pipeline utilities within the transformers library will be used to infer the</span>
 <span class="sd">            correct task type. If the value specified is not a supported type within the</span>
 <span class="sd">            version of transformers that is currently installed, an Exception will be thrown.</span>
+<span class="sd">        torch_dtype: The Pytorch dtype applied to the model when loading back. This is useful</span>
+<span class="sd">            when you want to save the model with a specific dtype that is different from the</span>
+<span class="sd">            dtype of the model when it was trained. If not specified, the current dtype of the</span>
+<span class="sd">            model instance will be used.</span>
 <span class="sd">        model_card: An Optional `ModelCard` instance from `huggingface-hub`. If provided, the</span>
 <span class="sd">            contents of the model card will be saved along with the provided</span>
 <span class="sd">            `transformers_model`. If not provided, an attempt will be made to fetch</span>
@@ -1064,9 +1060,7 @@
 <span class="sd">                        model_config=model_config,</span>
 <span class="sd">                    )</span>
 
-<span class="sd">        code_paths: A list of local filesystem paths to Python file dependencies (or directories</span>
-<span class="sd">            containing file dependencies). These files are *prepended* to the system</span>
-<span class="sd">            path when the model is loaded.</span>
+<span class="sd">        code_paths: {{ code_paths }}</span>
 <span class="sd">        registered_model_name: This argument may change or be removed in a</span>
 <span class="sd">            future release without warning. If given, create a model</span>
 <span class="sd">            version under ``registered_model_name``, also creating a</span>
@@ -1135,6 +1129,7 @@
         <span class="n">transformers_model</span><span class="o">=</span><span class="n">transformers_model</span><span class="p">,</span>
         <span class="n">processor</span><span class="o">=</span><span class="n">processor</span><span class="p">,</span>
         <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span>
+        <span class="n">torch_dtype</span><span class="o">=</span><span class="n">torch_dtype</span><span class="p">,</span>
         <span class="n">model_card</span><span class="o">=</span><span class="n">model_card</span><span class="p">,</span>
         <span class="n">inference_config</span><span class="o">=</span><span class="n">inference_config</span><span class="p">,</span>
         <span class="n">conda_env</span><span class="o">=</span><span class="n">conda_env</span><span class="p">,</span>
