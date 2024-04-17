@@ -13,7 +13,7 @@ The pace of feature development in MLflow is faster now than ever before, and th
 
 ## How It Works
 
-Starting from MLflow 2.13.0, new MLflow major and minor releases will be tagged as release candidates in PyPI two weeks before they are officially released.
+Starting from MLflow 2.13.0, new MLflow major and minor releases will be tagged as release candidates (e.g., `2.13.0rc0`) in PyPI two weeks before they are officially released.
 
 The release candidate process involves several key stages:
 
