@@ -27,6 +27,21 @@ export type Release = {
 // Sort by date descending
 export const BLOGS: Blog[] = [
   {
+    title: "MLflow Release Candidates",
+    path: "/blog/release-candidates",
+    tags: ["mlflow"],
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2024-04-17",
+    thumbnail: "img/blog/release-candidates.png",
+  },
+  {
     title:
       "Announcing MLflow Enhancements - Deep Learning with MLflow (Part 1)",
     path: "/blog/deep-learning-part-1",
