@@ -17,6 +17,7 @@ Starting from MLflow 2.13.0, new MLflow major and minor releases will be tagged 
 
 The release candidate process involves several key stages:
 
+- Feature Development Freeze: Prior to cutting the RC branch and announcing its availability, we will freeze the RC branch from feature commits. Once the branch is cut, only bug fix and stability PRs will be permitted to be merged, ensuring that unexpected, late-arriving, potentially regression-causing merges are not permitted to destabilize the forthcoming release.
 - Pre-Release Announcement: We will announce upcoming features and improvements, providing our community with a roadmap of what to expect.
 - Release Candidate Rollout: A release candidate version will be made available for testing, accompanied by detailed release notes outlining the changes.
 - Community Testing and Feedback: We encourage our users to test the release candidate in their environments and share their feedback with us by filing issue reports on the MLflow Github repository. This feedback is invaluable for identifying issues and ensuring the final release aligns with user needs (i.e., we didn't break your workflows).
