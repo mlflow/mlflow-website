@@ -27,6 +27,39 @@ export type Release = {
 // Sort by date descending
 export const BLOGS: Blog[] = [
   {
+    title: "Deep Learning with MLflow (Part 2)",
+    path: "/blog/deep-learning-part-2",
+    tags: ["Deep Learning"],
+    authors: [
+      {
+        name: "Puneet Jain",
+        title: "Sr. Specialist Solutions Architect at Databricks",
+        url: "https://www.linkedin.com/in/puneetjain159/",
+        image_url: "/img/authors/puneet.png",
+      },
+      {
+        name: "Avinash Sooriyarachchi",
+        title: "Sr. Solutions Architect at Databricks",
+        url: "https://www.linkedin.com/in/avi-data-ml/",
+        image_url: "/img/authors/avinash.png",
+      },
+      {
+        name: "Abe Omorogbe",
+        title: "Product Manager, ML at Databricks",
+        url: "https://www.linkedin.com/in/abeomor/",
+        image_url: "/img/authors/abe.png",
+      },
+      {
+        name: "Ben Wilson",
+        title: "Software Engineer at Databricks",
+        url: "https://www.linkedin.com/in/benjamin-wilson-arch/",
+        image_url: "/img/authors/ben.png",
+      },
+    ],
+    date: "2024-04-26",
+    thumbnail: "img/blog/dl-blog-2.png",
+  },
+  {
     title: "MLflow Release Candidates",
     path: "/blog/release-candidates",
     tags: ["mlflow"],
