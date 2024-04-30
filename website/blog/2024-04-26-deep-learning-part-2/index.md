@@ -38,10 +38,10 @@ with or without notice. Most people would consider this to be quite unfair.
 
 While this sentence is buried quite deeply within a fairly dense document, an ML algorithm is not burdened by the exhaustion that a human
 would have for combing through the text and identifying clauses that might seem a bit unfair. By automatically identifying potentially
-unfair clauses, transformers can help protect consumers from exploitative practices, ensure greater compliance with legal standards,
+unfair clauses, a transformers-based Deep Learning (DL) model can help protect consumers from exploitative practices, ensure greater compliance with legal standards,
 and foster trust between service providers and users.
 
-A base transformer model, without specialized fine-tuning, faces several challenges in accurately identifying unfair Terms of Service clauses.
+A base pre-trained transformer model, without specialized fine-tuning, faces several challenges in accurately identifying unfair Terms of Service clauses.
 Firstly, it lacks the domain-specific knowledge essential for understanding complex legal language. Secondly, its training objectives are
 too general to capture the nuanced interpretation required for legal analysis. Lastly, it may not effectively recognize the subtle
 contextual meanings that determine the fairness of contractual terms, making it less effective for this specialized task.
@@ -59,10 +59,11 @@ on modest hardware, such as an Nvidia T4 GPU.
 ### What is PEFT?
 
 [Parameter-Efficient Fine-Tuning (PEFT)](https://huggingface.co/docs/peft/en/index) approaches are advantageous as they involve
-keeping the bulk of the pre-trained model parameters fixed while only training a few additional layers. This methodology not only
-conserves memory but also significantly reduces training time. When compared with the alternative of fine-tuning a base model's weights, the PEFT
-approach can save significant time and computational resources while achieving similar (and in some cases, better) performance results with
-less data.
+keeping the bulk of the pre-trained model parameters fixed while either only training a few additional layers or modifying the parameters used
+when interacting with the model's weights. This methodology not only conserves memory during training, but also significantly reduces the overall training time. When
+compared with the alternative of fine-tuning a base model's weights in order to customize its performance for a specific targeted task, the PEFT
+approach can save significant cost in both time and money, while providing an equivalent or better performance results with less data than is required
+for a comprehensive fine-tuning training task.
 
 ## Integrating Hugging-Face models and the PyTorch Lightning framework
 
@@ -191,10 +192,54 @@ training is executed by calling `fit` on the `Trainer` object. By providing the 
 appropriate number of epochs will be used, logged, and tracked without any additional effort.
 
 ```python
+from dataclasses import dataclass, field
+import os
+
+from data import LexGlueDataModule
 from lightning import Trainer
 from lightning.pytorch.callbacks import EarlyStopping
+import mlflow
 
-# Run the training loop.
+
+@dataclass
+class TrainConfig:
+    pretrained_model: str = "bert-base-uncased"
+    num_classes: int = 2
+    lr: float = 2e-4
+    max_length: int = 128
+    batch_size: int = 256
+    num_workers: int = os.cpu_count()
+    max_epochs: int = 10
+    debug_mode_sample: int | None = None
+    max_time: dict[str, float] = field(default_factory=lambda: {"hours": 3})
+    model_checkpoint_dir: str = "/local_disk0/tmp/model-checkpoints"
+    min_delta: float = 0.005
+    patience: int = 4
+
+train_config = TrainConfig()
+
+# Instantiate the custom Transformer class for PEFT training
+nlp_model = TransformerModule(
+        pretrained_model=train_config.pretrained_model,
+        num_classes=train_config.num_classes,
+        lr=train_config.lr,
+    )
+
+datamodule = LexGlueDataModule(
+        pretrained_model=train_config.pretrained_model,
+        max_length=train_config.max_length,
+        batch_size=train_config.batch_size,
+        num_workers=train_config.num_workers,
+        debug_mode_sample=train_config.debug_mode_sample,
+    )
+
+# Log system metrics while training loop is running
+mlflow.enable_system_metrics_logging()
+
+# Automatically log per-epoch parameters, metrics, and checkpoint weights
+mlflow.pytorch.autolog(checkpoint_save_best_only = False)
+
+# Define the Trainer configuration
 trainer = Trainer(
    callbacks=[
        EarlyStopping(
@@ -212,6 +257,7 @@ trainer = Trainer(
    precision="32-true"
 )
 
+# Execute the training run
 trainer.fit(model=nlp_model, datamodule=datamodule)
 ```
 
@@ -251,9 +297,21 @@ import mlflow
 mlflow.pytorch.autolog(disable = True)
 
 run_id = '<Add the run ID>'
-model = mlflow.pytorch.load_model(f"runs:/{run_id}/model")
 
 model = mlflow.pytorch.load_checkpoint(TransformerModule, run_id, 3)
+
+examples_to_test = ["We reserve the right to modify the service price at any time and retroactively apply the adjusted price to historical service usage."]
+
+train_module = Trainer()
+tokenizer = AutoTokenizer.from_pretrained(train_config.pretrained_model)
+tokens = tokenizer(examples_to_test,
+                  max_length=train_config.max_length,
+                  padding="max_length",
+                  truncation=True)
+ds = Dataset.from_dict(dict(tokens))
+ds.set_format(
+            type="torch", columns=["input_ids", "attention_mask"]
+        )
 
 train_module.predict(model, dataloaders = DataLoader(ds))
 ```
@@ -272,7 +330,8 @@ If you're interested in seeing the full example in its entirety, feel free to [s
 
 ### Check out the code
 
-The code we provide will delve into additional aspects such as training from a checkpoint, integrating MLflow and TensorBoard, and utilizing Pyfunc for model wrapping, among others. These resources are specifically tailored for implementation on [Databricks Community Edition](https://mlflow.org/blog/databricks-ce).
+The code we provide will delve into additional aspects such as training from a checkpoint, integrating MLflow and TensorBoard, and utilizing Pyfunc for model wrapping, among others. These resources are specifically tailored for implementation on [Databricks Community Edition](https://mlflow.org/blog/databricks-ce). The main runner notebook
+within the full example repository [can be found here](https://github.com/puneet-jain159/deeplearning_with_mlfow/blob/master/train.ipynb).
 
 ## Get Started with MLflow 2.12 Today
 
