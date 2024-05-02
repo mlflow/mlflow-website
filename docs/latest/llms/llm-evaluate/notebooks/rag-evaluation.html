@@ -143,6 +143,8 @@
 <li class="toctree-l4"><a class="reference internal" href="question-answering-evaluation.html">LLM Evaluation with MLflow Example Notebook</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">LLM RAG Evaluation with MLflow Example Notebook</a></li>
 <li class="toctree-l4"><a class="reference internal" href="rag-evaluation-llama2.html">LLM RAG Evaluation with MLflow using llama2-as-judge Example Notebook</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rag-evaluation-llama2.html#Create-a-RAG-system">Create a RAG system</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rag-evaluation-llama2.html#Evaluate-the-RAG-system-using-mlflow.evaluate()">Evaluate the RAG system using <code class="docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="huggingface-evaluation.html">Evaluate a Hugging Face LLM with <code class="docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="index.html#qa-evaluation-tutorial">QA Evaluation Tutorial</a></li>
 <li class="toctree-l4"><a class="reference internal" href="index.html#rag-evaluation-tutorials">RAG Evaluation Tutorials</a></li>
@@ -486,29 +488,56 @@ div.rendered_html tbody tr:hover {
 <p><code class="docutils literal notranslate"><span class="pre">OPENAI_API_VERSION=&lt;YYYY-MM-DD&gt;</span></code></p>
 <p><code class="docutils literal notranslate"><span class="pre">OPENAI_API_KEY=&lt;https://&lt;&gt;.&lt;&gt;.&lt;&gt;.com&gt;</span></code></p>
 <p><code class="docutils literal notranslate"><span class="pre">OPENAI_API_DEPLOYMENT_NAME=&lt;deployment</span> <span class="pre">name&gt;</span></code></p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-
-<span class="kn">import</span> <span class="nn">mlflow</span>
-</pre></div>
-</div>
-</div>
+<div class="section" id="Notebook-compatibility">
+<h2>Notebook compatibility<a class="headerlink" href="#Notebook-compatibility" title="Permalink to this headline"> </a></h2>
+<p>With rapidly changing libraries such as <code class="docutils literal notranslate"><span class="pre">langchain</span></code>, examples can become outdated rather quickly and will no longer work. For the purposes of demonstration, here are the critical dependencies that are recommended to use to effectively run this notebook:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 64%" />
+<col style="width: 36%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Package</p></th>
+<th class="head"><p>Version</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>langchain</p></td>
+<td><p><strong>0.1.16</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p>lanchain-community</p></td>
+<td><p><strong>0.0.33</strong></p></td>
+</tr>
+<tr class="row-even"><td><p>langchain-openai</p></td>
+<td><p><strong>0.0.8</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p>openai</p></td>
+<td><p><strong>1.12.0</strong></p></td>
+</tr>
+<tr class="row-even"><td><p>mlflow</p></td>
+<td><p><strong>2.12.1</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p>chromadb</p></td>
+<td><p><strong>0.4.24</strong></p></td>
+</tr>
+</tbody>
+</table>
+<p>If you attempt to execute this notebook with different versions, it may function correctly, but it is recommended to use the precise versions above to ensure that your code executes properly.</p>
 <div class="section" id="Create-a-RAG-system">
-<h2>Create a RAG system<a class="headerlink" href="#Create-a-RAG-system" title="Permalink to this headline"> </a></h2>
+<h3>Create a RAG system<a class="headerlink" href="#Create-a-RAG-system" title="Permalink to this headline"> </a></h3>
 <p>Use Langchain and Chroma to create a RAG system that answers questions based on the MLflow documentation.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">langchain.chains</span> <span class="kn">import</span> <span class="n">RetrievalQA</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">langchain.chains</span> <span class="kn">import</span> <span class="n">RetrievalQA</span>
 <span class="kn">from</span> <span class="nn">langchain.document_loaders</span> <span class="kn">import</span> <span class="n">WebBaseLoader</span>
-<span class="kn">from</span> <span class="nn">langchain.embeddings.openai</span> <span class="kn">import</span> <span class="n">OpenAIEmbeddings</span>
-<span class="kn">from</span> <span class="nn">langchain.llms</span> <span class="kn">import</span> <span class="n">OpenAI</span>
 <span class="kn">from</span> <span class="nn">langchain.text_splitter</span> <span class="kn">import</span> <span class="n">CharacterTextSplitter</span>
 <span class="kn">from</span> <span class="nn">langchain.vectorstores</span> <span class="kn">import</span> <span class="n">Chroma</span>
+<span class="kn">from</span> <span class="nn">langchain_openai</span> <span class="kn">import</span> <span class="n">OpenAI</span><span class="p">,</span> <span class="n">OpenAIEmbeddings</span>
+
+<span class="kn">import</span> <span class="nn">mlflow</span>
 </pre></div>
 </div>
 </div>
@@ -536,7 +565,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="section" id="Evaluate-the-RAG-system-using-mlflow.evaluate()">
-<h2>Evaluate the RAG system using <code class="docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code><a class="headerlink" href="#Evaluate-the-RAG-system-using-mlflow.evaluate()" title="Permalink to this headline"> </a></h2>
+<h3>Evaluate the RAG system using <code class="docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code><a class="headerlink" href="#Evaluate-the-RAG-system-using-mlflow.evaluate()" title="Permalink to this headline"> </a></h3>
 <p>Create a simple function that runs each input through the RAG chain</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
@@ -548,14 +577,6 @@ div.rendered_html tbody tr:hover {
         <span class="n">answer</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">qa</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;questions&quot;</span><span class="p">]))</span>
 
     <span class="k">return</span> <span class="n">answer</span>
-</pre></div>
-</div>
-</div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
 </pre></div>
 </div>
 </div>
@@ -988,6 +1009,7 @@ Using default facebook/roberta-hate-speech-dynabench-r4-target checkpoint
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
 </pre></div>
+</div>
 </div>
 </div>
 </div>

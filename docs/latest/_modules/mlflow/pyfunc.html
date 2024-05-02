@@ -592,7 +592,8 @@
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">lru_cache</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span>
@@ -609,13 +610,17 @@
 <span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">Model</span><span class="p">,</span> <span class="n">ModelInputExample</span><span class="p">,</span> <span class="n">ModelSignature</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.flavor_backend_registry</span> <span class="kn">import</span> <span class="n">get_flavor_backend</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.model</span> <span class="kn">import</span> <span class="n">_DATABRICKS_FS_LOADER_MODULE</span><span class="p">,</span> <span class="n">MLMODEL_FILE_NAME</span>
+<span class="kn">from</span> <span class="nn">mlflow.models.resources</span> <span class="kn">import</span> <span class="n">Resource</span><span class="p">,</span> <span class="n">_ResourceBuilder</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.signature</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">_infer_signature_from_input_example</span><span class="p">,</span>
     <span class="n">_infer_signature_from_type_hints</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.utils</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">PyFuncInput</span><span class="p">,</span>
+    <span class="n">PyFuncLLMOutputChunk</span><span class="p">,</span>
+    <span class="n">PyFuncLLMSingleInput</span><span class="p">,</span>
     <span class="n">PyFuncOutput</span><span class="p">,</span>
+    <span class="n">_convert_llm_input_data</span><span class="p">,</span>
     <span class="n">_enforce_params_schema</span><span class="p">,</span>
     <span class="n">_enforce_schema</span><span class="p">,</span>
     <span class="n">_save_example</span><span class="p">,</span>
@@ -870,7 +875,6 @@
                 <span class="p">)</span>
 
         <span class="n">params</span> <span class="o">=</span> <span class="n">_validate_params</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">)</span>
-        <span class="n">_log_warning_if_params_not_in_predict_signature</span><span class="p">(</span><span class="n">_logger</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">HAS_PYSPARK</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">SparkDataFrame</span><span class="p">):</span>
             <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                 <span class="s2">&quot;Input data is a Spark DataFrame. Note that behaviour for &quot;</span>
@@ -888,7 +892,7 @@
 <span class="sd">        &lt;https://www.mlflow.org/docs/latest/models.html#signature-enforcement&gt;`_ for more details.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            data: Model input as one of pandas.DataFrame, numpy.ndarray,</span>
+<span class="sd">            data: LLM Model single input as one of pandas.DataFrame, numpy.ndarray,</span>
 <span class="sd">                scipy.sparse.(csc_matrix | csr_matrix), List[Any], or</span>
 <span class="sd">                Dict[str, numpy.ndarray].</span>
 <span class="sd">                For model signatures with tensor spec inputs</span>
@@ -903,9 +907,6 @@
 <span class="sd">                of the data rows.</span>
 <span class="sd">            params: Additional parameters to pass to the model for inference.</span>
 
-<span class="sd">                .. Note:: Experimental: This parameter may change or be removed in a future</span>
-<span class="sd">                    release without warning.</span>
-
 <span class="sd">        Returns:</span>
 <span class="sd">            Model predictions as one of pandas.DataFrame, pandas.Series, numpy.ndarray or list.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -913,17 +914,49 @@
         <span class="n">data</span><span class="p">,</span> <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_prediction_input</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_predict_fn</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;params&quot;</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_fn</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+
+        <span class="n">_log_warning_if_params_not_in_predict_signature</span><span class="p">(</span><span class="n">_logger</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_fn</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PyFuncModel.predict_stream"><a class="viewcode-back" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PyFuncModel.predict_stream">[docs]</a>    <span class="k">def</span> <span class="nf">predict_stream</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">PyFuncInput</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">PyFuncOutput</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">PyFuncLLMSingleInput</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">PyFuncLLMOutputChunk</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates streaming model predictions. Only LLM suports this method.</span>
+
+<span class="sd">        If the model contains signature, enforce the input schema first before calling the model</span>
+<span class="sd">        implementation with the sanitized input. If the pyfunc model does not include model schema,</span>
+<span class="sd">        the input is passed to the model implementation as is. See `Model Signature Enforcement</span>
+<span class="sd">        &lt;https://www.mlflow.org/docs/latest/models.html#signature-enforcement&gt;`_ for more details.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data: LLM Model single input as one of dict, str, bool, bytes, float, int, str type.</span>
+<span class="sd">            params: Additional parameters to pass to the model for inference.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Model predictions as an iterator of chunks. The chunks in the iterator must be type of</span>
+<span class="sd">            dict or string. Chunk dict fields are determined by the model implementation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_stream_fn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="s2">&quot;This model does not support predict_stream method.&quot;</span><span class="p">)</span>
 
         <span class="n">data</span><span class="p">,</span> <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_prediction_input</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_predict_fn</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;params&quot;</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">_convert_llm_input_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="c1"># `predict_stream` only accepts single input.</span>
+            <span class="c1"># but `enforce_schema` might convert single input into a list like `[single_input]`</span>
+            <span class="c1"># so extract the first element in the list.</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;&#39;predict_stream&#39; requires single input, but it got input data </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_predict_stream_fn</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;params&quot;</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_stream_fn</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+
+        <span class="n">_log_warning_if_params_not_in_predict_signature</span><span class="p">(</span><span class="n">_logger</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_stream_fn</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PyFuncModel.unwrap_python_model"><a class="viewcode-back" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PyFuncModel.unwrap_python_model">[docs]</a>    <span class="nd">@experimental</span>
@@ -1110,7 +1143,7 @@
         <span class="k">raise</span> <span class="n">e</span>
     <span class="n">predict_fn</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;predict_fn&quot;</span><span class="p">,</span> <span class="s2">&quot;predict&quot;</span><span class="p">)</span>
     <span class="n">streamable</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;streamable&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
-    <span class="n">predict_stream_fn</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;predict_stream_fn&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">streamable</span> <span class="k">else</span> <span class="kc">None</span>
+    <span class="n">predict_stream_fn</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;predict_stream_fn&quot;</span><span class="p">,</span> <span class="s2">&quot;predict_stream&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">streamable</span> <span class="k">else</span> <span class="kc">None</span>
 
     <span class="k">return</span> <span class="n">PyFuncModel</span><span class="p">(</span>
         <span class="n">model_meta</span><span class="o">=</span><span class="n">model_meta</span><span class="p">,</span>
@@ -1131,9 +1164,6 @@
 <span class="sd">        Args:</span>
 <span class="sd">            data: Model input data.</span>
 <span class="sd">            params: Additional parameters to pass to the model for inference.</span>
-
-<span class="sd">                .. Note:: Experimental: This parameter may change or be removed in a future</span>
-<span class="sd">                    release without warning.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Model predictions.</span>
@@ -1789,9 +1819,6 @@
 
 <span class="sd">        params: Additional parameters to pass to the model for inference.</span>
 
-<span class="sd">            .. Note:: Experimental: This parameter may change or be removed in a future</span>
-<span class="sd">                                    release without warning.</span>
-
 <span class="sd">        extra_env: Extra environment variables to pass to the UDF executors.</span>
 
 <span class="sd">    Returns:</span>
@@ -1824,9 +1851,12 @@
 
     <span class="n">_EnvManager</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">env_manager</span><span class="p">)</span>
 
-    <span class="c1"># Check whether spark is in local or local-cluster mode</span>
-    <span class="c1"># this case all executors and driver share the same filesystem</span>
-    <span class="n">is_spark_in_local_mode</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;spark.master&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;local&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">is_spark_connect</span><span class="p">:</span>
+        <span class="n">is_spark_in_local_mode</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Check whether spark is in local or local-cluster mode</span>
+        <span class="c1"># this case all executors and driver share the same filesystem</span>
+        <span class="n">is_spark_in_local_mode</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;spark.master&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;local&quot;</span><span class="p">)</span>
 
     <span class="n">nfs_root_dir</span> <span class="o">=</span> <span class="n">get_nfs_cache_root_dir</span><span class="p">()</span>
     <span class="n">should_use_nfs</span> <span class="o">=</span> <span class="n">nfs_root_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
@@ -2258,6 +2288,8 @@
     <span class="n">metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">model_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">example_no_conversion</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">streamable</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">resources</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Resource</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -2391,17 +2423,18 @@
 <span class="sd">        input_example: {{ input_example }}</span>
 <span class="sd">        pip_requirements: {{ pip_requirements }}</span>
 <span class="sd">        extra_pip_requirements: {{ extra_pip_requirements }}</span>
-<span class="sd">        metadata: Custom metadata dictionary passed to the model and stored in the MLmodel file.</span>
-
-<span class="sd">            .. Note:: Experimental: This parameter may change or be removed in a future</span>
-<span class="sd">                                    release without warning.</span>
-
+<span class="sd">        metadata: {{ metadata }}</span>
 <span class="sd">        model_config: The model configuration to apply to the model. This configuration</span>
 <span class="sd">            is available during model loading.</span>
 
 <span class="sd">            .. Note:: Experimental: This parameter may change or be removed in a future</span>
 <span class="sd">                                    release without warning.</span>
 <span class="sd">        example_no_conversion: {{ example_no_conversion }}</span>
+<span class="sd">        resources: A list of model resources or a resources.yaml file containing a list of</span>
+<span class="sd">                    resources required to serve the model.</span>
+
+<span class="sd">            .. Note:: Experimental: This parameter may change or be removed in a future</span>
+<span class="sd">                                    release without warning.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">_validate_env_arguments</span><span class="p">(</span><span class="n">conda_env</span><span class="p">,</span> <span class="n">pip_requirements</span><span class="p">,</span> <span class="n">extra_pip_requirements</span><span class="p">)</span>
     <span class="n">_validate_pyfunc_model_config</span><span class="p">(</span><span class="n">model_config</span><span class="p">)</span>
@@ -2535,6 +2568,14 @@
     <span class="k">if</span> <span class="n">metadata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">mlflow_model</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">metadata</span>
 
+    <span class="k">if</span> <span class="n">resources</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">resources</span><span class="p">,</span> <span class="p">(</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">)):</span>
+            <span class="n">serialized_resource</span> <span class="o">=</span> <span class="n">_ResourceBuilder</span><span class="o">.</span><span class="n">from_yaml_file</span><span class="p">(</span><span class="n">resources</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">serialized_resource</span> <span class="o">=</span> <span class="n">_ResourceBuilder</span><span class="o">.</span><span class="n">from_resources</span><span class="p">(</span><span class="n">resources</span><span class="p">)</span>
+
+        <span class="n">mlflow_model</span><span class="o">.</span><span class="n">resources</span> <span class="o">=</span> <span class="n">serialized_resource</span>
+
     <span class="k">if</span> <span class="n">first_argument_set_specified</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">_save_model_with_loader_module_and_data_path</span><span class="p">(</span>
             <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
@@ -2546,6 +2587,7 @@
             <span class="n">pip_requirements</span><span class="o">=</span><span class="n">pip_requirements</span><span class="p">,</span>
             <span class="n">extra_pip_requirements</span><span class="o">=</span><span class="n">extra_pip_requirements</span><span class="p">,</span>
             <span class="n">model_config</span><span class="o">=</span><span class="n">model_config</span><span class="p">,</span>
+            <span class="n">streamable</span><span class="o">=</span><span class="n">streamable</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="k">elif</span> <span class="n">second_argument_set_specified</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_save_model_with_class_artifacts_params</span><span class="p">(</span>
@@ -2560,6 +2602,7 @@
             <span class="n">pip_requirements</span><span class="o">=</span><span class="n">pip_requirements</span><span class="p">,</span>
             <span class="n">extra_pip_requirements</span><span class="o">=</span><span class="n">extra_pip_requirements</span><span class="p">,</span>
             <span class="n">model_config</span><span class="o">=</span><span class="n">model_config</span><span class="p">,</span>
+            <span class="n">streamable</span><span class="o">=</span><span class="n">streamable</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 
@@ -2582,6 +2625,8 @@
     <span class="n">metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">model_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">example_no_conversion</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">streamable</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">resources</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Resource</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Log a Pyfunc model with custom inference logic and optional data dependencies as an MLflow</span>
@@ -2725,16 +2770,24 @@
 <span class="sd">            waits for five minutes. Specify 0 or None to skip waiting.</span>
 <span class="sd">        pip_requirements: {{ pip_requirements }}</span>
 <span class="sd">        extra_pip_requirements: {{ extra_pip_requirements }}</span>
-<span class="sd">        metadata: Custom metadata dictionary passed to the model and stored in the MLmodel file.</span>
+<span class="sd">        metadata: {{ metadata }}</span>
 
-<span class="sd">            .. Note:: Experimental: This parameter may change or be removed in a future</span>
-<span class="sd">                                    release without warning.</span>
 <span class="sd">        model_config: The model configuration to apply to the model. This configuration</span>
 <span class="sd">            is available during model loading.</span>
 
 <span class="sd">            .. Note:: Experimental: This parameter may change or be removed in a future</span>
 <span class="sd">                                    release without warning.</span>
 <span class="sd">        example_no_conversion: {{ example_no_conversion }}</span>
+<span class="sd">        resources: A list of model resources or a resources.yaml file containing a list of</span>
+<span class="sd">                    resources required to serve the model.</span>
+
+<span class="sd">            .. Note:: Experimental: This parameter may change or be removed in a future</span>
+<span class="sd">                                    release without warning.</span>
+
+
+<span class="sd">        streamable: A boolean value indicating if the model supports streaming prediction,</span>
+<span class="sd">                    If None, MLflow will try to inspect if the model supports streaming</span>
+<span class="sd">                    by checking if `predict_stream` method exists. Default None.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A :py:class:`ModelInfo &lt;mlflow.models.model.ModelInfo&gt;` instance that contains the</span>
@@ -2759,6 +2812,8 @@
         <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span>
         <span class="n">model_config</span><span class="o">=</span><span class="n">model_config</span><span class="p">,</span>
         <span class="n">example_no_conversion</span><span class="o">=</span><span class="n">example_no_conversion</span><span class="p">,</span>
+        <span class="n">streamable</span><span class="o">=</span><span class="n">streamable</span><span class="p">,</span>
+        <span class="n">resources</span><span class="o">=</span><span class="n">resources</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 
@@ -2772,6 +2827,7 @@
     <span class="n">pip_requirements</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">extra_pip_requirements</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">model_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">streamable</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Export model as a generic Python function model.</span>
@@ -2788,6 +2844,8 @@
 <span class="sd">        conda_env: Either a dictionary representation of a Conda environment or the path to a</span>
 <span class="sd">            Conda environment yaml file. If provided, this describes the environment</span>
 <span class="sd">            this model should be run in.</span>
+<span class="sd">        streamable: A boolean value indicating if the model supports streaming prediction,</span>
+<span class="sd">                    None value also means not streamable.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Model configuration containing model info.</span>
@@ -2804,6 +2862,7 @@
     <span class="k">if</span> <span class="n">mlflow_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">mlflow_model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">()</span>
 
+    <span class="n">streamable</span> <span class="o">=</span> <span class="n">streamable</span> <span class="ow">or</span> <span class="kc">False</span>
     <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">add_to_model</span><span class="p">(</span>
         <span class="n">mlflow_model</span><span class="p">,</span>
         <span class="n">loader_module</span><span class="o">=</span><span class="n">loader_module</span><span class="p">,</span>
@@ -2812,6 +2871,7 @@
         <span class="n">conda_env</span><span class="o">=</span><span class="n">_CONDA_ENV_FILE_NAME</span><span class="p">,</span>
         <span class="n">python_env</span><span class="o">=</span><span class="n">_PYTHON_ENV_FILE_NAME</span><span class="p">,</span>
         <span class="n">model_config</span><span class="o">=</span><span class="n">model_config</span><span class="p">,</span>
+        <span class="n">streamable</span><span class="o">=</span><span class="n">streamable</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">size</span> <span class="o">:=</span> <span class="n">get_total_file_size</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
         <span class="n">mlflow_model</span><span class="o">.</span><span class="n">model_size_bytes</span> <span class="o">=</span> <span class="n">size</span>

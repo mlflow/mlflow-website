@@ -225,6 +225,7 @@
 <span class="kn">from</span> <span class="nn">mlflow.entities</span> <span class="kn">import</span> <span class="n">DatasetInput</span><span class="p">,</span> <span class="n">Experiment</span><span class="p">,</span> <span class="n">FileInfo</span><span class="p">,</span> <span class="n">Metric</span><span class="p">,</span> <span class="n">Param</span><span class="p">,</span> <span class="n">Run</span><span class="p">,</span> <span class="n">RunTag</span><span class="p">,</span> <span class="n">ViewType</span>
 <span class="kn">from</span> <span class="nn">mlflow.entities.model_registry</span> <span class="kn">import</span> <span class="n">ModelVersion</span><span class="p">,</span> <span class="n">RegisteredModel</span>
 <span class="kn">from</span> <span class="nn">mlflow.entities.model_registry.model_version_stages</span> <span class="kn">import</span> <span class="n">ALL_STAGES</span>
+<span class="kn">from</span> <span class="nn">mlflow.environment_variables</span> <span class="kn">import</span> <span class="n">MLFLOW_ENABLE_ASYNC_LOGGING</span>
 <span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
 <span class="kn">from</span> <span class="nn">mlflow.protos.databricks_pb2</span> <span class="kn">import</span> <span class="n">FEATURE_DISABLED</span><span class="p">,</span> <span class="n">RESOURCE_DOES_NOT_EXIST</span>
 <span class="kn">from</span> <span class="nn">mlflow.store.artifact.utils.models</span> <span class="kn">import</span> <span class="p">(</span>
@@ -937,7 +938,7 @@
         <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">timestamp</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">step</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">synchronous</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">synchronous</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RunOperations</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Log a metric against the run ID.</span>
@@ -957,11 +958,12 @@
 <span class="sd">            step: Integer training step (iteration) at which was the metric calculated.</span>
 <span class="sd">                Defaults to 0.</span>
 <span class="sd">            synchronous: *Experimental* If True, blocks until the metric is logged successfully.</span>
-<span class="sd">                If False, logs the metric asynchronously and returns a future</span>
-<span class="sd">                representing the logging operation.</span>
+<span class="sd">                If False, logs the metric asynchronously and returns a future representing the</span>
+<span class="sd">                logging operation. If None, read from environment variable</span>
+<span class="sd">                `MLFLOW_ENABLE_ASYNC_LOGGING`, which defaults to False if not set.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            When `synchronous=True`, returns None. When `synchronous=False`, returns an</span>
+<span class="sd">            When `synchronous=True` or None, returns None. When `synchronous=False`, returns an</span>
 <span class="sd">            :py:class:`mlflow.utils.async_logging.run_operations.RunOperations` instance that</span>
 <span class="sd">            represents future for logging operation.</span>
 
@@ -1008,12 +1010,15 @@
 <span class="sd">            metrics: {&#39;m&#39;: 1.5}</span>
 <span class="sd">            status: FINISHED</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">synchronous</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">synchronous</span> <span class="k">if</span> <span class="n">synchronous</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="ow">not</span> <span class="n">MLFLOW_ENABLE_ASYNC_LOGGING</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tracking_client</span><span class="o">.</span><span class="n">log_metric</span><span class="p">(</span>
             <span class="n">run_id</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">synchronous</span><span class="o">=</span><span class="n">synchronous</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="MlflowClient.log_param"><a class="viewcode-back" href="../../../python_api/mlflow.client.html#mlflow.client.MlflowClient.log_param">[docs]</a>    <span class="k">def</span> <span class="nf">log_param</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">synchronous</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">synchronous</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Log a parameter (e.g. model hyperparameter) against the run ID.</span>
@@ -1027,12 +1032,13 @@
 <span class="sd">            value: Parameter value, but will be string-ified if not.</span>
 <span class="sd">                All built-in backend stores support values up to length 6000, but some</span>
 <span class="sd">                may support larger values.</span>
-<span class="sd">            synchronous: *Experimental* If True, blocks until the parameter is logged</span>
-<span class="sd">                successfully. If False, logs the parameter asynchronously and</span>
-<span class="sd">                returns a future representing the logging operation.</span>
+<span class="sd">            synchronous: *Experimental* If True, blocks until the metric is logged successfully.</span>
+<span class="sd">                If False, logs the metric asynchronously and returns a future representing the</span>
+<span class="sd">                logging operation. If None, read from environment variable</span>
+<span class="sd">                `MLFLOW_ENABLE_ASYNC_LOGGING`, which defaults to False if not set.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            When `synchronous=True`, returns parameter value. When `synchronous=False`,</span>
+<span class="sd">            When `synchronous=True` or None, returns parameter value. When `synchronous=False`,</span>
 <span class="sd">            returns an :py:class:`mlflow.utils.async_logging.run_operations.RunOperations`</span>
 <span class="sd">            instance that represents future for logging operation.</span>
 
@@ -1076,6 +1082,9 @@
 <span class="sd">            params: {&#39;p&#39;: &#39;1&#39;}</span>
 <span class="sd">            status: FINISHED</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">synchronous</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">synchronous</span> <span class="k">if</span> <span class="n">synchronous</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="ow">not</span> <span class="n">MLFLOW_ENABLE_ASYNC_LOGGING</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="p">)</span>
         <span class="k">if</span> <span class="n">synchronous</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_tracking_client</span><span class="o">.</span><span class="n">log_param</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">synchronous</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">value</span>
@@ -1114,7 +1123,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_tracking_client</span><span class="o">.</span><span class="n">set_experiment_tag</span><span class="p">(</span><span class="n">experiment_id</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MlflowClient.set_tag"><a class="viewcode-back" href="../../../python_api/mlflow.client.html#mlflow.client.MlflowClient.set_tag">[docs]</a>    <span class="k">def</span> <span class="nf">set_tag</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">synchronous</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">synchronous</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RunOperations</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set a tag on the run with the specified ID. Value is converted to a string.</span>
@@ -1126,12 +1135,13 @@
 <span class="sd">                length 250, but some may support larger keys.</span>
 <span class="sd">            value: Tag value, but will be string-ified if not. All backend stores will support</span>
 <span class="sd">                values up to length 5000, but some may support larger values.</span>
-<span class="sd">            synchronous: *Experimental* If True, blocks until the tag is logged successfully. If</span>
-<span class="sd">                False, logs the tag asynchronously and returns a future representing the logging</span>
-<span class="sd">                operation.</span>
+<span class="sd">           synchronous: *Experimental* If True, blocks until the metric is logged successfully.</span>
+<span class="sd">                If False, logs the metric asynchronously and returns a future representing the</span>
+<span class="sd">                logging operation. If None, read from environment variable</span>
+<span class="sd">                `MLFLOW_ENABLE_ASYNC_LOGGING`, which defaults to False if not set.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            When `synchronous=True`, returns None. When `synchronous=False`, returns an</span>
+<span class="sd">            When `synchronous=True` or None, returns None. When `synchronous=False`, returns an</span>
 <span class="sd">            `mlflow.utils.async_logging.run_operations.RunOperations` instance that represents</span>
 <span class="sd">            future for logging operation.</span>
 
@@ -1166,6 +1176,9 @@
 <span class="sd">            run_id: 4f226eb5758145e9b28f78514b59a03b</span>
 <span class="sd">            Tags: {&#39;nlp.framework&#39;: &#39;Spark NLP&#39;}</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">synchronous</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">synchronous</span> <span class="k">if</span> <span class="n">synchronous</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="ow">not</span> <span class="n">MLFLOW_ENABLE_ASYNC_LOGGING</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tracking_client</span><span class="o">.</span><span class="n">set_tag</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">synchronous</span><span class="o">=</span><span class="n">synchronous</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MlflowClient.delete_tag"><a class="viewcode-back" href="../../../python_api/mlflow.client.html#mlflow.client.MlflowClient.delete_tag">[docs]</a>    <span class="k">def</span> <span class="nf">delete_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -1267,7 +1280,7 @@
         <span class="n">metrics</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Metric</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
         <span class="n">params</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Param</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
         <span class="n">tags</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">RunTag</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
-        <span class="n">synchronous</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">synchronous</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RunOperations</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Log multiple metrics, params, and/or tags.</span>
@@ -1277,15 +1290,16 @@
 <span class="sd">            metrics: If provided, List of Metric(key, value, timestamp) instances.</span>
 <span class="sd">            params: If provided, List of Param(key, value) instances.</span>
 <span class="sd">            tags: If provided, List of RunTag(key, value) instances.</span>
-<span class="sd">            synchronous: *Experimental* If True, blocks until the metrics/tags/params are logged</span>
-<span class="sd">                successfully. If False, logs the metrics/tags/params asynchronously</span>
-<span class="sd">                and returns a future representing the logging operation.</span>
+<span class="sd">            synchronous: *Experimental* If True, blocks until the metric is logged successfully.</span>
+<span class="sd">                If False, logs the metric asynchronously and returns a future representing the</span>
+<span class="sd">                logging operation. If None, read from environment variable</span>
+<span class="sd">                `MLFLOW_ENABLE_ASYNC_LOGGING`, which defaults to False if not set.</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            mlflow.MlflowException: If any errors occur.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            When `synchronous=True`, returns None. When `synchronous=False`, returns an</span>
+<span class="sd">            When `synchronous=True` or None, returns None. When `synchronous=False`, returns an</span>
 <span class="sd">            :py:class:`mlflow.utils.async_logging.run_operations.RunOperations` instance that</span>
 <span class="sd">            represents future for logging operation.</span>
 
@@ -1334,6 +1348,9 @@
 <span class="sd">            status: FINISHED</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">synchronous</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">synchronous</span> <span class="k">if</span> <span class="n">synchronous</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="ow">not</span> <span class="n">MLFLOW_ENABLE_ASYNC_LOGGING</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tracking_client</span><span class="o">.</span><span class="n">log_batch</span><span class="p">(</span>
             <span class="n">run_id</span><span class="p">,</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">tags</span><span class="p">,</span> <span class="n">synchronous</span><span class="o">=</span><span class="n">synchronous</span>
         <span class="p">)</span></div>
@@ -1361,6 +1378,10 @@
 <span class="sd">        Args:</span>
 <span class="sd">            local_path: Path to the file or directory to write.</span>
 <span class="sd">            artifact_path: If provided, the directory in ``artifact_uri`` to write to.</span>
+<span class="sd">            synchronous: *Experimental* If True, blocks until the metric is logged successfully.</span>
+<span class="sd">                If False, logs the metric asynchronously and returns a future representing the</span>
+<span class="sd">                logging operation. If None, read from environment variable</span>
+<span class="sd">                `MLFLOW_ENABLE_ASYNC_LOGGING`, which defaults to False if not set.</span>
 
 <span class="sd">        .. code-block:: python</span>
 <span class="sd">            :caption: Example</span>
@@ -1460,11 +1481,27 @@
         <span class="n">filename</span> <span class="o">=</span> <span class="n">posixpath</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">norm_path</span><span class="p">)</span>
         <span class="n">artifact_dir</span> <span class="o">=</span> <span class="n">posixpath</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">norm_path</span><span class="p">)</span>
         <span class="n">artifact_dir</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">artifact_dir</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="k">else</span> <span class="n">artifact_dir</span>
-
         <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmp_dir</span><span class="p">:</span>
             <span class="n">tmp_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmp_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
             <span class="k">yield</span> <span class="n">tmp_path</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log_artifact</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">tmp_path</span><span class="p">,</span> <span class="n">artifact_dir</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_log_artifact_async_helper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_id</span><span class="p">,</span> <span class="n">artifact_file</span><span class="p">,</span> <span class="n">artifact</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Log artifact asynchronously.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            run_id: The unique identifier for the run. This ID is used to associate the</span>
+<span class="sd">                artifact with a specific run.</span>
+<span class="sd">            artifact_file: The file path of the artifact relative to the run&#39;s directory.</span>
+<span class="sd">                The path should be in POSIX format, using forward slashes (/) as directory</span>
+<span class="sd">                separators.</span>
+<span class="sd">            artifact: The artifact to be logged.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">norm_path</span> <span class="o">=</span> <span class="n">posixpath</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">artifact_file</span><span class="p">)</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">posixpath</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">norm_path</span><span class="p">)</span>
+        <span class="n">artifact_dir</span> <span class="o">=</span> <span class="n">posixpath</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">norm_path</span><span class="p">)</span>
+        <span class="n">artifact_dir</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">artifact_dir</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="k">else</span> <span class="n">artifact_dir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tracking_client</span><span class="o">.</span><span class="n">_log_artifact_async</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">artifact_dir</span><span class="p">,</span> <span class="n">artifact</span><span class="p">)</span>
 
 <div class="viewcode-block" id="MlflowClient.log_text"><a class="viewcode-back" href="../../../python_api/mlflow.client.html#mlflow.client.MlflowClient.log_text">[docs]</a>    <span class="k">def</span> <span class="nf">log_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">artifact_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Log text as an artifact.</span>
@@ -1633,6 +1670,7 @@
         <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">step</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">timestamp</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">synchronous</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Logs an image in MLflow, supporting two use cases:</span>
@@ -1754,6 +1792,9 @@
 <span class="sd">                client = mlflow.MlflowClient()</span>
 <span class="sd">                client.log_image(run.info.run_id, image, &quot;image.png&quot;)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">synchronous</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">synchronous</span> <span class="k">if</span> <span class="n">synchronous</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="ow">not</span> <span class="n">MLFLOW_ENABLE_ASYNC_LOGGING</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="p">)</span>
         <span class="k">if</span> <span class="n">artifact_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">arg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="p">[</span><span class="n">key</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">]):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;The `artifact_file` parameter cannot be used in conjunction with `key`, &quot;</span>
@@ -1803,7 +1844,6 @@
             <span class="c1"># Sanitize key to use in filename (replace / with # to avoid subdirectories)</span>
             <span class="n">sanitized_key</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;#&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
             <span class="n">filename_uuid</span> <span class="o">=</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span>
-            <span class="n">filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;images/</span><span class="si">{</span><span class="n">sanitized_key</span><span class="si">}</span><span class="s2">%step%</span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2">%timestamp%</span><span class="si">{</span><span class="n">timestamp</span><span class="si">}</span><span class="s2">%</span><span class="si">{</span><span class="n">filename_uuid</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="n">uncompressed_filename</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;images/</span><span class="si">{</span><span class="n">sanitized_key</span><span class="si">}</span><span class="s2">%step%</span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2">%timestamp%</span><span class="si">{</span><span class="n">timestamp</span><span class="si">}</span><span class="s2">%</span><span class="si">{</span><span class="n">filename_uuid</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
@@ -1811,30 +1851,26 @@
 
             <span class="c1"># Save full-resolution image</span>
             <span class="n">image_filepath</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">uncompressed_filename</span><span class="si">}</span><span class="s2">.png&quot;</span>
-            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_artifact_helper</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">image_filepath</span><span class="p">)</span> <span class="k">as</span> <span class="n">tmp_path</span><span class="p">:</span>
-                <span class="n">image</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">)</span>
-
-            <span class="c1"># Save compressed image</span>
             <span class="n">compressed_image_filepath</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">compressed_filename</span><span class="si">}</span><span class="s2">.webp&quot;</span>
-            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_artifact_helper</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">compressed_image_filepath</span><span class="p">)</span> <span class="k">as</span> <span class="n">tmp_path</span><span class="p">:</span>
-                <span class="n">compress_image_size</span><span class="p">(</span><span class="n">image</span><span class="p">)</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">)</span>
 
-            <span class="c1"># Save metadata file</span>
-            <span class="n">metadata_filepath</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">.json&quot;</span>
-            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_artifact_helper</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">metadata_filepath</span><span class="p">)</span> <span class="k">as</span> <span class="n">tmp_path</span><span class="p">:</span>
-                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">,</span> <span class="s2">&quot;w+&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                    <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span>
-                        <span class="p">{</span>
-                            <span class="s2">&quot;filepath&quot;</span><span class="p">:</span> <span class="n">image_filepath</span><span class="p">,</span>
-                            <span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="n">key</span><span class="p">,</span>
-                            <span class="s2">&quot;step&quot;</span><span class="p">:</span> <span class="n">step</span><span class="p">,</span>
-                            <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="n">timestamp</span><span class="p">,</span>
-                        <span class="p">},</span>
-                        <span class="n">f</span><span class="p">,</span>
-                    <span class="p">)</span>
+            <span class="c1"># Need to make a resize copy before running thread for thread safety</span>
+            <span class="c1"># If further optimization is needed, we can move this resize to async queue.</span>
+            <span class="n">compressed_image</span> <span class="o">=</span> <span class="n">compress_image_size</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">synchronous</span><span class="p">:</span>
+                <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_artifact_helper</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">image_filepath</span><span class="p">)</span> <span class="k">as</span> <span class="n">tmp_path</span><span class="p">:</span>
+                    <span class="n">image</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_log_artifact_async_helper</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">image_filepath</span><span class="p">,</span> <span class="n">image</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">synchronous</span><span class="p">:</span>
+                <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_artifact_helper</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">compressed_image_filepath</span><span class="p">)</span> <span class="k">as</span> <span class="n">tmp_path</span><span class="p">:</span>
+                    <span class="n">compressed_image</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_log_artifact_async_helper</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">compressed_image_filepath</span><span class="p">,</span> <span class="n">compressed_image</span><span class="p">)</span>
 
             <span class="c1"># Log tag indicating that the run includes logged image</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">set_tag</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">MLFLOW_LOGGED_IMAGES</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">synchronous</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_tag</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">MLFLOW_LOGGED_IMAGES</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">synchronous</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_check_artifact_file_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">artifact_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if the artifact_file contains any forbidden characters.</span>

@@ -317,16 +317,6 @@ exploring these more advanced use cases.</p>
 <section>
     <article class="simple-grid">
         <div class="simple-card">
-            <a href="notebooks/langchain-agent.html">
-                <div class="header">
-                    LangChain Agents
-                </div>
-                <p>
-                    Learn how to build a LangChain agent that can query a web search engine and perform calculations based on complex questions using MLflow.
-                </p>
-            </a>
-        </div>
-        <div class="simple-card">
             <a href="notebooks/langchain-retriever.html">
                 <div class="header">
                     RAG tutorial with LangChain
@@ -347,6 +337,27 @@ exploring these more advanced use cases.</p>
 </div>
 <div class="section" id="faq">
 <h2>FAQ<a class="headerlink" href="#faq" title="Permalink to this headline"> </a></h2>
+<div class="section" id="i-can-t-load-my-chain">
+<h3>I can’t load my chain!<a class="headerlink" href="#i-can-t-load-my-chain" title="Permalink to this headline"> </a></h3>
+<ul>
+<li><p><strong>Allowing for Dangerous Deserialization</strong>: Pickle opt-in logic in LangChain will prevent components from being loaded via MLflow. You might see an error like this:</p>
+<blockquote>
+<div><div class="highlight-text notranslate"><div class="highlight"><pre><span></span>ValueError: This code relies on the pickle module. You will need to set allow_dangerous_deserialization=True if you want to opt-in to
+allow deserialization of data using pickle. Data can be compromised by a malicious actor if not handled properly to include a malicious
+payload that when deserialized with pickle can execute arbitrary code on your machine.
+</pre></div>
+</div>
+<p>A change within LangChain that <a class="reference external" href="https://github.com/langchain-ai/langchain/pull/18696">forces users to opt-in to pickle deserialization</a> can create
+some issues with loading chains, vector stores, retrievers, and agents that have been logged using MLflow. Because the option is not exposed per component
+to set this argument on the loader function, you will need to ensure that you are setting this option directly within the defined loader function when
+logging the model. LangChain components that do not set this value will be saved without issue, but a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> will be raised when loading if unset.</p>
+<p>To fix this, simply re-log your model, specifying the option <code class="docutils literal notranslate"><span class="pre">allow_dangerous_deserialization=True</span></code> in your defined loader function. See the tutorial
+<a class="reference external" href="notebooks/langchain-retriever.html#Establishing-RetrievalQA-Chain-and-Logging-with-MLflow">for LangChain retrievers</a> for an example of specifying this
+option when logging a <code class="docutils literal notranslate"><span class="pre">FAISS</span></code> vector store instance within a <code class="docutils literal notranslate"><span class="pre">loader_fn</span></code> declaration.</p>
+</div></blockquote>
+</li>
+</ul>
+</div>
 <div class="section" id="i-can-t-save-my-chain-agent-or-retriever-with-mlflow">
 <h3>I can’t save my chain, agent, or retriever with MLflow.<a class="headerlink" href="#i-can-t-save-my-chain-agent-or-retriever-with-mlflow" title="Permalink to this headline"> </a></h3>
 <ul>
@@ -366,7 +377,10 @@ ask for guidance in the <a class="reference external" href="https://github.com/l
 </li>
 <li><p><strong>Keeping Up with New Features in MLflow</strong>: MLflow might not immediately support the latest LangChain features immediately.</p>
 <blockquote>
-<div><p>If a new feature is not supported in MLflow, consider <a class="reference external" href="https://github.com/mlflow/mlflow/issues">filing a feature request on the MLflow GitHub issues page</a>.</p>
+<div><p>If a new feature is not supported in MLflow, consider <a class="reference external" href="https://github.com/mlflow/mlflow/issues">filing a feature request on the MLflow GitHub issues page</a>.
+With the rapid pace of changes in libraries that are in heavy active development (such as <a class="reference external" href="https://pypi.org/project/langchain/#history">LangChain’s release velocity</a>),
+breaking changes, API refactoring, and fundamental functionality support for even existing features can cause integration issues. If there is a chain, agent,
+retriever, or any future structure within LangChain that you’d like to see supported, please let us know!</p>
 </div></blockquote>
 </li>
 </ul>
@@ -401,10 +415,29 @@ As loading those models requires specifying <cite>loader_fn</cite> and <cite>per
 <a class="reference external" href="https://github.com/mlflow/mlflow/blob/master/examples/langchain/retriever_chain.py">retriever_chain</a></p>
 </div></blockquote>
 </li>
-<li><p><strong>Can’t pickle certain objects</strong>: Try manually log the model.</p>
+<li><p><strong>Can’t pickle certain objects</strong>: Try manually logging the model.</p>
 <blockquote>
-<div><p>For certain models that langchain does not support native saving/loading, we pickle the object and save it, while it requires cloudpickle version to be
-consistent when saving/loading the model, as well as PyDantic version to be 2.x. Try manually log the model with <code class="docutils literal notranslate"><span class="pre">mlflow.langchain.log_model</span></code> API.</p>
+<div><p>For certain models that LangChain does not support native saving or loading, we will pickle the object when saving it. Due to this functionality, your cloudpickle version must be
+consistent between the saving and loading environments to ensure that object references resolve properly. For further guarantees of correct object representation, you should ensure that your
+environment has <cite>pydantic</cite> installed with at least version 2.</p>
+</div></blockquote>
+</li>
+</ul>
+</div>
+<div class="section" id="how-does-mlflow-langchain-autologging-interact-with-callbacks">
+<h3>How does MLflow langchain autologging interact with callbacks?<a class="headerlink" href="#how-does-mlflow-langchain-autologging-interact-with-callbacks" title="Permalink to this headline"> </a></h3>
+<ul>
+<li><p><strong>Model inference with default callbacks</strong>:</p>
+<blockquote>
+<div><p>If you invoke a langchain model with <cite>invoke</cite>, <cite>__call__</cite>, <cite>batch</cite>, <cite>stream</cite> or <cite>get_relevant_documents</cite> (for BaseRetriever) functions directly, MLflow autologging will inject
+a callback into the inference call to collect metrics and artifacts that can be generated from the call chain.</p>
+</div></blockquote>
+</li>
+<li><p><strong>Model inference with user-specified callbacks</strong>:</p>
+<blockquote>
+<div><p>If your inference call already includes callbacks in the config, e.g. <cite>model.invoke(input, config=RunnableConfig(callbacks=customer_callbacks))</cite>, then MLflow autologging
+still preserves your callbacks and appends a callback after them. <a class="reference external" href="https://api.python.langchain.com/en/latest/runnables/langchain_core.runnables.config.RunnableConfig.html#langchain_core.runnables.config.RunnableConfig">RunnableConfig callbacks parameter</a>
+supports both <cite>BaseCallbackManager</cite> or <cite>List[BaseCallbackHandler]</cite>, in either case MLflow autologging appends a callback to collect metrics and artifacts.</p>
 </div></blockquote>
 </li>
 </ul>

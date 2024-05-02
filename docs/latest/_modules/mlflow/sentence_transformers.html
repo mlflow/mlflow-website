@@ -220,6 +220,11 @@
 <span class="kn">from</span> <span class="nn">mlflow.models.signature</span> <span class="kn">import</span> <span class="n">_infer_signature_from_input_example</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.utils</span> <span class="kn">import</span> <span class="n">_save_example</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracking._model_registry</span> <span class="kn">import</span> <span class="n">DEFAULT_AWAIT_MAX_SLEEP_SECONDS</span>
+<span class="kn">from</span> <span class="nn">mlflow.transformers.llm_inference_utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_LLM_INFERENCE_TASK_EMBEDDING</span><span class="p">,</span>
+    <span class="n">_LLM_V1_EMBEDDING_INPUT_KEY</span><span class="p">,</span>
+    <span class="n">postprocess_output_for_llm_v1_embedding_task</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.types.llm</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">EMBEDDING_MODEL_INPUT_SCHEMA</span><span class="p">,</span>
     <span class="n">EMBEDDING_MODEL_OUTPUT_SCHEMA</span><span class="p">,</span>
@@ -258,8 +263,6 @@
 
 <span class="n">SENTENCE_TRANSFORMERS_DATA_PATH</span> <span class="o">=</span> <span class="s2">&quot;model.sentence_transformer&quot;</span>
 <span class="n">_INFERENCE_CONFIG_PATH</span> <span class="o">=</span> <span class="s2">&quot;inference_config&quot;</span>
-<span class="n">_LLM_INFERENCE_TASK_EMBEDDING</span> <span class="o">=</span> <span class="s2">&quot;llm/v1/embeddings&quot;</span>
-<span class="n">_LLM_V1_EMBEDDING_INPUT_KEY</span> <span class="o">=</span> <span class="s2">&quot;input&quot;</span>
 
 <span class="c1"># Patterns to extract HuggingFace model repository name from the local snapshot path.</span>
 <span class="c1"># The path format would be like /path/to/{username}_{modelname}, where user name can</span>
@@ -368,11 +371,7 @@
 <span class="sd">        pip_requirements: {{ pip_requirements }}</span>
 <span class="sd">        extra_pip_requirements: {{ extra_pip_requirements }}</span>
 <span class="sd">        conda_env: {{ conda_env }}</span>
-<span class="sd">        metadata: Custom metadata dictionary passed to the model and stored in the MLmodel file.</span>
-
-<span class="sd">            .. Note:: Experimental: This parameter may change or be removed in a future</span>
-<span class="sd">                                    release without warning.</span>
-
+<span class="sd">        metadata: {{ metadata }}</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">import</span> <span class="nn">sentence_transformers</span>
 
@@ -579,11 +578,7 @@
 <span class="sd">        pip_requirements: {{ pip_requirements }}</span>
 <span class="sd">        extra_pip_requirements: {{ extra_pip_requirements }}</span>
 <span class="sd">        conda_env: {{ conda_env }}</span>
-<span class="sd">        metadata: Custom metadata dictionary passed to the model and stored in the MLmodel file.</span>
-
-<span class="sd">            .. Note:: Experimental: This parameter may change or be removed in a future</span>
-<span class="sd">                                    release without warning.</span>
-
+<span class="sd">        metadata: {{ metadata }}</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">task</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">metadata</span> <span class="o">=</span> <span class="n">_verify_task_and_update_metadata</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span>
@@ -691,10 +686,6 @@
 <span class="sd">            sentences: Model input data.</span>
 <span class="sd">            params: Additional parameters to pass to the model for inference.</span>
 
-<span class="sd">                .. Note:: Experimental: This parameter may change or be removed in a future</span>
-<span class="sd">                                        release without warning.</span>
-
-
 <span class="sd">        Returns:</span>
 <span class="sd">            Model predictions.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -722,59 +713,10 @@
             <span class="n">output_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">sentences</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">convert_output_to_llm_v1_format</span><span class="p">:</span>
-            <span class="n">output_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">postprocess_output_for_llm_v1_embedding_task</span><span class="p">(</span><span class="n">sentences</span><span class="p">,</span> <span class="n">output_data</span><span class="p">)</span>
+            <span class="n">output_data</span> <span class="o">=</span> <span class="n">postprocess_output_for_llm_v1_embedding_task</span><span class="p">(</span>
+                <span class="n">sentences</span><span class="p">,</span> <span class="n">output_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">tokenizer</span>
+            <span class="p">)</span>
         <span class="k">return</span> <span class="n">output_data</span>
-
-    <span class="k">def</span> <span class="nf">postprocess_output_for_llm_v1_embedding_task</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">input_prompts</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span> <span class="n">output_tensers</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span>
-    <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Wrap output data with usage information.</span>
-
-<span class="sd">        Examples:</span>
-<span class="sd">            .. code-block:: python</span>
-<span class="sd">                input_prompt = [&quot;hello world and hello mlflow&quot;]</span>
-<span class="sd">                output_embedding = [0.47137904, 0.4669448, ..., 0.69726706]</span>
-<span class="sd">                output_dicts = postprocess_output_for_llm_v1_embedding_task(</span>
-<span class="sd">                    input_prompt, output_embedding</span>
-<span class="sd">                )</span>
-<span class="sd">                assert output_dicts == [</span>
-<span class="sd">                    {</span>
-<span class="sd">                        &quot;object&quot;: &quot;list&quot;,</span>
-<span class="sd">                        &quot;data&quot;: [</span>
-<span class="sd">                            {</span>
-<span class="sd">                                &quot;object&quot;: &quot;embedding&quot;,</span>
-<span class="sd">                                &quot;index&quot;: 0,</span>
-<span class="sd">                                &quot;embedding&quot;: [0.47137904, 0.4669448, ..., 0.69726706],</span>
-<span class="sd">                            }</span>
-<span class="sd">                        ],</span>
-<span class="sd">                        &quot;usage&quot;: {&quot;prompt_tokens&quot;: 8, &quot;total_tokens&quot;: 8},</span>
-<span class="sd">                    }</span>
-<span class="sd">                ]</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            input_prompts: text input prompts</span>
-<span class="sd">            output_tensers: List of output tensors that contain the generated embeddings</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">             Dictionaries containing the output embedding and usage information for each</span>
-<span class="sd">             input prompt.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">prompt_tokens</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
-            <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">(</span><span class="n">prompt</span><span class="p">)[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">])</span> <span class="k">for</span> <span class="n">prompt</span> <span class="ow">in</span> <span class="n">input_prompts</span><span class="p">]</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;object&quot;</span><span class="p">:</span> <span class="s2">&quot;list&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="p">[</span>
-                <span class="p">{</span>
-                    <span class="s2">&quot;object&quot;</span><span class="p">:</span> <span class="s2">&quot;embedding&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="n">i</span><span class="p">,</span>
-                    <span class="s2">&quot;embedding&quot;</span><span class="p">:</span> <span class="n">tensor</span><span class="p">,</span>
-                <span class="p">}</span>
-                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">tensor</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">output_tensers</span><span class="p">)</span>
-            <span class="p">],</span>
-            <span class="s2">&quot;usage&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;prompt_tokens&quot;</span><span class="p">:</span> <span class="n">prompt_tokens</span><span class="p">,</span> <span class="s2">&quot;total_tokens&quot;</span><span class="p">:</span> <span class="n">prompt_tokens</span><span class="p">},</span>
-        <span class="p">}</span>
 </pre></div>
 
               </div>

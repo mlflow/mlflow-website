@@ -260,6 +260,8 @@
 <span class="kn">from</span> <span class="nn">mlflow.transformers.hub_utils</span> <span class="kn">import</span> <span class="n">is_valid_hf_repo_id</span>
 <span class="kn">from</span> <span class="nn">mlflow.transformers.llm_inference_utils</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">_LLM_INFERENCE_TASK_CHAT</span><span class="p">,</span>
+    <span class="n">_LLM_INFERENCE_TASK_COMPLETIONS</span><span class="p">,</span>
+    <span class="n">_LLM_INFERENCE_TASK_EMBEDDING</span><span class="p">,</span>
     <span class="n">_LLM_INFERENCE_TASK_KEY</span><span class="p">,</span>
     <span class="n">_LLM_INFERENCE_TASK_PREFIX</span><span class="p">,</span>
     <span class="n">_METADATA_LLM_INFERENCE_TASK_KEY</span><span class="p">,</span>
@@ -268,6 +270,8 @@
     <span class="n">convert_data_messages_with_chat_template</span><span class="p">,</span>
     <span class="n">infer_signature_from_llm_inference_task</span><span class="p">,</span>
     <span class="n">postprocess_output_for_llm_inference_task</span><span class="p">,</span>
+    <span class="n">postprocess_output_for_llm_v1_embedding_task</span><span class="p">,</span>
+    <span class="n">preprocess_llm_embedding_params</span><span class="p">,</span>
     <span class="n">preprocess_llm_inference_params</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.transformers.model_io</span> <span class="kn">import</span> <span class="p">(</span>
@@ -648,10 +652,7 @@
 <span class="sd">        pip_requirements: {{ pip_requirements }}</span>
 <span class="sd">        extra_pip_requirements: {{ extra_pip_requirements }}</span>
 <span class="sd">        conda_env: {{ conda_env }}</span>
-<span class="sd">        metadata: Custom metadata dictionary passed to the model and stored in the MLmodel file.</span>
-
-<span class="sd">            .. Note:: Experimental: This parameter may change or be removed in a future</span>
-<span class="sd">                                    release without warning.</span>
+<span class="sd">        metadata: {{ metadata }}</span>
 <span class="sd">        example_no_conversion: {{ example_no_conversion }}</span>
 <span class="sd">        prompt_template: {{ prompt_template }}</span>
 <span class="sd">        save_pretrained: {{ save_pretrained }}</span>
@@ -729,7 +730,7 @@
     <span class="c1">#  via the mlflow_model object attribute.</span>
     <span class="k">if</span> <span class="p">(</span>
         <span class="n">mlflow_model</span><span class="o">.</span><span class="n">metadata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="ow">and</span> <span class="p">(</span><span class="n">metadata_task</span> <span class="o">:=</span> <span class="n">mlflow_model</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="n">_METADATA_LLM_INFERENCE_TASK_KEY</span><span class="p">])</span>
+        <span class="ow">and</span> <span class="p">(</span><span class="n">metadata_task</span> <span class="o">:=</span> <span class="n">mlflow_model</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">_METADATA_LLM_INFERENCE_TASK_KEY</span><span class="p">))</span>
         <span class="ow">and</span> <span class="n">metadata_task</span> <span class="o">!=</span> <span class="n">task</span>
     <span class="p">):</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
@@ -1111,10 +1112,7 @@
 <span class="sd">        pip_requirements: {{ pip_requirements }}</span>
 <span class="sd">        extra_pip_requirements: {{ extra_pip_requirements }}</span>
 <span class="sd">        conda_env: {{ conda_env }}</span>
-<span class="sd">        metadata: Custom metadata dictionary passed to the model and stored in the MLmodel file.</span>
-
-<span class="sd">            .. Note:: Experimental: This parameter may change or be removed in a future</span>
-<span class="sd">                                    release without warning.</span>
+<span class="sd">        metadata: {{ metadata }}</span>
 <span class="sd">        example_no_conversion: {{ example_no_conversion }}</span>
 <span class="sd">        prompt_template: {{ prompt_template }}</span>
 <span class="sd">        save_pretrained: {{ save_pretrained }}</span>
@@ -1843,17 +1841,16 @@
 <span class="sd">            data: Model input data.</span>
 <span class="sd">            params: Additional parameters to pass to the model for inference.</span>
 
-<span class="sd">                .. Note:: Experimental: This parameter may change or be removed in a future</span>
-<span class="sd">                                        release without warning.</span>
-
 <span class="sd">        Returns:</span>
 <span class="sd">            Model predictions.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">llm_inference_task</span> <span class="o">==</span> <span class="n">_LLM_INFERENCE_TASK_CHAT</span><span class="p">:</span>
             <span class="n">convert_data_messages_with_chat_template</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">llm_inference_task</span><span class="p">:</span>
             <span class="n">data</span><span class="p">,</span> <span class="n">params</span> <span class="o">=</span> <span class="n">preprocess_llm_inference_params</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">flavor_config</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">llm_inference_task</span> <span class="o">==</span> <span class="n">_LLM_INFERENCE_TASK_COMPLETIONS</span><span class="p">:</span>
+            <span class="n">data</span><span class="p">,</span> <span class="n">params</span> <span class="o">=</span> <span class="n">preprocess_llm_inference_params</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">flavor_config</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">llm_inference_task</span> <span class="o">==</span> <span class="n">_LLM_INFERENCE_TASK_EMBEDDING</span><span class="p">:</span>
+            <span class="n">data</span><span class="p">,</span> <span class="n">params</span> <span class="o">=</span> <span class="n">preprocess_llm_embedding_params</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
         <span class="c1"># NB: This `predict` method updates the model_config several times. To make the predict</span>
         <span class="c1"># call idempotent, we keep the original self.model_config immutable and creates a deep</span>
@@ -2012,7 +2009,13 @@
                 <span class="p">)</span>
 
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">transformers</span><span class="o">.</span><span class="n">FeatureExtractionPipeline</span><span class="p">):</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_feature_extraction_output</span><span class="p">(</span><span class="n">raw_output</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">llm_inference_task</span><span class="p">:</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">tensor</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="n">tensor</span> <span class="ow">in</span> <span class="n">raw_output</span><span class="p">]</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="n">postprocess_output_for_llm_v1_embedding_task</span><span class="p">(</span>
+                    <span class="n">data</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">tokenizer</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_feature_extraction_output</span><span class="p">(</span><span class="n">raw_output</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">transformers</span><span class="o">.</span><span class="n">FillMaskPipeline</span><span class="p">):</span>
             <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_list_of_multiple_dicts</span><span class="p">(</span><span class="n">raw_output</span><span class="p">,</span> <span class="n">output_key</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">transformers</span><span class="o">.</span><span class="n">ZeroShotClassificationPipeline</span><span class="p">):</span>

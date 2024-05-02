@@ -59,7 +59,7 @@
     <link rel="top" title="MLflow 2.12.2.dev0 documentation" href="../../../index.html"/>
         <link rel="up" title="MLflow LangChain Flavor" href="../index.html"/>
         <link rel="next" title="LangChain within MLflow (Experimental)" href="/../guide/index.html"/>
-        <link rel="prev" title="Using LangChain Agents with MLflow" href="/langchain-agent.html"/> 
+        <link rel="prev" title="Introduction to Using LangChain with MLflow" href="/langchain-quickstart.html"/> 
 
   
   <script src="../../../_static/js/modernizr.min.js"></script>
@@ -482,7 +482,7 @@ div.rendered_html tbody tr:hover {
 <blockquote>
 <div><p>NOTE: In this tutorial, we’ll be using GPT-3.5 as our base language model. It’s important to note that the results obtained from a RAG system will differ from those obtained by interfacing directly with GPT models. RAG’s unique approach of combining external data retrieval with language model generation creates more nuanced and contextually rich responses.</p>
 </div></blockquote>
-<div style="text-align: center;"><p><img alt="5b0c92f8aefb4fb0b2cc5fd390e1f00e" src="https://i.imgur.com/uwo1PCj.png" /></p>
+<div style="text-align: center;"><p><img alt="c3f2d7dfb60847518b20efa3b363589d" src="https://i.imgur.com/uwo1PCj.png" /></p>
 </div></div>
 </div>
 <div class="section" id="Learning-Outcomes">
@@ -500,17 +500,56 @@ div.rendered_html tbody tr:hover {
 <p>For this tutorial, we will be utilizing <a class="reference external" href="https://github.com/facebookresearch/faiss/wiki">FAISS</a> (Facebook AI Similarity Search, developed and maintained by the <a class="reference external" href="https://ai.meta.com/tools/faiss/">Meta AI research group</a>), an efficient similarity search and clustering library. It’s a highly useful library that easily handles large datasets and is capable of performing operations such as nearest neighbor search, which are critical in Retrieval Augmented Generation (RAG) systems. There are
 numerous other vector database solutions that can perform similar functionality; we are using FAISS in this tutorial due to its simplicity, ease of use, and fantastic performance.</p>
 </div>
+</div>
+<div class="section" id="Notebook-compatibility">
+<h2>Notebook compatibility<a class="headerlink" href="#Notebook-compatibility" title="Permalink to this headline"> </a></h2>
+<p>With rapidly changing libraries such as <code class="docutils literal notranslate"><span class="pre">langchain</span></code>, examples can become outdated rather quickly and will no longer work. For the purposes of demonstration, here are the critical dependencies that are recommended to use to effectively run this notebook:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 64%" />
+<col style="width: 36%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Package</p></th>
+<th class="head"><p>Version</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>langchain</p></td>
+<td><p><strong>0.1.16</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p>lanchain-community</p></td>
+<td><p><strong>0.0.33</strong></p></td>
+</tr>
+<tr class="row-even"><td><p>langchain-openai</p></td>
+<td><p><strong>0.0.8</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p>openai</p></td>
+<td><p><strong>1.12.0</strong></p></td>
+</tr>
+<tr class="row-even"><td><p>tiktoken</p></td>
+<td><p><strong>0.6.0</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p>mlflow</p></td>
+<td><p><strong>2.12.1</strong></p></td>
+</tr>
+<tr class="row-even"><td><p>faiss-cpu</p></td>
+<td><p><strong>1.7.4</strong></p></td>
+</tr>
+</tbody>
+</table>
+<p>If you attempt to execute this notebook with different versions, it may function correctly, but it is recommended to use the precise versions above to ensure that your code executes properly.</p>
 <div class="section" id="Installing-Requirements">
 <h3>Installing Requirements<a class="headerlink" href="#Installing-Requirements" title="Permalink to this headline"> </a></h3>
-<p>Before proceeding with the tutorial, ensure that you have FAISS and <a class="reference external" href="https://pypi.org/project/beautifulsoup4/">Beautiful Soup</a> installed via <code class="docutils literal notranslate"><span class="pre">pip</span></code>.</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>pip install beautifulsoup4 faiss-cpu
+<p>Before proceeding with the tutorial, ensure that you have FAISS and <a class="reference external" href="https://pypi.org/project/beautifulsoup4/">Beautiful Soup</a> installed via <code class="docutils literal notranslate"><span class="pre">pip</span></code>. The version specifiers for other packages are guaranteed to work with this notebook. Other versions of these packages may not function correctly due to breaking changes their APIs.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>beautifulsoup4<span class="w"> </span>faiss-cpu<span class="o">==</span><span class="m">1</span>.7.4<span class="w"> </span><span class="nv">langchain</span><span class="o">==</span><span class="m">0</span>.1.16<span class="w"> </span>langchain-community<span class="o">==</span><span class="m">0</span>.0.33<span class="w"> </span>langchain-openai<span class="o">==</span><span class="m">0</span>.0.8<span class="w"> </span><span class="nv">openai</span><span class="o">==</span><span class="m">1</span>.12.0<span class="w"> </span><span class="nv">tiktoken</span><span class="o">==</span><span class="m">0</span>.6.0
 </pre></div>
 </div>
 <blockquote>
 <div><p>NOTE: If you’d like to run this using your GPU, you can install <code class="docutils literal notranslate"><span class="pre">faiss-gpu</span></code> instead.</p>
 </div></blockquote>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
@@ -521,10 +560,9 @@ numerous other vector database solutions that can perform similar functionality;
 <span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
 <span class="kn">from</span> <span class="nn">langchain.chains</span> <span class="kn">import</span> <span class="n">RetrievalQA</span>
 <span class="kn">from</span> <span class="nn">langchain.document_loaders</span> <span class="kn">import</span> <span class="n">TextLoader</span>
-<span class="kn">from</span> <span class="nn">langchain.embeddings.openai</span> <span class="kn">import</span> <span class="n">OpenAIEmbeddings</span>
-<span class="kn">from</span> <span class="nn">langchain.llms</span> <span class="kn">import</span> <span class="n">OpenAI</span>
 <span class="kn">from</span> <span class="nn">langchain.text_splitter</span> <span class="kn">import</span> <span class="n">CharacterTextSplitter</span>
 <span class="kn">from</span> <span class="nn">langchain.vectorstores</span> <span class="kn">import</span> <span class="n">FAISS</span>
+<span class="kn">from</span> <span class="nn">langchain_openai</span> <span class="kn">import</span> <span class="n">OpenAI</span><span class="p">,</span> <span class="n">OpenAIEmbeddings</span>
 
 <span class="kn">import</span> <span class="nn">mlflow</span>
 
@@ -533,10 +571,10 @@ numerous other vector database solutions that can perform similar functionality;
 </div>
 </div>
 <blockquote>
-<div><p>NOTE: If you’d like to use Azure OpenAI with LangChain, you need to install <code class="docutils literal notranslate"><span class="pre">openai&gt;=1.10.0</span></code> and <code class="docutils literal notranslate"><span class="pre">langchain-openai&gt;=0.0.6</span></code>, specify the following credentials and parameters:</p>
+<div><p><strong>NOTE: If you’d like to use Azure OpenAI with LangChain, you need to install ``openai&gt;=1.10.0`` and ``langchain-openai&gt;=0.0.6``, as well as to specify the following credentials and parameters:</strong></p>
 </div></blockquote>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">langchain_openai</span> <span class="kn">import</span> <span class="n">AzureOpenAI</span><span class="p">,</span> <span class="n">AzureOpenAIEmbeddings</span>
@@ -757,7 +795,7 @@ numerous other vector database solutions that can perform similar functionality;
 </li>
 </ol>
 <p>Through these steps, we successfully integrate a complex RAG application with MLflow, showcasing its capability to handle advanced NLP tasks.</p>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
@@ -769,7 +807,11 @@ numerous other vector database solutions that can perform similar functionality;
 <span class="c1"># Log the retrievalQA chain</span>
 <span class="k">def</span> <span class="nf">load_retriever</span><span class="p">(</span><span class="n">persist_directory</span><span class="p">):</span>
     <span class="n">embeddings</span> <span class="o">=</span> <span class="n">OpenAIEmbeddings</span><span class="p">()</span>
-    <span class="n">vectorstore</span> <span class="o">=</span> <span class="n">FAISS</span><span class="o">.</span><span class="n">load_local</span><span class="p">(</span><span class="n">persist_directory</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">)</span>
+    <span class="n">vectorstore</span> <span class="o">=</span> <span class="n">FAISS</span><span class="o">.</span><span class="n">load_local</span><span class="p">(</span>
+        <span class="n">persist_directory</span><span class="p">,</span>
+        <span class="n">embeddings</span><span class="p">,</span>
+        <span class="n">allow_dangerous_deserialization</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># This is required to load the index from MLflow</span>
+    <span class="p">)</span>
     <span class="k">return</span> <span class="n">vectorstore</span><span class="o">.</span><span class="n">as_retriever</span><span class="p">()</span>
 
 
@@ -783,14 +825,10 @@ numerous other vector database solutions that can perform similar functionality;
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-2023/12/22 15:29:17 INFO mlflow.tracking.fluent: Experiment with name &#39;Legal RAG&#39; does not exist. Creating a new experiment.
-</pre></div></div>
-</div>
+<blockquote>
+<div><p><strong>IMPORTANT</strong>: In order to load a stored vectorstore instance such as our FAISS instance above, we need to specify within the load function the argument <code class="docutils literal notranslate"><span class="pre">allow_dangeous_deserialization</span></code> to <code class="docutils literal notranslate"><span class="pre">True</span></code> in order for the load to succeed. This is due to a safety warning that was introduced in <code class="docutils literal notranslate"><span class="pre">langchain</span></code> for loading objects that have been serialized using <code class="docutils literal notranslate"><span class="pre">pickle</span></code> or <code class="docutils literal notranslate"><span class="pre">cloudpickle</span></code>. While this issue of remote code execution is not a risk with using MLflow, as the serialization and
+deserialization happens entirely via API and within your environment, the argument must be set in order to prevent an Exception from being thrown at load time.</p>
+</div></blockquote>
 </div>
 <div class="section" id="Our-RAG-application-in-the-MLflow-UI">
 <h2>Our RAG application in the MLflow UI<a class="headerlink" href="#Our-RAG-application-in-the-MLflow-UI" title="Permalink to this headline"> </a></h2>
@@ -851,9 +889,9 @@ numerous other vector database solutions that can perform similar functionality;
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Section 1 of the document states that all persons who shall locate or settle
-upon or occupy the public park, or any part thereof, shall be considered
-trespassers and removed therefrom.
+The document states that all persons who shall locate or settle upon or occupy
+the land reserved for the public park, except as provided, shall be considered
+trespassers and removed from the park.
 </pre></div></div>
 </div>
 </div>
@@ -941,10 +979,10 @@ trespassers and removed therefrom.
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-A bridle-path is a path for horses and riders. It is mentioned in Section 1 of
-the Act to set apart a certain tract of land lying near the headwaters of the
-Yellowstone River as a public park. You can use a bridle-path at Yellowstone if
-the Secretary of the Interior has approved it.
+A bridle-path is a narrow path or trail designed for horseback riding. Yes, you
+can use a bridle-path at Yellowstone as it is designated for the enjoyment and
+benefit of the people visiting the park. However, it may be subject to certain
+regulations and restrictions set by the Secretary of the Interior.
 </pre></div></div>
 </div>
 </div>
@@ -1010,9 +1048,20 @@ the Secretary of the Interior has approved it.
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 No, you cannot buy Yellowstone from the Federal Government to set up a
-buffalo-themed day spa. The tract of land near the headwaters of the
-Yellowstone River is reserved and dedicated as a public park, and it is under
-the exclusive control of the Secretary of the Interior.
+buffalo-themed day spa. The land near the headwaters of the Yellowstone River
+has been reserved and withdrawn from settlement, occupancy, or sale under the
+laws of the United States and dedicated and set apart as a public park for the
+benefit and enjoyment of the people. The Secretary of the Interior has control
+over the park and is responsible for making and publishing rules and
+regulations for its management. Leases for building purposes are only granted
+for small parcels of ground for the accommodation of visitors, and the proceeds
+are used for the management of the park and the construction of roads and
+bridle-paths. Additionally, the wanton destruction of fish and game within the
+park is prohibited. Furthermore, the Act to protect trade and commerce against
+unlawful restraints and monopolies (approved July 2, 1890) states that any
+contract, combination, or conspiracy in restraint of trade or commerce in any
+Territory or the District of Columbia is illegal. Thus, buying land to set up a
+buffalo-themed day spa would likely be considered a violation of this act.
 </pre></div></div>
 </div>
 </div>
@@ -1066,10 +1115,10 @@ the exclusive control of the Secretary of the Interior.
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-No, this is not allowed by the Act. The Act states that the Secretary of the
-Interior is authorized to grant leases for building purposes for terms not
-exceeding 10 years, but only for &#34;accommodation of visitors&#34; and not for
-commercial purposes like a day spa.
+No, according to the context provided, the Secretary of the Interior may grant
+leases for building purposes for terms not exceeding ten years, but only for
+the accommodation of visitors. It does not specifically mention a
+buffalo-themed day spa as a possible use for the leased land.
 </pre></div></div>
 </div>
 </div>
@@ -1105,13 +1154,12 @@ commercial purposes like a day spa.
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-No, this is not allowed. Section 2 of the Act to set apart a certain tract of
-land lying near the headwaters of the Yellowstone River as a public park states
-that the Secretary of the Interior may grant leases for building purposes for
-terms not exceeding ten years, of small parcels of ground, at such places in
-said park as shall require the erection of buildings for the accommodation of
-visitors, but this Act does not mention anything about buffalo-themed day spas
-and hotels.
+No, it is not possible to lease land from the Federal Government for a
+commercial purpose within the designated park area. The Secretary of the
+Interior may grant leases for building purposes for terms not exceeding ten
+years, but only for small parcels of ground for the accommodation of visitors.
+Additionally, all proceeds from leases and other revenues must be used for the
+management of the park and the construction of roads and bridle-paths.
 </pre></div></div>
 </div>
 </div>
@@ -1141,8 +1189,13 @@ and hotels.
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Yes, as long as you follow all of the rules and regulations set forth by the
-Secretary of the Interior.
+Yes, according to the context, the park was set apart as a public park or
+pleasuring-ground for the benefit and enjoyment of the people. However, the
+park is under the exclusive control of the Secretary of the Interior who has
+the authority to make and publish rules and regulations for the care and
+management of the park. Therefore, it is important to follow any rules or
+regulations set by the Secretary to ensure the preservation and protection of
+the park for future enjoyment.
 </pre></div></div>
 </div>
 </div>
@@ -1177,9 +1230,14 @@ Secretary of the Interior.
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-No, starting a buffalo themed day spa outside of Yellowstone National Park and
-stifling competition would be illegal according to the Act to protect trade and
-commerce against unlawful restraints and monopolies.
+No, according to the context, any attempt to monopolize trade or commerce in
+the Yellowstone area or in any territory of the United States is considered
+illegal. Additionally, the park is under the exclusive control of the Secretary
+of the Interior, who may grant leases for building purposes but is expected to
+prevent the destruction of natural resources and the exploitation of fish and
+game for profit. Therefore, it would not be possible to start a buffalo themed
+day spa outside of Yellowstone National Park and stifle competition without
+violating the law and risking consequences from the Secretary of the Interior.
 </pre></div></div>
 </div>
 <p><strong>Cleanup: Removing Temporary Directory</strong>: - After we’re done asking our Retriever Model a bunch of silly questions, the temporary directory created earlier is cleaned up using <code class="docutils literal notranslate"><span class="pre">shutil.rmtree</span></code>.</p>
@@ -1218,7 +1276,7 @@ commerce against unlawful restraints and monopolies.
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="langchain-agent.html" class="btn btn-neutral" title="Using LangChain Agents with MLflow" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+        <a href="langchain-quickstart.html" class="btn btn-neutral" title="Introduction to Using LangChain with MLflow" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
       
       
         <a href="../guide/index.html" class="btn btn-neutral" title="LangChain within MLflow (Experimental)" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
