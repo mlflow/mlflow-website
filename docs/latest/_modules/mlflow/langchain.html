@@ -233,7 +233,7 @@
 
 <span class="kn">import</span> <span class="nn">mlflow</span>
 <span class="kn">from</span> <span class="nn">mlflow</span> <span class="kn">import</span> <span class="n">pyfunc</span>
-<span class="kn">from</span> <span class="nn">mlflow.environment_variables</span> <span class="kn">import</span> <span class="n">_MLFLOW_TESTING</span>
+<span class="kn">from</span> <span class="nn">mlflow.environment_variables</span> <span class="kn">import</span> <span class="n">_MLFLOW_TESTING</span><span class="p">,</span> <span class="n">MLFLOW_ENABLE_TRACE_IN_SERVING</span>
 <span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
 <span class="kn">from</span> <span class="nn">mlflow.langchain._langchain_autolog</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">_update_langchain_model_config</span><span class="p">,</span>
@@ -258,10 +258,12 @@
     <span class="n">register_pydantic_v1_serializer_cm</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">Model</span><span class="p">,</span> <span class="n">ModelInputExample</span><span class="p">,</span> <span class="n">ModelSignature</span><span class="p">,</span> <span class="n">get_model_info</span>
-<span class="kn">from</span> <span class="nn">mlflow.models.model</span> <span class="kn">import</span> <span class="n">MLMODEL_FILE_NAME</span>
+<span class="kn">from</span> <span class="nn">mlflow.models.model</span> <span class="kn">import</span> <span class="n">MLMODEL_FILE_NAME</span><span class="p">,</span> <span class="n">MODEL_CODE_PATH</span><span class="p">,</span> <span class="n">MODEL_CONFIG</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.model_config</span> <span class="kn">import</span> <span class="n">_set_model_config</span>
+<span class="kn">from</span> <span class="nn">mlflow.models.resources</span> <span class="kn">import</span> <span class="n">_ResourceBuilder</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.signature</span> <span class="kn">import</span> <span class="n">_infer_signature_from_input_example</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.utils</span> <span class="kn">import</span> <span class="n">_convert_llm_input_data</span><span class="p">,</span> <span class="n">_save_example</span>
+<span class="kn">from</span> <span class="nn">mlflow.pyfunc.context</span> <span class="kn">import</span> <span class="n">get_prediction_context</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracking._model_registry</span> <span class="kn">import</span> <span class="n">DEFAULT_AWAIT_MAX_SLEEP_SECONDS</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracking.artifact_utils</span> <span class="kn">import</span> <span class="n">_download_artifact_from_uri</span>
 <span class="kn">from</span> <span class="nn">mlflow.types.schema</span> <span class="kn">import</span> <span class="n">ColSpec</span><span class="p">,</span> <span class="n">DataType</span><span class="p">,</span> <span class="n">Schema</span>
@@ -271,6 +273,7 @@
     <span class="n">autologging_is_disabled</span><span class="p">,</span>
     <span class="n">safe_patch</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span> <span class="nn">mlflow.utils.databricks_utils</span> <span class="kn">import</span> <span class="n">is_in_databricks_model_serving_environment</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.docstring_utils</span> <span class="kn">import</span> <span class="n">LOG_MODEL_PARAM_DOCS</span><span class="p">,</span> <span class="n">format_docstring</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.environment</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">_CONDA_ENV_FILE_NAME</span><span class="p">,</span>
@@ -298,8 +301,6 @@
 
 <span class="n">FLAVOR_NAME</span> <span class="o">=</span> <span class="s2">&quot;langchain&quot;</span>
 <span class="n">_MODEL_TYPE_KEY</span> <span class="o">=</span> <span class="s2">&quot;model_type&quot;</span>
-<span class="n">_MODEL_CODE_CONFIG</span> <span class="o">=</span> <span class="s2">&quot;model_config&quot;</span>
-<span class="n">_MODEL_CODE_PATH</span> <span class="o">=</span> <span class="s2">&quot;model_code_path&quot;</span>
 
 
 <div class="viewcode-block" id="get_default_pip_requirements"><a class="viewcode-back" href="../../python_api/mlflow.langchain.html#mlflow.langchain.get_default_pip_requirements">[docs]</a><span class="k">def</span> <span class="nf">get_default_pip_requirements</span><span class="p">():</span>
@@ -321,6 +322,20 @@
 <span class="sd">        :func:`save_model()` and :func:`log_model()`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">_mlflow_conda_env</span><span class="p">(</span><span class="n">additional_pip_deps</span><span class="o">=</span><span class="n">get_default_pip_requirements</span><span class="p">())</span></div>
+
+
+<span class="k">def</span> <span class="nf">_infer_signature_from_input_example_for_lc_model</span><span class="p">(</span><span class="n">input_example</span><span class="p">,</span> <span class="n">wrapped_model</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">mlflow.langchain.api_request_parallel_processor</span> <span class="kn">import</span> <span class="n">_ChatResponse</span>
+
+    <span class="n">signature</span><span class="p">,</span> <span class="n">prediction</span> <span class="o">=</span> <span class="n">_infer_signature_from_input_example</span><span class="p">(</span>
+        <span class="n">input_example</span><span class="p">,</span> <span class="n">wrapped_model</span><span class="p">,</span> <span class="n">return_prediction</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+    <span class="c1"># try assign output schema if failing to infer it from prediction</span>
+    <span class="k">if</span> <span class="n">signature</span><span class="o">.</span><span class="n">outputs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prediction</span><span class="p">,</span> <span class="n">_ChatResponse</span><span class="p">):</span>
+            <span class="n">signature</span><span class="o">.</span><span class="n">outputs</span> <span class="o">=</span> <span class="n">prediction</span><span class="o">.</span><span class="n">get_schema</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">signature</span>
 
 
 <div class="viewcode-block" id="save_model"><a class="viewcode-back" href="../../python_api/mlflow.langchain.html#mlflow.langchain.save_model">[docs]</a><span class="nd">@experimental</span>
@@ -494,7 +509,9 @@
     <span class="k">if</span> <span class="n">signature</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">input_example</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">wrapped_model</span> <span class="o">=</span> <span class="n">_LangChainModelWrapper</span><span class="p">(</span><span class="n">lc_model</span><span class="p">)</span>
-            <span class="n">signature</span> <span class="o">=</span> <span class="n">_infer_signature_from_input_example</span><span class="p">(</span><span class="n">input_example</span><span class="p">,</span> <span class="n">wrapped_model</span><span class="p">)</span>
+            <span class="n">signature</span> <span class="o">=</span> <span class="n">_infer_signature_from_input_example_for_lc_model</span><span class="p">(</span>
+                <span class="n">input_example</span><span class="p">,</span> <span class="n">wrapped_model</span>
+            <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">lc_model</span><span class="p">,</span> <span class="s2">&quot;input_keys&quot;</span><span class="p">):</span>
                 <span class="n">input_columns</span> <span class="o">=</span> <span class="p">[</span>
@@ -550,9 +567,9 @@
         <span class="c1"># can use that path instead of the config.yml path when the model is loaded</span>
         <span class="c1"># TODO: what if model_config is not a string / file path?</span>
         <span class="n">flavor_conf</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="p">{</span><span class="n">_MODEL_CODE_CONFIG</span><span class="p">:</span> <span class="n">model_config_path</span><span class="p">,</span> <span class="n">_MODEL_CODE_PATH</span><span class="p">:</span> <span class="n">model_code_path</span><span class="p">}</span>
+            <span class="p">{</span><span class="n">MODEL_CONFIG</span><span class="p">:</span> <span class="n">model_config_path</span><span class="p">,</span> <span class="n">MODEL_CODE_PATH</span><span class="p">:</span> <span class="n">model_code_path</span><span class="p">}</span>
             <span class="k">if</span> <span class="n">model_config_path</span>
-            <span class="k">else</span> <span class="p">{</span><span class="n">_MODEL_CODE_CONFIG</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="n">_MODEL_CODE_PATH</span><span class="p">:</span> <span class="n">model_code_path</span><span class="p">}</span>
+            <span class="k">else</span> <span class="p">{</span><span class="n">MODEL_CONFIG</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="n">MODEL_CODE_PATH</span><span class="p">:</span> <span class="n">model_code_path</span><span class="p">}</span>
         <span class="p">)</span>
         <span class="n">model_data_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
 
@@ -570,8 +587,12 @@
     <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">Version</span><span class="p">(</span><span class="n">langchain</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">Version</span><span class="p">(</span><span class="s2">&quot;0.0.311&quot;</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">databricks_dependency</span> <span class="o">:=</span> <span class="n">_detect_databricks_dependencies</span><span class="p">(</span><span class="n">lc_model</span><span class="p">):</span>
+        <span class="p">(</span><span class="n">databricks_dependency</span><span class="p">,</span> <span class="n">databricks_resources</span><span class="p">)</span> <span class="o">=</span> <span class="n">_detect_databricks_dependencies</span><span class="p">(</span><span class="n">lc_model</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">databricks_dependency</span><span class="p">:</span>
             <span class="n">flavor_conf</span><span class="p">[</span><span class="n">_DATABRICKS_DEPENDENCY_KEY</span><span class="p">]</span> <span class="o">=</span> <span class="n">databricks_dependency</span>
+        <span class="k">if</span> <span class="n">databricks_resources</span><span class="p">:</span>
+            <span class="n">serialized_databricks_resources</span> <span class="o">=</span> <span class="n">_ResourceBuilder</span><span class="o">.</span><span class="n">from_resources</span><span class="p">(</span><span class="n">databricks_resources</span><span class="p">)</span>
+            <span class="n">mlflow_model</span><span class="o">.</span><span class="n">resources</span> <span class="o">=</span> <span class="n">serialized_databricks_resources</span>
 
     <span class="n">mlflow_model</span><span class="o">.</span><span class="n">add_flavor</span><span class="p">(</span>
         <span class="n">FLAVOR_NAME</span><span class="p">,</span>
@@ -823,11 +844,24 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            Model predictions.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">mlflow.langchain.api_request_parallel_processor</span> <span class="kn">import</span> <span class="n">process_api_requests</span>
+        <span class="c1"># TODO: We don&#39;t automatically turn tracing on in OSS model serving, because we haven&#39;t</span>
+        <span class="c1"># implemented storage option for traces in OSS model serving (counterpart to the</span>
+        <span class="c1"># Inference Table in Databricks model serving).</span>
+        <span class="k">if</span> <span class="n">is_in_databricks_model_serving_environment</span><span class="p">()</span> <span class="ow">and</span> <span class="n">MLFLOW_ENABLE_TRACE_IN_SERVING</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
+            <span class="kn">from</span> <span class="nn">mlflow.langchain.langchain_tracer</span> <span class="kn">import</span> <span class="n">MlflowLangchainTracer</span>
 
-        <span class="n">messages</span><span class="p">,</span> <span class="n">return_first_element</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_predict_messages</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-        <span class="n">results</span> <span class="o">=</span> <span class="n">process_api_requests</span><span class="p">(</span><span class="n">lc_model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lc_model</span><span class="p">,</span> <span class="n">requests</span><span class="o">=</span><span class="n">messages</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">return_first_element</span> <span class="k">else</span> <span class="n">results</span>
+            <span class="n">callbacks</span> <span class="o">=</span> <span class="p">[</span><span class="n">MlflowLangchainTracer</span><span class="p">()]</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="n">context</span> <span class="o">:=</span> <span class="n">get_prediction_context</span><span class="p">())</span> <span class="ow">and</span> <span class="n">context</span><span class="o">.</span><span class="n">is_evaluate</span><span class="p">:</span>
+            <span class="c1"># NB: We enable traces automatically for the model evaluation. Note that we have to</span>
+            <span class="c1">#   manually pass the context instance to callback, because LangChain callback may be</span>
+            <span class="c1">#   invoked asynchronously and it doesn&#39;t correctly propagate the thread-local context.</span>
+            <span class="kn">from</span> <span class="nn">mlflow.langchain.langchain_tracer</span> <span class="kn">import</span> <span class="n">MlflowLangchainTracer</span>
+
+            <span class="n">callbacks</span> <span class="o">=</span> <span class="p">[</span><span class="n">MlflowLangchainTracer</span><span class="p">(</span><span class="n">prediction_context</span><span class="o">=</span><span class="n">context</span><span class="p">)]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">callbacks</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_with_callbacks</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">callback_handlers</span><span class="o">=</span><span class="n">callbacks</span><span class="p">)</span>
 
     <span class="nd">@experimental</span>
     <span class="k">def</span> <span class="nf">_predict_with_callbacks</span><span class="p">(</span>
@@ -1026,8 +1060,8 @@
 
 <span class="k">def</span> <span class="nf">_load_model_from_local_fs</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">):</span>
     <span class="n">flavor_conf</span> <span class="o">=</span> <span class="n">_get_flavor_configuration</span><span class="p">(</span><span class="n">model_path</span><span class="o">=</span><span class="n">local_model_path</span><span class="p">,</span> <span class="n">flavor_name</span><span class="o">=</span><span class="n">FLAVOR_NAME</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">_MODEL_CODE_PATH</span> <span class="ow">in</span> <span class="n">flavor_conf</span><span class="p">:</span>
-        <span class="n">flavor_config_path</span> <span class="o">=</span> <span class="n">flavor_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">_MODEL_CODE_CONFIG</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">MODEL_CODE_PATH</span> <span class="ow">in</span> <span class="n">flavor_conf</span><span class="p">:</span>
+        <span class="n">flavor_config_path</span> <span class="o">=</span> <span class="n">flavor_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">MODEL_CONFIG</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">flavor_config_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">config_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
                 <span class="n">local_model_path</span><span class="p">,</span>
@@ -1036,7 +1070,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">config_path</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="n">flavor_code_path</span> <span class="o">=</span> <span class="n">flavor_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">_MODEL_CODE_PATH</span><span class="p">)</span>
+        <span class="n">flavor_code_path</span> <span class="o">=</span> <span class="n">flavor_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">MODEL_CODE_PATH</span><span class="p">)</span>
         <span class="n">code_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
             <span class="n">local_model_path</span><span class="p">,</span>
             <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">flavor_code_path</span><span class="p">),</span>
@@ -1153,7 +1187,11 @@
     <span class="n">log_model_signatures</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">log_models</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">log_datasets</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">log_inputs_outputs</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="c1"># TODO: log_inputs_outputs was originally defaulted to True in the production version of</span>
+    <span class="c1"># the LangChain autologging, as it is a common use case to log input/output table for</span>
+    <span class="c1"># evaluation. Once tracing is fully launched, this should be supported by the tracer</span>
+    <span class="c1"># but we should design it to be compatible with the existing UJ.</span>
+    <span class="n">log_inputs_outputs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">disable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">exclusive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">disable_for_unsupported_versions</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -1186,7 +1224,7 @@
 <span class="sd">        log_inputs_outputs: If ``True``, inference data and results are combined into a single</span>
 <span class="sd">            pandas DataFrame and logged to MLflow Tracking as an artifact.</span>
 <span class="sd">            If ``False``, inference data and results are not logged.</span>
-<span class="sd">            Default to ``True``.</span>
+<span class="sd">            Default to ``False``.</span>
 <span class="sd">        disable: If ``True``, disables the Langchain autologging integration. If ``False``,</span>
 <span class="sd">            enables the Langchain autologging integration.</span>
 <span class="sd">        exclusive: If ``True``, autologged content is not logged to user-created fluent runs.</span>

@@ -251,7 +251,7 @@
 
 <span class="sd">            import pandas as pd</span>
 
-<span class="sd">            x_new = pd.DataFrame(dict(x1=[1,2,3], x2=[4,5,6]))</span>
+<span class="sd">            x_new = pd.DataFrame(dict(x1=[1, 2, 3], x2=[4, 5, 6]))</span>
 <span class="sd">            model.predict(x_new)</span>
 
 <span class="sd">    * - ``numpy.ndarray``</span>
@@ -260,7 +260,7 @@
 
 <span class="sd">            import numpy as np</span>
 
-<span class="sd">            x_new = np.array([[1, 4] [2, 5], [3, 6]])</span>
+<span class="sd">            x_new = np.array([[1, 4][2, 5], [3, 6]])</span>
 <span class="sd">            model.predict(x_new)</span>
 
 <span class="sd">    * - ``scipy.sparse.csc_matrix`` or ``scipy.sparse.csr_matrix``</span>
@@ -297,8 +297,8 @@
 
 <span class="sd">            spark = SparkSession.builder.getOrCreate()</span>
 
-<span class="sd">            data = [(1,4), (2,5), (3,6)]  # List of tuples</span>
-<span class="sd">            x_new = spark.createDataFrame(data, [&quot;x1&quot;,&quot;x2&quot;])  # Specify column name</span>
+<span class="sd">            data = [(1, 4), (2, 5), (3, 6)]  # List of tuples</span>
+<span class="sd">            x_new = spark.createDataFrame(data, [&quot;x1&quot;, &quot;x2&quot;])  # Specify column name</span>
 <span class="sd">            model.predict(x_new)</span>
 
 <span class="sd">.. _pyfunc-filesystem-format:</span>
@@ -521,9 +521,11 @@
 <span class="sd">    import mlflow</span>
 <span class="sd">    import pandas as pd</span>
 
+
 <span class="sd">    # Define a simple function to log</span>
 <span class="sd">    def predict(model_input):</span>
 <span class="sd">        return model_input.apply(lambda x: x * 2)</span>
+
 
 <span class="sd">    # Save the function as a model</span>
 <span class="sd">    with mlflow.start_run():</span>
@@ -532,7 +534,7 @@
 
 <span class="sd">    # Load the model from the tracking server and perform inference</span>
 <span class="sd">    model = mlflow.pyfunc.load_model(f&quot;runs:/{run_id}/model&quot;)</span>
-<span class="sd">    x_new = pd.Series([1,2,3])</span>
+<span class="sd">    x_new = pd.Series([1, 2, 3])</span>
 
 <span class="sd">    prediction = model.predict(x_new)</span>
 <span class="sd">    print(prediction)</span>
@@ -553,13 +555,17 @@
 <span class="sd">    import mlflow</span>
 <span class="sd">    import pandas as pd</span>
 
+
 <span class="sd">    class MyModel(mlflow.pyfunc.PythonModel):</span>
 <span class="sd">        def predict(self, context, model_input, params=None):</span>
-<span class="sd">            return [x*2 for x in model_input]</span>
+<span class="sd">            return [x * 2 for x in model_input]</span>
+
 
 <span class="sd">    # Save the function as a model</span>
 <span class="sd">    with mlflow.start_run():</span>
-<span class="sd">        mlflow.pyfunc.log_model(&quot;model&quot;, python_model=MyModel(), pip_requirements=[&quot;pandas&quot;])</span>
+<span class="sd">        mlflow.pyfunc.log_model(</span>
+<span class="sd">            &quot;model&quot;, python_model=MyModel(), pip_requirements=[&quot;pandas&quot;]</span>
+<span class="sd">        )</span>
 <span class="sd">        run_id = mlflow.active_run().info.run_id</span>
 
 <span class="sd">    # Load the model from the tracking server and perform inference</span>
@@ -598,6 +604,7 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span>
 <span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">from</span> <span class="nn">packaging.version</span> <span class="kn">import</span> <span class="n">Version</span>
 
 <span class="kn">import</span> <span class="nn">mlflow</span>
 <span class="kn">import</span> <span class="nn">mlflow.pyfunc.loaders</span>
@@ -609,7 +616,7 @@
 <span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
 <span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">Model</span><span class="p">,</span> <span class="n">ModelInputExample</span><span class="p">,</span> <span class="n">ModelSignature</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.flavor_backend_registry</span> <span class="kn">import</span> <span class="n">get_flavor_backend</span>
-<span class="kn">from</span> <span class="nn">mlflow.models.model</span> <span class="kn">import</span> <span class="n">_DATABRICKS_FS_LOADER_MODULE</span><span class="p">,</span> <span class="n">MLMODEL_FILE_NAME</span>
+<span class="kn">from</span> <span class="nn">mlflow.models.model</span> <span class="kn">import</span> <span class="n">_DATABRICKS_FS_LOADER_MODULE</span><span class="p">,</span> <span class="n">MLMODEL_FILE_NAME</span><span class="p">,</span> <span class="n">MODEL_CONFIG</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.resources</span> <span class="kn">import</span> <span class="n">Resource</span><span class="p">,</span> <span class="n">_ResourceBuilder</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.signature</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">_infer_signature_from_input_example</span><span class="p">,</span>
@@ -629,6 +636,12 @@
     <span class="n">BAD_REQUEST</span><span class="p">,</span>
     <span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
     <span class="n">RESOURCE_DOES_NOT_EXIST</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">mlflow.protos.databricks_uc_registry_messages_pb2</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Entity</span><span class="p">,</span>
+    <span class="n">Job</span><span class="p">,</span>
+    <span class="n">LineageHeaderInfo</span><span class="p">,</span>
+    <span class="n">Notebook</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.pyfunc.model</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ChatModel</span><span class="p">,</span>
@@ -653,6 +666,7 @@
     <span class="n">PYTHON_VERSION</span><span class="p">,</span>
     <span class="n">_is_in_ipython_notebook</span><span class="p">,</span>
     <span class="n">check_port_connectivity</span><span class="p">,</span>
+    <span class="n">databricks_utils</span><span class="p">,</span>
     <span class="n">find_free_port</span><span class="p">,</span>
     <span class="n">get_major_minor_py_version</span><span class="p">,</span>
     <span class="n">insecure_hash</span><span class="p">,</span>
@@ -705,7 +719,6 @@
 <span class="n">CODE</span> <span class="o">=</span> <span class="s2">&quot;code&quot;</span>
 <span class="n">DATA</span> <span class="o">=</span> <span class="s2">&quot;data&quot;</span>
 <span class="n">ENV</span> <span class="o">=</span> <span class="s2">&quot;env&quot;</span>
-<span class="n">MODEL_CONFIG</span> <span class="o">=</span> <span class="s2">&quot;config&quot;</span>
 
 <span class="n">_MODEL_DATA_SUBPATH</span> <span class="o">=</span> <span class="s2">&quot;data&quot;</span>
 
@@ -1097,7 +1110,26 @@
 <span class="sd">            .. Note:: Experimental: This parameter may change or be removed in a future</span>
 <span class="sd">                release without warning.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">local_path</span> <span class="o">=</span> <span class="n">_download_artifact_from_uri</span><span class="p">(</span><span class="n">artifact_uri</span><span class="o">=</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">output_path</span><span class="o">=</span><span class="n">dst_path</span><span class="p">)</span>
+
+    <span class="n">lineage_header_info</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">databricks_utils</span><span class="o">.</span><span class="n">is_in_databricks_runtime</span><span class="p">()</span> <span class="ow">and</span> <span class="p">(</span>
+        <span class="n">databricks_utils</span><span class="o">.</span><span class="n">is_in_databricks_notebook</span><span class="p">()</span> <span class="ow">or</span> <span class="n">databricks_utils</span><span class="o">.</span><span class="n">is_in_databricks_job</span><span class="p">()</span>
+    <span class="p">):</span>
+        <span class="n">entity_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># Get notebook id and job id, pack them into lineage_header_info</span>
+        <span class="k">if</span> <span class="n">notebook_id</span> <span class="o">:=</span> <span class="n">databricks_utils</span><span class="o">.</span><span class="n">get_notebook_id</span><span class="p">():</span>
+            <span class="n">notebook_entity</span> <span class="o">=</span> <span class="n">Notebook</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">notebook_id</span><span class="p">)</span>
+            <span class="n">entity_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Entity</span><span class="p">(</span><span class="n">notebook</span><span class="o">=</span><span class="n">notebook_entity</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">job_id</span> <span class="o">:=</span> <span class="n">databricks_utils</span><span class="o">.</span><span class="n">get_job_id</span><span class="p">():</span>
+            <span class="n">job_entity</span> <span class="o">=</span> <span class="n">Job</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">job_id</span><span class="p">)</span>
+            <span class="n">entity_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Entity</span><span class="p">(</span><span class="n">job</span><span class="o">=</span><span class="n">job_entity</span><span class="p">))</span>
+
+        <span class="n">lineage_header_info</span> <span class="o">=</span> <span class="n">LineageHeaderInfo</span><span class="p">(</span><span class="n">entities</span><span class="o">=</span><span class="n">entity_list</span><span class="p">)</span> <span class="k">if</span> <span class="n">entity_list</span> <span class="k">else</span> <span class="kc">None</span>
+
+    <span class="n">local_path</span> <span class="o">=</span> <span class="n">_download_artifact_from_uri</span><span class="p">(</span>
+        <span class="n">artifact_uri</span><span class="o">=</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">output_path</span><span class="o">=</span><span class="n">dst_path</span><span class="p">,</span> <span class="n">lineage_header_info</span><span class="o">=</span><span class="n">lineage_header_info</span>
+    <span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">suppress_warnings</span><span class="p">:</span>
         <span class="n">model_requirements</span> <span class="o">=</span> <span class="n">_get_pip_requirements_from_model_path</span><span class="p">(</span><span class="n">local_path</span><span class="p">)</span>
@@ -1985,10 +2017,10 @@
                     <span class="n">args</span> <span class="o">=</span> <span class="n">args</span><span class="p">[:</span> <span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">)]</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">required_names</span><span class="p">):</span>
                     <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
-                        <span class="s2">&quot;Model input is missing required columns. Expected </span><span class="si">{}</span><span class="s2"> required&quot;</span>
-                        <span class="s2">&quot; input columns </span><span class="si">{}</span><span class="s2">, but the model received only </span><span class="si">{}</span><span class="s2"> unnamed input columns&quot;</span>
-                        <span class="s2">&quot; (Since the columns were passed unnamed they are expected to be in&quot;</span>
-                        <span class="s2">&quot; the order specified by the schema).&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">),</span> <span class="n">names</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
+                        <span class="sa">f</span><span class="s2">&quot;Model input is missing required columns. Expected </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">)</span><span class="si">}</span><span class="s2"> required&quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot; input columns </span><span class="si">{</span><span class="n">names</span><span class="si">}</span><span class="s2">, but the model received only </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>
+                        <span class="s2">&quot;unnamed input columns (Since the columns were passed unnamed they are&quot;</span>
+                        <span class="s2">&quot; expected to be in the order specified by the schema).&quot;</span>
                     <span class="p">)</span>
             <span class="n">pdf</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
                 <span class="n">data</span><span class="o">=</span><span class="p">{</span>
@@ -2047,7 +2079,10 @@
             <span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">elem_type</span><span class="p">)</span> <span class="o">==</span> <span class="n">StringType</span><span class="p">:</span>
-            <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">applymap</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">Version</span><span class="p">(</span><span class="n">pandas</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">Version</span><span class="p">(</span><span class="s2">&quot;2.1.0&quot;</span><span class="p">):</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">applymap</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">result_type</span><span class="p">)</span> <span class="o">==</span> <span class="n">ArrayType</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
@@ -2234,11 +2269,9 @@
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
                         <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Cannot apply udf because no column names specified. The udf &quot;</span>
-                        <span class="s2">&quot;expects </span><span class="si">{}</span><span class="s2"> columns with types: </span><span class="si">{}</span><span class="s2">. Input column names could not be &quot;</span>
-                        <span class="s2">&quot;inferred from the model signature (column names not found).&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                            <span class="nb">len</span><span class="p">(</span><span class="n">input_schema</span><span class="o">.</span><span class="n">inputs</span><span class="p">),</span>
-                            <span class="n">input_schema</span><span class="o">.</span><span class="n">inputs</span><span class="p">,</span>
-                        <span class="p">),</span>
+                        <span class="sa">f</span><span class="s2">&quot;expects </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">input_schema</span><span class="o">.</span><span class="n">inputs</span><span class="p">)</span><span class="si">}</span><span class="s2"> columns with types: &quot;</span>
+                        <span class="s2">&quot;</span><span class="si">{input_schema.inputs}</span><span class="s2">. Input column names could not be inferred from the&quot;</span>
+                        <span class="s2">&quot; model signature (column names not found).&quot;</span><span class="p">,</span>
                         <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
                     <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
@@ -2482,14 +2515,10 @@
     <span class="k">if</span> <span class="n">first_argument_set_specified</span> <span class="ow">and</span> <span class="n">second_argument_set_specified</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
             <span class="n">message</span><span class="o">=</span><span class="p">(</span>
-                <span class="s2">&quot;The following sets of parameters cannot be specified together: </span><span class="si">{first_set_keys}</span><span class="s2">&quot;</span>
-                <span class="s2">&quot; and </span><span class="si">{second_set_keys}</span><span class="s2">. All parameters in one set must be `None`. Instead, found&quot;</span>
-                <span class="s2">&quot; the following values: </span><span class="si">{first_set_entries}</span><span class="s2"> and </span><span class="si">{second_set_entries}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">first_set_keys</span><span class="o">=</span><span class="n">first_argument_set</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span>
-                    <span class="n">second_set_keys</span><span class="o">=</span><span class="n">second_argument_set</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span>
-                    <span class="n">first_set_entries</span><span class="o">=</span><span class="n">first_argument_set</span><span class="p">,</span>
-                    <span class="n">second_set_entries</span><span class="o">=</span><span class="n">second_argument_set</span><span class="p">,</span>
-                <span class="p">)</span>
+                <span class="sa">f</span><span class="s2">&quot;The following sets of parameters cannot be specified together:&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">first_argument_set</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">  and </span><span class="si">{</span><span class="n">second_argument_set</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="s2">&quot; All parameters in one set must be `None`. Instead, found&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; the following values: </span><span class="si">{</span><span class="n">first_argument_set</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">second_argument_set</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">),</span>
             <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
         <span class="p">)</span>

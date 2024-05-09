@@ -145,6 +145,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#search-runs-on-mlflow-ui">Search Runs on MLflow UI</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#create-example-mlflow-runs">Create Example MLflow Runs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#search-query-example">Search Query Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#search-syntax-overview">Search Syntax Overview</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#search-query-syntax-deep-dive">Search Query Syntax Deep Dive</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#example-queries">Example Queries</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#searching-by-metrics">1 - Searching By Metrics</a></li>
@@ -374,23 +375,72 @@ conditions expressed in a distinct syntax.</p>
 </div>
 </div>
 <p>You’ll notice that we now are displaying 2 runs instead of 10. Pretty easy, right?</p>
-<p>Now let’s go over the search query syntax in more detail.</p>
+</div>
+<div class="section" id="search-syntax-overview">
+<h3>Search Syntax Overview<a class="headerlink" href="#search-syntax-overview" title="Permalink to this headline"> </a></h3>
+<p>MLflow’s Search functionality leverages a Domain Specific Language (DSL) for querying. It is inspired by SQL but does not
+offer the full range of SQL capabilities.</p>
+<p>This section describes the syntax formatting, focusing on “left side” and “right side” elements in search queries. The
+“left side” pertains to the field being filtered, such as <code class="docutils literal notranslate"><span class="pre">metrics.loss</span></code>, while the “right side” relates to the value against which
+the field is being compared, like <code class="docutils literal notranslate"><span class="pre">0.8</span></code>.</p>
+<p><strong>Visual Representation of Search Components:</strong></p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/search_syntax.png"><img alt="search components" src="_images/search_syntax.png" style="width: 30%;" /></a>
+</div>
+<p><strong>Valid Syntax for Left and Right Side Elements:</strong></p>
+<ol class="arabic">
+<li><p><strong>Left Side Syntax:</strong></p>
+<ul class="simple">
+<li><p>Fields without special characters or reserved keywords can be referenced directly (e.g., <code class="docutils literal notranslate"><span class="pre">tag.test</span></code>).</p></li>
+<li><p>Use backticks for fields that contain special characters or are reserved keywords.</p></li>
+<li><p>Double quotes are also acceptable for enclosing field names (e.g., <code class="docutils literal notranslate"><span class="pre">tag.&quot;test&quot;</span></code>).</p></li>
+</ul>
+<p><strong>Unsupported:</strong></p>
+<ul class="simple">
+<li><p>Single quotes are <strong>not valid</strong> for enclosing field names (e.g., <code class="docutils literal notranslate"><span class="pre">tag.'test'</span></code> results in a syntax error).</p></li>
+</ul>
+</li>
+<li><p><strong>Right Side Syntax:</strong></p>
+<ul class="simple">
+<li><p>Enclose values in single or double quotes based on content requirements (e.g., <code class="docutils literal notranslate"><span class="pre">tag.`test`</span> <span class="pre">=</span> <span class="pre">'abc'</span></code> or <code class="docutils literal notranslate"><span class="pre">tag.`test`</span> <span class="pre">=</span> <span class="pre">&quot;abc&quot;</span></code>).</p></li>
+<li><p>Non-metric values, <strong>including numeric values</strong> that may be stored as tags or as parameters must be enclosed in quotations.</p></li>
+</ul>
+<p><strong>Unsupported:</strong></p>
+<ul class="simple">
+<li><p>Using backticks or no wrapping for values is not allowed. Examples of invalid syntax include:</p></li>
+</ul>
+<blockquote>
+<div><div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">This results in a syntax error as backticks cannot be used for right-hand values.</span><a class="headerlink" href="#id3" title="Permalink to this code"> </a></div>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="n">tag</span><span class="p">.</span><span class="o">`</span><span class="n">test</span><span class="o">`</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">`</span><span class="n">abc</span><span class="o">`</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">This results in a syntax error as values must be wrapped in double quotes if they are not metrics.</span><a class="headerlink" href="#id4" title="Permalink to this code"> </a></div>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="n">tag</span><span class="p">.</span><span class="o">`</span><span class="n">test</span><span class="o">`</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">abc</span>
+</pre></div>
+</div>
+</div>
+</div></blockquote>
+</li>
+</ol>
 </div>
 <div class="section" id="search-query-syntax-deep-dive">
 <h3>Search Query Syntax Deep Dive<a class="headerlink" href="#search-query-syntax-deep-dive" title="Permalink to this headline"> </a></h3>
 <p>As noted above, MLflow search syntax is similar to SQL with a few notable exceptions.</p>
 <ul>
 <li><p>The SQL <code class="docutils literal notranslate"><span class="pre">OR</span></code> keyword is not supported.</p></li>
-<li><p>For fields that contain special characters or start with numbers, you need to wrap them in double quotes.</p>
+<li><p>For fields that contain special characters or start with numbers, these should be wrapped in <strong>backticks</strong>.</p>
 <div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="gd">- Bad:  metrics.cross-entropy-loss &lt; 0.5</span>
-<span class="gi">+ Good: metrics.&quot;cross-entropy-loss&quot; &lt; 0.5</span>
+<span class="gi">+ Good: metrics.`cross-entropy-loss` &lt; 0.5</span>
 
 <span class="gd">- Bad:  params.1st_iteration_timestamp = &quot;2022-01-01&quot;</span>
-<span class="gi">+ Good: params.&quot;1st_iteration_timestamp&quot; = &quot;2022-01-01&quot;</span>
+<span class="gi">+ Good: params.`1st_iteration_timestamp` = &quot;2022-01-01&quot;</span>
 </pre></div>
 </div>
 </li>
-<li><p>For the SQL <code class="docutils literal notranslate"><span class="pre">IN</span></code> keyword, you must surround the values of your list with single quotes.</p>
+<li><p>For the SQL <code class="docutils literal notranslate"><span class="pre">IN</span></code> keyword, you must surround the values of your list with <strong>single quotes</strong>.</p>
 <div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="gd">- Bad:  attributes.run_id IN (&quot;5984a3488161440f92de9847e846b342&quot;, &quot;babe221a676b4fa4b204f8240f2c4f14&quot;)</span>
 <span class="gi">+ Good: attributes.run_id IN (&#39;5984a3488161440f92de9847e846b342&#39;, &#39;babe221a676b4fa4b204f8240f2c4f14&#39;)</span>
 </pre></div>
@@ -458,8 +508,8 @@ side of the inequality. Note that they are <strong>stored as numbers</strong>, s
 <div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="n">metrics</span><span class="p">.</span><span class="n">accuracy</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">72</span>
 <span class="n">metrics</span><span class="p">.</span><span class="ss">&quot;accuracy&quot;</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">72</span>
 <span class="n">metrics</span><span class="p">.</span><span class="n">loss</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">15</span>
-<span class="n">metrics</span><span class="p">.</span><span class="ss">&quot;log-scale-loss&quot;</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">0</span>
-<span class="n">metrics</span><span class="p">.</span><span class="ss">&quot;f1 score&quot;</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">5</span>
+<span class="n">metrics</span><span class="p">.</span><span class="o">`</span><span class="n">log</span><span class="o">-</span><span class="k">scale</span><span class="o">-</span><span class="n">loss</span><span class="o">`</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">0</span>
+<span class="n">metrics</span><span class="p">.</span><span class="o">`</span><span class="n">f1</span><span class="w"> </span><span class="n">score</span><span class="o">`</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">5</span>
 <span class="n">metrics</span><span class="p">.</span><span class="n">accuracy</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">72</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">metrics</span><span class="p">.</span><span class="n">loss</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">15</span>
 </pre></div>
 </div>
@@ -472,6 +522,8 @@ or <code class="docutils literal notranslate"><span class="pre">mlflow.log_param
 <p>To search for runs by filtering on params, you must include the <code class="docutils literal notranslate"><span class="pre">params</span></code> prefix in the left
 side of the inequality. Note that they are <strong>stored as strings</strong>, so you must use string
 comparators, such as <code class="docutils literal notranslate"><span class="pre">=</span></code> and <code class="docutils literal notranslate"><span class="pre">!=</span></code>.</p>
+<p>Note that numeric values stored as parameters are cast to string in the tracking store.
+When querying for numeric parameters, you must specify them as strings by enclosing them in <strong>double quotes</strong>.</p>
 <div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="n">params</span><span class="p">.</span><span class="n">batch_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ss">&quot;2&quot;</span>
 <span class="n">params</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="ss">&quot;GPT%&quot;</span>
 <span class="n">params</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="k">ILIKE</span><span class="w"> </span><span class="ss">&quot;gPt%&quot;</span>
@@ -525,18 +577,18 @@ searchable.</p>
 <p>To search for runs by filtering on tags, you must include the <code class="docutils literal notranslate"><span class="pre">tags</span></code> or <code class="docutils literal notranslate"><span class="pre">mlflow</span></code> prefixes in
 the left side of the inequality. Note that tags are <strong>stored as strings</strong>, so you must use string
 comparators, such as <code class="docutils literal notranslate"><span class="pre">=</span></code> and <code class="docutils literal notranslate"><span class="pre">!=</span></code>.</p>
-<div class="literal-block-wrapper docutils container" id="id3">
-<div class="code-block-caption"><span class="caption-text">Examples for Strings</span><a class="headerlink" href="#id3" title="Permalink to this code"> </a></div>
-<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="n">attributes</span><span class="p">.</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;ACTIVE&#39;</span>
-<span class="n">attributes</span><span class="p">.</span><span class="n">user_id</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">&#39;user1&#39;</span>
-<span class="n">attributes</span><span class="p">.</span><span class="n">run_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;my-run&#39;</span>
-<span class="n">attributes</span><span class="p">.</span><span class="n">run_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;a1b2c3d4&#39;</span>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text">Examples for Strings</span><a class="headerlink" href="#id5" title="Permalink to this code"> </a></div>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="n">attributes</span><span class="p">.</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ss">&quot;ACTIVE&quot;</span>
+<span class="n">attributes</span><span class="p">.</span><span class="n">user_id</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="ss">&quot;user1&quot;</span>
+<span class="n">attributes</span><span class="p">.</span><span class="n">run_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ss">&quot;my-run&quot;</span>
+<span class="n">attributes</span><span class="p">.</span><span class="n">run_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ss">&quot;a1b2c3d4&quot;</span>
 <span class="n">attributes</span><span class="p">.</span><span class="n">run_id</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="s1">&#39;a1b2c3d4&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;e5f6g7h8&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<div class="literal-block-wrapper docutils container" id="id4">
-<div class="code-block-caption"><span class="caption-text">Examples for Numerics</span><a class="headerlink" href="#id4" title="Permalink to this code"> </a></div>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">Examples for Numerics</span><a class="headerlink" href="#id6" title="Permalink to this code"> </a></div>
 <div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="n">attributes</span><span class="p">.</span><span class="n">start_time</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">1664067852747</span>
 <span class="n">attributes</span><span class="p">.</span><span class="n">end_time</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">1664067852747</span>
 <span class="n">attributes</span><span class="p">.</span><span class="n">created</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1664067852747</span>
@@ -700,7 +752,8 @@ check out the documentation for more details.</p>
 </div>
 <div class="section" id="r">
 <h3>R<a class="headerlink" href="#r" title="Permalink to this headline"> </a></h3>
-<p>The R API is similar to the Python API.</p>
+<p>The R API is similar to the Python API, with the exeption that the filter conditions must be string wrapped. Due to this
+behavior, right-hand side conditional elements must be wrapped in single quotes for parameters, attributes, and tags.</p>
 <div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">mlflow</span><span class="p">)</span>
 <span class="nf">mlflow_search_runs</span><span class="p">(</span>
 <span class="w">  </span><span class="n">filter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;metrics.rmse &lt; 0.9 and tags.production = &#39;true&#39;&quot;</span><span class="p">,</span>
@@ -712,7 +765,9 @@ check out the documentation for more details.</p>
 </div>
 <div class="section" id="java">
 <h3>Java<a class="headerlink" href="#java" title="Permalink to this headline"> </a></h3>
-<p>The Java API is similar to Python API.</p>
+<p>The Java API is similar to the Python API with the exception that the entire conditional filter syntax is string-encapsulated.
+This is due to the fact that the Java API is a thin wrapper around the Python core APIs, and as such, will be translated between
+the two languages.</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">List</span><span class="o">&lt;</span><span class="n">Long</span><span class="o">&gt;</span><span class="w"> </span><span class="n">experimentIds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arrays</span><span class="p">.</span><span class="na">asList</span><span class="p">(</span><span class="s">&quot;1&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;2&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;4&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;8&quot;</span><span class="p">);</span>
 <span class="n">List</span><span class="o">&lt;</span><span class="n">RunInfo</span><span class="o">&gt;</span><span class="w"> </span><span class="n">searchResult</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">client</span><span class="p">.</span><span class="na">searchRuns</span><span class="p">(</span><span class="n">experimentIds</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;metrics.accuracy_score &lt; 99.90&quot;</span><span class="p">);</span>
 </pre></div>

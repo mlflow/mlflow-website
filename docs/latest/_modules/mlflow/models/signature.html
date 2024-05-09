@@ -542,7 +542,7 @@
 
 
 <span class="k">def</span> <span class="nf">_infer_signature_from_input_example</span><span class="p">(</span>
-    <span class="n">input_example</span><span class="p">:</span> <span class="n">ModelInputExample</span><span class="p">,</span> <span class="n">wrapped_model</span>
+    <span class="n">input_example</span><span class="p">:</span> <span class="n">ModelInputExample</span><span class="p">,</span> <span class="n">wrapped_model</span><span class="p">,</span> <span class="n">return_prediction</span><span class="o">=</span><span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ModelSignature</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Infer the signature from an example input and a PyFunc wrapped model. Catches all exceptions.</span>
@@ -575,8 +575,19 @@
             <span class="ow">and</span> <span class="n">prediction</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span>
         <span class="p">):</span>
             <span class="n">prediction</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span>
-        <span class="n">output_schema</span> <span class="o">=</span> <span class="n">_infer_schema</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">ModelSignature</span><span class="p">(</span><span class="n">input_schema</span><span class="p">,</span> <span class="n">output_schema</span><span class="p">,</span> <span class="n">params_schema</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">output_schema</span> <span class="o">=</span> <span class="n">_infer_schema</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;Failed to infer model output schema from prediction &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;result </span><span class="si">{</span><span class="n">prediction</span><span class="si">}</span><span class="s2">. Detailed exception: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="n">signature</span> <span class="o">=</span> <span class="n">ModelSignature</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="n">input_schema</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params_schema</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">signature</span> <span class="o">=</span> <span class="n">ModelSignature</span><span class="p">(</span><span class="n">input_schema</span><span class="p">,</span> <span class="n">output_schema</span><span class="p">,</span> <span class="n">params_schema</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">return_prediction</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">signature</span><span class="p">,</span> <span class="n">prediction</span>
+        <span class="k">return</span> <span class="n">signature</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">environment_variables</span><span class="o">.</span><span class="n">_MLFLOW_TESTING</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
             <span class="k">raise</span>

@@ -186,6 +186,7 @@
 <li class="toctree-l2"><a class="reference internal" href="mlflow.statsmodels.html">mlflow.statsmodels</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.system_metrics.html">mlflow.system_metrics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.tensorflow.html">mlflow.tensorflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mlflow.tracing.html">mlflow.tracing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.transformers.html">mlflow.transformers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.types.html">mlflow.types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.utils.html">mlflow.utils</a></li>
@@ -1387,6 +1388,23 @@ Artifact uri: file:///.../0/a46a80f1c9644bd8f4e5dd5553fffce/artifacts/features/f
 </dd></dl>
 
 <dl class="py function">
+<dt id="mlflow.get_current_active_span">
+<code class="sig-prename descclassname"><span class="pre">mlflow.</span></code><code class="sig-name descname"><span class="pre">get_current_active_span</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mlflow/tracing/fluent.html#get_current_active_span"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.get_current_active_span" title="Permalink to this definition"> </a></dt>
+<dd><p>Get the current active span in the global context.</p>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<p>This only works when the span is created with fluent APIs like <cite>&#64;mlflow.trace</cite> or
+<cite>with mlflow.start_span</cite>. If a span is created with MlflowClient APIs, it won’t be
+attached to the global context so this function will not return it.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The current active span if exists, otherwise None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt id="mlflow.get_experiment">
 <code class="sig-prename descclassname"><span class="pre">mlflow.</span></code><code class="sig-name descname"><span class="pre">get_experiment</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">experiment_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="mlflow.entities.html#mlflow.entities.Experiment" title="mlflow.entities.Experiment"><span class="pre">Experiment</span></a><a class="reference internal" href="../_modules/mlflow/tracking/fluent.html#get_experiment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.get_experiment" title="Permalink to this definition"> </a></dt>
 <dd><p>Retrieve an experiment by experiment_id from the backend store</p>
@@ -1562,6 +1580,17 @@ run, the RunData contains the most recently logged value at the largest step for
 </pre></div>
 </div>
 </div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mlflow.get_trace">
+<code class="sig-prename descclassname"><span class="pre">mlflow.</span></code><code class="sig-name descname"><span class="pre">get_trace</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="mlflow.entities.html#mlflow.entities.Trace" title="mlflow.entities.Trace"><span class="pre">Trace</span></a><a class="reference internal" href="../_modules/mlflow/tracing/fluent.html#get_trace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.get_trace" title="Permalink to this definition"> </a></dt>
+<dd><p>Get a trace by the given request ID.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A <a class="reference internal" href="mlflow.entities.html#mlflow.entities.Trace" title="mlflow.entities.Trace"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.entities.Trace</span></code></a> objects with the given request ID.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -2189,7 +2218,7 @@ future for logging operation.</p>
 
 <dl class="py function">
 <dt id="mlflow.log_params">
-<code class="sig-prename descclassname"><span class="pre">mlflow.</span></code><code class="sig-name descname"><span class="pre">log_params</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synchronous</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="mlflow.utils.html#mlflow.utils.async_logging.run_operations.RunOperations" title="mlflow.utils.async_logging.run_operations.RunOperations"><span class="pre">mlflow.utils.async_logging.run_operations.RunOperations</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/mlflow/tracking/fluent.html#log_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.log_params" title="Permalink to this definition"> </a></dt>
+<code class="sig-prename descclassname"><span class="pre">mlflow.</span></code><code class="sig-name descname"><span class="pre">log_params</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synchronous</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="mlflow.utils.html#mlflow.utils.async_logging.run_operations.RunOperations" title="mlflow.utils.async_logging.run_operations.RunOperations"><span class="pre">mlflow.utils.async_logging.run_operations.RunOperations</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/mlflow/tracking/fluent.html#log_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.log_params" title="Permalink to this definition"> </a></dt>
 <dd><p>Log a batch of params for the current run. If no run is active, this method will create a
 new active run.</p>
 <dl class="field-list simple">
@@ -2201,6 +2230,8 @@ not)</p></li>
 successfully. If False, logs the parameters asynchronously and
 returns a future representing the logging operation. If None, read from environment
 variable <cite>MLFLOW_ENABLE_ASYNC_LOGGING</cite>, which defaults to False if not set.</p></li>
+<li><p><strong>run_id</strong> – Run ID. If specified, log params to the specified run. If not specified, log
+params to the currently active run.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -2892,6 +2923,64 @@ respectively.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt id="mlflow.search_traces">
+<code class="sig-prename descclassname"><span class="pre">mlflow.</span></code><code class="sig-name descname"><span class="pre">search_traces</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">experiment_ids</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_string</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_results</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order_by</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extract_fields</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">pandas.DataFrame</span><a class="reference internal" href="../_modules/mlflow/tracing/fluent.html#search_traces"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.search_traces" title="Permalink to this definition"> </a></dt>
+<dd><p>Return traces that match the given list of search expressions within the experiments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>experiment_ids</strong> – List of experiment ids to scope the search. If not provided, the search
+will be performed across the current active experiment.</p></li>
+<li><p><strong>filter_string</strong> – A search filter string.</p></li>
+<li><p><strong>max_results</strong> – Maximum number of traces desired. If None, all traces matching the search
+expressions will be returned.</p></li>
+<li><p><strong>order_by</strong> – List of order_by clauses.</p></li>
+<li><p><strong>extract_fields</strong> – <p>Specify fields to extract from traces using the format
+“span_name.[inputs|outputs].field_name” or “span_name.[inputs|outputs]”.
+For instance, “predict.outputs.result” retrieves the output “result” field from
+a span named “predict”, while “predict.outputs” fetches the entire outputs
+dictionary, including keys “result” and “explanation”.</p>
+<p>By default, no fields are extracted into the DataFrame columns. When multiple
+fields are specified, each is extracted as its own column. If an invalid field
+string is provided, the function silently returns without adding that field’s column.
+The supported fields are limited to “inputs” and “outputs” of spans. Span names
+cannot contain “.”.</p>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A Pandas DataFrame containing information about traces that satisfy the search expressions.</p>
+</dd>
+</dl>
+<div class="literal-block-wrapper docutils container" id="id81">
+<div class="code-block-caption"><span class="caption-text">Search traces with extract_fields</span><a class="headerlink" href="#id81" title="Permalink to this code"> </a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_span</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;span1&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">span</span><span class="p">:</span>
+    <span class="n">span</span><span class="o">.</span><span class="n">set_inputs</span><span class="p">({</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">})</span>
+    <span class="n">span</span><span class="o">.</span><span class="n">set_outputs</span><span class="p">({</span><span class="s2">&quot;c&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;d&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">})</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">search_traces</span><span class="p">(</span>
+    <span class="n">extract_fields</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;span1.inputs&quot;</span><span class="p">,</span> <span class="s2">&quot;span1.outputs&quot;</span><span class="p">,</span> <span class="s2">&quot;span1.outputs.c&quot;</span><span class="p">]</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id82">
+<div class="code-block-caption"><span class="caption-text">Search traces with extract_fields and non-dictionary span inputs and outputs</span><a class="headerlink" href="#id82" title="Permalink to this code"> </a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_span</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;non_dict_span&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">span</span><span class="p">:</span>
+    <span class="n">span</span><span class="o">.</span><span class="n">set_inputs</span><span class="p">([</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">])</span>
+    <span class="n">span</span><span class="o">.</span><span class="n">set_outputs</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">search_traces</span><span class="p">(</span>
+    <span class="n">extract_fields</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;non_dict_span.inputs&quot;</span><span class="p">,</span> <span class="s2">&quot;non_dict_span.outputs&quot;</span><span class="p">],</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</dd></dl>
+
+<dl class="py function">
 <dt id="mlflow.set_experiment">
 <code class="sig-prename descclassname"><span class="pre">mlflow.</span></code><code class="sig-name descname"><span class="pre">set_experiment</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">experiment_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">experiment_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="mlflow.entities.html#mlflow.entities.Experiment" title="mlflow.entities.Experiment"><span class="pre">Experiment</span></a><a class="reference internal" href="../_modules/mlflow/tracking/fluent.html#set_experiment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.set_experiment" title="Permalink to this definition"> </a></dt>
 <dd><p>Set the given experiment as the active experiment. The experiment must either be specified by
@@ -2917,8 +3006,8 @@ does not exist, an exception is thrown.</p></li>
 experiment.</p>
 </dd>
 </dl>
-<div class="literal-block-wrapper docutils container" id="id81">
-<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id81" title="Permalink to this code"> </a></div>
+<div class="literal-block-wrapper docutils container" id="id83">
+<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id83" title="Permalink to this code"> </a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
 
 <span class="c1"># Set an experiment name, which must be unique and case-sensitive.</span>
@@ -2931,8 +3020,8 @@ experiment.</p>
 </pre></div>
 </div>
 </div>
-<div class="literal-block-wrapper docutils container" id="id82">
-<div class="code-block-caption"><span class="caption-text">Output</span><a class="headerlink" href="#id82" title="Permalink to this code"> </a></div>
+<div class="literal-block-wrapper docutils container" id="id84">
+<div class="code-block-caption"><span class="caption-text">Output</span><a class="headerlink" href="#id84" title="Permalink to this code"> </a></div>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Experiment_id: 1
 Artifact Location: file:///.../mlruns/1
 Tags: {}
@@ -2957,8 +3046,8 @@ up to length 5000, but some may support larger values.</p></li>
 </ul>
 </dd>
 </dl>
-<div class="literal-block-wrapper docutils container" id="id83">
-<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id83" title="Permalink to this code"> </a></div>
+<div class="literal-block-wrapper docutils container" id="id85">
+<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id85" title="Permalink to this code"> </a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
 
 <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
@@ -2977,8 +3066,8 @@ up to length 5000, but some may support larger values.</p></li>
 <dd class="field-odd"><p><strong>tags</strong> – Dictionary containing tag names and corresponding values.</p>
 </dd>
 </dl>
-<div class="literal-block-wrapper docutils container" id="id84">
-<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id84" title="Permalink to this code"> </a></div>
+<div class="literal-block-wrapper docutils container" id="id86">
+<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id86" title="Permalink to this code"> </a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
 
 <span class="n">tags</span> <span class="o">=</span> <span class="p">{</span>
@@ -3010,8 +3099,8 @@ locally at the provided file (or <code class="docutils literal notranslate"><spa
 “databricks://&lt;profileName&gt;”.</p>
 </dd>
 </dl>
-<div class="literal-block-wrapper docutils container" id="id85">
-<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id85" title="Permalink to this code"> </a></div>
+<div class="literal-block-wrapper docutils container" id="id87">
+<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id87" title="Permalink to this code"> </a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mflow</span>
 
 <span class="c1"># Set model registry uri, fetch the set uri, and compare</span>
@@ -3027,8 +3116,8 @@ locally at the provided file (or <code class="docutils literal notranslate"><spa
 </pre></div>
 </div>
 </div>
-<div class="literal-block-wrapper docutils container" id="id86">
-<div class="code-block-caption"><span class="caption-text">Output</span><a class="headerlink" href="#id86" title="Permalink to this code"> </a></div>
+<div class="literal-block-wrapper docutils container" id="id88">
+<div class="code-block-caption"><span class="caption-text">Output</span><a class="headerlink" href="#id88" title="Permalink to this code"> </a></div>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Current registry uri: sqlite:////tmp/registry.db
 Current tracking uri: file:///.../mlruns
 </pre></div>
@@ -3102,8 +3191,8 @@ defaults to False if not set.</p></li>
 represents future for logging operation.</p>
 </dd>
 </dl>
-<div class="literal-block-wrapper docutils container" id="id87">
-<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id87" title="Permalink to this code"> </a></div>
+<div class="literal-block-wrapper docutils container" id="id89">
+<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id89" title="Permalink to this code"> </a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
 
 <span class="c1"># Set a tag.</span>
@@ -3140,8 +3229,8 @@ defaults to False if not set.</p></li>
 represents future for logging operation.</p>
 </dd>
 </dl>
-<div class="literal-block-wrapper docutils container" id="id88">
-<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id88" title="Permalink to this code"> </a></div>
+<div class="literal-block-wrapper docutils container" id="id90">
+<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id90" title="Permalink to this code"> </a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
 
 <span class="n">tags</span> <span class="o">=</span> <span class="p">{</span>
@@ -3181,8 +3270,8 @@ CLI <a class="reference external" href="https://github.com/databricks/databricks
 </p>
 </dd>
 </dl>
-<div class="literal-block-wrapper docutils container" id="id89">
-<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id89" title="Permalink to this code"> </a></div>
+<div class="literal-block-wrapper docutils container" id="id91">
+<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id91" title="Permalink to this code"> </a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
 
 <span class="n">mlflow</span><span class="o">.</span><span class="n">set_tracking_uri</span><span class="p">(</span><span class="s2">&quot;file:///tmp/my_tracking&quot;</span><span class="p">)</span>
@@ -3191,8 +3280,8 @@ CLI <a class="reference external" href="https://github.com/databricks/databricks
 </pre></div>
 </div>
 </div>
-<div class="literal-block-wrapper docutils container" id="id90">
-<div class="code-block-caption"><span class="caption-text">Output</span><a class="headerlink" href="#id90" title="Permalink to this code"> </a></div>
+<div class="literal-block-wrapper docutils container" id="id92">
+<div class="code-block-caption"><span class="caption-text">Output</span><a class="headerlink" href="#id92" title="Permalink to this code"> </a></div>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Current tracking uri: file:///tmp/my_tracking
 </pre></div>
 </div>
@@ -3244,8 +3333,8 @@ System metrics logging is an experimental feature in MLflow 2.8 and subject to c
 run’s state.</p>
 </dd>
 </dl>
-<div class="literal-block-wrapper docutils container" id="id91">
-<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id91" title="Permalink to this code"> </a></div>
+<div class="literal-block-wrapper docutils container" id="id93">
+<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id93" title="Permalink to this code"> </a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
 
 <span class="c1"># Create nested runs</span>
@@ -3278,8 +3367,8 @@ run’s state.</p>
 </pre></div>
 </div>
 </div>
-<div class="literal-block-wrapper docutils container" id="id92">
-<div class="code-block-caption"><span class="caption-text">Output</span><a class="headerlink" href="#id92" title="Permalink to this code"> </a></div>
+<div class="literal-block-wrapper docutils container" id="id94">
+<div class="code-block-caption"><span class="caption-text">Output</span><a class="headerlink" href="#id94" title="Permalink to this code"> </a></div>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>parent run:
 run_id: 8979459433a24a52ab3be87a229a9cdf
 description: starting a parent for experiment 7
@@ -3292,6 +3381,121 @@ child runs:
 </pre></div>
 </div>
 </div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mlflow.start_span">
+<code class="sig-prename descclassname"><span class="pre">mlflow.</span></code><code class="sig-name descname"><span class="pre">start_span</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'span'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">span_type</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'UNKNOWN'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attributes</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mlflow/tracing/fluent.html#start_span"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.start_span" title="Permalink to this definition"> </a></dt>
+<dd><p>Context manager to create a new span and start it as the current span in the context.</p>
+<p>This context manager automatically manages the span lifecycle and parent-child relationships.
+The span will be ended when the context manager exits. Any exception raised within the
+context manager will set the span status to <code class="docutils literal notranslate"><span class="pre">ERROR</span></code>, and detailed information such as
+exception message and stacktrace will be recorded to the <code class="docutils literal notranslate"><span class="pre">attributes</span></code> field of the span.
+New spans can be created within the context manager, then they will be assigned as child
+spans.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_span</span><span class="p">(</span><span class="s2">&quot;my_span&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">span</span><span class="p">:</span>
+    <span class="n">span</span><span class="o">.</span><span class="n">set_inputs</span><span class="p">({</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">})</span>
+
+    <span class="n">z</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
+
+    <span class="n">span</span><span class="o">.</span><span class="n">set_outputs</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+    <span class="n">span</span><span class="o">.</span><span class="n">set_attribute</span><span class="p">(</span><span class="s2">&quot;key&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">)</span>
+    <span class="c1"># do something</span>
+</pre></div>
+</div>
+<p>When this context manager is used in the top-level scope, i.e. not within another span context,
+the span will be treated as a root span. The root span doesn’t have a parent reference and
+<strong>the entire trace will be logged when the root span is ended</strong>.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>If you want more explicit control over the trace lifecycle, you can use
+<a class="reference internal" href="mlflow.client.html#mlflow.client.MlflowClient.start_trace" title="mlflow.client.MlflowClient.start_trace"><code class="xref py py-func docutils literal notranslate"><span class="pre">MLflow</span> <span class="pre">Client</span> <span class="pre">APIs</span></code></a>. It provides lower
+level to start and end traces manually, as well as setting the parent spans explicitly.
+However, it is generally recommended to use this context manager as long as it satisfies
+your requirements, because it requires less boilerplate code and is less error-prone.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The context manager doesn’t propagate the span context across threads. If you want to create
+a child span in a different thread, you should use
+<a class="reference internal" href="mlflow.client.html#mlflow.client.MlflowClient.start_trace" title="mlflow.client.MlflowClient.start_trace"><code class="xref py py-func docutils literal notranslate"><span class="pre">MLflow</span> <span class="pre">Client</span> <span class="pre">APIs</span></code></a>
+and pass the parent span ID explicitly.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>All spans created under the root span (i.e. a single trace) are buffered in memory and
+not exported until the root span is ended. The buffer has a default size of 1000 traces
+and TTL of 1 hour. You can configure the buffer size and TTL using the environment variables
+<code class="docutils literal notranslate"><span class="pre">MLFLOW_TRACE_BUFFER_MAX_SIZE</span></code> and <code class="docutils literal notranslate"><span class="pre">MLFLOW_TRACE_BUFFER_TTL_SECONDS</span></code> respectively.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – The name of the span.</p></li>
+<li><p><strong>span_type</strong> – The type of the span. Can be either a string or
+a <a class="reference internal" href="mlflow.entities.html#mlflow.entities.SpanType" title="mlflow.entities.SpanType"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpanType</span></code></a> enum value</p></li>
+<li><p><strong>attributes</strong> – A dictionary of attributes to set on the span.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Yields an <a class="reference internal" href="mlflow.entities.html#mlflow.entities.Span" title="mlflow.entities.Span"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.entities.Span</span></code></a> that represents the created span.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="mlflow.trace">
+<code class="sig-prename descclassname"><span class="pre">mlflow.</span></code><code class="sig-name descname"><span class="pre">trace</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">span_type</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'UNKNOWN'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attributes</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Callable</span><a class="reference internal" href="../_modules/mlflow/tracing/fluent.html#trace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.trace" title="Permalink to this definition"> </a></dt>
+<dd><p>A decorator that creates a new span for the decorated function.</p>
+<p>When you decorate a function with this <a class="reference internal" href="#mlflow.trace" title="mlflow.trace"><code class="xref py py-func docutils literal notranslate"><span class="pre">&#64;mlflow.trace()</span></code></a> decorator,
+a span will be created for the scope of the decorated function. The span will automatically
+capture the input and output of the function. When it is applied to a method, it doesn’t
+capture the <cite>self</cite> argument. Any exception raised within the function will set the span
+status to <code class="docutils literal notranslate"><span class="pre">ERROR</span></code> and detailed information such as exception message and stacktrace
+will be recorded to the <code class="docutils literal notranslate"><span class="pre">attributes</span></code> field of the span.</p>
+<p>For example, the following code will yield a span with the name <code class="docutils literal notranslate"><span class="pre">&quot;my_function&quot;</span></code>,
+capturing the input arguments <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code>, and the output of the function.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@mlflow</span><span class="o">.</span><span class="n">trace</span>
+<span class="k">def</span> <span class="nf">my_function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
+</pre></div>
+</div>
+<p>This is equivalent to doing the following using the <a class="reference internal" href="#mlflow.start_span" title="mlflow.start_span"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.start_span()</span></code></a> context
+manager, but requires less boilerplate code.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">my_function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
+
+
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_span</span><span class="p">(</span><span class="s2">&quot;my_function&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">span</span><span class="p">:</span>
+    <span class="n">span</span><span class="o">.</span><span class="n">set_inputs</span><span class="p">({</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">y</span><span class="p">})</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">my_function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">span</span><span class="o">.</span><span class="n">set_outputs</span><span class="p">({</span><span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="n">result</span><span class="p">})</span>
+</pre></div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>The &#64;mlflow.trace decorator is useful when you want to trace a function defined by
+yourself. However, you may also want to trace a function in external libraries. In
+such case, you can use this <code class="docutils literal notranslate"><span class="pre">mlflow.trace()</span></code> function to directly wrap the function,
+instead of using as the decorator. This will create the exact same span as the
+one created by the decorator i.e. captures information from the function call.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">some.external.library</span> <span class="kn">import</span> <span class="n">predict</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">predict</span><span class="p">)(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>func</strong> – The function to be decorated. Must <strong>not</strong> be provided when using as a decorator.</p></li>
+<li><p><strong>name</strong> – The name of the span. If not provided, the name of the function will be used.</p></li>
+<li><p><strong>span_type</strong> – The type of the span. Can be either a string or a
+<a class="reference internal" href="mlflow.entities.html#mlflow.entities.SpanType" title="mlflow.entities.SpanType"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpanType</span></code></a> enum value.</p></li>
+<li><p><strong>attributes</strong> – A dictionary of attributes to set on the span.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
