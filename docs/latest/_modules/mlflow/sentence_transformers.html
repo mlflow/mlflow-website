@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mlflow.sentence_transformers &mdash; MLflow 2.12.2.dev0 documentation</title>
+  <title>mlflow.sentence_transformers &mdash; MLflow 2.13.1.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -56,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="MLflow 2.12.2.dev0 documentation" href="../../index.html"/>
+    <link rel="top" title="MLflow 2.13.1.dev0 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
@@ -87,7 +87,7 @@
     <a href="../../index.html" class="wy-nav-top-logo"
       ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.12.2.dev0</span>
+    <span class="version">2.13.1.dev0</span>
   </li>
 </ul>
   </nav>
@@ -600,6 +600,20 @@
     <span class="p">)</span></div>
 
 
+<span class="k">def</span> <span class="nf">_get_load_kwargs</span><span class="p">():</span>
+    <span class="kn">import</span> <span class="nn">sentence_transformers</span>
+
+    <span class="n">load_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="c1"># The trust_remote_code is supported since Sentence Transformers 2.3.0</span>
+    <span class="k">if</span> <span class="n">Version</span><span class="p">(</span><span class="n">sentence_transformers</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">Version</span><span class="p">(</span><span class="s2">&quot;2.3.0&quot;</span><span class="p">):</span>
+        <span class="c1"># Always set trust_remote_code=True because we save the entire repository files in</span>
+        <span class="c1"># the model artifacts, so there is no risk of running untrusted code unless the logged</span>
+        <span class="c1"># artifact is modified by a malicious actor, which is much more broader security</span>
+        <span class="c1"># concern that even cannot be prevented by setting trust_remote_code=False.</span>
+        <span class="n">load_kwargs</span><span class="p">[</span><span class="s2">&quot;trust_remote_code&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="n">load_kwargs</span>
+
+
 <span class="k">def</span> <span class="nf">_load_pyfunc</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">model_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Load PyFunc implementation for SentenceTransformer. Called by ``pyfunc.load_model``.</span>
@@ -609,7 +623,8 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">import</span> <span class="nn">sentence_transformers</span>
 
-    <span class="n">model</span> <span class="o">=</span> <span class="n">sentence_transformers</span><span class="o">.</span><span class="n">SentenceTransformer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">load_kwargs</span> <span class="o">=</span> <span class="n">_get_load_kwargs</span><span class="p">()</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">sentence_transformers</span><span class="o">.</span><span class="n">SentenceTransformer</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">load_kwargs</span><span class="p">)</span>
     <span class="n">model_config</span> <span class="o">=</span> <span class="n">model_config</span> <span class="ow">or</span> <span class="p">{}</span>
     <span class="n">task</span> <span class="o">=</span> <span class="n">model_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;task&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">_SentenceTransformerModelWrapper</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">task</span><span class="p">)</span>
@@ -653,14 +668,7 @@
 
     <span class="n">_add_code_from_conf_to_system_path</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">,</span> <span class="n">flavor_config</span><span class="p">)</span>
 
-    <span class="n">load_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="c1"># The trust_remote_code is supported since Sentence Transformers 2.3.0</span>
-    <span class="k">if</span> <span class="n">Version</span><span class="p">(</span><span class="n">sentence_transformers</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">Version</span><span class="p">(</span><span class="s2">&quot;2.3.0&quot;</span><span class="p">):</span>
-        <span class="c1"># Always set trust_remote_code=True because we save the entire repository files in</span>
-        <span class="c1"># the model artifacts, so there is no risk of running untrusted code unless the logged</span>
-        <span class="c1"># artifact is modified by a malicious actor, which is much more broader security</span>
-        <span class="c1"># concern that even cannot be prevented by setting trust_remote_code=False.</span>
-        <span class="n">load_kwargs</span><span class="p">[</span><span class="s2">&quot;trust_remote_code&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">load_kwargs</span> <span class="o">=</span> <span class="n">_get_load_kwargs</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">sentence_transformers</span><span class="o">.</span><span class="n">SentenceTransformer</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">local_model_dir</span><span class="p">),</span> <span class="o">**</span><span class="n">load_kwargs</span><span class="p">)</span></div>
 
 
@@ -747,7 +755,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../',
-      VERSION:'2.12.2.dev0',
+      VERSION:'2.13.1.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

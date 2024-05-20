@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mlflow.pyfunc.model &mdash; MLflow 2.12.2.dev0 documentation</title>
+  <title>mlflow.pyfunc.model &mdash; MLflow 2.13.1.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -56,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="MLflow 2.12.2.dev0 documentation" href="../../../index.html"/>
+    <link rel="top" title="MLflow 2.13.1.dev0 documentation" href="../../../index.html"/>
         <link rel="up" title="mlflow.pyfunc" href="../pyfunc.html"/> 
 
   
@@ -87,7 +87,7 @@
     <a href="../../../index.html" class="wy-nav-top-logo"
       ><img src="../../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.12.2.dev0</span>
+    <span class="version">2.13.1.dev0</span>
   </li>
 </ul>
   </nav>
@@ -223,8 +223,10 @@
 <span class="kn">import</span> <span class="nn">mlflow.utils</span>
 <span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
 <span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">Model</span>
-<span class="kn">from</span> <span class="nn">mlflow.models.model</span> <span class="kn">import</span> <span class="n">MLMODEL_FILE_NAME</span>
+<span class="kn">from</span> <span class="nn">mlflow.models.model</span> <span class="kn">import</span> <span class="n">MLMODEL_FILE_NAME</span><span class="p">,</span> <span class="n">MODEL_CODE_PATH</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.signature</span> <span class="kn">import</span> <span class="n">_extract_type_hints</span>
+<span class="kn">from</span> <span class="nn">mlflow.models.utils</span> <span class="kn">import</span> <span class="n">_load_model_code_path</span>
+<span class="kn">from</span> <span class="nn">mlflow.protos.databricks_pb2</span> <span class="kn">import</span> <span class="n">INVALID_PARAMETER_VALUE</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracking.artifact_utils</span> <span class="kn">import</span> <span class="n">_download_artifact_from_uri</span>
 <span class="kn">from</span> <span class="nn">mlflow.types.llm</span> <span class="kn">import</span> <span class="n">ChatMessage</span><span class="p">,</span> <span class="n">ChatParams</span><span class="p">,</span> <span class="n">ChatResponse</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.annotations</span> <span class="kn">import</span> <span class="n">experimental</span>
@@ -239,7 +241,7 @@
     <span class="n">_PythonEnv</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.file_utils</span> <span class="kn">import</span> <span class="n">TempDir</span><span class="p">,</span> <span class="n">get_total_file_size</span><span class="p">,</span> <span class="n">write_to</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.model_utils</span> <span class="kn">import</span> <span class="n">_get_flavor_configuration</span><span class="p">,</span> <span class="n">_validate_and_copy_code_paths</span>
+<span class="kn">from</span> <span class="nn">mlflow.utils.model_utils</span> <span class="kn">import</span> <span class="n">_get_flavor_configuration</span><span class="p">,</span> <span class="n">_validate_infer_and_copy_code_paths</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.requirements_utils</span> <span class="kn">import</span> <span class="n">_get_pinned_requirement</span>
 
 <span class="n">CONFIG_KEY_ARTIFACTS</span> <span class="o">=</span> <span class="s2">&quot;artifacts&quot;</span>
@@ -460,6 +462,8 @@
     <span class="n">extra_pip_requirements</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">model_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">streamable</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">model_code_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">infer_code_paths</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Args:</span>
@@ -489,6 +493,12 @@
 <span class="sd">            .. Note:: Experimental: This parameter may change or be removed in a future release</span>
 <span class="sd">                without warning.</span>
 
+<span class="sd">        model_code_path: The path to the code that is being logged as a PyFunc model. Can be used</span>
+<span class="sd">            to load python_model when python_model is None.</span>
+
+<span class="sd">            .. Note:: Experimental: This parameter may change or be removed in a future release</span>
+<span class="sd">                without warning.</span>
+
 <span class="sd">        streamable: A boolean value indicating if the model supports streaming prediction,</span>
 <span class="sd">                    If None, MLflow will try to inspect if the model supports streaming</span>
 <span class="sd">                    by checking if `predict_stream` method exists. Default None.</span>
@@ -503,33 +513,36 @@
         <span class="n">python_model</span> <span class="o">=</span> <span class="n">_FunctionPythonModel</span><span class="p">(</span><span class="n">python_model</span><span class="p">,</span> <span class="n">hints</span><span class="p">,</span> <span class="n">signature</span><span class="p">)</span>
     <span class="n">saved_python_model_subpath</span> <span class="o">=</span> <span class="n">_SAVED_PYTHON_MODEL_SUBPATH</span>
 
-    <span class="k">try</span><span class="p">:</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">saved_python_model_subpath</span><span class="p">),</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">out</span><span class="p">:</span>
-            <span class="n">cloudpickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">python_model</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="c1"># cloudpickle sometimes raises TypeError instead of PicklingError.</span>
-        <span class="c1"># catching generic Exception and checking message to handle both cases.</span>
-        <span class="k">if</span> <span class="s2">&quot;cannot pickle&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
-            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
-                <span class="s2">&quot;Failed to serialize Python model. Please audit your &quot;</span>
-                <span class="s2">&quot;class variables (e.g. in `__init__()`) for any &quot;</span>
-                <span class="s2">&quot;unpicklable objects. If you&#39;re trying to save an external model &quot;</span>
-                <span class="s2">&quot;in your custom pyfunc, Please use the `artifacts` parameter &quot;</span>
-                <span class="s2">&quot;in `mlflow.pyfunc.save_model()`, and load your external model &quot;</span>
-                <span class="s2">&quot;in the `load_context()` method instead. For example:</span><span class="se">\n\n</span><span class="s2">&quot;</span>
-                <span class="s2">&quot;class MyModel(mlflow.pyfunc.PythonModel):</span><span class="se">\n</span><span class="s2">&quot;</span>
-                <span class="s2">&quot;    def load_context(self, context):</span><span class="se">\n</span><span class="s2">&quot;</span>
-                <span class="s2">&quot;        model_path = context.artifacts[&#39;my_model_path&#39;]</span><span class="se">\n</span><span class="s2">&quot;</span>
-                <span class="s2">&quot;        // custom load logic here</span><span class="se">\n</span><span class="s2">&quot;</span>
-                <span class="s2">&quot;        self.model = load_model(model_path)</span><span class="se">\n\n</span><span class="s2">&quot;</span>
-                <span class="s2">&quot;For more information, see our full tutorial at: &quot;</span>
-                <span class="s2">&quot;https://mlflow.org/docs/latest/traditional-ml/creating-custom-pyfunc/index.html&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Full serialization error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span> <span class="kn">from</span> <span class="kc">None</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">e</span>
+    <span class="c1"># If model_code_path is defined, we load the model into python_model, but we don&#39;t want to</span>
+    <span class="c1"># pickle/save the python_model since the module won&#39;t be able to be imported.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">model_code_path</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">saved_python_model_subpath</span><span class="p">),</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">out</span><span class="p">:</span>
+                <span class="n">cloudpickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">python_model</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># cloudpickle sometimes raises TypeError instead of PicklingError.</span>
+            <span class="c1"># catching generic Exception and checking message to handle both cases.</span>
+            <span class="k">if</span> <span class="s2">&quot;cannot pickle&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                    <span class="s2">&quot;Failed to serialize Python model. Please audit your &quot;</span>
+                    <span class="s2">&quot;class variables (e.g. in `__init__()`) for any &quot;</span>
+                    <span class="s2">&quot;unpicklable objects. If you&#39;re trying to save an external model &quot;</span>
+                    <span class="s2">&quot;in your custom pyfunc, Please use the `artifacts` parameter &quot;</span>
+                    <span class="s2">&quot;in `mlflow.pyfunc.save_model()`, and load your external model &quot;</span>
+                    <span class="s2">&quot;in the `load_context()` method instead. For example:</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+                    <span class="s2">&quot;class MyModel(mlflow.pyfunc.PythonModel):</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="s2">&quot;    def load_context(self, context):</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="s2">&quot;        model_path = context.artifacts[&#39;my_model_path&#39;]</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="s2">&quot;        // custom load logic here</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="s2">&quot;        self.model = load_model(model_path)</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+                    <span class="s2">&quot;For more information, see our full tutorial at: &quot;</span>
+                    <span class="s2">&quot;https://mlflow.org/docs/latest/traditional-ml/creating-custom-pyfunc/index.html&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Full serialization error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span> <span class="kn">from</span> <span class="kc">None</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">e</span>
 
-    <span class="n">custom_model_config_kwargs</span><span class="p">[</span><span class="n">CONFIG_KEY_PYTHON_MODEL</span><span class="p">]</span> <span class="o">=</span> <span class="n">saved_python_model_subpath</span>
+        <span class="n">custom_model_config_kwargs</span><span class="p">[</span><span class="n">CONFIG_KEY_PYTHON_MODEL</span><span class="p">]</span> <span class="o">=</span> <span class="n">saved_python_model_subpath</span>
 
     <span class="k">if</span> <span class="n">artifacts</span><span class="p">:</span>
         <span class="n">saved_artifacts_config</span> <span class="o">=</span> <span class="p">{}</span>
@@ -586,23 +599,43 @@
             <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">tmp_artifacts_dir</span><span class="o">.</span><span class="n">path</span><span class="p">(),</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">saved_artifacts_dir_subpath</span><span class="p">))</span>
         <span class="n">custom_model_config_kwargs</span><span class="p">[</span><span class="n">CONFIG_KEY_ARTIFACTS</span><span class="p">]</span> <span class="o">=</span> <span class="n">saved_artifacts_config</span>
 
-    <span class="n">saved_code_subpath</span> <span class="o">=</span> <span class="n">_validate_and_copy_code_paths</span><span class="p">(</span><span class="n">code_paths</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
-
     <span class="k">if</span> <span class="n">streamable</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">streamable</span> <span class="o">=</span> <span class="n">python_model</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">predict_stream</span> <span class="o">!=</span> <span class="n">PythonModel</span><span class="o">.</span><span class="n">predict_stream</span>
 
+    <span class="k">if</span> <span class="n">model_code_path</span><span class="p">:</span>
+        <span class="n">loader_module</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">loaders</span><span class="o">.</span><span class="n">code_model</span><span class="o">.</span><span class="vm">__name__</span>
+    <span class="k">elif</span> <span class="n">python_model</span><span class="p">:</span>
+        <span class="n">loader_module</span> <span class="o">=</span> <span class="n">_get_pyfunc_loader_module</span><span class="p">(</span><span class="n">python_model</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+            <span class="s2">&quot;Either `python_model` or `model_code_path` must be provided to save the model.&quot;</span><span class="p">,</span>
+            <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
+        <span class="p">)</span>
+
     <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">add_to_model</span><span class="p">(</span>
         <span class="n">model</span><span class="o">=</span><span class="n">mlflow_model</span><span class="p">,</span>
-        <span class="n">loader_module</span><span class="o">=</span><span class="n">_get_pyfunc_loader_module</span><span class="p">(</span><span class="n">python_model</span><span class="p">),</span>
-        <span class="n">code</span><span class="o">=</span><span class="n">saved_code_subpath</span><span class="p">,</span>
+        <span class="n">loader_module</span><span class="o">=</span><span class="n">loader_module</span><span class="p">,</span>
+        <span class="n">code</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">conda_env</span><span class="o">=</span><span class="n">_CONDA_ENV_FILE_NAME</span><span class="p">,</span>
         <span class="n">python_env</span><span class="o">=</span><span class="n">_PYTHON_ENV_FILE_NAME</span><span class="p">,</span>
         <span class="n">model_config</span><span class="o">=</span><span class="n">model_config</span><span class="p">,</span>
         <span class="n">streamable</span><span class="o">=</span><span class="n">streamable</span><span class="p">,</span>
+        <span class="n">model_code_path</span><span class="o">=</span><span class="n">model_code_path</span><span class="p">,</span>
         <span class="o">**</span><span class="n">custom_model_config_kwargs</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">size</span> <span class="o">:=</span> <span class="n">get_total_file_size</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
         <span class="n">mlflow_model</span><span class="o">.</span><span class="n">model_size_bytes</span> <span class="o">=</span> <span class="n">size</span>
+    <span class="n">mlflow_model</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">MLMODEL_FILE_NAME</span><span class="p">))</span>
+
+    <span class="n">saved_code_subpath</span> <span class="o">=</span> <span class="n">_validate_infer_and_copy_code_paths</span><span class="p">(</span>
+        <span class="n">code_paths</span><span class="p">,</span>
+        <span class="n">path</span><span class="p">,</span>
+        <span class="n">infer_code_paths</span><span class="p">,</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">FLAVOR_NAME</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">mlflow_model</span><span class="o">.</span><span class="n">flavors</span><span class="p">[</span><span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">FLAVOR_NAME</span><span class="p">][</span><span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">CODE</span><span class="p">]</span> <span class="o">=</span> <span class="n">saved_code_subpath</span>
+
+    <span class="c1"># `mlflow_model.code` is updated, re-generate `MLmodel` file.</span>
     <span class="n">mlflow_model</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">MLMODEL_FILE_NAME</span><span class="p">))</span>
 
     <span class="k">if</span> <span class="n">conda_env</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -645,30 +678,39 @@
     <span class="n">pyfunc_config</span> <span class="o">=</span> <span class="n">_get_flavor_configuration</span><span class="p">(</span>
         <span class="n">model_path</span><span class="o">=</span><span class="n">model_path</span><span class="p">,</span> <span class="n">flavor_name</span><span class="o">=</span><span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">FLAVOR_NAME</span>
     <span class="p">)</span>
+    <span class="n">signature</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">model_path</span><span class="p">)</span><span class="o">.</span><span class="n">signature</span>
 
-    <span class="n">python_model_cloudpickle_version</span> <span class="o">=</span> <span class="n">pyfunc_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">CONFIG_KEY_CLOUDPICKLE_VERSION</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">python_model_cloudpickle_version</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-            <span class="s2">&quot;The version of CloudPickle used to save the model could not be found in the MLmodel&quot;</span>
-            <span class="s2">&quot; configuration&quot;</span>
-        <span class="p">)</span>
-    <span class="k">elif</span> <span class="n">python_model_cloudpickle_version</span> <span class="o">!=</span> <span class="n">cloudpickle</span><span class="o">.</span><span class="n">__version__</span><span class="p">:</span>
-        <span class="c1"># CloudPickle does not have a well-defined cross-version compatibility policy. Micro version</span>
-        <span class="c1"># releases have been known to cause incompatibilities. Therefore, we match on the full</span>
-        <span class="c1"># library version</span>
-        <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-            <span class="s2">&quot;The version of CloudPickle that was used to save the model, `CloudPickle </span><span class="si">%s</span><span class="s2">`, differs&quot;</span>
-            <span class="s2">&quot; from the version of CloudPickle that is currently running, `CloudPickle </span><span class="si">%s</span><span class="s2">`, and may&quot;</span>
-            <span class="s2">&quot; be incompatible&quot;</span><span class="p">,</span>
-            <span class="n">python_model_cloudpickle_version</span><span class="p">,</span>
-            <span class="n">cloudpickle</span><span class="o">.</span><span class="n">__version__</span><span class="p">,</span>
-        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">MODEL_CODE_PATH</span> <span class="ow">in</span> <span class="n">pyfunc_config</span><span class="p">:</span>
+        <span class="n">conf_model_code_path</span> <span class="o">=</span> <span class="n">pyfunc_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">MODEL_CODE_PATH</span><span class="p">)</span>
+        <span class="n">model_code_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">conf_model_code_path</span><span class="p">))</span>
+        <span class="n">python_model</span> <span class="o">=</span> <span class="n">_load_model_code_path</span><span class="p">(</span><span class="n">model_code_path</span><span class="p">,</span> <span class="n">model_config</span><span class="p">)</span>
 
-    <span class="n">python_model_subpath</span> <span class="o">=</span> <span class="n">pyfunc_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">CONFIG_KEY_PYTHON_MODEL</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">python_model_subpath</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="s2">&quot;Python model path was not specified in the model configuration&quot;</span><span class="p">)</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="n">python_model_subpath</span><span class="p">),</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">python_model</span> <span class="o">=</span> <span class="n">cloudpickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">python_model</span><span class="p">):</span>
+            <span class="n">python_model</span> <span class="o">=</span> <span class="n">_FunctionPythonModel</span><span class="p">(</span><span class="n">python_model</span><span class="p">,</span> <span class="n">signature</span><span class="o">=</span><span class="n">signature</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">python_model_cloudpickle_version</span> <span class="o">=</span> <span class="n">pyfunc_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">CONFIG_KEY_CLOUDPICKLE_VERSION</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">python_model_cloudpickle_version</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;The version of CloudPickle used to save the model could not be found in the &quot;</span>
+                <span class="s2">&quot;MLmodel configuration&quot;</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">python_model_cloudpickle_version</span> <span class="o">!=</span> <span class="n">cloudpickle</span><span class="o">.</span><span class="n">__version__</span><span class="p">:</span>
+            <span class="c1"># CloudPickle does not have a well-defined cross-version compatibility policy. Micro</span>
+            <span class="c1"># version releases have been known to cause incompatibilities. Therefore, we match on</span>
+            <span class="c1"># the full library version</span>
+            <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;The version of CloudPickle that was used to save the model, `CloudPickle </span><span class="si">%s</span><span class="s2">`, &quot;</span>
+                <span class="s2">&quot;differs from the version of CloudPickle that is currently running, `CloudPickle &quot;</span>
+                <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">`, and may be incompatible&quot;</span><span class="p">,</span>
+                <span class="n">python_model_cloudpickle_version</span><span class="p">,</span>
+                <span class="n">cloudpickle</span><span class="o">.</span><span class="n">__version__</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">python_model_subpath</span> <span class="o">=</span> <span class="n">pyfunc_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">CONFIG_KEY_PYTHON_MODEL</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">python_model_subpath</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="s2">&quot;Python model path was not specified in the model configuration&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="n">python_model_subpath</span><span class="p">),</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">python_model</span> <span class="o">=</span> <span class="n">cloudpickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 
     <span class="n">artifacts</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">saved_artifact_name</span><span class="p">,</span> <span class="n">saved_artifact_info</span> <span class="ow">in</span> <span class="n">pyfunc_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
@@ -680,7 +722,6 @@
 
     <span class="n">context</span> <span class="o">=</span> <span class="n">PythonModelContext</span><span class="p">(</span><span class="n">artifacts</span><span class="o">=</span><span class="n">artifacts</span><span class="p">,</span> <span class="n">model_config</span><span class="o">=</span><span class="n">model_config</span><span class="p">)</span>
     <span class="n">python_model</span><span class="o">.</span><span class="n">load_context</span><span class="p">(</span><span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
-    <span class="n">signature</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">model_path</span><span class="p">)</span><span class="o">.</span><span class="n">signature</span>
 
     <span class="k">return</span> <span class="n">context</span><span class="p">,</span> <span class="n">python_model</span><span class="p">,</span> <span class="n">signature</span>
 
@@ -818,7 +859,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../../',
-      VERSION:'2.12.2.dev0',
+      VERSION:'2.13.1.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

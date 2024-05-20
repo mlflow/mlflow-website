@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mlflow.pyfunc &mdash; MLflow 2.12.2.dev0 documentation</title>
+  <title>mlflow.pyfunc &mdash; MLflow 2.13.1.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -56,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="MLflow 2.12.2.dev0 documentation" href="../../index.html"/>
+    <link rel="top" title="MLflow 2.13.1.dev0 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
@@ -87,7 +87,7 @@
     <a href="../../index.html" class="wy-nav-top-logo"
       ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.12.2.dev0</span>
+    <span class="version">2.13.1.dev0</span>
   </li>
 </ul>
   </nav>
@@ -588,6 +588,7 @@
 <span class="kn">import</span> <span class="nn">functools</span>
 <span class="kn">import</span> <span class="nn">importlib</span>
 <span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">signal</span>
@@ -615,8 +616,14 @@
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
 <span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">Model</span><span class="p">,</span> <span class="n">ModelInputExample</span><span class="p">,</span> <span class="n">ModelSignature</span>
+<span class="kn">from</span> <span class="nn">mlflow.models.dependencies_schema</span> <span class="kn">import</span> <span class="n">_clear_dependencies_schema</span><span class="p">,</span> <span class="n">_get_dependencies_schema</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.flavor_backend_registry</span> <span class="kn">import</span> <span class="n">get_flavor_backend</span>
-<span class="kn">from</span> <span class="nn">mlflow.models.model</span> <span class="kn">import</span> <span class="n">_DATABRICKS_FS_LOADER_MODULE</span><span class="p">,</span> <span class="n">MLMODEL_FILE_NAME</span><span class="p">,</span> <span class="n">MODEL_CONFIG</span>
+<span class="kn">from</span> <span class="nn">mlflow.models.model</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_DATABRICKS_FS_LOADER_MODULE</span><span class="p">,</span>
+    <span class="n">MLMODEL_FILE_NAME</span><span class="p">,</span>
+    <span class="n">MODEL_CODE_PATH</span><span class="p">,</span>
+    <span class="n">MODEL_CONFIG</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.resources</span> <span class="kn">import</span> <span class="n">Resource</span><span class="p">,</span> <span class="n">_ResourceBuilder</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.signature</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">_infer_signature_from_input_example</span><span class="p">,</span>
@@ -630,7 +637,9 @@
     <span class="n">_convert_llm_input_data</span><span class="p">,</span>
     <span class="n">_enforce_params_schema</span><span class="p">,</span>
     <span class="n">_enforce_schema</span><span class="p">,</span>
+    <span class="n">_load_model_code_path</span><span class="p">,</span>
     <span class="n">_save_example</span><span class="p">,</span>
+    <span class="n">_validate_and_get_model_code_path</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.protos.databricks_pb2</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">BAD_REQUEST</span><span class="p">,</span>
@@ -643,6 +652,7 @@
     <span class="n">LineageHeaderInfo</span><span class="p">,</span>
     <span class="n">Notebook</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span> <span class="nn">mlflow.pyfunc.context</span> <span class="kn">import</span> <span class="n">get_prediction_context</span>
 <span class="kn">from</span> <span class="nn">mlflow.pyfunc.model</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ChatModel</span><span class="p">,</span>
     <span class="n">PythonModel</span><span class="p">,</span>
@@ -698,8 +708,10 @@
     <span class="n">_get_flavor_configuration</span><span class="p">,</span>
     <span class="n">_get_flavor_configuration_from_ml_model_file</span><span class="p">,</span>
     <span class="n">_get_overridden_pyfunc_model_config</span><span class="p">,</span>
-    <span class="n">_validate_and_copy_code_paths</span><span class="p">,</span>
+    <span class="n">_validate_and_copy_file_to_directory</span><span class="p">,</span>
+    <span class="n">_validate_and_get_model_config_from_file</span><span class="p">,</span>
     <span class="n">_validate_and_prepare_target_save_path</span><span class="p">,</span>
+    <span class="n">_validate_infer_and_copy_code_paths</span><span class="p">,</span>
     <span class="n">_validate_pyfunc_model_config</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.nfs_on_spark</span> <span class="kn">import</span> <span class="n">get_nfs_cache_root_dir</span>
@@ -745,6 +757,7 @@
     <span class="n">conda_env</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">python_env</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">model_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">model_code_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -792,6 +805,8 @@
             <span class="n">params</span><span class="p">[</span><span class="n">ENV</span><span class="p">][</span><span class="n">EnvType</span><span class="o">.</span><span class="n">VIRTUALENV</span><span class="p">]</span> <span class="o">=</span> <span class="n">python_env</span>
     <span class="k">if</span> <span class="n">model_config</span><span class="p">:</span>
         <span class="n">params</span><span class="p">[</span><span class="n">MODEL_CONFIG</span><span class="p">]</span> <span class="o">=</span> <span class="n">model_config</span>
+    <span class="k">if</span> <span class="n">model_code_path</span><span class="p">:</span>
+        <span class="n">params</span><span class="p">[</span><span class="n">MODEL_CODE_PATH</span><span class="p">]</span> <span class="o">=</span> <span class="n">model_code_path</span>
     <span class="k">return</span> <span class="n">model</span><span class="o">.</span><span class="n">add_flavor</span><span class="p">(</span><span class="n">FLAVOR_NAME</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span></div>
 
 
@@ -895,6 +910,16 @@
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">params</span>
 
+    <span class="k">def</span> <span class="nf">_update_dependencies_schema_in_prediction_context</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model_meta</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model_meta</span><span class="o">.</span><span class="n">metadata</span> <span class="ow">and</span> <span class="p">(</span><span class="n">context</span> <span class="o">:=</span> <span class="n">get_prediction_context</span><span class="p">()):</span>
+            <span class="n">dependencies_schema</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model_meta</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dependencies_schemas&quot;</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="n">context</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                <span class="n">dependencies_schema</span><span class="o">=</span><span class="p">{</span>
+                    <span class="n">dependency</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">dependency</span><span class="p">,</span> <span class="n">schema</span> <span class="ow">in</span> <span class="n">dependencies_schema</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+
 <div class="viewcode-block" id="PyFuncModel.predict"><a class="viewcode-back" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PyFuncModel.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">PyFuncInput</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PyFuncOutput</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generates model predictions.</span>
@@ -923,7 +948,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            Model predictions as one of pandas.DataFrame, pandas.Series, numpy.ndarray or list.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_dependencies_schema_in_prediction_context</span><span class="p">()</span>
         <span class="n">data</span><span class="p">,</span> <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_prediction_input</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_predict_fn</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;params&quot;</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_fn</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
@@ -954,6 +979,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_stream_fn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="s2">&quot;This model does not support predict_stream method.&quot;</span><span class="p">)</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_dependencies_schema_in_prediction_context</span><span class="p">()</span>
         <span class="n">data</span><span class="p">,</span> <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_prediction_input</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">_convert_llm_input_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
@@ -1079,7 +1105,7 @@
     <span class="n">model_uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">suppress_warnings</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">dst_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">model_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">model_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PyFuncModel</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Load a model stored in Python function format.</span>
@@ -1105,7 +1131,8 @@
 <span class="sd">            This directory must already exist. If unspecified, a local output</span>
 <span class="sd">            path will be created.</span>
 <span class="sd">        model_config: The model configuration to apply to the model. This configuration</span>
-<span class="sd">            is available during model loading.</span>
+<span class="sd">            is available during model loading. The configuration can be passed as a file path,</span>
+<span class="sd">            or a dict with string keys.</span>
 
 <span class="sd">            .. Note:: Experimental: This parameter may change or be removed in a future</span>
 <span class="sd">                release without warning.</span>
@@ -1149,6 +1176,10 @@
 
     <span class="n">_add_code_from_conf_to_system_path</span><span class="p">(</span><span class="n">local_path</span><span class="p">,</span> <span class="n">conf</span><span class="p">,</span> <span class="n">code_key</span><span class="o">=</span><span class="n">CODE</span><span class="p">)</span>
     <span class="n">data_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">local_path</span><span class="p">,</span> <span class="n">conf</span><span class="p">[</span><span class="n">DATA</span><span class="p">])</span> <span class="k">if</span> <span class="p">(</span><span class="n">DATA</span> <span class="ow">in</span> <span class="n">conf</span><span class="p">)</span> <span class="k">else</span> <span class="n">local_path</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_config</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">model_config</span> <span class="o">=</span> <span class="n">_validate_and_get_model_config_from_file</span><span class="p">(</span><span class="n">model_config</span><span class="p">)</span>
+
     <span class="n">model_config</span> <span class="o">=</span> <span class="n">_get_overridden_pyfunc_model_config</span><span class="p">(</span>
         <span class="n">conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">MODEL_CONFIG</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">model_config</span><span class="p">,</span> <span class="n">_logger</span>
     <span class="p">)</span>
@@ -1173,6 +1204,10 @@
                 <span class="n">BAD_REQUEST</span><span class="p">,</span>
             <span class="p">)</span> <span class="kn">from</span> <span class="kc">None</span>
         <span class="k">raise</span> <span class="n">e</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="c1"># clean up the dependencies schema which is set to global state after loading the model.</span>
+        <span class="c1"># This avoids the schema being used by other models loaded in the same process.</span>
+        <span class="n">_clear_dependencies_schema</span><span class="p">()</span>
     <span class="n">predict_fn</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;predict_fn&quot;</span><span class="p">,</span> <span class="s2">&quot;predict&quot;</span><span class="p">)</span>
     <span class="n">streamable</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;streamable&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
     <span class="n">predict_stream_fn</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;predict_stream_fn&quot;</span><span class="p">,</span> <span class="s2">&quot;predict_stream&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">streamable</span> <span class="k">else</span> <span class="kc">None</span>
@@ -2289,7 +2324,8 @@
 <span class="k">def</span> <span class="nf">_validate_function_python_model</span><span class="p">(</span><span class="n">python_model</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">python_model</span><span class="p">,</span> <span class="n">PythonModel</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">callable</span><span class="p">(</span><span class="n">python_model</span><span class="p">)):</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
-            <span class="s2">&quot;`python_model` must be a PythonModel instance or a callable object&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;`python_model` must be a PythonModel instance, callable object, or path to a script &quot;</span>
+            <span class="s2">&quot;that uses set_model() to set a PythonModel instance or callable object.&quot;</span><span class="p">,</span>
             <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
         <span class="p">)</span>
 
@@ -2310,6 +2346,7 @@
     <span class="n">data_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">code_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># deprecated</span>
     <span class="n">code_paths</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">infer_code_paths</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">conda_env</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">mlflow_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">python_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -2355,6 +2392,7 @@
 <span class="sd">        code_path: **Deprecated** The legacy argument for defining dependent code. This argument is</span>
 <span class="sd">            replaced by ``code_paths`` and will be removed in a future version of MLflow.</span>
 <span class="sd">        code_paths: {{ code_paths }}</span>
+<span class="sd">        infer_code_paths: {{ infer_code_paths }}</span>
 <span class="sd">        conda_env: {{ conda_env }}</span>
 <span class="sd">        mlflow_model: :py:mod:`mlflow.models.Model` configuration to which to add the</span>
 <span class="sd">            **python_function** flavor.</span>
@@ -2471,7 +2509,24 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">_validate_env_arguments</span><span class="p">(</span><span class="n">conda_env</span><span class="p">,</span> <span class="n">pip_requirements</span><span class="p">,</span> <span class="n">extra_pip_requirements</span><span class="p">)</span>
     <span class="n">_validate_pyfunc_model_config</span><span class="p">(</span><span class="n">model_config</span><span class="p">)</span>
+    <span class="n">_validate_and_prepare_target_save_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+    <span class="n">model_code_path</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="n">python_model</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_config</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
+            <span class="n">model_config</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">fspath</span><span class="p">(</span><span class="n">model_config</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_config</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">model_config</span> <span class="o">=</span> <span class="n">_validate_and_get_model_config_from_file</span><span class="p">(</span><span class="n">model_config</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">python_model</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
+            <span class="n">python_model</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">fspath</span><span class="p">(</span><span class="n">python_model</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">python_model</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">model_code_path</span> <span class="o">=</span> <span class="n">_validate_and_get_model_code_path</span><span class="p">(</span><span class="n">python_model</span><span class="p">)</span>
+            <span class="n">_validate_and_copy_file_to_directory</span><span class="p">(</span><span class="n">model_code_path</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="s2">&quot;code&quot;</span><span class="p">)</span>
+            <span class="n">python_model</span> <span class="o">=</span> <span class="n">_load_model_code_path</span><span class="p">(</span><span class="n">model_code_path</span><span class="p">,</span> <span class="n">model_config</span><span class="p">)</span>
+
         <span class="n">_validate_function_python_model</span><span class="p">(</span><span class="n">python_model</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">python_model</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span>
             <span class="n">a</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="p">(</span><span class="n">input_example</span><span class="p">,</span> <span class="n">pip_requirements</span><span class="p">,</span> <span class="n">extra_pip_requirements</span><span class="p">)</span>
@@ -2528,8 +2583,6 @@
             <span class="s2">&quot;should be a python module. A `python_model` should be a subclass of PythonModel&quot;</span>
         <span class="p">)</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">)</span>
-
-    <span class="n">_validate_and_prepare_target_save_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">mlflow_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">mlflow_model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">()</span>
@@ -2597,6 +2650,13 @@
     <span class="k">if</span> <span class="n">metadata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">mlflow_model</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">metadata</span>
 
+    <span class="k">with</span> <span class="n">_get_dependencies_schema</span><span class="p">()</span> <span class="k">as</span> <span class="n">dependencies_schema</span><span class="p">:</span>
+        <span class="n">schema</span> <span class="o">=</span> <span class="n">dependencies_schema</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">schema</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">mlflow_model</span><span class="o">.</span><span class="n">metadata</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">mlflow_model</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">mlflow_model</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span>
+
     <span class="k">if</span> <span class="n">resources</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">resources</span><span class="p">,</span> <span class="p">(</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">)):</span>
             <span class="n">serialized_resource</span> <span class="o">=</span> <span class="n">_ResourceBuilder</span><span class="o">.</span><span class="n">from_yaml_file</span><span class="p">(</span><span class="n">resources</span><span class="p">)</span>
@@ -2617,6 +2677,7 @@
             <span class="n">extra_pip_requirements</span><span class="o">=</span><span class="n">extra_pip_requirements</span><span class="p">,</span>
             <span class="n">model_config</span><span class="o">=</span><span class="n">model_config</span><span class="p">,</span>
             <span class="n">streamable</span><span class="o">=</span><span class="n">streamable</span><span class="p">,</span>
+            <span class="n">infer_code_paths</span><span class="o">=</span><span class="n">infer_code_paths</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="k">elif</span> <span class="n">second_argument_set_specified</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_save_model_with_class_artifacts_params</span><span class="p">(</span>
@@ -2632,6 +2693,8 @@
             <span class="n">extra_pip_requirements</span><span class="o">=</span><span class="n">extra_pip_requirements</span><span class="p">,</span>
             <span class="n">model_config</span><span class="o">=</span><span class="n">model_config</span><span class="p">,</span>
             <span class="n">streamable</span><span class="o">=</span><span class="n">streamable</span><span class="p">,</span>
+            <span class="n">model_code_path</span><span class="o">=</span><span class="n">model_code_path</span><span class="p">,</span>
+            <span class="n">infer_code_paths</span><span class="o">=</span><span class="n">infer_code_paths</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 
@@ -2642,6 +2705,7 @@
     <span class="n">data_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">code_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># deprecated</span>
     <span class="n">code_paths</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">infer_code_paths</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">conda_env</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">python_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">artifacts</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -2683,6 +2747,7 @@
 <span class="sd">        code_path: **Deprecated** The legacy argument for defining dependent code. This argument is</span>
 <span class="sd">            replaced by ``code_paths`` and will be removed in a future version of MLflow.</span>
 <span class="sd">        code_paths: {{ code_paths }}</span>
+<span class="sd">        infer_code_paths: {{ infer_code_paths }}</span>
 <span class="sd">        conda_env: {{ conda_env }}</span>
 <span class="sd">        python_model:</span>
 <span class="sd">            An instance of a subclass of :class:`~PythonModel` or a callable object with a single</span>
@@ -2843,6 +2908,7 @@
         <span class="n">example_no_conversion</span><span class="o">=</span><span class="n">example_no_conversion</span><span class="p">,</span>
         <span class="n">streamable</span><span class="o">=</span><span class="n">streamable</span><span class="p">,</span>
         <span class="n">resources</span><span class="o">=</span><span class="n">resources</span><span class="p">,</span>
+        <span class="n">infer_code_paths</span><span class="o">=</span><span class="n">infer_code_paths</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 
@@ -2857,6 +2923,7 @@
     <span class="n">extra_pip_requirements</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">model_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">streamable</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">infer_code_paths</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Export model as a generic Python function model.</span>
@@ -2886,8 +2953,6 @@
         <span class="n">model_file</span> <span class="o">=</span> <span class="n">_copy_file_or_tree</span><span class="p">(</span><span class="n">src</span><span class="o">=</span><span class="n">data_path</span><span class="p">,</span> <span class="n">dst</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">dst_dir</span><span class="o">=</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">model_file</span>
 
-    <span class="n">code_dir_subpath</span> <span class="o">=</span> <span class="n">_validate_and_copy_code_paths</span><span class="p">(</span><span class="n">code_paths</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
-
     <span class="k">if</span> <span class="n">mlflow_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">mlflow_model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">()</span>
 
@@ -2895,7 +2960,7 @@
     <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">add_to_model</span><span class="p">(</span>
         <span class="n">mlflow_model</span><span class="p">,</span>
         <span class="n">loader_module</span><span class="o">=</span><span class="n">loader_module</span><span class="p">,</span>
-        <span class="n">code</span><span class="o">=</span><span class="n">code_dir_subpath</span><span class="p">,</span>
+        <span class="n">code</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
         <span class="n">conda_env</span><span class="o">=</span><span class="n">_CONDA_ENV_FILE_NAME</span><span class="p">,</span>
         <span class="n">python_env</span><span class="o">=</span><span class="n">_PYTHON_ENV_FILE_NAME</span><span class="p">,</span>
@@ -2904,6 +2969,14 @@
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">size</span> <span class="o">:=</span> <span class="n">get_total_file_size</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
         <span class="n">mlflow_model</span><span class="o">.</span><span class="n">model_size_bytes</span> <span class="o">=</span> <span class="n">size</span>
+    <span class="n">mlflow_model</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">MLMODEL_FILE_NAME</span><span class="p">))</span>
+
+    <span class="n">code_dir_subpath</span> <span class="o">=</span> <span class="n">_validate_infer_and_copy_code_paths</span><span class="p">(</span>
+        <span class="n">code_paths</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">infer_code_paths</span><span class="p">,</span> <span class="n">FLAVOR_NAME</span>
+    <span class="p">)</span>
+    <span class="n">mlflow_model</span><span class="o">.</span><span class="n">flavors</span><span class="p">[</span><span class="n">FLAVOR_NAME</span><span class="p">][</span><span class="n">CODE</span><span class="p">]</span> <span class="o">=</span> <span class="n">code_dir_subpath</span>
+
+    <span class="c1"># `mlflow_model.code` is updated, re-generate `MLmodel` file.</span>
     <span class="n">mlflow_model</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">MLMODEL_FILE_NAME</span><span class="p">))</span>
 
     <span class="k">if</span> <span class="n">conda_env</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -2969,7 +3042,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../',
-      VERSION:'2.12.2.dev0',
+      VERSION:'2.13.1.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mlflow.models.model &mdash; MLflow 2.12.2.dev0 documentation</title>
+  <title>mlflow.models.model &mdash; MLflow 2.13.1.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -56,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="MLflow 2.12.2.dev0 documentation" href="../../../index.html"/>
+    <link rel="top" title="MLflow 2.13.1.dev0 documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
   
@@ -87,7 +87,7 @@
     <a href="../../../index.html" class="wy-nav-top-logo"
       ><img src="../../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.12.2.dev0</span>
+    <span class="version">2.13.1.dev0</span>
   </li>
 </ul>
   </nav>
@@ -899,8 +899,8 @@
             <span class="n">mlflow</span><span class="o">.</span><span class="n">tracking</span><span class="o">.</span><span class="n">fluent</span><span class="o">.</span><span class="n">log_artifacts</span><span class="p">(</span><span class="n">local_path</span><span class="p">,</span> <span class="n">mlflow_model</span><span class="o">.</span><span class="n">artifact_path</span><span class="p">,</span> <span class="n">run_id</span><span class="p">)</span>
 
             <span class="c1"># if the model_config kwarg is passed in, then log the model config as an params</span>
-            <span class="k">if</span> <span class="n">MODEL_CONFIG</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
-                <span class="n">model_config</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">MODEL_CONFIG</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s2">&quot;model_config&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+                <span class="n">model_config</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;model_config&quot;</span><span class="p">]</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_config</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
                     <span class="k">try</span><span class="p">:</span>
                         <span class="n">file_extension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">model_config</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
@@ -1113,7 +1113,8 @@
 <span class="n">__mlflow_model__</span> <span class="o">=</span> <span class="kc">None</span>
 
 
-<div class="viewcode-block" id="set_model"><a class="viewcode-back" href="../../../python_api/mlflow.models.html#mlflow.models.set_model">[docs]</a><span class="k">def</span> <span class="nf">set_model</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+<div class="viewcode-block" id="set_model"><a class="viewcode-back" href="../../../python_api/mlflow.models.html#mlflow.models.set_model">[docs]</a><span class="nd">@experimental</span>
+<span class="k">def</span> <span class="nf">set_model</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    When logging model as code, this function can be used to set the model object</span>
 <span class="sd">    to be logged.</span>
@@ -1123,12 +1124,17 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">mlflow.pyfunc</span> <span class="kn">import</span> <span class="n">PythonModel</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">PythonModel</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">PythonModel</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">callable</span><span class="p">(</span><span class="n">model</span><span class="p">)):</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">mlflow.langchain</span> <span class="kn">import</span> <span class="n">_validate_and_wrap_lc_model</span>
+            <span class="kn">from</span> <span class="nn">mlflow.langchain</span> <span class="kn">import</span> <span class="n">_validate_and_prepare_lc_model_or_path</span>
 
-            <span class="c1"># If its not a PyFuncModel, then it should be a Langchain model</span>
-            <span class="n">_validate_and_wrap_lc_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="c1"># If its not a PyFuncModel, then it should be a Langchain model (not a path)</span>
+            <span class="c1"># Check this since the validation function does not</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">MlflowException</span><span class="p">(</span>
+                    <span class="s2">&quot;Model should either be an instance of PyFuncModel or Langchain type.&quot;</span>
+                <span class="p">)</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="n">_validate_and_prepare_lc_model_or_path</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">MlflowException</span><span class="p">(</span>
                 <span class="s2">&quot;Model should either be an instance of PyFuncModel or Langchain type.&quot;</span>
@@ -1165,7 +1171,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../../',
-      VERSION:'2.12.2.dev0',
+      VERSION:'2.13.1.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

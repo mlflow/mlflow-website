@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mlflow.models.evaluation.base &mdash; MLflow 2.12.2.dev0 documentation</title>
+  <title>mlflow.models.evaluation.base &mdash; MLflow 2.13.1.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -56,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../../search.html"/>
-    <link rel="top" title="MLflow 2.12.2.dev0 documentation" href="../../../../index.html"/>
+    <link rel="top" title="MLflow 2.13.1.dev0 documentation" href="../../../../index.html"/>
         <link rel="up" title="Module code" href="../../../index.html"/> 
 
   
@@ -87,7 +87,7 @@
     <a href="../../../../index.html" class="wy-nav-top-logo"
       ><img src="../../../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.12.2.dev0</span>
+    <span class="version">2.13.1.dev0</span>
   </li>
 </ul>
   </nav>
@@ -695,13 +695,15 @@
 
 
 <span class="k">def</span> <span class="nf">_hash_data_as_bytes</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
-        <span class="k">return</span> <span class="n">_hash_ndarray_as_bytes</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">_hash_dict_as_bytes</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">_hash_uint64_ndarray_as_bytes</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">hash_array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">data</span><span class="p">])))</span>
-    <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported data type for hashing: `</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s2">`&quot;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="n">_hash_ndarray_as_bytes</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">_hash_dict_as_bytes</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">_hash_uint64_ndarray_as_bytes</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">hash_array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">data</span><span class="p">])))</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span>  <span class="c1"># Skip unsupported types by returning an empty byte string</span>
 
 
 <span class="k">def</span> <span class="nf">_hash_dict_as_bytes</span><span class="p">(</span><span class="n">data_dict</span><span class="p">):</span>
@@ -734,7 +736,13 @@
                     <span class="k">return</span> <span class="n">_hash_ndarray_as_bytes</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">toArray</span><span class="p">())</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
                 <span class="k">return</span> <span class="n">_hash_data_as_bytes</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">v</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># Attempt to hash the value, if it fails, return an empty byte string</span>
+                <span class="n">pd</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">hash_array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">v</span><span class="p">]))</span>
+                <span class="k">return</span> <span class="n">v</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="k">return</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span>  <span class="c1"># Skip unhashable types by returning an empty byte string</span>
 
         <span class="k">if</span> <span class="n">Version</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">Version</span><span class="p">(</span><span class="s2">&quot;2.1.0&quot;</span><span class="p">):</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">_hash_array_like_element_as_bytes</span><span class="p">)</span>
@@ -1212,7 +1220,7 @@
     <span class="k">if</span> <span class="n">evaluators</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">evaluator_name_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">_model_evaluation_registry</span><span class="o">.</span><span class="n">_registry</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">evaluator_name_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Multiple registered evaluators have been configured: </span><span class="si">{</span><span class="n">evaluator_name_list</span><span class="si">}</span><span class="s2">. &quot;</span>
                 <span class="s2">&quot;Each evaluator will be used for evaluation if the specified model type is &quot;</span>
                 <span class="s2">&quot;compatible with the evaluator definition. If you are intending to override &quot;</span>
@@ -1500,7 +1508,7 @@
 
         <span class="n">_last_failed_evaluator</span> <span class="o">=</span> <span class="n">evaluator_name</span>
         <span class="k">if</span> <span class="n">evaluator</span><span class="o">.</span><span class="n">can_evaluate</span><span class="p">(</span><span class="n">model_type</span><span class="o">=</span><span class="n">model_type</span><span class="p">,</span> <span class="n">evaluator_config</span><span class="o">=</span><span class="n">config</span><span class="p">):</span>
-            <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Evaluating the model with the </span><span class="si">{</span><span class="n">evaluator_name</span><span class="si">}</span><span class="s2"> evaluator.&quot;</span><span class="p">)</span>
+            <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Evaluating the model with the </span><span class="si">{</span><span class="n">evaluator_name</span><span class="si">}</span><span class="s2"> evaluator.&quot;</span><span class="p">)</span>
             <span class="n">eval_result</span> <span class="o">=</span> <span class="n">evaluator</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
                 <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
                 <span class="n">model_type</span><span class="o">=</span><span class="n">model_type</span><span class="p">,</span>
@@ -2384,7 +2392,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../../../',
-      VERSION:'2.12.2.dev0',
+      VERSION:'2.13.1.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

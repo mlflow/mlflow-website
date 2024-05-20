@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mlflow.types.schema &mdash; MLflow 2.12.2.dev0 documentation</title>
+  <title>mlflow.types.schema &mdash; MLflow 2.13.1.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -56,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="MLflow 2.12.2.dev0 documentation" href="../../../index.html"/>
+    <link rel="top" title="MLflow 2.13.1.dev0 documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
   
@@ -87,7 +87,7 @@
     <a href="../../../index.html" class="wy-nav-top-logo"
       ><img src="../../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.12.2.dev0</span>
+    <span class="version">2.13.1.dev0</span>
   </li>
 </ul>
   </nav>
@@ -208,8 +208,9 @@
 <span class="kn">import</span> <span class="nn">string</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">is_dataclass</span>
 <span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">TypedDict</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">TypedDict</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">get_args</span><span class="p">,</span> <span class="n">get_origin</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
@@ -1532,6 +1533,138 @@
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_map_field_type</span><span class="p">(</span><span class="n">field</span><span class="p">):</span>
+    <span class="n">field_type_mapping</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="nb">bool</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span>
+        <span class="nb">int</span><span class="p">:</span> <span class="s2">&quot;integer&quot;</span><span class="p">,</span>
+        <span class="n">builtins</span><span class="o">.</span><span class="n">float</span><span class="p">:</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span>
+        <span class="nb">str</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+        <span class="nb">bytes</span><span class="p">:</span> <span class="s2">&quot;binary&quot;</span><span class="p">,</span>
+        <span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">:</span> <span class="s2">&quot;datetime&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">field_type_mapping</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">field</span><span class="p">)</span>
+
+
+<span class="nd">@experimental</span>
+<span class="k">def</span> <span class="nf">convert_dataclass_to_schema</span><span class="p">(</span><span class="n">dataclass</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts a given dataclass into a Schema object. The dataclass must include type hints</span>
+<span class="sd">    for all its fields. Fields can be of basic types, other dataclasses, or Lists/Optional of</span>
+<span class="sd">    these types. Union types are not supported. Only the top-level fields are directly converted</span>
+<span class="sd">    to ColSpecs, while nested fields are converted into nested Object types.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">inputs</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">field_name</span><span class="p">,</span> <span class="n">field_type</span> <span class="ow">in</span> <span class="n">dataclass</span><span class="o">.</span><span class="vm">__annotations__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="c1"># Determine the type and handle Optional and List correctly</span>
+        <span class="n">is_optional</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">effective_type</span> <span class="o">=</span> <span class="n">field_type</span>
+
+        <span class="k">if</span> <span class="n">get_origin</span><span class="p">(</span><span class="n">field_type</span><span class="p">)</span> <span class="o">==</span> <span class="n">Union</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span> <span class="ow">in</span> <span class="n">get_args</span><span class="p">(</span><span class="n">field_type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">get_args</span><span class="p">(</span><span class="n">field_type</span><span class="p">))</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="c1"># This is an Optional type; determine the effective type excluding None</span>
+                <span class="n">is_optional</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">effective_type</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">get_args</span><span class="p">(</span><span class="n">field_type</span><span class="p">)</span> <span class="k">if</span> <span class="n">t</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                    <span class="s2">&quot;Only Optional[...] is supported as a Union type in dataclass fields&quot;</span>
+                <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">get_origin</span><span class="p">(</span><span class="n">effective_type</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span><span class="p">:</span>
+            <span class="c1"># It&#39;s a list, check the type within the list</span>
+            <span class="n">list_type</span> <span class="o">=</span> <span class="n">get_args</span><span class="p">(</span><span class="n">effective_type</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">is_dataclass</span><span class="p">(</span><span class="n">list_type</span><span class="p">):</span>
+                <span class="n">dtype</span> <span class="o">=</span> <span class="n">_convert_dataclass_to_nested_object</span><span class="p">(</span><span class="n">list_type</span><span class="p">)</span>  <span class="c1"># Convert to nested Object</span>
+                <span class="n">inputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">ColSpec</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="n">Array</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="n">field_name</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="ow">not</span> <span class="n">is_optional</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">dtype</span> <span class="o">:=</span> <span class="n">_map_field_type</span><span class="p">(</span><span class="n">list_type</span><span class="p">):</span>
+                    <span class="n">inputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="n">ColSpec</span><span class="p">(</span>
+                            <span class="nb">type</span><span class="o">=</span><span class="n">Array</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">),</span>
+                            <span class="n">name</span><span class="o">=</span><span class="n">field_name</span><span class="p">,</span>
+                            <span class="n">required</span><span class="o">=</span><span class="ow">not</span> <span class="n">is_optional</span><span class="p">,</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;List field type </span><span class="si">{</span><span class="n">list_type</span><span class="si">}</span><span class="s2"> is not supported in dataclass&quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">dataclass</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">is_dataclass</span><span class="p">(</span><span class="n">effective_type</span><span class="p">):</span>
+            <span class="c1"># It&#39;s a nested dataclass</span>
+            <span class="n">dtype</span> <span class="o">=</span> <span class="n">_convert_dataclass_to_nested_object</span><span class="p">(</span><span class="n">effective_type</span><span class="p">)</span>  <span class="c1"># Convert to nested Object</span>
+            <span class="n">inputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">ColSpec</span><span class="p">(</span>
+                    <span class="nb">type</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span>
+                    <span class="n">name</span><span class="o">=</span><span class="n">field_name</span><span class="p">,</span>
+                    <span class="n">required</span><span class="o">=</span><span class="ow">not</span> <span class="n">is_optional</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="c1"># confirm the effective type is a basic type</span>
+        <span class="k">elif</span> <span class="n">dtype</span> <span class="o">:=</span> <span class="n">_map_field_type</span><span class="p">(</span><span class="n">effective_type</span><span class="p">):</span>
+            <span class="c1"># It&#39;s a basic type</span>
+            <span class="n">inputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">ColSpec</span><span class="p">(</span>
+                    <span class="nb">type</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span>
+                    <span class="n">name</span><span class="o">=</span><span class="n">field_name</span><span class="p">,</span>
+                    <span class="n">required</span><span class="o">=</span><span class="ow">not</span> <span class="n">is_optional</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Unsupported field type </span><span class="si">{</span><span class="n">effective_type</span><span class="si">}</span><span class="s2"> in dataclass </span><span class="si">{</span><span class="n">dataclass</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">Schema</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_convert_dataclass_to_nested_object</span><span class="p">(</span><span class="n">dataclass</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert a nested dataclass to an Object type used within a ColSpec.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">properties</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">field_name</span><span class="p">,</span> <span class="n">field_type</span> <span class="ow">in</span> <span class="n">dataclass</span><span class="o">.</span><span class="vm">__annotations__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">properties</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_convert_field_to_property</span><span class="p">(</span><span class="n">field_name</span><span class="p">,</span> <span class="n">field_type</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">Object</span><span class="p">(</span><span class="n">properties</span><span class="o">=</span><span class="n">properties</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_convert_field_to_property</span><span class="p">(</span><span class="n">field_name</span><span class="p">,</span> <span class="n">field_type</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper function to convert a single field to a Property object suitable for inclusion in an</span>
+<span class="sd">    Object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">is_optional</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">effective_type</span> <span class="o">=</span> <span class="n">field_type</span>
+
+    <span class="k">if</span> <span class="n">get_origin</span><span class="p">(</span><span class="n">field_type</span><span class="p">)</span> <span class="o">==</span> <span class="n">Union</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span> <span class="ow">in</span> <span class="n">get_args</span><span class="p">(</span><span class="n">field_type</span><span class="p">):</span>
+        <span class="n">is_optional</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">effective_type</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">get_args</span><span class="p">(</span><span class="n">field_type</span><span class="p">)</span> <span class="k">if</span> <span class="n">t</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">get_origin</span><span class="p">(</span><span class="n">effective_type</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="n">list_type</span> <span class="o">=</span> <span class="n">get_args</span><span class="p">(</span><span class="n">effective_type</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">Property</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">field_name</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">Array</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">_map_field_type</span><span class="p">(</span><span class="n">list_type</span><span class="p">)),</span>
+            <span class="n">required</span><span class="o">=</span><span class="ow">not</span> <span class="n">is_optional</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">is_dataclass</span><span class="p">(</span><span class="n">effective_type</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Property</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">field_name</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">_convert_dataclass_to_nested_object</span><span class="p">(</span><span class="n">effective_type</span><span class="p">),</span>
+            <span class="n">required</span><span class="o">=</span><span class="ow">not</span> <span class="n">is_optional</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Property</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">field_name</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">_map_field_type</span><span class="p">(</span><span class="n">effective_type</span><span class="p">),</span>
+            <span class="n">required</span><span class="o">=</span><span class="ow">not</span> <span class="n">is_optional</span><span class="p">,</span>
+        <span class="p">)</span>
 </pre></div>
 
               </div>
@@ -1562,7 +1695,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../../',
-      VERSION:'2.12.2.dev0',
+      VERSION:'2.13.1.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

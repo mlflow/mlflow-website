@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>MLflow Models &mdash; MLflow 2.12.2.dev0 documentation</title>
+  <title>MLflow Models &mdash; MLflow 2.13.1.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -56,7 +56,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="MLflow 2.12.2.dev0 documentation" href="index.html"/>
+    <link rel="top" title="MLflow 2.13.1.dev0 documentation" href="index.html"/>
         <link rel="next" title="Managing Dependencies in MLflow Models" href="/model/dependencies.html"/>
         <link rel="prev" title="MLflow Projects" href="/projects.html"/> 
 
@@ -87,7 +87,7 @@
     <a href="index.html" class="wy-nav-top-logo"
       ><img src="_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.12.2.dev0</span>
+    <span class="version">2.13.1.dev0</span>
   </li>
 </ul>
   </nav>
@@ -154,6 +154,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#python-function-python-function">Python Function (<code class="docutils literal notranslate"><span class="pre">python_function</span></code>)</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#how-to-save-model-as-python-function">How To Save Model As Python Function</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#how-to-load-and-score-python-function-models">How To Load And Score Python Function Models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#python-function-model-interfaces">Python Function Model Interfaces</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#r-function-crate">R Function (<code class="docutils literal notranslate"><span class="pre">crate</span></code>)</a><ul>
@@ -519,17 +520,87 @@ documentation</span></a>.</p>
 </div>
 <div class="section" id="how-to-load-and-score-python-function-models">
 <h4>How To Load And Score Python Function Models<a class="headerlink" href="#how-to-load-and-score-python-function-models" title="Permalink to this headline"> </a></h4>
-<p>You can load <code class="docutils literal notranslate"><span class="pre">python_function</span></code> models in Python by calling the <a class="reference internal" href="python_api/mlflow.pyfunc.html#mlflow.pyfunc.load_model" title="mlflow.pyfunc.load_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.pyfunc.load_model()</span></code></a>
-function. Note that the <code class="docutils literal notranslate"><span class="pre">load_model</span></code> function assumes that all dependencies are already available
-and <em>will not</em> check nor install any dependencies (
-see <a class="reference internal" href="#built-in-deployment"><span class="std std-ref">model deployment section</span></a> for tools to deploy models with
-automatic dependency management).</p>
-<p>Once loaded, you can score the model by calling the <a class="reference internal" href="python_api/mlflow.pyfunc.html#mlflow.pyfunc.PyFuncModel.predict" title="mlflow.pyfunc.PyFuncModel.predict"><code class="xref py py-func docutils literal notranslate"><span class="pre">predict</span></code></a>
-method, which has the following signature:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>predict(data: Union[pandas.(Series | DataFrame), numpy.ndarray, csc_matrix, csr_matrix, List[Any], Dict[str, Any], str],
-        params: Optional[Dict[str, Any]] = None) → Union[pandas.(Series | DataFrame), numpy.ndarray, list, str]
+<div class="section" id="loading-models">
+<h5>Loading Models<a class="headerlink" href="#loading-models" title="Permalink to this headline"> </a></h5>
+<p>You can load <code class="docutils literal notranslate"><span class="pre">python_function</span></code> models in Python by using the <a class="reference internal" href="python_api/mlflow.pyfunc.html#mlflow.pyfunc.load_model" title="mlflow.pyfunc.load_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.pyfunc.load_model()</span></code></a> function. It is important
+to note that <code class="docutils literal notranslate"><span class="pre">load_model</span></code> assumes all dependencies are already available and <em>will not</em> perform any checks or installations
+of dependencies. For deployment options that handle dependencies, refer to the <a class="reference internal" href="#built-in-deployment"><span class="std std-ref">model deployment section</span></a>.</p>
+</div>
+<div class="section" id="scoring-models">
+<h5>Scoring Models<a class="headerlink" href="#scoring-models" title="Permalink to this headline"> </a></h5>
+<p>Once a model is loaded, it can be scored in two primary ways:</p>
+<ol class="arabic">
+<li><p><strong>Synchronous Scoring</strong>
+The standard method for scoring is using the <a class="reference internal" href="python_api/mlflow.pyfunc.html#mlflow.pyfunc.PyFuncModel.predict" title="mlflow.pyfunc.PyFuncModel.predict"><code class="xref py py-func docutils literal notranslate"><span class="pre">predict</span></code></a> method, which supports various
+input types and returns a scalar or collection based on the input data. The method signature is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>predict(data: Union[pandas.Series, pandas.DataFrame, numpy.ndarray, csc_matrix, csr_matrix, List[Any], Dict[str, Any], str],
+        params: Optional[Dict[str, Any]] = None) → Union[pandas.Series, pandas.DataFrame, numpy.ndarray, list, str]
 </pre></div>
 </div>
+</li>
+<li><p><strong>Synchronous Streaming Scoring</strong></p>
+<blockquote>
+<div><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">predict_stream</span></code> is a new interface that was added to MLflow in the 2.12.2 release. Previous versions of MLflow will not support this interface.
+In order to utilize <code class="docutils literal notranslate"><span class="pre">predict_stream</span></code> in a custom Python Function Model, you must implement the <code class="docutils literal notranslate"><span class="pre">predict_stream</span></code> method in your model class and
+return a generator type.</p>
+</div>
+<p>For models that support streaming data processing, <a class="reference internal" href="python_api/mlflow.pyfunc.html#mlflow.pyfunc.PyFuncModel.predict_stream" title="mlflow.pyfunc.PyFuncModel.predict_stream"><code class="xref py py-func docutils literal notranslate"><span class="pre">predict_stream</span></code></a>
+method is available. This method returns a <code class="docutils literal notranslate"><span class="pre">generator</span></code>, which yields a stream of responses, allowing for efficient processing of
+large datasets or continuous data streams. Note that the <code class="docutils literal notranslate"><span class="pre">predict_stream</span></code> method is not available for all model types.
+The usage involves iterating over the generator to consume the responses:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>predict_stream(data: Any, params: Optional[Dict[str, Any]] = None) → GeneratorType
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ol>
+</div>
+<div class="section" id="demonstrating-predict-stream">
+<h5>Demonstrating <code class="docutils literal notranslate"><span class="pre">predict_stream()</span></code><a class="headerlink" href="#demonstrating-predict-stream" title="Permalink to this headline"> </a></h5>
+<p>Below is an example demonstrating how to define, save, load, and use a streamable model with the <cite>predict_stream()</cite> method:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+
+<span class="c1"># Define a custom model that supports streaming</span>
+<span class="k">class</span> <span class="nc">StreamableModel</span><span class="p">(</span><span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">PythonModel</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">model_input</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># Regular predict method implementation (optional for this demo)</span>
+        <span class="k">return</span> <span class="s2">&quot;regular-predict-output&quot;</span>
+
+    <span class="k">def</span> <span class="nf">predict_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">model_input</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># Yielding elements one at a time</span>
+        <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="s2">&quot;e&quot;</span><span class="p">]:</span>
+            <span class="k">yield</span> <span class="n">element</span>
+
+
+<span class="c1"># Save the model to a directory</span>
+<span class="n">tmp_path</span> <span class="o">=</span> <span class="s2">&quot;/tmp/test_model&quot;</span>
+<span class="n">pyfunc_model_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">,</span> <span class="s2">&quot;pyfunc_model&quot;</span><span class="p">)</span>
+<span class="n">python_model</span> <span class="o">=</span> <span class="n">StreamableModel</span><span class="p">()</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">save_model</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">pyfunc_model_path</span><span class="p">,</span> <span class="n">python_model</span><span class="o">=</span><span class="n">python_model</span><span class="p">)</span>
+
+<span class="c1"># Load the model</span>
+<span class="n">loaded_pyfunc_model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_uri</span><span class="o">=</span><span class="n">pyfunc_model_path</span><span class="p">)</span>
+
+<span class="c1"># Use predict_stream to get a generator</span>
+<span class="n">stream_output</span> <span class="o">=</span> <span class="n">loaded_pyfunc_model</span><span class="o">.</span><span class="n">predict_stream</span><span class="p">(</span><span class="s2">&quot;single-input&quot;</span><span class="p">)</span>
+
+<span class="c1"># Consuming the generator using next</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">stream_output</span><span class="p">))</span>  <span class="c1"># Output: &#39;a&#39;</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">stream_output</span><span class="p">))</span>  <span class="c1"># Output: &#39;b&#39;</span>
+
+<span class="c1"># Alternatively, consuming the generator using a for-loop</span>
+<span class="k">for</span> <span class="n">response</span> <span class="ow">in</span> <span class="n">stream_output</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>  <span class="c1"># This will print &#39;c&#39;, &#39;d&#39;, &#39;e&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="python-function-model-interfaces">
+<h4>Python Function Model Interfaces<a class="headerlink" href="#python-function-model-interfaces" title="Permalink to this headline"> </a></h4>
 <p>All PyFunc models will support <cite>pandas.DataFrame</cite> as an input. In addition to <cite>pandas.DataFrame</cite>,
 DL PyFunc models will also support tensor inputs in the form of <cite>numpy.ndarrays</cite>. To verify
 whether a model flavor supports tensor inputs, please check the flavor’s documentation.</p>
@@ -4410,7 +4481,7 @@ maintained by the MLflow community.</p>
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'./',
-      VERSION:'2.12.2.dev0',
+      VERSION:'2.13.1.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

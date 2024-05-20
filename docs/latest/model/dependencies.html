@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Managing Dependencies in MLflow Models &mdash; MLflow 2.12.2.dev0 documentation</title>
+  <title>Managing Dependencies in MLflow Models &mdash; MLflow 2.13.1.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -56,7 +56,7 @@
         <link rel="index" title="Index"
               href="../genindex.html"/>
         <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="MLflow 2.12.2.dev0 documentation" href="../index.html"/>
+    <link rel="top" title="MLflow 2.13.1.dev0 documentation" href="../index.html"/>
         <link rel="up" title="MLflow Models" href="../models.html"/>
         <link rel="next" title="MLflow Model Signatures and Input Examples Guide" href="/signatures.html"/>
         <link rel="prev" title="MLflow Models" href="/../models.html"/> 
@@ -89,7 +89,7 @@
     <a href="../index.html" class="wy-nav-top-logo"
       ><img src="../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.12.2.dev0</span>
+    <span class="version">2.13.1.dev0</span>
   </li>
 </ul>
   </nav>
@@ -241,16 +241,17 @@ Please refer to <a class="reference internal" href="signatures.html#input-exampl
 <div class="contents local topic" id="table-of-contents">
 <p class="topic-title">Table of Contents</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#how-mlflow-records-model-dependencies" id="id5">How MLflow Records Model Dependencies</a></p></li>
-<li><p><a class="reference internal" href="#adding-extra-dependencies-to-an-mlflow-model" id="id6">Adding Extra Dependencies to an MLflow Model</a></p></li>
-<li><p><a class="reference internal" href="#defining-all-dependencies-by-yourself" id="id7">Defining All Dependencies by Yourself</a></p></li>
-<li><p><a class="reference internal" href="#saving-extra-code-with-an-mlflow-model" id="id8">Saving Extra Code with an MLflow Model</a></p></li>
-<li><p><a class="reference internal" href="#validating-environment-for-prediction" id="id9">Validating Environment for Prediction</a></p></li>
-<li><p><a class="reference internal" href="#troubleshooting" id="id10">Troubleshooting</a></p></li>
+<li><p><a class="reference internal" href="#how-mlflow-records-model-dependencies" id="id7">How MLflow Records Model Dependencies</a></p></li>
+<li><p><a class="reference internal" href="#adding-extra-dependencies-to-an-mlflow-model" id="id8">Adding Extra Dependencies to an MLflow Model</a></p></li>
+<li><p><a class="reference internal" href="#defining-all-dependencies-by-yourself" id="id9">Defining All Dependencies by Yourself</a></p></li>
+<li><p><a class="reference internal" href="#saving-extra-code-dependencies-with-an-mlflow-model-automatic-inference" id="id10">Saving Extra Code dependencies with an MLflow Model - Automatic inference</a></p></li>
+<li><p><a class="reference internal" href="#saving-extra-code-with-an-mlflow-model-manual-declaration" id="id11">Saving Extra Code with an MLflow Model - Manual Declaration</a></p></li>
+<li><p><a class="reference internal" href="#validating-environment-for-prediction" id="id12">Validating Environment for Prediction</a></p></li>
+<li><p><a class="reference internal" href="#troubleshooting" id="id13">Troubleshooting</a></p></li>
 </ul>
 </div>
 <div class="section" id="how-mlflow-records-model-dependencies">
-<span id="how-mlflow-records-dependencies"></span><h2><a class="toc-backref" href="#id5">How MLflow Records Model Dependencies</a><a class="headerlink" href="#how-mlflow-records-model-dependencies" title="Permalink to this headline"> </a></h2>
+<span id="how-mlflow-records-dependencies"></span><h2><a class="toc-backref" href="#id7">How MLflow Records Model Dependencies</a><a class="headerlink" href="#how-mlflow-records-model-dependencies" title="Permalink to this headline"> </a></h2>
 <p>An MLflow Model is saved within a specified directory with the following structure:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>my_model/
 ├── MLmodel
@@ -309,7 +310,7 @@ cloudpickle==3.0.0
 </div>
 </div>
 <div class="section" id="adding-extra-dependencies-to-an-mlflow-model">
-<h2><a class="toc-backref" href="#id6">Adding Extra Dependencies to an MLflow Model</a><a class="headerlink" href="#adding-extra-dependencies-to-an-mlflow-model" title="Permalink to this headline"> </a></h2>
+<h2><a class="toc-backref" href="#id8">Adding Extra Dependencies to an MLflow Model</a><a class="headerlink" href="#adding-extra-dependencies-to-an-mlflow-model" title="Permalink to this headline"> </a></h2>
 <p>MLflow infers dependencies required for the model flavor library, but your model may depend on other libraries e.g. data
 preprocessing. In this case, you can add extra dependencies to the model by specifying the <strong>extra_pip_requirements</strong> param
 when logging the model. For example,</p>
@@ -350,7 +351,7 @@ your model in a virtual environment. Please refer to <a class="reference interna
 </div>
 </div>
 <div class="section" id="defining-all-dependencies-by-yourself">
-<h2><a class="toc-backref" href="#id7">Defining All Dependencies by Yourself</a><a class="headerlink" href="#defining-all-dependencies-by-yourself" title="Permalink to this headline"> </a></h2>
+<h2><a class="toc-backref" href="#id9">Defining All Dependencies by Yourself</a><a class="headerlink" href="#defining-all-dependencies-by-yourself" title="Permalink to this headline"> </a></h2>
 <p>Alternatively, you can also define all dependencies from scratch rather than adding extra ones. To do so,
 specify <strong>pip_requirements</strong> when logging the model. For example,</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
@@ -386,8 +387,110 @@ issues when deploying the model to production. Since MLflow 2.10.0, you can use 
 test your model in a virtual environment. Please refer to <a class="reference internal" href="#validating-environment-for-prediction"><span class="std std-ref">Validating Environment for Prediction</span></a> for more details.</p>
 </div>
 </div>
-<div class="section" id="saving-extra-code-with-an-mlflow-model">
-<h2><a class="toc-backref" href="#id8">Saving Extra Code with an MLflow Model</a><a class="headerlink" href="#saving-extra-code-with-an-mlflow-model" title="Permalink to this headline"> </a></h2>
+<div class="section" id="saving-extra-code-dependencies-with-an-mlflow-model-automatic-inference">
+<h2><a class="toc-backref" href="#id10">Saving Extra Code dependencies with an MLflow Model - Automatic inference</a><a class="headerlink" href="#saving-extra-code-dependencies-with-an-mlflow-model-automatic-inference" title="Permalink to this headline"> </a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Automatic code dependency inference is a feature that was introduced in MLflow 2.13.0 and is marked as Experimental. The base implementation may be
+modified, improved, and adjusted with no prior notice in order to address potential issues and edge cases.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Automatic code dependency inference is currently supported for Python Function Models only. Support for additional named model flavors will be coming in
+future releases of MLflow.</p>
+</div>
+<p>In the MLflow 2.13.0 release, a new method of including custom dependent code was introduced that expands on the existing feature of declaring <code class="docutils literal notranslate"><span class="pre">code_paths</span></code> when
+saving or logging a model. This new feature utilizes import dependency analysis to automatically infer the code dependencies required by the model by checking which
+modules are imported within the references of a Python Model’s definition.</p>
+<p>In order to use this new feature, you can simply set the argument <code class="docutils literal notranslate"><span class="pre">infer_code_paths</span></code> (Default <code class="docutils literal notranslate"><span class="pre">False</span></code>) to <code class="docutils literal notranslate"><span class="pre">True</span></code> when logging. You do not have to define
+file locations explicitly via declaring <code class="docutils literal notranslate"><span class="pre">code_paths</span></code> directory locations when utilizing this method of dependency inference, as you would have had to
+prior to MLflow 2.13.0.</p>
+<p>An example of using this feature is shown below, where we are logging a model that contains an external dependency.
+In the first section, we are defining an external module named <code class="docutils literal notranslate"><span class="pre">custom_code</span></code> that exists in a different than our model definition.</p>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">custom_code.py</span><a class="headerlink" href="#id4" title="Permalink to this code"> </a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+
+<span class="n">iris_types</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;setosa&quot;</span><span class="p">,</span> <span class="s2">&quot;versicolor&quot;</span><span class="p">,</span> <span class="s2">&quot;viginica&quot;</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">map_iris_types</span><span class="p">(</span><span class="n">predictions</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">iris_types</span><span class="p">[</span><span class="n">pred</span><span class="p">]</span> <span class="k">for</span> <span class="n">pred</span> <span class="ow">in</span> <span class="n">predictions</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<p>With this <code class="docutils literal notranslate"><span class="pre">custom_code.py</span></code> module defined, it is ready for use in our Python Model:</p>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text">model.py</span><a class="headerlink" href="#id5" title="Permalink to this code"> </a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">from</span> <span class="nn">custom_code</span> <span class="kn">import</span> <span class="n">map_iris_types</span>  <span class="c1"># import the external reference</span>
+
+<span class="kn">import</span> <span class="nn">mlflow</span>
+
+
+<span class="k">class</span> <span class="nc">FlowerMapping</span><span class="p">(</span><span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">PythonModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Custom model with an external dependency&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">model_input</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="n">predictions</span> <span class="o">=</span> <span class="p">[</span><span class="n">pred</span> <span class="o">%</span> <span class="mi">3</span> <span class="k">for</span> <span class="n">pred</span> <span class="ow">in</span> <span class="n">model_input</span><span class="p">]</span>
+
+        <span class="c1"># Call the external function</span>
+        <span class="k">return</span> <span class="n">map_iris_types</span><span class="p">(</span><span class="n">predictions</span><span class="p">)</span>
+
+
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="n">model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+        <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;flowers&quot;</span><span class="p">,</span>
+        <span class="n">python_model</span><span class="o">=</span><span class="n">FlowerMapping</span><span class="p">(),</span>
+        <span class="n">infer_code_paths</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># Enabling automatic code dependency inference</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>With <code class="docutils literal notranslate"><span class="pre">infer_code_paths</span></code> set to <code class="docutils literal notranslate"><span class="pre">True</span></code>, the dependency of <code class="docutils literal notranslate"><span class="pre">map_iris_types</span></code> will be analyzed, its source declaration detected as originating in
+the <code class="docutils literal notranslate"><span class="pre">custom_code.py</span></code> module, and the code reference within <code class="docutils literal notranslate"><span class="pre">custom_code.py</span></code> will be stored along with the model artifact. Note that defining the
+external code dependency by using the <code class="docutils literal notranslate"><span class="pre">code_paths</span></code> argument (discussed in the next section) is not needed.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Only modules that are within the current working directory are accessible. Dependency inference will not work across module boundaries or if your
+custom code is defined in an entirely different library. If your code base is structured in such a way that common modules are entirely external to
+the path that your model logging code is executing within, the original <code class="docutils literal notranslate"><span class="pre">code_paths</span></code> option is required in order to log these dependencies, as
+<code class="docutils literal notranslate"><span class="pre">infer_code_paths</span></code> dependency inference will not capture those requirements.</p>
+</div>
+<div class="section" id="restrictions-with-infer-code-paths">
+<h3>Restrictions with <code class="docutils literal notranslate"><span class="pre">infer_code_paths</span></code><a class="headerlink" href="#restrictions-with-infer-code-paths" title="Permalink to this headline"> </a></h3>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Before using dependency inference via <code class="docutils literal notranslate"><span class="pre">infer_code_paths</span></code>, ensure that your dependent code modules do not have sensitive data hard-coded within the modules (e.g., passwords,
+access tokens, or secrets). Code inference does not obfuscate sensitive information and will capture and log (save) the module, regardless of what it contains.</p>
+</div>
+<p>An important aspect to note about code structure when using <code class="docutils literal notranslate"><span class="pre">infer_code_paths</span></code> is to avoid defining dependencies within a main entry point to your code.
+When a Python code file is loaded as the <code class="docutils literal notranslate"><span class="pre">__main__</span></code> module, it cannot be inferred as a code path file. This means that if you run your script directly
+(e.g., using <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">script.py</span></code>), the functions and classes defined in that script will be part of the <code class="docutils literal notranslate"><span class="pre">__main__</span></code> module and not easily accessible by
+other modules.</p>
+<p>If your model depends on these classes or functions, this can pose a problem because they are not part of the standard module namespace and thus not
+straightforward to serialize. To handle this situation, you should use <code class="docutils literal notranslate"><span class="pre">cloudpickle</span></code> to serialize your model instance. <code class="docutils literal notranslate"><span class="pre">cloudpickle</span></code> is an
+extended version of Python’s <code class="docutils literal notranslate"><span class="pre">pickle</span></code> module that can serialize a wider range of Python objects, including functions and classes defined in
+the <code class="docutils literal notranslate"><span class="pre">__main__</span></code> module.</p>
+<dl class="simple">
+<dt><strong>Why This Matters</strong>:</dt><dd><ul class="simple">
+<li><p><strong>Code Path Inference</strong>: MLflow uses the code path to understand and log the code associated with your model. When the script is executed as <code class="docutils literal notranslate"><span class="pre">__main__</span></code>, the code path cannot be inferred, which complicates the tracking and reproducibility of your MLflow experiments.</p></li>
+<li><p><strong>Serialization</strong>: Standard serialization methods like <code class="docutils literal notranslate"><span class="pre">pickle</span></code> may not work with <code class="docutils literal notranslate"><span class="pre">__main__</span></code> module objects, leading to issues when trying to save and load models. <code class="docutils literal notranslate"><span class="pre">cloudpickle</span></code> provides a workaround by enabling the serialization of these objects, ensuring that your model can be correctly saved and restored.</p></li>
+</ul>
+</dd>
+<dt><strong>Best Practices</strong>:</dt><dd><ul class="simple">
+<li><p>Avoid defining critical functions and classes in the <code class="docutils literal notranslate"><span class="pre">__main__</span></code> module. Instead, place them in separate module files that can be imported as needed.</p></li>
+<li><p>If you must define functions and classes in the <code class="docutils literal notranslate"><span class="pre">__main__</span></code> module, use <code class="docutils literal notranslate"><span class="pre">cloudpickle</span></code> to serialize your model to ensure that all dependencies are correctly handled.</p></li>
+</ul>
+</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="saving-extra-code-with-an-mlflow-model-manual-declaration">
+<h2><a class="toc-backref" href="#id11">Saving Extra Code with an MLflow Model - Manual Declaration</a><a class="headerlink" href="#saving-extra-code-with-an-mlflow-model-manual-declaration" title="Permalink to this headline"> </a></h2>
 <p>MLflow also supports saving your custom Python code as dependencies to the model. This is particularly useful
 when you want to deploy your custom modules that are required for prediction with the model.
 To do so, specify <strong>code_paths</strong> when logging the model. For example, if you have the following file structure in your project:</p>
@@ -396,8 +499,8 @@ To do so, specify <strong>code_paths</strong> when logging the model. For exampl
 └── train.py
 </pre></div>
 </div>
-<div class="literal-block-wrapper docutils container" id="id4">
-<div class="code-block-caption"><span class="caption-text">train.py</span><a class="headerlink" href="#id4" title="Permalink to this code"> </a></div>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">train.py</span><a class="headerlink" href="#id6" title="Permalink to this code"> </a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
 
 
@@ -511,7 +614,7 @@ that are only used for development.</p>
 </div>
 </div>
 <div class="section" id="validating-environment-for-prediction">
-<span id="id1"></span><h2><a class="toc-backref" href="#id9">Validating Environment for Prediction</a><a class="headerlink" href="#validating-environment-for-prediction" title="Permalink to this headline"> </a></h2>
+<span id="id1"></span><h2><a class="toc-backref" href="#id12">Validating Environment for Prediction</a><a class="headerlink" href="#validating-environment-for-prediction" title="Permalink to this headline"> </a></h2>
 <p>Validating your model before deployment is a critical step to ensure production readiness.
 MLflow provides a few ways to test your model locally, either in a virtual environment or a Docker container.
 If you find any dependency issues during validation, please follow the guidance in <a class="reference internal" href="#how-to-fix-dependency-errors-in-model"><span class="std std-ref">How to fix dependency errors when serving my model?</span></a></p>
@@ -585,7 +688,7 @@ curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </spa
 </div>
 </div>
 <div class="section" id="troubleshooting">
-<span id="model-dependencies-troubleshooting"></span><h2><a class="toc-backref" href="#id10">Troubleshooting</a><a class="headerlink" href="#troubleshooting" title="Permalink to this headline"> </a></h2>
+<span id="model-dependencies-troubleshooting"></span><h2><a class="toc-backref" href="#id13">Troubleshooting</a><a class="headerlink" href="#troubleshooting" title="Permalink to this headline"> </a></h2>
 <div class="section" id="how-to-fix-dependency-errors-when-serving-my-model">
 <span id="how-to-fix-dependency-errors-in-model"></span><h3>How to Fix Dependency Errors when Serving my Model<a class="headerlink" href="#how-to-fix-dependency-errors-when-serving-my-model" title="Permalink to this headline"> </a></h3>
 <p>One of the most common issues experienced during model deployment centers around dependency issues. When logging or saving your model, MLflow tries to infer the
@@ -724,7 +827,7 @@ To manually confirm whether a model has this dependency, you can examine the <co
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../',
-      VERSION:'2.12.2.dev0',
+      VERSION:'2.13.1.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

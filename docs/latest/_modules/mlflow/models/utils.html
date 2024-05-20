@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mlflow.models.utils &mdash; MLflow 2.12.2.dev0 documentation</title>
+  <title>mlflow.models.utils &mdash; MLflow 2.13.1.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -56,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="MLflow 2.12.2.dev0 documentation" href="../../../index.html"/>
+    <link rel="top" title="MLflow 2.13.1.dev0 documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
   
@@ -87,7 +87,7 @@
     <a href="../../../index.html" class="wy-nav-top-logo"
       ><img src="../../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.12.2.dev0</span>
+    <span class="version">2.13.1.dev0</span>
   </li>
 </ul>
   </nav>
@@ -201,20 +201,28 @@
               <div itemprop="articleBody">
                 
   <h1>Source code for mlflow.models.utils</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">dt</span>
+<span></span><span class="kn">import</span> <span class="nn">base64</span>
+<span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">dt</span>
 <span class="kn">import</span> <span class="nn">decimal</span>
+<span class="kn">import</span> <span class="nn">importlib</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">uuid</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
+<span class="kn">import</span> <span class="nn">mlflow</span>
 <span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span> <span class="n">MlflowException</span>
 <span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">Model</span>
+<span class="kn">from</span> <span class="nn">mlflow.models.model_config</span> <span class="kn">import</span> <span class="n">_set_model_config</span>
 <span class="kn">from</span> <span class="nn">mlflow.store.artifact.utils.models</span> <span class="kn">import</span> <span class="n">get_model_name_and_version</span>
 <span class="kn">from</span> <span class="nn">mlflow.types</span> <span class="kn">import</span> <span class="n">DataType</span><span class="p">,</span> <span class="n">ParamSchema</span><span class="p">,</span> <span class="n">ParamSpec</span><span class="p">,</span> <span class="n">Schema</span><span class="p">,</span> <span class="n">TensorSpec</span>
 <span class="kn">from</span> <span class="nn">mlflow.types.schema</span> <span class="kn">import</span> <span class="n">Array</span><span class="p">,</span> <span class="n">Map</span><span class="p">,</span> <span class="n">Object</span><span class="p">,</span> <span class="n">Property</span>
@@ -1658,19 +1666,29 @@
         <span class="s2">&quot;functions correctly, remove or comment out usage of &#39;dbutils&#39; command.&quot;</span>
     <span class="p">)</span>
 
+    <span class="n">output_code_list</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">code</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
         <span class="k">for</span> <span class="n">match</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\bdbutils\b&quot;</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
             <span class="n">start</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_in_comment</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_is_in_string_only</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="s2">&quot;dbutils&quot;</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
+        <span class="c1"># Prefix any line containing MAGIC commands with a comment. When there is better support</span>
+        <span class="c1"># for the Databricks workspace export API, we can get rid of this.</span>
+        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;%&quot;</span><span class="p">):</span>
+            <span class="n">output_code_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;# MAGIC &quot;</span> <span class="o">+</span> <span class="n">line</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">output_code_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+    <span class="n">output_code</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_code_list</span><span class="p">)</span>
 
     <span class="n">magic_regex</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;^# MAGIC %\S+.*&quot;</span>
-    <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">magic_regex</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">MULTILINE</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">magic_regex</span><span class="p">,</span> <span class="n">output_code</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">MULTILINE</span><span class="p">):</span>
         <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
             <span class="s2">&quot;The model file uses magic commands which have been commented out. To ensure your code &quot;</span>
             <span class="s2">&quot;functions correctly, make sure that it does not rely on these magic commands for &quot;</span>
             <span class="s2">&quot;correctness.&quot;</span>
         <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">output_code</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
 
 
 <span class="c1"># Convert llm input data:</span>
@@ -1701,6 +1719,102 @@
             <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="n">orient</span><span class="o">=</span><span class="s2">&quot;records&quot;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">_convert_llm_ndarray_to_list</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_get_temp_file_with_content</span><span class="p">(</span><span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">content</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">content_format</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Write the contents to a temporary file and return the path to that file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        file_name: The name of the file to be created.</span>
+<span class="sd">        content: The contents to be written to the file.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The string path to the file where the chain model is build.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Get the temporary directory path</span>
+    <span class="n">temp_dir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">()</span>
+
+    <span class="c1"># Construct the full path where the temporary file will be created</span>
+    <span class="n">temp_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+
+    <span class="c1"># Create and write to the file</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">temp_file_path</span><span class="p">,</span> <span class="n">content_format</span><span class="p">)</span> <span class="k">as</span> <span class="n">tmp_file</span><span class="p">:</span>
+        <span class="n">tmp_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">temp_file_path</span>
+
+
+<span class="k">def</span> <span class="nf">_validate_and_get_model_code_path</span><span class="p">(</span><span class="n">model_code_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Validate model code path exists. Creates a temp file and validate its contents if it&#39;s a</span>
+<span class="sd">    notebook.</span>
+
+<span class="sd">    Returns either `model_code_path` or a temp file path with the contents of the notebook.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">model_code_path</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;If the provided model &#39;</span><span class="si">{</span><span class="n">model_code_path</span><span class="si">}</span><span class="s2">&#39; is a string, it must be a valid python &quot;</span>
+            <span class="s2">&quot;file path or a databricks notebook file path containing the code for defining &quot;</span>
+            <span class="s2">&quot;the chain instance.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">model_code_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">_</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">model_code_path</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">databricks.sdk</span> <span class="kn">import</span> <span class="n">WorkspaceClient</span>
+            <span class="kn">from</span> <span class="nn">databricks.sdk.service.workspace</span> <span class="kn">import</span> <span class="n">ExportFormat</span>
+
+            <span class="n">w</span> <span class="o">=</span> <span class="n">WorkspaceClient</span><span class="p">()</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">model_code_path</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">ExportFormat</span><span class="o">.</span><span class="n">SOURCE</span><span class="p">)</span>
+            <span class="n">decoded_content</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;If the provided model &#39;</span><span class="si">{</span><span class="n">model_code_path</span><span class="si">}</span><span class="s2">&#39; is a string, it must be a valid python &quot;</span>
+                <span class="s2">&quot;file path or a databricks notebook file path containing the code for defining &quot;</span>
+                <span class="s2">&quot;the chain instance.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">_validate_model_code_from_notebook</span><span class="p">(</span><span class="n">decoded_content</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">_get_temp_file_with_content</span><span class="p">(</span><span class="s2">&quot;model.py&quot;</span><span class="p">,</span> <span class="n">decoded_content</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span>
+
+
+<span class="nd">@contextmanager</span>
+<span class="k">def</span> <span class="nf">_config_context</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="c1"># Check if config_path is None and set it to &quot;&quot; so when loading the model</span>
+    <span class="c1"># the config_path is set to &quot;&quot; so the ModelConfig can correctly check if the</span>
+    <span class="c1"># config is set or not</span>
+    <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="n">_set_model_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">yield</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">_set_model_config</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+
+
+<span class="c1"># Python&#39;s module caching mechanism prevents the re-importation of previously loaded modules by</span>
+<span class="c1"># default. Once a module is imported, it&#39;s added to `sys.modules`, and subsequent import attempts</span>
+<span class="c1"># retrieve the cached module rather than re-importing it.</span>
+<span class="c1"># Here, we want to import the `code path` module multiple times during a single runtime session.</span>
+<span class="c1"># This function addresses this by dynamically importing the `code path` module under a unique,</span>
+<span class="c1"># dynamically generated module name. This bypasses the caching mechanism, as each import is</span>
+<span class="c1"># considered a separate module by the Python interpreter.</span>
+<span class="k">def</span> <span class="nf">_load_model_code_path</span><span class="p">(</span><span class="n">code_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]):</span>
+    <span class="k">with</span> <span class="n">_config_context</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">new_module_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;code_model_</span><span class="si">{</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">spec</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spec_from_file_location</span><span class="p">(</span><span class="n">new_module_name</span><span class="p">,</span> <span class="n">code_path</span><span class="p">)</span>
+            <span class="n">module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">module_from_spec</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">new_module_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">module</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">loader</span><span class="o">.</span><span class="n">exec_module</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to import model from </span><span class="si">{</span><span class="n">code_path</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+
+    <span class="k">return</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">__mlflow_model__</span>
 </pre></div>
 
               </div>
@@ -1731,7 +1845,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../../',
-      VERSION:'2.12.2.dev0',
+      VERSION:'2.13.1.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',
