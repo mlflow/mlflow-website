@@ -240,7 +240,8 @@
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.entities.model_registry</span> <span class="kn">import</span> <span class="n">ModelVersion</span><span class="p">,</span> <span class="n">RegisteredModel</span>
 <span class="kn">from</span> <span class="nn">mlflow.entities.model_registry.model_version_stages</span> <span class="kn">import</span> <span class="n">ALL_STAGES</span>
-<span class="kn">from</span> <span class="nn">mlflow.entities.span</span> <span class="kn">import</span> <span class="n">LiveSpan</span><span class="p">,</span> <span class="n">NoOpSpan</span>
+<span class="kn">from</span> <span class="nn">mlflow.entities.span</span> <span class="kn">import</span> <span class="n">NO_OP_SPAN_REQUEST_ID</span><span class="p">,</span> <span class="n">NoOpSpan</span><span class="p">,</span> <span class="n">create_mlflow_span</span>
+<span class="kn">from</span> <span class="nn">mlflow.entities.trace_status</span> <span class="kn">import</span> <span class="n">TraceStatus</span>
 <span class="kn">from</span> <span class="nn">mlflow.environment_variables</span> <span class="kn">import</span> <span class="n">MLFLOW_ENABLE_ASYNC_LOGGING</span>
 <span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
 <span class="kn">from</span> <span class="nn">mlflow.protos.databricks_pb2</span> <span class="kn">import</span> <span class="p">(</span>
@@ -736,22 +737,23 @@
 <span class="sd">        Example:</span>
 
 <span class="sd">        .. code-block:: python</span>
+<span class="sd">            :test:</span>
 
-<span class="sd">                from mlflow import MlflowClient</span>
+<span class="sd">            from mlflow import MlflowClient</span>
 
-<span class="sd">                client = MlflowClient()</span>
+<span class="sd">            client = MlflowClient()</span>
 
-<span class="sd">                root_span = client.start_trace(&quot;my_trace&quot;)</span>
-<span class="sd">                request_id = root_span.request_id</span>
+<span class="sd">            root_span = client.start_trace(&quot;my_trace&quot;)</span>
+<span class="sd">            request_id = root_span.request_id</span>
 
-<span class="sd">                # Create a child span</span>
-<span class="sd">                child_span = client.start_span(</span>
-<span class="sd">                    &quot;child_span&quot;, request_id=request_id, parent_id=root_span.span_id</span>
-<span class="sd">                )</span>
-<span class="sd">                # Do something...</span>
-<span class="sd">                client.end_span(request_id=request_id, span_id=child_span.span_id)</span>
+<span class="sd">            # Create a child span</span>
+<span class="sd">            child_span = client.start_span(</span>
+<span class="sd">                &quot;child_span&quot;, request_id=request_id, parent_id=root_span.span_id</span>
+<span class="sd">            )</span>
+<span class="sd">            # Do something...</span>
+<span class="sd">            client.end_span(request_id=request_id, span_id=child_span.span_id)</span>
 
-<span class="sd">                client.end_trace(request_id)</span>
+<span class="sd">            client.end_trace(request_id)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Validate no active trace is set in the global context. If there is an active trace,</span>
         <span class="c1"># the span created by this method will be a child span under the active trace rather than</span>
@@ -780,7 +782,7 @@
             <span class="p">)</span>
             <span class="n">request_id</span> <span class="o">=</span> <span class="n">get_otel_attribute</span><span class="p">(</span><span class="n">otel_span</span><span class="p">,</span> <span class="n">SpanAttributeKey</span><span class="o">.</span><span class="n">REQUEST_ID</span><span class="p">)</span>
 
-            <span class="n">mlflow_span</span> <span class="o">=</span> <span class="n">LiveSpan</span><span class="p">(</span><span class="n">otel_span</span><span class="p">,</span> <span class="n">request_id</span><span class="p">,</span> <span class="n">span_type</span><span class="p">)</span>
+            <span class="n">mlflow_span</span> <span class="o">=</span> <span class="n">create_mlflow_span</span><span class="p">(</span><span class="n">otel_span</span><span class="p">,</span> <span class="n">request_id</span><span class="p">,</span> <span class="n">span_type</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">inputs</span><span class="p">:</span>
                 <span class="n">mlflow_span</span><span class="o">.</span><span class="n">set_inputs</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">attributes</span><span class="p">:</span>
@@ -837,19 +839,26 @@
 <span class="sd">                :py:class:`SpanStatusCode &lt;mlflow.entities.SpanStatusCode&gt;`</span>
 <span class="sd">                e.g. ``&quot;OK&quot;``, ``&quot;ERROR&quot;``. The default status is OK.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># NB: If the specified request ID is of no-op span, this means something went wrong in</span>
+        <span class="c1">#     the span start logic. We should simply ignore it as the upstream should already</span>
+        <span class="c1">#     have logged the error.</span>
+        <span class="k">if</span> <span class="n">request_id</span> <span class="o">==</span> <span class="n">NO_OP_SPAN_REQUEST_ID</span><span class="p">:</span>
+            <span class="k">return</span>
+
         <span class="n">trace_manager</span> <span class="o">=</span> <span class="n">InMemoryTraceManager</span><span class="o">.</span><span class="n">get_instance</span><span class="p">()</span>
         <span class="n">root_span_id</span> <span class="o">=</span> <span class="n">trace_manager</span><span class="o">.</span><span class="n">get_root_span_id</span><span class="p">(</span><span class="n">request_id</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">root_span_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_trace</span><span class="p">(</span><span class="n">request_id</span><span class="o">=</span><span class="n">request_id</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Trace with ID </span><span class="si">{</span><span class="n">request_id</span><span class="si">}</span><span class="s2"> already finished.&quot;</span><span class="p">,</span>
-                    <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
-                <span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
+            <span class="n">trace</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_trace</span><span class="p">(</span><span class="n">request_id</span><span class="o">=</span><span class="n">request_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">trace</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
                     <span class="sa">f</span><span class="s2">&quot;Trace with ID </span><span class="si">{</span><span class="n">request_id</span><span class="si">}</span><span class="s2"> not found.&quot;</span><span class="p">,</span>
                     <span class="n">error_code</span><span class="o">=</span><span class="n">RESOURCE_DOES_NOT_EXIST</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">trace</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">status</span> <span class="ow">in</span> <span class="n">TraceStatus</span><span class="o">.</span><span class="n">end_statuses</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Trace with ID </span><span class="si">{</span><span class="n">request_id</span><span class="si">}</span><span class="s2"> already finished.&quot;</span><span class="p">,</span>
+                    <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
                 <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">end_span</span><span class="p">(</span><span class="n">request_id</span><span class="p">,</span> <span class="n">root_span_id</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">attributes</span><span class="p">,</span> <span class="n">status</span><span class="p">)</span></div>
@@ -921,6 +930,7 @@
 <span class="sd">            conjunction with the fluent APIs like below:</span>
 
 <span class="sd">            .. code-block:: python</span>
+<span class="sd">                :test:</span>
 
 <span class="sd">                import mlflow</span>
 <span class="sd">                from mlflow import MlflowClient</span>
@@ -965,34 +975,39 @@
 <span class="sd">        Example:</span>
 
 <span class="sd">        .. code-block:: python</span>
+<span class="sd">            :test:</span>
 
-<span class="sd">                from mlflow import MlflowClient</span>
+<span class="sd">            from mlflow import MlflowClient</span>
 
-<span class="sd">                client = MlflowClient()</span>
+<span class="sd">            client = MlflowClient()</span>
 
-<span class="sd">                span = client.start_trace(&quot;my_trace&quot;)</span>
+<span class="sd">            span = client.start_trace(&quot;my_trace&quot;)</span>
 
-<span class="sd">                x = 2</span>
+<span class="sd">            x = 2</span>
 
-<span class="sd">                # Create a child span</span>
-<span class="sd">                child_span = client.start_span(</span>
-<span class="sd">                    &quot;child_span&quot;,</span>
-<span class="sd">                    request_id=span.request_id,</span>
-<span class="sd">                    parent_id=span.id,</span>
-<span class="sd">                    inputs={&quot;x&quot;: 2},</span>
-<span class="sd">                )</span>
+<span class="sd">            # Create a child span</span>
+<span class="sd">            child_span = client.start_span(</span>
+<span class="sd">                &quot;child_span&quot;,</span>
+<span class="sd">                request_id=span.request_id,</span>
+<span class="sd">                parent_id=span.span_id,</span>
+<span class="sd">                inputs={&quot;x&quot;: x},</span>
+<span class="sd">            )</span>
 
-<span class="sd">                y = x**2</span>
+<span class="sd">            y = x**2</span>
 
-<span class="sd">                client.end_span(</span>
-<span class="sd">                    request_id=child_span.request_id,</span>
-<span class="sd">                    span_id=child_span.span_id,</span>
-<span class="sd">                    attributes={&quot;factor&quot;: 2},</span>
-<span class="sd">                    outputs={&quot;y&quot;: y},</span>
-<span class="sd">                )</span>
+<span class="sd">            client.end_span(</span>
+<span class="sd">                request_id=child_span.request_id,</span>
+<span class="sd">                span_id=child_span.span_id,</span>
+<span class="sd">                attributes={&quot;factor&quot;: 2},</span>
+<span class="sd">                outputs={&quot;y&quot;: y},</span>
+<span class="sd">            )</span>
 
-<span class="sd">                client.end_trace(request_id)</span>
+<span class="sd">            client.end_trace(span.request_id)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># If parent span is no-op span, the child should also be no-op too</span>
+        <span class="k">if</span> <span class="n">request_id</span> <span class="o">==</span> <span class="n">NO_OP_SPAN_REQUEST_ID</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">NoOpSpan</span><span class="p">()</span>
+
         <span class="k">if</span> <span class="ow">not</span> <span class="n">parent_id</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
                 <span class="s2">&quot;start_span() must be called with an explicit parent_id.&quot;</span>
@@ -1015,7 +1030,7 @@
 
         <span class="k">try</span><span class="p">:</span>
             <span class="n">otel_span</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">tracing</span><span class="o">.</span><span class="n">provider</span><span class="o">.</span><span class="n">start_detached_span</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">parent_span</span><span class="o">.</span><span class="n">_span</span><span class="p">)</span>
-            <span class="n">span</span> <span class="o">=</span> <span class="n">LiveSpan</span><span class="p">(</span><span class="n">otel_span</span><span class="p">,</span> <span class="n">request_id</span><span class="p">,</span> <span class="n">span_type</span><span class="p">)</span>
+            <span class="n">span</span> <span class="o">=</span> <span class="n">create_mlflow_span</span><span class="p">(</span><span class="n">otel_span</span><span class="p">,</span> <span class="n">request_id</span><span class="p">,</span> <span class="n">span_type</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">attributes</span><span class="p">:</span>
                 <span class="n">span</span><span class="o">.</span><span class="n">set_attributes</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">inputs</span><span class="p">:</span>
@@ -1056,6 +1071,9 @@
 <span class="sd">                :py:class:`SpanStatusCode &lt;mlflow.entities.SpanStatusCode&gt;`</span>
 <span class="sd">                e.g. ``&quot;OK&quot;``, ``&quot;ERROR&quot;``. The default status is OK.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">request_id</span> <span class="o">==</span> <span class="n">NO_OP_SPAN_REQUEST_ID</span><span class="p">:</span>
+            <span class="k">return</span>
+
         <span class="n">trace_manager</span> <span class="o">=</span> <span class="n">InMemoryTraceManager</span><span class="o">.</span><span class="n">get_instance</span><span class="p">()</span>
         <span class="n">span</span> <span class="o">=</span> <span class="n">trace_manager</span><span class="o">.</span><span class="n">get_span_from_id</span><span class="p">(</span><span class="n">request_id</span><span class="p">,</span> <span class="n">span_id</span><span class="p">)</span>
 
@@ -1071,7 +1089,14 @@
             <span class="n">span</span><span class="o">.</span><span class="n">set_outputs</span><span class="p">(</span><span class="n">outputs</span><span class="p">)</span>
         <span class="n">span</span><span class="o">.</span><span class="n">set_status</span><span class="p">(</span><span class="n">status</span><span class="p">)</span>
 
-        <span class="n">span</span><span class="o">.</span><span class="n">end</span><span class="p">()</span></div>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">span</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Failed to end span </span><span class="si">{</span><span class="n">span_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">. &quot;</span>
+                <span class="s2">&quot;For full traceback, set logging level to debug.&quot;</span><span class="p">,</span>
+                <span class="n">exc_info</span><span class="o">=</span><span class="n">_logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">),</span>
+            <span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_start_tracked_trace</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -1131,6 +1156,7 @@
 <span class="sd">        ``request_id`` parameter to set a tag on an already ended trace.</span>
 
 <span class="sd">        .. code-block:: python</span>
+<span class="sd">            :test:</span>
 
 <span class="sd">            from mlflow import MlflowClient</span>
 
@@ -1173,6 +1199,7 @@
 <span class="sd">        ``request_id`` parameter to delete a tag on an already ended trace.</span>
 
 <span class="sd">        .. code-block:: python</span>
+<span class="sd">            :test:</span>
 
 <span class="sd">            from mlflow import MlflowClient</span>
 
@@ -2462,7 +2489,7 @@
             <span class="n">image</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">to_pil</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Import PIL and check if the image is a PIL image</span>
-            <span class="kn">import</span> <span class="nn">PIL</span>
+            <span class="kn">import</span> <span class="nn">PIL.Image</span>
 
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">PIL</span><span class="o">.</span><span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>

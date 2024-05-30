@@ -1752,11 +1752,15 @@
 
 <span class="sd">    Returns either `model_code_path` or a temp file path with the contents of the notebook.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># If the path is not a absolute path then convert it</span>
+    <span class="n">model_code_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">model_code_path</span><span class="p">)</span>
+
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">model_code_path</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;If the provided model &#39;</span><span class="si">{</span><span class="n">model_code_path</span><span class="si">}</span><span class="s2">&#39; is a string, it must be a valid python &quot;</span>
-            <span class="s2">&quot;file path or a databricks notebook file path containing the code for defining &quot;</span>
-            <span class="s2">&quot;the chain instance.&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;The provided model path &#39;</span><span class="si">{</span><span class="n">model_code_path</span><span class="si">}</span><span class="s2">&#39; is not a valid Python file path or a &quot;</span>
+            <span class="s2">&quot;Databricks Notebook file path containing the code for defining the chain instance. &quot;</span>
+            <span class="s2">&quot;Ensure the file path is valid and try again.&quot;</span>
         <span class="p">)</span>
 
     <span class="k">try</span><span class="p">:</span>
@@ -1772,9 +1776,9 @@
             <span class="n">decoded_content</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;If the provided model &#39;</span><span class="si">{</span><span class="n">model_code_path</span><span class="si">}</span><span class="s2">&#39; is a string, it must be a valid python &quot;</span>
-                <span class="s2">&quot;file path or a databricks notebook file path containing the code for defining &quot;</span>
-                <span class="s2">&quot;the chain instance.&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;The provided model path &#39;</span><span class="si">{</span><span class="n">model_code_path</span><span class="si">}</span><span class="s2">&#39; is not a valid Python file path or a &quot;</span>
+                <span class="s2">&quot;Databricks Notebook file path containing the code for defining the chain &quot;</span>
+                <span class="s2">&quot;instance. Ensure the file path is valid and try again.&quot;</span>
             <span class="p">)</span>
 
         <span class="n">_validate_model_code_from_notebook</span><span class="p">(</span><span class="n">decoded_content</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
@@ -1812,7 +1816,12 @@
             <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">new_module_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">module</span>
             <span class="n">spec</span><span class="o">.</span><span class="n">loader</span><span class="o">.</span><span class="n">exec_module</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to import model from </span><span class="si">{</span><span class="n">code_path</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to import code code model from </span><span class="si">{</span><span class="n">code_path</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Failed to run user code from </span><span class="si">{</span><span class="n">code_path</span><span class="si">}</span><span class="s2">. &quot;</span>
+                <span class="s2">&quot;Please review the stack trace for more information.&quot;</span>
+            <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
 
     <span class="k">return</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">__mlflow_model__</span>
 </pre></div>

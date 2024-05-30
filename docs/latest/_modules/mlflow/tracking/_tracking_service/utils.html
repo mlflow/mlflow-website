@@ -207,13 +207,14 @@
 <span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Generator</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">from</span> <span class="nn">mlflow.environment_variables</span> <span class="kn">import</span> <span class="n">MLFLOW_TRACKING_URI</span>
 <span class="kn">from</span> <span class="nn">mlflow.store.db.db_types</span> <span class="kn">import</span> <span class="n">DATABASE_ENGINES</span>
 <span class="kn">from</span> <span class="nn">mlflow.store.tracking</span> <span class="kn">import</span> <span class="n">DEFAULT_LOCAL_FILE_AND_ARTIFACT_PATH</span>
 <span class="kn">from</span> <span class="nn">mlflow.store.tracking.file_store</span> <span class="kn">import</span> <span class="n">FileStore</span>
 <span class="kn">from</span> <span class="nn">mlflow.store.tracking.rest_store</span> <span class="kn">import</span> <span class="n">RestStore</span>
+<span class="kn">from</span> <span class="nn">mlflow.tracing.provider</span> <span class="kn">import</span> <span class="n">reset_tracer_setup</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracking._tracking_service.registry</span> <span class="kn">import</span> <span class="n">TrackingStoreRegistry</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.credentials</span> <span class="kn">import</span> <span class="n">get_default_host_creds</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.databricks_utils</span> <span class="kn">import</span> <span class="n">get_databricks_host_creds</span>
@@ -269,11 +270,18 @@
         <span class="c1"># then .resolve() to clean the path</span>
         <span class="n">uri</span> <span class="o">=</span> <span class="n">uri</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">as_uri</span><span class="p">()</span>
     <span class="k">global</span> <span class="n">_tracking_uri</span>
-    <span class="n">_tracking_uri</span> <span class="o">=</span> <span class="n">uri</span></div>
+
+    <span class="k">if</span> <span class="n">_tracking_uri</span> <span class="o">!=</span> <span class="n">uri</span><span class="p">:</span>
+        <span class="n">_tracking_uri</span> <span class="o">=</span> <span class="n">uri</span>
+
+        <span class="c1"># Tracer provider uses tracking URI to determine where to export traces.</span>
+        <span class="c1"># Tracer provider stores the URI as its state so we need to reset</span>
+        <span class="c1"># it explicitly when the global tracking URI changes.</span>
+        <span class="n">reset_tracer_setup</span><span class="p">()</span></div>
 
 
 <span class="nd">@contextmanager</span>
-<span class="k">def</span> <span class="nf">_use_tracking_uri</span><span class="p">(</span><span class="n">uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">_use_tracking_uri</span><span class="p">(</span><span class="n">uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Temporarily use the specified tracking URI.</span>
 
 <span class="sd">    Args:</span>
@@ -283,10 +291,10 @@
     <span class="k">global</span> <span class="n">_tracking_uri</span>
     <span class="n">old_tracking_uri</span> <span class="o">=</span> <span class="n">_tracking_uri</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">_tracking_uri</span> <span class="o">=</span> <span class="n">uri</span>
+        <span class="n">set_tracking_uri</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
         <span class="k">yield</span>
     <span class="k">finally</span><span class="p">:</span>
-        <span class="n">_tracking_uri</span> <span class="o">=</span> <span class="n">old_tracking_uri</span>
+        <span class="n">set_tracking_uri</span><span class="p">(</span><span class="n">old_tracking_uri</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_resolve_tracking_uri</span><span class="p">(</span><span class="n">tracking_uri</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>

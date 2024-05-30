@@ -626,7 +626,7 @@ e.g. <code class="docutils literal notranslate"><span class="pre">&quot;OK&quot;
 
 <dl class="py class">
 <dt id="mlflow.entities.NoOpSpan">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">mlflow.entities.</span></code><code class="sig-name descname"><span class="pre">NoOpSpan</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mlflow/entities/span.html#NoOpSpan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.entities.NoOpSpan" title="Permalink to this definition"> </a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">mlflow.entities.</span></code><code class="sig-name descname"><span class="pre">NoOpSpan</span></code><a class="reference internal" href="../_modules/mlflow/entities/span.html#NoOpSpan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.entities.NoOpSpan" title="Permalink to this definition"> </a></dt>
 <dd><p>No-op implementation of the Span interface.</p>
 <p>This instance should be returned from the mlflow.start_span context manager when span
 creation fails. This class should have exactly the same interface as the Span so that
@@ -669,6 +669,12 @@ user’s setter calls do not raise runtime errors.</p>
 <dt id="mlflow.entities.NoOpSpan.parent_id">
 <em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">parent_id</span></code><a class="headerlink" href="#mlflow.entities.NoOpSpan.parent_id" title="Permalink to this definition"> </a></dt>
 <dd><p>The span ID of the parent span.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mlflow.entities.NoOpSpan.request_id">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">request_id</span></code><a class="headerlink" href="#mlflow.entities.NoOpSpan.request_id" title="Permalink to this definition"> </a></dt>
+<dd><p>No-op span returns a special request ID to distinguish it from the real spans.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1380,6 +1386,11 @@ is ERROR, otherwise it will be ignored.</p></li>
 <dd></dd></dl>
 
 <dl class="py method">
+<dt id="mlflow.entities.Trace.pandas_dataframe_columns">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">pandas_dataframe_columns</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/mlflow/entities/trace.html#Trace.pandas_dataframe_columns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.entities.Trace.pandas_dataframe_columns" title="Permalink to this definition"> </a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt id="mlflow.entities.Trace.to_dict">
 <code class="sig-name descname"><span class="pre">to_dict</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/mlflow/entities/trace.html#Trace.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.entities.Trace.to_dict" title="Permalink to this definition"> </a></dt>
 <dd></dd></dl>
@@ -1450,8 +1461,10 @@ Stored as a JSON string.</p></li>
 <li><p><strong>timestamp_ms</strong> – start time of the trace, in milliseconds.</p></li>
 <li><p><strong>execution_time_ms</strong> – duration of the trace, in milliseconds.</p></li>
 <li><p><strong>status</strong> – status of the trace.</p></li>
-<li><p><strong>request_metadata</strong> – request metadata associated with the trace.</p></li>
-<li><p><strong>tags</strong> – tags associated with the trace.</p></li>
+<li><p><strong>request_metadata</strong> – Key-value pairs associated with the trace. Request metadata are designed
+for immutable values like run ID associated with the trace.</p></li>
+<li><p><strong>tags</strong> – Tags associated with the trace. Tags are designed for mutable values like trace name,
+that can be updated by the users after the trace is created, unlike request_metadata.</p></li>
 </ul>
 </dd>
 </dl>

@@ -221,8 +221,10 @@
 <span class="sd">        timestamp_ms: start time of the trace, in milliseconds.</span>
 <span class="sd">        execution_time_ms: duration of the trace, in milliseconds.</span>
 <span class="sd">        status: status of the trace.</span>
-<span class="sd">        request_metadata: request metadata associated with the trace.</span>
-<span class="sd">        tags: tags associated with the trace.</span>
+<span class="sd">        request_metadata: Key-value pairs associated with the trace. Request metadata are designed</span>
+<span class="sd">            for immutable values like run ID associated with the trace.</span>
+<span class="sd">        tags: Tags associated with the trace. Tags are designed for mutable values like trace name,</span>
+<span class="sd">            that can be updated by the users after the trace is created, unlike request_metadata.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">request_id</span><span class="p">:</span> <span class="nb">str</span>
@@ -245,7 +247,10 @@
         <span class="n">proto</span><span class="o">.</span><span class="n">request_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request_id</span>
         <span class="n">proto</span><span class="o">.</span><span class="n">experiment_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiment_id</span>
         <span class="n">proto</span><span class="o">.</span><span class="n">timestamp_ms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timestamp_ms</span>
-        <span class="n">proto</span><span class="o">.</span><span class="n">execution_time_ms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">execution_time_ms</span>
+        <span class="c1"># NB: Proto setter does not support nullable fields (even with &#39;optional&#39; keyword),</span>
+        <span class="c1"># so we substitute None with 0 for execution_time_ms. This should be not too confusing</span>
+        <span class="c1"># as we only put None when starting a trace i.e. the execution time is actually 0.</span>
+        <span class="n">proto</span><span class="o">.</span><span class="n">execution_time_ms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">execution_time_ms</span> <span class="ow">or</span> <span class="mi">0</span>
         <span class="n">proto</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">to_proto</span><span class="p">()</span>
 
         <span class="n">request_metadata</span> <span class="o">=</span> <span class="p">[]</span>

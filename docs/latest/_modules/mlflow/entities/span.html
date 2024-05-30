@@ -209,6 +209,7 @@
 
 <span class="kn">from</span> <span class="nn">opentelemetry.sdk.trace</span> <span class="kn">import</span> <span class="n">Event</span> <span class="k">as</span> <span class="n">OTelEvent</span>
 <span class="kn">from</span> <span class="nn">opentelemetry.sdk.trace</span> <span class="kn">import</span> <span class="n">ReadableSpan</span> <span class="k">as</span> <span class="n">OTelReadableSpan</span>
+<span class="kn">from</span> <span class="nn">opentelemetry.trace</span> <span class="kn">import</span> <span class="n">NonRecordingSpan</span>
 <span class="kn">from</span> <span class="nn">opentelemetry.trace</span> <span class="kn">import</span> <span class="n">Span</span> <span class="k">as</span> <span class="n">OTelSpan</span>
 
 <span class="kn">from</span> <span class="nn">mlflow.entities.span_event</span> <span class="kn">import</span> <span class="n">SpanEvent</span>
@@ -243,6 +244,31 @@
     <span class="n">EMBEDDING</span> <span class="o">=</span> <span class="s2">&quot;EMBEDDING&quot;</span>
     <span class="n">RERANKER</span> <span class="o">=</span> <span class="s2">&quot;RERANKER&quot;</span>
     <span class="n">UNKNOWN</span> <span class="o">=</span> <span class="s2">&quot;UNKNOWN&quot;</span></div>
+
+
+<span class="k">def</span> <span class="nf">create_mlflow_span</span><span class="p">(</span>
+    <span class="n">otel_span</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">request_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">span_type</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;Span&quot;</span><span class="p">,</span> <span class="s2">&quot;LiveSpan&quot;</span><span class="p">,</span> <span class="s2">&quot;NoOpSpan&quot;</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Factory function to create a span object.</span>
+
+<span class="sd">    When creating a MLflow span object from the OpenTelemetry span, the factory function</span>
+<span class="sd">    should always be used to ensure the correct span object is created.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">otel_span</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">otel_span</span><span class="p">,</span> <span class="n">NonRecordingSpan</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">NoOpSpan</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">otel_span</span><span class="p">,</span> <span class="n">OTelSpan</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">LiveSpan</span><span class="p">(</span><span class="n">otel_span</span><span class="p">,</span> <span class="n">request_id</span><span class="p">,</span> <span class="n">span_type</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">otel_span</span><span class="p">,</span> <span class="n">OTelReadableSpan</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Span</span><span class="p">(</span><span class="n">otel_span</span><span class="p">)</span>
+
+    <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+        <span class="s2">&quot;The `otel_span` argument must be an instance of one of valid &quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;OpenTelemetry span classes, but got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">otel_span</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span>
+        <span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
+    <span class="p">)</span>
 
 
 <div class="viewcode-block" id="Span"><a class="viewcode-back" href="../../../python_api/mlflow.entities.html#mlflow.entities.Span">[docs]</a><span class="k">class</span> <span class="nc">Span</span><span class="p">:</span>
@@ -356,6 +382,12 @@
             <span class="p">)</span>
             <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_span</span><span class="o">.</span><span class="n">events</span>
         <span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">(name=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2">, request_id=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">request_id</span><span class="si">!r}</span><span class="s2">, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;span_id=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">span_id</span><span class="si">!r}</span><span class="s2">, parent_id=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">parent_id</span><span class="si">!r}</span><span class="s2">)&quot;</span>
+        <span class="p">)</span>
 
 <div class="viewcode-block" id="Span.get_attribute"><a class="viewcode-back" href="../../../python_api/mlflow.entities.html#mlflow.entities.Span.get_attribute">[docs]</a>    <span class="k">def</span> <span class="nf">get_attribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -546,7 +578,19 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_span</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
 
 <div class="viewcode-block" id="LiveSpan.from_dict"><a class="viewcode-back" href="../../../python_api/mlflow.entities.html#mlflow.entities.LiveSpan.from_dict">[docs]</a>    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;Span&quot;</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;The `from_dict` method is not supported for the LiveSpan class.&quot;</span><span class="p">)</span></div></div>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;The `from_dict` method is not supported for the LiveSpan class.&quot;</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">to_immutable_span</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Span&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Downcast the live span object to the immutable span.</span>
+
+<span class="sd">        :meta private:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># All state of the live span is already persisted in the OpenTelemetry span object.</span>
+        <span class="k">return</span> <span class="n">Span</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_span</span><span class="p">)</span></div>
+
+
+<span class="n">NO_OP_SPAN_REQUEST_ID</span> <span class="o">=</span> <span class="s2">&quot;MLFLOW_NO_OP_SPAN_REQUEST_ID&quot;</span>
 
 
 <div class="viewcode-block" id="NoOpSpan"><a class="viewcode-back" href="../../../python_api/mlflow.entities.html#mlflow.entities.NoOpSpan">[docs]</a><span class="k">class</span> <span class="nc">NoOpSpan</span><span class="p">(</span><span class="n">Span</span><span class="p">):</span>
@@ -568,8 +612,16 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_span</span> <span class="o">=</span> <span class="n">NonRecordingSpan</span><span class="p">(</span><span class="n">context</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">request_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        No-op span returns a special request ID to distinguish it from the real spans.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">NO_OP_SPAN_REQUEST_ID</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">span_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

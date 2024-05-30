@@ -225,6 +225,7 @@
 <span class="kn">from</span> <span class="nn">mlflow.protos.databricks_pb2</span> <span class="kn">import</span> <span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span> <span class="n">RESOURCE_DOES_NOT_EXIST</span>
 <span class="kn">from</span> <span class="nn">mlflow.store.artifact.models_artifact_repo</span> <span class="kn">import</span> <span class="n">ModelsArtifactRepository</span>
 <span class="kn">from</span> <span class="nn">mlflow.store.artifact.runs_artifact_repo</span> <span class="kn">import</span> <span class="n">RunsArtifactRepository</span>
+<span class="kn">from</span> <span class="nn">mlflow.tracing.provider</span> <span class="kn">import</span> <span class="n">trace_disabled</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracking.artifact_utils</span> <span class="kn">import</span> <span class="n">_download_artifact_from_uri</span><span class="p">,</span> <span class="n">_upload_artifact_to_uri</span>
 <span class="kn">from</span> <span class="nn">mlflow.types.schema</span> <span class="kn">import</span> <span class="n">ParamSchema</span><span class="p">,</span> <span class="n">Schema</span><span class="p">,</span> <span class="n">convert_dataclass_to_schema</span>
 <span class="kn">from</span> <span class="nn">mlflow.types.utils</span> <span class="kn">import</span> <span class="n">_infer_param_schema</span><span class="p">,</span> <span class="n">_infer_schema</span><span class="p">,</span> <span class="n">_infer_schema_from_type_hint</span>
@@ -554,7 +555,7 @@
 
 
 <span class="k">def</span> <span class="nf">_infer_signature_from_input_example</span><span class="p">(</span>
-    <span class="n">input_example</span><span class="p">:</span> <span class="n">ModelInputExample</span><span class="p">,</span> <span class="n">wrapped_model</span><span class="p">,</span> <span class="n">return_prediction</span><span class="o">=</span><span class="kc">False</span>
+    <span class="n">input_example</span><span class="p">:</span> <span class="n">ModelInputExample</span><span class="p">,</span> <span class="n">wrapped_model</span><span class="p">,</span> <span class="n">return_prediction</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">no_conversion</span><span class="o">=</span><span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ModelSignature</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Infer the signature from an example input and a PyFunc wrapped model. Catches all exceptions.</span>
@@ -573,12 +574,15 @@
             <span class="n">input_example</span><span class="p">,</span> <span class="n">params</span> <span class="o">=</span> <span class="n">input_example</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">params</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">example</span> <span class="o">=</span> <span class="n">_Example</span><span class="p">(</span><span class="n">input_example</span><span class="p">)</span>
-        <span class="c1"># Copy the input example so that it is not mutated by predict()</span>
-        <span class="n">input_example</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">example</span><span class="o">.</span><span class="n">inference_data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">no_conversion</span><span class="p">:</span>
+            <span class="n">example</span> <span class="o">=</span> <span class="n">_Example</span><span class="p">(</span><span class="n">input_example</span><span class="p">)</span>
+            <span class="c1"># Copy the input example so that it is not mutated by predict()</span>
+            <span class="n">input_example</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">example</span><span class="o">.</span><span class="n">inference_data</span><span class="p">)</span>
         <span class="n">input_schema</span> <span class="o">=</span> <span class="n">_infer_schema</span><span class="p">(</span><span class="n">input_example</span><span class="p">)</span>
         <span class="n">params_schema</span> <span class="o">=</span> <span class="n">_infer_param_schema</span><span class="p">(</span><span class="n">params</span><span class="p">)</span> <span class="k">if</span> <span class="n">params</span> <span class="k">else</span> <span class="kc">None</span>
-        <span class="n">prediction</span> <span class="o">=</span> <span class="n">wrapped_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">input_example</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+        <span class="c1"># Avoid rendering traces when inferring the signature</span>
+        <span class="k">with</span> <span class="n">trace_disabled</span><span class="p">():</span>
+            <span class="n">prediction</span> <span class="o">=</span> <span class="n">wrapped_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">input_example</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
         <span class="c1"># For column-based inputs, 1D numpy arrays likely signify row-based predictions. Thus, we</span>
         <span class="c1"># convert them to a Pandas series for inferring as a single ColSpec Schema.</span>
         <span class="k">if</span> <span class="p">(</span>
