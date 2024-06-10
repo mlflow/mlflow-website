@@ -709,6 +709,13 @@ export default function Home(): JSX.Element {
                       img: "img/learning/mlflow_16_9.png",
                     },
                     {
+                      title: "MLflow Tracing",
+                      content:
+                        "Add instrumentation to your GenAI applications and store the instrumented trace data directly within MLflow Tracking.",
+                      href: "docs/latest/llms/tracing/index.html",
+                      img: "img/learning/mlflow_16_9.png",
+                    },
+                    {
                       title: "MLflow Tracking Quickstart",
                       content:
                         "A great place to start to learn the fundamentals of MLflow Tracking! Learn in 5 minutes how to log, register, and load a model for inference.",
