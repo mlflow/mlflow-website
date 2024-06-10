@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mlflow.types.llm &mdash; MLflow 2.13.1.dev0 documentation</title>
+  <title>mlflow.types.llm &mdash; MLflow 2.13.3.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -56,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="MLflow 2.13.1.dev0 documentation" href="../../../index.html"/>
+    <link rel="top" title="MLflow 2.13.3.dev0 documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
   
@@ -87,7 +87,7 @@
     <a href="../../../index.html" class="wy-nav-top-logo"
       ><img src="../../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.13.1.dev0</span>
+    <span class="version">2.13.3.dev0</span>
   </li>
 </ul>
   </nav>
@@ -237,8 +237,12 @@
             <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">` must be a list, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">values</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_convert_dataclass_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="bp">cls</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_convert_dataclass_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="n">values</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">values</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">required</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">` is required&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">` must be a list&quot;</span><span class="p">)</span>
 
@@ -338,20 +342,97 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__post_init__</span><span class="p">()</span></div>
 
 
+<div class="viewcode-block" id="TopTokenLogProb"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.llm.TopTokenLogProb">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">TopTokenLogProb</span><span class="p">(</span><span class="n">_BaseDataclass</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Token and its log probability.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        token: The token.</span>
+<span class="sd">        logprob: The log probability of this token, if it is within the top</span>
+<span class="sd">            20 most likely tokens. Otherwise, the value -9999.0 is used to</span>
+<span class="sd">            signify that the token is very unlikely.</span>
+<span class="sd">        bytes: A list of integers representing the UTF-8 bytes representation</span>
+<span class="sd">            of the token. Useful in instances where characters are represented</span>
+<span class="sd">            by multiple tokens and their byte representations must be combined</span>
+<span class="sd">            to generate the correct text representation. Can be null if there</span>
+<span class="sd">            is no bytes representation for the token.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">token</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">logprob</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="nb">bytes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;token&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;logprob&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_list</span><span class="p">(</span><span class="s2">&quot;bytes&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TokenLogProb"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.llm.TokenLogProb">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">TokenLogProb</span><span class="p">(</span><span class="n">_BaseDataclass</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Message content token with log probability information.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        token: The token.</span>
+<span class="sd">        logprob: The log probability of this token, if it is within the top</span>
+<span class="sd">            20 most likely tokens. Otherwise, the value -9999.0 is used to</span>
+<span class="sd">            signify that the token is very unlikely.</span>
+<span class="sd">        bytes: A list of integers representing the UTF-8 bytes representation</span>
+<span class="sd">            of the token. Useful in instances where characters are represented</span>
+<span class="sd">            by multiple tokens and their byte representations must be combined</span>
+<span class="sd">            to generate the correct text representation. Can be null if there</span>
+<span class="sd">            is no bytes representation for the token.</span>
+<span class="sd">        top_logprobs: List of the most likely tokens and their log probability,</span>
+<span class="sd">            at this token position. In rare cases, there may be fewer than the</span>
+<span class="sd">            number of requested top_logprobs returned.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">token</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">logprob</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">top_logprobs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">TopTokenLogProb</span><span class="p">]</span>
+    <span class="nb">bytes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;token&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;logprob&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_convert_dataclass_list</span><span class="p">(</span><span class="s2">&quot;top_logprobs&quot;</span><span class="p">,</span> <span class="n">TopTokenLogProb</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_list</span><span class="p">(</span><span class="s2">&quot;bytes&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ChatChoiceLogProbs"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.llm.ChatChoiceLogProbs">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">ChatChoiceLogProbs</span><span class="p">(</span><span class="n">_BaseDataclass</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Log probability information for the choice.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        content: A list of message content tokens with log probability information.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">content</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">TokenLogProb</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_convert_dataclass_list</span><span class="p">(</span><span class="s2">&quot;content&quot;</span><span class="p">,</span> <span class="n">TokenLogProb</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="ChatChoice"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.llm.ChatChoice">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">ChatChoice</span><span class="p">(</span><span class="n">_BaseDataclass</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A single chat response generated by the model.</span>
+<span class="sd">    ref: https://platform.openai.com/docs/api-reference/chat/object</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        index (int): The index of the response in the list of responses.</span>
 <span class="sd">        message (:py:class:`ChatMessage`): The message that was generated.</span>
 <span class="sd">        finish_reason (str): The reason why generation stopped.</span>
+<span class="sd">        logprobs (:py:class:`ChatChoiceLogProbs`): Log probability information for the choice.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">index</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">message</span><span class="p">:</span> <span class="n">ChatMessage</span>
     <span class="n">finish_reason</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">logprobs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ChatChoiceLogProbs</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
@@ -361,6 +442,12 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">,</span> <span class="n">ChatMessage</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Expected `message` to be of type ChatMessage or dict, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logprobs</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logprobs</span> <span class="o">=</span> <span class="n">ChatChoiceLogProbs</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">logprobs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logprobs</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logprobs</span><span class="p">,</span> <span class="n">ChatChoiceLogProbs</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Expected `logprobs` to be of type LogProbs or dict, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logprobs</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span></div>
 
 
@@ -603,7 +690,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../../',
-      VERSION:'2.13.1.dev0',
+      VERSION:'2.13.3.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

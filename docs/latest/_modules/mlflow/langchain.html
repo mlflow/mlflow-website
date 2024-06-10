@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mlflow.langchain &mdash; MLflow 2.13.1.dev0 documentation</title>
+  <title>mlflow.langchain &mdash; MLflow 2.13.3.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -56,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="MLflow 2.13.1.dev0 documentation" href="../../index.html"/>
+    <link rel="top" title="MLflow 2.13.3.dev0 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
@@ -87,7 +87,7 @@
     <a href="../../index.html" class="wy-nav-top-logo"
       ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.13.1.dev0</span>
+    <span class="version">2.13.3.dev0</span>
   </li>
 </ul>
   </nav>
@@ -221,6 +221,7 @@
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
@@ -231,7 +232,7 @@
 
 <span class="kn">import</span> <span class="nn">mlflow</span>
 <span class="kn">from</span> <span class="nn">mlflow</span> <span class="kn">import</span> <span class="n">pyfunc</span>
-<span class="kn">from</span> <span class="nn">mlflow.environment_variables</span> <span class="kn">import</span> <span class="n">_MLFLOW_TESTING</span><span class="p">,</span> <span class="n">MLFLOW_ENABLE_TRACE_IN_SERVING</span>
+<span class="kn">from</span> <span class="nn">mlflow.environment_variables</span> <span class="kn">import</span> <span class="n">_MLFLOW_TESTING</span>
 <span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
 <span class="kn">from</span> <span class="nn">mlflow.langchain._langchain_autolog</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">_update_langchain_model_config</span><span class="p">,</span>
@@ -266,6 +267,7 @@
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.pyfunc</span> <span class="kn">import</span> <span class="n">FLAVOR_NAME</span> <span class="k">as</span> <span class="n">PYFUNC_FLAVOR_NAME</span>
 <span class="kn">from</span> <span class="nn">mlflow.pyfunc.context</span> <span class="kn">import</span> <span class="n">get_prediction_context</span>
+<span class="kn">from</span> <span class="nn">mlflow.tracing.provider</span> <span class="kn">import</span> <span class="n">trace_disabled</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracking._model_registry</span> <span class="kn">import</span> <span class="n">DEFAULT_AWAIT_MAX_SLEEP_SECONDS</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracking.artifact_utils</span> <span class="kn">import</span> <span class="n">_download_artifact_from_uri</span>
 <span class="kn">from</span> <span class="nn">mlflow.types.schema</span> <span class="kn">import</span> <span class="n">ColSpec</span><span class="p">,</span> <span class="n">DataType</span><span class="p">,</span> <span class="n">Schema</span>
@@ -349,6 +351,7 @@
 
 <div class="viewcode-block" id="save_model"><a class="viewcode-back" href="../../python_api/mlflow.langchain.html#mlflow.langchain.save_model">[docs]</a><span class="nd">@experimental</span>
 <span class="nd">@format_docstring</span><span class="p">(</span><span class="n">LOG_MODEL_PARAM_DOCS</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">package_name</span><span class="o">=</span><span class="n">FLAVOR_NAME</span><span class="p">))</span>
+<span class="nd">@trace_disabled</span>  <span class="c1"># Suppress traces for internal predict calls while saving model</span>
 <span class="k">def</span> <span class="nf">save_model</span><span class="p">(</span>
     <span class="n">lc_model</span><span class="p">,</span>
     <span class="n">path</span><span class="p">,</span>
@@ -469,30 +472,31 @@
 <span class="sd">            True, the model must implement `stream` method. If None, streamable is</span>
 <span class="sd">            set to True if the model implements `stream` method. Default to `None`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">langchain</span>
-    <span class="kn">from</span> <span class="nn">langchain.schema</span> <span class="kn">import</span> <span class="n">BaseRetriever</span>
+    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">temp_dir</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">langchain</span>
+        <span class="kn">from</span> <span class="nn">langchain.schema</span> <span class="kn">import</span> <span class="n">BaseRetriever</span>
 
-    <span class="n">lc_model_or_path</span> <span class="o">=</span> <span class="n">_validate_and_prepare_lc_model_or_path</span><span class="p">(</span><span class="n">lc_model</span><span class="p">,</span> <span class="n">loader_fn</span><span class="p">)</span>
+        <span class="n">lc_model_or_path</span> <span class="o">=</span> <span class="n">_validate_and_prepare_lc_model_or_path</span><span class="p">(</span><span class="n">lc_model</span><span class="p">,</span> <span class="n">loader_fn</span><span class="p">,</span> <span class="n">temp_dir</span><span class="p">)</span>
 
-    <span class="n">_validate_env_arguments</span><span class="p">(</span><span class="n">conda_env</span><span class="p">,</span> <span class="n">pip_requirements</span><span class="p">,</span> <span class="n">extra_pip_requirements</span><span class="p">)</span>
+        <span class="n">_validate_env_arguments</span><span class="p">(</span><span class="n">conda_env</span><span class="p">,</span> <span class="n">pip_requirements</span><span class="p">,</span> <span class="n">extra_pip_requirements</span><span class="p">)</span>
 
-    <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-    <span class="n">_validate_and_prepare_target_save_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">_validate_and_prepare_target_save_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_config</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="n">model_config</span> <span class="o">=</span> <span class="n">_validate_and_get_model_config_from_file</span><span class="p">(</span><span class="n">model_config</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_config</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">model_config</span> <span class="o">=</span> <span class="n">_validate_and_get_model_config_from_file</span><span class="p">(</span><span class="n">model_config</span><span class="p">)</span>
 
-    <span class="n">model_code_path</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lc_model_or_path</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="c1"># The LangChain model is defined as Python code located in the file at the path</span>
-        <span class="c1"># specified by `lc_model`. Verify that the path exists and, if so, copy it to the</span>
-        <span class="c1"># model directory along with any other specified code modules</span>
-        <span class="n">model_code_path</span> <span class="o">=</span> <span class="n">lc_model_or_path</span>
+        <span class="n">model_code_path</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lc_model_or_path</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="c1"># The LangChain model is defined as Python code located in the file at the path</span>
+            <span class="c1"># specified by `lc_model`. Verify that the path exists and, if so, copy it to the</span>
+            <span class="c1"># model directory along with any other specified code modules</span>
+            <span class="n">model_code_path</span> <span class="o">=</span> <span class="n">lc_model_or_path</span>
 
-        <span class="n">lc_model</span> <span class="o">=</span> <span class="n">_load_model_code_path</span><span class="p">(</span><span class="n">model_code_path</span><span class="p">,</span> <span class="n">model_config</span><span class="p">)</span>
-        <span class="n">_validate_and_copy_file_to_directory</span><span class="p">(</span><span class="n">model_code_path</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="s2">&quot;code&quot;</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">lc_model</span> <span class="o">=</span> <span class="n">lc_model_or_path</span>
+            <span class="n">lc_model</span> <span class="o">=</span> <span class="n">_load_model_code_path</span><span class="p">(</span><span class="n">model_code_path</span><span class="p">,</span> <span class="n">model_config</span><span class="p">)</span>
+            <span class="n">_validate_and_copy_file_to_directory</span><span class="p">(</span><span class="n">model_code_path</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="s2">&quot;code&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lc_model</span> <span class="o">=</span> <span class="n">lc_model_or_path</span>
 
     <span class="n">code_dir_subpath</span> <span class="o">=</span> <span class="n">_validate_and_copy_code_paths</span><span class="p">(</span><span class="n">code_paths</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
 
@@ -618,6 +622,7 @@
 
 <div class="viewcode-block" id="log_model"><a class="viewcode-back" href="../../python_api/mlflow.langchain.html#mlflow.langchain.log_model">[docs]</a><span class="nd">@experimental</span>
 <span class="nd">@format_docstring</span><span class="p">(</span><span class="n">LOG_MODEL_PARAM_DOCS</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">package_name</span><span class="o">=</span><span class="n">FLAVOR_NAME</span><span class="p">))</span>
+<span class="nd">@trace_disabled</span>  <span class="c1"># Suppress traces for internal predict calls while logging model</span>
 <span class="k">def</span> <span class="nf">log_model</span><span class="p">(</span>
     <span class="n">lc_model</span><span class="p">,</span>
     <span class="n">artifact_path</span><span class="p">,</span>
@@ -755,13 +760,11 @@
 <span class="sd">        A :py:class:`ModelInfo &lt;mlflow.models.model.ModelInfo&gt;` instance that contains the</span>
 <span class="sd">        metadata of the logged model.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">lc_model_or_path</span> <span class="o">=</span> <span class="n">_validate_and_prepare_lc_model_or_path</span><span class="p">(</span><span class="n">lc_model</span><span class="p">,</span> <span class="n">loader_fn</span><span class="p">)</span>
-
     <span class="k">return</span> <span class="n">Model</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
         <span class="n">artifact_path</span><span class="o">=</span><span class="n">artifact_path</span><span class="p">,</span>
         <span class="n">flavor</span><span class="o">=</span><span class="n">mlflow</span><span class="o">.</span><span class="n">langchain</span><span class="p">,</span>
         <span class="n">registered_model_name</span><span class="o">=</span><span class="n">registered_model_name</span><span class="p">,</span>
-        <span class="n">lc_model</span><span class="o">=</span><span class="n">lc_model_or_path</span><span class="p">,</span>
+        <span class="n">lc_model</span><span class="o">=</span><span class="n">lc_model</span><span class="p">,</span>
         <span class="n">conda_env</span><span class="o">=</span><span class="n">conda_env</span><span class="p">,</span>
         <span class="n">code_paths</span><span class="o">=</span><span class="n">code_paths</span><span class="p">,</span>
         <span class="n">signature</span><span class="o">=</span><span class="n">signature</span><span class="p">,</span>
@@ -843,7 +846,12 @@
         <span class="c1"># Inference Table in Databricks model serving).</span>
         <span class="k">if</span> <span class="p">(</span>
             <span class="n">is_in_databricks_model_serving_environment</span><span class="p">()</span>
-            <span class="ow">and</span> <span class="n">MLFLOW_ENABLE_TRACE_IN_SERVING</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+            <span class="c1"># TODO: This env var was once used for controlling whether or not to inject the</span>
+            <span class="c1">#   tracer in Databricks model serving. However, now we have the new env var</span>
+            <span class="c1">#   `ENABLE_MLFLOW_TRACING` to control that. We don&#39;t remove this condition</span>
+            <span class="c1">#   right now in the interest of caution, but we should remove this condition</span>
+            <span class="c1">#   after making sure that the functionality is stable.</span>
+            <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;MLFLOW_ENABLE_TRACE_IN_SERVING&quot;</span><span class="p">,</span> <span class="s2">&quot;false&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;true&quot;</span>
             <span class="c1"># if this is False, tracing is disabled and we shouldn&#39;t inject the tracer</span>
             <span class="ow">and</span> <span class="n">is_mlflow_tracing_enabled_in_model_serving</span><span class="p">()</span>
         <span class="p">):</span>
@@ -1124,6 +1132,7 @@
 
 
 <div class="viewcode-block" id="load_model"><a class="viewcode-back" href="../../python_api/mlflow.langchain.html#mlflow.langchain.load_model">[docs]</a><span class="nd">@experimental</span>
+<span class="nd">@trace_disabled</span>  <span class="c1"># Suppress traces while loading model</span>
 <span class="k">def</span> <span class="nf">load_model</span><span class="p">(</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">dst_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Load a LangChain model from a local file or a run.</span>
@@ -1193,11 +1202,7 @@
     <span class="n">log_model_signatures</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">log_models</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">log_datasets</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="c1"># TODO: log_inputs_outputs was originally defaulted to True in the production version of</span>
-    <span class="c1"># the LangChain autologging, as it is a common use case to log input/output table for</span>
-    <span class="c1"># evaluation. Once tracing is fully launched, this should be supported by the tracer</span>
-    <span class="c1"># but we should design it to be compatible with the existing UJ.</span>
-    <span class="n">log_inputs_outputs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">log_inputs_outputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">disable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">exclusive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">disable_for_unsupported_versions</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -1205,6 +1210,7 @@
     <span class="n">registered_model_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">extra_tags</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">extra_model_classes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">log_traces</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Enables (or disables) and configures autologging from Langchain to MLflow.</span>
@@ -1228,7 +1234,11 @@
 <span class="sd">            are also omitted when ``log_models`` is ``False``.</span>
 <span class="sd">        log_datasets: If ``True``, dataset information is logged to MLflow Tracking</span>
 <span class="sd">            if applicable. If ``False``, dataset information is not logged.</span>
-<span class="sd">        log_inputs_outputs: If ``True``, inference data and results are combined into a single</span>
+<span class="sd">        log_inputs_outputs: **Deprecated** The legacy parameter used for logging inference</span>
+<span class="sd">            inputs and outputs. This argument will be removed in a future version of MLflow.</span>
+<span class="sd">            The alternative is to use ``log_traces`` which logs traces for Langchain models,</span>
+<span class="sd">            including inputs and outputs for each stage.</span>
+<span class="sd">            If ``True``, inference data and results are combined into a single</span>
 <span class="sd">            pandas DataFrame and logged to MLflow Tracking as an artifact.</span>
 <span class="sd">            If ``False``, inference data and results are not logged.</span>
 <span class="sd">            Default to ``False``.</span>
@@ -1251,6 +1261,9 @@
 <span class="sd">            We do not guarantee classes specified in this list can be logged as a model, but tracing</span>
 <span class="sd">            will be supported. Note that all classes within the list must be subclasses of Runnable,</span>
 <span class="sd">            and we only patch `invoke`, `batch`, and `stream` methods for tracing.</span>
+<span class="sd">        log_traces: If ``True``, traces are logged for Langchain models by using</span>
+<span class="sd">            MlflowLangchainTracer as a callback during inference. If ``False``, no traces are</span>
+<span class="sd">            collected during inference. Default to ``True``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">with</span> <span class="n">contextlib</span><span class="o">.</span><span class="n">suppress</span><span class="p">(</span><span class="ne">ImportError</span><span class="p">):</span>
         <span class="kn">import</span> <span class="nn">langchain</span>
@@ -1336,7 +1349,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../',
-      VERSION:'2.13.1.dev0',
+      VERSION:'2.13.3.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

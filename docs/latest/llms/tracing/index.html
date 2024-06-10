@@ -1,0 +1,981 @@
+
+  
+
+<!DOCTYPE html>
+<!-- source: docs/source/llms/tracing/index.rst -->
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Tracing in MLflow &mdash; MLflow 2.13.3.dev0 documentation</title>
+  
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/llms/tracing/index.html">
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    
+
+    
+
+  
+    
+        <!-- Google Tag Manager -->
+        <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer',"GTM-N6WMTTJ");</script>
+        <!-- End Google Tag Manager -->
+    
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/grids.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/mobile.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/simple-cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/tabs.css" type="text/css" />
+    
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="MLflow 2.13.3.dev0 documentation" href="../../index.html"/>
+        <link rel="up" title="LLMs" href="../index.html"/>
+        <link rel="next" title="Tracing Concepts" href="/overview.html"/>
+        <link rel="prev" title="LLMs" href="/../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+<script type="text/javascript" src="../../_static/jquery.js"></script>
+<script type="text/javascript" src="../../_static/underscore.js"></script>
+<script type="text/javascript" src="../../_static/doctools.js"></script>
+<script type="text/javascript" src="../../_static/languagesections.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+
+<body class="wy-body-for-nav" role="document">
+  
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N6WMTTJ"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+  
+
+  
+  <nav class="wy-nav-top header" role="navigation" aria-label="top navigation">
+    <ul>
+  <li class="menu-toggle">
+    <i data-toggle="wy-nav-top" class="wy-nav-top-menu-button db-icon db-icon-menu pull-left"></i>
+    <a href="../../index.html" class="wy-nav-top-logo"
+      ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
+    /></a>
+    <span class="version">2.13.3.dev0</span>
+  </li>
+</ul>
+  </nav>
+  <page>
+    
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side relative">
+      <div class="wy-side-scroll">
+  <div class="wy-side-nav-search">
+    
+
+    
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+    
+  </div>
+
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+    
+      <a href="../../index.html" class="main-navigation-home"><img src="../../_static/icons/nav-home.svg"> MLflow</a>
+    
+
+    
+      
+
+      
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../introduction/index.html">What is MLflow?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started/index.html">Getting Started with MLflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../new-features/index.html">New Features</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">LLMs</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#id1">MLflow Tracing</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Tracing in MLflow</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#langchain-automatic-tracing">LangChain Automatic Tracing</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tracing-fluent-apis">Tracing Fluent APIs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tracing-client-apis">Tracing Client APIs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#searching-and-retrieving-traces">Searching and Retrieving Traces</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#managing-trace-data">Managing Trace Data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#faq">FAQ</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="overview.html">Tracing Concepts</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#id2">MLflow Deployments Server for LLMs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#id3">LLM Evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#id4">Prompt Engineering UI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#native-mlflow-flavors-for-llms">Native MLflow Flavors for LLMs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#id5">LLM Tracking in MLflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#tutorials-and-use-case-guides-for-llms-in-mlflow">Tutorials and Use Case Guides for LLMs in MLflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../model-evaluation/index.html">Model Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../deep-learning/index.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../traditional-ml/index.html">Traditional ML</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../deployment/index.html">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tracking.html">MLflow Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../system-metrics/index.html">System Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../projects.html">MLflow Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../models.html">MLflow Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../model-registry.html">MLflow Model Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../recipes.html">MLflow Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plugins.html">MLflow Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auth/index.html">MLflow Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../search-runs.html">Search Runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../search-experiments.html">Search Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../python_api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../R-api.html">R API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../java_api/index.html">Java API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rest-api.html">REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../docker.html">Official MLflow Docker Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../community-model-flavors.html">Community Model Flavors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials-and-examples/index.html">Tutorials and Examples</a></li>
+</ul>
+
+      
+    
+  </div>
+
+  <div role="contentinfo">
+    
+
+    <p>
+      <a id='feedbacklink' href="https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a>
+    </p>
+  </div>
+</div>
+    </nav>
+
+    <main class="wy-grid-for-nav">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+          <div class="rst-content">
+            
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Documentation</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../index.html">LLMs</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+    
+      <li>Tracing in MLflow</li>
+    
+    
+    <!-- <li class="wy-breadcrumbs-aside">
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/llms/tracing/index.rst" class="fa fa-github"> Edit on GitHub</a>
+    </li> -->
+    
+  </ul>
+</div>
+            <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <div itemprop="articleBody">
+                
+  <div class="section" id="tracing-in-mlflow">
+<h1>Tracing in MLflow<a class="headerlink" href="#tracing-in-mlflow" title="Permalink to this headline"> </a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>MLflow Tracing is currently in <strong>Experimental Status</strong> and is subject to change without deprecation warning or notification.</p>
+</div>
+<p>MLflow offers a number of different options to enable tracing of your GenAI applications.</p>
+<ul class="simple">
+<li><p><strong>Automated tracing with LangChain</strong>: MLflow provides a fully automated integration with LangChain that can activate by simply enabling <code class="docutils literal notranslate"><span class="pre">mlflow.langchain.autolog()</span></code>.</p></li>
+<li><p><strong>Manual trace instrumentation with high-level fluent APIs</strong>: Decorators, function wrappers and context managers via the fluent API allow you to add tracing functionality with minor code modifications.</p></li>
+<li><p><strong>Low-level client APIs for tracing</strong>: The MLflow client API provides a thread-safe way to handle trace implementations, even in aysnchronous modes of operation.</p></li>
+</ul>
+<p>To learn more about what tracing is, see our <a class="reference external" href="./overview.html">Tracing Concepts Overview</a> guide.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>MLflow Tracing support is available for <strong>early access</strong> with the <strong>MLflow 2.14.0rc0</strong> release candidate build. Versions of MLflow prior to this release
+do not contain the full set of features that are required for trace logging support.</p>
+<p>Release candidates can be installed via PyPI via the following syntax, which will fetch the latest release candidate build
+for a given release version:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>--pre<span class="w"> </span><span class="nv">mlflow</span><span class="o">==</span><span class="m">2</span>.14.0rc*
+</pre></div>
+</div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If you are using MLflow tracing from within Databricks, MLflow <strong>2.13.2 and above</strong> contain the required dependencies to utilize tracing functionality
+within Databricks. Additionally, it is not recommended to install release candidates of MLflow on Databricks except for compatibility testing.
+Other Databricks service integrations with MLflow may not function correctly if you do install an RC build of MLflow.</p>
+</div>
+<div class="section" id="langchain-automatic-tracing">
+<h2>LangChain Automatic Tracing<a class="headerlink" href="#langchain-automatic-tracing" title="Permalink to this headline"> </a></h2>
+<p>The easiest way to get started with MLflow Tracing is to leverage the built-in capabilities with MLflow’s LangChain integration. As part of the
+<a class="reference internal" href="../../python_api/mlflow.langchain.html#mlflow.langchain.autolog" title="mlflow.langchain.autolog"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.langchain.autolog()</span></code></a> integration, traces are logged to the active MLflow Experiment when calling invocation APIs on chains.</p>
+<p>In the example below, the model and its associated metadata will be logged as a run, while the traces are logged separately to the active experiment.</p>
+<p>Running the code below will automatically log the traces associated with the simple chain that is being interacted with.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This example has been confirmed working with the following requirement versions:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="nv">openai</span><span class="o">==</span><span class="m">1</span>.30.5<span class="w"> </span><span class="nv">langchain</span><span class="o">==</span><span class="m">0</span>.2.1<span class="w"> </span>langchain-openai<span class="o">==</span><span class="m">0</span>.1.8<span class="w"> </span>langchain-community<span class="o">==</span><span class="m">0</span>.2.1<span class="w"> </span><span class="nv">mlflow</span><span class="o">==</span><span class="m">2</span>.14.0<span class="w"> </span><span class="nv">tiktoken</span><span class="o">==</span><span class="m">0</span>.7.0
+</pre></div>
+</div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">langchain.prompts</span> <span class="kn">import</span> <span class="n">PromptTemplate</span>
+<span class="kn">from</span> <span class="nn">langchain_openai</span> <span class="kn">import</span> <span class="n">OpenAI</span>
+
+<span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="k">assert</span> <span class="p">(</span>
+    <span class="s2">&quot;OPENAI_API_KEY&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span>
+<span class="p">),</span> <span class="s2">&quot;Please set your OPENAI_API_KEY environment variable.&quot;</span>
+
+<span class="c1"># Using a local MLflow tracking server</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_tracking_uri</span><span class="p">(</span><span class="s2">&quot;http://localhost:5000&quot;</span><span class="p">)</span>
+
+<span class="c1"># Create a new experiment that the model and the traces will be logged to</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s2">&quot;LangChain Tracing&quot;</span><span class="p">)</span>
+
+<span class="c1"># Enable LangChain autologging</span>
+<span class="c1"># Note that models and examples are not required to be logged in order to log traces.</span>
+<span class="c1"># Simply enabling autolog for LangChain via mlflow.langchain.autolog() will enable trace logging.</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">langchain</span><span class="o">.</span><span class="n">autolog</span><span class="p">(</span><span class="n">log_models</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">log_input_examples</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">llm</span> <span class="o">=</span> <span class="n">OpenAI</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">max_tokens</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+
+<span class="n">prompt_template</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;Imagine that you are </span><span class="si">{person}</span><span class="s2">, and you are embodying their manner of answering questions posed to them. &quot;</span>
+    <span class="s2">&quot;While answering, attempt to mirror their conversational style, their wit, and the habits of their speech &quot;</span>
+    <span class="s2">&quot;and prose. You will emulate them as best that you can, attempting to distill their quirks, personality, &quot;</span>
+    <span class="s2">&quot;and habits of engagement to the best of your ability. Feel free to fully embrace their personality, whether &quot;</span>
+    <span class="s2">&quot;aspects of it are not guaranteed to be productive or entirely constructive or inoffensive.&quot;</span>
+    <span class="s2">&quot;The question you are asked, to which you will reply as that person, is: </span><span class="si">{question}</span><span class="s2">&quot;</span>
+<span class="p">)</span>
+
+<span class="n">chain</span> <span class="o">=</span> <span class="n">prompt_template</span> <span class="o">|</span> <span class="n">llm</span>
+
+<span class="c1"># Test the chain</span>
+<span class="n">chain</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;person&quot;</span><span class="p">:</span> <span class="s2">&quot;Richard Feynman&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;question&quot;</span><span class="p">:</span> <span class="s2">&quot;Why should we colonize Mars instead of Venus?&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+
+<span class="c1"># Let&#39;s test another call</span>
+<span class="n">chain</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;person&quot;</span><span class="p">:</span> <span class="s2">&quot;Linus Torvalds&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;question&quot;</span><span class="p">:</span> <span class="s2">&quot;Can I just set everyone&#39;s access to sudo to make things easier?&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>If we navigate to the MLflow UI, we can see not only the model that has been auto-logged, but the traces as well, as shown in the below video:</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="../../_images/langchain-tracing.gif"><img alt="LangChain Tracing via autolog" src="../../_images/langchain-tracing.gif" style="width: 100%;" /></a>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The example above is purposely simple (a simple chat completions demonstration) for purposes of brevity. In real-world scenarios involving complex
+RAG chains, the trace that is recorded by MLflow will be significantly more complex and verbose.</p>
+</div>
+</div>
+<div class="section" id="tracing-fluent-apis">
+<h2>Tracing Fluent APIs<a class="headerlink" href="#tracing-fluent-apis" title="Permalink to this headline"> </a></h2>
+<p>MLflow’s <a class="reference internal" href="../../python_api/mlflow.html#mlflow.start_span" title="mlflow.start_span"><code class="xref py py-func docutils literal notranslate"><span class="pre">fluent</span> <span class="pre">APIs</span></code></a> provide a straightforward way to add tracing to your functions and code blocks.
+By using decorators, function wrappers, and context managers, you can easily capture detailed trace data with minimal code changes.</p>
+<p>As a comparison between the fluent and the client APIs for tracing, the figure below illustrates the differences in complexity between the two APIs,
+with the fluent API being more concise and the recommended approach if your tracing use case can support using the higher-level APIs.</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="../../_images/fluent-vs-client-tracing.png"><img alt="Fluent vs Client APIs" src="../../_images/fluent-vs-client-tracing.png" style="width: 60%;" /></a>
+</div>
+<p>This section will cover how to initiate traces using these fluent APIs.</p>
+<div class="section" id="initiating-a-trace">
+<h3>Initiating a Trace<a class="headerlink" href="#initiating-a-trace" title="Permalink to this headline"> </a></h3>
+<p>In this section, we will explore different methods to initiate a trace using MLflow’s fluent APIs. These methods allow you to add tracing
+functionality to your code with minimal modifications, enabling you to capture detailed information about the execution of your functions and workflows.</p>
+<div class="section" id="trace-decorator">
+<h4>Trace Decorator<a class="headerlink" href="#trace-decorator" title="Permalink to this headline"> </a></h4>
+<p>The trace decorator allows you to automatically capture the inputs and outputs of a function by simply adding the <a class="reference internal" href="../../python_api/mlflow.html#mlflow.trace" title="mlflow.trace"><code class="xref py py-func docutils literal notranslate"><span class="pre">&#64;mlflow.trace</span></code></a> decorator
+to its definition. This approach is ideal for quickly adding tracing to individual functions without significant changes to your existing code.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="c1"># Create a new experiment to log the trace to</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s2">&quot;Tracing Demo&quot;</span><span class="p">)</span>
+
+
+<span class="c1"># Mark any function with the trace decorator to automatically capture input(s) and output(s)</span>
+<span class="nd">@mlflow</span><span class="o">.</span><span class="n">trace</span>
+<span class="k">def</span> <span class="nf">some_function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">z</span><span class="p">)</span>
+
+
+<span class="c1"># Invoking the function will generate a trace that is logged to the active experiment</span>
+<span class="n">some_function</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You can add additional metadata to the tracing decorator as follows:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@mlflow</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;My Span&quot;</span><span class="p">,</span> <span class="n">span_type</span><span class="o">=</span><span class="s2">&quot;func&quot;</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">})</span>
+<span class="k">def</span> <span class="nf">my_func</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
+</pre></div>
+</div>
+<p>When adding additional metadata to the trace decorator constructor, these additional components will be logged along with the span entry within
+the trace that is stored within the active MLflow experiment.</p>
+</div>
+<div class="section" id="what-is-captured">
+<h4>What is captured?<a class="headerlink" href="#what-is-captured" title="Permalink to this headline"> </a></h4>
+<p>If we navigate to the MLflow UI, we can see that the trace decorator automatically captured the following information, in addition to the basic
+metadata associated with any span (start time, end time, status, etc):</p>
+<ul class="simple">
+<li><p><strong>Inputs</strong>: In the case of our decorated function, this includes the state of all input arguments (including the default <cite>z</cite> value that is applied).</p></li>
+<li><p><strong>Response</strong>: The output of the function is also captured, in this case the result of the addition and subtraction operations.</p></li>
+<li><p><strong>Trace Name</strong>: The name of the decorated function.</p></li>
+</ul>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="../../_images/trace-demo-1.png"><img alt="Trace UI - simple use case" src="../../_images/trace-demo-1.png" style="width: 100%;" /></a>
+</div>
+</div>
+<div class="section" id="error-handling-with-traces">
+<h4>Error Handling with Traces<a class="headerlink" href="#error-handling-with-traces" title="Permalink to this headline"> </a></h4>
+<p>If an <cite>Exception</cite> is raised during processing of a trace-instrumented operation, an indication will be shown within the UI that the invocation was not
+successful and a partial capture of data will be available to aid in debugging. Additionally, details about the Exception that was raised will be included
+within the <code class="docutils literal notranslate"><span class="pre">events</span></code> attribute of the partially completed span, further aiding the identification of where issues are occuring within your code.</p>
+<p>An example of a trace that has been recorded from code that raised an Exception is shown below:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># This will raise an AttributeError exception</span>
+<span class="n">do_math</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;multiply&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="../../_images/trace-error.png"><img alt="Trace Error" src="../../_images/trace-error.png" style="width: 100%;" /></a>
+</div>
+</div>
+<div class="section" id="how-to-handle-parent-child-relationships">
+<h4>How to handle parent-child relationships<a class="headerlink" href="#how-to-handle-parent-child-relationships" title="Permalink to this headline"> </a></h4>
+<p>When using the trace decorator, each decorated function will be treated as a separate span within the trace. The relationship between dependent function calls
+is handled directly through the native call excecution order within Python. For example, the following code will introduce two “child” spans to the main
+parent span, all using decorators.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+
+<span class="nd">@mlflow</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">span_type</span><span class="o">=</span><span class="s2">&quot;func&quot;</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="s2">&quot;value&quot;</span><span class="p">})</span>
+<span class="k">def</span> <span class="nf">add_1</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">1</span>
+
+
+<span class="nd">@mlflow</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">span_type</span><span class="o">=</span><span class="s2">&quot;func&quot;</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;key1&quot;</span><span class="p">:</span> <span class="s2">&quot;value1&quot;</span><span class="p">})</span>
+<span class="k">def</span> <span class="nf">minus_1</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span> <span class="o">-</span> <span class="mi">1</span>
+
+
+<span class="nd">@mlflow</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Trace Test&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">trace_test</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="n">step1</span> <span class="o">=</span> <span class="n">add_1</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">minus_1</span><span class="p">(</span><span class="n">step1</span><span class="p">)</span>
+
+
+<span class="n">trace_test</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If we look at this trace from within the MLflow UI, we can see the relationship of the call order shown in the structure of the trace.</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="../../_images/trace-decorator.gif"><img alt="Trace Decorator" src="../../_images/trace-decorator.gif" style="width: 100%;" /></a>
+</div>
+</div>
+<div class="section" id="context-handler">
+<h4>Context Handler<a class="headerlink" href="#context-handler" title="Permalink to this headline"> </a></h4>
+<p>The context handler provides a way to create nested traces or spans, which can be useful for capturing complex interactions within your code.
+By using the <a class="reference internal" href="../../python_api/mlflow.html#mlflow.start_span" title="mlflow.start_span"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.start_span()</span></code></a> context manager, you can group multiple traced functions under a single parent span, making it easier to understand
+the relationships between different parts of your code.</p>
+<p>The context handler is recommended when you need to refine the scope of data capture for a given span. If your code is logically constructed such that
+individual calls to services or models are contained within functions or methods, on the other hand, using the decorator approach is more straight-forward
+and less complex.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+
+<span class="nd">@mlflow</span><span class="o">.</span><span class="n">trace</span>
+<span class="k">def</span> <span class="nf">first_func</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
+
+
+<span class="nd">@mlflow</span><span class="o">.</span><span class="n">trace</span>
+<span class="k">def</span> <span class="nf">second_func</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">a</span> <span class="o">*</span> <span class="n">b</span>
+
+
+<span class="k">def</span> <span class="nf">do_math</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">operation</span><span class="o">=</span><span class="s2">&quot;add&quot;</span><span class="p">):</span>
+    <span class="c1"># Use the fluent API context handler to create a new span</span>
+    <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_span</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Math&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">span</span><span class="p">:</span>
+        <span class="c1"># Specify the inputs and attributes that will be associated with the span</span>
+        <span class="n">span</span><span class="o">.</span><span class="n">set_inputs</span><span class="p">({</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="n">a</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">x</span><span class="p">})</span>
+        <span class="n">span</span><span class="o">.</span><span class="n">set_attributes</span><span class="p">({</span><span class="s2">&quot;mode&quot;</span><span class="p">:</span> <span class="n">operation</span><span class="p">})</span>
+
+        <span class="c1"># Both of these functions are decorated for tracing and will be associated</span>
+        <span class="c1"># as &#39;children&#39; of the parent &#39;span&#39; defined with the context handler</span>
+        <span class="n">first</span> <span class="o">=</span> <span class="n">first_func</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">second</span> <span class="o">=</span> <span class="n">second_func</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">operation</span> <span class="o">==</span> <span class="s2">&quot;add&quot;</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">first</span> <span class="o">+</span> <span class="n">second</span>
+        <span class="k">elif</span> <span class="n">operation</span> <span class="o">==</span> <span class="s2">&quot;subtract&quot;</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">first</span> <span class="o">-</span> <span class="n">second</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported Operation Mode: </span><span class="si">{</span><span class="n">operation</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Specify the output result to the span</span>
+        <span class="n">span</span><span class="o">.</span><span class="n">set_outputs</span><span class="p">({</span><span class="s2">&quot;result&quot;</span><span class="p">:</span> <span class="n">result</span><span class="p">})</span>
+
+        <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+</div>
+<p>When calling the <code class="docutils literal notranslate"><span class="pre">do_math</span></code> function, a trace will be generated that has the root span (parent) defined as the
+context handler <code class="docutils literal notranslate"><span class="pre">with</span> <span class="pre">mlflow.start_span():</span></code> call. The <code class="docutils literal notranslate"><span class="pre">first_func</span></code> and <code class="docutils literal notranslate"><span class="pre">second_func</span></code> calls will be associated as child spans
+to this parent span due to the fact that they are both decorated functions (having <code class="docutils literal notranslate"><span class="pre">&#64;mlflow.trace</span></code> decorated on the function definition).</p>
+<p>Running the following code will generate a trace.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">do_math</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;add&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This trace can be seen within the MLflow UI:</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="../../_images/trace-view.png"><img alt="Trace within the MLflow UI" src="../../_images/trace-view.png" style="width: 100%;" /></a>
+</div>
+</div>
+<div class="section" id="function-wrapping">
+<h4>Function wrapping<a class="headerlink" href="#function-wrapping" title="Permalink to this headline"> </a></h4>
+<p>Function wrapping provides a flexible way to add tracing to existing functions without modifying their definitions. This is particularly useful when
+you want to add tracing to third-party functions or functions defined outside of your control. By wrapping an external function with <a class="reference internal" href="../../python_api/mlflow.html#mlflow.trace" title="mlflow.trace"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.trace()</span></code></a>, you can
+capture its inputs, outputs, and execution context.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
+
+<span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s2">&quot;External Function Tracing&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">invocation</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">exp</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <span class="c1"># Initiate a context handler for parent logging</span>
+    <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_span</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Parent&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">span</span><span class="p">:</span>
+        <span class="n">span</span><span class="o">.</span><span class="n">set_attributes</span><span class="p">({</span><span class="s2">&quot;level&quot;</span><span class="p">:</span> <span class="s2">&quot;parent&quot;</span><span class="p">,</span> <span class="s2">&quot;override&quot;</span><span class="p">:</span> <span class="n">y</span> <span class="o">==</span> <span class="mi">4</span><span class="p">})</span>
+        <span class="n">span</span><span class="o">.</span><span class="n">set_inputs</span><span class="p">({</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">y</span><span class="p">,</span> <span class="s2">&quot;exp&quot;</span><span class="p">:</span> <span class="n">exp</span><span class="p">})</span>
+
+        <span class="c1"># Wrap an external function instead of modifying</span>
+        <span class="n">traced_pow</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">)</span>
+
+        <span class="c1"># Call the wrapped function as you would call it directly</span>
+        <span class="n">raised</span> <span class="o">=</span> <span class="n">traced_pow</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">exp</span><span class="p">)</span>
+
+        <span class="c1"># Wrap another external function</span>
+        <span class="n">traced_factorial</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">factorial</span><span class="p">)</span>
+
+        <span class="n">factorial</span> <span class="o">=</span> <span class="n">traced_factorial</span><span class="p">(</span><span class="n">raised</span><span class="p">)</span>
+
+        <span class="c1"># Wrap another and call it directly</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">)(</span><span class="n">factorial</span><span class="p">)</span>
+
+        <span class="c1"># Set the outputs to the parent span prior to returning</span>
+        <span class="n">span</span><span class="o">.</span><span class="n">set_outputs</span><span class="p">({</span><span class="s2">&quot;result&quot;</span><span class="p">:</span> <span class="n">response</span><span class="p">})</span>
+
+        <span class="k">return</span> <span class="n">response</span>
+
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">):</span>
+    <span class="n">invocation</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The video below shows our external function wrapping runs within the MLflow UI. Note that</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="../../_images/external-trace.gif"><img alt="External Function tracing" src="../../_images/external-trace.gif" style="width: 100%;" /></a>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="tracing-client-apis">
+<h2>Tracing Client APIs<a class="headerlink" href="#tracing-client-apis" title="Permalink to this headline"> </a></h2>
+<p>The MLflow client API provides a comprehensive set of thread-safe methods for manually managing traces. These APIs allow for fine-grained
+control over tracing, enabling you to create, manipulate, and retrieve traces programmatically. This section will cover how to use these APIs
+to manually trace a model, providing step-by-step instructions and examples.</p>
+<div class="section" id="starting-a-trace">
+<h3>Starting a Trace<a class="headerlink" href="#starting-a-trace" title="Permalink to this headline"> </a></h3>
+<p>Unlike with the fluent API, the MLflow Trace Client API requires that you explicitly start a trace before adding child spans. This initial API call
+starts the root span for the trace, providing a context request_id that is used for associating subsequent spans to the root span.</p>
+<p>To start a new trace, use the <a class="reference internal" href="../../python_api/mlflow.client.html#mlflow.client.MlflowClient.start_trace" title="mlflow.client.MlflowClient.start_trace"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mlflow.client.MlflowClient.start_trace()</span></code></a> method. This method creates a new trace and returns the root span object.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow</span> <span class="kn">import</span> <span class="n">MlflowClient</span>
+
+<span class="n">client</span> <span class="o">=</span> <span class="n">MlflowClient</span><span class="p">()</span>
+
+<span class="c1"># Start a new trace</span>
+<span class="n">root_span</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">start_trace</span><span class="p">(</span><span class="s2">&quot;my_trace&quot;</span><span class="p">)</span>
+
+<span class="c1"># The request_id is used for creating additional spans that have a hierarchical association to this root span</span>
+<span class="n">request_id</span> <span class="o">=</span> <span class="n">root_span</span><span class="o">.</span><span class="n">request_id</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="adding-a-child-span">
+<h3>Adding a Child Span<a class="headerlink" href="#adding-a-child-span" title="Permalink to this headline"> </a></h3>
+<p>Once a trace is started, you can add child spans to it with the <a class="reference internal" href="../../python_api/mlflow.client.html#mlflow.client.MlflowClient.start_span" title="mlflow.client.MlflowClient.start_span"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mlflow.client.MlflowClient.start_span()</span></code></a> API. Child spans allow you to break down the trace into smaller, more manageable segments,
+each representing a specific operation or step within the overall process.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a child span</span>
+<span class="n">child_span</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">start_span</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;child_span&quot;</span><span class="p">,</span>
+    <span class="n">request_id</span><span class="o">=</span><span class="n">request_id</span><span class="p">,</span>
+    <span class="n">parent_id</span><span class="o">=</span><span class="n">root_span</span><span class="o">.</span><span class="n">span_id</span><span class="p">,</span>
+    <span class="n">inputs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;input_key&quot;</span><span class="p">:</span> <span class="s2">&quot;input_value&quot;</span><span class="p">},</span>
+    <span class="n">attributes</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;attribute_key&quot;</span><span class="p">:</span> <span class="s2">&quot;attribute_value&quot;</span><span class="p">},</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="ending-a-span">
+<h3>Ending a Span<a class="headerlink" href="#ending-a-span" title="Permalink to this headline"> </a></h3>
+<p>After performing the operations associated with a span, you must end the span explicitly using the <a class="reference internal" href="../../python_api/mlflow.client.html#mlflow.client.MlflowClient.end_span" title="mlflow.client.MlflowClient.end_span"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mlflow.client.MlflowClient.end_span()</span></code></a> method. Make note of the two required fields
+that are in the API signature:</p>
+<ul class="simple">
+<li><p><strong>request_id</strong>: The identifier associated with the root span</p></li>
+<li><p><strong>span_id</strong>: The identifier associated with the span that is being ended</p></li>
+</ul>
+<p>In order to effectively end a particular span, both the root span (returned from calling <code class="docutils literal notranslate"><span class="pre">start_trace</span></code>) and the targeted span (returned from calling <code class="docutils literal notranslate"><span class="pre">start_span</span></code>)
+need to be identified when calling the <code class="docutils literal notranslate"><span class="pre">end_span</span></code> API.
+The initiating <code class="docutils literal notranslate"><span class="pre">request_id</span></code> can be accessed from any parent span object’s properties.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Spans created via the Client API will need to be terminated manually. Ensure that all spans that have been started with the <code class="docutils literal notranslate"><span class="pre">start_span</span></code> API
+have been ended with the <code class="docutils literal notranslate"><span class="pre">end_span</span></code> API.</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># End the child span</span>
+<span class="n">client</span><span class="o">.</span><span class="n">end_span</span><span class="p">(</span>
+    <span class="n">request_id</span><span class="o">=</span><span class="n">child_span</span><span class="o">.</span><span class="n">request_id</span><span class="p">,</span>
+    <span class="n">span_id</span><span class="o">=</span><span class="n">child_span</span><span class="o">.</span><span class="n">span_id</span><span class="p">,</span>
+    <span class="n">outputs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;output_key&quot;</span><span class="p">:</span> <span class="s2">&quot;output_value&quot;</span><span class="p">},</span>
+    <span class="n">attributes</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;custom_attribute&quot;</span><span class="p">:</span> <span class="s2">&quot;value&quot;</span><span class="p">},</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="ending-a-trace">
+<h3>Ending a Trace<a class="headerlink" href="#ending-a-trace" title="Permalink to this headline"> </a></h3>
+<p>To complete the trace, end the root span using the <a class="reference internal" href="../../python_api/mlflow.client.html#mlflow.client.MlflowClient.end_trace" title="mlflow.client.MlflowClient.end_trace"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mlflow.client.MlflowClient.end_trace()</span></code></a> method. This will also ensure that all associated child
+spans are properly ended.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># End the root span (trace)</span>
+<span class="n">client</span><span class="o">.</span><span class="n">end_trace</span><span class="p">(</span>
+    <span class="n">request_id</span><span class="o">=</span><span class="n">request_id</span><span class="p">,</span>
+    <span class="n">outputs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;final_output_key&quot;</span><span class="p">:</span> <span class="s2">&quot;final_output_value&quot;</span><span class="p">},</span>
+    <span class="n">attributes</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;token_usage&quot;</span><span class="p">:</span> <span class="s2">&quot;1174&quot;</span><span class="p">},</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="searching-and-retrieving-traces">
+<h2>Searching and Retrieving Traces<a class="headerlink" href="#searching-and-retrieving-traces" title="Permalink to this headline"> </a></h2>
+<div class="section" id="searching-for-traces">
+<h3>Searching for Traces<a class="headerlink" href="#searching-for-traces" title="Permalink to this headline"> </a></h3>
+<p>You can search for traces based on various criteria using the <a class="reference internal" href="../../python_api/mlflow.client.html#mlflow.client.MlflowClient.search_traces" title="mlflow.client.MlflowClient.search_traces"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mlflow.client.MlflowClient.search_traces()</span></code></a> method. This method allows you to filter traces by experiment IDs,
+filter strings, and other parameters.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Search for traces in specific experiments</span>
+<span class="n">traces</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">search_traces</span><span class="p">(</span>
+    <span class="n">experiment_ids</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">],</span> <span class="n">filter_string</span><span class="o">=</span><span class="s2">&quot;attributes.status = &#39;OK&#39;&quot;</span><span class="p">,</span> <span class="n">max_results</span><span class="o">=</span><span class="mi">5</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="retrieving-a-specific-trace">
+<h3>Retrieving a Specific Trace<a class="headerlink" href="#retrieving-a-specific-trace" title="Permalink to this headline"> </a></h3>
+<p>To retrieve a specific trace by its request ID, use the <a class="reference internal" href="../../python_api/mlflow.client.html#mlflow.client.MlflowClient.get_trace" title="mlflow.client.MlflowClient.get_trace"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mlflow.client.MlflowClient.get_trace()</span></code></a> method. This method returns the trace object corresponding to the given request ID.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Retrieve a trace by request ID</span>
+<span class="n">trace</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_trace</span><span class="p">(</span><span class="n">request_id</span><span class="o">=</span><span class="s2">&quot;12345678&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="managing-trace-data">
+<h2>Managing Trace Data<a class="headerlink" href="#managing-trace-data" title="Permalink to this headline"> </a></h2>
+<div class="section" id="deleting-traces">
+<h3>Deleting Traces<a class="headerlink" href="#deleting-traces" title="Permalink to this headline"> </a></h3>
+<p>You can delete traces based on specific criteria using the <a class="reference internal" href="../../python_api/mlflow.client.html#mlflow.client.MlflowClient.delete_traces" title="mlflow.client.MlflowClient.delete_traces"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mlflow.client.MlflowClient.delete_traces()</span></code></a> method. This method allows you to delete traces by <strong>experiment ID</strong>,
+<strong>maximum timestamp</strong>, or <strong>request IDs</strong>.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Deleting a trace is an irreversible process. Ensure that the setting provided within the <code class="docutils literal notranslate"><span class="pre">delete_traces</span></code> API meet the intended range for deletion.</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+
+<span class="c1"># Get the current timestamp in milliseconds</span>
+<span class="n">current_time</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">)</span>
+
+<span class="c1"># Delete traces older than a specific timestamp</span>
+<span class="n">deleted_count</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">delete_traces</span><span class="p">(</span>
+    <span class="n">experiment_id</span><span class="o">=</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="n">max_timestamp_millis</span><span class="o">=</span><span class="n">current_time</span><span class="p">,</span> <span class="n">max_traces</span><span class="o">=</span><span class="mi">10</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="setting-and-deleting-trace-tags">
+<h3>Setting and Deleting Trace Tags<a class="headerlink" href="#setting-and-deleting-trace-tags" title="Permalink to this headline"> </a></h3>
+<p>Tags can be added to traces to provide additional metadata. Use the <a class="reference internal" href="../../python_api/mlflow.client.html#mlflow.client.MlflowClient.set_trace_tag" title="mlflow.client.MlflowClient.set_trace_tag"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mlflow.client.MlflowClient.set_trace_tag()</span></code></a> method to set a tag on a trace,
+and the <a class="reference internal" href="../../python_api/mlflow.client.html#mlflow.client.MlflowClient.delete_trace_tag" title="mlflow.client.MlflowClient.delete_trace_tag"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mlflow.client.MlflowClient.delete_trace_tag()</span></code></a> method to remove a tag from a trace.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set a tag on a trace</span>
+<span class="n">client</span><span class="o">.</span><span class="n">set_trace_tag</span><span class="p">(</span><span class="n">request_id</span><span class="o">=</span><span class="s2">&quot;12345678&quot;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">&quot;tag_key&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="s2">&quot;tag_value&quot;</span><span class="p">)</span>
+
+<span class="c1"># Delete a tag from a trace</span>
+<span class="n">client</span><span class="o">.</span><span class="n">delete_trace_tag</span><span class="p">(</span><span class="n">request_id</span><span class="o">=</span><span class="s2">&quot;12345678&quot;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">&quot;tag_key&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="faq">
+<h2>FAQ<a class="headerlink" href="#faq" title="Permalink to this headline"> </a></h2>
+<div class="section" id="q-can-i-disable-and-re-enable-tracing-globally">
+<h3>Q: Can I disable and re-enable tracing globally?<a class="headerlink" href="#q-can-i-disable-and-re-enable-tracing-globally" title="Permalink to this headline"> </a></h3>
+<p>Yes.</p>
+<p>There are two fluent APIs that are used for blanket enablement or disablement of the MLflow Tracing feature in order to support
+users who may not wish to record interactions with their trace-enabled models for a brief period, or if they have concerns about long-term storage
+of data that was sent along with a request payload to a model in interactive mode.</p>
+<p>To <strong>disable</strong> tracing, the <a class="reference internal" href="../../python_api/mlflow.tracing.html#mlflow.tracing.disable" title="mlflow.tracing.disable"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.tracing.disable()</span></code></a> API will cease the collection of trace data from within MLflow and will not log
+any data to the MLflow Tracking service regarding traces.</p>
+<p>To <strong>enable</strong> tracing (if it had been temporarily disabled), the <a class="reference internal" href="../../python_api/mlflow.tracing.html#mlflow.tracing.enable" title="mlflow.tracing.enable"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.tracing.enable()</span></code></a> API will re-enable tracing functionality for instrumented models
+that are invoked.</p>
+</div>
+<div class="section" id="q-how-can-i-associate-a-trace-with-an-mlflow-run">
+<h3>Q: How can I associate a trace with an MLflow Run?<a class="headerlink" href="#q-how-can-i-associate-a-trace-with-an-mlflow-run" title="Permalink to this headline"> </a></h3>
+<p>If a trace is generated within a run context, the recorded traces to an active Experiment will be associated with the active Run.</p>
+<p>For example, in the following code, the traces are generated within the <code class="docutils literal notranslate"><span class="pre">start_run</span></code> context.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="c1"># Create and activate an Experiment</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s2">&quot;Run Associated Tracing&quot;</span><span class="p">)</span>
+
+<span class="c1"># Start a new MLflow Run</span>
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="c1"># Initiate a trace by starting a Span context from within the Run context</span>
+    <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_span</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Run Span&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">parent_span</span><span class="p">:</span>
+        <span class="n">parent_span</span><span class="o">.</span><span class="n">set_inputs</span><span class="p">({</span><span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="s2">&quot;a&quot;</span><span class="p">})</span>
+        <span class="n">parent_span</span><span class="o">.</span><span class="n">set_outputs</span><span class="p">({</span><span class="s2">&quot;response&quot;</span><span class="p">:</span> <span class="s2">&quot;b&quot;</span><span class="p">})</span>
+        <span class="n">parent_span</span><span class="o">.</span><span class="n">set_attribute</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">)</span>
+        <span class="c1"># Initiate a child span from within the parent Span&#39;s context</span>
+        <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_span</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Child Span&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">child_span</span><span class="p">:</span>
+            <span class="n">child_span</span><span class="o">.</span><span class="n">set_inputs</span><span class="p">({</span><span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="s2">&quot;b&quot;</span><span class="p">})</span>
+            <span class="n">child_span</span><span class="o">.</span><span class="n">set_outputs</span><span class="p">({</span><span class="s2">&quot;response&quot;</span><span class="p">:</span> <span class="s2">&quot;c&quot;</span><span class="p">})</span>
+            <span class="n">child_span</span><span class="o">.</span><span class="n">set_attributes</span><span class="p">({</span><span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">:</span> <span class="s2">&quot;d&quot;</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>When navigating to the MLflow UI and selecting the active Experiment, the trace display view will show the run that is associated with the trace, as
+well as providing a link to navigate to the run within the MLflow UI. See the below video for an example of this in action.</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="../../_images/run-trace.gif"><img alt="Tracing within a Run Context" src="../../_images/run-trace.gif" style="width: 100%;" /></a>
+</div>
+</div>
+<div class="section" id="q-can-i-use-the-fluent-api-and-the-client-api-together">
+<h3>Q: Can I use the fluent API and the client API together?<a class="headerlink" href="#q-can-i-use-the-fluent-api-and-the-client-api-together" title="Permalink to this headline"> </a></h3>
+<p>You definitely can. However, the Client API is much more verbose than the fluent API and is designed for more complex use cases where you need
+to control asynchronous tasks for which a context manager will not have the ability to handle an appropriate closure over the context.</p>
+<p>Mixing the two, while entirely possible, is not generally recommended.</p>
+<p>For example, the following will work:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="c1"># Initiate a fluent span creation context</span>
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_span</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Testing!&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">span</span><span class="p">:</span>
+    <span class="c1"># Use the client API to start a child span</span>
+    <span class="n">child_span</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">start_span</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Child Span From Client&quot;</span><span class="p">,</span>
+        <span class="n">request_id</span><span class="o">=</span><span class="n">span</span><span class="o">.</span><span class="n">request_id</span><span class="p">,</span>
+        <span class="n">parent_id</span><span class="o">=</span><span class="n">span</span><span class="o">.</span><span class="n">span_id</span><span class="p">,</span>
+        <span class="n">inputs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;request&quot;</span><span class="p">:</span> <span class="s2">&quot;test input&quot;</span><span class="p">},</span>
+        <span class="n">attributes</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;attribute1&quot;</span><span class="p">:</span> <span class="s2">&quot;value1&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+
+    <span class="c1"># End the child span</span>
+    <span class="n">client</span><span class="o">.</span><span class="n">end_span</span><span class="p">(</span>
+        <span class="n">request_id</span><span class="o">=</span><span class="n">span</span><span class="o">.</span><span class="n">request_id</span><span class="p">,</span>
+        <span class="n">span_id</span><span class="o">=</span><span class="n">child_span</span><span class="o">.</span><span class="n">span_id</span><span class="p">,</span>
+        <span class="n">outputs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;response&quot;</span><span class="p">:</span> <span class="s2">&quot;test output&quot;</span><span class="p">},</span>
+        <span class="n">attributes</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;attribute2&quot;</span><span class="p">:</span> <span class="s2">&quot;value2&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="../../_images/client-with-fluent.png"><img alt="Using Client APIs within fluent context" src="../../_images/client-with-fluent.png" style="width: 100%;" /></a>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Using the fluent API to manage a child span of a client-initiated root span or child span is not possible.
+Attempting to start a <code class="docutils literal notranslate"><span class="pre">start_span</span></code> context handler while using the client API will result in two traces being created,
+one for the fluent API and one for the client API.</p>
+</div>
+</div>
+<div class="section" id="q-how-can-i-add-custom-metadata-to-a-span">
+<h3>Q: How can I add custom metadata to a span?<a class="headerlink" href="#q-how-can-i-add-custom-metadata-to-a-span" title="Permalink to this headline"> </a></h3>
+<p>There are several ways.</p>
+<div class="section" id="fluent-api">
+<h4>Fluent API<a class="headerlink" href="#fluent-api" title="Permalink to this headline"> </a></h4>
+<ol class="arabic simple">
+<li><p>Within the <a class="reference internal" href="../../python_api/mlflow.html#mlflow.start_span" title="mlflow.start_span"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.start_span()</span></code></a> constructor itself.</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_span</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Parent&quot;</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;attribute1&quot;</span><span class="p">:</span> <span class="s2">&quot;value1&quot;</span><span class="p">,</span> <span class="s2">&quot;attribute2&quot;</span><span class="p">:</span> <span class="s2">&quot;value2&quot;</span><span class="p">}</span>
+<span class="p">)</span> <span class="k">as</span> <span class="n">span</span><span class="p">:</span>
+    <span class="n">span</span><span class="o">.</span><span class="n">set_inputs</span><span class="p">({</span><span class="s2">&quot;input1&quot;</span><span class="p">:</span> <span class="s2">&quot;value1&quot;</span><span class="p">,</span> <span class="s2">&quot;input2&quot;</span><span class="p">:</span> <span class="s2">&quot;value2&quot;</span><span class="p">})</span>
+    <span class="n">span</span><span class="o">.</span><span class="n">set_outputs</span><span class="p">({</span><span class="s2">&quot;output1&quot;</span><span class="p">:</span> <span class="s2">&quot;value1&quot;</span><span class="p">,</span> <span class="s2">&quot;output2&quot;</span><span class="p">:</span> <span class="s2">&quot;value2&quot;</span><span class="p">})</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>Using the <code class="docutils literal notranslate"><span class="pre">set_attribute</span></code> or <code class="docutils literal notranslate"><span class="pre">set_attributes</span></code> methods on the <code class="docutils literal notranslate"><span class="pre">span</span></code> object returned from the <code class="docutils literal notranslate"><span class="pre">start_span</span></code> returned object.</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_span</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Parent&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">span</span><span class="p">:</span>
+    <span class="c1"># Set multiple attributes</span>
+    <span class="n">span</span><span class="o">.</span><span class="n">set_attributes</span><span class="p">({</span><span class="s2">&quot;attribute1&quot;</span><span class="p">:</span> <span class="s2">&quot;value1&quot;</span><span class="p">,</span> <span class="s2">&quot;attribute2&quot;</span><span class="p">:</span> <span class="s2">&quot;value2&quot;</span><span class="p">})</span>
+    <span class="c1"># Set a single attribute</span>
+    <span class="n">span</span><span class="o">.</span><span class="n">set_attribute</span><span class="p">(</span><span class="s2">&quot;attribute3&quot;</span><span class="p">,</span> <span class="s2">&quot;value3&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="client-api">
+<h4>Client API<a class="headerlink" href="#client-api" title="Permalink to this headline"> </a></h4>
+<ol class="arabic simple">
+<li><p>When starting a span, you can pass in the attributes as part of the <code class="docutils literal notranslate"><span class="pre">start_trace</span></code> and <code class="docutils literal notranslate"><span class="pre">start_span</span></code> method calls.</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">parent_span</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">start_trace</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Parent Span&quot;</span><span class="p">,</span>
+    <span class="n">attributes</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;attribute1&quot;</span><span class="p">:</span> <span class="s2">&quot;value1&quot;</span><span class="p">,</span> <span class="s2">&quot;attribute2&quot;</span><span class="p">:</span> <span class="s2">&quot;value2&quot;</span><span class="p">}</span>
+<span class="p">)</span>
+
+<span class="n">child_span</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">start_span</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Child Span&quot;</span><span class="p">,</span>
+    <span class="n">request_id</span><span class="o">=</span><span class="n">parent_span</span><span class="o">.</span><span class="n">request_id</span><span class="p">,</span>
+    <span class="n">parent_id</span><span class="o">=</span><span class="n">parent_span</span><span class="o">.</span><span class="n">span_id</span><span class="p">,</span>
+    <span class="n">attributes</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;attribute1&quot;</span><span class="p">:</span> <span class="s2">&quot;value1&quot;</span><span class="p">,</span> <span class="s2">&quot;attribute2&quot;</span><span class="p">:</span> <span class="s2">&quot;value2&quot;</span><span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>Utilize the <code class="docutils literal notranslate"><span class="pre">set_attribute</span></code> or <code class="docutils literal notranslate"><span class="pre">set_attributes</span></code> APIs directly on the <code class="docutils literal notranslate"><span class="pre">Span</span></code> objects.</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">parent_span</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">start_trace</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Parent Span&quot;</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;attribute1&quot;</span><span class="p">:</span> <span class="s2">&quot;value1&quot;</span><span class="p">,</span> <span class="s2">&quot;attribute2&quot;</span><span class="p">:</span> <span class="s2">&quot;value2&quot;</span><span class="p">}</span>
+<span class="p">)</span>
+
+<span class="c1"># Set a single attribute</span>
+<span class="n">parent_span</span><span class="o">.</span><span class="n">set_attribute</span><span class="p">(</span><span class="s2">&quot;attribute3&quot;</span><span class="p">,</span> <span class="s2">&quot;value3&quot;</span><span class="p">)</span>
+<span class="c1"># Set multiple attributes</span>
+<span class="n">parent_span</span><span class="o">.</span><span class="n">set_attributes</span><span class="p">({</span><span class="s2">&quot;attribute4&quot;</span><span class="p">:</span> <span class="s2">&quot;value4&quot;</span><span class="p">,</span> <span class="s2">&quot;attribute5&quot;</span><span class="p">:</span> <span class="s2">&quot;value5&quot;</span><span class="p">})</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="3">
+<li><p>Set attributes when ending a span or the entire trace.</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">client</span><span class="o">.</span><span class="n">end_span</span><span class="p">(</span>
+    <span class="n">request_id</span><span class="o">=</span><span class="n">parent_span</span><span class="o">.</span><span class="n">request_id</span><span class="p">,</span>
+    <span class="n">span_id</span><span class="o">=</span><span class="n">child_span</span><span class="o">.</span><span class="n">span_id</span><span class="p">,</span>
+    <span class="n">attributes</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;attribute1&quot;</span><span class="p">:</span> <span class="s2">&quot;value1&quot;</span><span class="p">,</span> <span class="s2">&quot;attribute2&quot;</span><span class="p">:</span> <span class="s2">&quot;value2&quot;</span><span class="p">},</span>
+<span class="p">)</span>
+
+<span class="n">client</span><span class="o">.</span><span class="n">end_trace</span><span class="p">(</span>
+    <span class="n">request_id</span><span class="o">=</span><span class="n">parent_span</span><span class="o">.</span><span class="n">request_id</span><span class="p">,</span>
+    <span class="n">attributes</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;attribute3&quot;</span><span class="p">:</span> <span class="s2">&quot;value3&quot;</span><span class="p">,</span> <span class="s2">&quot;attribute4&quot;</span><span class="p">:</span> <span class="s2">&quot;value4&quot;</span><span class="p">},</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+              </div>
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../index.html" class="btn btn-neutral" title="LLMs" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+      
+      
+        <a href="overview.html" class="btn btn-neutral" title="Tracing Concepts" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+      <p class="copyright">
+          &copy; MLflow Project, a Series of LF Projects, LLC. All rights reserved.
+      </p>
+
+  </div> 
+
+</footer>
+          </div>
+        </div>
+      </section>
+    </main>
+  </page>
+
+  
+
+
+  
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+      URL_ROOT:'../../',
+      VERSION:'2.13.3.dev0',
+      COLLAPSE_INDEX:false,
+      FILE_SUFFIX:'.html',
+      LINK_SUFFIX: '.html',
+      HAS_SOURCE:  true
+    };
+  </script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/clipboard.min.js"></script>
+  <script type="text/javascript" src="../../_static/js/jquery.waypoints.min.js"></script>
+
+  
+  
+  
+  <script type="text/javascript">var CLIPPY_SVG_PATH = "../../_static/clippy.svg";</script>
+  <script type="text/javascript" src="../../_static/js/custom.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.StickyNav.enable();
+    });
+
+  </script>
+  
+
+  
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        // Get the code block designator class entries
+        const allHighlights = document.querySelectorAll('.highlight');
+        // Disable copyable links for notebook cell numbering and for cell outputs
+        const highlights = Array.from(allHighlights).filter(highlight => !highlight.closest('.highlight-none') && 
+            !highlight.closest('.nboutput'));
+    
+        highlights.forEach(function(highlight) {
+            const copyIcon = document.createElement('span');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.innerHTML = '&#xf0ea;';
+
+            copyIcon.addEventListener('click', function() {
+                const code = highlight.querySelector('pre').textContent;
+                copyToClipboard(code);
+
+                // Flash effect on click
+                this.style.color = '#0194E2';
+                setTimeout(() => {
+                    this.style.color = ''; 
+                }, 100);
+
+                // Display "Code copied to clipboard" near the clicked icon
+                const message = document.createElement('span');
+                message.textContent = "Copied!";
+                message.classList.add('copy-message'); 
+
+                // Append the message to the icon
+                this.appendChild(message);
+
+                setTimeout(() => {
+                    this.removeChild(message);
+                }, 500);
+            });
+
+            highlight.appendChild(copyIcon);
+        });
+    });
+  </script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Force download for notebook-download-btn
+        const downloadButtons = document.querySelectorAll('.notebook-download-btn');
+        downloadButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                // Fetch the raw content of the notebook from GitHub
+                fetch(button.href)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = url;
+                        const filename = button.href.split('/').pop();
+                        link.download = filename; 
+
+                        document.body.appendChild(link);
+                        link.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    })
+                    .catch(err => console.error('Error fetching the notebook:', err));
+            });
+        });
+    });
+</script> 
+</body>
+</html>

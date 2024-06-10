@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mlflow.client &mdash; MLflow 2.13.1.dev0 documentation</title>
+  <title>mlflow.client &mdash; MLflow 2.13.3.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -56,7 +56,7 @@
         <link rel="index" title="Index"
               href="../genindex.html"/>
         <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="MLflow 2.13.1.dev0 documentation" href="../index.html"/>
+    <link rel="top" title="MLflow 2.13.3.dev0 documentation" href="../index.html"/>
         <link rel="up" title="Python API" href="index.html"/>
         <link rel="next" title="mlflow.config" href="/mlflow.config.html"/>
         <link rel="prev" title="mlflow.catboost" href="/mlflow.catboost.html"/> 
@@ -88,7 +88,7 @@
     <a href="../index.html" class="wy-nav-top-logo"
       ><img src="../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.13.1.dev0</span>
+    <span class="version">2.13.3.dev0</span>
   </li>
 </ul>
   </nav>
@@ -146,6 +146,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../search-experiments.html">Search Experiments</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Python API</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="mlflow.html">mlflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mlflow.html#mlflow-tracing-apis">MLflow Tracing APIs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.artifacts.html">mlflow.artifacts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.catboost.html">mlflow.catboost</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">mlflow.client</a></li>
@@ -1139,7 +1140,9 @@ it will be truncated when stored.</p></li>
 <li><p><strong>experiment_id</strong> – ID of the associated experiment.</p></li>
 <li><p><strong>max_timestamp_millis</strong> – The maximum timestamp in milliseconds since the UNIX epoch for
 deleting traces. Traces older than or equal to this timestamp will be deleted.</p></li>
-<li><p><strong>max_traces</strong> – The maximum number of traces to delete.</p></li>
+<li><p><strong>max_traces</strong> – The maximum number of traces to delete. If max_traces is specified, and
+it is less than the number of traces that would be deleted based on the
+max_timestamp_millis, the oldest traces will be deleted first.</p></li>
 <li><p><strong>request_ids</strong> – A set of request IDs to delete.</p></li>
 </ul>
 </dd>
@@ -1147,6 +1150,28 @@ deleting traces. Traces older than or equal to this timestamp will be deleted.</
 <dd class="field-even"><p>The number of traces deleted.</p>
 </dd>
 </dl>
+<p>Example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="n">client</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">MlflowClient</span><span class="p">()</span>
+
+<span class="c1"># Delete all traces in the experiment</span>
+<span class="n">client</span><span class="o">.</span><span class="n">delete_traces</span><span class="p">(</span>
+    <span class="n">experiment_id</span><span class="o">=</span><span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="n">max_timestamp_millis</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time_ns</span><span class="p">()</span> <span class="o">//</span> <span class="mi">1_000_000</span>
+<span class="p">)</span>
+
+<span class="c1"># Delete traces based on max_timestamp_millis and max_traces</span>
+<span class="c1"># Older traces will be deleted first.</span>
+<span class="n">some_timestamp</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time_ns</span><span class="p">()</span> <span class="o">//</span> <span class="mi">1_000_000</span>
+<span class="n">client</span><span class="o">.</span><span class="n">delete_traces</span><span class="p">(</span>
+    <span class="n">experiment_id</span><span class="o">=</span><span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="n">max_timestamp_millis</span><span class="o">=</span><span class="n">some_timestamp</span><span class="p">,</span> <span class="n">max_traces</span><span class="o">=</span><span class="mi">2</span>
+<span class="p">)</span>
+
+<span class="c1"># Delete traces based on request_ids</span>
+<span class="n">client</span><span class="o">.</span><span class="n">delete_traces</span><span class="p">(</span><span class="n">experiment_id</span><span class="o">=</span><span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="n">request_ids</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;id_1&quot;</span><span class="p">,</span> <span class="s2">&quot;id_2&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -1344,7 +1369,7 @@ Lifecycle_stage: active
 <code class="sig-name descname"><span class="pre">get_latest_versions</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stages</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="mlflow.entities.html#mlflow.entities.model_registry.ModelVersion" title="mlflow.entities.model_registry.ModelVersion"><span class="pre">ModelVersion</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/mlflow/tracking/client.html#MlflowClient.get_latest_versions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.client.MlflowClient.get_latest_versions" title="Permalink to this definition"> </a></dt>
 <dd><div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p><code class="docutils literal notranslate"><span class="pre">mlflow.tracking.client.MlflowClient.get_latest_versions</span></code> is deprecated since 2.9.0. Model registry stages will be removed in a future major release. To learn more about the deprecation of model registry stages, see our migration guide here: <a class="reference external" href="https://mlflow.org/docs/2.13.1/model-registry.html#migrating-from-stages">https://mlflow.org/docs/2.13.1/model-registry.html#migrating-from-stages</a></p>
+<p><code class="docutils literal notranslate"><span class="pre">mlflow.tracking.client.MlflowClient.get_latest_versions</span></code> is deprecated since 2.9.0. Model registry stages will be removed in a future major release. To learn more about the deprecation of model registry stages, see our migration guide here: <a class="reference external" href="https://mlflow.org/docs/2.13.3/model-registry.html#migrating-from-stages">https://mlflow.org/docs/2.13.3/model-registry.html#migrating-from-stages</a></p>
 </div>
 <p>Latest version models for each requests stage. If no <code class="docutils literal notranslate"><span class="pre">stages</span></code> provided, returns the
 latest version for each stage.</p>
@@ -1717,7 +1742,7 @@ Aliases: [&quot;test-alias&quot;]
 <code class="sig-name descname"><span class="pre">get_model_version_stages</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/mlflow/tracking/client.html#MlflowClient.get_model_version_stages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.client.MlflowClient.get_model_version_stages" title="Permalink to this definition"> </a></dt>
 <dd><div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p><code class="docutils literal notranslate"><span class="pre">mlflow.tracking.client.MlflowClient.get_model_version_stages</span></code> is deprecated since 2.9.0. Model registry stages will be removed in a future major release. To learn more about the deprecation of model registry stages, see our migration guide here: <a class="reference external" href="https://mlflow.org/docs/2.13.1/model-registry.html#migrating-from-stages">https://mlflow.org/docs/2.13.1/model-registry.html#migrating-from-stages</a></p>
+<p><code class="docutils literal notranslate"><span class="pre">mlflow.tracking.client.MlflowClient.get_model_version_stages</span></code> is deprecated since 2.9.0. Model registry stages will be removed in a future major release. To learn more about the deprecation of model registry stages, see our migration guide here: <a class="reference external" href="https://mlflow.org/docs/2.13.3/model-registry.html#migrating-from-stages">https://mlflow.org/docs/2.13.3/model-registry.html#migrating-from-stages</a></p>
 </div>
 <p>This is a docstring. Here is info.</p>
 <dl class="field-list simple">
@@ -3955,7 +3980,7 @@ representing the root span of the trace.</p>
 <code class="sig-name descname"><span class="pre">transition_model_version_stage</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stage</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">archive_existing_versions</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="mlflow.entities.html#mlflow.entities.model_registry.ModelVersion" title="mlflow.entities.model_registry.ModelVersion"><span class="pre">ModelVersion</span></a><a class="reference internal" href="../_modules/mlflow/tracking/client.html#MlflowClient.transition_model_version_stage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.client.MlflowClient.transition_model_version_stage" title="Permalink to this definition"> </a></dt>
 <dd><div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p><code class="docutils literal notranslate"><span class="pre">mlflow.tracking.client.MlflowClient.transition_model_version_stage</span></code> is deprecated since 2.9.0. Model registry stages will be removed in a future major release. To learn more about the deprecation of model registry stages, see our migration guide here: <a class="reference external" href="https://mlflow.org/docs/2.13.1/model-registry.html#migrating-from-stages">https://mlflow.org/docs/2.13.1/model-registry.html#migrating-from-stages</a></p>
+<p><code class="docutils literal notranslate"><span class="pre">mlflow.tracking.client.MlflowClient.transition_model_version_stage</span></code> is deprecated since 2.9.0. Model registry stages will be removed in a future major release. To learn more about the deprecation of model registry stages, see our migration guide here: <a class="reference external" href="https://mlflow.org/docs/2.13.3/model-registry.html#migrating-from-stages">https://mlflow.org/docs/2.13.3/model-registry.html#migrating-from-stages</a></p>
 </div>
 <p>Update model version stage.</p>
 <dl class="field-list simple">
@@ -4259,7 +4284,7 @@ status: FINISHED
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../',
-      VERSION:'2.13.1.dev0',
+      VERSION:'2.13.3.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

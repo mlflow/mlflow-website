@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mlflow.tracking.client &mdash; MLflow 2.13.1.dev0 documentation</title>
+  <title>mlflow.tracking.client &mdash; MLflow 2.13.3.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -56,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="MLflow 2.13.1.dev0 documentation" href="../../../index.html"/>
+    <link rel="top" title="MLflow 2.13.3.dev0 documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
   
@@ -87,7 +87,7 @@
     <a href="../../../index.html" class="wy-nav-top-logo"
       ><img src="../../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.13.1.dev0</span>
+    <span class="version">2.13.3.dev0</span>
   </li>
 </ul>
   </nav>
@@ -618,11 +618,38 @@
 <span class="sd">            experiment_id: ID of the associated experiment.</span>
 <span class="sd">            max_timestamp_millis: The maximum timestamp in milliseconds since the UNIX epoch for</span>
 <span class="sd">                deleting traces. Traces older than or equal to this timestamp will be deleted.</span>
-<span class="sd">            max_traces: The maximum number of traces to delete.</span>
+<span class="sd">            max_traces: The maximum number of traces to delete. If max_traces is specified, and</span>
+<span class="sd">                it is less than the number of traces that would be deleted based on the</span>
+<span class="sd">                max_timestamp_millis, the oldest traces will be deleted first.</span>
 <span class="sd">            request_ids: A set of request IDs to delete.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            The number of traces deleted.</span>
+
+<span class="sd">        Example:</span>
+
+<span class="sd">        .. code-block:: python</span>
+<span class="sd">            :test:</span>
+
+<span class="sd">            import mlflow</span>
+<span class="sd">            import time</span>
+
+<span class="sd">            client = mlflow.MlflowClient()</span>
+
+<span class="sd">            # Delete all traces in the experiment</span>
+<span class="sd">            client.delete_traces(</span>
+<span class="sd">                experiment_id=&quot;0&quot;, max_timestamp_millis=time.time_ns() // 1_000_000</span>
+<span class="sd">            )</span>
+
+<span class="sd">            # Delete traces based on max_timestamp_millis and max_traces</span>
+<span class="sd">            # Older traces will be deleted first.</span>
+<span class="sd">            some_timestamp = time.time_ns() // 1_000_000</span>
+<span class="sd">            client.delete_traces(</span>
+<span class="sd">                experiment_id=&quot;0&quot;, max_timestamp_millis=some_timestamp, max_traces=2</span>
+<span class="sd">            )</span>
+
+<span class="sd">            # Delete traces based on request_ids</span>
+<span class="sd">            client.delete_traces(experiment_id=&quot;0&quot;, request_ids=[&quot;id_1&quot;, &quot;id_2&quot;])</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tracking_client</span><span class="o">.</span><span class="n">delete_traces</span><span class="p">(</span>
             <span class="n">experiment_id</span><span class="o">=</span><span class="n">experiment_id</span><span class="p">,</span>
@@ -781,8 +808,12 @@
                 <span class="n">name</span><span class="p">,</span> <span class="n">experiment_id</span><span class="o">=</span><span class="n">experiment_id</span>
             <span class="p">)</span>
             <span class="n">request_id</span> <span class="o">=</span> <span class="n">get_otel_attribute</span><span class="p">(</span><span class="n">otel_span</span><span class="p">,</span> <span class="n">SpanAttributeKey</span><span class="o">.</span><span class="n">REQUEST_ID</span><span class="p">)</span>
-
             <span class="n">mlflow_span</span> <span class="o">=</span> <span class="n">create_mlflow_span</span><span class="p">(</span><span class="n">otel_span</span><span class="p">,</span> <span class="n">request_id</span><span class="p">,</span> <span class="n">span_type</span><span class="p">)</span>
+
+            <span class="c1"># # If the span is a no-op span i.e. tracing is disabled, do nothing</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mlflow_span</span><span class="p">,</span> <span class="n">NoOpSpan</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">mlflow_span</span>
+
             <span class="k">if</span> <span class="n">inputs</span><span class="p">:</span>
                 <span class="n">mlflow_span</span><span class="o">.</span><span class="n">set_inputs</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">attributes</span><span class="p">:</span>
@@ -4933,7 +4964,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../../',
-      VERSION:'2.13.1.dev0',
+      VERSION:'2.13.3.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',
