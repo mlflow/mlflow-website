@@ -426,12 +426,13 @@
 <span class="sd">        index (int): The index of the response in the list of responses.</span>
 <span class="sd">        message (:py:class:`ChatMessage`): The message that was generated.</span>
 <span class="sd">        finish_reason (str): The reason why generation stopped.</span>
+<span class="sd">            **Optional**, defaults to ``&quot;stop&quot;``</span>
 <span class="sd">        logprobs (:py:class:`ChatChoiceLogProbs`): Log probability information for the choice.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">index</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">message</span><span class="p">:</span> <span class="n">ChatMessage</span>
-    <span class="n">finish_reason</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">finish_reason</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;stop&quot;</span>
     <span class="n">logprobs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ChatChoiceLogProbs</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -458,18 +459,21 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        prompt_tokens (int): The number of tokens in the prompt.</span>
+<span class="sd">            **Optional**, defaults to ``None``</span>
 <span class="sd">        completion_tokens (int): The number of tokens in the generated completion.</span>
+<span class="sd">            **Optional**, defaults to ``None``</span>
 <span class="sd">        total_tokens (int): The total number of tokens used.</span>
+<span class="sd">            **Optional**, defaults to ``None``</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">prompt_tokens</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="n">completion_tokens</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="n">total_tokens</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">prompt_tokens</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">completion_tokens</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">total_tokens</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;prompt_tokens&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;completion_tokens&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;total_tokens&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;prompt_tokens&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;completion_tokens&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;total_tokens&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ChatResponse"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.llm.ChatResponse">[docs]</a><span class="nd">@dataclass</span>
@@ -478,35 +482,41 @@
 <span class="sd">    The full response object returned by the chat endpoint.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        id (str): The ID of the response.</span>
-<span class="sd">        object (str): The object type.</span>
-<span class="sd">        created (int): The time the response was created.</span>
-<span class="sd">            **Optional**, defaults to the current time.</span>
-<span class="sd">        model (str): The name of the model used.</span>
 <span class="sd">        choices (List[:py:class:`ChatChoice`]): A list of :py:class:`ChatChoice` objects</span>
 <span class="sd">            containing the generated responses</span>
 <span class="sd">        usage (:py:class:`TokenUsageStats`): An object describing the tokens used by the request.</span>
+<span class="sd">        id (str): The ID of the response. **Optional**, defaults to ``None``</span>
+<span class="sd">        model (str): The name of the model used. **Optional**, defaults to ``None``</span>
+<span class="sd">        object (str): The object type. The value should always be &#39;chat.completion&#39;</span>
+<span class="sd">        created (int): The time the response was created.</span>
+<span class="sd">            **Optional**, defaults to the current time.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">model</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">choices</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ChatChoice</span><span class="p">]</span>
     <span class="n">usage</span><span class="p">:</span> <span class="n">TokenUsageStats</span>
+    <span class="nb">id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">model</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="nb">object</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;chat.completion&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;chat.completion&quot;</span>
     <span class="n">created</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()))</span>
 
     <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;object&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;created&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_convert_dataclass_list</span><span class="p">(</span><span class="s2">&quot;choices&quot;</span><span class="p">,</span> <span class="n">ChatChoice</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">usage</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">usage</span> <span class="o">=</span> <span class="n">TokenUsageStats</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">usage</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">usage</span><span class="p">,</span> <span class="n">TokenUsageStats</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Expected `usage` to be of type TokenUsageStats or dict, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">usage</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span></div>
+            <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="c1"># A hack to ensure users cannot overwrite &#39;object&#39; field</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;object&quot;</span> <span class="ow">and</span> <span class="n">value</span> <span class="o">!=</span> <span class="s2">&quot;chat.completion&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`object` field must be &#39;chat.completion&#39;&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
 
 
 <span class="n">CHAT_MODEL_INPUT_SCHEMA</span> <span class="o">=</span> <span class="n">Schema</span><span class="p">(</span>

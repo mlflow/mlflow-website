@@ -2427,7 +2427,9 @@
 <span class="sd">        python_model:</span>
 <span class="sd">            An instance of a subclass of :class:`~PythonModel` or a callable object with a single</span>
 <span class="sd">            argument (see the examples below). The passed-in object is serialized using the</span>
-<span class="sd">            CloudPickle library. Any dependencies of the class should be included in one of the</span>
+<span class="sd">            CloudPickle library. The python_model can also be a file path to the PythonModel</span>
+<span class="sd">            which defines the model from code artifact rather than serializing the model object.</span>
+<span class="sd">            Any dependencies of the class should be included in one of the</span>
 <span class="sd">            following locations:</span>
 
 <span class="sd">            - The MLflow library.</span>
@@ -2477,6 +2479,35 @@
 <span class="sd">                mlflow.pyfunc.save_model(&quot;model&quot;, python_model=predict, input_example=[&quot;a&quot;])</span>
 <span class="sd">                model = mlflow.pyfunc.load_model(&quot;model&quot;)</span>
 <span class="sd">                print(model.predict([&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]))  # -&gt; [&quot;A&quot;, &quot;B&quot;, &quot;C&quot;]</span>
+
+<span class="sd">            Model from code</span>
+
+<span class="sd">            .. note::</span>
+<span class="sd">                Experimental: Model from code model support is experimental and may change or</span>
+<span class="sd">                be removed in a future release without warning.</span>
+
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                # code.py</span>
+<span class="sd">                from typing import List</span>
+<span class="sd">                import mlflow</span>
+
+
+<span class="sd">                class MyModel(mlflow.pyfunc.PythonModel):</span>
+<span class="sd">                    def predict(self, context, model_input: List[str], params=None) -&gt; List[str]:</span>
+<span class="sd">                        return [i.upper() for i in model_input]</span>
+
+
+<span class="sd">                mlflow.models.set_model(MyModel())</span>
+
+<span class="sd">                # log_model.py</span>
+<span class="sd">                import mlflow</span>
+
+<span class="sd">                with mlflow.start_run():</span>
+<span class="sd">                    model_info = mlflow.pyfunc.log_model(</span>
+<span class="sd">                        artifact_path=&quot;model&quot;,</span>
+<span class="sd">                        python_model=&quot;code.py&quot;,</span>
+<span class="sd">                    )</span>
 
 <span class="sd">            If the `predict` method or function has type annotations, MLflow automatically</span>
 <span class="sd">            constructs a model signature based on the type annotations (unless the ``signature``</span>
@@ -2792,7 +2823,9 @@
 <span class="sd">        python_model:</span>
 <span class="sd">            An instance of a subclass of :class:`~PythonModel` or a callable object with a single</span>
 <span class="sd">            argument (see the examples below). The passed-in object is serialized using the</span>
-<span class="sd">            CloudPickle library. Any dependencies of the class should be included in one of the</span>
+<span class="sd">            CloudPickle library. The python_model can also be a file path to the PythonModel</span>
+<span class="sd">            which defines the model from code artifact rather than serializing the model object.</span>
+<span class="sd">            Any dependencies of the class should be included in one of the</span>
 <span class="sd">            following locations:</span>
 
 <span class="sd">            - The MLflow library.</span>
@@ -2853,6 +2886,35 @@
 
 <span class="sd">                loaded_model = mlflow.pyfunc.load_model(model_uri=model_info.model_uri)</span>
 <span class="sd">                print(loaded_model.predict([&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]))  # -&gt; [&quot;A&quot;, &quot;B&quot;, &quot;C&quot;]</span>
+
+<span class="sd">            Model from code</span>
+
+<span class="sd">            .. note::</span>
+<span class="sd">                Experimental: Model from code model support is experimental and may change or</span>
+<span class="sd">                be removed in a future release without warning.</span>
+
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                # code.py</span>
+<span class="sd">                from typing import List</span>
+<span class="sd">                import mlflow</span>
+
+
+<span class="sd">                class MyModel(mlflow.pyfunc.PythonModel):</span>
+<span class="sd">                    def predict(self, context, model_input: List[str], params=None) -&gt; List[str]:</span>
+<span class="sd">                        return [i.upper() for i in model_input]</span>
+
+
+<span class="sd">                mlflow.models.set_model(MyModel())</span>
+
+<span class="sd">                # log_model.py</span>
+<span class="sd">                import mlflow</span>
+
+<span class="sd">                with mlflow.start_run():</span>
+<span class="sd">                    model_info = mlflow.pyfunc.log_model(</span>
+<span class="sd">                        artifact_path=&quot;model&quot;,</span>
+<span class="sd">                        python_model=&quot;code.py&quot;,</span>
+<span class="sd">                    )</span>
 
 <span class="sd">            If the `predict` method or function has type annotations, MLflow automatically</span>
 <span class="sd">            constructs a model signature based on the type annotations (unless the ``signature``</span>

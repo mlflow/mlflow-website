@@ -11,6 +11,10 @@ MLflow Deployments Server (Experimental)
    MLflow AI Gateway should refer to the new documentation for migration guidelines and familiarize
    themselves with the updated API structure. See :ref:`gateway-migration` for migration.
 
+.. warning::
+
+    MLflow Deployments Server does not support Windows.
+
 The MLflow Deployments Server is a powerful tool designed to streamline the usage and management of
 various large language model (LLM) providers, such as OpenAI and Anthropic, within an organization.
 It offers a high-level interface that simplifies the interaction with these services by providing
@@ -36,6 +40,7 @@ organizations that use LLMs on a regular basis.
     :hidden:
 
     guides/index
+    uc_integration
 
 Tutorials and Guides
 ====================
@@ -1182,6 +1187,11 @@ MLflow Deployments Server API Documentation
 ===========================================
 
 `API documentation <./api.html>`_
+
+Unity Catalog Integration
+=========================
+
+See `Unity Catalog Integration <./uc_integration.html>`_ for how to integrate the MLflow Deployments Server with Unity Catalog.
 
 .. _deployments_security:
 

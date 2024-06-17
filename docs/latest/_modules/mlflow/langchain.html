@@ -251,7 +251,6 @@
     <span class="n">patch_langchain_type_to_cls_dict</span><span class="p">,</span>
     <span class="n">register_pydantic_v1_serializer_cm</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.ml_package_versions</span> <span class="kn">import</span> <span class="n">_ML_PACKAGE_VERSIONS</span>
 <span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">Model</span><span class="p">,</span> <span class="n">ModelInputExample</span><span class="p">,</span> <span class="n">ModelSignature</span><span class="p">,</span> <span class="n">get_model_info</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.dependencies_schemas</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">_clear_dependencies_schemas</span><span class="p">,</span>
@@ -308,8 +307,6 @@
 
 <span class="n">FLAVOR_NAME</span> <span class="o">=</span> <span class="s2">&quot;langchain&quot;</span>
 <span class="n">_MODEL_TYPE_KEY</span> <span class="o">=</span> <span class="s2">&quot;model_type&quot;</span>
-<span class="n">_MIN_REQ_VERSION</span> <span class="o">=</span> <span class="n">Version</span><span class="p">(</span><span class="n">_ML_PACKAGE_VERSIONS</span><span class="p">[</span><span class="s2">&quot;langchain&quot;</span><span class="p">][</span><span class="s2">&quot;autologging&quot;</span><span class="p">][</span><span class="s2">&quot;minimum&quot;</span><span class="p">])</span>
-<span class="n">_MAX_REQ_VERSION</span> <span class="o">=</span> <span class="n">Version</span><span class="p">(</span><span class="n">_ML_PACKAGE_VERSIONS</span><span class="p">[</span><span class="s2">&quot;langchain&quot;</span><span class="p">][</span><span class="s2">&quot;autologging&quot;</span><span class="p">][</span><span class="s2">&quot;maximum&quot;</span><span class="p">])</span>
 
 
 <div class="viewcode-block" id="get_default_pip_requirements"><a class="viewcode-back" href="../../python_api/mlflow.langchain.html#mlflow.langchain.get_default_pip_requirements">[docs]</a><span class="k">def</span> <span class="nf">get_default_pip_requirements</span><span class="p">():</span>
@@ -377,7 +374,13 @@
 <span class="sd">            `Chain &lt;https://python.langchain.com/docs/modules/chains/&gt;`_,</span>
 <span class="sd">            `Agent &lt;https://python.langchain.com/docs/modules/agents/&gt;`_,</span>
 <span class="sd">            `retriever &lt;https://python.langchain.com/docs/modules/data_connection/retrievers/&gt;`_,</span>
-<span class="sd">            or `RunnableSequence &lt;https://python.langchain.com/docs/modules/chains/foundational/sequential_chains#using-lcel&gt;`_.</span>
+<span class="sd">            or `RunnableSequence &lt;https://python.langchain.com/docs/modules/chains/foundational/sequential_chains#using-lcel&gt;`_,</span>
+<span class="sd">            or a path containing the `LangChain model code &lt;https://github.com/mlflow/mlflow/blob/master/examples/langchain/chain_as_code_driver.py&gt;`</span>
+<span class="sd">            for the above types. When using model as path, make sure to set the model</span>
+<span class="sd">            by using :func:`mlflow.models.set_model()`.</span>
+
+<span class="sd">            .. Note:: Experimental: Using model as path may change or be removed in a future</span>
+<span class="sd">                        release without warning.</span>
 <span class="sd">        path: Local path where the serialized model (as YAML) is to be saved.</span>
 <span class="sd">        conda_env: {{ conda_env }}</span>
 <span class="sd">        code_paths: {{ code_paths }}</span>
@@ -463,7 +466,7 @@
 <span class="sd">                DataFrame format when saving. This is useful when the model expects a DataFrame</span>
 <span class="sd">                input and the input example could be passed directly to the model.</span>
 <span class="sd">                Defaults to ``True``.</span>
-<span class="sd">        model_config: The model configuration to apply to the model if saving model as code. This</span>
+<span class="sd">        model_config: The model configuration to apply to the model if saving model from code. This</span>
 <span class="sd">            configuration is available during model loading.</span>
 
 <span class="sd">            .. Note:: Experimental: This parameter may change or be removed in a future</span>
@@ -649,7 +652,13 @@
 <span class="sd">        lc_model: A LangChain model, which could be a</span>
 <span class="sd">            `Chain &lt;https://python.langchain.com/docs/modules/chains/&gt;`_,</span>
 <span class="sd">            `Agent &lt;https://python.langchain.com/docs/modules/agents/&gt;`_, or</span>
-<span class="sd">            `retriever &lt;https://python.langchain.com/docs/modules/data_connection/retrievers/&gt;`_.</span>
+<span class="sd">            `retriever &lt;https://python.langchain.com/docs/modules/data_connection/retrievers/&gt;`_</span>
+<span class="sd">            or a path containing the `LangChain model code &lt;https://github.com/mlflow/mlflow/blob/master/examples/langchain/chain_as_code_driver.py&gt;`</span>
+<span class="sd">            for the above types. When using model as path, make sure to set the model</span>
+<span class="sd">            by using :func:`mlflow.models.set_model()`.</span>
+
+<span class="sd">            .. Note:: Experimental: Using model as path may change or be removed in a future</span>
+<span class="sd">                                    release without warning.</span>
 <span class="sd">        artifact_path: Run-relative artifact path.</span>
 <span class="sd">        conda_env: {{ conda_env }}</span>
 <span class="sd">        code_paths: {{ code_paths }}</span>
@@ -747,7 +756,7 @@
 <span class="sd">        run_id: run_id to associate with this model version. If specified, we resume the</span>
 <span class="sd">                run and log the model to that run. Otherwise, a new run is created.</span>
 <span class="sd">                Default to None.</span>
-<span class="sd">        model_config: The model configuration to apply to the model if saving model as code. This</span>
+<span class="sd">        model_config: The model configuration to apply to the model if saving model from code. This</span>
 <span class="sd">            configuration is available during model loading.</span>
 
 <span class="sd">            .. Note:: Experimental: This parameter may change or be removed in a future</span>
@@ -1161,10 +1170,14 @@
 
 <span class="k">def</span> <span class="nf">_patch_runnable_cls</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    For classes that are subclasses of Runnable, we patch the `invoke`, `batch`, and `stream`</span>
-<span class="sd">    methods for autologging.</span>
+<span class="sd">    For classes that are subclasses of Runnable, we patch the `invoke`, `batch`, `stream` and</span>
+<span class="sd">    `ainvoke`, `abatch`, `astream` methods for autologging.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        cls: The class to patch.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">for</span> <span class="n">func_name</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;invoke&quot;</span><span class="p">,</span> <span class="s2">&quot;batch&quot;</span><span class="p">,</span> <span class="s2">&quot;stream&quot;</span><span class="p">]:</span>
+    <span class="n">patch_functions</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;invoke&quot;</span><span class="p">,</span> <span class="s2">&quot;batch&quot;</span><span class="p">,</span> <span class="s2">&quot;stream&quot;</span><span class="p">,</span> <span class="s2">&quot;ainvoke&quot;</span><span class="p">,</span> <span class="s2">&quot;abatch&quot;</span><span class="p">,</span> <span class="s2">&quot;astream&quot;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">func_name</span> <span class="ow">in</span> <span class="n">patch_functions</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">func_name</span><span class="p">):</span>
             <span class="n">safe_patch</span><span class="p">(</span>
                 <span class="n">FLAVOR_NAME</span><span class="p">,</span>
@@ -1272,14 +1285,6 @@
         <span class="kn">from</span> <span class="nn">langchain.chains.base</span> <span class="kn">import</span> <span class="n">Chain</span>
         <span class="kn">from</span> <span class="nn">langchain.schema</span> <span class="kn">import</span> <span class="n">BaseRetriever</span>
         <span class="kn">from</span> <span class="nn">langchain.schema.runnable</span> <span class="kn">import</span> <span class="n">Runnable</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">_MIN_REQ_VERSION</span> <span class="o">&lt;=</span> <span class="n">Version</span><span class="p">(</span><span class="n">langchain</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">_MAX_REQ_VERSION</span><span class="p">:</span>
-            <span class="c1"># Suppress the warning after it is shown once</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s2">&quot;Autologging is known to be compatible with langchain versions between &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_MIN_REQ_VERSION</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">_MAX_REQ_VERSION</span><span class="si">}</span><span class="s2"> and may not succeed with packages &quot;</span>
-                <span class="s2">&quot;outside this range.&quot;</span>
-            <span class="p">)</span>
 
         <span class="c1"># avoid duplicate patching</span>
         <span class="n">patched_classes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>

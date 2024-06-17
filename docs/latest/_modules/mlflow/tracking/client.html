@@ -261,8 +261,6 @@
 <span class="kn">from</span> <span class="nn">mlflow.store.tracking</span> <span class="kn">import</span> <span class="n">SEARCH_MAX_RESULTS_DEFAULT</span><span class="p">,</span> <span class="n">SEARCH_TRACES_DEFAULT_MAX_RESULTS</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracing.constant</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">TRACE_REQUEST_ID_PREFIX</span><span class="p">,</span>
-    <span class="n">TRACE_SCHEMA_VERSION</span><span class="p">,</span>
-    <span class="n">TRACE_SCHEMA_VERSION_KEY</span><span class="p">,</span>
     <span class="n">SpanAttributeKey</span><span class="p">,</span>
     <span class="n">TraceTagKey</span><span class="p">,</span>
 <span class="p">)</span>
@@ -659,7 +657,7 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="MlflowClient.get_trace"><a class="viewcode-back" href="../../../python_api/mlflow.client.html#mlflow.client.MlflowClient.get_trace">[docs]</a>    <span class="nd">@experimental</span>
-    <span class="k">def</span> <span class="nf">get_trace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Trace</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">get_trace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">display</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Trace</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the trace matching the specified ``request_id``.</span>
 
@@ -679,7 +677,8 @@
 <span class="sd">            trace = client.get_trace(request_id)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">trace</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tracking_client</span><span class="o">.</span><span class="n">get_trace</span><span class="p">(</span><span class="n">request_id</span><span class="p">)</span>
-        <span class="n">get_display_handler</span><span class="p">()</span><span class="o">.</span><span class="n">display_traces</span><span class="p">([</span><span class="n">trace</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">display</span><span class="p">:</span>
+            <span class="n">get_display_handler</span><span class="p">()</span><span class="o">.</span><span class="n">display_traces</span><span class="p">([</span><span class="n">trace</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">trace</span></div>
 
 <div class="viewcode-block" id="MlflowClient.search_traces"><a class="viewcode-back" href="../../../python_api/mlflow.client.html#mlflow.client.MlflowClient.search_traces">[docs]</a>    <span class="nd">@experimental</span>
@@ -820,7 +819,6 @@
                 <span class="n">mlflow_span</span><span class="o">.</span><span class="n">set_attributes</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
             <span class="n">trace_manager</span> <span class="o">=</span> <span class="n">InMemoryTraceManager</span><span class="o">.</span><span class="n">get_instance</span><span class="p">()</span>
             <span class="n">tags</span> <span class="o">=</span> <span class="n">exclude_immutable_tags</span><span class="p">(</span><span class="n">tags</span> <span class="ow">or</span> <span class="p">{})</span>
-            <span class="n">tags</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">TRACE_SCHEMA_VERSION_KEY</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">TRACE_SCHEMA_VERSION</span><span class="p">)})</span>
             <span class="k">if</span> <span class="n">is_in_databricks_model_serving_environment</span><span class="p">():</span>
                 <span class="c1"># Update trace tags for trace in in-memory trace manager</span>
                 <span class="k">with</span> <span class="n">trace_manager</span><span class="o">.</span><span class="n">get_trace</span><span class="p">(</span><span class="n">request_id</span><span class="p">)</span> <span class="k">as</span> <span class="n">trace</span><span class="p">:</span>

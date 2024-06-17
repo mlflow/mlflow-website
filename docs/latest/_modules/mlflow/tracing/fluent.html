@@ -458,6 +458,10 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get a trace by the given request ID if it exists.</span>
 
+<span class="sd">    This function retrieves the trace from the in-memory buffer first, and if it doesn&#39;t exist,</span>
+<span class="sd">    it fetches the trace from the tracking store. If the trace is not found in the tracking store,</span>
+<span class="sd">    it returns None.</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        request_id: The request ID of the trace.</span>
 
@@ -478,7 +482,19 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        A :py:class:`mlflow.entities.Trace` objects with the given request ID.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">TRACE_BUFFER</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">request_id</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+    <span class="c1"># Try to get the trace from the in-memory buffer first</span>
+    <span class="k">if</span> <span class="n">trace</span> <span class="o">:=</span> <span class="n">TRACE_BUFFER</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">request_id</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">trace</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">MlflowClient</span><span class="p">()</span><span class="o">.</span><span class="n">get_trace</span><span class="p">(</span><span class="n">request_id</span><span class="p">,</span> <span class="n">display</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">MlflowException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Failed to get trace from the tracking store: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;For full traceback, set logging level to debug.&quot;</span><span class="p">,</span>
+            <span class="n">exc_info</span><span class="o">=</span><span class="n">_logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
 
 
 <div class="viewcode-block" id="search_traces"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.search_traces">[docs]</a><span class="nd">@experimental</span>

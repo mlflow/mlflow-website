@@ -966,7 +966,9 @@ The following is an <em>example</em> dictionary representation of a conda enviro
 </p></li>
 <li><p><strong>python_model</strong> – <p>An instance of a subclass of <a class="reference internal" href="#mlflow.pyfunc.PythonModel" title="mlflow.pyfunc.PythonModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">PythonModel</span></code></a> or a callable object with a single
 argument (see the examples below). The passed-in object is serialized using the
-CloudPickle library. Any dependencies of the class should be included in one of the
+CloudPickle library. The python_model can also be a file path to the PythonModel
+which defines the model from code artifact rather than serializing the model object.
+Any dependencies of the class should be included in one of the
 following locations:</p>
 <ul>
 <li><p>The MLflow library.</p></li>
@@ -1021,6 +1023,34 @@ in a future release without warning.</p>
 
 <span class="n">loaded_model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_uri</span><span class="o">=</span><span class="n">model_info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">loaded_model</span><span class="o">.</span><span class="n">predict</span><span class="p">([</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">]))</span>  <span class="c1"># -&gt; [&quot;A&quot;, &quot;B&quot;, &quot;C&quot;]</span>
+</pre></div>
+</div>
+<p>Model from code</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Experimental: Model from code model support is experimental and may change or
+be removed in a future release without warning.</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># code.py</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+<span class="kn">import</span> <span class="nn">mlflow</span>
+
+
+<span class="k">class</span> <span class="nc">MyModel</span><span class="p">(</span><span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">PythonModel</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">model_input</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">model_input</span><span class="p">]</span>
+
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">set_model</span><span class="p">(</span><span class="n">MyModel</span><span class="p">())</span>
+
+<span class="c1"># log_model.py</span>
+<span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="n">model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+        <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
+        <span class="n">python_model</span><span class="o">=</span><span class="s2">&quot;code.py&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
 </pre></div>
 </div>
 <p>If the <cite>predict</cite> method or function has type annotations, MLflow automatically
@@ -1235,7 +1265,9 @@ The following is an <em>example</em> dictionary representation of a conda enviro
 <strong>python_function</strong> flavor.</p></li>
 <li><p><strong>python_model</strong> – <p>An instance of a subclass of <a class="reference internal" href="#mlflow.pyfunc.PythonModel" title="mlflow.pyfunc.PythonModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">PythonModel</span></code></a> or a callable object with a single
 argument (see the examples below). The passed-in object is serialized using the
-CloudPickle library. Any dependencies of the class should be included in one of the
+CloudPickle library. The python_model can also be a file path to the PythonModel
+which defines the model from code artifact rather than serializing the model object.
+Any dependencies of the class should be included in one of the
 following locations:</p>
 <ul>
 <li><p>The MLflow library.</p></li>
@@ -1279,6 +1311,34 @@ in a future release without warning.</p>
 <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">save_model</span><span class="p">(</span><span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="n">python_model</span><span class="o">=</span><span class="n">predict</span><span class="p">,</span> <span class="n">input_example</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">])</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="s2">&quot;model&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">([</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">]))</span>  <span class="c1"># -&gt; [&quot;A&quot;, &quot;B&quot;, &quot;C&quot;]</span>
+</pre></div>
+</div>
+<p>Model from code</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Experimental: Model from code model support is experimental and may change or
+be removed in a future release without warning.</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># code.py</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+<span class="kn">import</span> <span class="nn">mlflow</span>
+
+
+<span class="k">class</span> <span class="nc">MyModel</span><span class="p">(</span><span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">PythonModel</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">model_input</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">model_input</span><span class="p">]</span>
+
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">set_model</span><span class="p">(</span><span class="n">MyModel</span><span class="p">())</span>
+
+<span class="c1"># log_model.py</span>
+<span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="n">model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+        <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
+        <span class="n">python_model</span><span class="o">=</span><span class="s2">&quot;code.py&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
 </pre></div>
 </div>
 <p>If the <cite>predict</cite> method or function has type annotations, MLflow automatically

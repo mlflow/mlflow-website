@@ -237,13 +237,8 @@
 <p>To learn more about what tracing is, see our <a class="reference external" href="./overview.html">Tracing Concepts Overview</a> guide.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>MLflow Tracing support is available for <strong>early access</strong> with the <strong>MLflow 2.14.0rc0</strong> release candidate build. Versions of MLflow prior to this release
+<p>MLflow Tracing support is available with the <strong>MLflow 2.14.0</strong> release. Versions of MLflow prior to this release
 do not contain the full set of features that are required for trace logging support.</p>
-<p>Release candidates can be installed via PyPI via the following syntax, which will fetch the latest release candidate build
-for a given release version:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>--pre<span class="w"> </span><span class="nv">mlflow</span><span class="o">==</span><span class="m">2</span>.14.0rc*
-</pre></div>
-</div>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -515,7 +510,7 @@ capture its inputs, outputs, and execution context.</p>
         <span class="c1"># Wrap another external function</span>
         <span class="n">traced_factorial</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">factorial</span><span class="p">)</span>
 
-        <span class="n">factorial</span> <span class="o">=</span> <span class="n">traced_factorial</span><span class="p">(</span><span class="n">raised</span><span class="p">)</span>
+        <span class="n">factorial</span> <span class="o">=</span> <span class="n">traced_factorial</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">raised</span><span class="p">))</span>
 
         <span class="c1"># Wrap another and call it directly</span>
         <span class="n">response</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">)(</span><span class="n">factorial</span><span class="p">)</span>
@@ -622,8 +617,33 @@ spans are properly ended.</p>
 filter strings, and other parameters.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Search for traces in specific experiments</span>
 <span class="n">traces</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">search_traces</span><span class="p">(</span>
-    <span class="n">experiment_ids</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">],</span> <span class="n">filter_string</span><span class="o">=</span><span class="s2">&quot;attributes.status = &#39;OK&#39;&quot;</span><span class="p">,</span> <span class="n">max_results</span><span class="o">=</span><span class="mi">5</span>
+    <span class="n">experiment_ids</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">],</span>
+    <span class="n">filter_string</span><span class="o">=</span><span class="s2">&quot;attributes.status = &#39;OK&#39;&quot;</span><span class="p">,</span>
+    <span class="n">max_results</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
 <span class="p">)</span>
+</pre></div>
+</div>
+<p>Alternatively, you can use fluent API <a class="reference internal" href="../../python_api/mlflow.html#mlflow.search_traces" title="mlflow.search_traces"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.search_traces()</span></code></a> to search for traces, which returns a pandas DataFrame with each row containing a trace.
+This method allows you to specify fields to extract from traces using the format <code class="docutils literal notranslate"><span class="pre">&quot;span_name.[inputs|outputs]&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;span_name.[inputs|outputs].field_name&quot;</span></code>.
+The extracted fields are included as extra columns in the pandas DataFrame. This feature can be used to build evaluation datasets to further improve model and agent performance.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_span</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;span1&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">span</span><span class="p">:</span>
+    <span class="n">span</span><span class="o">.</span><span class="n">set_inputs</span><span class="p">({</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">})</span>
+    <span class="n">span</span><span class="o">.</span><span class="n">set_outputs</span><span class="p">({</span><span class="s2">&quot;c&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;d&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">})</span>
+
+<span class="c1"># Search for traces with specific fields extracted</span>
+<span class="n">traces</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">search_traces</span><span class="p">(</span>
+    <span class="n">extract_fields</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;span1.inputs&quot;</span><span class="p">,</span> <span class="s2">&quot;span1.outputs.c&quot;</span><span class="p">],</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">traces</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This outputs:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>    request_id                              ...     span1.inputs        span1.outputs.c
+0   tr-97c4ef97c21f4348a5698f069c1320f1     ...     {&#39;a&#39;: 1, &#39;b&#39;: 2}    3.0
+1   tr-4dc3cd5567764499b5532e3af61b9f78     ...     {&#39;a&#39;: 1, &#39;b&#39;: 2}    3.0
 </pre></div>
 </div>
 </div>
@@ -824,6 +844,79 @@ one for the fluent API and one for the client API.</p>
 </pre></div>
 </div>
 </div>
+</div>
+<div class="section" id="q-how-can-i-see-the-stack-trace-of-a-span-that-captured-an-exception">
+<h3>Q: How can I see the stack trace of a Span that captured an Exception?<a class="headerlink" href="#q-how-can-i-see-the-stack-trace-of-a-span-that-captured-an-exception" title="Permalink to this headline"> </a></h3>
+<p>The MLflow UI does not display Exception types, messages, or stacktraces if faults occur while logging a trace.
+However, the trace does contain this critical debugging information as part of the Span objects that comprise the Trace.</p>
+<p>The simplest way to retrieve a particular stack trace information from a span that endured an exception is to retrieve the trace directly in
+an interactive environment (such as a Jupyter Notebook).</p>
+<p>Here is an example of intentionally throwing an Exception while a trace is being collected and a simple way to view the exception details:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="n">experiment</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s2">&quot;Intentional Exception&quot;</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_span</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;A Problematic Span&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">span</span><span class="p">:</span>
+    <span class="n">span</span><span class="o">.</span><span class="n">set_inputs</span><span class="p">({</span><span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="s2">&quot;Exception should log as event&quot;</span><span class="p">})</span>
+    <span class="n">span</span><span class="o">.</span><span class="n">set_attribute</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Intentionally throwing!&quot;</span><span class="p">)</span>
+    <span class="n">span</span><span class="o">.</span><span class="n">set_outputs</span><span class="p">({</span><span class="s2">&quot;This&quot;</span><span class="p">:</span> <span class="s2">&quot;should not be recorded&quot;</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>When running this, an Exception will be thrown, as expected. However, a trace is still logged to the active experiment and can be retrieved as follows:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
+
+<span class="n">trace</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">get_trace</span><span class="p">(</span><span class="n">span</span><span class="o">.</span><span class="n">request_id</span><span class="p">)</span>
+<span class="n">trace_data</span> <span class="o">=</span> <span class="n">trace</span><span class="o">.</span><span class="n">data</span>
+<span class="n">pprint</span><span class="p">(</span><span class="n">trace_data</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># Minimum indent due to depth of Span object</span>
+</pre></div>
+</div>
+<p>In an interactive environment, such as a Jupyter Notebook, the <code class="docutils literal notranslate"><span class="pre">stdout</span></code> return will render an output like this:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>{&#39;spans&#39;: [{&#39;name&#39;: &#39;A Span&#39;,
+    &#39;context&#39;: {&#39;span_id&#39;: &#39;0x896ff177c0942903&#39;,
+        &#39;trace_id&#39;: &#39;0xcae9cb08ec0a273f4c0aab36c484fe87&#39;},
+    &#39;parent_id&#39;: None,
+    &#39;start_time&#39;: 1718063629190062000,
+    &#39;end_time&#39;: 1718063629190595000,
+    &#39;status_code&#39;: &#39;ERROR&#39;,
+    &#39;status_message&#39;: &#39;Exception: Intentionally throwing!&#39;,
+    &#39;attributes&#39;: {&#39;mlflow.traceRequestId&#39;: &#39;&quot;7d418211df5945fa94e5e39b8009039e&quot;&#39;,
+        &#39;mlflow.spanType&#39;: &#39;&quot;UNKNOWN&quot;&#39;,
+        &#39;mlflow.spanInputs&#39;: &#39;{&quot;input&quot;: &quot;Exception should log as event&quot;}&#39;,
+        &#39;a&#39;: &#39;&quot;b&quot;&#39;},
+    &#39;events&#39;: [{&#39;name&#39;: &#39;exception&#39;,
+        &#39;timestamp&#39;: 1718063629190527000,
+        &#39;attributes&#39;: {&#39;exception.type&#39;: &#39;Exception&#39;,
+        &#39;exception.message&#39;: &#39;Intentionally throwing!&#39;,
+        &#39;exception.stacktrace&#39;: &#39;Traceback (most recent call last):\n
+                                 File &quot;/usr/local/lib/python3.8/site-packages/opentelemetry/trace/__init__.py&quot;,
+                                 line 573, in use_span\n
+                                    yield span\n  File &quot;/usr/local/mlflow/mlflow/tracing/fluent.py&quot;,
+                                 line 241, in start_span\n
+                                    yield mlflow_span\n  File &quot;/var/folders/cd/n8n0rm2x53l_s0xv_j_xklb00000gp/T/ipykernel_9875/4089093747.py&quot;,
+                                 line 4, in &lt;cell line: 1&gt;\n
+                                    raise Exception(&quot;Intentionally throwing!&quot;)\nException: Intentionally throwing!\n&#39;,
+        &#39;exception.escaped&#39;: &#39;False&#39;}}]}],
+ &#39;request&#39;: &#39;{&quot;input&quot;: &quot;Exception should log as event&quot;}&#39;,
+ &#39;response&#39;: None
+}
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">exception.stacktrace</span></code> attribute contains the full stack trace of the Exception that was raised during the span’s execution.</p>
+<p>Alternatively, if you were to use the MLflowClient API to search traces, the access to retrieve the span’s event data from the failure would be
+slightly different (due to the return value being a <code class="docutils literal notranslate"><span class="pre">pandas</span></code> DataFrame). To use the <code class="docutils literal notranslate"><span class="pre">search_traces</span></code> API to access the same exception data would
+be as follows:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="n">client</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">MlflowClient</span><span class="p">()</span>
+
+<span class="n">traces</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">search_traces</span><span class="p">(</span>
+    <span class="n">experiment_ids</span><span class="o">=</span><span class="p">[</span><span class="n">experiment</span><span class="o">.</span><span class="n">experiment_id</span><span class="p">]</span>
+<span class="p">)</span>  <span class="c1"># This returns a pandas DataFrame</span>
+<span class="n">pprint</span><span class="p">(</span><span class="n">traces</span><span class="p">[</span><span class="s2">&quot;trace&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">spans</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The stdout values that will be rendered from this call are identical to those from the example span data above.</p>
 </div>
 </div>
 </div>
