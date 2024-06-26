@@ -78,8 +78,6 @@ To demonstrate the power of using LLMs as judges with MLflow evaluate, let's wal
 
 For the full code example, please refer to the accompanying notebook. Here's a brief overview of the process:
 
-## Code walktrough
-
 start by installing all the necessary libraries for this demo to work.
 Since mlflow evaluate offers some default metrics we need to install the libraries to calculate those metrics (toxiticy etc..)
 
