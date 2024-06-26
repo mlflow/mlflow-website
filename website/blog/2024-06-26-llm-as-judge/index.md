@@ -1,4 +1,11 @@
-# Leveraging LLMs as Judges: Advanced Model Evaluation with MLflow
+---
+title: LLM as judge
+description: Perform LLM Evaluations with custom metrics
+slug: llm-as-judge
+authors: [pedro-azevedo,rahul-pandey]
+tags: [genai,mlflow-evalaute]
+thumbnail: img/blog/llm-as-judge.png
+---
 
 ## 1. Introduction
 
