@@ -9,7 +9,7 @@ thumbnail: img/blog/llm-as-judge.png
 
 ## 1. Introduction
 
-In the rapidly evolving field of machine learning, evaluating model performance is crucial. MLflow, an open-source platform for managing the ML lifecycle, offers powerful tools for assessing models comprehensively. In this blog post, we'll explore how to use MLflow evaluate, with a special focus on leveraging Large Language Models (LLMs) as judges for custom evaluation metrics.
+In the rapidly evolving field of machine learning, evaluating model performance is crucial. MLflow, an open-source platform for managing the ML lifecycle, offers powerful tools for assessing models comprehensively. In this blog post, we'll explore how to use [recently introduced MLflow LLM Evaluate features on Mlflow Evalaute](https://mlflow.org/docs/latest/llms/llm-evaluate/index.html), with a special focus on leveraging Large Language Models (LLMs) as judges for custom evaluation metrics.
 
 ## 2. What is MLflow evaluate?
 
@@ -44,27 +44,27 @@ Consider this real life common example; Companies looking to enhance the profess
 
 MLflow offers a few pre-canned metrics which uses LLM as the judge. Despite the difference under the hood, the usage is the same - put these metrics in the extra_metrics argument in mlflow.evaluate(). Here is the list of pre-canned metrics:
 
-1. **mlflow.metrics.genai.answer_similarity()**
+1. **[mlflow.metrics.genai.answer_similarity()](https://mlflow.org/docs/latest/python_api/mlflow.metrics.html?highlight=genai%20answer#mlflow.metrics.genai.answer_similarity)**
    - **Purpose**: Evaluates semantic similarity between model output and ground truth.
    - **Use case**: Ideal for question-answering tasks.
    - **Scoring**: Higher scores indicate greater alignment.
 
-2. **mlflow.metrics.genai.answer_correctness()**
+2. **[mlflow.metrics.genai.answer_correctness()](https://mlflow.org/docs/latest/python_api/mlflow.metrics.html?highlight=genai%20answer#mlflow.metrics.genai.answer_correctness)**
    - **Purpose**: Assesses factual correctness based on ground truth.
    - **Use case**: Crucial for knowledge-based question answering.
    - **Scoring**: Higher scores indicate similarity and factual correctness.
 
-3. **mlflow.metrics.genai.answer_relevance()**
+3. **[mlflow.metrics.genai.answer_relevance()](https://mlflow.org/docs/latest/python_api/mlflow.metrics.html?highlight=genai%20answer#mlflow.metrics.genai.answer_relevance)**
    - **Purpose**: Evaluates output relevance to the input question (ignoring context).
    - **Use case**: Assesses if the model stays on topic.
    - **Scoring**: Higher scores mean more topical relevance.
 
-4. **mlflow.metrics.genai.relevance()**
+4. **[mlflow.metrics.genai.relevance()](https://mlflow.org/docs/latest/python_api/mlflow.metrics.html?highlight=genai%20answer#mlflow.metrics.genai.relevance)**
    - **Purpose**: Measures relevance to both input question and context.
    - **Use case**: Useful for question answering over specific contexts.
    - **Scoring**: Higher scores indicate understanding of question and context.
 
-5. **mlflow.metrics.genai.faithfulness()**
+5. **[mlflow.metrics.genai.faithfulness()](https://mlflow.org/docs/latest/python_api/mlflow.metrics.html?highlight=genai%20answer#mlflow.metrics.genai.faithfulness)**
    - **Purpose**: Evaluates output faithfulness to provided context (ignoring question).
    - **Use case**: Important for summarization or information extraction.
    - **Scoring**: Higher scores mean better alignment with context.
@@ -73,8 +73,8 @@ MLflow offers a few pre-canned metrics which uses LLM as the judge. Despite the 
 
 MLflow provides two main functions for creating custom metrics using LLMs as judges:
 
-1. `mlflow.metrics.genai.make_genai_metric()`
-2. `mlflow.metrics.genai.make_genai_metric_from_prompt()`
+1. [mlflow.metrics.genai.make_genai_metric()](https://mlflow.org/docs/latest/python_api/mlflow.metrics.html?highlight=genai%20answer#mlflow.metrics.genai.make_genai_metric)
+2. [mlflow.metrics.genai.make_genai_metric_from_prompt()](https://mlflow.org/docs/latest/python_api/mlflow.metrics.html?highlight=genai%20answer#mlflow.metrics.genai.make_genai_metric_from_prompt)
 
 Let's explore both of these functions and their use cases.
 
