@@ -63,6 +63,17 @@ The company decided to build a pipline for their materials which is invoked insi
 
 This metric assesses how well the chatbot's responses align with the provided context (company policies) and the specific questions asked by customers.
 
+### Built in Text Model Metrics
+
+In addition to this we can leverage mlflow built in metrics to measure some relevant metrics.
+Since Worldwide WanderAgency uses a text model we get these metrics out of the box. 
+
+- [toxicity](https://huggingface.co/spaces/evaluate-measurement/toxicity) 
+- [ari_grade_level](https://en.wikipedia.org/wiki/Automated_readability_index) 
+- [flesch_kincaid_grade_level](https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests#Flesch%E2%80%93Kincaid_grade_level) 
+
+For this use case we want to make sure none of the context translated are toxic.
+
 
 ## Putting It All Together: Evaluating Worldwide WanderAgency's AI Systems
 
