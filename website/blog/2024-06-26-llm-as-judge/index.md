@@ -7,7 +7,7 @@ tags: [genai,mlflow-evalaute]
 thumbnail: img/blog/llm-as-judge.png
 ---
 
-In this blog post, we'll embark on a journey to revolutionize how we evaluate language models. We'll explore the power of MLflow Evaluate and harness the capabilities of Large Language Models (LLMs) as impartial judges. By the end, you'll learn how to create custom metrics, implement LLM-based evaluation, and apply these techniques to real-world scenarios. Get ready to transform your model assessment process and gain deeper insights into your AI's performance!
+In this blog post, we'll dive on a journey to revolutionize how we evaluate language models. We'll explore the power of MLflow Evaluate and harness the capabilities of Large Language Models (LLMs) as impartial judges. By the end, you'll learn how to create custom metrics, implement LLM-based evaluation, and apply these techniques to real-world scenarios. Get ready to transform your model assessment process and gain deeper insights into your AI's performance!
 
 ## The Challenge of Evaluating Language Models
 
@@ -33,7 +33,7 @@ For Worldwide WanderAgency, MLflow Evaluate offers the flexibility to create met
 
 Traditional metrics often struggle to capture the subtleties of language tasks. This is where LLMs shine as impartial judges. With their advanced language understanding capabilities, LLMs can provide nuanced assessments of model outputs, considering context, tone, and cultural appropriateness.
 
-![Mlflow Metrics](metrics-comparison-v2.svg)
+![Mlflow Metrics](metrics-comparision-v3.svg)
 
 For our travel agency, using LLMs as judges means they can evaluate translations not just for accuracy, but for how well they preserve the intended message and cultural nuances across different languages.
 
@@ -168,7 +168,8 @@ Let's set a metric that takes into account that cultural sensitivity.
 By default MLflow evaluate uses openai:/gpt-4 as a judge. However you can choose also choose a local model to do this evaluation (for example using ollama wraped in a pyfync)
 
 ```python
-To use an endpoint hosted by a local MLflow Deployments Server, you can use the following code.
+#To use an endpoint hosted by a local MLflow Deployments Server, you can use the following code.
+
 from mlflow.deployments import set_deployments_target
 
 set_deployments_target("http://localhost:5000")
