@@ -184,7 +184,7 @@ Begin by providing a few examples of good and bad scores.
 
 ```python
 
-# 2. Define the custom metric
+# Define the custom metric
 cultural_sensitivity = mlflow.metrics.genai.make_genai_metric(
     name="cultural_sensitivity",
     definition="Assesses how well the translation preserves cultural nuances and idioms.",
@@ -260,7 +260,7 @@ cultural_sensitivity = mlflow.metrics.genai.make_genai_metric(
 On top of this let's use mlflow default metrics for the evaluators. In this case mlflow wll use roberta-hate-speech model to detect the toxicity
 
 ```python
-# 3. Log and evaluate the model
+# Log and evaluate the model
 with mlflow.start_run() as run:
     results = mlflow.evaluate(
         basic_translation_model.model_uri,
@@ -350,7 +350,7 @@ Since in the first metric we used an mlflow model in the example ,for tutorial p
 
 
 ```python
-# 1. Prepare evaluation data
+# Prepare evaluation data
 eval_data = pd.DataFrame(
     {
         "llm_inputs": [
@@ -399,7 +399,7 @@ context: "Employees are entitled to 20 days of paid annual leave per year. Leave
             justification="The answer is accurate and directly related to the question and context provided."
         )]
 
-# 2. Define the custom metric
+#  Define the custom metric
 faithfulness = mlflow.metrics.genai.make_genai_metric(
     name="faithfulness",
     definition="Assesses how well the answer relates to the question and provided context.",
