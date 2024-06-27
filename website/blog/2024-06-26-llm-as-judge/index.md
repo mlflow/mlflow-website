@@ -63,7 +63,7 @@ The company decided to build a pipline for their materials which is invoked insi
 
 This metric assesses how well the chatbot's responses align with the provided context (company policies) and the specific questions asked by customers.
 
-### Built in Text Model Metrics
+### Built in Metrics
 
 In addition to this we can leverage mlflow built in metrics to measure some relevant metrics.
 Since Worldwide WanderAgency uses a text model we get these metrics out of the box. 
