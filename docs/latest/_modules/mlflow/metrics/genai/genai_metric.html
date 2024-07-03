@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mlflow.metrics.genai.genai_metric &mdash; MLflow 2.14.1.dev0 documentation</title>
+  <title>mlflow.metrics.genai.genai_metric &mdash; MLflow 2.14.2.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -56,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../../search.html"/>
-    <link rel="top" title="MLflow 2.14.1.dev0 documentation" href="../../../../index.html"/>
+    <link rel="top" title="MLflow 2.14.2.dev0 documentation" href="../../../../index.html"/>
         <link rel="up" title="mlflow.metrics" href="../../metrics.html"/> 
 
   
@@ -87,7 +87,7 @@
     <a href="../../../../index.html" class="wy-nav-top-logo"
       ><img src="../../../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.14.1.dev0</span>
+    <span class="version">2.14.2.dev0</span>
   </li>
 </ul>
   </nav>
@@ -228,6 +228,7 @@
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.annotations</span> <span class="kn">import</span> <span class="n">experimental</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.class_utils</span> <span class="kn">import</span> <span class="n">_get_class_from_string</span>
+<span class="kn">from</span> <span class="nn">mlflow.version</span> <span class="kn">import</span> <span class="n">VERSION</span>
 
 <span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -450,6 +451,22 @@
 <span class="sd">        )</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># When users create a custom metric using this function,the metric configuration</span>
+    <span class="c1"># will be serialized and stored as an artifact. This enables us to later deserialize</span>
+    <span class="c1"># the configuration, allowing users to understand their LLM evaluation results more clearly.</span>
+    <span class="n">genai_metric_args</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
+        <span class="s2">&quot;judge_prompt&quot;</span><span class="p">:</span> <span class="n">judge_prompt</span><span class="p">,</span>
+        <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="n">model</span><span class="p">,</span>
+        <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="n">parameters</span><span class="p">,</span>
+        <span class="s2">&quot;aggregations&quot;</span><span class="p">:</span> <span class="n">aggregations</span><span class="p">,</span>
+        <span class="s2">&quot;greater_is_better&quot;</span><span class="p">:</span> <span class="n">greater_is_better</span><span class="p">,</span>
+        <span class="s2">&quot;max_workers&quot;</span><span class="p">:</span> <span class="n">max_workers</span><span class="p">,</span>
+        <span class="s2">&quot;metric_metadata&quot;</span><span class="p">:</span> <span class="n">metric_metadata</span><span class="p">,</span>
+        <span class="c1"># Record the mlflow version for serialization in case the function signature changes later</span>
+        <span class="s2">&quot;mlflow_version&quot;</span><span class="p">:</span> <span class="n">VERSION</span><span class="p">,</span>
+    <span class="p">}</span>
+
     <span class="n">aggregations</span> <span class="o">=</span> <span class="n">aggregations</span> <span class="ow">or</span> <span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;variance&quot;</span><span class="p">,</span> <span class="s2">&quot;p90&quot;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">eval_fn</span><span class="p">(</span>
@@ -481,6 +498,7 @@
         <span class="n">greater_is_better</span><span class="o">=</span><span class="n">greater_is_better</span><span class="p">,</span>
         <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
         <span class="n">metric_metadata</span><span class="o">=</span><span class="n">metric_metadata</span><span class="p">,</span>
+        <span class="n">genai_metric_args</span><span class="o">=</span><span class="n">genai_metric_args</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 
@@ -600,6 +618,27 @@
 <span class="sd">            greater_is_better=True,</span>
 <span class="sd">        )</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># When users create a custom metric using this function,the metric configuration</span>
+    <span class="c1"># will be serialized and stored as an artifact. This enables us to later deserialize</span>
+    <span class="c1"># the configuration, allowing users to understand their LLM evaluation results more clearly.</span>
+    <span class="n">genai_metric_args</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
+        <span class="s2">&quot;definition&quot;</span><span class="p">:</span> <span class="n">definition</span><span class="p">,</span>
+        <span class="s2">&quot;grading_prompt&quot;</span><span class="p">:</span> <span class="n">grading_prompt</span><span class="p">,</span>
+        <span class="s2">&quot;examples&quot;</span><span class="p">:</span> <span class="n">examples</span><span class="p">,</span>
+        <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="n">version</span><span class="p">,</span>
+        <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="n">model</span><span class="p">,</span>
+        <span class="s2">&quot;grading_context_columns&quot;</span><span class="p">:</span> <span class="n">grading_context_columns</span><span class="p">,</span>
+        <span class="s2">&quot;include_input&quot;</span><span class="p">:</span> <span class="n">include_input</span><span class="p">,</span>
+        <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="n">parameters</span><span class="p">,</span>
+        <span class="s2">&quot;aggregations&quot;</span><span class="p">:</span> <span class="n">aggregations</span><span class="p">,</span>
+        <span class="s2">&quot;greater_is_better&quot;</span><span class="p">:</span> <span class="n">greater_is_better</span><span class="p">,</span>
+        <span class="s2">&quot;max_workers&quot;</span><span class="p">:</span> <span class="n">max_workers</span><span class="p">,</span>
+        <span class="s2">&quot;metric_metadata&quot;</span><span class="p">:</span> <span class="n">metric_metadata</span><span class="p">,</span>
+        <span class="c1"># Record the mlflow version for serialization in case the function signature changes later</span>
+        <span class="s2">&quot;mlflow_version&quot;</span><span class="p">:</span> <span class="n">VERSION</span><span class="p">,</span>
+    <span class="p">}</span>
+
     <span class="n">aggregations</span> <span class="o">=</span> <span class="n">aggregations</span> <span class="ow">or</span> <span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;variance&quot;</span><span class="p">,</span> <span class="s2">&quot;p90&quot;</span><span class="p">]</span>
     <span class="n">grading_context_columns</span> <span class="o">=</span> <span class="n">grading_context_columns</span> <span class="ow">or</span> <span class="p">[]</span>
 
@@ -763,6 +802,7 @@
         <span class="n">version</span><span class="o">=</span><span class="n">version</span><span class="p">,</span>
         <span class="n">metric_details</span><span class="o">=</span><span class="n">evaluation_context</span><span class="p">[</span><span class="s2">&quot;eval_prompt&quot;</span><span class="p">]</span><span class="o">.</span><span class="fm">__str__</span><span class="p">(),</span>
         <span class="n">metric_metadata</span><span class="o">=</span><span class="n">metric_metadata</span><span class="p">,</span>
+        <span class="n">genai_metric_args</span><span class="o">=</span><span class="n">genai_metric_args</span><span class="p">,</span>
     <span class="p">)</span></div>
 </pre></div>
 
@@ -794,7 +834,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../../../',
-      VERSION:'2.14.1.dev0',
+      VERSION:'2.14.2.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

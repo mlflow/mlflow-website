@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Managing Dependencies in MLflow Models &mdash; MLflow 2.14.1.dev0 documentation</title>
+  <title>Managing Dependencies in MLflow Models &mdash; MLflow 2.14.2.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -56,7 +56,7 @@
         <link rel="index" title="Index"
               href="../genindex.html"/>
         <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="MLflow 2.14.1.dev0 documentation" href="../index.html"/>
+    <link rel="top" title="MLflow 2.14.2.dev0 documentation" href="../index.html"/>
         <link rel="up" title="MLflow Models" href="../models.html"/>
         <link rel="next" title="MLflow Model Signatures and Input Examples Guide" href="/signatures.html"/>
         <link rel="prev" title="MLflow Models" href="/../models.html"/> 
@@ -89,7 +89,7 @@
     <a href="../index.html" class="wy-nav-top-logo"
       ><img src="../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.14.1.dev0</span>
+    <span class="version">2.14.2.dev0</span>
   </li>
 </ul>
   </nav>
@@ -595,6 +595,92 @@ This way, MLflow will copy the entire <code class="docutils literal notranslate"
 <p>By the same reason, the <code class="docutils literal notranslate"><span class="pre">code_paths</span></code> option doesn’t handle the relative import of <code class="docutils literal notranslate"><span class="pre">code_paths=[&quot;../src&quot;]</span></code>.</p>
 </div>
 </div>
+<div class="section" id="limitation-of-code-paths-in-loading-multiple-models-with-the-same-module-name-but-different-implementations">
+<h3>Limitation of <code class="docutils literal notranslate"><span class="pre">code_paths</span></code> in loading multiple models with the same module name but different implementations<a class="headerlink" href="#limitation-of-code-paths-in-loading-multiple-models-with-the-same-module-name-but-different-implementations" title="Permalink to this headline"> </a></h3>
+<p>The current implementation of the <code class="docutils literal notranslate"><span class="pre">code_paths</span></code> option has a limitation that it doesn’t support loading multiple models that depend on modules with the same name but different implementations within the same Python process, as illustrated in the following example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">importlib</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmpdir</span><span class="p">:</span>
+    <span class="n">tmpdir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">)</span>
+    <span class="n">my_model_path</span> <span class="o">=</span> <span class="n">tmpdir</span> <span class="o">/</span> <span class="s2">&quot;my_model.py&quot;</span>
+    <span class="n">code_template</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">import mlflow</span>
+
+<span class="s2">class MyModel(mlflow.pyfunc.PythonModel):</span>
+<span class="s2">    def predict(self, context, model_input):</span>
+<span class="s2">        return [</span><span class="si">{n}</span><span class="s2">] * len(model_input)</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+    <span class="n">my_model_path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">code_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">))</span>
+    <span class="kn">import</span> <span class="nn">my_model</span>
+
+    <span class="c1"># model 1</span>
+    <span class="n">model1</span> <span class="o">=</span> <span class="n">my_model</span><span class="o">.</span><span class="n">MyModel</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="n">model1</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">context</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_input</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+        <span class="n">info1</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+            <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
+            <span class="n">python_model</span><span class="o">=</span><span class="n">model1</span><span class="p">,</span>
+            <span class="n">code_paths</span><span class="o">=</span><span class="p">[</span><span class="n">my_model_path</span><span class="p">],</span>
+        <span class="p">)</span>
+
+    <span class="c1"># model 2</span>
+    <span class="n">my_model_path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">code_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+    <span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">my_model</span><span class="p">)</span>
+    <span class="n">model2</span> <span class="o">=</span> <span class="n">my_model</span><span class="o">.</span><span class="n">MyModel</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="n">model2</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">context</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_input</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+        <span class="n">info2</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+            <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
+            <span class="n">python_model</span><span class="o">=</span><span class="n">model2</span><span class="p">,</span>
+            <span class="n">code_paths</span><span class="o">=</span><span class="p">[</span><span class="n">my_model_path</span><span class="p">],</span>
+        <span class="p">)</span>
+
+<span class="c1"># To simulate a fresh Python process, remove the `my_model` module from the cache</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;my_model&quot;</span><span class="p">)</span>
+
+<span class="c1"># Now we have two models that depend on modules with the same name but different implementations.</span>
+<span class="c1"># Let&#39;s load them and check the prediction results.</span>
+<span class="n">pred</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">info1</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span><span class="o">.</span><span class="n">predict</span><span class="p">([</span><span class="mi">0</span><span class="p">])</span>
+<span class="k">assert</span> <span class="n">pred</span> <span class="o">==</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">pred</span>  <span class="c1"># passes</span>
+
+<span class="c1"># As the `my_model` module was loaded and cached in the previous `load_model` call,</span>
+<span class="c1"># the next `load_model` call will reuse it and return the wrong prediction result.</span>
+<span class="k">assert</span> <span class="s2">&quot;my_model&quot;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
+<span class="n">pred</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">info2</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span><span class="o">.</span><span class="n">predict</span><span class="p">([</span><span class="mi">0</span><span class="p">])</span>
+<span class="k">assert</span> <span class="n">pred</span> <span class="o">==</span> <span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">pred</span>  <span class="c1"># doesn&#39;t pass, `pred` is [1]</span>
+</pre></div>
+</div>
+<p>To work around this limitation, you can remove the module from the cache before loading the model. For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model1</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">info1</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;my_model&quot;</span><span class="p">)</span>
+<span class="n">model2</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">info2</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Another workaround is to use different module names for different implementations. For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+    <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model1&quot;</span><span class="p">,</span>
+    <span class="n">python_model</span><span class="o">=</span><span class="n">model1</span><span class="p">,</span>
+    <span class="n">code_paths</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;my_model1.py&quot;</span><span class="p">],</span>
+<span class="p">)</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+    <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
+    <span class="n">python_model</span><span class="o">=</span><span class="n">model2</span><span class="p">,</span>
+    <span class="n">code_paths</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;my_model2.py&quot;</span><span class="p">],</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
 <div class="section" id="recommended-project-structure">
 <h3>Recommended Project Structure<a class="headerlink" href="#recommended-project-structure" title="Permalink to this headline"> </a></h3>
 <p>With this limitation for <code class="docutils literal notranslate"><span class="pre">code_paths</span></code> in mind, the recommended project structure looks like the following:</p>
@@ -827,7 +913,7 @@ To manually confirm whether a model has this dependency, you can examine the <co
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../',
-      VERSION:'2.14.1.dev0',
+      VERSION:'2.14.2.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

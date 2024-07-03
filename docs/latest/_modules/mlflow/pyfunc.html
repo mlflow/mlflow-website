@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mlflow.pyfunc &mdash; MLflow 2.14.1.dev0 documentation</title>
+  <title>mlflow.pyfunc &mdash; MLflow 2.14.2.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -56,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="MLflow 2.14.1.dev0 documentation" href="../../index.html"/>
+    <link rel="top" title="MLflow 2.14.2.dev0 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
@@ -87,7 +87,7 @@
     <a href="../../index.html" class="wy-nav-top-logo"
       ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.14.1.dev0</span>
+    <span class="version">2.14.2.dev0</span>
   </li>
 </ul>
   </nav>
@@ -611,6 +611,7 @@
 <span class="kn">import</span> <span class="nn">mlflow.pyfunc.loaders</span>
 <span class="kn">import</span> <span class="nn">mlflow.pyfunc.model</span>
 <span class="kn">from</span> <span class="nn">mlflow.environment_variables</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_MLFLOW_IN_CAPTURE_MODULE_PROCESS</span><span class="p">,</span>
     <span class="n">_MLFLOW_TESTING</span><span class="p">,</span>
     <span class="n">MLFLOW_SCORING_SERVER_REQUEST_TIMEOUT</span><span class="p">,</span>
 <span class="p">)</span>
@@ -968,7 +969,8 @@
 <span class="sd">            Model predictions as one of pandas.DataFrame, pandas.Series, numpy.ndarray or list.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">data</span><span class="p">,</span> <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_prediction_input</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_predict_fn</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;params&quot;</span><span class="p">):</span>
+        <span class="n">params_arg</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_predict_fn</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;params&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">params_arg</span> <span class="ow">and</span> <span class="n">params_arg</span><span class="o">.</span><span class="n">kind</span> <span class="o">!=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="o">.</span><span class="n">VAR_KEYWORD</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_fn</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
 
         <span class="n">_log_warning_if_params_not_in_predict_signature</span><span class="p">(</span><span class="n">_logger</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
@@ -1164,8 +1166,12 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">lineage_header_info</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="k">if</span> <span class="n">databricks_utils</span><span class="o">.</span><span class="n">is_in_databricks_runtime</span><span class="p">()</span> <span class="ow">and</span> <span class="p">(</span>
-        <span class="n">databricks_utils</span><span class="o">.</span><span class="n">is_in_databricks_notebook</span><span class="p">()</span> <span class="ow">or</span> <span class="n">databricks_utils</span><span class="o">.</span><span class="n">is_in_databricks_job</span><span class="p">()</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="p">(</span><span class="ow">not</span> <span class="n">_MLFLOW_IN_CAPTURE_MODULE_PROCESS</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+        <span class="ow">and</span> <span class="n">databricks_utils</span><span class="o">.</span><span class="n">is_in_databricks_runtime</span><span class="p">()</span>
+        <span class="ow">and</span> <span class="p">(</span>
+            <span class="n">databricks_utils</span><span class="o">.</span><span class="n">is_in_databricks_notebook</span><span class="p">()</span> <span class="ow">or</span> <span class="n">databricks_utils</span><span class="o">.</span><span class="n">is_in_databricks_job</span><span class="p">()</span>
+        <span class="p">)</span>
     <span class="p">):</span>
         <span class="n">entity_list</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="c1"># Get notebook id and job id, pack them into lineage_header_info</span>
@@ -1341,7 +1347,17 @@
     <span class="k">try</span><span class="p">:</span>
         <span class="n">client</span><span class="o">.</span><span class="n">wait_server_ready</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">scoring_server_proc</span><span class="o">=</span><span class="n">scoring_server_proc</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="s2">&quot;MLflow model server failed to launch.&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+        <span class="k">if</span> <span class="n">scoring_server_proc</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># the scoring server is still running but client can&#39;t connect to it.</span>
+            <span class="c1"># kill the server.</span>
+            <span class="n">scoring_server_proc</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
+        <span class="n">server_output</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">scoring_server_proc</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">server_output</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+            <span class="n">server_output</span> <span class="o">=</span> <span class="n">server_output</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;UTF-8&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+            <span class="s2">&quot;MLflow model server failed to launch, server process stdout and stderr are:</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="o">+</span> <span class="n">server_output</span>
+        <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
 
     <span class="k">return</span> <span class="n">_ServedPyFuncModel</span><span class="p">(</span>
         <span class="n">model_meta</span><span class="o">=</span><span class="n">model_meta</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">server_pid</span><span class="o">=</span><span class="n">scoring_server_proc</span><span class="o">.</span><span class="n">pid</span>
@@ -3144,7 +3160,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../',
-      VERSION:'2.14.1.dev0',
+      VERSION:'2.14.2.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',
