@@ -37,5 +37,6 @@ const generateLinks = (content) => {
 }
 
 module.exports = {
-  formatMarkdown
+  formatMarkdown,
+  generateLinks
 }
