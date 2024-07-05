@@ -1,19 +1,18 @@
 const fs = require('fs');
 const path = require('path');
 
-const { generateLinks } = require('../.github/workflows/format-release-note');
+const { generateLinks } = require('../../.github/workflows/format-release-note');
 
 const getMarkdownFiles = (dir) => {
   let results = [];
-  const list = fs.readdirSync(dir);
+  const list = fs.readdirSync(dir, { withFileTypes: true});
   list.forEach(file => {
-    file = path.resolve(dir, file);
-    const stat = fs.statSync(file);
-    if (stat && stat.isDirectory()) {
-      results = results.concat(getMarkdownFiles(file));
+    const filePath = path.resolve(dir, file.name);
+    if (file.isDirectory()) {
+      results = results.concat(getMarkdownFiles(filePath));
     } else {
-      if (file.endsWith("release.md") && !isPreRelease(file)) {
-        results.push(file);
+      if (file.name.endsWith("release.md") && !isPreRelease(file.name)) {
+        results.push(filePath);
       }
     }
   });
@@ -31,7 +30,7 @@ const isPreRelease = (filename) => {
 }
 
 const formatAllMarkdownFiles = () => {
-  const releaseDir = path.resolve(__dirname, '../website/releases');
+  const releaseDir = path.resolve(__dirname, '../releases');
   const markdownFiles = getMarkdownFiles(releaseDir);
 
   const updatedFiles = [];
