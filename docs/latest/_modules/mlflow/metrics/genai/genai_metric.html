@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mlflow.metrics.genai.genai_metric &mdash; MLflow 2.14.2.dev0 documentation</title>
+  <title>mlflow.metrics.genai.genai_metric &mdash; MLflow 2.14.3.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -56,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../../search.html"/>
-    <link rel="top" title="MLflow 2.14.2.dev0 documentation" href="../../../../index.html"/>
+    <link rel="top" title="MLflow 2.14.3.dev0 documentation" href="../../../../index.html"/>
         <link rel="up" title="mlflow.metrics" href="../../metrics.html"/> 
 
   
@@ -87,7 +87,7 @@
     <a href="../../../../index.html" class="wy-nav-top-logo"
       ><img src="../../../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.14.2.dev0</span>
+    <span class="version">2.14.3.dev0</span>
   </li>
 </ul>
   </nav>
@@ -206,12 +206,15 @@
 <span></span><span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">concurrent.futures</span> <span class="kn">import</span> <span class="n">ThreadPoolExecutor</span><span class="p">,</span> <span class="n">as_completed</span>
 <span class="kn">from</span> <span class="nn">inspect</span> <span class="kn">import</span> <span class="n">Parameter</span><span class="p">,</span> <span class="n">Signature</span>
+<span class="kn">from</span> <span class="nn">tempfile</span> <span class="kn">import</span> <span class="n">TemporaryDirectory</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
+<span class="kn">import</span> <span class="nn">mlflow</span>
 <span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
 <span class="kn">from</span> <span class="nn">mlflow.metrics.base</span> <span class="kn">import</span> <span class="n">MetricValue</span>
 <span class="kn">from</span> <span class="nn">mlflow.metrics.genai</span> <span class="kn">import</span> <span class="n">model_utils</span>
@@ -232,6 +235,7 @@
 
 <span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
+<span class="n">_GENAI_CUSTOM_METRICS_FILE_NAME</span> <span class="o">=</span> <span class="s2">&quot;genai_custom_metrics.json&quot;</span>
 <span class="n">_PROMPT_FORMATTING_WRAPPER</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
 
 <span class="s2">You must return the following fields in your response in two lines, one below the other:</span>
@@ -465,6 +469,7 @@
         <span class="s2">&quot;metric_metadata&quot;</span><span class="p">:</span> <span class="n">metric_metadata</span><span class="p">,</span>
         <span class="c1"># Record the mlflow version for serialization in case the function signature changes later</span>
         <span class="s2">&quot;mlflow_version&quot;</span><span class="p">:</span> <span class="n">VERSION</span><span class="p">,</span>
+        <span class="s2">&quot;fn_name&quot;</span><span class="p">:</span> <span class="n">make_genai_metric_from_prompt</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
     <span class="p">}</span>
 
     <span class="n">aggregations</span> <span class="o">=</span> <span class="n">aggregations</span> <span class="ow">or</span> <span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;variance&quot;</span><span class="p">,</span> <span class="s2">&quot;p90&quot;</span><span class="p">]</span>
@@ -637,6 +642,7 @@
         <span class="s2">&quot;metric_metadata&quot;</span><span class="p">:</span> <span class="n">metric_metadata</span><span class="p">,</span>
         <span class="c1"># Record the mlflow version for serialization in case the function signature changes later</span>
         <span class="s2">&quot;mlflow_version&quot;</span><span class="p">:</span> <span class="n">VERSION</span><span class="p">,</span>
+        <span class="s2">&quot;fn_name&quot;</span><span class="p">:</span> <span class="n">make_genai_metric</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
     <span class="p">}</span>
 
     <span class="n">aggregations</span> <span class="o">=</span> <span class="n">aggregations</span> <span class="ow">or</span> <span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;variance&quot;</span><span class="p">,</span> <span class="s2">&quot;p90&quot;</span><span class="p">]</span>
@@ -804,6 +810,133 @@
         <span class="n">metric_metadata</span><span class="o">=</span><span class="n">metric_metadata</span><span class="p">,</span>
         <span class="n">genai_metric_args</span><span class="o">=</span><span class="n">genai_metric_args</span><span class="p">,</span>
     <span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_filter_by_field</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">field_name</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">field_name</span><span class="p">]</span> <span class="o">==</span> <span class="n">value</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">_deserialize_genai_metric_args</span><span class="p">(</span><span class="n">args_dict</span><span class="p">):</span>
+    <span class="n">mlflow_version_at_ser</span> <span class="o">=</span> <span class="n">args_dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;mlflow_version&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">fn_name</span> <span class="o">=</span> <span class="n">args_dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;fn_name&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">fn_name</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">mlflow_version_at_ser</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+            <span class="n">message</span><span class="o">=</span><span class="s2">&quot;The artifact JSON file appears to be corrupted and cannot be deserialized. &quot;</span>
+            <span class="s2">&quot;Please regenerate the custom metrics and rerun the evaluation. &quot;</span>
+            <span class="s2">&quot;Ensure that the file is correctly formatted and not tampered with.&quot;</span><span class="p">,</span>
+            <span class="n">error_code</span><span class="o">=</span><span class="n">INTERNAL_ERROR</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">mlflow_version_at_ser</span> <span class="o">!=</span> <span class="n">VERSION</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;The custom metric definitions were serialized using MLflow </span><span class="si">{</span><span class="n">mlflow_version_at_ser</span><span class="si">}</span><span class="s2">. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Deserializing them with the current version </span><span class="si">{</span><span class="n">VERSION</span><span class="si">}</span><span class="s2"> might cause mismatches. &quot;</span>
+            <span class="s2">&quot;Please ensure compatibility or consider regenerating the metrics &quot;</span>
+            <span class="s2">&quot;using the current version.&quot;</span><span class="p">,</span>
+            <span class="ne">UserWarning</span><span class="p">,</span>
+            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">fn_name</span> <span class="o">==</span> <span class="n">make_genai_metric_from_prompt</span><span class="o">.</span><span class="vm">__name__</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">make_genai_metric_from_prompt</span><span class="p">(</span><span class="o">**</span><span class="n">args_dict</span><span class="p">)</span>
+
+    <span class="n">examples</span> <span class="o">=</span> <span class="n">args_dict</span><span class="p">[</span><span class="s2">&quot;examples&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">examples</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">args_dict</span><span class="p">[</span><span class="s2">&quot;examples&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">EvaluationExample</span><span class="p">(</span><span class="o">**</span><span class="n">example</span><span class="p">)</span> <span class="k">for</span> <span class="n">example</span> <span class="ow">in</span> <span class="n">examples</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">make_genai_metric</span><span class="p">(</span><span class="o">**</span><span class="n">args_dict</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="retrieve_custom_metrics"><a class="viewcode-back" href="../../../../python_api/mlflow.metrics.html#mlflow.metrics.genai.retrieve_custom_metrics">[docs]</a><span class="k">def</span> <span class="nf">retrieve_custom_metrics</span><span class="p">(</span>
+    <span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">version</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">EvaluationMetric</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Retrieve the custom metrics created by users through `make_genai_metric()` or</span>
+<span class="sd">    `make_genai_metric_from_prompt()` that are associated with a particular evaluation run.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        run_id: The unique identifier for the run.</span>
+<span class="sd">        name: (Optional) The name of the custom metric to retrieve.</span>
+<span class="sd">            If None, retrieve all metrics.</span>
+<span class="sd">        version: (Optional) The version of the custom metric to retrieve.</span>
+<span class="sd">            If None, retrieve all metrics.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A list of EvaluationMetric objects that match the retrieval criteria.</span>
+
+<span class="sd">    .. code-block:: python</span>
+<span class="sd">        :caption: Example for retrieving a custom genai metric</span>
+
+<span class="sd">        import pandas as pd</span>
+
+<span class="sd">        import mlflow</span>
+<span class="sd">        from mlflow.metrics.genai.genai_metric import (</span>
+<span class="sd">            make_genai_metric_from_prompt,</span>
+<span class="sd">            retrieve_custom_metrics,</span>
+<span class="sd">        )</span>
+
+<span class="sd">        eval_df = pd.DataFrame(</span>
+<span class="sd">            {</span>
+<span class="sd">                &quot;inputs&quot;: [&quot;foo&quot;],</span>
+<span class="sd">                &quot;ground_truth&quot;: [&quot;bar&quot;],</span>
+<span class="sd">            }</span>
+<span class="sd">        )</span>
+<span class="sd">        with mlflow.start_run() as run:</span>
+<span class="sd">            system_prompt = &quot;Answer the following question in two sentences&quot;</span>
+<span class="sd">            basic_qa_model = mlflow.openai.log_model(</span>
+<span class="sd">                model=&quot;gpt-3.5-turbo&quot;,</span>
+<span class="sd">                task=&quot;chat.completions&quot;,</span>
+<span class="sd">                artifact_path=&quot;model&quot;,</span>
+<span class="sd">                messages=[</span>
+<span class="sd">                    {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: system_prompt},</span>
+<span class="sd">                    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;{question}&quot;},</span>
+<span class="sd">                ],</span>
+<span class="sd">            )</span>
+<span class="sd">            custom_metric = make_genai_metric_from_prompt(</span>
+<span class="sd">                name=&quot;custom llm judge&quot;,</span>
+<span class="sd">                judge_prompt=&quot;This is a custom judge prompt.&quot;,</span>
+<span class="sd">                greater_is_better=False,</span>
+<span class="sd">                parameters={&quot;temperature&quot;: 0.0},</span>
+<span class="sd">            )</span>
+<span class="sd">            results = mlflow.evaluate(</span>
+<span class="sd">                basic_qa_model.model_uri,</span>
+<span class="sd">                eval_df,</span>
+<span class="sd">                targets=&quot;ground_truth&quot;,</span>
+<span class="sd">                model_type=&quot;question-answering&quot;,</span>
+<span class="sd">                evaluators=&quot;default&quot;,</span>
+<span class="sd">                extra_metrics=[custom_metric],</span>
+<span class="sd">            )</span>
+<span class="sd">        metrics = retrieve_custom_metrics(</span>
+<span class="sd">            run_id=run.info.run_id,</span>
+<span class="sd">            name=&quot;custom llm judge&quot;,</span>
+<span class="sd">        )</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">client</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">MlflowClient</span><span class="p">()</span>
+    <span class="n">artifacts</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">path</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">client</span><span class="o">.</span><span class="n">list_artifacts</span><span class="p">(</span><span class="n">run_id</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="n">_GENAI_CUSTOM_METRICS_FILE_NAME</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">artifacts</span><span class="p">:</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No custom metric definitions were found for this evaluation run.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[]</span>
+
+    <span class="k">with</span> <span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmpdir</span><span class="p">:</span>
+        <span class="n">downloaded_artifact_path</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">artifacts</span><span class="o">.</span><span class="n">download_artifacts</span><span class="p">(</span>
+            <span class="n">run_id</span><span class="o">=</span><span class="n">run_id</span><span class="p">,</span>
+            <span class="n">artifact_path</span><span class="o">=</span><span class="n">_GENAI_CUSTOM_METRICS_FILE_NAME</span><span class="p">,</span>
+            <span class="n">dst_path</span><span class="o">=</span><span class="n">tmpdir</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">custom_metrics</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">_read_from_file</span><span class="p">(</span><span class="n">downloaded_artifact_path</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">custom_metrics</span> <span class="o">=</span> <span class="n">_filter_by_field</span><span class="p">(</span><span class="n">custom_metrics</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">version</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">custom_metrics</span> <span class="o">=</span> <span class="n">_filter_by_field</span><span class="p">(</span><span class="n">custom_metrics</span><span class="p">,</span> <span class="s2">&quot;version&quot;</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+    <span class="n">metric_args_list</span> <span class="o">=</span> <span class="n">custom_metrics</span><span class="p">[</span><span class="s2">&quot;metric_args&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">metric_args_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No matching custom metric definitions were found.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[]</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="n">_deserialize_genai_metric_args</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">metric_args_list</span><span class="p">]</span></div>
 </pre></div>
 
               </div>
@@ -834,7 +967,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../../../',
-      VERSION:'2.14.2.dev0',
+      VERSION:'2.14.3.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',
