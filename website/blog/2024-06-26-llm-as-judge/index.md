@@ -115,11 +115,11 @@ import openai
 import pandas as pd
 ```
 
-In order to evaluate your LLM with mlflow.evaluate(), your LLM has to be one of the following type:
-1.	A `mlflow.pyfunc.PyFuncModel()` instance or a URI pointing to a logged mlflow.pyfunc.PyFuncModel model. In general we call that MLflow model. The
-2.	A `python function` that takes in string inputs and outputs a single string. 
-3.	An `MLflow Deployments` endpoint URI pointing to a local MLflow Deployments Server, Databricks Foundation Models API, and External Models in Databricks Model Serving.
-4.	Set `model=None`, and put model outputs in data. Only applicable when the data is a Pandas dataframe.
+When using mlflow.evaluate(), your LLM can be either:
+1.	A `mlflow.pyfunc.PyFuncModel()` . Generally speaking an MLflow model. 
+2.	A `python function` that has strings as inputs and outputs a single string. 
+3.	An `MLflow Deployments` endpoint URI.
+4.	Set `model=None` when you only want to provide the data which has already been scored by the model.
 
 For this case let's use an mlflow model.
 
