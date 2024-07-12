@@ -1,0 +1,659 @@
+
+  
+
+<!DOCTYPE html>
+<!-- source: docs/source/llms/openai/autologging.rst -->
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>MLflow OpenAI Autologging &mdash; MLflow 2.14.3.dev0 documentation</title>
+  
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/llms/openai/autologging.html">
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    
+
+    
+
+  
+    
+        <!-- Google Tag Manager -->
+        <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer',"GTM-N6WMTTJ");</script>
+        <!-- End Google Tag Manager -->
+    
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/grids.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/mobile.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/simple-cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/tabs.css" type="text/css" />
+    
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="MLflow 2.14.3.dev0 documentation" href="../../index.html"/>
+        <link rel="up" title="MLflow OpenAI Flavor" href="index.html"/>
+        <link rel="next" title="Introduction to Using the OpenAI Flavor in MLflow" href="/notebooks/openai-quickstart.html"/>
+        <link rel="prev" title="MLflow OpenAI Flavor" href="/index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+<script type="text/javascript" src="../../_static/jquery.js"></script>
+<script type="text/javascript" src="../../_static/underscore.js"></script>
+<script type="text/javascript" src="../../_static/doctools.js"></script>
+<script type="text/javascript" src="../../_static/languagesections.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+
+<body class="wy-body-for-nav" role="document">
+  
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N6WMTTJ"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+  
+
+  
+  <nav class="wy-nav-top header" role="navigation" aria-label="top navigation">
+    <ul>
+  <li class="menu-toggle">
+    <i data-toggle="wy-nav-top" class="wy-nav-top-menu-button db-icon db-icon-menu pull-left"></i>
+    <a href="../../index.html" class="wy-nav-top-logo"
+      ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
+    /></a>
+    <span class="version">2.14.3.dev0</span>
+  </li>
+</ul>
+  </nav>
+  <page>
+    
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side relative">
+      <div class="wy-side-scroll">
+  <div class="wy-side-nav-search">
+    
+
+    
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+    
+  </div>
+
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+    
+      <a href="../../index.html" class="main-navigation-home"><img src="../../_static/icons/nav-home.svg"> MLflow</a>
+    
+
+    
+      
+
+      
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../introduction/index.html">What is MLflow?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started/index.html">Getting Started with MLflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../new-features/index.html">New Features</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">LLMs</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#id1">MLflow Tracing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#id2">MLflow Deployments Server for LLMs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#id3">LLM Evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#id4">Prompt Engineering UI</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#native-mlflow-flavors-for-llms">Native MLflow Flavors for LLMs</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../transformers/index.html">MLflow Transformers Flavor</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="index.html">MLflow OpenAI Flavor</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="index.html#introduction">Introduction</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="index.html#autologging-support-for-the-openai-integration">Autologging Support for the OpenAI integration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="index.html#tracing-with-the-openai-flavor">Tracing with the OpenAI flavor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="index.html#what-makes-this-integration-so-special">What makes this Integration so Special?</a></li>
+<li class="toctree-l4"><a class="reference internal" href="index.html#features">Features</a></li>
+<li class="toctree-l4"><a class="reference internal" href="index.html#getting-started-with-the-mlflow-openai-flavor-tutorials-and-guides">Getting Started with the MLflow OpenAI Flavor - Tutorials and Guides</a></li>
+<li class="toctree-l4"><a class="reference internal" href="index.html#id1">Detailed Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../sentence-transformers/index.html">MLflow Sentence-Transformers Flavor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../langchain/index.html">MLflow LangChain Flavor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../index.html#explore-the-native-llm-flavors">Explore the Native LLM Flavors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#id5">LLM Tracking in MLflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#tutorials-and-use-case-guides-for-llms-in-mlflow">Tutorials and Use Case Guides for LLMs in MLflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../model-evaluation/index.html">Model Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../deep-learning/index.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../traditional-ml/index.html">Traditional ML</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../deployment/index.html">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tracking.html">MLflow Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../system-metrics/index.html">System Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../projects.html">MLflow Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../models.html">MLflow Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../model-registry.html">MLflow Model Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../recipes.html">MLflow Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plugins.html">MLflow Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auth/index.html">MLflow Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../search-runs.html">Search Runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../search-experiments.html">Search Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../python_api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../R-api.html">R API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../java_api/index.html">Java API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rest-api.html">REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../docker.html">Official MLflow Docker Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../community-model-flavors.html">Community Model Flavors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials-and-examples/index.html">Tutorials and Examples</a></li>
+</ul>
+
+      
+    
+  </div>
+
+  <div role="contentinfo">
+    
+
+    <p>
+      <a id='feedbacklink' href="https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a>
+    </p>
+  </div>
+</div>
+    </nav>
+
+    <main class="wy-grid-for-nav">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+          <div class="rst-content">
+            
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Documentation</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../index.html">LLMs</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="index.html">MLflow OpenAI Flavor</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+    
+      <li>MLflow OpenAI Autologging</li>
+    
+    
+    <!-- <li class="wy-breadcrumbs-aside">
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/llms/openai/autologging.rst" class="fa fa-github"> Edit on GitHub</a>
+    </li> -->
+    
+  </ul>
+</div>
+            <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <div itemprop="articleBody">
+                
+  <div class="section" id="mlflow-openai-autologging">
+<h1>MLflow OpenAI Autologging<a class="headerlink" href="#mlflow-openai-autologging" title="Permalink to this headline"> </a></h1>
+<p>The OpenAI flavor for MLflow supports autologging to ensure that experimentation, testing, and validation of your ideas can be captured dynamically without
+having to wrap your code with logging boilerplate.</p>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<p>Autologging is <strong>only supported</strong> for versions of the OpenAI SDK that are 1.17 and higher.</p>
+</div>
+<p>MLflow autologging for the OpenAI SDK supports the following interfaces:</p>
+<ul class="simple">
+<li><p><strong>Chat Completions</strong> via <code class="docutils literal notranslate"><span class="pre">client.chat.completions.create()</span></code></p></li>
+<li><p><strong>Completions</strong> (legacy) via <code class="docutils literal notranslate"><span class="pre">client.completions.create()</span></code></p></li>
+<li><p><strong>Embeddings</strong> via <code class="docutils literal notranslate"><span class="pre">client.embeddings.create()</span></code></p></li>
+</ul>
+<p>Where <code class="docutils literal notranslate"><span class="pre">client</span></code> is an instance of <code class="docutils literal notranslate"><span class="pre">openai.OpenAI()</span></code>.</p>
+<p>In this guide, we’ll discuss some of the key features that are available in the autologging feature.</p>
+<div class="contents local topic" id="table-of-contents">
+<p class="topic-title">Table of Contents</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#quickstart" id="id1">Quickstart</a></p></li>
+<li><p><a class="reference internal" href="#configuration-of-openai-autologging" id="id2">Configuration of OpenAI Autologging</a></p></li>
+<li><p><a class="reference internal" href="#example-of-using-openai-autologging" id="id3">Example of using OpenAI Autologging</a></p></li>
+<li><p><a class="reference internal" href="#faq" id="id4">FAQ</a></p></li>
+</ul>
+</div>
+<div class="section" id="quickstart">
+<h2><a class="toc-backref" href="#id1">Quickstart</a><a class="headerlink" href="#quickstart" title="Permalink to this headline"> </a></h2>
+<p>To get started with MLflow’s OpenAI autologging, you simply need to call <a class="reference internal" href="../../python_api/openai/index.html#mlflow.openai.autolog" title="mlflow.openai.autolog"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.openai.autolog()</span></code></a> at the beginning of your script or notebook.
+Enabling autologging with no argument overrides will behave as the <code class="docutils literal notranslate"><span class="pre">default</span></code> configuration in the table in the next section. Overriding any of these settings
+will allow you to log additional elements.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>The only element that is <strong>enabled by default</strong> when autologging is activated is the recording of trace information. You can read more about MLflow tracing
+<a class="reference external" href="../tracing/index.html">here</a>.</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">openai</span>
+<span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="c1"># Enables trace logging by default</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">openai</span><span class="o">.</span><span class="n">autolog</span><span class="p">()</span>
+
+<span class="n">openai_client</span> <span class="o">=</span> <span class="n">openai</span><span class="o">.</span><span class="n">OpenAI</span><span class="p">()</span>
+
+<span class="n">messages</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;What does turning something up to 11 refer to?&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+
+<span class="c1"># The input messages and the response will be logged as a trace to the active experiment</span>
+<span class="n">answer</span> <span class="o">=</span> <span class="n">openai_client</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">completions</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-4o&quot;</span><span class="p">,</span>
+    <span class="n">messages</span><span class="o">=</span><span class="n">messages</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When using the OpenAI SDK, ensure that your access token is assigned to the environment variable <code class="docutils literal notranslate"><span class="pre">OPENAI_API_KEY</span></code>.</p>
+</div>
+</div>
+<div class="section" id="configuration-of-openai-autologging">
+<h2><a class="toc-backref" href="#id2">Configuration of OpenAI Autologging</a><a class="headerlink" href="#configuration-of-openai-autologging" title="Permalink to this headline"> </a></h2>
+<p>MLflow OpenAI autologging can log various information about the model and its inference. <strong>By default, only trace logging is enabled</strong>, but you can enable
+autologging of other information by setting the corresponding parameters when calling <a class="reference internal" href="../../python_api/openai/index.html#mlflow.openai.autolog" title="mlflow.openai.autolog"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.openai.autolog()</span></code></a>.</p>
+<p>The available options and their default values are shown below. To learn more about additional parameters, see the API documentation.</p>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 30%" />
+<col style="width: 30%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Target</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Parameter</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Traces</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">true</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">log_traces</span></code></p></td>
+<td><p>Whether to generate and log traces for the model. See <a class="reference external" href="../tracing/index.html">MLflow Tracing</a> for more details about the tracing feature.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Model Artifacts</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">false</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">log_models</span></code></p></td>
+<td><p>If set to <code class="docutils literal notranslate"><span class="pre">True</span></code>, the OpenAI model will be logged when it is invoked.</p></td>
+</tr>
+<tr class="row-even"><td><p>Model Signatures</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">false</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">log_model_signatures</span></code></p></td>
+<td><p>If set to <code class="docutils literal notranslate"><span class="pre">True</span></code>, <a class="reference internal" href="../../python_api/mlflow.models.html#mlflow.models.ModelSignature" title="mlflow.models.ModelSignature"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModelSignatures</span></code></a> describing model inputs and outputs are collected and logged along with OpenAI model artifacts during inference. This option is only available when <code class="docutils literal notranslate"><span class="pre">log_models</span></code> is enabled.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Input Example</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">false</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">log_input_examples</span></code></p></td>
+<td><p>If set to <code class="docutils literal notranslate"><span class="pre">True</span></code>, input examples from inference data are collected and logged along with OpenAI model artifacts during inference. This option is only available when <code class="docutils literal notranslate"><span class="pre">log_models</span></code> is enabled.</p></td>
+</tr>
+</tbody>
+</table>
+<p>For example, to disable logging of traces, and instead enable model logging, run the following code:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">openai</span><span class="o">.</span><span class="n">autolog</span><span class="p">(</span>
+    <span class="n">log_traces</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">log_models</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="example-of-using-openai-autologging">
+<h2><a class="toc-backref" href="#id3">Example of using OpenAI Autologging</a><a class="headerlink" href="#example-of-using-openai-autologging" title="Permalink to this headline"> </a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">import</span> <span class="nn">openai</span>
+
+<span class="n">API_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;OPENAI_API_KEY&quot;</span><span class="p">)</span>
+<span class="n">EXPERIMENT_NAME</span> <span class="o">=</span> <span class="s2">&quot;OpenAI Autologging Demonstration&quot;</span>
+<span class="n">REGISTERED_MODEL_NAME</span> <span class="o">=</span> <span class="s2">&quot;openai-auto&quot;</span>
+<span class="n">MODEL_VERSION</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">openai</span><span class="o">.</span><span class="n">autolog</span><span class="p">(</span>
+    <span class="n">log_input_examples</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">log_model_signatures</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">log_models</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">log_traces</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">registered_model_name</span><span class="o">=</span><span class="n">REGISTERED_MODEL_NAME</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="n">EXPERIMENT_NAME</span><span class="p">)</span>
+
+<span class="n">openai_client</span> <span class="o">=</span> <span class="n">openai</span><span class="o">.</span><span class="n">OpenAI</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="n">API_KEY</span><span class="p">)</span>
+
+<span class="n">messages</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;State that you are responding to a test and that you are alive.&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+
+<span class="n">openai_client</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">completions</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-4o&quot;</span><span class="p">,</span>
+    <span class="n">messages</span><span class="o">=</span><span class="n">messages</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Viewing the logged model and the trace used when invoking the OpenAI client within the UI can be seen in the image below:</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="../../_images/openai-autolog.gif"><img alt="OpenAI Autologging artifacts and traces" src="../../_images/openai-autolog.gif" style="width: 100%;" /></a>
+</div>
+<p>The model can be loaded by using the <code class="docutils literal notranslate"><span class="pre">models</span></code> uri via the model that was logged and registered and interfaced with via the pyfunc API as shown below:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">loaded_autologged_model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s2">&quot;models:/</span><span class="si">{</span><span class="n">REGISTERED_MODEL_NAME</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">MODEL_VERSION</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="p">)</span>
+
+<span class="n">loaded_autologged_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span>
+    <span class="s2">&quot;How much relative time difference would occur between an astronaut travelling at 0.98c for 14 years &quot;</span>
+    <span class="s2">&quot;as measured by an on-board clock on the spacecraft and humans on Earth, assuming constant speed?&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="faq">
+<h2><a class="toc-backref" href="#id4">FAQ</a><a class="headerlink" href="#faq" title="Permalink to this headline"> </a></h2>
+<div class="section" id="how-can-i-manually-log-traces-for-the-openai-sdk-with-mlflow">
+<h3>How can I manually log traces for the OpenAI SDK with MLflow?<a class="headerlink" href="#how-can-i-manually-log-traces-for-the-openai-sdk-with-mlflow" title="Permalink to this headline"> </a></h3>
+<p>By setting an active experiment (it is not recommended to use the Default Experiment for this), you can use the high-level tracing fluent API
+when working on an interface to your model (whether you log the model or not) by utilizing the MLflow tracing fluent API.</p>
+<p>You can discover how to use the <a class="reference external" href="../tracing/index.html#tracing-fluent-apis">fluent API here</a>.</p>
+</div>
+<div class="section" id="if-i-m-using-streaming-for-my-openai-model-will-autologging-log-the-trace-data-correctly">
+<h3>If I’m using streaming for my OpenAI model, will autologging log the trace data correctly?<a class="headerlink" href="#if-i-m-using-streaming-for-my-openai-model-will-autologging-log-the-trace-data-correctly" title="Permalink to this headline"> </a></h3>
+<p>Yes. For each of the MLflow-supported client interface types that have the ability to stream responses from OpenAI, autologging will record the
+iterator response chunks in the output.</p>
+<p>As an example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">openai</span>
+<span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s2">&quot;OpenAI&quot;</span><span class="p">)</span>
+
+<span class="c1"># Enable trace logging</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">openai</span><span class="o">.</span><span class="n">autolog</span><span class="p">()</span>
+
+<span class="n">client</span> <span class="o">=</span> <span class="n">openai</span><span class="o">.</span><span class="n">OpenAI</span><span class="p">()</span>
+
+<span class="n">stream</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">completions</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-4o&quot;</span><span class="p">,</span>
+    <span class="n">messages</span><span class="o">=</span><span class="p">[</span>
+        <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;How fast would a glass of water freeze on Titan?&quot;</span><span class="p">}</span>
+    <span class="p">],</span>
+    <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># Stream response</span>
+<span class="p">)</span>
+<span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">stream</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">chunk</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">delta</span><span class="o">.</span><span class="n">content</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Within the MLflow UI, the traces for a streaming model will be displayed as shown below:</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="../../_images/openai-stream-trace.png"><img alt="OpenAI Autologging stream traces" src="../../_images/openai-stream-trace.png" style="width: 100%;" /></a>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>OpenAI configurations that specify streaming responses are <strong>not yet supported</strong> for using the <code class="docutils literal notranslate"><span class="pre">predict_stream()</span></code> pyfunc invocation API in MLflow.
+However, you can still record streaming traces. When loading a the logged openai model as pyfunc via <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.load_model" title="mlflow.pyfunc.load_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.pyfunc.load_model()</span></code></a>, the only
+available interface for inference is the synchronous blocking <code class="docutils literal notranslate"><span class="pre">predict()</span></code> API.</p>
+</div>
+</div>
+<div class="section" id="are-asynchronous-apis-supported-in-autologging">
+<h3>Are asynchronous APIs supported in autologging?<a class="headerlink" href="#are-asynchronous-apis-supported-in-autologging" title="Permalink to this headline"> </a></h3>
+<p>The MLflow OpenAI autologging feature <strong>does not support asynchronous APIs</strong> for logging models or traces.</p>
+<p>Saving your async implementation is best done by using the <a class="reference external" href="../../models.html#models-from-code">models from code feature</a>.</p>
+<p>If you would like to log trace events for an async OpenAI API, below is a simplified example of logging the trace for a streaming async request:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">openai</span>
+<span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">import</span> <span class="nn">asyncio</span>
+
+<span class="c1"># Activate an experiment for logging traces to</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s2">&quot;OpenAI&quot;</span><span class="p">)</span>
+
+
+<span class="k">async</span> <span class="k">def</span> <span class="nf">fetch_openai_response</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-4o&quot;</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mf">0.99</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Asynchronously gets a response from the OpenAI API using the provided messages and streams the response.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        messages (list): List of message dictionaries for the OpenAI API.</span>
+<span class="sd">        model (str): The model to use for the OpenAI API. Default is &quot;gpt-4o&quot;.</span>
+<span class="sd">        temperature (float): The temperature to use for the OpenAI API. Default is 0.99.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">client</span> <span class="o">=</span> <span class="n">openai</span><span class="o">.</span><span class="n">AsyncOpenAI</span><span class="p">()</span>
+
+    <span class="c1"># Create the response stream</span>
+    <span class="n">response_stream</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">completions</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+        <span class="n">messages</span><span class="o">=</span><span class="n">messages</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
+        <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Manually log traces using the tracing fluent API</span>
+    <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_span</span><span class="p">()</span> <span class="k">as</span> <span class="n">trace</span><span class="p">:</span>
+        <span class="n">trace</span><span class="o">.</span><span class="n">set_inputs</span><span class="p">(</span><span class="n">messages</span><span class="p">)</span>
+        <span class="n">full_response</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">async</span> <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">response_stream</span><span class="p">:</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="n">chunk</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">delta</span><span class="o">.</span><span class="n">content</span>
+            <span class="k">if</span> <span class="n">content</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="n">full_response</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+
+        <span class="n">trace</span><span class="o">.</span><span class="n">set_outputs</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">full_response</span><span class="p">))</span>
+
+
+<span class="n">messages</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;How much additional hydrogen mass would Jupiter require to ignite a sustainable fusion cycle?&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+
+<span class="k">await</span> <span class="n">fetch_openai_response</span><span class="p">(</span><span class="n">messages</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+              </div>
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="index.html" class="btn btn-neutral" title="MLflow OpenAI Flavor" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+      
+      
+        <a href="notebooks/openai-quickstart.html" class="btn btn-neutral" title="Introduction to Using the OpenAI Flavor in MLflow" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+      <p class="copyright">
+          &copy; MLflow Project, a Series of LF Projects, LLC. All rights reserved.
+      </p>
+
+  </div> 
+
+</footer>
+          </div>
+        </div>
+      </section>
+    </main>
+  </page>
+
+  
+
+
+  
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+      URL_ROOT:'../../',
+      VERSION:'2.14.3.dev0',
+      COLLAPSE_INDEX:false,
+      FILE_SUFFIX:'.html',
+      LINK_SUFFIX: '.html',
+      HAS_SOURCE:  true
+    };
+  </script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/clipboard.min.js"></script>
+  <script type="text/javascript" src="../../_static/js/jquery.waypoints.min.js"></script>
+
+  
+  
+  
+  <script type="text/javascript">var CLIPPY_SVG_PATH = "../../_static/clippy.svg";</script>
+  <script type="text/javascript" src="../../_static/js/custom.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.StickyNav.enable();
+    });
+
+  </script>
+  
+
+  
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        // Get the code block designator class entries
+        const allHighlights = document.querySelectorAll('.highlight');
+        // Disable copyable links for notebook cell numbering and for cell outputs
+        const highlights = Array.from(allHighlights).filter(highlight => !highlight.closest('.highlight-none') && 
+            !highlight.closest('.nboutput'));
+    
+        highlights.forEach(function(highlight) {
+            const copyIcon = document.createElement('span');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.innerHTML = '&#xf0ea;';
+
+            copyIcon.addEventListener('click', function() {
+                const code = highlight.querySelector('pre').textContent;
+                copyToClipboard(code);
+
+                // Flash effect on click
+                this.style.color = '#0194E2';
+                setTimeout(() => {
+                    this.style.color = ''; 
+                }, 100);
+
+                // Display "Code copied to clipboard" near the clicked icon
+                const message = document.createElement('span');
+                message.textContent = "Copied!";
+                message.classList.add('copy-message'); 
+
+                // Append the message to the icon
+                this.appendChild(message);
+
+                setTimeout(() => {
+                    this.removeChild(message);
+                }, 500);
+            });
+
+            highlight.appendChild(copyIcon);
+        });
+    });
+  </script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Force download for notebook-download-btn
+        const downloadButtons = document.querySelectorAll('.notebook-download-btn');
+        downloadButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                // Fetch the raw content of the notebook from GitHub
+                fetch(button.href)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = url;
+                        const filename = button.href.split('/').pop();
+                        link.download = filename; 
+
+                        document.body.appendChild(link);
+                        link.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    })
+                    .catch(err => console.error('Error fetching the notebook:', err));
+            });
+        });
+    });
+</script> 
+</body>
+</html>

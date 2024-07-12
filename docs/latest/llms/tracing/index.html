@@ -132,6 +132,7 @@
 <li class="toctree-l2 current"><a class="reference internal" href="../index.html#id1">MLflow Tracing</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Tracing in MLflow</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#langchain-automatic-tracing">LangChain Automatic Tracing</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#openai-automatic-tracing">OpenAI Automatic Tracing</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tracing-fluent-apis">Tracing Fluent APIs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tracing-client-apis">Tracing Client APIs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#searching-and-retrieving-traces">Searching and Retrieving Traces</a></li>
@@ -242,8 +243,20 @@
 <p>MLflow Tracing support is available with the <strong>MLflow 2.14.0</strong> release. Versions of MLflow prior to this release
 do not contain the full set of features that are required for trace logging support.</p>
 </div>
+<div class="contents local topic" id="table-of-contents">
+<p class="topic-title">Table of Contents</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#langchain-automatic-tracing" id="id1">LangChain Automatic Tracing</a></p></li>
+<li><p><a class="reference internal" href="#openai-automatic-tracing" id="id2">OpenAI Automatic Tracing</a></p></li>
+<li><p><a class="reference internal" href="#tracing-fluent-apis" id="id3">Tracing Fluent APIs</a></p></li>
+<li><p><a class="reference internal" href="#tracing-client-apis" id="id4">Tracing Client APIs</a></p></li>
+<li><p><a class="reference internal" href="#searching-and-retrieving-traces" id="id5">Searching and Retrieving Traces</a></p></li>
+<li><p><a class="reference internal" href="#managing-trace-data" id="id6">Managing Trace Data</a></p></li>
+<li><p><a class="reference internal" href="#faq" id="id7">FAQ</a></p></li>
+</ul>
+</div>
 <div class="section" id="langchain-automatic-tracing">
-<h2>LangChain Automatic Tracing<a class="headerlink" href="#langchain-automatic-tracing" title="Permalink to this headline"> </a></h2>
+<h2><a class="toc-backref" href="#id1">LangChain Automatic Tracing</a><a class="headerlink" href="#langchain-automatic-tracing" title="Permalink to this headline"> </a></h2>
 <p>The easiest way to get started with MLflow Tracing is to leverage the built-in capabilities with MLflow’s LangChain integration. As part of the
 <a class="reference internal" href="../../python_api/mlflow.langchain.html#mlflow.langchain.autolog" title="mlflow.langchain.autolog"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.langchain.autolog()</span></code></a> integration, traces are logged to the active MLflow Experiment when calling invocation APIs on chains.</p>
 <p>In the example below, the model and its associated metadata will be logged as a run, while the traces are logged separately to the active experiment.</p>
@@ -317,8 +330,47 @@ do not contain the full set of features that are required for trace logging supp
 RAG chains, the trace that is recorded by MLflow will be significantly more complex and verbose.</p>
 </div>
 </div>
+<div class="section" id="openai-automatic-tracing">
+<h2><a class="toc-backref" href="#id2">OpenAI Automatic Tracing</a><a class="headerlink" href="#openai-automatic-tracing" title="Permalink to this headline"> </a></h2>
+<p>The MLflow OpenAI flavor’s autologging feature has a direct integration with MLflow tracing. When OpenAI autologging is enabled with <a class="reference internal" href="../../python_api/openai/index.html#mlflow.openai.autolog" title="mlflow.openai.autolog"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.openai.autolog()</span></code></a>,
+usage of the OpenAI SDK will automatically record generated traces during interactive development.</p>
+<p>For example, the code below will log traces to the currently active experiment (in this case, the activated experiment <code class="docutils literal notranslate"><span class="pre">&quot;OpenAI&quot;</span></code>, set through the use
+of the <a class="reference internal" href="../../python_api/mlflow.html#mlflow.set_experiment" title="mlflow.set_experiment"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.set_experiment()</span></code></a> API).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">openai</span>
+<span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="c1"># Calling the autolog API will enable trace logging by default.</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">openai</span><span class="o">.</span><span class="n">autolog</span><span class="p">()</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s2">&quot;OpenAI&quot;</span><span class="p">)</span>
+
+<span class="n">openai_client</span> <span class="o">=</span> <span class="n">openai</span><span class="o">.</span><span class="n">OpenAI</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;OPENAI_API_KEY&quot;</span><span class="p">))</span>
+
+<span class="n">messages</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;How can I improve my resting metabolic rate most effectively?&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">openai_client</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">completions</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-4o&quot;</span><span class="p">,</span>
+    <span class="n">messages</span><span class="o">=</span><span class="n">messages</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The logged trace, associated with the <code class="docutils literal notranslate"><span class="pre">OpenAI</span></code> experiment, can be seen in the MLflow UI, as shown below:</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="../../_images/openai-tracing.png"><img alt="OpenAI Tracing" src="../../_images/openai-tracing.png" style="width: 100%;" /></a>
+</div>
+<p>To learn more about OpenAI autologging, you can <a class="reference external" href="../openai/autologging.html">view the documentation here</a>.</p>
+</div>
 <div class="section" id="tracing-fluent-apis">
-<h2>Tracing Fluent APIs<a class="headerlink" href="#tracing-fluent-apis" title="Permalink to this headline"> </a></h2>
+<h2><a class="toc-backref" href="#id3">Tracing Fluent APIs</a><a class="headerlink" href="#tracing-fluent-apis" title="Permalink to this headline"> </a></h2>
 <p>MLflow’s <a class="reference internal" href="../../python_api/mlflow.html#mlflow.start_span" title="mlflow.start_span"><code class="xref py py-func docutils literal notranslate"><span class="pre">fluent</span> <span class="pre">APIs</span></code></a> provide a straightforward way to add tracing to your functions and code blocks.
 By using decorators, function wrappers, and context managers, you can easily capture detailed trace data with minimal code changes.</p>
 <p>As a comparison between the fluent and the client APIs for tracing, the figure below illustrates the differences in complexity between the two APIs,
@@ -529,7 +581,7 @@ capture its inputs, outputs, and execution context.</p>
 </div>
 </div>
 <div class="section" id="tracing-client-apis">
-<h2>Tracing Client APIs<a class="headerlink" href="#tracing-client-apis" title="Permalink to this headline"> </a></h2>
+<h2><a class="toc-backref" href="#id4">Tracing Client APIs</a><a class="headerlink" href="#tracing-client-apis" title="Permalink to this headline"> </a></h2>
 <p>The MLflow client API provides a comprehensive set of thread-safe methods for manually managing traces. These APIs allow for fine-grained
 control over tracing, enabling you to create, manipulate, and retrieve traces programmatically. This section will cover how to use these APIs
 to manually trace a model, providing step-by-step instructions and examples.</p>
@@ -606,7 +658,7 @@ spans are properly ended.</p>
 </div>
 </div>
 <div class="section" id="searching-and-retrieving-traces">
-<span id="search-traces"></span><h2>Searching and Retrieving Traces<a class="headerlink" href="#searching-and-retrieving-traces" title="Permalink to this headline"> </a></h2>
+<span id="search-traces"></span><h2><a class="toc-backref" href="#id5">Searching and Retrieving Traces</a><a class="headerlink" href="#searching-and-retrieving-traces" title="Permalink to this headline"> </a></h2>
 <div class="section" id="searching-for-traces">
 <h3>Searching for Traces<a class="headerlink" href="#searching-for-traces" title="Permalink to this headline"> </a></h3>
 <p>You can search for traces based on various criteria using the <a class="reference internal" href="../../python_api/mlflow.client.html#mlflow.client.MlflowClient.search_traces" title="mlflow.client.MlflowClient.search_traces"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mlflow.client.MlflowClient.search_traces()</span></code></a> method. This method allows you to filter traces by experiment IDs,
@@ -653,7 +705,7 @@ The extracted fields are included as extra columns in the pandas DataFrame. This
 </div>
 </div>
 <div class="section" id="managing-trace-data">
-<h2>Managing Trace Data<a class="headerlink" href="#managing-trace-data" title="Permalink to this headline"> </a></h2>
+<h2><a class="toc-backref" href="#id6">Managing Trace Data</a><a class="headerlink" href="#managing-trace-data" title="Permalink to this headline"> </a></h2>
 <div class="section" id="deleting-traces">
 <h3>Deleting Traces<a class="headerlink" href="#deleting-traces" title="Permalink to this headline"> </a></h3>
 <p>You can delete traces based on specific criteria using the <a class="reference internal" href="../../python_api/mlflow.client.html#mlflow.client.MlflowClient.delete_traces" title="mlflow.client.MlflowClient.delete_traces"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mlflow.client.MlflowClient.delete_traces()</span></code></a> method. This method allows you to delete traces by <strong>experiment ID</strong>,
@@ -688,7 +740,7 @@ and the <a class="reference internal" href="../../python_api/mlflow.client.html#
 </div>
 </div>
 <div class="section" id="faq">
-<h2>FAQ<a class="headerlink" href="#faq" title="Permalink to this headline"> </a></h2>
+<h2><a class="toc-backref" href="#id7">FAQ</a><a class="headerlink" href="#faq" title="Permalink to this headline"> </a></h2>
 <div class="section" id="q-can-i-disable-and-re-enable-tracing-globally">
 <h3>Q: Can I disable and re-enable tracing globally?<a class="headerlink" href="#q-can-i-disable-and-re-enable-tracing-globally" title="Permalink to this headline"> </a></h3>
 <p>Yes.</p>
