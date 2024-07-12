@@ -237,6 +237,20 @@ export const RELEASES: Release[] = [
     version: "2.14.3",
   },
   {
+    title: "MLflow 2.14.4",
+    path: "/releases/2.14.4",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2024-07-12",
+    version: "2.14.4",
+  },
+  {
     title: "MLflow 2.14.2",
     path: "/releases/2.14.2",
     authors: [
