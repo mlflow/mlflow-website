@@ -7,13 +7,13 @@ authors: [hugo-carvalho, joana-ferreira, rahul-pandey, filipe-miranda]
 thumbnail: img/blog/pyfunc-in-practice.png
 ---
 
-If you're looking to fully leverage the capabilities of `mlflow.pyfunc`  and understand how it can be utilized in a Machine Learning, this blog post will guide you through the process. MLflow PyFunc offers creative freedom and flexibility, allowing the development of complex systems encapsulated as models in MLflow that follow the same lifecycle as traditional ones. This blog will showcase how to create multi-model setups, seamlessly connect to databases, and implement your own custom fit method.
+If you're looking to fully leverage the capabilities of `mlflow.pyfunc`  and understand how it can be utilized in a Machine Learning project, this blog post will guide you through the process. MLflow PyFunc offers creative freedom and flexibility, allowing the development of complex systems encapsulated as models in MLflow that follow the same lifecycle as traditional ones. This blog will showcase how to create multi-model setups, seamlessly connect to databases, and implement your own custom fit method in your MLflow PyFunc model.
 
 <!-- truncate -->
 
 ## Introduction
 
-This blog post demonstrates the capabilities of [MLflow PyFunc](https://mlflow.org/docs/latest/python_api/mlflow.pyfunc.html) and how it can be utilized to build a multi-model setup encapsulated as a PyFunc flavor model in MLflow. This approach allows ensemble model to follow the same lifecycle as traditional models in MLflow.
+This blog post demonstrates the capabilities of [MLflow PyFunc](https://mlflow.org/docs/latest/python_api/mlflow.pyfunc.html) and how it can be utilized to build a multi-model setup encapsulated as a PyFunc flavor model in MLflow. This approach allows ensemble models to follow the same lifecycle as traditional [Built-In Model Flavors](https://mlflow.org/docs/latest/models.html#built-in-model-flavors) in MLflow.
 
 But first, let's use an analogy to get you familiarized with the concept of ensemble models and why you should consider this solution in your next Machine Learning project.
 
@@ -38,23 +38,24 @@ However, developing such systems requires careful management of the lifecycle of
 
 This blog utilizes the house price dataset from Kaggle to demonstrate the development and management of ensemble models through MLflow.
 
-We will leverage various tools and technologies to highlight the capabilities of MLflow PyFunc models. Before delving into the ensemble model itself, we will explore how these components integrate to create a robust and efficient machine learning pipeline.
+We will leverage various tools and technologies to highlight the capabilities of MLflow PyFunc models. Before delving into the ensemble model itself, we will explore how these components integrate to create a robust and efficient Machine Learning pipeline.
 
 ### Components of the Project
 
 **DuckDB**  
 DuckDB is a high-performance analytical database system designed to be fast, reliable, portable, and easy to use. In this project, it showcases the integration of a database connection within the model context, facilitating efficient data handling directly within the model. [Learn more about DuckDB](https://duckdb.org/).
 
-**MLflow**  
-MLflow is an open-source platform for managing the end-to-end machine learning lifecycle, including experimentation, reproducibility, and deployment. In this project, it tracks experiments, manages model versions, and facilitates the deployment of MLflow PyFunc models in a similar manner to how we are familiar with individual flavors. [Learn more about MLflow](https://mlflow.org/).
-
 **scikit-learn (sklearn)**  
-scikit-learn is a machine learning library for Python that provides efficient tools for data analysis and modelling. In this project, it is used to develop and evaluate various Machine Learning models that are integrated into our ensemble model. [Learn more about scikit-learn](https://scikit-learn.org/).
+scikit-learn is a Machine Learning library for Python that provides efficient tools for data analysis and modelling. In this project, it is used to develop and evaluate various Machine Learning models that are integrated into our ensemble model. [Learn more about scikit-learn](https://scikit-learn.org/).
 
+**MLflow**  
+MLflow is an open-source platform for managing the end-to-end Machine Learning lifecycle, including experimentation, reproducibility, and deployment. In this project, it tracks experiments, manages model versions, and facilitates the deployment of MLflow PyFunc models in a similar manner to how we are familiar with individual flavors. [Learn more about MLflow](https://mlflow.org/).
+
+> **Note:** To reproduce this project, please refer to the [official MLflow documentation](https://mlflow.org/docs/latest/tracking/server.html) to set up a simple local MLflow Tracking server.
 
 ## Creating the Ensemble Model
 
-Creating a MLflow PyFunc ensemble model requires additional steps compared to using the built-in flavors for logging and working with popular machine learning frameworks.
+Creating a MLflow PyFunc ensemble model requires additional steps compared to using the built-in flavors for logging and working with popular Machine Learning frameworks.
 
 To implement an ensemble model, you need to define an `mlflow.pyfunc` model, which involves creating a Python class that inherits from the `PythonModel` class and implementing its constructor and class methods. While the basic creation of a PyFunc model only requires implementing the `predict` method, an ensemble model requires additional methods to manage the models and obtain multi-model predictions. After instantiating the ensemble model, you must use the custom `fit` method to train the ensemble model's sub-models. Similar to an out-of-the-box MLflow model, you need to log the model along with its artifacts during the training run and then register the model in the MLflow server. A model alias ` production` will also be added to the model to streamline both model updates and inference. Model aliases allow you to assign a mutable, named reference to a specific version of a registered model. By assigning the alias to a particular model version, it can be easily referenced via a model URI or the model registry API. This setup allows for seamless updates to the model version used for inference without changing the serving workload code.
 
@@ -204,7 +205,7 @@ def feature_engineering(self, X: pd.DataFrame) -> np.ndarray:
 
 ### Initializing Models
 
-The `initialize_models` method sets up a dictionary of various machine learning models along with their hyperparameter grids. This includes models such as `RandomForest`, `XGBoost`, `DecisionTree`, `GradientBoosting`, and `AdaBoost`. This step is crucial for preparing the ensemble’s sub-models and specifying the hyperparameters to adjust during training, ensuring that each model is configured correctly and ready for training.
+The `initialize_models` method sets up a dictionary of various Machine Learning models along with their hyperparameter grids. This includes models such as `RandomForest`, `XGBoost`, `DecisionTree`, `GradientBoosting`, and `AdaBoost`. This step is crucial for preparing the ensemble’s sub-models and specifying the hyperparameters to adjust during training, ensuring that each model is configured correctly and ready for training.
 
 ```python
 def initialize_models(self) -> None:
@@ -425,7 +426,7 @@ from sklearn.metrics import r2_score
 
 class EnsembleModel(mlflow.pyfunc.PythonModel):
     """
-    An ensemble model class for training and predicting with multiple machine learning models.
+    An ensemble model class for training and predicting with multiple Machine Learning models.
 
     Attributes:
         preprocessor (ColumnTransformer or None): Preprocessing pipeline for feature engineering.
@@ -716,6 +717,9 @@ class EnsembleModel(mlflow.pyfunc.PythonModel):
 
 Now that everything has been encapsulated in a PyFunc model, the lifecycle of the ensemble model closely mirrors that of a traditional MLflow model. The following diagram depicts the lifecycle of the model.
 
+![Ensemble Model Lifecycle](ensemble-model-lifecycle.png)
+
+
 ## MLflow Tracking
 ### Using the `fit` Method to Train Sub-Models  
 
@@ -836,14 +840,6 @@ with mlflow.start_run(run_name=timestamp) as run:
     )
 
     print(f"Model logged in run {run.info.run_id}")
-
-# Register the model in MLflow and assign a production alias
-model_uri = f"runs:/{run.info.run_id}/ensemble_model"
-model_details = mlflow.register_model(model_uri=model_uri, name="ensemble_model")
-
-client.set_registered_model_alias(
-	name="ensemble_model", alias="production", version=model_details.version
-)
 ```
 
 ### Registering the Model with MLflow
@@ -862,44 +858,9 @@ client.set_registered_model_alias(
 )
 ```
 
-```python
-# Load the registered model using its alias
-loaded_model = mlflow.pyfunc.load_model(
-	model_uri=f"models:/ensemble_model@production"
-)
+The following illustration demonstrates the complete lifecycle of our ensemble model within the MLflow UI up until this step.
 
-# Define the different strategies for evaluation
-strategies = [
-    "average_1",
-    "average_2",
-    "weighted_1",
-    "weighted_2",
-    "weighted_3",
-    "weighted_4",
-]
-
-# Initialize a DataFrame to store the results of predictions
-results_df = pd.DataFrame()
-
-# Iterate over each strategy, make predictions, and calculate R^2 scores
-for strategy in strategies:
-    # Create a test DataFrame with the current strategy
-    X_test_with_params = X_test.copy()
-    X_test_with_params["strategy"] = strategy
-
-    # Use the loaded model to make predictions
-    y_pred = loaded_model.predict(X_test_with_params)
-
-    # Calculate R^2 score for the predictions
-    r2 = r2_score(y_test, y_pred)
-
-    # Store the results and R^2 score in the results DataFrame
-    results_df[strategy] = y_pred
-    results_df[f"r2_{strategy}"] = r2
-
-# Add the actual target values to the results DataFrame
-results_df["y_test"] = y_test.values
-```
+![Ensemble Model within MLflow UI](ensemble-model-mlflow-ui.gif)
 
 ### Using the `predict` Method to Perform Inference
 
@@ -956,7 +917,7 @@ The bar graph below illustrates the average R² scores for each strategy. Higher
 
 ## Summary
 
-This blog post highlights the capabilities of mlflow.pyfunc and its application in a machine learning project. mlflow.pyfunc provides creative freedom and flexibility, enabling teams to build complex systems encapsulated as models within MLflow, following the same lifecycle as traditional models. This post showcases the creation of ensemble model setups, seamless integration with DuckDB, and the implementation of custom methods using mlflow.pyfunc.
+This blog post highlights the capabilities of mlflow.pyfunc and its application in a Machine Learning project. mlflow.pyfunc provides creative freedom and flexibility, enabling teams to build complex systems encapsulated as models within MLflow, following the same lifecycle as traditional models. This post showcases the creation of ensemble model setups, seamless integration with DuckDB, and the implementation of custom methods using mlflow.pyfunc.
 
 Beyond offering a structured approach to achieving desired outcomes, this blog demonstrates practical possibilities based on hands-on experience, discussing potential challenges and their solutions.
 
