@@ -7,22 +7,24 @@ tags: [genai,mlflow-evalaute]
 thumbnail: img/blog/llm-as-judge.png
 ---
 
-In this blog post, we'll dive on a journey to revolutionize how we evaluate language models. We'll explore the power of MLflow Evaluate and harness the capabilities of Large Language Models (LLMs) as impartial judges. By the end, you'll learn how to create custom metrics, implement LLM-based evaluation, and apply these techniques to real-world scenarios. Get ready to transform your model assessment process and gain deeper insights into your AI's performance!
+In this blog post, we'll dive on a journey to revolutionize how we evaluate language models. We'll explore the power of MLflow Evaluate and harness the capabilities of Large Language Models (LLMs) as judges. By the end, you'll learn how to create custom metrics, implement LLM-based evaluation, and apply these techniques to real-world scenarios. Get ready to transform your model assessment process and gain deeper insights into your AI's performance!
 
 ## The Challenge of Evaluating Language Models
 
 Imagine you're part of a global travel agency, "WorldWide Wandercorp," that's expanding its reach to Spanish-speaking countries. Your team has developed an AI-powered translation system to help create culturally appropriate marketing materials and customer communications. However, as you begin to use this system, you realize that traditional evaluation metrics fall short in capturing the nuances of language translation, especially when it comes to preserving cultural context and idiomatic expressions. You want to understand the materials in which your translation is failing so you can improve the model or manually translate them.
 
-This is where MLflow Evaluate and LLMs as judges come into play. Let's dive into how these tools can help solve Worldwide WanderAgency's challenges and improve their AI-driven communication strategy.
+This is where [MLflow Evaluate](https://mlflow.org/docs/latest/python_api/mlflow.html#mlflow.evaluate) and LLMs as judges come into play. Let's dive into how these tools can help solve Worldwide WanderAgency's challenges and improve their AI-driven communication strategy.
 
-## Introducing MLflow Evaluate
+## Introducing MLflow LLM Evaluate
 
-The traveling agency needs a way to evaluate the outputs of it's LLM translation model.
-MLflow Evaluate is a powerful function within the MLflow ecosystem that allows for comprehensive model assessment. It supports both built-in metrics and custom metrics, making it an ideal tool for evaluating complex language tasks. With MLflow Evaluate, you can:
+The traveling agency needs a way to evaluate the outputs of its LLM translation model.
+[Mlflow LLM Evaluate](https://mlflow.org/docs/latest/llms/llm-evaluate/index.html) is a powerful function within the MLflow ecosystem that allows for comprehensive model assessment. It supports both built-in metrics and custom metrics, making it an ideal tool for evaluating complex language tasks. With [Mlflow LLM Evaluate](https://mlflow.org/docs/latest/python_api/mlflow.html#mlflow.evaluate), you can:
 
 - Evaluate models against multiple metrics simultaneously
 - Use pre-defined metrics for specific model types (e.g., question-answering, text-summarization and pure text)
-- Create custom metrics, including those that use LLMs as judges
+- Create custom metrics, including those that use LLMs as judges using [mlflow.metrics.genai.make_genai_metric()](https://mlflow.org/docs/latest/python_api/mlflow.metrics.html#mlflow.metrics.genai.make_genai_metric)
+and
+[mlflow.metrics.genai.make_genai_metric_from_prompt()](https://mlflow.org/docs/latest/python_api/mlflow.metrics.html#mlflow.metrics.genai.make_genai_metric_from_prompt)
 
 
 ![Mlflow Evaluate](mlflow_evaluate.drawio.svg)
@@ -52,6 +54,12 @@ The travel agency wants to ensure their translations are not only accurate but a
 
 This custom metric allows Worldwide WanderAgency to quantify how well their translations maintain cultural context and idiomatic expressions.
 
+For instance, a phrase that is polite in one culture might be inappropriate in another. 
+
+In English, addressing someone as "Dear" in a professional email might be seen as polite. However, in Spanish, using "Querido" in a professional context can be too personal and inappropriate.
+
+How can we evaluate such an abstract concept in a systematic way? Traditional Metrics would fall short so we need a better way of doing it. In this case LLM as a judge would be a great fit!
+
 ### The Faithfulness Metric
 
 As Worldwide WanderAgency's AI capabilities grow, they decide to implement an AI-powered customer service chatbot to handle inquiries in multiple languages.
@@ -63,34 +71,30 @@ The company decided to build a pipline for their materials which is invoked insi
 
 This metric assesses how well the chatbot's responses align with the provided context (company policies) and the specific questions asked by customers.
 
-### Built in Metrics
+### The Toxicity Metric
 
-In addition to this we can leverage mlflow built in metrics to measure some relevant metrics.
-Since Worldwide WanderAgency uses a text model we get these metrics out of the box. 
 
-- [toxicity](https://huggingface.co/spaces/evaluate-measurement/toxicity) 
-- [ari_grade_level](https://en.wikipedia.org/wiki/Automated_readability_index) 
-- [flesch_kincaid_grade_level](https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests#Flesch%E2%80%93Kincaid_grade_level) 
 
-For this use case we want to make sure none of the context translated are toxic.
+In addition to faithfulness, Worldwide WanderAgency introduces the [toxicity](https://huggingface.co/spaces/evaluate-measurement/toxicity) metric to ensure all interactions remain respectful and safe. This metric evaluates responses for any harmful or inappropriate content, reinforcing the company's commitment to a positive customer experience.
+
+ 
 
 
 ## Putting It All Together: Evaluating Worldwide WanderAgency's AI Systems
 
-With these custom metrics in place, the travel agency can now use MLflow Evaluate to assess both their translation model and customer service chatbot. They can track performance over time, identify areas for improvement, and ensure that their AI-driven communication maintains high standards of cultural sensitivity and accuracy.
+Now that we understand what WanderAgency is trying to measure and why it is challenging, let's walk through an example showing how to implement the types of measures we discussed above.
 
-Here's a glimpse of how they might visualize their evaluation results:
 
-![Gauge Chart](gauge.png)
 
 This dashboard allows Worldwide WanderAgency's team to quickly assess the performance of their AI systems across different metrics, ensuring they're meeting the high standards required for effective global communication.
 
 To demonstrate the power of using LLMs as judges with MLflow evaluate, let's walk through an example of evaluating a language translation model. We'll create a custom metric called "cultural_sensitivity" to assess how well our translation model preserves cultural nuances. 
 
-For the full code example, please refer to the accompanying notebook. Here's a brief overview of the process:
+Here's a brief overview of the process:
 
-start by installing all the necessary libraries for this demo to work.
-Since mlflow evaluate offers some default metrics we need to install the libraries to calculate those metrics (toxiticy etc..)
+Start by installing all the necessary libraries for this demo to work.
+
+
 
 ```python
 !pip install mlflow==2.14.1 openai  transformers torch torchvision evaluate datasets openai tiktoken fastapi rouge_score textstat tenacity plotly ipykernel nbformat==5.10.4
