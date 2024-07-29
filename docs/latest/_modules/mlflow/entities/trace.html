@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mlflow.entities.trace &mdash; MLflow 2.14.3.dev0 documentation</title>
+  <title>mlflow.entities.trace &mdash; MLflow 2.14.4.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -56,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="MLflow 2.14.3.dev0 documentation" href="../../../index.html"/>
+    <link rel="top" title="MLflow 2.14.4.dev0 documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
   
@@ -87,7 +87,7 @@
     <a href="../../../index.html" class="wy-nav-top-logo"
       ><img src="../../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.14.3.dev0</span>
+    <span class="version">2.14.4.dev0</span>
   </li>
 </ul>
   </nav>
@@ -226,6 +226,9 @@
     <span class="n">info</span><span class="p">:</span> <span class="n">TraceInfo</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">TraceData</span>
 
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Trace(request_id=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">request_id</span><span class="si">}</span><span class="s2">)&quot;</span>
+
 <div class="viewcode-block" id="Trace.to_dict"><a class="viewcode-back" href="../../../python_api/mlflow.entities.html#mlflow.entities.Trace.to_dict">[docs]</a>    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;info&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span> <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()}</span></div>
 
@@ -260,6 +263,12 @@
             <span class="p">)</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">trace_dict</span><span class="p">)</span></div>
 
+    <span class="k">def</span> <span class="nf">_serialize_for_mimebundle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># databricks notebooks will use the request ID to</span>
+        <span class="c1"># fetch the trace from the backend. including the</span>
+        <span class="c1"># full JSON can cause notebooks to exceed size limits</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">request_id</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="nf">_repr_mimebundle_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">include</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method is used to trigger custom display logic in IPython notebooks.</span>
@@ -271,8 +280,8 @@
 <span class="sd">        in Databricks notebooks to display the Trace object in a nicer UI.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;application/databricks.mlflow.trace&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_json</span><span class="p">(),</span>
-            <span class="s2">&quot;text/plain&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">(),</span>
+            <span class="s2">&quot;application/databricks.mlflow.trace&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_serialize_for_mimebundle</span><span class="p">(),</span>
+            <span class="s2">&quot;text/plain&quot;</span><span class="p">:</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span>
         <span class="p">}</span>
 
 <div class="viewcode-block" id="Trace.to_pandas_dataframe_row"><a class="viewcode-back" href="../../../python_api/mlflow.entities.html#mlflow.entities.Trace.to_pandas_dataframe_row">[docs]</a>    <span class="k">def</span> <span class="nf">to_pandas_dataframe_row</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
@@ -333,7 +342,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../../',
-      VERSION:'2.14.3.dev0',
+      VERSION:'2.14.4.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

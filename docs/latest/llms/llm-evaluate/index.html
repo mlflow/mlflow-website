@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>MLflow LLM Evaluate &mdash; MLflow 2.14.3.dev0 documentation</title>
+  <title>MLflow LLM Evaluate &mdash; MLflow 2.14.4.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -56,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="MLflow 2.14.3.dev0 documentation" href="../../index.html"/>
+    <link rel="top" title="MLflow 2.14.4.dev0 documentation" href="../../index.html"/>
         <link rel="up" title="LLMs" href="../index.html"/>
         <link rel="next" title="Prompt Engineering UI (Experimental)" href="/../prompt-engineering/index.html"/>
         <link rel="prev" title="Unity Catalog Integration" href="/../deployments/uc_integration.html"/> 
@@ -88,7 +88,7 @@
     <a href="../../index.html" class="wy-nav-top-logo"
       ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.14.3.dev0</span>
+    <span class="version">2.14.4.dev0</span>
   </li>
 </ul>
   </nav>
@@ -380,12 +380,22 @@ below:</p>
 </ul>
 </div></blockquote>
 </li>
+<li><p><strong>retrievers</strong>: <code class="docutils literal notranslate"><span class="pre">model_type=&quot;retriever&quot;</span></code>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://en.wikipedia.org/wiki/Evaluation_measures_(information_retrieval)#Precision_at_k">precision_at_k</a>  <sup>4</sup></p></li>
+<li><p><a class="reference external" href="https://en.wikipedia.org/wiki/Evaluation_measures_(information_retrieval)#Recall">recall_at_k</a> <sup>4</sup></p></li>
+<li><p><a class="reference external" href="https://en.wikipedia.org/wiki/Discounted_cumulative_gain#Normalized_DCG">ndcg_at_k</a> <sup>4</sup></p></li>
 </ul>
-<p><sup>1</sup> Requires package <a class="reference external" href="https://pypi.org/project/evaluate">evaluate</a>, <a class="reference external" href="https://pytorch.org/get-started/locally/">torch</a>, and
+</div></blockquote>
+</li>
+</ul>
+<p><sup>1</sup> Requires packages <a class="reference external" href="https://pypi.org/project/evaluate">evaluate</a>, <a class="reference external" href="https://pytorch.org/get-started/locally/">torch</a>, and
 <a class="reference external" href="https://huggingface.co/docs/transformers/installation">transformers</a></p>
 <p><sup>2</sup> Requires package <a class="reference external" href="https://pypi.org/project/textstat">textstat</a></p>
-<p><sup>3</sup> Requires package <a class="reference external" href="https://pypi.org/project/evaluate">evaluate</a>, <a class="reference external" href="https://pypi.org/project/nltk">nltk</a>, and
+<p><sup>3</sup> Requires packages <a class="reference external" href="https://pypi.org/project/evaluate">evaluate</a>, <a class="reference external" href="https://pypi.org/project/nltk">nltk</a>, and
 <a class="reference external" href="https://pypi.org/project/rouge-score">rouge-score</a></p>
+<p><sup>4</sup> All retriever metrics have a default <code class="docutils literal notranslate"><span class="pre">retriever_k</span></code> value of <code class="docutils literal notranslate"><span class="pre">3</span></code> that can be overridden by specifying <code class="docutils literal notranslate"><span class="pre">retriever_k</span></code> in the <code class="docutils literal notranslate"><span class="pre">evaluator_config</span></code> argument.</p>
 </div>
 <div class="section" id="use-a-custom-list-of-metrics">
 <span id="llm-eval-custom-metrics"></span><h3>Use a Custom List of Metrics<a class="headerlink" href="#use-a-custom-list-of-metrics" title="Permalink to this headline"> </a></h3>
@@ -468,7 +478,7 @@ needs the following information:</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">grading_prompt</span></code>: describe the scoring critieria.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">examples</span></code>: a few input/output examples with score, they are used as a reference for LLM judge.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">model</span></code>: the identifier of LLM judge, in the format of “openai:/gpt-4” or “endpoints:/databricks-llama-2-70b-chat”.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">parameters</span></code>: the extra parameters to send to LLM judge, e.g., <code class="docutils literal notranslate"><span class="pre">temperature</span></code> for <code class="docutils literal notranslate"><span class="pre">&quot;openai:/gpt-3.5-turbo-16k&quot;</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">parameters</span></code>: the extra parameters to send to LLM judge, e.g., <code class="docutils literal notranslate"><span class="pre">temperature</span></code> for <code class="docutils literal notranslate"><span class="pre">&quot;openai:/gpt-4o-mini&quot;</span></code>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">aggregations</span></code>: The list of options to aggregate the per-row scores using numpy functions.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">greater_is_better</span></code>: indicates if a higher score means your model is better.</p></li>
 </ul>
@@ -531,7 +541,7 @@ we will use <a class="reference internal" href="../../python_api/mlflow.metrics.
         <span class="s2">&quot;business or academic settings. &quot;</span>
     <span class="p">),</span>
     <span class="n">examples</span><span class="o">=</span><span class="p">[</span><span class="n">professionalism_example_score_2</span><span class="p">,</span> <span class="n">professionalism_example_score_4</span><span class="p">],</span>
-    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;openai:/gpt-3.5-turbo-16k&quot;</span><span class="p">,</span>
+    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;openai:/gpt-4o-mini&quot;</span><span class="p">,</span>
     <span class="n">parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">},</span>
     <span class="n">aggregations</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;variance&quot;</span><span class="p">],</span>
     <span class="n">greater_is_better</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -616,9 +626,9 @@ to evaluate your model as an MLflow model, we recommend following the steps belo
 has its own <code class="docutils literal notranslate"><span class="pre">log_model</span></code> API, e.g., <a class="reference internal" href="../../python_api/openai/index.html#mlflow.openai.log_model" title="mlflow.openai.log_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.openai.log_model()</span></code></a>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
     <span class="n">system_prompt</span> <span class="o">=</span> <span class="s2">&quot;Answer the following question in two sentences&quot;</span>
-    <span class="c1"># Wrap &quot;gpt-3.5-turbo&quot; as an MLflow model.</span>
+    <span class="c1"># Wrap &quot;gpt-4o-mini&quot; as an MLflow model.</span>
     <span class="n">logged_model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">openai</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
-        <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-3.5-turbo&quot;</span><span class="p">,</span>
+        <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-4o-mini&quot;</span><span class="p">,</span>
         <span class="n">task</span><span class="o">=</span><span class="n">openai</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">completions</span><span class="p">,</span>
         <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
         <span class="n">messages</span><span class="o">=</span><span class="p">[</span>
@@ -666,7 +676,7 @@ up OpenAI authentication to run the code below.</p>
     <span class="n">system_prompt</span> <span class="o">=</span> <span class="s2">&quot;Please answer the following question in formal language.&quot;</span>
     <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">inputs</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
         <span class="n">completion</span> <span class="o">=</span> <span class="n">openai</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">completions</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-            <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-3.5-turbo&quot;</span><span class="p">,</span>
+            <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-4o-mini&quot;</span><span class="p">,</span>
             <span class="n">messages</span><span class="o">=</span><span class="p">[</span>
                 <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">system_prompt</span><span class="p">},</span>
                 <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{row}</span><span class="s2">&quot;</span><span class="p">},</span>
@@ -994,7 +1004,7 @@ MLflow UI. To view the evaluation results on MLflow UI, please follow the steps 
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../',
-      VERSION:'2.14.3.dev0',
+      VERSION:'2.14.4.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

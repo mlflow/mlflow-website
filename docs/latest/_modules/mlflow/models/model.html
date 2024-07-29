@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mlflow.models.model &mdash; MLflow 2.14.3.dev0 documentation</title>
+  <title>mlflow.models.model &mdash; MLflow 2.14.4.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -56,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="MLflow 2.14.3.dev0 documentation" href="../../../index.html"/>
+    <link rel="top" title="MLflow 2.14.4.dev0 documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
   
@@ -87,7 +87,7 @@
     <a href="../../../index.html" class="wy-nav-top-logo"
       ><img src="../../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.14.3.dev0</span>
+    <span class="version">2.14.4.dev0</span>
   </li>
 </ul>
   </nav>
@@ -556,6 +556,21 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">signature</span><span class="p">,</span> <span class="s2">&quot;params&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="Model.get_serving_input"><a class="viewcode-back" href="../../../python_api/mlflow.models.html#mlflow.models.Model.get_serving_input">[docs]</a>    <span class="k">def</span> <span class="nf">get_serving_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load serving input example from a model directory. Returns None if there is no serving input</span>
+<span class="sd">        example.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            path: Path to the model directory.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Serving input example or None if the model has no serving input example.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">mlflow.models.utils</span> <span class="kn">import</span> <span class="n">_load_serving_input_example</span>
+
+        <span class="k">return</span> <span class="n">_load_serving_input_example</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="Model.load_input_example"><a class="viewcode-back" href="../../../python_api/mlflow.models.html#mlflow.models.Model.load_input_example">[docs]</a>    <span class="k">def</span> <span class="nf">load_input_example</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Load the input example saved along a model. Returns None if there is no example metadata</span>
@@ -950,9 +965,36 @@
                     <span class="n">await_registration_for</span><span class="o">=</span><span class="n">await_registration_for</span><span class="p">,</span>
                     <span class="n">local_model_path</span><span class="o">=</span><span class="n">local_path</span><span class="p">,</span>
                 <span class="p">)</span>
-        <span class="n">model_info</span> <span class="o">=</span> <span class="n">mlflow_model</span><span class="o">.</span><span class="n">get_model_info</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">registered_model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">model_info</span><span class="o">.</span><span class="n">registered_model_version</span> <span class="o">=</span> <span class="n">registered_model</span><span class="o">.</span><span class="n">version</span>
+            <span class="n">model_info</span> <span class="o">=</span> <span class="n">mlflow_model</span><span class="o">.</span><span class="n">get_model_info</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">registered_model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">model_info</span><span class="o">.</span><span class="n">registered_model_version</span> <span class="o">=</span> <span class="n">registered_model</span><span class="o">.</span><span class="n">version</span>
+
+            <span class="c1"># validate input example works for serving when logging the model</span>
+            <span class="n">serving_input</span> <span class="o">=</span> <span class="n">mlflow_model</span><span class="o">.</span><span class="n">get_serving_input</span><span class="p">(</span><span class="n">local_path</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">mlflow_model</span><span class="o">.</span><span class="n">signature</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">serving_input</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;Input example should be provided to infer model signature if the model &quot;</span>
+                    <span class="s2">&quot;signature is not provided when logging the model.&quot;</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="n">serving_input</span><span class="p">:</span>
+                <span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">validate_serving_input</span>
+
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">validate_serving_input</span><span class="p">(</span><span class="n">model_info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">serving_input</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Failed to validate serving input example </span><span class="si">{</span><span class="n">serving_input</span><span class="si">}</span><span class="s2">. &quot;</span>
+                        <span class="s2">&quot;Alternatively, you can avoid passing input example and pass model &quot;</span>
+                        <span class="s2">&quot;signature instead when logging the model. To ensure the input example &quot;</span>
+                        <span class="s2">&quot;is valid prior to serving, please try calling &quot;</span>
+                        <span class="s2">&quot;`mlflow.models.validate_serving_input` on the model uri and serving &quot;</span>
+                        <span class="s2">&quot;input example. A serving input example can be generated from model &quot;</span>
+                        <span class="s2">&quot;input example using &quot;</span>
+                        <span class="s2">&quot;`mlflow.models.convert_input_example_to_serving_input` function.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;Got error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                        <span class="n">exc_info</span><span class="o">=</span><span class="n">_logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">),</span>
+                    <span class="p">)</span>
+
         <span class="k">return</span> <span class="n">model_info</span></div></div>
 
 
@@ -1035,8 +1077,9 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">mlflow.pyfunc</span> <span class="kn">import</span> <span class="n">_download_artifact_from_uri</span>
 
-    <span class="n">local_path</span> <span class="o">=</span> <span class="n">_download_artifact_from_uri</span><span class="p">(</span><span class="n">artifact_uri</span><span class="o">=</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">output_path</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-    <span class="n">model_meta</span> <span class="o">=</span> <span class="n">Model</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">local_path</span><span class="p">,</span> <span class="n">MLMODEL_FILE_NAME</span><span class="p">))</span>
+    <span class="n">meta_file_uri</span> <span class="o">=</span> <span class="n">model_uri</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">MLMODEL_FILE_NAME</span>
+    <span class="n">meta_local_path</span> <span class="o">=</span> <span class="n">_download_artifact_from_uri</span><span class="p">(</span><span class="n">artifact_uri</span><span class="o">=</span><span class="n">meta_file_uri</span><span class="p">)</span>
+    <span class="n">model_meta</span> <span class="o">=</span> <span class="n">Model</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">meta_local_path</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">ModelInfo</span><span class="p">(</span>
         <span class="n">artifact_path</span><span class="o">=</span><span class="n">model_meta</span><span class="o">.</span><span class="n">artifact_path</span><span class="p">,</span>
         <span class="n">flavors</span><span class="o">=</span><span class="n">model_meta</span><span class="o">.</span><span class="n">flavors</span><span class="p">,</span>
@@ -1219,7 +1262,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../../',
-      VERSION:'2.14.3.dev0',
+      VERSION:'2.14.4.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

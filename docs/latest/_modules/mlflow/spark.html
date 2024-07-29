@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mlflow.spark &mdash; MLflow 2.14.3.dev0 documentation</title>
+  <title>mlflow.spark &mdash; MLflow 2.14.4.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -56,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="MLflow 2.14.3.dev0 documentation" href="../../index.html"/>
+    <link rel="top" title="MLflow 2.14.4.dev0 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
@@ -87,7 +87,7 @@
     <a href="../../index.html" class="wy-nav-top-logo"
       ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.14.3.dev0</span>
+    <span class="version">2.14.4.dev0</span>
   </li>
 </ul>
   </nav>
@@ -228,7 +228,6 @@
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">yaml</span>
 <span class="kn">from</span> <span class="nn">packaging.version</span> <span class="kn">import</span> <span class="n">Version</span>
 
@@ -236,7 +235,7 @@
 <span class="kn">from</span> <span class="nn">mlflow</span> <span class="kn">import</span> <span class="n">environment_variables</span><span class="p">,</span> <span class="n">mleap</span><span class="p">,</span> <span class="n">pyfunc</span>
 <span class="kn">from</span> <span class="nn">mlflow.environment_variables</span> <span class="kn">import</span> <span class="n">MLFLOW_DFS_TMP</span>
 <span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
-<span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">Model</span><span class="p">,</span> <span class="n">ModelInputExample</span><span class="p">,</span> <span class="n">ModelSignature</span><span class="p">,</span> <span class="n">infer_signature</span>
+<span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">Model</span><span class="p">,</span> <span class="n">ModelInputExample</span><span class="p">,</span> <span class="n">ModelSignature</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.model</span> <span class="kn">import</span> <span class="n">MLMODEL_FILE_NAME</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.signature</span> <span class="kn">import</span> <span class="n">_LOG_MODEL_INFER_SIGNATURE_WARNING_TEMPLATE</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.utils</span> <span class="kn">import</span> <span class="n">_Example</span><span class="p">,</span> <span class="n">_save_example</span>
@@ -247,6 +246,7 @@
     <span class="n">_download_artifact_from_uri</span><span class="p">,</span>
     <span class="n">_get_root_uri_and_artifact_path</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span> <span class="nn">mlflow.types.schema</span> <span class="kn">import</span> <span class="n">SparkMLVector</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils</span> <span class="kn">import</span> <span class="n">_get_fully_qualified_class_name</span><span class="p">,</span> <span class="n">databricks_utils</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.autologging_utils</span> <span class="kn">import</span> <span class="n">autologging_integration</span><span class="p">,</span> <span class="n">safe_patch</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.class_utils</span> <span class="kn">import</span> <span class="n">_get_class_from_string</span>
@@ -906,12 +906,10 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">spark</span> <span class="o">=</span> <span class="n">_get_active_spark_session</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">spark</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">wrapped_model</span> <span class="o">=</span> <span class="n">_PyFuncModelWrapper</span><span class="p">(</span><span class="n">spark</span><span class="p">,</span> <span class="n">spark_model</span><span class="p">)</span>
-                <span class="c1"># We cast the predictions to a Pandas series because the Spark _PyFuncModelWrapper</span>
-                <span class="c1"># returns predictions as a list, which the `infer_signature` API does not support</span>
-                <span class="c1"># (unless it is a list of strings).</span>
-                <span class="n">prediction</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">wrapped_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">input_ex</span><span class="p">))</span>
-                <span class="n">signature</span> <span class="o">=</span> <span class="n">infer_signature</span><span class="p">(</span><span class="n">input_ex</span><span class="p">,</span> <span class="n">prediction</span><span class="p">)</span>
+                <span class="n">input_example_spark_df</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">createDataFrame</span><span class="p">(</span><span class="n">input_ex</span><span class="p">)</span>
+                <span class="n">signature</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyspark</span><span class="o">.</span><span class="n">ml</span><span class="o">.</span><span class="n">_infer_spark_model_signature</span><span class="p">(</span>
+                    <span class="n">spark_model</span><span class="p">,</span> <span class="n">input_example_spark_df</span>
+                <span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">environment_variables</span><span class="o">.</span><span class="n">_MLFLOW_TESTING</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
                 <span class="k">raise</span>
@@ -1102,7 +1100,7 @@
 
         <span class="n">spark_model</span> <span class="o">=</span> <span class="n">_load_model</span><span class="p">(</span><span class="n">model_uri</span><span class="o">=</span><span class="n">path</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">_PyFuncModelWrapper</span><span class="p">(</span><span class="n">spark</span><span class="p">,</span> <span class="n">spark_model</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_PyFuncModelWrapper</span><span class="p">(</span><span class="n">spark</span><span class="p">,</span> <span class="n">spark_model</span><span class="p">,</span> <span class="n">signature</span><span class="o">=</span><span class="n">model_meta</span><span class="o">.</span><span class="n">signature</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_find_and_set_features_col_as_vector_if_needed</span><span class="p">(</span><span class="n">spark_df</span><span class="p">,</span> <span class="n">spark_model</span><span class="p">):</span>
@@ -1163,9 +1161,10 @@
 <span class="sd">    Wrapper around Spark MLlib PipelineModel providing interface for scoring pandas DataFrame.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spark</span><span class="p">,</span> <span class="n">spark_model</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spark</span><span class="p">,</span> <span class="n">spark_model</span><span class="p">,</span> <span class="n">signature</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">spark</span> <span class="o">=</span> <span class="n">spark</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">spark_model</span> <span class="o">=</span> <span class="n">spark_model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">signature</span> <span class="o">=</span> <span class="n">signature</span>
 
     <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -1182,8 +1181,6 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            List with model predictions.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">pyspark.ml</span> <span class="kn">import</span> <span class="n">PipelineModel</span>
-
         <span class="k">if</span> <span class="n">_is_spark_connect_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spark_model</span><span class="p">):</span>
             <span class="c1"># Spark connect ML model directly appends prediction result column to input pandas</span>
             <span class="c1"># dataframe. To make input dataframe intact, make a copy first.</span>
@@ -1195,27 +1192,50 @@
             <span class="c1"># Spark model uses &quot;prediction&quot; as default model inference output column name.</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">spark_model</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">pandas_df</span><span class="p">)[</span><span class="s2">&quot;prediction&quot;</span><span class="p">]</span>
 
-        <span class="n">spark_df</span> <span class="o">=</span> <span class="n">_find_and_set_features_col_as_vector_if_needed</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">spark</span><span class="o">.</span><span class="n">createDataFrame</span><span class="p">(</span><span class="n">pandas_df</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">spark_model</span>
-        <span class="p">)</span>
-        <span class="n">prediction_column</span> <span class="o">=</span> <span class="s2">&quot;prediction&quot;</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spark_model</span><span class="p">,</span> <span class="n">PipelineModel</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">spark_model</span><span class="o">.</span><span class="n">stages</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">hasParam</span><span class="p">(</span>
-            <span class="s2">&quot;outputCol&quot;</span>
-        <span class="p">):</span>
-            <span class="kn">from</span> <span class="nn">pyspark.sql</span> <span class="kn">import</span> <span class="n">SparkSession</span>
+        <span class="c1"># Convert List[np.float64] / np.array[np.float64] type to List[float] type,</span>
+        <span class="c1"># otherwise it will break `spark.createDataFrame` column type inferring.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">signature</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">signature</span><span class="o">.</span><span class="n">inputs</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">col_spec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">signature</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">inputs</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col_spec</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">SparkMLVector</span><span class="p">):</span>
+                    <span class="n">col_name</span> <span class="o">=</span> <span class="n">col_spec</span><span class="o">.</span><span class="n">name</span> <span class="ow">or</span> <span class="n">pandas_df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-            <span class="n">spark</span> <span class="o">=</span> <span class="n">SparkSession</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">getOrCreate</span><span class="p">()</span>
-            <span class="c1"># do a transform with an empty input DataFrame</span>
-            <span class="c1"># to get the schema of the transformed DataFrame</span>
-            <span class="n">transformed_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spark_model</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">spark</span><span class="o">.</span><span class="n">createDataFrame</span><span class="p">([],</span> <span class="n">spark_df</span><span class="o">.</span><span class="n">schema</span><span class="p">))</span>
-            <span class="c1"># Ensure prediction column doesn&#39;t already exist</span>
-            <span class="k">if</span> <span class="n">prediction_column</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">transformed_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
-                <span class="c1"># make sure predict work by default for Transformers</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">spark_model</span><span class="o">.</span><span class="n">stages</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">setOutputCol</span><span class="p">(</span><span class="n">prediction_column</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">[</span>
-            <span class="n">x</span><span class="o">.</span><span class="n">prediction</span>
-            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">spark_model</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">spark_df</span><span class="p">)</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">prediction_column</span><span class="p">)</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
-        <span class="p">]</span>
+                    <span class="n">pandas_df</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">pandas_df</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+                        <span class="k">lambda</span> <span class="n">array</span><span class="p">:</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span> <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">array</span><span class="p">]</span>
+                    <span class="p">)</span>
+
+        <span class="n">spark_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spark</span><span class="o">.</span><span class="n">createDataFrame</span><span class="p">(</span><span class="n">pandas_df</span><span class="p">)</span>
+
+        <span class="c1"># Convert Array[Double] column to spark ML vector type according to signature</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">signature</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">signature</span><span class="o">.</span><span class="n">inputs</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">col_spec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">signature</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">inputs</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col_spec</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">SparkMLVector</span><span class="p">):</span>
+                    <span class="kn">from</span> <span class="nn">pyspark.ml.functions</span> <span class="kn">import</span> <span class="n">array_to_vector</span>
+
+                    <span class="n">col_name</span> <span class="o">=</span> <span class="n">col_spec</span><span class="o">.</span><span class="n">name</span> <span class="ow">or</span> <span class="n">spark_df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">spark_df</span> <span class="o">=</span> <span class="n">spark_df</span><span class="o">.</span><span class="n">withColumn</span><span class="p">(</span><span class="n">col_name</span><span class="p">,</span> <span class="n">array_to_vector</span><span class="p">(</span><span class="n">col_name</span><span class="p">))</span>
+
+        <span class="c1"># For the case of no signature or signature logged by old version MLflow,</span>
+        <span class="c1"># the signature does not support spark ML vector type, in this case,</span>
+        <span class="c1"># automatically infer vector type input columns and do the conversion</span>
+        <span class="c1"># using `_find_and_set_features_col_as_vector_if_needed` utility function.</span>
+        <span class="n">spark_df</span> <span class="o">=</span> <span class="n">_find_and_set_features_col_as_vector_if_needed</span><span class="p">(</span><span class="n">spark_df</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">spark_model</span><span class="p">)</span>
+
+        <span class="n">prediction_column</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyspark</span><span class="o">.</span><span class="n">ml</span><span class="o">.</span><span class="n">_check_or_set_model_prediction_column</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spark_model</span><span class="p">,</span> <span class="n">spark_df</span>
+        <span class="p">)</span>
+        <span class="n">prediction_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spark_model</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">spark_df</span><span class="p">)</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">prediction_column</span><span class="p">)</span>
+
+        <span class="c1"># If signature output schema exists and it contains vector type columns,</span>
+        <span class="c1"># Convert spark ML vector type column to Array[Double] otherwise it will</span>
+        <span class="c1"># break enforce_schema checking</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">signature</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">signature</span><span class="o">.</span><span class="n">outputs</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">col_spec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">signature</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">inputs</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col_spec</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">SparkMLVector</span><span class="p">):</span>
+                    <span class="kn">from</span> <span class="nn">pyspark.ml.functions</span> <span class="kn">import</span> <span class="n">vector_to_array</span>
+
+                    <span class="n">col_name</span> <span class="o">=</span> <span class="n">col_spec</span><span class="o">.</span><span class="n">name</span> <span class="ow">or</span> <span class="n">prediction_df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">prediction_df</span> <span class="o">=</span> <span class="n">prediction_df</span><span class="o">.</span><span class="n">withColumn</span><span class="p">(</span><span class="n">col_name</span><span class="p">,</span> <span class="n">vector_to_array</span><span class="p">(</span><span class="n">col_name</span><span class="p">))</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">prediction</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">prediction_df</span><span class="o">.</span><span class="n">collect</span><span class="p">()]</span>
 
 
 <div class="viewcode-block" id="autolog"><a class="viewcode-back" href="../../python_api/mlflow.spark.html#mlflow.spark.autolog">[docs]</a><span class="nd">@autologging_integration</span><span class="p">(</span><span class="n">FLAVOR_NAME</span><span class="p">)</span>
@@ -1362,7 +1382,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../',
-      VERSION:'2.14.3.dev0',
+      VERSION:'2.14.4.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Introduction to Using the OpenAI Flavor in MLflow &mdash; MLflow 2.14.3.dev0 documentation</title>
+  <title>Introduction to Using the OpenAI Flavor in MLflow &mdash; MLflow 2.14.4.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -56,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="MLflow 2.14.3.dev0 documentation" href="../../../index.html"/>
+    <link rel="top" title="MLflow 2.14.4.dev0 documentation" href="../../../index.html"/>
         <link rel="up" title="MLflow OpenAI Flavor" href="../index.html"/>
         <link rel="next" title="Introduction: Advancing Communication with GPT-4 and MLflow" href="/openai-chat-completions.html"/>
         <link rel="prev" title="MLflow OpenAI Autologging" href="/../autologging.html"/> 
@@ -90,7 +90,7 @@
     <a href="../../../index.html" class="wy-nav-top-logo"
       ><img src="../../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.14.3.dev0</span>
+    <span class="version">2.14.4.dev0</span>
   </li>
 </ul>
   </nav>
@@ -149,6 +149,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../sentence-transformers/index.html">MLflow Sentence-Transformers Flavor</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../langchain/index.html">MLflow LangChain Flavor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../llama-index/index.html">MLflow LlamaIndex Flavor</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../index.html#explore-the-native-llm-flavors">Explore the Native LLM Flavors</a></li>
 </ul>
 </li>
@@ -631,7 +632,7 @@ div.rendered_html tbody tr:hover {
 <p>In this section, we define our model and <a class="reference external" href="https://www.mlflow.org/docs/latest/tracking/tracking-api.html">log it to MLflow</a>. This integrates our prompt that defines the characteristics of what we want the nature of the responses to be with the configuration parameters that dictate how MLflow will interact with the OpenAI SDK in order to select the right model with our desired parameters.</p>
 <ul class="simple">
 <li><p><strong>MLflow Experiments</strong>: Our first step involves creating or reusing an <a class="reference external" href="https://www.mlflow.org/docs/latest/tracking/tracking-api.html#organizing-runs-in-experiments">MLflow experiment</a> named “Lyrics Corrector”. Experiments in MLflow are crucial for organizing and tracking different model runs, along with their associated data and parameters.</p></li>
-<li><p><strong>Model Logging</strong>: Within an <a class="reference external" href="https://www.mlflow.org/docs/latest/tracking.html#tracking-runs">MLflow run</a>, we log our model, specifying details such as the model type (<code class="docutils literal notranslate"><span class="pre">gpt-3.5-turbo-instruct</span></code>), the task it’s intended for (<code class="docutils literal notranslate"><span class="pre">openai.completions</span></code>), and the custom prompt we’ve designed. This action ensures that MLflow accurately captures the essence and operational context of our model.</p></li>
+<li><p><strong>Model Logging</strong>: Within an <a class="reference external" href="https://www.mlflow.org/docs/latest/tracking.html#tracking-runs">MLflow run</a>, we log our model, specifying details such as the model type (<code class="docutils literal notranslate"><span class="pre">gpt-4o-mini</span></code>), the task it’s intended for (<code class="docutils literal notranslate"><span class="pre">openai.completions</span></code>), and the custom prompt we’ve designed. This action ensures that MLflow accurately captures the essence and operational context of our model.</p></li>
 <li><p><strong>Model Signature</strong>: Here, we define the input and output schema for our model. We expect a string as input (the misheard lyric) and output a string (the corrected lyric with a humorous explanation). Additional parameters like <code class="docutils literal notranslate"><span class="pre">max_tokens</span></code>, <code class="docutils literal notranslate"><span class="pre">temperature</span></code>, and <code class="docutils literal notranslate"><span class="pre">best_of</span></code> are set to control the model’s text generation process.</p></li>
 <li><p><strong>Model Loading</strong>: Finally, we load the logged model as a generic Python function within MLflow. This makes the model readily usable for predictions and further interactions, allowing us to invoke it like a regular Python function with the specified inputs.</p></li>
 </ul>
@@ -646,7 +647,7 @@ div.rendered_html tbody tr:hover {
 <span class="c1"># Start our run and log our model</span>
 <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
     <span class="n">model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">openai</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
-        <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-3.5-turbo-instruct&quot;</span><span class="p">,</span>
+        <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-4o-mini&quot;</span><span class="p">,</span>
         <span class="n">task</span><span class="o">=</span><span class="n">openai</span><span class="o">.</span><span class="n">completions</span><span class="p">,</span>
         <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
         <span class="n">prompt</span><span class="o">=</span><span class="n">lyrics_prompt</span><span class="p">,</span>
@@ -792,7 +793,7 @@ I would rate the creativity of the misheard lyric a 1, as it doesn't really make
 <span class="c1"># Start our run and log our model</span>
 <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
     <span class="n">model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">openai</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
-        <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-3.5-turbo-instruct&quot;</span><span class="p">,</span>
+        <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-4o-mini&quot;</span><span class="p">,</span>
         <span class="n">task</span><span class="o">=</span><span class="n">openai</span><span class="o">.</span><span class="n">completions</span><span class="p">,</span>
         <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
         <span class="n">prompt</span><span class="o">=</span><span class="n">improved_lyrics_prompt</span><span class="p">,</span>
@@ -918,7 +919,7 @@ The misheard lyric is a 3 on the scale. The original lyric is a sweet and innoce
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../../',
-      VERSION:'2.14.3.dev0',
+      VERSION:'2.14.4.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

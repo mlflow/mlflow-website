@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mlflow.pyspark.ml &mdash; MLflow 2.14.3.dev0 documentation</title>
+  <title>mlflow.pyspark.ml &mdash; MLflow 2.14.4.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -56,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="MLflow 2.14.3.dev0 documentation" href="../../../index.html"/>
+    <link rel="top" title="MLflow 2.14.4.dev0 documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
   
@@ -87,7 +87,7 @@
     <a href="../../../index.html" class="wy-nav-top-logo"
       ><img src="../../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.14.3.dev0</span>
+    <span class="version">2.14.4.dev0</span>
   </li>
 </ul>
   </nav>
@@ -956,14 +956,58 @@
 
 
 <span class="k">def</span> <span class="nf">_get_columns_with_unsupported_data_type</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">pyspark.ml.linalg</span> <span class="kn">import</span> <span class="n">VectorUDT</span>
+
     <span class="kn">from</span> <span class="nn">mlflow.types.schema</span> <span class="kn">import</span> <span class="n">DataType</span>
 
     <span class="n">supported_spark_types</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">get_spark_types</span><span class="p">()</span>
     <span class="n">unsupported_columns</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">field</span><span class="o">.</span><span class="n">dataType</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">supported_spark_types</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">dataType</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">supported_spark_types</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
+            <span class="n">field</span><span class="o">.</span><span class="n">dataType</span><span class="p">,</span> <span class="n">VectorUDT</span>
+        <span class="p">):</span>
             <span class="n">unsupported_columns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">field</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">unsupported_columns</span>
+
+
+<span class="k">def</span> <span class="nf">_check_or_set_model_prediction_column</span><span class="p">(</span><span class="n">spark_model</span><span class="p">,</span> <span class="n">input_spark_df</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">pyspark.ml</span> <span class="kn">import</span> <span class="n">PipelineModel</span>
+
+    <span class="n">prediction_column</span> <span class="o">=</span> <span class="s2">&quot;prediction&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spark_model</span><span class="p">,</span> <span class="n">PipelineModel</span><span class="p">)</span> <span class="ow">and</span> <span class="n">spark_model</span><span class="o">.</span><span class="n">stages</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">hasParam</span><span class="p">(</span><span class="s2">&quot;outputCol&quot;</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">mlflow.utils._spark_utils</span> <span class="kn">import</span> <span class="n">_get_active_spark_session</span>
+
+        <span class="n">spark</span> <span class="o">=</span> <span class="n">_get_active_spark_session</span><span class="p">()</span>
+        <span class="c1"># do a transform with an empty input DataFrame</span>
+        <span class="c1"># to get the schema of the transformed DataFrame</span>
+        <span class="n">transformed_df</span> <span class="o">=</span> <span class="n">spark_model</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">spark</span><span class="o">.</span><span class="n">createDataFrame</span><span class="p">([],</span> <span class="n">input_spark_df</span><span class="o">.</span><span class="n">schema</span><span class="p">))</span>
+        <span class="c1"># Ensure prediction column doesn&#39;t already exist</span>
+        <span class="k">if</span> <span class="n">prediction_column</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">transformed_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="c1"># make sure predict work by default for Transformers</span>
+            <span class="n">spark_model</span><span class="o">.</span><span class="n">stages</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">setOutputCol</span><span class="p">(</span><span class="n">prediction_column</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">prediction_column</span>
+
+
+<span class="k">def</span> <span class="nf">_infer_spark_model_signature</span><span class="p">(</span><span class="n">spark_model</span><span class="p">,</span> <span class="n">input_example_spark_df</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">infer_signature</span>
+
+    <span class="n">prediction_column</span> <span class="o">=</span> <span class="n">_check_or_set_model_prediction_column</span><span class="p">(</span><span class="n">spark_model</span><span class="p">,</span> <span class="n">input_example_spark_df</span><span class="p">)</span>
+    <span class="n">model_output</span> <span class="o">=</span> <span class="n">spark_model</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">input_example_spark_df</span><span class="p">)</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">prediction_column</span><span class="p">)</span>
+    <span class="c1"># TODO: Remove this once we support non-scalar spark data types</span>
+    <span class="k">if</span> <span class="n">unsupported_columns</span> <span class="o">:=</span> <span class="n">_get_columns_with_unsupported_data_type</span><span class="p">(</span><span class="n">model_output</span><span class="p">):</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;Model outputs contain unsupported Spark data types: &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">unsupported_columns</span><span class="si">}</span><span class="s2">. Output schema is not be logged.&quot;</span>
+        <span class="p">)</span>
+        <span class="n">model_output</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">signature</span> <span class="o">=</span> <span class="n">infer_signature</span><span class="p">(</span><span class="n">input_example_spark_df</span><span class="p">,</span> <span class="n">model_output</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">signature</span><span class="o">.</span><span class="n">outputs</span><span class="p">:</span>
+        <span class="c1"># We only have one prediction column output,</span>
+        <span class="c1"># convert it to unnamed output schema to keep consistent with old MLflow version.</span>
+        <span class="n">signature</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">signature</span>
 
 
 <div class="viewcode-block" id="autolog"><a class="viewcode-back" href="../../../python_api/mlflow.pyspark.ml.html#mlflow.pyspark.ml.autolog">[docs]</a><span class="nd">@autologging_integration</span><span class="p">(</span><span class="n">AUTOLOGGING_INTEGRATION_NAME</span><span class="p">)</span>
@@ -1235,63 +1279,42 @@
 
         <span class="k">if</span> <span class="n">log_models</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">_should_log_model</span><span class="p">(</span><span class="n">spark_model</span><span class="p">):</span>
-                <span class="kn">from</span> <span class="nn">pyspark.sql</span> <span class="kn">import</span> <span class="n">SparkSession</span>
-
-                <span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">infer_signature</span>
                 <span class="kn">from</span> <span class="nn">mlflow.pyspark.ml._autolog</span> <span class="kn">import</span> <span class="p">(</span>
                     <span class="n">cast_spark_df_with_vector_to_array</span><span class="p">,</span>
                     <span class="n">get_feature_cols</span><span class="p">,</span>
                 <span class="p">)</span>
-                <span class="kn">from</span> <span class="nn">mlflow.spark</span> <span class="kn">import</span> <span class="n">_find_and_set_features_col_as_vector_if_needed</span>
 
-                <span class="n">spark</span> <span class="o">=</span> <span class="n">SparkSession</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">getOrCreate</span><span class="p">()</span>
-
-                <span class="k">def</span> <span class="nf">_get_input_example_as_pd_df</span><span class="p">():</span>
+                <span class="k">def</span> <span class="nf">_get_input_example_spark_df</span><span class="p">():</span>
                     <span class="n">feature_cols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">get_feature_cols</span><span class="p">(</span><span class="n">input_df</span><span class="p">,</span> <span class="n">spark_model</span><span class="p">))</span>
-                    <span class="n">limited_input_df</span> <span class="o">=</span> <span class="n">input_df</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">feature_cols</span><span class="p">)</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span>
-                        <span class="n">INPUT_EXAMPLE_SAMPLE_ROWS</span>
-                    <span class="p">)</span>
-                    <span class="k">return</span> <span class="n">cast_spark_df_with_vector_to_array</span><span class="p">(</span><span class="n">limited_input_df</span><span class="p">)</span><span class="o">.</span><span class="n">toPandas</span><span class="p">()</span>
+                    <span class="k">return</span> <span class="n">input_df</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">feature_cols</span><span class="p">)</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="n">INPUT_EXAMPLE_SAMPLE_ROWS</span><span class="p">)</span>
 
                 <span class="k">def</span> <span class="nf">_infer_model_signature</span><span class="p">(</span><span class="n">input_example_slice</span><span class="p">):</span>
-                    <span class="n">input_slice_df</span> <span class="o">=</span> <span class="n">_find_and_set_features_col_as_vector_if_needed</span><span class="p">(</span>
-                        <span class="n">spark</span><span class="o">.</span><span class="n">createDataFrame</span><span class="p">(</span><span class="n">input_example_slice</span><span class="p">),</span> <span class="n">spark_model</span>
-                    <span class="p">)</span>
-                    <span class="n">model_output</span> <span class="o">=</span> <span class="n">spark_model</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">input_slice_df</span><span class="p">)</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span>
-                        <span class="o">*</span><span class="n">input_slice_df</span><span class="o">.</span><span class="n">columns</span>
-                    <span class="p">)</span>
-                    <span class="c1"># TODO: Remove this once we support non-scalar spark data types</span>
-                    <span class="n">unsupported_columns</span> <span class="o">=</span> <span class="n">_get_columns_with_unsupported_data_type</span><span class="p">(</span><span class="n">model_output</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">unsupported_columns</span><span class="p">:</span>
-                        <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                            <span class="s2">&quot;Model outputs contain unsupported Spark data types: &quot;</span>
-                            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">unsupported_columns</span><span class="si">}</span><span class="s2">. Output schema is not be logged.&quot;</span>
-                        <span class="p">)</span>
-                        <span class="n">model_output</span> <span class="o">=</span> <span class="kc">None</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">model_output</span> <span class="o">=</span> <span class="n">model_output</span><span class="o">.</span><span class="n">toPandas</span><span class="p">()</span>
-
-                    <span class="k">return</span> <span class="n">infer_signature</span><span class="p">(</span><span class="n">input_example_slice</span><span class="p">,</span> <span class="n">model_output</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">_infer_spark_model_signature</span><span class="p">(</span><span class="n">spark_model</span><span class="p">,</span> <span class="n">input_example_slice</span><span class="p">)</span>
 
                 <span class="c1"># TODO: Remove this once we support non-scalar spark data types</span>
                 <span class="k">nonlocal</span> <span class="n">log_model_signatures</span>
                 <span class="k">if</span> <span class="n">log_model_signatures</span><span class="p">:</span>
-                    <span class="n">unsupported_columns</span> <span class="o">=</span> <span class="n">_get_columns_with_unsupported_data_type</span><span class="p">(</span><span class="n">input_df</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">unsupported_columns</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">unsupported_columns</span> <span class="o">:=</span> <span class="n">_get_columns_with_unsupported_data_type</span><span class="p">(</span><span class="n">input_df</span><span class="p">):</span>
                         <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                             <span class="s2">&quot;Model inputs contain unsupported Spark data types: &quot;</span>
                             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">unsupported_columns</span><span class="si">}</span><span class="s2">. Model signature is not logged.&quot;</span>
                         <span class="p">)</span>
                         <span class="n">log_model_signatures</span> <span class="o">=</span> <span class="kc">False</span>
 
-                <span class="n">input_example</span><span class="p">,</span> <span class="n">signature</span> <span class="o">=</span> <span class="n">resolve_input_example_and_signature</span><span class="p">(</span>
-                    <span class="n">_get_input_example_as_pd_df</span><span class="p">,</span>
+                <span class="n">input_example_spark_df</span><span class="p">,</span> <span class="n">signature</span> <span class="o">=</span> <span class="n">resolve_input_example_and_signature</span><span class="p">(</span>
+                    <span class="n">_get_input_example_spark_df</span><span class="p">,</span>
                     <span class="n">_infer_model_signature</span><span class="p">,</span>
                     <span class="n">log_input_examples</span><span class="p">,</span>
                     <span class="n">log_model_signatures</span><span class="p">,</span>
                     <span class="n">_logger</span><span class="p">,</span>
                 <span class="p">)</span>
 
+                <span class="k">if</span> <span class="n">input_example_spark_df</span><span class="p">:</span>
+                    <span class="n">input_example</span> <span class="o">=</span> <span class="n">cast_spark_df_with_vector_to_array</span><span class="p">(</span>
+                        <span class="n">input_example_spark_df</span>
+                    <span class="p">)</span><span class="o">.</span><span class="n">toPandas</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">input_example</span> <span class="o">=</span> <span class="kc">None</span>
                 <span class="n">mlflow</span><span class="o">.</span><span class="n">spark</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
                     <span class="n">spark_model</span><span class="p">,</span>
                     <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
@@ -1472,7 +1495,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../../',
-      VERSION:'2.14.3.dev0',
+      VERSION:'2.14.4.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

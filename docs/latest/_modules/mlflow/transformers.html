@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mlflow.transformers &mdash; MLflow 2.14.3.dev0 documentation</title>
+  <title>mlflow.transformers &mdash; MLflow 2.14.4.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -56,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="MLflow 2.14.3.dev0 documentation" href="../../index.html"/>
+    <link rel="top" title="MLflow 2.14.4.dev0 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
@@ -87,7 +87,7 @@
     <a href="../../index.html" class="wy-nav-top-logo"
       ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.14.3.dev0</span>
+    <span class="version">2.14.4.dev0</span>
   </li>
 </ul>
   </nav>
@@ -1537,20 +1537,49 @@
     <span class="n">path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">_LICENSE_FILE_NAME</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">fallback</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
 
 
+<span class="k">def</span> <span class="nf">_get_supported_pretrained_model_types</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Users might not have all the necessary libraries installed to determine the supported model</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">supported_model_types</span> <span class="o">=</span> <span class="p">()</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">FlaxPreTrainedModel</span>
+
+        <span class="n">supported_model_types</span> <span class="o">+=</span> <span class="p">(</span><span class="n">FlaxPreTrainedModel</span><span class="p">,)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">PreTrainedModel</span>
+
+        <span class="n">supported_model_types</span> <span class="o">+=</span> <span class="p">(</span><span class="n">PreTrainedModel</span><span class="p">,)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">TFPreTrainedModel</span>
+
+        <span class="n">supported_model_types</span> <span class="o">+=</span> <span class="p">(</span><span class="n">TFPreTrainedModel</span><span class="p">,)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+    <span class="k">return</span> <span class="n">supported_model_types</span>
+
+
 <span class="k">def</span> <span class="nf">_build_pipeline_from_model_input</span><span class="p">(</span><span class="n">model_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">task</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Pipeline</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Utility for generating a pipeline from component parts. If required components are not</span>
 <span class="sd">    specified, use the transformers library pipeline component validation to force raising an</span>
 <span class="sd">    exception. The underlying Exception thrown in transformers is verbose enough for diagnosis.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">FlaxPreTrainedModel</span><span class="p">,</span> <span class="n">PreTrainedModel</span><span class="p">,</span> <span class="n">TFPreTrainedModel</span><span class="p">,</span> <span class="n">pipeline</span>
+
+    <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">pipeline</span>
 
     <span class="n">model</span> <span class="o">=</span> <span class="n">model_dict</span><span class="p">[</span><span class="n">FlavorKey</span><span class="o">.</span><span class="n">MODEL</span><span class="p">]</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span>
-        <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="p">(</span><span class="n">TFPreTrainedModel</span><span class="p">,</span> <span class="n">PreTrainedModel</span><span class="p">,</span> <span class="n">FlaxPreTrainedModel</span><span class="p">))</span>
-        <span class="ow">or</span> <span class="n">is_peft_model</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
-    <span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">_get_supported_pretrained_model_types</span><span class="p">())</span> <span class="ow">or</span> <span class="n">is_peft_model</span><span class="p">(</span><span class="n">model</span><span class="p">)):</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
             <span class="s2">&quot;The supplied model type is unsupported. The model must be one of: &quot;</span>
             <span class="s2">&quot;PreTrainedModel, TFPreTrainedModel, FlaxPreTrainedModel, or PeftModel&quot;</span><span class="p">,</span>
@@ -3058,7 +3087,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../',
-      VERSION:'2.14.3.dev0',
+      VERSION:'2.14.4.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

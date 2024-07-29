@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Tracing in MLflow &mdash; MLflow 2.14.3.dev0 documentation</title>
+  <title>Tracing in MLflow &mdash; MLflow 2.14.4.dev0 documentation</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -56,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="MLflow 2.14.3.dev0 documentation" href="../../index.html"/>
+    <link rel="top" title="MLflow 2.14.4.dev0 documentation" href="../../index.html"/>
         <link rel="up" title="LLMs" href="../index.html"/>
         <link rel="next" title="Tracing Concepts" href="/overview.html"/>
         <link rel="prev" title="LLMs" href="/../index.html"/> 
@@ -68,6 +68,7 @@
 <script type="text/javascript" src="../../_static/jquery.js"></script>
 <script type="text/javascript" src="../../_static/underscore.js"></script>
 <script type="text/javascript" src="../../_static/doctools.js"></script>
+<script type="text/javascript" src="../../_static/tabs.js"></script>
 <script type="text/javascript" src="../../_static/languagesections.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
@@ -88,7 +89,7 @@
     <a href="../../index.html" class="wy-nav-top-logo"
       ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.14.3.dev0</span>
+    <span class="version">2.14.4.dev0</span>
   </li>
 </ul>
   </nav>
@@ -131,8 +132,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">LLMs</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="../index.html#id1">MLflow Tracing</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Tracing in MLflow</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#langchain-automatic-tracing">LangChain Automatic Tracing</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#openai-automatic-tracing">OpenAI Automatic Tracing</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#automatic-tracing">Automatic Tracing</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tracing-fluent-apis">Tracing Fluent APIs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tracing-client-apis">Tracing Client APIs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#searching-and-retrieving-traces">Searching and Retrieving Traces</a></li>
@@ -232,7 +232,7 @@
 </div>
 <p>MLflow offers a number of different options to enable tracing of your GenAI applications.</p>
 <ul class="simple">
-<li><p><strong>Automated tracing with LangChain</strong>: MLflow provides a fully automated integration with LangChain that can activate by simply enabling <code class="docutils literal notranslate"><span class="pre">mlflow.langchain.autolog()</span></code>.</p></li>
+<li><p><strong>Automated tracing</strong>: MLflow provides a fully automated integration with integrated libraries such as LangChain, OpenAI, and LlamaIndex, that can activate by simply enabling <code class="docutils literal notranslate"><span class="pre">mlflow.&lt;library&gt;.autolog()</span></code>.</p></li>
 <li><p><strong>Manual trace instrumentation with high-level fluent APIs</strong>: Decorators, function wrappers and context managers via the fluent API allow you to add tracing functionality with minor code modifications.</p></li>
 <li><p><strong>Low-level client APIs for tracing</strong>: The MLflow client API provides a thread-safe way to handle trace implementations, even in aysnchronous modes of operation.</p></li>
 </ul>
@@ -246,8 +246,7 @@ do not contain the full set of features that are required for trace logging supp
 <div class="contents local topic" id="table-of-contents">
 <p class="topic-title">Table of Contents</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#langchain-automatic-tracing" id="id1">LangChain Automatic Tracing</a></p></li>
-<li><p><a class="reference internal" href="#openai-automatic-tracing" id="id2">OpenAI Automatic Tracing</a></p></li>
+<li><p><a class="reference internal" href="#automatic-tracing" id="id2">Automatic Tracing</a></p></li>
 <li><p><a class="reference internal" href="#tracing-fluent-apis" id="id3">Tracing Fluent APIs</a></p></li>
 <li><p><a class="reference internal" href="#tracing-client-apis" id="id4">Tracing Client APIs</a></p></li>
 <li><p><a class="reference internal" href="#searching-and-retrieving-traces" id="id5">Searching and Retrieving Traces</a></p></li>
@@ -255,12 +254,24 @@ do not contain the full set of features that are required for trace logging supp
 <li><p><a class="reference internal" href="#faq" id="id7">FAQ</a></p></li>
 </ul>
 </div>
-<div class="section" id="langchain-automatic-tracing">
-<h2><a class="toc-backref" href="#id1">LangChain Automatic Tracing</a><a class="headerlink" href="#langchain-automatic-tracing" title="Permalink to this headline"> </a></h2>
-<p>The easiest way to get started with MLflow Tracing is to leverage the built-in capabilities with MLflow’s LangChain integration. As part of the
-<a class="reference internal" href="../../python_api/mlflow.langchain.html#mlflow.langchain.autolog" title="mlflow.langchain.autolog"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.langchain.autolog()</span></code></a> integration, traces are logged to the active MLflow Experiment when calling invocation APIs on chains.</p>
-<p>In the example below, the model and its associated metadata will be logged as a run, while the traces are logged separately to the active experiment.</p>
-<p>Running the code below will automatically log the traces associated with the simple chain that is being interacted with.</p>
+<div class="section" id="automatic-tracing">
+<h2><a class="toc-backref" href="#id2">Automatic Tracing</a><a class="headerlink" href="#automatic-tracing" title="Permalink to this headline"> </a></h2>
+<p>The easiest way to get started with MLflow Tracing is to leverage the built-in capabilities with MLflow’s integrated libraries. MLflow provides automatic tracing capabilities for some of the integrated libraries such as
+LangChain, OpenAI, and LlamaIndex. For these libraries, you can instrument your code with
+just a single command <code class="docutils literal notranslate"><span class="pre">mlflow.&lt;library&gt;.autolog()</span></code> and MLflow will automatically log traces
+for model/API invocations to the active MLflow Experiment.</p>
+<div class="sphinx-tabs docutils container">
+<div aria-label="Tabbed content" role="tablist"><button aria-controls="panel-0-0-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-0-0-0" name="0-0" role="tab" tabindex="0">LangChain</button><button aria-controls="panel-0-0-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-1" name="0-1" role="tab" tabindex="-1">OpenAI</button><button aria-controls="panel-0-0-2" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-2" name="0-2" role="tab" tabindex="-1">LlamaIndex</button></div><div aria-labelledby="tab-0-0-0" class="sphinx-tabs-panel" id="panel-0-0-0" name="0-0" role="tabpanel" tabindex="0"><h3>LangChain Automatic Tracing</h3><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>As part of the LangChain autologging integration, traces are logged to the active MLflow Experiment when calling invocation APIs on chains. You can enable tracing
+for LangChain by calling the <a class="reference internal" href="../../python_api/mlflow.langchain.html#mlflow.langchain.autolog" title="mlflow.langchain.autolog"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.langchain.autolog()</span></code></a> function.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">langchain</span><span class="o">.</span><span class="n">autolog</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>In the full example below, the model and its associated metadata will be logged as a run, while the traces are logged separately to the active experiment. To learn more, please visit <a class="reference external" href="../langchain/autologging.html">LangChain Autologging documentation</a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This example has been confirmed working with the following requirement versions:</p>
@@ -329,13 +340,19 @@ do not contain the full set of features that are required for trace logging supp
 <p>The example above is purposely simple (a simple chat completions demonstration) for purposes of brevity. In real-world scenarios involving complex
 RAG chains, the trace that is recorded by MLflow will be significantly more complex and verbose.</p>
 </div>
+</div><div aria-labelledby="tab-0-0-1" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-1" name="0-1" role="tabpanel" tabindex="0"><h3>LangChain Automatic Tracing</h3><div class="line-block">
+<div class="line"><br /></div>
 </div>
-<div class="section" id="openai-automatic-tracing">
-<h2><a class="toc-backref" href="#id2">OpenAI Automatic Tracing</a><a class="headerlink" href="#openai-automatic-tracing" title="Permalink to this headline"> </a></h2>
 <p>The MLflow OpenAI flavor’s autologging feature has a direct integration with MLflow tracing. When OpenAI autologging is enabled with <a class="reference internal" href="../../python_api/openai/index.html#mlflow.openai.autolog" title="mlflow.openai.autolog"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.openai.autolog()</span></code></a>,
 usage of the OpenAI SDK will automatically record generated traces during interactive development.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">openai</span><span class="o">.</span><span class="n">autolog</span><span class="p">()</span>
+</pre></div>
+</div>
 <p>For example, the code below will log traces to the currently active experiment (in this case, the activated experiment <code class="docutils literal notranslate"><span class="pre">&quot;OpenAI&quot;</span></code>, set through the use
-of the <a class="reference internal" href="../../python_api/mlflow.html#mlflow.set_experiment" title="mlflow.set_experiment"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.set_experiment()</span></code></a> API).</p>
+of the <a class="reference internal" href="../../python_api/mlflow.html#mlflow.set_experiment" title="mlflow.set_experiment"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.set_experiment()</span></code></a> API).
+To learn more about OpenAI autologging, you can <a class="reference external" href="../openai/autologging.html">view the documentation here</a>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">openai</span>
 <span class="kn">import</span> <span class="nn">mlflow</span>
@@ -367,7 +384,21 @@ of the <a class="reference internal" href="../../python_api/mlflow.html#mlflow.s
 <div class="figure align-center">
 <a class="reference internal image-reference" href="../../_images/openai-tracing.png"><img alt="OpenAI Tracing" src="../../_images/openai-tracing.png" style="width: 100%;" /></a>
 </div>
-<p>To learn more about OpenAI autologging, you can <a class="reference external" href="../openai/autologging.html">view the documentation here</a>.</p>
+</div><div aria-labelledby="tab-0-0-2" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-2" name="0-2" role="tabpanel" tabindex="0"><h3>LlamaIndex Automatic Tracing</h3><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>The MLflow LlamaIndex flavor’s autologging feature has a direct integration with MLflow tracing. When LlamaIndex autologging is enabled with <a class="reference internal" href="../../python_api/mlflow.llama_index.html#mlflow.llama_index.autolog" title="mlflow.llama_index.autolog"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.llama_index.autolog()</span></code></a>, invocation of components
+such as LLMs, agents, and query/chat engines will automatically record generated traces during interactive development.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">llama_index</span><span class="o">.</span><span class="n">autolog</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>To see the full example of tracing LlamaIndex, please visit <a class="reference external" href="../llama-index/index.html##enable-tracing">LLamaIndex Tracing documentation</a>.</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="../../_images/llama-index-trace.png"><img alt="LlamaIndex Tracing" src="../../_images/llama-index-trace.png" style="width: 100%;" /></a>
+</div>
+</div></div>
 </div>
 <div class="section" id="tracing-fluent-apis">
 <h2><a class="toc-backref" href="#id3">Tracing Fluent APIs</a><a class="headerlink" href="#tracing-fluent-apis" title="Permalink to this headline"> </a></h2>
@@ -469,6 +500,75 @@ parent span, all using decorators.</p>
 <p>If we look at this trace from within the MLflow UI, we can see the relationship of the call order shown in the structure of the trace.</p>
 <div class="figure align-center">
 <a class="reference internal image-reference" href="../../_images/trace-decorator.gif"><img alt="Trace Decorator" src="../../_images/trace-decorator.gif" style="width: 100%;" /></a>
+</div>
+</div>
+<div class="section" id="span-type">
+<h4>Span Type<a class="headerlink" href="#span-type" title="Permalink to this headline"> </a></h4>
+<p>Span types are a way to categorize spans within a trace. By default, the span type is set to <code class="docutils literal notranslate"><span class="pre">&quot;UNKNOWN&quot;</span></code> when using the trace decorator. MLflow provides a set of predefined span types for common use cases, while also allowing you to setting custom span types.</p>
+<p>The following span types are available:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Span Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&quot;LLM&quot;</span></code></p></td>
+<td><p>Represents a call to an LLM endpoint or a local model.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&quot;CHAT_MODEL&quot;</span></code></p></td>
+<td><p>Represents a query to a chat model. This is a special case of an LLM interaction.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&quot;CHAIN&quot;</span></code></p></td>
+<td><p>Represents a chain of operations.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&quot;AGENT&quot;</span></code></p></td>
+<td><p>Represents an autonomous agent operation.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&quot;TOOL&quot;</span></code></p></td>
+<td><p>Represents a tool execution (typically by an agent), such as querying a search engine.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&quot;EMBEDDING&quot;</span></code></p></td>
+<td><p>Represents a text embedding operation.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&quot;RETRIEVER&quot;</span></code></p></td>
+<td><p>Represents a context retrieval operation, such as querying a vector database.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&quot;PARSER&quot;</span></code></p></td>
+<td><p>Represents a parsing operation, transforming text into a structured format.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&quot;RERANKER&quot;</span></code></p></td>
+<td><p>Represents a re-ranking operation, ordering the retrieved contexts based on relevance.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&quot;UNKNOWN&quot;</span></code></p></td>
+<td><p>A default span type that is used when no other span type is specified.</p></td>
+</tr>
+</tbody>
+</table>
+<p>To set a span type, you can pass the <code class="docutils literal notranslate"><span class="pre">span_type</span></code> parameter to the <a class="reference internal" href="../../python_api/mlflow.html#mlflow.trace" title="mlflow.trace"><code class="xref py py-func docutils literal notranslate"><span class="pre">&#64;mlflow.trace</span></code></a> decorator or <a class="reference internal" href="../../python_api/mlflow.html#mlflow.start_span" title="mlflow.start_span"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.start_span</span></code></a> context manager. When you are using <a class="reference external" href="#automatic-tracing">automatic tracing</a>, the span type is automatically set by MLflow.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">from</span> <span class="nn">mlflow.entities</span> <span class="kn">import</span> <span class="n">SpanType</span>
+
+
+<span class="c1"># Using a built-in span type</span>
+<span class="nd">@mlflow</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">span_type</span><span class="o">=</span><span class="n">SpanType</span><span class="o">.</span><span class="n">RETRIEVER</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">retrieve_documents</span><span class="p">(</span><span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="o">...</span>
+
+
+<span class="c1"># Setting a custom span type</span>
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_span</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;add&quot;</span><span class="p">,</span> <span class="n">span_type</span><span class="o">=</span><span class="s2">&quot;MATH&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">span</span><span class="p">:</span>
+    <span class="n">span</span><span class="o">.</span><span class="n">set_inputs</span><span class="p">({</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">z</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">y</span><span class="p">})</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
+    <span class="n">span</span><span class="o">.</span><span class="n">set_outputs</span><span class="p">({</span><span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="n">z</span><span class="p">})</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="n">span</span><span class="o">.</span><span class="n">span_type</span><span class="p">)</span>
+    <span class="c1"># Output: MATH</span>
+</pre></div>
 </div>
 </div>
 <div class="section" id="context-handler">
@@ -1007,7 +1107,7 @@ be as follows:</p>
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../',
-      VERSION:'2.14.3.dev0',
+      VERSION:'2.14.4.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',
