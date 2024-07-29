@@ -96,22 +96,18 @@ Start by installing all the necessary libraries for this demo to work.
 
 
 
-```python
-!pip install mlflow==2.14.1 openai  transformers torch torchvision evaluate datasets openai tiktoken fastapi rouge_score textstat tenacity plotly ipykernel nbformat==5.10.4
-
-!pip install --upgrade nbformat
+```bash
+pip install mlflow==2.14.1 openai  transformers torch torchvision evaluate datasets tiktoken fastapi rouge_score textstat tenacity plotly ipykernel nbformat>=5.10.4
 ```
 
 
-We will be using gpt3.5 and gpt4 during this example for that let's start by setting up an open ai key
-```python
-%env OPENAI_API_KEY=<your-api-key>
-```
+We will be using gpt3.5 and gpt4 during this example for that let's start by making sure our [OpenAI key is setup](https://mlflow.org/docs/latest/llms/openai/notebooks/openai-quickstart.html#API-Key-Security-Overview)
 
 Import the necessary libraries
 ```python
 import mlflow
 import os
+
 # Run a quick validation that we have an entry for the OPEN_API_KEY within environment variables
 assert "OPENAI_API_KEY" in os.environ, "OPENAI_API_KEY environment variable must be set"
 
@@ -128,11 +124,16 @@ When using mlflow.evaluate(), your LLM can be either:
 For this case let's use an mlflow model.
 
 Let's start by logging our translation model on mlflow.
-For this tutorial let's use a gpt3.5 with a system prompt
+For this tutorial let's use a gpt3.5 with a system prompt.
+
+In a production setting tipically this would be something you would experiment with and do some carefull prompting / different model selections to figure out which one is best for your use case. Check mlflow's [Prompt Engineering UI](https://mlflow.org/docs/latest/llms/prompt-engineering/index.html) for more info on this.
 
 ```python
 
 system_prompt = "Translate the following sentences into Spanish"
+# Let's set up an experiment to make it easier to track our results
+mlflow.set_experiment("/Path/to/your/experiment")
+
 basic_translation_model = mlflow.openai.log_model(
     model="gpt-3.5-turbo",
     task=openai.chat.completions,
@@ -154,7 +155,8 @@ model.predict("Hello, how are you?")
 # Output = ['¡Hola, ¿cómo estás?']
 ```
 
-To use mlflow evaluate we need to prepare some data to provide as input to our LLM.
+To use mlflow evaluate we need to prepare some sample data to provide as input to our LLM. In our scenario this would be the material the company is trying to translate.
+
 In this example we will define some common english expressions which we want translated.
 
 ```python
@@ -180,17 +182,7 @@ We want to adress how faithfull the translation is, for that we have to consider
 
 Let's set a metric that takes into account that cultural sensitivity.
 
-By default MLflow evaluate uses openai:/gpt-4 as a judge. However you can choose also choose a local model to do this evaluation (for example using ollama wraped in a pyfync)
-
-```python
-#To use an endpoint hosted by a local MLflow Deployments Server, you can use the following code.
-
-from mlflow.deployments import set_deployments_target
-
-set_deployments_target("http://localhost:5000")
-my_answer_similarity = mlflow.metrics.genai.answer_similarity(
-    model="endpoints:/my-endpoint"
-)
+By default MLflow evaluate uses openai:/gpt-4 as a judge. However you can choose also choose a [local model to do this evaluation](https://mlflow.org/docs/latest/llms/llm-evaluate/index.html#selecting-the-llm-as-judge-model) (for example using ollama wraped in a pyfync)
 
 ```
 For this example we will use GPT4
@@ -272,7 +264,7 @@ cultural_sensitivity = mlflow.metrics.genai.make_genai_metric(
 
 ```
 
-On top of this let's use mlflow default metrics for the evaluators. In this case mlflow wll use roberta-hate-speech model to detect the toxicity
+On top of this let's use mlflow default metrics for the evaluators. In this case mlflow wll use roberta-hate-speech model to detect the toxicity. This is important to the company at hand because it assures that their content is not considered offensive.
 
 ```python
 # Log and evaluate the model
@@ -301,22 +293,22 @@ results.tables["eval_results_table"]
 Let's analyse the final metrics
 
 ```python
-cultural_sensitive_score = results.metrics['cultural_sensitivity/v1/mean']
-print(f"Cultural Sensitivity Score: {cultural_sensitive_score}")
+cultural_sensitivity_score = results.metrics['cultural_sensitivity/v1/mean']
+print(f"Cultural Sensitivity Score: {cultural_sensitivity_score}")
 
 toxicity_score = results.metrics['toxicity/v1/mean'] 
-# Calculate pureness score
-purity_score = "{:.2f}".format((1 - toxicity_score) * 100)
-print(f"Pureness Score: {purity_score}%")
+# Calculate non-toxicity score
+non_toxicity_score = "{:.2f}".format((1 - toxicity_score) * 100)
+print(f"Non-Toxicity Score: {non_toxicity_score}%")
 
 # Output:
 # Cultural Sensitivity Score: 3.75
 # Pureness Score: 99.80
 ```
 
-It is often the case we want to monitor and track these metrics on a dashboard per say so both data scientists and stakeholders have an understanding of the performance and reliability of these solutions.
+It is often the case we want to monitor and track these metrics on a dashboard so both data scientists and stakeholders have an understanding of the performance and reliability of these solutions.
 
-For this example let's create a guage to display the final metric.
+For this example let's create a gauge to display the final metric.
 
 ```python
 import plotly.graph_objects as go
@@ -348,7 +340,7 @@ def create_gauge_chart(value1, title1, value2, title2):
     # Show figure
     fig.show()
 
-create_gauge_chart(cultural_sensitive_score, "Cultural Sensitivity Score", float(purity_score), "Purity Score (Non Toxicity)")
+create_gauge_chart(cultural_sensitive_score, "Cultural Sensitivity Score", float(non_toxicity_score), "Non Toxicity Score")
 ```
 
 ![Gauge Chart](gauge.png)
@@ -466,20 +458,9 @@ mlflow.end_run()
 
 As an alternative we can use mlflow built in metrics for genai using the same examples.
 
-MLflow offers a few pre-built metrics which uses LLM as the judge. Despite the difference under the hood, the usage is the same - put these metrics in the extra_metrics argument in mlflow.evaluate(). Here is the list of pre-built metrics:
+MLflow offers a few [pre-built metrics](https://mlflow.org/docs/latest/python_api/mlflow.metrics.html?highlight=genai%20answer#generative-ai-metrics) which uses LLM as the judge. Despite the difference under the hood, the usage is the same - put these metrics in the extra_metrics argument in mlflow.evaluate().
 
-1. **[mlflow.metrics.genai.answer_similarity()](https://mlflow.org/docs/latest/python_api/mlflow.metrics.html?highlight=genai%20answer#mlflow.metrics.genai.answer_similarity)**
-
-2. **[mlflow.metrics.genai.answer_correctness()](https://mlflow.org/docs/latest/python_api/mlflow.metrics.html?highlight=genai%20answer#mlflow.metrics.genai.answer_correctness)**
-
-
-3. **[mlflow.metrics.genai.answer_relevance()](https://mlflow.org/docs/latest/python_api/mlflow.metrics.html?highlight=genai%20answer#mlflow.metrics.genai.answer_relevance)**
- 
-4. **[mlflow.metrics.genai.relevance()](https://mlflow.org/docs/latest/python_api/mlflow.metrics.html?highlight=genai%20answer#mlflow.metrics.genai.relevance)**
-
-5. **[mlflow.metrics.genai.faithfulness()](https://mlflow.org/docs/latest/python_api/mlflow.metrics.html?highlight=genai%20answer#mlflow.metrics.genai.faithfulness)**
-
-Let's use mlflow's pre-built in faithfulness metric.
+Let's use mlflow's pre-built in [faithfulness metric](https://mlflow.org/docs/latest/python_api/mlflow.metrics.html?highlight=genai%20answer#mlflow.metrics.genai.faithfulness).
 
 
 ```python
@@ -488,7 +469,7 @@ faithfullness_metric = faithfulness(model="openai:/gpt-4")
 print(faithfullness_metric)
 ```
 
-This metric works quite well in singery with langchain retrivals since you can provide the grading context seperatly from the llm_input column if you prefer.
+This metric works quite well in synergy with langchain retrievals since you can provide the grading context separately from the llm_input column if you prefer.
 
 Since in this example we are doing everything in the same input column let's map out the context column to our input column.
 
