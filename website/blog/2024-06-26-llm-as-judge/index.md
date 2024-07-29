@@ -177,15 +177,15 @@ eval_data = pd.DataFrame(
 
 This example demonstrates how to create a custom metric that uses an LLM to judge the cultural sensitivity of translations. The LLM considers context, idiomatic expressions, and cultural nuances that might be missed by traditional metrics.
 
-To achieve this let's define some custom metric. 
-We want to adress how faithfull the translation is, for that we have to consider cultural factors and not only a literal translation.
+To achieve this let's define some custom metrics. 
+We want to adress how faithful the translation is, for that we have to consider cultural factors and not only a literal translation.
 
 Let's set a metric that takes into account that cultural sensitivity.
 
 By default MLflow evaluate uses openai:/gpt-4 as a judge. However you can choose also choose a [local model to do this evaluation](https://mlflow.org/docs/latest/llms/llm-evaluate/index.html#selecting-the-llm-as-judge-model) (for example using ollama wraped in a pyfync)
 
 ```
-For this example we will use GPT4
+For this example we will use GPT4.
 
 Begin by providing a few examples of good and bad scores.
 
@@ -290,7 +290,29 @@ You can retrieve the final results as such:
 results.tables["eval_results_table"]
 ```
 
-Let's analyse the final metrics
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|    | llm_inputs                     | outputs                  | token_count   | toxicity/v1/score   | flesch_kincaid_grade_level/v1/score   | ari_grade_level/v1/score   | cultural_sensitivity/v1/score   | cultural_sensitivity/v1/justification                          |
+|----|--------------------------------|--------------------------|---------------|---------------------|--------------------------------------|----------------------------|--------------------------------|----------------------------------------------------------------|
+| 0  | I'm over the moon about the news! | ¡Estoy feliz por la noticia! | 9             | 0.000258            | 5.2                                  | 3.7                        | 4                              | The translation captures the general sentiment...              |
+| 1  | Spill the beans.                | Revela el secreto.       | 7             | 0.001017            | 9.2                                  | 5.2                        | 5                              | The translation accurately captures the idioma...               |
+| 2  | Bite the bullet.                | Morder la bala.        | 7             | 0.001586            | 0.9                                  | 3.6                        | 2                              | The translation "Morder la bala" is a litera...               |
+| 3  | Better late than never.         | Más vale tarde que nunca. | 7             | 0.004947            | 0.5                                  | 0.9                        | 5                              | The translation accurately captures the idioma...               |
+
+
+Let's analyse the final metrics...
 
 ```python
 cultural_sensitivity_score = results.metrics['cultural_sensitivity/v1/mean']
@@ -346,12 +368,12 @@ create_gauge_chart(cultural_sensitive_score, "Cultural Sensitivity Score", float
 ![Gauge Chart](gauge.png)
 
 
-### Using Mlflow to evaluate RAG - Faithfullness
+### Using Mlflow to evaluate RAG - faithfulness
 
 The company decided to build a pipline for their materials which is invoked inside a RAG system.
 
 Let's say we want to evaluate how well our LLM is performing based on the context (materials) we provide it.
-For this lets define a custom metric called faithfullness.
+For this lets define a custom metric called faithfulness.
 
 Since in the first metric we used an mlflow model in the example ,for tutorial purposes this time instead of passing an mlflow model let's pass in a custom function to the `mlflow evaluate`
 
@@ -373,7 +395,7 @@ context: "Performance reviews are conducted annually. Employees are evaluated ba
 
 ```
 
-Now let's define some examples for this faithfullness metric.
+Now let's define some examples for this faithfulness metric.
 
 ```python
 examples = [
@@ -415,7 +437,7 @@ faithfulness = mlflow.metrics.genai.make_genai_metric(
 
 ```
 
-Define out LLM function (in this case it can be any function that follows certain input /output formats that mlflow evalaute supports)
+Define out LLM function (in this case it can be any function that follows certain input /output formats that mlflow evalaute supports).
 
 ```python
 # Using custom function
@@ -436,7 +458,7 @@ def my_llm(inputs):
     return answers
 ```
 
-Then our evaluation is similar to what we did before
+Then our evaluation is similar to what we did before...
 
 ```python
 with mlflow.start_run() as run:
@@ -465,8 +487,8 @@ Let's use mlflow's pre-built in [faithfulness metric](https://mlflow.org/docs/la
 
 ```python
 from mlflow.metrics.genai import EvaluationExample, faithfulness
-faithfullness_metric = faithfulness(model="openai:/gpt-4")
-print(faithfullness_metric)
+faithfulness_metric = faithfulness(model="openai:/gpt-4")
+print(faithfulness_metric)
 ```
 
 This metric works quite well in synergy with langchain retrievals since you can provide the grading context separately from the llm_input column if you prefer.
@@ -482,7 +504,7 @@ with mlflow.start_run() as run:
         eval_data,
         model_type="text",
         evaluators="default",
-        extra_metrics=[faithfullness_metric],
+        extra_metrics=[faithfulness_metric],
         evaluator_config={
         "col_mapping": {
             "inputs": "llm_inputs",
@@ -492,10 +514,12 @@ with mlflow.start_run() as run:
 mlflow.end_run()
 ```
 
-![Gauge Faithfullness Chart](faithfulness.png)
+![Gauge faithfulness Chart](faithfulness.png)
 
 
 ## Conclusion
+
+By combining the Cultural Sensitivity score with our other calculated metrics, our travel agency can further refine its model to ensure the delivery of high-quality content across all languages. Moving forward, we can revisit and adjust the prompts used to boost our Cultural Sensitivity score. Alternatively, we could fine-tune a smaller model to maintain the same high level of cultural sensitivity while reducing costs. These steps will help us provide even better service to the agency's diverse customer base.
 
 MLflow evaluate, combined with LLMs as judges, opens up new possibilities for nuanced and context-aware model evaluation. By creating custom metrics tailored to specific aspects of model performance, data scientists can gain deeper insights into their models' strengths and weaknesses.
 
@@ -505,3 +529,5 @@ As you explore MLflow evaluate and LLM-based metrics, remember that the key lies
 
 
 The built-in metrics, such as toxicity, offer standardized assessments that are crucial for ensuring the safety and accessibility of model outputs. 
+
+Here's a final challenge, re-run all the tests we did but this time with "gpt-4o-mini" and see how the performance is affected.
