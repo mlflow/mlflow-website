@@ -97,7 +97,7 @@ Start by installing all the necessary libraries for this demo to work.
 
 
 ```bash
-pip install mlflow==2.14.1 openai  transformers torch torchvision evaluate datasets tiktoken fastapi rouge_score textstat tenacity plotly ipykernel nbformat>=5.10.4
+pip install mlflow>=2.14.1 openai  transformers torch torchvision evaluate datasets tiktoken fastapi rouge_score textstat tenacity plotly ipykernel nbformat>=5.10.4
 ```
 
 
