@@ -13,6 +13,8 @@ const config: PlaywrightTestConfig = {
     },
   ],
   webServer: {
+    // Several docusaurus plugins are disabled in development.
+    // Use production build to enable them.
     command: "yarn build && yarn serve",
     port: 3000,
     timeout: 60 * 1000, // 30 seconds
