@@ -131,10 +131,7 @@ const GetConnectedCard = ({ isMobile }: { isMobile: boolean }) => {
       <li>
         <ArrowText
           text={
-            <a
-              className={styles.a}
-              href="https://mlflow.org/slack"
-            >
+            <a className={styles.a} href="https://mlflow.org/slack">
               Join 10,000+ ML practitioners in Slack
             </a>
           }
