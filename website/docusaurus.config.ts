@@ -83,6 +83,7 @@ const config: Config = {
       {
         redirects: [
           {
+            // See https://slack.com/help/articles/201330256-Invite-new-members-to-your-workspace for how to create a new invite link
             from: "/slack",
             to: "https://join.slack.com/t/mlflow-users/shared_invite/zt-2nyy6x19s-iBUGKEBExnXXv0zQD28uWg",
           },
