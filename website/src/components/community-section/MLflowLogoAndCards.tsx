@@ -133,7 +133,7 @@ const GetConnectedCard = ({ isMobile }: { isMobile: boolean }) => {
           text={
             <a
               className={styles.a}
-              href="https://join.slack.com/t/mlflow-users/shared_invite/zt-1iffrtbly-UNU8hV03aV8feUeGmqf_uA"
+              href="https://join.slack.com/t/mlflow-users/shared_invite/zt-2nyy6x19s-iBUGKEBExnXXv0zQD28uWg"
             >
               Join 10,000+ ML practitioners in Slack
             </a>
