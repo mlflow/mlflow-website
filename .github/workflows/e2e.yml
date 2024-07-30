@@ -1,0 +1,22 @@
+name: E2E
+
+on:
+  pull_request:
+  schedule:
+    # Run this job daily to detect dead slack invite links
+    - cron: "0 0 * * *"
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - working-directory: website
+        run: yarn
+      - working-directory: website
+        run: yarn build
+      - working-directory: website
+        run: yarn e2e-test
