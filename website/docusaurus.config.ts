@@ -78,9 +78,14 @@ const config: Config = {
     ],
     [
       // This plugin is always inactive in development and only active in production because it works on the build output.
+      // Run `yarn build` and then `yarn serve` for testing.
       "@docusaurus/plugin-client-redirects",
       {
         redirects: [
+          {
+            from: "/slack",
+            to: "https://join.slack.com/t/mlflow-users/shared_invite/zt-2nyy6x19s-iBUGKEBExnXXv0zQD28uWg",
+          },
           {
             from: "/blog/2024/01/25/databricks-ce",
             to: "/blog/databricks-ce",
