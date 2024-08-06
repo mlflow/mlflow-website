@@ -51,7 +51,7 @@ Before building our custom PyFunc model, let's first review what PyFunc does. Wh
 
 However, as with many other packages, pickling objects is often not supported by LangGraph chains. 
 
-To get around this issue, we will leverage the [code_paths](https://mlflow.org/docs/latest/model/dependencies.html?highlight=code_paths#saving-extra-code-with-an-mlflow-model-manual-declaration) argument to specify a custom dependency. Now, instead of serializing the entire LangGraph chain, we'll look to reload it from a python file. 
+To get around this issue, we will leverage the [code_paths](https://mlflow.org/docs/latest/model/dependencies.html?highlight=code_paths#saving-extra-code-with-an-mlflow-model-manual-declaration) argument to specify a custom dependency. Instead of serializing the entire LangGraph chain, we'll look to reload it from a python file. 
 
 Below, we use the magic `%%writefile` command to create a new file in a jupyter notebook context. If you're running this outside of an interactive notebook, simply create the file below, omitting the `%%writefile graph_chain.py` line.
 
@@ -212,3 +212,12 @@ User: What's my name?
 Agent: Your name is Morpheus. How can I assist you today?
 ```
 
+### Conclusion
+There are many logical extensions of the this tutorial, however the MLflow components can remain largely unchanged. 
+
+To summarize, here's what was covered in this tutorial:
+* Declaring an MVP LangGraph chain within an additional python file.
+* Creating a custom PyFunc class that uses the above chain to create a stateful chatbot.
+* Logging and loading the above objects via the standard MLflow APIs.
+
+Happy coding!
