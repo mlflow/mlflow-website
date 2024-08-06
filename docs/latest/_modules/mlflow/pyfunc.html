@@ -1126,7 +1126,16 @@
             <span class="p">):</span>
                 <span class="n">info</span><span class="p">[</span><span class="s2">&quot;artifact_path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model_meta</span><span class="o">.</span><span class="n">artifact_path</span>
             <span class="n">info</span><span class="p">[</span><span class="s2">&quot;flavor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model_meta</span><span class="o">.</span><span class="n">flavors</span><span class="p">[</span><span class="n">FLAVOR_NAME</span><span class="p">][</span><span class="s2">&quot;loader_module&quot;</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_dump</span><span class="p">({</span><span class="s2">&quot;mlflow.pyfunc.loaded_model&quot;</span><span class="p">:</span> <span class="n">info</span><span class="p">},</span> <span class="n">default_flow_style</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_dump</span><span class="p">({</span><span class="s2">&quot;mlflow.pyfunc.loaded_model&quot;</span><span class="p">:</span> <span class="n">info</span><span class="p">},</span> <span class="n">default_flow_style</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PyFuncModel.get_raw_model"><a class="viewcode-back" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PyFuncModel.get_raw_model">[docs]</a>    <span class="nd">@experimental</span>
+    <span class="k">def</span> <span class="nf">get_raw_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the underlying raw model if the model wrapper implemented `get_raw_model` function.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_model_impl</span><span class="p">,</span> <span class="s2">&quot;get_raw_model&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model_impl</span><span class="o">.</span><span class="n">get_raw_model</span><span class="p">()</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;`get_raw_model` is not implemented by the underlying model&quot;</span><span class="p">)</span></div></div>
 
 
 <span class="k">def</span> <span class="nf">_get_pip_requirements_from_model_path</span><span class="p">(</span><span class="n">model_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
@@ -1260,10 +1269,13 @@
 
 
 <span class="k">class</span> <span class="nc">_ServedPyFuncModel</span><span class="p">(</span><span class="n">PyFuncModel</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_meta</span><span class="p">:</span> <span class="n">Model</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">server_pid</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_meta</span><span class="p">:</span> <span class="n">Model</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">server_pid</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">env_manager</span><span class="o">=</span><span class="s2">&quot;local&quot;</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">model_meta</span><span class="o">=</span><span class="n">model_meta</span><span class="p">,</span> <span class="n">model_impl</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">predict_fn</span><span class="o">=</span><span class="s2">&quot;invoke&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_client</span> <span class="o">=</span> <span class="n">client</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_server_pid</span> <span class="o">=</span> <span class="n">server_pid</span>
+        <span class="c1"># We need to set `env_manager` attribute because it is used by Databricks runtime</span>
+        <span class="c1"># evaluate usage logging to log &#39;env_manager&#39; tag in `_evaluate` function patching.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_env_manager</span> <span class="o">=</span> <span class="n">env_manager</span>
 
     <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1288,6 +1300,10 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_server_pid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="s2">&quot;Served PyFunc Model is missing server process ID.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_server_pid</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">env_manager</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_env_manager</span>
 
 
 <span class="k">def</span> <span class="nf">_load_model_or_server</span><span class="p">(</span>
@@ -1368,7 +1384,10 @@
         <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
 
     <span class="k">return</span> <span class="n">_ServedPyFuncModel</span><span class="p">(</span>
-        <span class="n">model_meta</span><span class="o">=</span><span class="n">model_meta</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">server_pid</span><span class="o">=</span><span class="n">scoring_server_proc</span><span class="o">.</span><span class="n">pid</span>
+        <span class="n">model_meta</span><span class="o">=</span><span class="n">model_meta</span><span class="p">,</span>
+        <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
+        <span class="n">server_pid</span><span class="o">=</span><span class="n">scoring_server_proc</span><span class="o">.</span><span class="n">pid</span><span class="p">,</span>
+        <span class="n">env_manager</span><span class="o">=</span><span class="n">env_manager</span><span class="p">,</span>
     <span class="p">)</span>
 
 
@@ -2409,7 +2428,7 @@
     <span class="n">extra_pip_requirements</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">model_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">example_no_conversion</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">example_no_conversion</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">streamable</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">resources</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Resource</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
@@ -2819,7 +2838,7 @@
     <span class="n">extra_pip_requirements</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">model_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">example_no_conversion</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">example_no_conversion</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">streamable</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">resources</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Resource</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>

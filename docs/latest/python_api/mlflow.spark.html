@@ -277,7 +277,11 @@ MLeap-compatible arguments.</p>
 <dl class="py function">
 <dt id="mlflow.spark.autolog">
 <code class="sig-prename descclassname"><span class="pre">mlflow.spark.</span></code><code class="sig-name descname"><span class="pre">autolog</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">disable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mlflow/spark.html#autolog"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.spark.autolog" title="Permalink to this definition"> </a></dt>
-<dd><p>Enables (or disables) and configures logging of Spark datasource paths, versions
+<dd><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Autologging is known to be compatible with the following package versions: <code class="docutils literal notranslate"><span class="pre">3.1.2</span></code> &lt;= <code class="docutils literal notranslate"><span class="pre">pyspark</span></code> &lt;= <code class="docutils literal notranslate"><span class="pre">3.5.1</span></code>. Autologging may not succeed when used with package versions outside of this range.</p>
+</div>
+<p>Enables (or disables) and configures logging of Spark datasource paths, versions
 (if applicable), and formats when they are read. This method is not threadsafe and assumes a
 <a class="reference external" href="https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/api/pyspark.sql.SparkSession.html">SparkSession</a>
 already exists with the
@@ -479,21 +483,59 @@ This must be a PySpark DataFrame that the model can evaluate. If
 <li><p><strong>registered_model_name</strong> – If given, create a model version under
 <code class="docutils literal notranslate"><span class="pre">registered_model_name</span></code>, also creating a registered model if one
 with the given name does not exist.</p></li>
-<li><p><strong>signature</strong> – <p>an instance of the <a class="reference internal" href="mlflow.models.html#mlflow.models.ModelSignature" title="mlflow.models.ModelSignature"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModelSignature</span></code></a>
-class that describes the model’s inputs and outputs. If not specified but an
-<code class="docutils literal notranslate"><span class="pre">input_example</span></code> is supplied, a signature will be automatically inferred
-based on the supplied input example and model. To disable automatic signature
-inference when providing an input example, set <code class="docutils literal notranslate"><span class="pre">signature</span></code> to <code class="docutils literal notranslate"><span class="pre">False</span></code>.
-To manually infer a model signature, call
-<a class="reference internal" href="mlflow.models.html#mlflow.models.infer_signature" title="mlflow.models.infer_signature"><code class="xref py py-func docutils literal notranslate"><span class="pre">infer_signature()</span></code></a> on datasets
-with valid model inputs, such as a training dataset with the target column
-omitted, and valid model outputs, like model predictions made on the training
-dataset, for example:</p>
+<li><p><strong>signature</strong> – <p>A Model Signature object that describes the input and output Schema of the
+model. The model signature can be inferred using <cite>infer_signature</cite> function
+of <cite>mlflow.models.signature</cite>.
+Note if your Spark model contains Spark ML vector type input or output column,
+you should create <code class="docutils literal notranslate"><span class="pre">SparkMLVector</span></code> vector type for the column,
+<cite>infer_signature</cite> function can also infer <code class="docutils literal notranslate"><span class="pre">SparkMLVector</span></code> vector type correctly
+from Spark Dataframe input / output.
+When loading a Spark ML model with <code class="docutils literal notranslate"><span class="pre">SparkMLVector</span></code> vector type input as MLflow
+pyfunc model, it accepts <code class="docutils literal notranslate"><span class="pre">Array[double]</span></code> type input. MLflow internally converts
+the array into Spark ML vector and then invoke Spark model for inference. Similarly,
+if the model has vector type output, MLflow internally converts Spark ML vector
+output data into <code class="docutils literal notranslate"><span class="pre">Array[double]</span></code> type inference result.</p>
+<p>Example:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">infer_signature</span>
+<span class="kn">from</span> <span class="nn">pyspark.sql.functions</span> <span class="kn">import</span> <span class="n">col</span>
+<span class="kn">from</span> <span class="nn">pyspark.ml.classification</span> <span class="kn">import</span> <span class="n">LogisticRegression</span>
+<span class="kn">from</span> <span class="nn">pyspark.ml.functions</span> <span class="kn">import</span> <span class="n">array_to_vector</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">mlflow</span>
 
-<span class="n">train</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop_column</span><span class="p">(</span><span class="s2">&quot;target_label&quot;</span><span class="p">)</span>
-<span class="n">predictions</span> <span class="o">=</span> <span class="o">...</span>  <span class="c1"># compute model predictions</span>
-<span class="n">signature</span> <span class="o">=</span> <span class="n">infer_signature</span><span class="p">(</span><span class="n">train</span><span class="p">,</span> <span class="n">predictions</span><span class="p">)</span>
+<span class="n">train_df</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">createDataFrame</span><span class="p">(</span>
+    <span class="p">[([</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">],</span> <span class="mi">0</span><span class="p">),</span> <span class="p">([</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">],</span> <span class="mi">1</span><span class="p">)],</span> <span class="n">schema</span><span class="o">=</span><span class="s2">&quot;features array&lt;double&gt;, label long&quot;</span>
+<span class="p">)</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">array_to_vector</span><span class="p">(</span><span class="s2">&quot;features&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;features&quot;</span><span class="p">),</span> <span class="n">col</span><span class="p">(</span><span class="s2">&quot;label&quot;</span><span class="p">))</span>
+<span class="n">lor</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">maxIter</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">lor</span><span class="o">.</span><span class="n">setPredictionCol</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setProbabilityCol</span><span class="p">(</span><span class="s2">&quot;prediction&quot;</span><span class="p">)</span>
+<span class="n">lor_model</span> <span class="o">=</span> <span class="n">lor</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_df</span><span class="p">)</span>
+
+<span class="n">test_df</span> <span class="o">=</span> <span class="n">train_df</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;features&quot;</span><span class="p">)</span>
+<span class="n">prediction_df</span> <span class="o">=</span> <span class="n">lor_model</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">train_df</span><span class="p">)</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;prediction&quot;</span><span class="p">)</span>
+
+<span class="n">signature</span> <span class="o">=</span> <span class="n">infer_signature</span><span class="p">(</span><span class="n">test_df</span><span class="p">,</span> <span class="n">prediction_df</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">()</span> <span class="k">as</span> <span class="n">run</span><span class="p">:</span>
+    <span class="n">model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">spark</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+        <span class="n">lor_model</span><span class="p">,</span>
+        <span class="s2">&quot;model&quot;</span><span class="p">,</span>
+        <span class="n">signature</span><span class="o">=</span><span class="n">signature</span><span class="p">,</span>
+    <span class="p">)</span>
+
+<span class="c1"># The following signature is outputed:</span>
+<span class="c1"># inputs:</span>
+<span class="c1">#   [&#39;features&#39;: SparkML vector (required)]</span>
+<span class="c1"># outputs:</span>
+<span class="c1">#   [&#39;prediction&#39;: SparkML vector (required)]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">model_info</span><span class="o">.</span><span class="n">signature</span><span class="p">)</span>
+
+<span class="n">loaded</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
+
+<span class="n">test_dataset</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;features&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">]]})</span>
+
+<span class="c1"># `loaded.predict` accepts `Array[double]` type input column,</span>
+<span class="c1"># and generates `Array[double]` type output column.</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">loaded</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">))</span>
 </pre></div>
 </div>
 </p></li>
@@ -629,24 +671,7 @@ completes successfully. Defaults to <code class="docutils literal notranslate"><
 <li><p><strong>sample_input</strong> – A sample input that is used to add the MLeap flavor to the model.
 This must be a PySpark DataFrame that the model can evaluate. If
 <code class="docutils literal notranslate"><span class="pre">sample_input</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code>, the MLeap flavor is not added.</p></li>
-<li><p><strong>signature</strong> – <p>an instance of the <a class="reference internal" href="mlflow.models.html#mlflow.models.ModelSignature" title="mlflow.models.ModelSignature"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModelSignature</span></code></a>
-class that describes the model’s inputs and outputs. If not specified but an
-<code class="docutils literal notranslate"><span class="pre">input_example</span></code> is supplied, a signature will be automatically inferred
-based on the supplied input example and model. To disable automatic signature
-inference when providing an input example, set <code class="docutils literal notranslate"><span class="pre">signature</span></code> to <code class="docutils literal notranslate"><span class="pre">False</span></code>.
-To manually infer a model signature, call
-<a class="reference internal" href="mlflow.models.html#mlflow.models.infer_signature" title="mlflow.models.infer_signature"><code class="xref py py-func docutils literal notranslate"><span class="pre">infer_signature()</span></code></a> on datasets
-with valid model inputs, such as a training dataset with the target column
-omitted, and valid model outputs, like model predictions made on the training
-dataset, for example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">infer_signature</span>
-
-<span class="n">train</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop_column</span><span class="p">(</span><span class="s2">&quot;target_label&quot;</span><span class="p">)</span>
-<span class="n">predictions</span> <span class="o">=</span> <span class="o">...</span>  <span class="c1"># compute model predictions</span>
-<span class="n">signature</span> <span class="o">=</span> <span class="n">infer_signature</span><span class="p">(</span><span class="n">train</span><span class="p">,</span> <span class="n">predictions</span><span class="p">)</span>
-</pre></div>
-</div>
-</p></li>
+<li><p><strong>signature</strong> – See the document of argument <code class="docutils literal notranslate"><span class="pre">signature</span></code> in <a class="reference internal" href="#mlflow.spark.log_model" title="mlflow.spark.log_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.spark.log_model()</span></code></a>.</p></li>
 <li><p><strong>input_example</strong> – one or several instances of valid model input. The input example is used
 as a hint of what data to feed the model. It will be converted to a Pandas
 DataFrame and then serialized to json using the Pandas split-oriented

@@ -385,7 +385,64 @@
 <span class="sd">        registered_model_name: If given, create a model version under</span>
 <span class="sd">            ``registered_model_name``, also creating a registered model if one</span>
 <span class="sd">            with the given name does not exist.</span>
-<span class="sd">        signature: {{ signature }}</span>
+<span class="sd">        signature: A Model Signature object that describes the input and output Schema of the</span>
+<span class="sd">            model. The model signature can be inferred using `infer_signature` function</span>
+<span class="sd">            of `mlflow.models.signature`.</span>
+<span class="sd">            Note if your Spark model contains Spark ML vector type input or output column,</span>
+<span class="sd">            you should create ``SparkMLVector`` vector type for the column,</span>
+<span class="sd">            `infer_signature` function can also infer ``SparkMLVector`` vector type correctly</span>
+<span class="sd">            from Spark Dataframe input / output.</span>
+<span class="sd">            When loading a Spark ML model with ``SparkMLVector`` vector type input as MLflow</span>
+<span class="sd">            pyfunc model, it accepts ``Array[double]`` type input. MLflow internally converts</span>
+<span class="sd">            the array into Spark ML vector and then invoke Spark model for inference. Similarly,</span>
+<span class="sd">            if the model has vector type output, MLflow internally converts Spark ML vector</span>
+<span class="sd">            output data into ``Array[double]`` type inference result.</span>
+
+<span class="sd">            Example:</span>
+
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                from mlflow.models import infer_signature</span>
+<span class="sd">                from pyspark.sql.functions import col</span>
+<span class="sd">                from pyspark.ml.classification import LogisticRegression</span>
+<span class="sd">                from pyspark.ml.functions import array_to_vector</span>
+<span class="sd">                import pandas as pd</span>
+<span class="sd">                import mlflow</span>
+
+<span class="sd">                train_df = spark.createDataFrame(</span>
+<span class="sd">                    [([3.0, 4.0], 0), ([5.0, 6.0], 1)], schema=&quot;features array&lt;double&gt;, label long&quot;</span>
+<span class="sd">                ).select(array_to_vector(&quot;features&quot;).alias(&quot;features&quot;), col(&quot;label&quot;))</span>
+<span class="sd">                lor = LogisticRegression(maxIter=2)</span>
+<span class="sd">                lor.setPredictionCol(&quot;&quot;).setProbabilityCol(&quot;prediction&quot;)</span>
+<span class="sd">                lor_model = lor.fit(train_df)</span>
+
+<span class="sd">                test_df = train_df.select(&quot;features&quot;)</span>
+<span class="sd">                prediction_df = lor_model.transform(train_df).select(&quot;prediction&quot;)</span>
+
+<span class="sd">                signature = infer_signature(test_df, prediction_df)</span>
+
+<span class="sd">                with mlflow.start_run() as run:</span>
+<span class="sd">                    model_info = mlflow.spark.log_model(</span>
+<span class="sd">                        lor_model,</span>
+<span class="sd">                        &quot;model&quot;,</span>
+<span class="sd">                        signature=signature,</span>
+<span class="sd">                    )</span>
+
+<span class="sd">                # The following signature is outputed:</span>
+<span class="sd">                # inputs:</span>
+<span class="sd">                #   [&#39;features&#39;: SparkML vector (required)]</span>
+<span class="sd">                # outputs:</span>
+<span class="sd">                #   [&#39;prediction&#39;: SparkML vector (required)]</span>
+<span class="sd">                print(model_info.signature)</span>
+
+<span class="sd">                loaded = mlflow.pyfunc.load_model(model_info.model_uri)</span>
+
+<span class="sd">                test_dataset = pd.DataFrame({&quot;features&quot;: [[1.0, 2.0]]})</span>
+
+<span class="sd">                # `loaded.predict` accepts `Array[double]` type input column,</span>
+<span class="sd">                # and generates `Array[double]` type output column.</span>
+<span class="sd">                print(loaded.predict(test_dataset))</span>
+
 <span class="sd">        input_example: {{ input_example }}</span>
 <span class="sd">        await_registration_for: Number of seconds to wait for the model version to finish</span>
 <span class="sd">            being created and is in ``READY`` status. By default, the function</span>
@@ -866,7 +923,7 @@
 <span class="sd">        sample_input: A sample input that is used to add the MLeap flavor to the model.</span>
 <span class="sd">            This must be a PySpark DataFrame that the model can evaluate. If</span>
 <span class="sd">            ``sample_input`` is ``None``, the MLeap flavor is not added.</span>
-<span class="sd">        signature: {{ signature }}</span>
+<span class="sd">        signature: See the document of argument ``signature`` in :py:func:`mlflow.spark.log_model`.</span>
 <span class="sd">        input_example: {{ input_example }}</span>
 <span class="sd">        pip_requirements: {{ pip_requirements }}</span>
 <span class="sd">        extra_pip_requirements: {{ extra_pip_requirements }}</span>
@@ -1165,6 +1222,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">spark</span> <span class="o">=</span> <span class="n">spark</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">spark_model</span> <span class="o">=</span> <span class="n">spark_model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">signature</span> <span class="o">=</span> <span class="n">signature</span>
+
+    <span class="k">def</span> <span class="nf">get_raw_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the underlying model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">spark_model</span>
 
     <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
