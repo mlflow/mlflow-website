@@ -88,7 +88,7 @@ By the end of this step, you should see another file in your current directory w
 ### Custom PyFunc
 Great! Now that the custom dependency is created at `./graph_chain.py`, we are ready to declare a custom PyFunc and log the model.
 
-To quickly summarize the code below, we look to create a class that inherits from `mlflow.pyfunc.PythonModel`. Within that class we create a `predict` method that is standard to MLflow. We also create a variety of helpers to facilitate chatbot functionality. One notable call-out is that in the `predict` method, we import out custom `compiled_graph` object from the `graph_chain` python module created in the above step. That will dynamically instantiate our chain without using pickle!
+To quickly summarize the code below, we look to create a class that inherits from `mlflow.pyfunc.PythonModel`. Within that class we create a `predict` method that is standard to MLflow. We also create a variety of helpers to facilitate chatbot functionality. One notable call-out is that in the `predict` method, we perform the import of our custom `compiled_graph` object from the `graph_chain` python module created in the above step. The reason that this is possible is due to the fact that we execute the stored script when loading the model into an inference environment, just as you would execute any python script. Running the script makes the `graph_chain` reference available to the REPL.
 
 After creating this class, we leverage the standard APIs to log the model. 
 
