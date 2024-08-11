@@ -31,7 +31,7 @@ For a full walkthrough, check out the [LangGraph Quickstart](https://langchain-a
 # The Code
 
 ### Setup
-First, we must install the required dependencies. We will use OpenAI for our LLM, but LangChain paired with LangGraph makes it easy to substitute your desired LLM.
+First, we must install the required dependencies. We will use OpenAI for our LLM in this example, but using LangChain with LangGraph makes it easy to substitute any alternative supported LLM or LLM provider.
 
 ```python
 %%capture
