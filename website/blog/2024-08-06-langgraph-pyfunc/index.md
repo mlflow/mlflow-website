@@ -10,13 +10,23 @@ In this blog, we'll guide you through creating a LangGraph chatbot within an MLf
 
 ### What is a Custom PyFunc?
 
-While MLflow strives to cover the many popular machine learning libraries, there are libraries and pieces of functionality within supported libraries that are not natively supported. For these cases, when users want MLflow functionality they can create a custom PyFunc model. 
-Custom PyFunc models allow you to integrate any Python code, providing flexibility in defining complex and niche machine learning models. These models can be easily logged, managed, and deployed using the typical MLflow APIs, enhancing flexibility and portability in machine learning workflows.
+While MLflow strives to cover many popular machine learning libraries, there has been a proliferation of open source packages. If users want MLflows myriad benefits paired with a package that doesn't have native support, users can create a custom PyFunc model. 
+Custom PyFunc models allow you to integrate any Python code, providing flexibility in defining GenAI apps and AI mdoels. These models can be easily logged, managed, and deployed using the typical MLflow APIs, enhancing flexibility and portability in machine learning workflows.
 
 ### What is LangGraph?
 
-LangGraph is a library for building stateful, multi-actor applications with LLMs, used to create agent and multi-agent workflows. Compared to other LLM frameworks, it offers these core benefits: cycles, controllability, and persistence. LangGraph allows you to define flows that involve cycles, essential for most agentic architectures, differentiating it from DAG-based solutions. As a very low-level framework, it provides fine-grained control over both the flow and state of your application, crucial for creating reliable agents. Additionally, LangGraph includes built-in persistence, enabling advanced human-in-the-loop and memory features.
+[LangGraph](https://langchain-ai.github.io/langgraph/) is a library for building stateful, multi-actor applications with LLMs, used to create agent and multi-agent workflows. Compared to other LLM frameworks, it offers these core benefits: 
+* **Cycles and Branching**: Implement loops and conditionals in your apps.
+* **Persistence**: Automatically save state after each step in the graph. Pause and resume the graph execution at any point to support error recovery, human-in-the-loop workflows, time travel and more.
+* **Human-in-the-Loop**: Interrupt graph execution to approve or edit next action planned by the agent.
+* **Streaming Support**: Stream outputs as they are produced by each node (including token streaming).
+* **Integration with LangChain**: LangGraph integrates seamlessly with LangChain and LangSmith (but does not require them).
+
+LangGraph allows you to define flows that involve cycles, essential for most agentic architectures, differentiating it from DAG-based solutions. As a very low-level framework, it provides fine-grained control over both the flow and state of your application, crucial for creating reliable agents. Additionally, LangGraph includes built-in persistence, enabling advanced human-in-the-loop and memory features.
+
 LangGraph is inspired by Pregel and Apache Beam. The public interface draws inspiration from NetworkX. LangGraph is built by LangChain Inc, the creators of LangChain, but can be used without LangChain.
+
+For a full walkthrough, check out the [LangGraph Quickstart](https://langchain-ai.github.io/langgraph/tutorials/introduction/) and for more on the fundamentals of design with LangGraph, check out the [conceptual guides](https://langchain-ai.github.io/langgraph/concepts/#human-in-the-loop).
 
 # The Code
 
@@ -24,39 +34,42 @@ LangGraph is inspired by Pregel and Apache Beam. The public interface draws insp
 First, we must install the required dependencies. We will use OpenAI for our LLM, but LangChain paired with LangGraph makes it easy to substitute your desired LLM.
 
 ```python
-%%capture --no-stderr
-%pip install -U langgraph langsmith mlflow
-%pip install --upgrade typing_extensions
-
-# Used for this tutorial; not a requirement for LangGraph
-%pip install -U langchain_openai
+%%capture
+%pip install langgraph==0.2.3 langsmith==0.1.98 mlflow>=2.15.1
+%pip install -U typing_extensions
+%pip install langchain_openai==0.1.21
 ```
 
 Next, let's get our relevant secrets.
 
 ```python
 import os
-import getpass
 
-def _set_env(var: str):
-    if not os.environ.get(var):
-        os.environ[var] = getpass.getpass(f"{var}: ")
-
-_set_env("OPENAI_API_KEY")
-_set_env("LANGSMITH_API_KEY")
+# Set required environment variables for authenticating to OpenAI and LangSmith
+# Check additional MLflow tutorials for examples of authentication if needed
+# https://mlflow.org/docs/latest/llms/openai/guide/index.html#direct-openai-service-usage
+assert "OPENAI_API_KEY" in os.environ, "Please set the OPENAI_API_KEY environment variable."
+assert "LANGSMITH_API_KEY" in os.environ, "Please set the LANGSMITH_API_KEY environment variable."
 ```
 
 ### Custom Dependencies
+I would make this a compare / contrast view to make it clear that standard pyfunc saving will attempt to create a binary representation of the code references (with limitations, which is why it is so frustrating for people to use, namely around recursion depth and references to nested dependencies / mutable object states that themselves can't be serialized properly), while what we're doing with models from code is quite simple - just executing a python script that is defined, the same that any system would do when 'running' any code.
+
 Before building our custom PyFunc model, let's first review what PyFunc does. When you specify a model to log, MLflow will try to leverage `cloudpickle` to store the serialized model. Along with this model artifact, MLflow will store the signature, which can be passed or inferred from the `model_input` parameter. It will also log inferred model dependencies to help you serve the model in a new environment.
 
-However, as with many other packages, pickling objects is often not supported by LangGraph chains. 
+Pickle is an easy-to-use serialization mechanism, but it has a variety of limitations: 
+* **Limited Support for Some Data Types**: `cloudpickle` may struggle with serializing certain complex or low-level data types, such as file handles, sockets, or objects containing these types, which can lead to errors or incorrect deserialization.
+* **Version Compatibility Issues**: Serialized objects with `cloudpickle` may not be deserializable across different versions of `cloudpickle` or Python, making long-term storage or sharing between different environments risky.
+* **Recursion Depth for Nested Dependencies**: `cloudpickle` can serialize objects with nested dependencies (e.g., functions within functions, or objects that reference other objects). However, deeply nested dependencies can hit the recursion depth limit imposed by Python's interpreter.
+* **Mutable Object States that Cannot be Serialized**: `cloudpickle` struggles to serialize certain mutable objects whose states change during runtime, especially if these objects contain non-serializable elements like open file handles, thread locks, or custom C extensions. Even if `cloudpickle` can serialize the object structure, it may fail to capture the exact state or may not be able to deserialize the state accurately, leading to potential data loss or incorrect behavior upon deserialization.
 
-To get around this issue, we will leverage the [code_paths](https://mlflow.org/docs/latest/model/dependencies.html?highlight=code_paths#saving-extra-code-with-an-mlflow-model-manual-declaration) argument to specify a custom dependency. Instead of serializing the entire LangGraph chain, we'll look to reload it from a python file. 
+To get around this issue, we will leverage the [code_paths](https://mlflow.org/docs/latest/model/dependencies.html?highlight=code_paths#saving-extra-code-with-an-mlflow-model-manual-declaration) argument to specify a custom dependency. Instead of serializing the LangGraph chain in binary format, we leverage python to instantiate the object. On the backend, MLflow simply runs this python file with the specified package dependencies.
 
 Below, we use the magic `%%writefile` command to create a new file in a jupyter notebook context. If you're running this outside of an interactive notebook, simply create the file below, omitting the `%%writefile graph_chain.py` line.
 
 ```python
 %%writefile graph_chain.py
+# omit this line if directly creating this file; this command is purely for running within Jupyter
 
 from langchain_openai import ChatOpenAI
 from typing import Annotated
@@ -216,7 +229,7 @@ Agent: Your name is Morpheus. How can I assist you today?
 There are many logical extensions of the this tutorial, however the MLflow components can remain largely unchanged. 
 
 To summarize, here's what was covered in this tutorial:
-* Declaring an MVP LangGraph chain within an additional python file.
+* Declaring an simple LangGraph chain within an additional python script.
 * Creating a custom PyFunc class that uses the above chain to create a stateful chatbot.
 * Logging and loading the above objects via the standard MLflow APIs.
 
