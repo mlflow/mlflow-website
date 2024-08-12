@@ -36,7 +36,7 @@ Ensemble models in Machine Learning operate on a similar idea. Ensemble learning
 
 However, developing such systems requires careful management of the lifecycle of ensemble models, as integrating diverse models can be highly complex. This is where MLflow PyFunc becomes invaluable. It offers the flexibility to build complex systems, treating the entire ensemble as a model that adheres to the same lifecycle processes as traditional models. Essentially, MLflow PyFunc allows the creation of custom methods tailored to ensemble models, serving as an alternative to the built-in MLflow flavors available for popular frameworks such as scikit-learn, PyTorch, and LangChain.
 
-This blog utilizes the house price dataset from Kaggle to demonstrate the development and management of ensemble models through MLflow.
+This blog utilizes the house price dataset from [Kaggle](https://www.kaggle.com/) to demonstrate the development and management of ensemble models through MLflow.
 
 We will leverage various tools and technologies to highlight the capabilities of MLflow PyFunc models. Before delving into the ensemble model itself, we will explore how these components integrate to create a robust and efficient Machine Learning pipeline.
 
@@ -51,13 +51,13 @@ scikit-learn is a Machine Learning library for Python that provides efficient to
 **MLflow**  
 MLflow is an open-source platform for managing the end-to-end Machine Learning lifecycle, including experimentation, reproducibility, and deployment. In this project, it tracks experiments, manages model versions, and facilitates the deployment of MLflow PyFunc models in a similar manner to how we are familiar with individual flavors. [Learn more about MLflow](https://mlflow.org/).
 
-> **Note:** To reproduce this project, please refer to the [official MLflow documentation](https://mlflow.org/docs/latest/tracking/server.html) to set up a simple local MLflow Tracking server.
+> **Note:** To reproduce this project, please refer to the official MLflow documentation for more details on setting up a simple local [MLflow Tracking Server](https://mlflow.org/docs/latest/tracking/server.html).
 
 ## Creating the Ensemble Model
 
 Creating a MLflow PyFunc ensemble model requires additional steps compared to using the built-in flavors for logging and working with popular Machine Learning frameworks.
 
-To implement an ensemble model, you need to define an `mlflow.pyfunc` model, which involves creating a Python class that inherits from the `PythonModel` class and implementing its constructor and class methods. While the basic creation of a PyFunc model only requires implementing the `predict` method, an ensemble model requires additional methods to manage the models and obtain multi-model predictions. After instantiating the ensemble model, you must use the custom `fit` method to train the ensemble model's sub-models. Similar to an out-of-the-box MLflow model, you need to log the model along with its artifacts during the training run and then register the model in the MLflow server. A model alias ` production` will also be added to the model to streamline both model updates and inference. Model aliases allow you to assign a mutable, named reference to a specific version of a registered model. By assigning the alias to a particular model version, it can be easily referenced via a model URI or the model registry API. This setup allows for seamless updates to the model version used for inference without changing the serving workload code.
+To implement an ensemble model, you need to define an `mlflow.pyfunc` model, which involves creating a Python class that inherits from the `PythonModel` class and implementing its constructor and class methods. While the basic creation of a PyFunc model only requires implementing the `predict` method, an ensemble model requires additional methods to manage the models and obtain multi-model predictions. After instantiating the ensemble model, you must use the custom `fit` method to train the ensemble model's sub-models. Similar to an out-of-the-box MLflow model, you need to log the model along with its artifacts during the training run and then register the model in the MLflow Model Registry. A model alias `production` will also be added to the model to streamline both model updates and inference. Model aliases allow you to assign a mutable, named reference to a specific version of a registered model. By assigning the alias to a particular model version, it can be easily referenced via a model URI or the model registry API. This setup allows for seamless updates to the model version used for inference without changing the serving workload code. For more details, refer to [Deploy and Organize Models with Aliases and Tags](https://mlflow.org/docs/latest/model-registry.html#deploy-and-organize-models-with-aliases-and-tags).
 
 The following sections, as depicted in the diagram, detail the implementation of each method for the ensemble model, providing a comprehensive understanding of defining, managing, and utilizing an ensemble model with MLflow PyFunc.
 
@@ -528,10 +528,10 @@ from sklearn.model_selection import train_test_split
 # Initialize the MLflow client
 client = mlflow.MlflowClient()
 
-# Set the URI of your MLflow tracking server
+# Set the URI of your MLflow Tracking Server
 remote_server_uri = "..."  # Replace with your server URI
 
-# Point MLflow to the remote tracking server
+# Point MLflow to your MLflow Tracking Server
 mlflow.set_tracking_uri(remote_server_uri)
 
 # Set the experiment name for organizing runs in MLflow
@@ -647,9 +647,9 @@ with mlflow.start_run(run_name=timestamp) as run:
 
 ### Registering the Model with MLflow
 
-Following the completion of model training, the subsequent step involves registering the ensemble model with MLflow. This process entails logging the trained models, preprocessing pipelines, and associated strategies into the MLflow tracking server. This ensures that all components of the ensemble model are systematically saved and versioned, facilitating reproducibility and traceability.
+Following the completion of model training, the subsequent step involves registering the ensemble model with MLflow. This process entails logging the trained models, preprocessing pipelines, and associated strategies into the MLflow Tracking Server. This ensures that all components of the ensemble model are systematically saved and versioned, facilitating reproducibility and traceability.
 
-Moreover, we will assign to this initial version of the model a production alias. This designation establishes a baseline model against which future iterations can be assessed. By marking this version as the "production" model, we can effectively benchmark improvements and confirm that subsequent versions yield measurable advancements over this established baseline.
+Moreover, we will assign to this initial version of the model a production alias. This designation establishes a baseline model against which future iterations can be assessed. By marking this version as the `production` model, we can effectively benchmark improvements and confirm that subsequent versions yield measurable advancements over this established baseline.
 
 ```python
 # Register the model in MLflow and assign a production alias
@@ -667,7 +667,7 @@ The following illustration demonstrates the complete lifecycle of our ensemble m
 
 ### Using the `predict` Method to Perform Inference
 
-With the ensemble model registered in the MLflow server, it can now be utilized to predict house prices by aggregating the predictions from the various sub-models within the ensemble.
+With the ensemble model registered in the MLflow Model Registry, it can now be utilized to predict house prices by aggregating the predictions from the various sub-models within the ensemble.
 
 ```python
 import pandas as pd
@@ -725,7 +725,7 @@ The bar graph below illustrates the average R² scores for each strategy. Higher
 
 ## Summary
 
-This blog post highlights the capabilities of `mlflow.pyfunc` and its application in a Machine Learning project. This powerful feature of MLflow provides creative freedom and flexibility, enabling teams to build complex systems encapsulated as models within MLflow, following the same lifecycle as traditional models. The post showcases the creation of ensemble model setups, seamless integration with DuckDB, and the implementation of custom methods using this versatile module.
+This blog post highlights the capabilities of mlflow.pyfunc and its application in a Machine Learning project. This powerful feature of MLflow provides creative freedom and flexibility, enabling teams to build complex systems encapsulated as models within MLflow, following the same lifecycle as traditional models. The post showcases the creation of ensemble model setups, seamless integration with DuckDB, and the implementation of custom methods using this versatile module.
 
 Beyond offering a structured approach to achieving desired outcomes, this blog demonstrates practical possibilities based on hands-on experience, discussing potential challenges and their solutions.
 
