@@ -508,11 +508,12 @@ After everything has been encapsulated in a PyFunc model, the lifecycle of the e
 
 ![Ensemble Model Lifecycle](ensemble-model-lifecycle.png)
 
-
 ## MLflow Tracking
 ### Using the `fit` Method to Train Sub-Models  
 
 Once the data is preprocessed, we use the custom `fit` method to train all the sub-models in our Ensemble Model. This method applies grid search to find the best hyperparameters for each sub-model, fits them to the training data, and saves the trained models for future use.
+
+> **Note:** For the following block of code, you might need to set the MLflow Tracking Server if you're not using Managed MLflow. In the [Components of the Project](#components-of-the-project), there's a note about setting up a simple local MLflow Tracking Server. For this step of the project, you'll need to point MLflow to the server’s URI that has been configured and is currently running. Don't forget to set the server URI variable `remote_server_uri`. You can refer to the official MLflow documentation for more details on [Logging to a Tracking Server](https://mlflow.org/docs/latest/tracking/server.html#logging-to-a-tracking-server).
 
 ```python
 import datetime
@@ -526,6 +527,12 @@ from sklearn.model_selection import train_test_split
 
 # Initialize the MLflow client
 client = mlflow.MlflowClient()
+
+# Set the URI of your MLflow tracking server
+remote_server_uri = "..."  # Replace with your server URI
+
+# Point MLflow to the remote tracking server
+mlflow.set_tracking_uri(remote_server_uri)
 
 # Set the experiment name for organizing runs in MLflow
 mlflow.set_experiment("Ensemble Model")
