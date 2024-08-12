@@ -63,7 +63,44 @@ The following sections, as depicted in the diagram, detail the implementation of
 
 ![Ensemble Model Architecture](ensemble-model-architecture.png)
 
-Given the overview diagram of the components of the ensemble model, each method will be explored one by one, including an overview and code for both the default methods provided by MLflow PyFunc and the custom methods implemented for the ensemble model.
+Before delving into the detailed implementation of each method, let's first review the skeleton of our `EnsembleModel` class. This skeleton serves as a blueprint for understanding the structure of the ensemble model. The subsequent sections will provide an overview and code for both the default methods provided by MLflow PyFunc and the custom methods implemented for the ensemble model.
+
+Here is the skeleton of the `EnsembleModel` class:
+
+```python
+import mlflow
+
+class EnsembleModel(mlflow.pyfunc.PythonModel):
+    """Ensemble model class leveraging Pyfunc for multi-model integration in MLflow."""
+
+    def __init__(self):
+        """Initialize the EnsembleModel instance."""
+        ...
+
+    def add_strategy_and_save_to_db(self):
+        """Add strategies to the DuckDB database."""
+        ...
+
+    def feature_engineering(self):
+        """Perform feature engineering on input data."""
+        ...
+
+    def initialize_models(self):
+        """Initialize models and their hyperparameter grids."""
+        ...
+
+    def fit(self):
+        """Train the ensemble of models."""
+        ...
+
+    def predict(self):
+        """Predict using the ensemble of models."""
+        ...
+
+    def load_context(self):
+        """Load the preprocessor and models from the MLflow context."""
+        ...
+```
 
 ### Initializing the EnsembleModel
 
