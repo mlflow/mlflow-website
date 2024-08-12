@@ -53,9 +53,7 @@ assert "LANGSMITH_API_KEY" in os.environ, "Please set the LANGSMITH_API_KEY envi
 ```
 
 ### Custom Dependencies
-I would make this a compare / contrast view to make it clear that standard pyfunc saving will attempt to create a binary representation of the code references (with limitations, which is why it is so frustrating for people to use, namely around recursion depth and references to nested dependencies / mutable object states that themselves can't be serialized properly), while what we're doing with models from code is quite simple - just executing a python script that is defined, the same that any system would do when 'running' any code.
-
-Before building our custom PyFunc model, let's first review what PyFunc does. When you specify a model to log, MLflow will try to leverage `cloudpickle` to store the serialized model. Along with this model artifact, MLflow will store the signature, which can be passed or inferred from the `model_input` parameter. It will also log inferred model dependencies to help you serve the model in a new environment.
+Historically, MLflow's process of saving a custom `pyfunc` model uses a mechanism that has some frustrating drawbacks: `cloudpickle`. Prior to the release of support for saving a model as a python script in MLflow 2.12.2 (known as the [models from code](https://mlflow.org/docs/latest/models.html#models-from-code) feature), logging a defined `pyfunc` involved pickling an instance of that model. Along with the pickled model artifact, MLflow will store the signature, which can be passed or inferred from the `model_input` parameter. It will also log inferred model dependencies to help you serve the model in a new environment.
 
 Pickle is an easy-to-use serialization mechanism, but it has a variety of limitations: 
 * **Limited Support for Some Data Types**: `cloudpickle` may struggle with serializing certain complex or low-level data types, such as file handles, sockets, or objects containing these types, which can lead to errors or incorrect deserialization.
