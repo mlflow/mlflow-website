@@ -107,6 +107,8 @@ class EnsembleModel(mlflow.pyfunc.PythonModel):
 The constructor method in the ensemble model is crucial for setting up its essential elements. It establishes key attributes such as the preprocessor, a dictionary to store trained models, the path to a DuckDB database, and a pandas DataFrame for managing different ensemble strategies. Additionally, it takes advantage of the `initialize_models` method to define the sub-models integrated into the ensemble.
 
 ```python
+import pandas as pd
+
 def __init__(self):
     """
     Initializes the EnsembleModel instance.
@@ -126,6 +128,9 @@ def __init__(self):
 The custom-defined `add_strategy_and_save_to_db` method enables the addition of new ensemble strategies to the model and their storage in a DuckDB database. This method accepts a pandas DataFrame containing the strategies and the database path as inputs. It appends the new strategies to the existing ones and saves them in the database specified during the initialization of the ensemble model. This method facilitates the management of various ensemble strategies and ensures their persistent storage for future use.
 
 ```python
+import duckdb
+import pandas as pd
+
 def add_strategy_and_save_to_db(self, strategy_df: pd.DataFrame, db_path: str) -> None:
     """Add strategies from a DataFrame and save them to the DuckDB database.
 
@@ -163,6 +168,13 @@ def add_strategy_and_save_to_db(self, strategy_df: pd.DataFrame, db_path: str) -
 The `feature_engineering` method preprocesses input data by handling missing values, scaling numerical features, and encoding categorical features. It applies different transformations to both numerical and categorical features, and returns the processed features as a NumPy array. This method is crucial for preparing data in a suitable format for model training, ensuring consistency and enhancing model performance.
 
 ```python
+import numpy as np
+import pandas as pd
+from sklearn.compose import ColumnTransformer
+from sklearn.impute import SimpleImputer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+
 def feature_engineering(self, X: pd.DataFrame) -> np.ndarray:
     """
     Applies feature engineering to the input data X, including imputation, scaling, and encoding.
@@ -239,6 +251,14 @@ def feature_engineering(self, X: pd.DataFrame) -> np.ndarray:
 The `initialize_models` method sets up a dictionary of various Machine Learning models along with their hyperparameter grids. This includes models such as `RandomForest`, `XGBoost`, `DecisionTree`, `GradientBoosting`, and `AdaBoost`. This step is crucial for preparing the ensemble’s sub-models and specifying the hyperparameters to adjust during training, ensuring that each model is configured correctly and ready for training.
 
 ```python
+from sklearn.ensemble import (
+    AdaBoostRegressor,
+    GradientBoostingRegressor,
+    RandomForestRegressor,
+)
+from sklearn.tree import DecisionTreeRegressor
+from xgboost import XGBRegressor
+
 def initialize_models(self) -> None:
     """
     Initializes a dictionary of models along with their hyperparameter grids for grid search.
@@ -273,6 +293,12 @@ def initialize_models(self) -> None:
 As already highlighted in the previous method, a key feature of MLflow PyFunc models is the ability to define custom methods, providing significant flexibility and customization for various tasks. In the multi-model PyFunc setup, the `fit` method is essential for customizing and optimizing multiple sub-models. It manages the training and fine-tuning of algorithms such as `RandomForestRegressor`, `XGBRegressor`, `DecisionTreeRegressor`, `GradientBoostingRegressor`, and `AdaBoostRegressor`. In addition, by utilizing techniques like GridSearchCV, the `fit` method ensures that each model variant is optimized for maximum performance.
 
 ```python
+import os
+
+import joblib
+import pandas as pd
+from sklearn.model_selection import GridSearchCV
+
 def fit(
         self, X_train_processed: pd.DataFrame, y_train: pd.Series, save_path: str
     ) -> None:
@@ -317,6 +343,15 @@ The custom `predict` method for the ensemble model is designed to collect and co
 5. Aggregate the model predictions according to the specified strategy.
 
 ```python
+import duckdb
+import joblib
+import numpy as np
+import pandas as pd
+from sklearn.compose import ColumnTransformer
+from sklearn.impute import SimpleImputer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+
 def predict(self, context, model_input: pd.DataFrame) -> np.ndarray:
     """
     Predicts the target variable using the ensemble of models based on the selected strategy.
@@ -396,6 +431,10 @@ This initialization process includes:
 2. Fetching strategies definitions from DuckDB Database.
 
 ```python
+import duckdb
+import joblib
+import pandas as pd
+
 def load_context(self, context) -> None:
     """
     Loads the preprocessor and models from the MLflow context.
