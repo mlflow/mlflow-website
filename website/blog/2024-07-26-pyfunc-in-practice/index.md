@@ -832,26 +832,24 @@ strategies_df = pd.DataFrame(strategy_data)
 ensemble_model.add_strategy_and_save_to_db(strategies_df, "models/strategies.db")
 
 # Define the Conda environment configuration for the MLflow model
-conda_env_path = "models/conda_env.yaml"
-with open(conda_env_path, "w") as f:
-    f.write(
-        """
-        name: megamodel_env
-        channels:
-        - defaults
-        - conda-forge
-        dependencies:
-        - python=3.8
-        - scikit-learn=1.3.0
-        - xgboost=2.0.3
-        - joblib=1.2.0
-        - pandas=1.5.3
-        - numpy=1.23.5
-        - duckdb=1.0.0
-        - pip:
-            - mlflow==2.14.1
-        """
-    )
+conda_env = {
+    "name": "mlflow-env",
+    "channels": ["conda-forge"],
+    "dependencies": [
+        "python=3.8",
+        "scikit-learn=1.3.0",
+        "xgboost=2.0.3",
+        "joblib=1.2.0",
+        "pandas=1.5.3",
+        "numpy=1.23.5",
+        "duckdb=1.0.0",
+        {
+            "pip": [
+                "mlflow==2.14.1",
+            ]
+        },
+    ],
+}
 
 # Get current timestamp
 timestamp = datetime.datetime.now().isoformat()
@@ -872,7 +870,7 @@ with mlflow.start_run(run_name=timestamp) as run:
         artifact_path="ensemble_model",
         python_model=ensemble_model,
         artifacts=artifacts,
-        conda_env=conda_env_path,
+        conda_env=conda_env,
         signature=signature,
     )
 
