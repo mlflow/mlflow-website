@@ -126,42 +126,36 @@ def __init__(self):
 The custom-defined `add_strategy_and_save_to_db` method enables the addition of new ensemble strategies to the model and their storage in a DuckDB database. This method accepts a pandas DataFrame containing the strategies and the database path as inputs. It appends the new strategies to the existing ones and saves them in the database specified during the initialization of the ensemble model. This method facilitates the management of various ensemble strategies and ensures their persistent storage for future use.
 
 ```python
-def add_strategy_and_save_to_db(
-        self, strategy_df: pd.DataFrame, db_path: str
-    ) -> None:
-    """
-    Adds new strategies from a DataFrame to the DuckDB database.
+def add_strategy_and_save_to_db(self, strategy_df: pd.DataFrame, db_path: str) -> None:
+    """Add strategies from a DataFrame and save them to the DuckDB database.
 
     Args:
-        strategy_df (pd.DataFrame): DataFrame containing strategy information.
-        db_path (str): Path to the DuckDB database where strategies will be stored.
+        strategy_df (pd.DataFrame): DataFrame containing strategies.
+        db_path (str): Path to the DuckDB database.
     """
+    # Update the instance-level database path for the current object
+    self.db_path = db_path
+
+    # Attempt to concatenate new strategies with the existing DataFrame
     try:
-        # Update the instance-level database path for the current object
-        self.db_path = db_path
+        self.strategies = pd.concat([self.strategies, strategy_df], ignore_index=True)
+    except Exception as e:
+        # Print an error message if any exceptions occur during concatenation
+        print(f"Error concatenating DataFrames: {e}")
+        return  # Exit early to prevent further errors
 
-        # Concatenate new strategies with the existing DataFrame
-        self.strategies = pd.concat(
-            [self.strategies, strategy_df], ignore_index=True
-        )
+    # Use context manager for the database connection
+    try:
+        with duckdb.connect(self.db_path) as con:
+            # Register the strategies DataFrame as a temporary table in DuckDB
+            con.register("strategy_df", self.strategies)
 
-        # Establish a connection to the DuckDB database
-        con = duckdb.connect(self.db_path)
-
-        # Register the strategies DataFrame as a temporary table in DuckDB
-        con.register("strategy_df", self.strategies)
-
-        # Drop any existing strategies table and create a new one with updated strategies
-        con.execute("DROP TABLE IF EXISTS strategies")
-        con.execute("CREATE TABLE strategies AS SELECT * FROM strategy_df")
-
+            # Drop any existing strategies table and create a new one with updated strategies
+            con.execute("DROP TABLE IF EXISTS strategies")
+            con.execute("CREATE TABLE strategies AS SELECT * FROM strategy_df")
     except Exception as e:
         # Print an error message if any exceptions occur during database operations
-        print(f"Error saving strategies to database: {e}")
-
-    finally:
-        # Ensure the database connection is closed, even if an error occurred
-        con.close()
+        print(f"Error executing database operations: {e}")
 ```
 
 ### Feature Engineering
