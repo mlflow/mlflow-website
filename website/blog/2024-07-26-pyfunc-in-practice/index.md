@@ -515,6 +515,15 @@ After everything has been encapsulated in a PyFunc model, the lifecycle of the e
 Once the data is preprocessed, we use the custom `fit` method to train all the sub-models in our Ensemble Model. This method applies grid search to find the best hyperparameters for each sub-model, fits them to the training data, and saves the trained models for future use.
 
 ```python
+import datetime
+import os
+
+import joblib
+import mlflow
+import pandas as pd
+from mlflow.models.signature import infer_signature
+from sklearn.model_selection import train_test_split
+
 # Initialize the MLflow client
 client = mlflow.MlflowClient()
 
@@ -654,6 +663,11 @@ The following illustration demonstrates the complete lifecycle of our ensemble m
 With the ensemble model registered in the MLflow server, it can now be utilized to predict house prices by aggregating the predictions from the various sub-models within the ensemble.
 
 ```python
+import pandas as pd
+
+import mlflow
+from sklearn.metrics import r2_score
+
 # Load the registered model using its alias
 loaded_model = mlflow.pyfunc.load_model(
 	model_uri=f"models:/ensemble_model@production"
