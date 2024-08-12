@@ -142,16 +142,8 @@ class LangGraphCustomChain(PythonModel):
             raise ValueError(f"The following keys are missing: {missing_keys}")
 
         # Add project environent variables if not present
-        os.environ["LANCHAIN_TRACING_V2"] = (
-            "true"
-            if not os.environ.get("LANGCHAIN_TRACING_V2")
-            else os.environ.get("LANGCHAIN_TRACING_V2")
-        )
-        os.environ["LANGCHAIN_PROJECT"] = (
-            "LangGraph MLflow Tutorial"
-            if not os.environ.get("LANGCHAIN_TRACING_V2")
-            else os.environ.get("LANGCHAIN_TRACING_V2")
-        )
+        os.environ["LANCHAIN_TRACING_V2"] = os.environ.get("LANGCHAIN_TRACING_V2", "true")
+        os.environ["LANGCHAIN_PROJECT"] = os.environ.get("LANGCHAIN_TRACING_V2", "LangGraph MLflow Tutorial")
 
     def predict(self, context, input_data: str, params: dict = None):
         # Import from the `graph_chain.py` module specified in the `code_paths` argument
