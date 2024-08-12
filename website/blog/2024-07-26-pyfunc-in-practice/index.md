@@ -163,6 +163,38 @@ def add_strategy_and_save_to_db(self, strategy_df: pd.DataFrame, db_path: str) -
         print(f"Error executing database operations: {e}")
 ```
 
+The following example demonstrates how to use this method to add strategies to the database.
+
+```python
+import pandas as pd
+
+# Initialize ensemble model
+ensemble_model = EnsembleModel()
+
+# Define strategies for the ensemble model
+strategy_data = {
+    "strategy": ["average_1"],
+    "model_list": ["random_forest,xgboost,decision_tree,gradient_boosting,adaboost"],
+    "weights": ["1"],
+}
+
+# Create a DataFrame to hold the strategy information
+strategies_df = pd.DataFrame(strategy_data)
+
+# Add strategies to the database
+ensemble_model.add_strategy_and_save_to_db(strategies_df, "models/strategies.db")
+```
+
+The DataFrame `strategy_data` includes:
+
+- **strategy**: The name of the strategy for model predictions.
+- **model_list**: A comma-separated list of model names included in the strategy.
+- **weights**: A comma-separated list of weights assigned to each model in the `model_list`. If not provided, implies equal weights or default values.
+
+| strategy  | model_list                                                     | weights |
+| ----------| -------------------------------------------------------------- | ------- |
+| average_1 | random_forest,xgboost,decision_tree,gradient_boosting,adaboost | 1       |
+
 ### Feature Engineering
 
 The `feature_engineering` method preprocesses input data by handling missing values, scaling numerical features, and encoding categorical features. It applies different transformations to both numerical and categorical features, and returns the processed features as a NumPy array. This method is crucial for preparing data in a suitable format for model training, ensuring consistency and enhancing model performance.
