@@ -135,6 +135,12 @@ class LangGraphCustomChain(PythonModel):
         return self.messages[-1].content
 
     def load_context(self, context):
+        # Import from the `graph_chain.py` module specified in the `code_paths` argument
+        from graph_chain import compiled_graph
+
+        # Create a class variable for our compiled graph
+        self.graph = compiled_graph
+
         # Validate enviornment variable secrets are present
         required_secrets = ["OPENAI_API_KEY", "LANGSMITH_API_KEY"]
 
@@ -143,19 +149,17 @@ class LangGraphCustomChain(PythonModel):
 
         # Add project environent variables if not present
         os.environ["LANCHAIN_TRACING_V2"] = os.environ.get("LANGCHAIN_TRACING_V2", "true")
-        os.environ["LANGCHAIN_PROJECT"] = os.environ.get("LANGCHAIN_TRACING_V2", "LangGraph MLflow Tutorial")
+        os.environ["LANGCHAIN_PROJECT"] = os.environ.get(
+            "LANGCHAIN_TRACING_V2", 
+            "LangGraph MLflow Tutorial"
+        )
 
     def predict(self, context, input_data: str, params: dict = None):
-        # Import from the `graph_chain.py` module specified in the `code_paths` argument
-        from graph_chain import compiled_graph
-
-        self.graph = compiled_graph
-
         # Format the string input as messages
         state = self._format_input(input_data)
 
         # Run inference on our loaded chain
-        output_messages = self.graph.invoke(state)
+        output_messages = compiled_graph.invoke(state)
 
         # Update messages and return the string
         return self._parse_output(output_messages)
@@ -163,13 +167,18 @@ class LangGraphCustomChain(PythonModel):
 
 # Save the model
 with mlflow.start_run() as run:
+    # Create an instance of our custom chain
+    custom_chain = LangGraphCustomChain()
+    custom_chain.load_context(None) # Required if using input_example to infer signature
+
     # Log the model to the mlflow tracking server
     mlflow.pyfunc.log_model(
         artifact_path="langgraph_model",
-        python_model=LangGraphCustomChain(),
+        python_model=custom_chain,
         input_example=["hi"],
         code_paths=["./graph_chain.py"],
     )
+
 
     run_id = run.info.run_id
 ```
