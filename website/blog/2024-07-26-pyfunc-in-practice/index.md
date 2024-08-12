@@ -342,7 +342,7 @@ def predict(self, context, model_input: pd.DataFrame) -> np.ndarray:
         # Extract the strategy and drop it from the input features
         print(f"Strategy: {model_input['strategy'].iloc[0]}")
         strategy = model_input["strategy"].iloc[0]
-        model_input = model_input.drop(columns=["strategy"])
+        model_input.drop(columns=["strategy"], inplace=True)
     else:
         # Default to 'average' strategy if none is provided
         strategy = "average"
