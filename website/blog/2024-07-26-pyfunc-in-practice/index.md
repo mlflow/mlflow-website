@@ -725,7 +725,7 @@ The bar graph below illustrates the average R² scores for each strategy. Higher
 
 ## Summary
 
-This blog post highlights the capabilities of mlflow.pyfunc and its application in a Machine Learning project. mlflow.pyfunc provides creative freedom and flexibility, enabling teams to build complex systems encapsulated as models within MLflow, following the same lifecycle as traditional models. This post showcases the creation of ensemble model setups, seamless integration with DuckDB, and the implementation of custom methods using mlflow.pyfunc.
+This blog post highlights the capabilities of `mlflow.pyfunc` and its application in a Machine Learning project. This powerful feature of MLflow provides creative freedom and flexibility, enabling teams to build complex systems encapsulated as models within MLflow, following the same lifecycle as traditional models. The post showcases the creation of ensemble model setups, seamless integration with DuckDB, and the implementation of custom methods using this versatile module.
 
 Beyond offering a structured approach to achieving desired outcomes, this blog demonstrates practical possibilities based on hands-on experience, discussing potential challenges and their solutions.
 
