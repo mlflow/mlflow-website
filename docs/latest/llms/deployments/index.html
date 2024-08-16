@@ -1,5 +1,4 @@
 
-  
 
 <!DOCTYPE html>
 <!-- source: docs/source/llms/deployments/index.rst -->
@@ -10,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>MLflow Deployments Server (Experimental) &mdash; MLflow 2.15.1.dev0 documentation</title>
+  <title>MLflow Deployments Server (Experimental)</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -56,7 +55,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="MLflow 2.15.1.dev0 documentation" href="../../index.html"/>
+    <link rel="top" title="MLflow 2.15.2.dev0 documentation" href="../../index.html"/>
         <link rel="up" title="LLMs" href="../index.html"/>
         <link rel="next" title="Getting Started with MLflow Deployments for LLMs" href="/guides/index.html"/>
         <link rel="prev" title="MLflow Tracing Schema" href="/../tracing/tracing-schema.html"/> 
@@ -88,7 +87,7 @@
     <a href="../../index.html" class="wy-nav-top-logo"
       ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.15.1.dev0</span>
+    <span class="version">2.15.2.dev0</span>
   </li>
 </ul>
   </nav>
@@ -138,7 +137,9 @@
 <li class="toctree-l4"><a class="reference internal" href="#concepts">Concepts</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#configuring-the-deployments-server">Configuring the Deployments Server</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#querying-the-deployments-server">Querying the Deployments Server</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#plugin-llm-provider-experimental">Plugin LLM Provider (Experimental)</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#mlflow-deployments-server-api-documentation">MLflow Deployments Server API Documentation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#openai-compatibility">OpenAI Compatibility</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#unity-catalog-integration">Unity Catalog Integration</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#deployments-server-security-considerations">Deployments Server Security Considerations</a></li>
 </ul>
@@ -637,8 +638,9 @@ models using the <code class="docutils literal notranslate"><span class="pre">se
 </ul>
 <p>More providers are being added continually. Check the latest version of the MLflow Deployments Server Docs for the
 most up-to-date list of supported providers.</p>
-<p>Remember, the provider you specify must be one that the MLflow Deployments Server supports. If the provider
-is not supported, the deployments server will return an error when trying to route requests to that provider.</p>
+<p>If you would like to use a LLM model that is not offered by the above providers, or if you
+would like to integrate a private LLM model, you can create a <a class="reference internal" href="#deployments-plugin"><span class="std std-ref">provider plugin</span></a>
+to integrate with the MLflow Deployments Server.</p>
 </div>
 </div>
 <div class="section" id="endpoints">
@@ -1796,9 +1798,171 @@ This provides information about the name and type, as well as the model details 
 </div>
 </div>
 </div>
+<div class="section" id="plugin-llm-provider-experimental">
+<span id="deployments-plugin"></span><h2>Plugin LLM Provider (Experimental)<a class="headerlink" href="#plugin-llm-provider-experimental" title="Permalink to this headline"> </a></h2>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<p>This feature is in active development and is marked as Experimental. It may change in a future release without warning.</p>
+</div>
+<p>The MLflow Deployments Server supports the use of custom language model providers through the use of plugins.
+A plugin is a Python package that provides a custom implementation of a language model provider.
+This allows users to integrate their own language model services with the MLflow Deployments Server.</p>
+<p>To create a custom plugin, you need to implement a provider class that inherits from <code class="docutils literal notranslate"><span class="pre">mlflow.gateway.providers.BaseProvider</span></code>,
+and a config class that inherits from <code class="docutils literal notranslate"><span class="pre">mlflow.gateway.base_models.ConfigModel</span></code>.</p>
+<div class="literal-block-wrapper docutils container" id="id15">
+<div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id15" title="Permalink to this code"> </a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">AsyncIterable</span>
+
+<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">validator</span>
+<span class="kn">from</span> <span class="nn">mlflow.gateway.base_models</span> <span class="kn">import</span> <span class="n">ConfigModel</span>
+<span class="kn">from</span> <span class="nn">mlflow.gateway.config</span> <span class="kn">import</span> <span class="n">RouteConfig</span>
+<span class="kn">from</span> <span class="nn">mlflow.gateway.providers</span> <span class="kn">import</span> <span class="n">BaseProvider</span>
+<span class="kn">from</span> <span class="nn">mlflow.gateway.schemas</span> <span class="kn">import</span> <span class="n">chat</span><span class="p">,</span> <span class="n">completions</span><span class="p">,</span> <span class="n">embeddings</span>
+
+
+<span class="k">class</span> <span class="nc">MyLLMConfig</span><span class="p">(</span><span class="n">ConfigModel</span><span class="p">):</span>
+    <span class="c1"># This model defines the configuration for the provider such as API keys</span>
+    <span class="n">my_llm_api_key</span><span class="p">:</span> <span class="nb">str</span>
+
+    <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;my_llm_api_key&quot;</span><span class="p">,</span> <span class="n">pre</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">validate_my_llm_api_key</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">value</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s2">&quot;$&quot;</span><span class="p">)]</span>
+
+
+<span class="k">class</span> <span class="nc">MyLLMProvider</span><span class="p">(</span><span class="n">BaseProvider</span><span class="p">):</span>
+    <span class="c1"># Define the provider name. This will be displayed in log and error messages.</span>
+    <span class="n">NAME</span> <span class="o">=</span> <span class="s2">&quot;my_llm&quot;</span>
+    <span class="c1"># Define the config model for the provider.</span>
+    <span class="c1"># This must be a subclass of ConfigModel.</span>
+    <span class="n">CONFIG_TYPE</span> <span class="o">=</span> <span class="n">MyLLMConfig</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">RouteConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">config</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">MyLLMConfig</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unexpected config type </span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">config</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">my_llm_config</span><span class="p">:</span> <span class="n">MyLLMConfig</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">config</span>
+
+    <span class="c1"># You can implement one or more of the following methods</span>
+    <span class="c1"># depending on the capabilities of your provider.</span>
+    <span class="c1"># Implementing `completions`, `chat` and `embeddings` will enable the respective endpoints.</span>
+    <span class="c1"># Implementing `completions_stream` and `chat_stream` will enable the `stream=True`</span>
+    <span class="c1"># option for the respective endpoints.</span>
+    <span class="c1"># Unimplemented methods will return a 501 Not Implemented HTTP response upon invocation.</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">completions_stream</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span> <span class="n">completions</span><span class="o">.</span><span class="n">RequestPayload</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncIterable</span><span class="p">[</span><span class="n">completions</span><span class="o">.</span><span class="n">StreamResponsePayload</span><span class="p">]:</span>
+        <span class="o">...</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">completions</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span> <span class="n">completions</span><span class="o">.</span><span class="n">RequestPayload</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">completions</span><span class="o">.</span><span class="n">ResponsePayload</span><span class="p">:</span>
+        <span class="o">...</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">chat_stream</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span> <span class="n">chat</span><span class="o">.</span><span class="n">RequestPayload</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncIterable</span><span class="p">[</span><span class="n">chat</span><span class="o">.</span><span class="n">StreamResponsePayload</span><span class="p">]:</span>
+        <span class="o">...</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">chat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span> <span class="n">chat</span><span class="o">.</span><span class="n">RequestPayload</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">chat</span><span class="o">.</span><span class="n">ResponsePayload</span><span class="p">:</span>
+        <span class="o">...</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">embeddings</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span> <span class="n">embeddings</span><span class="o">.</span><span class="n">RequestPayload</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">embeddings</span><span class="o">.</span><span class="n">ResponsePayload</span><span class="p">:</span>
+        <span class="o">...</span>
+</pre></div>
+</div>
+</div>
+<p>Then, you need to create a Python package that contains the plugin implementation.
+You must specify an entry point under the <code class="docutils literal notranslate"><span class="pre">mlflow.gateway.providers</span></code> group, so that your plugin can be detected by MLflow.
+The entry point should be in the format <code class="docutils literal notranslate"><span class="pre">&lt;name&gt;</span> <span class="pre">=</span> <span class="pre">&lt;module&gt;:&lt;class&gt;</span></code>.</p>
+<div class="literal-block-wrapper docutils container" id="id16">
+<div class="code-block-caption"><span class="caption-text">pyproject.toml</span><a class="headerlink" href="#id16" title="Permalink to this code"> </a></div>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[project]</span>
+<span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;my_llm&quot;</span>
+<span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;1.0&quot;</span>
+
+<span class="k">[project.entry-points.</span><span class="s2">&quot;mlflow.gateway.providers&quot;</span><span class="k">]</span>
+<span class="n">my_llm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;my_llm.providers:MyLLMProvider&quot;</span>
+
+<span class="k">[tool.setuptools.packages.find]</span>
+<span class="n">include</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;my_llm*&quot;</span><span class="p">]</span>
+<span class="n">namespaces</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
+</pre></div>
+</div>
+</div>
+<p>You can specify more than one entry point in the same package if you have multiple providers.
+Note that entry point names must be globally unique. If two plugins specify the same entry point name,
+MLflow will raise an error at startup time.</p>
+<p>MLflow already provides a number of providers by default. Your plugin name cannot be the same as any one
+of them. See <a class="reference internal" href="#deployments-configuration-details"><span class="std std-ref">Deployments Server Configuration Details</span></a> for a complete list of default providers.</p>
+<p>Finally, you need to install the plugin package in the same environment as the MLflow Deployments Server.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Only install plugin packages from sources that you trust. Starting a server with a plugin provider will
+execute any arbitrary code that is defined within the plugin package.</p>
+</div>
+<p>Then, you can specify the plugin provider according to the entry point name
+in the MLflow Deployments Server configuration file.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">endpoints</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">chat</span>
+<span class="w">    </span><span class="nt">endpoint_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">llm/v1/chat</span>
+<span class="w">    </span><span class="nt">model</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">provider</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my_llm</span>
+<span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-model-0.1.2</span>
+<span class="w">      </span><span class="nt">config</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">my_llm_api_key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">$MY_LLM_API_KEY</span>
+</pre></div>
+</div>
+<div class="section" id="example">
+<h3>Example<a class="headerlink" href="#example" title="Permalink to this headline"> </a></h3>
+<p>A working example can be found in the MLflow repository at
+<a class="reference external" href="https://github.com/mlflow/mlflow/tree/master/examples/deployments/deployments_server/plugin">examples/deployments/deployments_server/plugin</a>.</p>
+</div>
+</div>
 <div class="section" id="mlflow-deployments-server-api-documentation">
 <h2>MLflow Deployments Server API Documentation<a class="headerlink" href="#mlflow-deployments-server-api-documentation" title="Permalink to this headline"> </a></h2>
 <p><a class="reference external" href="./api.html">API documentation</a></p>
+</div>
+<div class="section" id="openai-compatibility">
+<h2>OpenAI Compatibility<a class="headerlink" href="#openai-compatibility" title="Permalink to this headline"> </a></h2>
+<p>MLflow Deployments Server is compatible with OpenAI API and supports the <code class="docutils literal notranslate"><span class="pre">chat</span></code>, <code class="docutils literal notranslate"><span class="pre">completions</span></code>, and <code class="docutils literal notranslate"><span class="pre">embeddings</span></code> APIs.
+The OpenAI client can be used to query the server as shown in the example below:</p>
+<ol class="arabic simple">
+<li><p>Create a configuration file:</p></li>
+</ol>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">endpoints</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-chat</span>
+<span class="w">    </span><span class="nt">endpoint_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">llm/v1/chat</span>
+<span class="w">    </span><span class="nt">model</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">provider</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">openai</span>
+<span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gpt-4o-mini</span>
+<span class="w">      </span><span class="nt">config</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">openai_api_key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">$OPENAI_API_KEY</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>Start the server with the configuration file:</p></li>
+</ol>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>mlflow<span class="w"> </span>deployments<span class="w"> </span>start-server<span class="w"> </span>--config-path<span class="w"> </span>/path/to/config.yaml<span class="w"> </span>--port<span class="w"> </span><span class="m">7000</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="3">
+<li><p>Once the server is up and running, query the server using the OpenAI client:</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">openai</span> <span class="kn">import</span> <span class="n">OpenAI</span>
+
+<span class="n">client</span> <span class="o">=</span> <span class="n">OpenAI</span><span class="p">(</span><span class="n">base_url</span><span class="o">=</span><span class="s2">&quot;http://localhost:7000/v1&quot;</span><span class="p">)</span>
+<span class="n">completion</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">completions</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;my-chat&quot;</span><span class="p">,</span>
+    <span class="n">messages</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;Hello&quot;</span><span class="p">}],</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">completion</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="unity-catalog-integration">
 <h2>Unity Catalog Integration<a class="headerlink" href="#unity-catalog-integration" title="Permalink to this headline"> </a></h2>
@@ -1871,7 +2035,7 @@ This provides information about the name and type, as well as the model details 
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../',
-      VERSION:'2.15.1.dev0',
+      VERSION:'2.15.2.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

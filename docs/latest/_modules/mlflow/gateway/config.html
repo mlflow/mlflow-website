@@ -1,5 +1,4 @@
 
-  
 
 <!DOCTYPE html>
 <!-- source: docs/source/_modules/mlflow/gateway/config -->
@@ -10,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mlflow.gateway.config &mdash; MLflow 2.15.1.dev0 documentation</title>
+  <title>mlflow.gateway.config</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -56,7 +55,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="MLflow 2.15.1.dev0 documentation" href="../../../index.html"/>
+    <link rel="top" title="MLflow 2.15.2.dev0 documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
   
@@ -87,7 +86,7 @@
     <a href="../../../index.html" class="wy-nav-top-logo"
       ><img src="../../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.15.1.dev0</span>
+    <span class="version">2.15.2.dev0</span>
   </li>
 </ul>
   </nav>
@@ -234,6 +233,9 @@
 <span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 <span class="n">IS_PYDANTIC_V2</span> <span class="o">=</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">pydantic</span><span class="o">.</span><span class="n">version</span><span class="o">.</span><span class="n">VERSION</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s2">&quot;2.0&quot;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">IS_PYDANTIC_V2</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">SerializeAsAny</span>
 
 
 <div class="viewcode-block" id="Provider"><a class="viewcode-back" href="../../../python_api/mlflow.gateway.html#mlflow.gateway.config.Provider">[docs]</a><span class="k">class</span> <span class="nc">Provider</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
@@ -432,22 +434,6 @@
         <span class="k">return</span> <span class="n">_resolve_api_key_from_input</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div></div>
 
 
-<span class="n">config_types</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="n">Provider</span><span class="o">.</span><span class="n">COHERE</span><span class="p">:</span> <span class="n">CohereConfig</span><span class="p">,</span>
-    <span class="n">Provider</span><span class="o">.</span><span class="n">OPENAI</span><span class="p">:</span> <span class="n">OpenAIConfig</span><span class="p">,</span>
-    <span class="n">Provider</span><span class="o">.</span><span class="n">ANTHROPIC</span><span class="p">:</span> <span class="n">AnthropicConfig</span><span class="p">,</span>
-    <span class="n">Provider</span><span class="o">.</span><span class="n">AI21LABS</span><span class="p">:</span> <span class="n">AI21LabsConfig</span><span class="p">,</span>
-    <span class="n">Provider</span><span class="o">.</span><span class="n">MOSAICML</span><span class="p">:</span> <span class="n">MosaicMLConfig</span><span class="p">,</span>
-    <span class="n">Provider</span><span class="o">.</span><span class="n">BEDROCK</span><span class="p">:</span> <span class="n">AmazonBedrockConfig</span><span class="p">,</span>
-    <span class="n">Provider</span><span class="o">.</span><span class="n">AMAZON_BEDROCK</span><span class="p">:</span> <span class="n">AmazonBedrockConfig</span><span class="p">,</span>
-    <span class="n">Provider</span><span class="o">.</span><span class="n">MLFLOW_MODEL_SERVING</span><span class="p">:</span> <span class="n">MlflowModelServingConfig</span><span class="p">,</span>
-    <span class="n">Provider</span><span class="o">.</span><span class="n">PALM</span><span class="p">:</span> <span class="n">PaLMConfig</span><span class="p">,</span>
-    <span class="n">Provider</span><span class="o">.</span><span class="n">HUGGINGFACE_TEXT_GENERATION_INFERENCE</span><span class="p">:</span> <span class="n">HuggingFaceTextGenerationInferenceConfig</span><span class="p">,</span>
-    <span class="n">Provider</span><span class="o">.</span><span class="n">MISTRAL</span><span class="p">:</span> <span class="n">MistralConfig</span><span class="p">,</span>
-    <span class="n">Provider</span><span class="o">.</span><span class="n">TOGETHERAI</span><span class="p">:</span> <span class="n">TogetherAIConfig</span><span class="p">,</span>
-<span class="p">}</span>
-
-
 <div class="viewcode-block" id="ModelInfo"><a class="viewcode-back" href="../../../python_api/mlflow.gateway.html#mlflow.gateway.config.ModelInfo">[docs]</a><span class="k">class</span> <span class="nc">ModelInfo</span><span class="p">(</span><span class="n">ResponseModel</span><span class="p">):</span>
     <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">provider</span><span class="p">:</span> <span class="n">Provider</span></div>
@@ -492,35 +478,30 @@
 <div class="viewcode-block" id="Model"><a class="viewcode-back" href="../../../python_api/mlflow.gateway.html#mlflow.gateway.config.Model">[docs]</a><span class="k">class</span> <span class="nc">Model</span><span class="p">(</span><span class="n">ConfigModel</span><span class="p">):</span>
     <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">provider</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Provider</span><span class="p">]</span>
-    <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
-        <span class="n">Union</span><span class="p">[</span>
-            <span class="n">CohereConfig</span><span class="p">,</span>
-            <span class="n">OpenAIConfig</span><span class="p">,</span>
-            <span class="n">AI21LabsConfig</span><span class="p">,</span>
-            <span class="n">AnthropicConfig</span><span class="p">,</span>
-            <span class="n">AmazonBedrockConfig</span><span class="p">,</span>
-            <span class="n">MosaicMLConfig</span><span class="p">,</span>
-            <span class="n">MlflowModelServingConfig</span><span class="p">,</span>
-            <span class="n">HuggingFaceTextGenerationInferenceConfig</span><span class="p">,</span>
-            <span class="n">PaLMConfig</span><span class="p">,</span>
-            <span class="n">MistralConfig</span><span class="p">,</span>
-            <span class="n">TogetherAIConfig</span><span class="p">,</span>
-        <span class="p">]</span>
-    <span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">IS_PYDANTIC_V2</span><span class="p">:</span>
+        <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SerializeAsAny</span><span class="p">[</span><span class="n">ConfigModel</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ConfigModel</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="Model.validate_provider"><a class="viewcode-back" href="../../../python_api/mlflow.gateway.html#mlflow.gateway.config.Model.validate_provider">[docs]</a>    <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;provider&quot;</span><span class="p">,</span> <span class="n">pre</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">validate_provider</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">mlflow.gateway.provider_registry</span> <span class="kn">import</span> <span class="n">provider_registry</span>
+
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Provider</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">value</span>
         <span class="n">formatted_value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">formatted_value</span> <span class="ow">in</span> <span class="n">Provider</span><span class="o">.</span><span class="n">__members__</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">Provider</span><span class="p">[</span><span class="n">formatted_value</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">provider_registry</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">value</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The provider &#39;</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&#39; is not supported.&quot;</span><span class="p">)</span></div>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">_validate_config</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">mlflow.gateway.provider_registry</span> <span class="kn">import</span> <span class="n">provider_registry</span>
+
         <span class="k">if</span> <span class="n">provider</span> <span class="o">:=</span> <span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;provider&quot;</span><span class="p">):</span>
-            <span class="n">config_type</span> <span class="o">=</span> <span class="n">config_types</span><span class="p">[</span><span class="n">provider</span><span class="p">]</span>
+            <span class="n">config_type</span> <span class="o">=</span> <span class="n">provider_registry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">provider</span><span class="p">)</span><span class="o">.</span><span class="n">CONFIG_TYPE</span>
             <span class="k">return</span> <span class="n">config_type</span><span class="p">(</span><span class="o">**</span><span class="n">info</span><span class="p">)</span>
 
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
@@ -764,7 +745,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../../',
-      VERSION:'2.15.1.dev0',
+      VERSION:'2.15.2.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

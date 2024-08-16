@@ -1,5 +1,4 @@
 
-  
 
 <!DOCTYPE html>
 <!-- source: docs/source/_modules/mlflow/models/model -->
@@ -10,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mlflow.models.model &mdash; MLflow 2.15.1.dev0 documentation</title>
+  <title>mlflow.models.model</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -56,7 +55,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="MLflow 2.15.1.dev0 documentation" href="../../../index.html"/>
+    <link rel="top" title="MLflow 2.15.2.dev0 documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
   
@@ -87,7 +86,7 @@
     <a href="../../../index.html" class="wy-nav-top-logo"
       ><img src="../../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.15.1.dev0</span>
+    <span class="version">2.15.2.dev0</span>
   </li>
 </ul>
   </nav>
@@ -254,11 +253,15 @@
     <span class="s1">&#39;`logging.getLogger(&quot;mlflow&quot;).setLevel(logging.DEBUG)` to see the full traceback.&#39;</span>
 <span class="p">)</span>
 <span class="n">_LOG_MODEL_MISSING_SIGNATURE_WARNING</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="s2">&quot;Model logged without a signature. Signatures will be required for upcoming model registry &quot;</span>
-    <span class="s2">&quot;features as they validate model inputs and denote the expected schema of model outputs. &quot;</span>
+    <span class="s2">&quot;Model logged without a signature. Signatures are required for Databricks UC model registry &quot;</span>
+    <span class="s2">&quot;as they validate model inputs and denote the expected schema of model outputs. &quot;</span>
     <span class="sa">f</span><span class="s2">&quot;Please visit https://www.mlflow.org/docs/</span><span class="si">{</span><span class="n">mlflow</span><span class="o">.</span><span class="n">__version__</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.dev0&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">/&quot;</span>
-    <span class="s2">&quot;models.html#set-signature-on-logged-model for instructions on setting a model signature on &quot;</span>
-    <span class="s2">&quot;your logged model.&quot;</span>
+    <span class="s2">&quot;model/signatures.html#how-to-set-signatures-on-models for instructions on setting &quot;</span>
+    <span class="s2">&quot;signature on models.&quot;</span>
+<span class="p">)</span>
+<span class="n">_LOG_MODEL_MISSING_INPUT_EXAMPLE_WARNING</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;Model logged without a signature and input example. Please set `input_example` parameter &quot;</span>
+    <span class="s2">&quot;when logging the model to auto infer the model signature.&quot;</span>
 <span class="p">)</span>
 <span class="c1"># NOTE: The _MLFLOW_VERSION_KEY constant is considered @developer_stable</span>
 <span class="n">_MLFLOW_VERSION_KEY</span> <span class="o">=</span> <span class="s2">&quot;mlflow_version&quot;</span>
@@ -908,12 +911,14 @@
                 <span class="n">_copy_model_metadata_for_uc_sharing</span><span class="p">(</span><span class="n">local_path</span><span class="p">,</span> <span class="n">flavor</span><span class="p">)</span>
 
             <span class="n">tracking_uri</span> <span class="o">=</span> <span class="n">_resolve_tracking_uri</span><span class="p">()</span>
+            <span class="n">serving_input</span> <span class="o">=</span> <span class="n">mlflow_model</span><span class="o">.</span><span class="n">get_serving_input</span><span class="p">(</span><span class="n">local_path</span><span class="p">)</span>
             <span class="c1"># We check signature presence here as some flavors have a default signature as a</span>
             <span class="c1"># fallback when not provided by user, which is set during flavor&#39;s save_model() call.</span>
-            <span class="k">if</span> <span class="n">mlflow_model</span><span class="o">.</span><span class="n">signature</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span>
-                <span class="n">tracking_uri</span> <span class="o">==</span> <span class="s2">&quot;databricks&quot;</span> <span class="ow">or</span> <span class="n">get_uri_scheme</span><span class="p">(</span><span class="n">tracking_uri</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;databricks&quot;</span>
-            <span class="p">):</span>
-                <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">_LOG_MODEL_MISSING_SIGNATURE_WARNING</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">mlflow_model</span><span class="o">.</span><span class="n">signature</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">serving_input</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">_LOG_MODEL_MISSING_INPUT_EXAMPLE_WARNING</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">tracking_uri</span> <span class="o">==</span> <span class="s2">&quot;databricks&quot;</span> <span class="ow">or</span> <span class="n">get_uri_scheme</span><span class="p">(</span><span class="n">tracking_uri</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;databricks&quot;</span><span class="p">:</span>
+                    <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">_LOG_MODEL_MISSING_SIGNATURE_WARNING</span><span class="p">)</span>
             <span class="n">mlflow</span><span class="o">.</span><span class="n">tracking</span><span class="o">.</span><span class="n">fluent</span><span class="o">.</span><span class="n">log_artifacts</span><span class="p">(</span><span class="n">local_path</span><span class="p">,</span> <span class="n">mlflow_model</span><span class="o">.</span><span class="n">artifact_path</span><span class="p">,</span> <span class="n">run_id</span><span class="p">)</span>
 
             <span class="c1"># if the model_config kwarg is passed in, then log the model config as an params</span>
@@ -970,12 +975,6 @@
                 <span class="n">model_info</span><span class="o">.</span><span class="n">registered_model_version</span> <span class="o">=</span> <span class="n">registered_model</span><span class="o">.</span><span class="n">version</span>
 
             <span class="c1"># validate input example works for serving when logging the model</span>
-            <span class="n">serving_input</span> <span class="o">=</span> <span class="n">mlflow_model</span><span class="o">.</span><span class="n">get_serving_input</span><span class="p">(</span><span class="n">local_path</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">mlflow_model</span><span class="o">.</span><span class="n">signature</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">serving_input</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                    <span class="s2">&quot;Input example should be provided to infer model signature if the model &quot;</span>
-                    <span class="s2">&quot;signature is not provided when logging the model.&quot;</span>
-                <span class="p">)</span>
             <span class="k">if</span> <span class="n">serving_input</span><span class="p">:</span>
                 <span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">validate_serving_input</span>
 
@@ -1262,7 +1261,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../../',
-      VERSION:'2.15.1.dev0',
+      VERSION:'2.15.2.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',
