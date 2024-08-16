@@ -27,6 +27,39 @@ export type Release = {
 // Sort by date descending
 export const BLOGS: Blog[] = [
   {
+    title: "PyFunc in Practice",
+    path: "/blog/pyfunc-in-practice",
+    tags: ["pyfunc", "mlflow", "ensemble-models"],
+    authors: [
+      {
+        name: "Hugo Carvalho",
+        title: "Machine Learning Analyst at adidas",
+        url: "https://www.linkedin.com/in/hugodscarvalho/",
+        image_url: "/img/authors/hugo_carvalho.png",
+      },
+      {
+        name: "Joana Ferreira",
+        title: "Machine Learning Engineer at adidas",
+        url: "https://www.linkedin.com/in/joanaferreira96/",
+        image_url: "/img/authors/joana_ferreira.png",
+      },
+      {
+        name: "Rahul Pandey",
+        title: "Sr. Solutions Architect at adidas",
+        url: "https://www.linkedin.com/in/rahulpandey1901/",
+        image_url: "/img/ambassadors/Rahul_Pandey.png",
+      },
+      {
+        name: "Filipe Miranda",
+        title: "Sr. Data Engineer at adidas",
+        url: "https://www.linkedin.com/in/filipe-miranda-b576b186/",
+        image_url: "/img/authors/filipe_miranda.png",
+      },
+    ],
+    date: "2024-07-26",
+    thumbnail: "img/blog/pyfunc-in-practice.png",
+  },
+  {
     title: "Introducing MLflow Tracing",
     path: "/blog/mlflow-tracing",
     tags: ["tracing", "genai", "mlops"],

@@ -7,7 +7,7 @@ authors: [hugo-carvalho, joana-ferreira, rahul-pandey, filipe-miranda]
 thumbnail: img/blog/pyfunc-in-practice.png
 ---
 
-If you're looking to fully leverage the capabilities of `mlflow.pyfunc`  and understand how it can be utilized in a Machine Learning project, this blog post will guide you through the process. MLflow PyFunc offers creative freedom and flexibility, allowing the development of complex systems encapsulated as models in MLflow that follow the same lifecycle as traditional ones. This blog will showcase how to create multi-model setups, seamlessly connect to databases, and implement your own custom fit method in your MLflow PyFunc model.
+If you're looking to fully leverage the capabilities of `mlflow.pyfunc` and understand how it can be utilized in a Machine Learning project, this blog post will guide you through the process. MLflow PyFunc offers creative freedom and flexibility, allowing the development of complex systems encapsulated as models in MLflow that follow the same lifecycle as traditional ones. This blog will showcase how to create multi-model setups, seamlessly connect to databases, and implement your own custom fit method in your MLflow PyFunc model.
 
 <!-- truncate -->
 
@@ -20,6 +20,7 @@ But first, let's use an analogy to get you familiarized with the concept of ense
 Imagine you are in the market to buy a house. Would you make a decision based solely on the first house you visit and the advice of a single real estate agent? Of course not! The process of buying a house involves considering multiple factors and gathering information from various sources to make an informed decision.
 
 The house buying process explained:
+
 - **Identify Your Needs**: Determine whether you want a new or used house, the type of house, the model, and the year of construction.
 - **Research**: Look for a list of available houses, check for discounts and offers, read customer reviews, and seek opinions from friends and family.
 - **Evaluate**: Consider the performance, location, neighborhood amenities, and price range.
@@ -28,6 +29,7 @@ The house buying process explained:
 In short, you wouldn’t directly reach a conclusion but would instead make a decision considering all the aforementioned factors before deciding on the best choice.
 
 Ensemble models in Machine Learning operate on a similar idea. Ensemble learning helps improve Machine Learning results by combining several models to improve predictive performance compared to a single model. The performance increase can be due to several factors such as the reduction in variance by averaging multiple models or reducing bias by focusing on errors of previous models. There are several types of ensemble learning techniques exists such as:
+
 - **Averaging**
 - **Weighted Averaging**
 - **Bagging**
@@ -192,7 +194,7 @@ The DataFrame `strategy_data` includes:
 - **weights**: A comma-separated list of weights assigned to each model in the `model_list`. If not provided, implies equal weights or default values.
 
 | strategy  | model_list                                                     | weights |
-| ----------| -------------------------------------------------------------- | ------- |
+| --------- | -------------------------------------------------------------- | ------- |
 | average_1 | random_forest,xgboost,decision_tree,gradient_boosting,adaboost | 1       |
 
 ### Feature Engineering
@@ -368,6 +370,7 @@ def fit(
 To streamline the inference process, every PyFunc model should define a custom `predict` method as the single entry point for inference. This approach abstracts the model's internal workings at inference time, whether dealing with a custom PyFunc model or an out-of-the-box MLflow built-in flavor for popular ML frameworks.
 
 The custom `predict` method for the ensemble model is designed to collect and combine predictions from the sub-models, supporting various aggregation strategies (e.g., average, weighted). The process involves the following steps:
+
 1. Load the sub-model predictions aggregation strategy based on the user-defined approach.
 2. Load the models to be used for inference.
 3. Preprocess the input data.
@@ -455,6 +458,7 @@ def predict(self, context, model_input: pd.DataFrame) -> np.ndarray:
 ```
 
 ### Defining a `load context` custom method to initialize the Ensemble Model
+
 When loading the ensemble model using `mlflow.pyfunc.load_model`, the custom `load_context` method is executed to handle the required model initialization steps before inference.
 
 This initialization process includes:
@@ -509,7 +513,8 @@ After everything has been encapsulated in a PyFunc model, the lifecycle of the e
 ![Ensemble Model Lifecycle](ensemble-model-lifecycle.png)
 
 ## MLflow Tracking
-### Using the `fit` Method to Train Sub-Models  
+
+### Using the `fit` Method to Train Sub-Models
 
 Once the data is preprocessed, we use the custom `fit` method to train all the sub-models in our Ensemble Model. This method applies grid search to find the best hyperparameters for each sub-model, fits them to the training data, and saves the trained models for future use.
 
@@ -732,7 +737,8 @@ Beyond offering a structured approach to achieving desired outcomes, this blog d
 ## Additional resources
 
 Explore the following resources for a deeper understanding of MLflow PyFunc models:
-* [Custom MLflow Models with mlflow.pyfunc](https://mlflow.org/blog/custom-pyfunc)
-* [Understanding PyFunc in MLflow](https://mlflow.org/docs/latest/traditional-ml/creating-custom-pyfunc/part2-pyfunc-components.html)
-* [Building Custom Python Function Models with MLflow](https://mlflow.org/docs/latest/traditional-ml/creating-custom-pyfunc/index.html)
-* [Deploy an MLflow PyFunc model with Model Serving](https://mlflow.org/docs/latest/traditional-ml/serving-multiple-models-with-pyfunc/notebooks/MME_Tutorial.html)
+
+- [Custom MLflow Models with mlflow.pyfunc](https://mlflow.org/blog/custom-pyfunc)
+- [Understanding PyFunc in MLflow](https://mlflow.org/docs/latest/traditional-ml/creating-custom-pyfunc/part2-pyfunc-components.html)
+- [Building Custom Python Function Models with MLflow](https://mlflow.org/docs/latest/traditional-ml/creating-custom-pyfunc/index.html)
+- [Deploy an MLflow PyFunc model with Model Serving](https://mlflow.org/docs/latest/traditional-ml/serving-multiple-models-with-pyfunc/notebooks/MME_Tutorial.html)
