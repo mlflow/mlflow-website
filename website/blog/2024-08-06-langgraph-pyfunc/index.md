@@ -233,7 +233,7 @@ User: What's my name?
 Agent: I'm sorry, but I do not have the ability to know your name unless you provide it to me. How can I assist you today?
 
 -------- Message 2 -----------
-User: My name is Morpheus?
+User: My name is Morpheus.
 Agent: Hello Morpheus! How can I assist you today?
 
 -------- Message 3 -----------
