@@ -6,12 +6,14 @@ authors: [michael-berk, mlflow-maintainers]
 thumbnail: img/blog/release-candidates.png
 ---
 
-In this blog, we'll guide you through creating a LangGraph chatbot within an MLflow custom PyFunc.
+In this blog, we'll guide you through creating a LangGraph chatbot within an MLflow custom PyFunc. By combining MLflow with LangGraph's ability to create and manage cyclical graphs, you can create powerful stateful, multi-actor applications in a scalable fashion. 
+
+Throughout this post we will demonstrate how to leverage MLflow's ChatModel to create a serializable and servable MLflow model which can easily be tracked, versioned, and deployed on a variety of servers.
 
 ### What is a Custom PyFunc?
 
-While MLflow strives to cover many popular machine learning libraries, there has been a proliferation of open source packages. If users want MLflows myriad benefits paired with a package that doesn't have native support, users can create a custom PyFunc model. 
-Custom PyFunc models allow you to integrate any Python code, providing flexibility in defining GenAI apps and AI mdoels. These models can be easily logged, managed, and deployed using the typical MLflow APIs, enhancing flexibility and portability in machine learning workflows.
+While MLflow strives to cover many popular machine learning libraries, there has been a proliferation of open source packages. If users want MLflow's myriad benefits paired with a package that doesn't have native support, users can create a [custom PyFunc model](https://mlflow.org/docs/latest/traditional-ml/creating-custom-pyfunc/index.html or https://mlflow.org/blog/custom-pyfunc). 
+Custom PyFunc models allow you to integrate any Python code, providing flexibility in defining GenAI apps and AI models. These models can be easily logged, managed, and deployed using the typical MLflow APIs, enhancing flexibility and portability in machine learning workflows.
 
 Within the category of custom PyFunc models, MLflow supports a specialized model called [ChatModel](https://mlflow.org/docs/latest/llms/transformers/tutorials/conversational/pyfunc-chat-model.html). It extends the base PyFunc functionality to specifically support messages. For this demo, we will use ChatModel to create a LangGraph chatbot. 
 
@@ -132,7 +134,7 @@ Note that it's best practice to add unit tests and properly organize your projec
 Great! Now that we have some reusable utilities located in `./langgraph_utils.py`, we are ready to declare a custom PyFunc and log the model. However, before writing more code, let's provide some quick background on the **Model from Code** feature.
 
 ### 3.1 - Create our Model-From-Code File
-Historically, MLflow's process of saving a custom `pyfunc` model uses a mechanism that has some frustrating drawbacks: `cloudpickle`. Prior to the release of support for saving a model as a python script in MLflow 2.12.2 (known as the [models from code](https://mlflow.org/docs/latest/models.html#models-from-code) feature), logging a defined `pyfunc` involved pickling an instance of that model. Along with the pickled model artifact, MLflow will store the signature, which can be passed or inferred from the `model_input` parameter. It will also log inferred model dependencies to help you serve the model in a new environment.
+Historically, MLflow's process of saving a custom `pyfunc` model uses a mechanism that has some frustrating drawbacks: `cloudpickle`. Prior to the release of support for saving a model as a Python script in MLflow 2.12.2 (known as the [models from code](https://mlflow.org/docs/latest/models.html#models-from-code) feature), logging a defined `pyfunc` involved pickling an instance of that model. Along with the pickled model artifact, MLflow will store the signature, which can be passed or inferred from the `model_input` parameter. It will also log inferred model dependencies to help you serve the model in a new environment.
 
 Pickle is an easy-to-use serialization mechanism, but it has a variety of limitations: 
 * **Limited Support for Some Data Types**: `cloudpickle` may struggle with serializing certain complex or low-level data types, such as file handles, sockets, or objects containing these types, which can lead to errors or incorrect deserialization.
@@ -141,12 +143,13 @@ Pickle is an easy-to-use serialization mechanism, but it has a variety of limita
 * **Mutable Object States that Cannot be Serialized**: `cloudpickle` struggles to serialize certain mutable objects whose states change during runtime, especially if these objects contain non-serializable elements like open file handles, thread locks, or custom C extensions. Even if `cloudpickle` can serialize the object structure, it may fail to capture the exact state or may not be able to deserialize the state accurately, leading to potential data loss or incorrect behavior upon deserialization.
 
 To get around this issue, we must perform the following steps:
-1. Create an additional python file in our directory.
-2. In that file, create a [MLflow custom PyFunc](https://mlflow.org/docs/latest/traditional-ml/creating-custom-pyfunc/index.html). Note that in our case, we're using a [custom ChatModel](https://mlflow.org/docs/latest/llms/transformers/tutorials/conversational/pyfunc-chat-model.html#Customizing-the-model).
-3. Also in that file, set the custom ChatModel to be accessible by [MLflow model from code](https://mlflow.org/docs/latest/models.html#models-from-code) via the [mlflow.models.set_model()](https://mlflow.org/docs/latest/python_api/mlflow.models.html#mlflow.models.set_model) command.
-4. In a different file, log the **path** to the file created in steps 1-3 instead of the model object.
+1. Create an additional Python file in our directory.
+2. In that file, create a function that creates a [CompiledStateGraph](https://langchain-ai.github.io/langgraph/tutorials/introduction/#part-1-build-a-basic-chatbot), which is DAG-based stateful chatbot.
+3. Also in that file, create a [MLflow custom PyFunc](https://mlflow.org/docs/latest/traditional-ml/creating-custom-pyfunc/index.html). Note that in our case, we're using a [custom ChatModel](https://mlflow.org/docs/latest/llms/transformers/tutorials/conversational/pyfunc-chat-model.html#Customizing-the-model).
+4. Also in that file, set the custom ChatModel to be accessible by [MLflow model from code](https://mlflow.org/docs/latest/models.html#models-from-code) via the [mlflow.models.set_model()](https://mlflow.org/docs/latest/python_api/mlflow.models.html#mlflow.models.set_model) command.
+5. In a different file, log the **path** to the file created in steps 1-3 instead of the model object.
 
-By passing a python file, we simply can load the model from that python code, thereby bypassing all the headaches associated with serialization and `cloudpickle`.
+By passing a Python file, we simply can load the model from that Python code, thereby bypassing all the headaches associated with serialization and `cloudpickle`.
 
 ```python
 %%writefile graph_chain.py
@@ -307,7 +310,7 @@ Agent: Your name is Morpheus!
 ```
 
 ## 5 - Summary
-There are many logical extensions of the this tutorial, however the MLflow components can remain largely unchanged. 
+There are many logical extensions of the this tutorial, however the MLflow components can remain largely unchanged. Some examples include persisting chat history to a database, implementing a more complex langgraph object, productionizing this solution, and much more!
 
 To summarize, here's what was covered in this tutorial:
 * Creating a simple LangGraph chain.
