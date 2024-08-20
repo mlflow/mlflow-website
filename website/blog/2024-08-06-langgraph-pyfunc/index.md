@@ -2,7 +2,7 @@
 title: LangGraph with Custom PyFunc 
 tags: [genai, mlops]
 slug: mlflow
-authors: [mlflow-maintainers]
+authors: [michael-berk, mlflow-maintainers]
 thumbnail: img/blog/release-candidates.png
 ---
 
@@ -30,9 +30,7 @@ LangGraph is inspired by Pregel and Apache Beam. The public interface draws insp
 
 For a full walkthrough, check out the [LangGraph Quickstart](https://langchain-ai.github.io/langgraph/tutorials/introduction/) and for more on the fundamentals of design with LangGraph, check out the [conceptual guides](https://langchain-ai.github.io/langgraph/concepts/#human-in-the-loop).
 
-# The Code
-
-###  1 - Setup
+##  1 - Setup
 First, we must install the required dependencies. We will use OpenAI for our LLM in this example, but using LangChain with LangGraph makes it easy to substitute any alternative supported LLM or LLM provider.
 
 ```python
@@ -54,7 +52,7 @@ assert "OPENAI_API_KEY" in os.environ, "Please set the OPENAI_API_KEY environmen
 assert "LANGSMITH_API_KEY" in os.environ, "Please set the LANGSMITH_API_KEY environment variable."
 ```
 
-### 2 - Custom Utilities
+## 2 - Custom Utilities
 While this is a demo, it's good practice to separate reusable utilities into a separate file/directory. Below we create three general utilities that theoretically would valuable when building additional MLflow + LangGraph implementations.  
 
 Note that we use the magic `%%writefile` command to create a new file in a jupyter notebook context. If you're running this outside of an interactive notebook, simply create the file below, omitting the `%%writefile {FILE_NAME}.py` line.
@@ -130,10 +128,10 @@ By the end of this step, you should see a new file in your current directory wit
 
 Note that it's best practice to add unit tests and properly organize your project into logically structured directories.
 
-### 3 - Custom PyFunc ChatModel
+## 3 - Custom PyFunc ChatModel
 Great! Now that we have some reusable utilities located in `./langgraph_utils.py`, we are ready to declare a custom PyFunc and log the model. However, before writing more code, let's provide some quick background on the **Model from Code** feature.
 
-#### 3.1 - Create our Model-From-Code File
+### 3.1 - Create our Model-From-Code File
 Historically, MLflow's process of saving a custom `pyfunc` model uses a mechanism that has some frustrating drawbacks: `cloudpickle`. Prior to the release of support for saving a model as a python script in MLflow 2.12.2 (known as the [models from code](https://mlflow.org/docs/latest/models.html#models-from-code) feature), logging a defined `pyfunc` involved pickling an instance of that model. Along with the pickled model artifact, MLflow will store the signature, which can be passed or inferred from the `model_input` parameter. It will also log inferred model dependencies to help you serve the model in a new environment.
 
 Pickle is an easy-to-use serialization mechanism, but it has a variety of limitations: 
@@ -235,7 +233,7 @@ class LangGraphChatModel(mlflow.pyfunc.ChatModel):
 mlflow.models.set_model(LangGraphChatModel())
 ```
 
-#### 3.2 - Log our Model-From-Code
+### 3.2 - Log our Model-From-Code
 After creating this ChatModel implementation in we leverage the standard MLflow APIs to log the model. However, as noted above, instead of passing a model object, we pass the path `str` to the file containing our `mlflow.models.set_model()` command. 
 
 ```python
@@ -253,10 +251,10 @@ with mlflow.start_run() as run:
     run_id = run.info.run_id
 ```
 
-### 4 - Use the Logged Model
+## 4 - Use the Logged Model
 Now that we have successfully logged a model, we can load it and leverage it for inference. 
 
-In the code below, we demonstrate that our chat chain chatbot functionality!
+In the code below, we demonstrate that our chain has chatbot functionality!
 
 ```python
 import mlflow
@@ -308,7 +306,7 @@ User: What's my name?
 Agent: Your name is Morpheus!
 ```
 
-### 5 - Summary
+## 5 - Summary
 There are many logical extensions of the this tutorial, however the MLflow components can remain largely unchanged. 
 
 To summarize, here's what was covered in this tutorial:
