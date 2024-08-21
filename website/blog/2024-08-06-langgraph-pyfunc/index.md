@@ -1,30 +1,31 @@
 ---
-title: LangGraph with Custom PyFunc 
+title: LangGraph with Custom PyFunc
 tags: [genai, mlops]
 slug: mlflow
 authors: [michael-berk, mlflow-maintainers]
 thumbnail: img/blog/release-candidates.png
 ---
 
-In this blog, we'll guide you through creating a LangGraph chatbot within an MLflow custom PyFunc. By combining MLflow with LangGraph's ability to create and manage cyclical graphs, you can create powerful stateful, multi-actor applications in a scalable fashion. 
+In this blog, we'll guide you through creating a LangGraph chatbot within an MLflow custom PyFunc. By combining MLflow with LangGraph's ability to create and manage cyclical graphs, you can create powerful stateful, multi-actor applications in a scalable fashion.
 
 Throughout this post we will demonstrate how to leverage MLflow's ChatModel to create a serializable and servable MLflow model which can easily be tracked, versioned, and deployed on a variety of servers.
 
 ### What is a Custom PyFunc?
 
-While MLflow strives to cover many popular machine learning libraries, there has been a proliferation of open source packages. If users want MLflow's myriad benefits paired with a package that doesn't have native support, users can create a [custom PyFunc model](https://mlflow.org/docs/latest/traditional-ml/creating-custom-pyfunc/index.html or https://mlflow.org/blog/custom-pyfunc). 
+While MLflow strives to cover many popular machine learning libraries, there has been a proliferation of open source packages. If users want MLflow's myriad benefits paired with a package that doesn't have native support, users can create a [custom PyFunc model](https://mlflow.org/docs/latest/traditional-ml/creating-custom-pyfunc/index.html or https://mlflow.org/blog/custom-pyfunc).
 Custom PyFunc models allow you to integrate any Python code, providing flexibility in defining GenAI apps and AI models. These models can be easily logged, managed, and deployed using the typical MLflow APIs, enhancing flexibility and portability in machine learning workflows.
 
-Within the category of custom PyFunc models, MLflow supports a specialized model called [ChatModel](https://mlflow.org/docs/latest/llms/transformers/tutorials/conversational/pyfunc-chat-model.html). It extends the base PyFunc functionality to specifically support messages. For this demo, we will use ChatModel to create a LangGraph chatbot. 
+Within the category of custom PyFunc models, MLflow supports a specialized model called [ChatModel](https://mlflow.org/docs/latest/llms/transformers/tutorials/conversational/pyfunc-chat-model.html). It extends the base PyFunc functionality to specifically support messages. For this demo, we will use ChatModel to create a LangGraph chatbot.
 
 ### What is LangGraph?
 
-[LangGraph](https://langchain-ai.github.io/langgraph/) is a library for building stateful, multi-actor applications with LLMs, used to create agent and multi-agent workflows. Compared to other LLM frameworks, it offers these core benefits: 
-* **Cycles and Branching**: Implement loops and conditionals in your apps.
-* **Persistence**: Automatically save state after each step in the graph. Pause and resume the graph execution at any point to support error recovery, human-in-the-loop workflows, time travel and more.
-* **Human-in-the-Loop**: Interrupt graph execution to approve or edit next action planned by the agent.
-* **Streaming Support**: Stream outputs as they are produced by each node (including token streaming).
-* **Integration with LangChain**: LangGraph integrates seamlessly with LangChain and LangSmith (but does not require them).
+[LangGraph](https://langchain-ai.github.io/langgraph/) is a library for building stateful, multi-actor applications with LLMs, used to create agent and multi-agent workflows. Compared to other LLM frameworks, it offers these core benefits:
+
+- **Cycles and Branching**: Implement loops and conditionals in your apps.
+- **Persistence**: Automatically save state after each step in the graph. Pause and resume the graph execution at any point to support error recovery, human-in-the-loop workflows, time travel and more.
+- **Human-in-the-Loop**: Interrupt graph execution to approve or edit next action planned by the agent.
+- **Streaming Support**: Stream outputs as they are produced by each node (including token streaming).
+- **Integration with LangChain**: LangGraph integrates seamlessly with LangChain and LangSmith (but does not require them).
 
 LangGraph allows you to define flows that involve cycles, essential for most agentic architectures, differentiating it from DAG-based solutions. As a very low-level framework, it provides fine-grained control over both the flow and state of your application, crucial for creating reliable agents. Additionally, LangGraph includes built-in persistence, enabling advanced human-in-the-loop and memory features.
 
@@ -32,7 +33,8 @@ LangGraph is inspired by Pregel and Apache Beam. The public interface draws insp
 
 For a full walkthrough, check out the [LangGraph Quickstart](https://langchain-ai.github.io/langgraph/tutorials/introduction/) and for more on the fundamentals of design with LangGraph, check out the [conceptual guides](https://langchain-ai.github.io/langgraph/concepts/#human-in-the-loop).
 
-##  1 - Setup
+## 1 - Setup
+
 First, we must install the required dependencies. We will use OpenAI for our LLM in this example, but using LangChain with LangGraph makes it easy to substitute any alternative supported LLM or LLM provider.
 
 ```python
@@ -42,7 +44,7 @@ First, we must install the required dependencies. We will use OpenAI for our LLM
 %pip install langchain_openai==0.1.21
 ```
 
-Next, let's get our relevant secrets. `getpass`, as demonstrated in the [LangGraph quickstart](https://langchain-ai.github.io/langgraph/tutorials/introduction/#setup) is a great way to insert your keys into an interactive jupyter environment. 
+Next, let's get our relevant secrets. `getpass`, as demonstrated in the [LangGraph quickstart](https://langchain-ai.github.io/langgraph/tutorials/introduction/#setup) is a great way to insert your keys into an interactive jupyter environment.
 
 ```python
 import os
@@ -55,7 +57,8 @@ assert "LANGSMITH_API_KEY" in os.environ, "Please set the LANGSMITH_API_KEY envi
 ```
 
 ## 2 - Custom Utilities
-While this is a demo, it's good practice to separate reusable utilities into a separate file/directory. Below we create three general utilities that theoretically would valuable when building additional MLflow + LangGraph implementations.  
+
+While this is a demo, it's good practice to separate reusable utilities into a separate file/directory. Below we create three general utilities that theoretically would valuable when building additional MLflow + LangGraph implementations.
 
 Note that we use the magic `%%writefile` command to create a new file in a jupyter notebook context. If you're running this outside of an interactive notebook, simply create the file below, omitting the `%%writefile {FILE_NAME}.py` line.
 
@@ -131,18 +134,22 @@ By the end of this step, you should see a new file in your current directory wit
 Note that it's best practice to add unit tests and properly organize your project into logically structured directories.
 
 ## 3 - Custom PyFunc ChatModel
+
 Great! Now that we have some reusable utilities located in `./langgraph_utils.py`, we are ready to declare a custom PyFunc and log the model. However, before writing more code, let's provide some quick background on the **Model from Code** feature.
 
 ### 3.1 - Create our Model-From-Code File
+
 Historically, MLflow's process of saving a custom `pyfunc` model uses a mechanism that has some frustrating drawbacks: `cloudpickle`. Prior to the release of support for saving a model as a Python script in MLflow 2.12.2 (known as the [models from code](https://mlflow.org/docs/latest/models.html#models-from-code) feature), logging a defined `pyfunc` involved pickling an instance of that model. Along with the pickled model artifact, MLflow will store the signature, which can be passed or inferred from the `model_input` parameter. It will also log inferred model dependencies to help you serve the model in a new environment.
 
-Pickle is an easy-to-use serialization mechanism, but it has a variety of limitations: 
-* **Limited Support for Some Data Types**: `cloudpickle` may struggle with serializing certain complex or low-level data types, such as file handles, sockets, or objects containing these types, which can lead to errors or incorrect deserialization.
-* **Version Compatibility Issues**: Serialized objects with `cloudpickle` may not be deserializable across different versions of `cloudpickle` or Python, making long-term storage or sharing between different environments risky.
-* **Recursion Depth for Nested Dependencies**: `cloudpickle` can serialize objects with nested dependencies (e.g., functions within functions, or objects that reference other objects). However, deeply nested dependencies can hit the recursion depth limit imposed by Python's interpreter.
-* **Mutable Object States that Cannot be Serialized**: `cloudpickle` struggles to serialize certain mutable objects whose states change during runtime, especially if these objects contain non-serializable elements like open file handles, thread locks, or custom C extensions. Even if `cloudpickle` can serialize the object structure, it may fail to capture the exact state or may not be able to deserialize the state accurately, leading to potential data loss or incorrect behavior upon deserialization.
+Pickle is an easy-to-use serialization mechanism, but it has a variety of limitations:
+
+- **Limited Support for Some Data Types**: `cloudpickle` may struggle with serializing certain complex or low-level data types, such as file handles, sockets, or objects containing these types, which can lead to errors or incorrect deserialization.
+- **Version Compatibility Issues**: Serialized objects with `cloudpickle` may not be deserializable across different versions of `cloudpickle` or Python, making long-term storage or sharing between different environments risky.
+- **Recursion Depth for Nested Dependencies**: `cloudpickle` can serialize objects with nested dependencies (e.g., functions within functions, or objects that reference other objects). However, deeply nested dependencies can hit the recursion depth limit imposed by Python's interpreter.
+- **Mutable Object States that Cannot be Serialized**: `cloudpickle` struggles to serialize certain mutable objects whose states change during runtime, especially if these objects contain non-serializable elements like open file handles, thread locks, or custom C extensions. Even if `cloudpickle` can serialize the object structure, it may fail to capture the exact state or may not be able to deserialize the state accurately, leading to potential data loss or incorrect behavior upon deserialization.
 
 To get around this issue, we must perform the following steps:
+
 1. Create an additional Python file in our directory.
 2. In that file, create a function that creates a [CompiledStateGraph](https://langchain-ai.github.io/langgraph/tutorials/introduction/#part-1-build-a-basic-chatbot), which is DAG-based stateful chatbot.
 3. Also in that file, create a [MLflow custom PyFunc](https://mlflow.org/docs/latest/traditional-ml/creating-custom-pyfunc/index.html). Note that in our case, we're using a [custom ChatModel](https://mlflow.org/docs/latest/llms/transformers/tutorials/conversational/pyfunc-chat-model.html#Customizing-the-model).
@@ -210,8 +217,8 @@ class LangGraphChatModel(mlflow.pyfunc.ChatModel):
         text = response["messages"][-1].content
 
         # NB: chat session ID should be handled on the client side. Here we
-        # create a placeholder for demonstration purposes. Furthermore, if you 
-        # need persistance between model sessions, it's a good idea to 
+        # create a placeholder for demonstration purposes. Furthermore, if you
+        # need persistance between model sessions, it's a good idea to
         # write your session history to a database.
         id = f"some_meaningful_id_{random.randint(0, 100)}"
 
@@ -237,7 +244,8 @@ mlflow.models.set_model(LangGraphChatModel())
 ```
 
 ### 3.2 - Log our Model-From-Code
-After creating this ChatModel implementation in we leverage the standard MLflow APIs to log the model. However, as noted above, instead of passing a model object, we pass the path `str` to the file containing our `mlflow.models.set_model()` command. 
+
+After creating this ChatModel implementation in we leverage the standard MLflow APIs to log the model. However, as noted above, instead of passing a model object, we pass the path `str` to the file containing our `mlflow.models.set_model()` command.
 
 ```python
 import mlflow
@@ -255,7 +263,8 @@ with mlflow.start_run() as run:
 ```
 
 ## 4 - Use the Logged Model
-Now that we have successfully logged a model, we can load it and leverage it for inference. 
+
+Now that we have successfully logged a model, we can load it and leverage it for inference.
 
 In the code below, we demonstrate that our chain has chatbot functionality!
 
@@ -295,6 +304,7 @@ print(f"Agent: {response['choices'][-1]['message']['content']}")
 ```
 
 Ouput:
+
 ```text
 -------- Message 1 -----------
 User: What's my name?
@@ -310,12 +320,14 @@ Agent: Your name is Morpheus!
 ```
 
 ## 5 - Summary
+
 There are many logical extensions of the this tutorial, however the MLflow components can remain largely unchanged. Some examples include persisting chat history to a database, implementing a more complex langgraph object, productionizing this solution, and much more!
 
 To summarize, here's what was covered in this tutorial:
-* Creating a simple LangGraph chain.
-* Declaring a custom MLflow PyFunc ChatModel that wraps the above LangGraph chain with pre/post-processing logic. 
-* Leveraging MLflow [model from code](https://mlflow.org/docs/latest/models.html#models-from-code) functionality to log our Custom PyFunc.
-* Loading the Custom PyFunc via the standard MLflow APIs.
+
+- Creating a simple LangGraph chain.
+- Declaring a custom MLflow PyFunc ChatModel that wraps the above LangGraph chain with pre/post-processing logic.
+- Leveraging MLflow [model from code](https://mlflow.org/docs/latest/models.html#models-from-code) functionality to log our Custom PyFunc.
+- Loading the Custom PyFunc via the standard MLflow APIs.
 
 Happy coding!
