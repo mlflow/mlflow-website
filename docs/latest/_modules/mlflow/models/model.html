@@ -273,6 +273,9 @@
 <span class="p">]</span>
 <span class="n">MODEL_CONFIG</span> <span class="o">=</span> <span class="s2">&quot;config&quot;</span>
 <span class="n">MODEL_CODE_PATH</span> <span class="o">=</span> <span class="s2">&quot;model_code_path&quot;</span>
+<span class="n">SET_MODEL_ERROR</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;Model should either be an instance of PyFuncModel, Langchain type, or LlamaIndex index.&quot;</span>
+<span class="p">)</span>
 
 
 <div class="viewcode-block" id="ModelInfo"><a class="viewcode-back" href="../../../python_api/mlflow.models.html#mlflow.models.ModelInfo">[docs]</a><span class="k">class</span> <span class="nc">ModelInfo</span><span class="p">:</span>
@@ -1203,6 +1206,18 @@
 <span class="n">__mlflow_model__</span> <span class="o">=</span> <span class="kc">None</span>
 
 
+<span class="k">def</span> <span class="nf">_validate_langchain_model</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">mlflow.langchain</span> <span class="kn">import</span> <span class="n">_validate_and_prepare_lc_model_or_path</span>
+
+    <span class="k">return</span> <span class="n">_validate_and_prepare_lc_model_or_path</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_validate_llama_index_model</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">mlflow.llama_index</span> <span class="kn">import</span> <span class="n">_validate_and_prepare_llama_index_model_or_path</span>
+
+    <span class="k">return</span> <span class="n">_validate_and_prepare_llama_index_model_or_path</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+
 <div class="viewcode-block" id="set_model"><a class="viewcode-back" href="../../../python_api/mlflow.models.html#mlflow.models.set_model">[docs]</a><span class="nd">@experimental</span>
 <span class="k">def</span> <span class="nf">set_model</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1210,27 +1225,29 @@
 <span class="sd">    to be logged.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        model: The model object to be logged.</span>
+<span class="sd">        model: The model object to be logged. Supported model types are:</span>
+
+<span class="sd">                - A Python function or callable object.</span>
+<span class="sd">                - A Langchain model or path to a Langchain model.</span>
+<span class="sd">                - A Llama Index model or path to a Llama Index model.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">mlflow.pyfunc</span> <span class="kn">import</span> <span class="n">PythonModel</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">PythonModel</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">callable</span><span class="p">(</span><span class="n">model</span><span class="p">)):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">MlflowException</span><span class="p">(</span><span class="n">SET_MODEL_ERROR</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">PythonModel</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">callable</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+        <span class="nb">globals</span><span class="p">()[</span><span class="s2">&quot;__mlflow_model__&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="k">return</span>
+
+    <span class="k">for</span> <span class="n">validate_function</span> <span class="ow">in</span> <span class="p">[</span><span class="n">_validate_langchain_model</span><span class="p">,</span> <span class="n">_validate_llama_index_model</span><span class="p">]:</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">mlflow.langchain</span> <span class="kn">import</span> <span class="n">_validate_and_prepare_lc_model_or_path</span>
+            <span class="nb">globals</span><span class="p">()[</span><span class="s2">&quot;__mlflow_model__&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">validate_function</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
 
-            <span class="c1"># If its not a PyFuncModel, then it should be a Langchain model (not a path)</span>
-            <span class="c1"># Check this since the validation function does not</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">MlflowException</span><span class="p">(</span>
-                    <span class="s2">&quot;Model should either be an instance of PyFuncModel or Langchain type.&quot;</span>
-                <span class="p">)</span>
-            <span class="n">model</span> <span class="o">=</span> <span class="n">_validate_and_prepare_lc_model_or_path</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">MlflowException</span><span class="p">(</span>
-                <span class="s2">&quot;Model should either be an instance of PyFuncModel or Langchain type.&quot;</span>
-            <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
-
-    <span class="nb">globals</span><span class="p">()[</span><span class="s2">&quot;__mlflow_model__&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span></div>
+    <span class="k">raise</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">MlflowException</span><span class="p">(</span><span class="n">SET_MODEL_ERROR</span><span class="p">)</span></div>
 </pre></div>
 
               </div>

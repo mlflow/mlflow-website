@@ -219,6 +219,7 @@
 <span class="sd">    https://xgboost.readthedocs.io/en/latest/python/python_api.html#module-xgboost.sklearn</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
@@ -563,8 +564,37 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            Model predictions.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">xgboost</span> <span class="k">as</span> <span class="nn">xgb</span>
+
         <span class="n">predict_fn</span> <span class="o">=</span> <span class="n">_wrapped_xgboost_model_predict_fn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xgb_model</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">predict_fn</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="o">**</span><span class="p">(</span><span class="n">params</span> <span class="ow">or</span> <span class="p">{}))</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">params</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="c1"># filter is applied inside predict_fn wrapper for xgb.Booster</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xgb_model</span><span class="p">,</span> <span class="n">xgb</span><span class="o">.</span><span class="n">Booster</span><span class="p">):</span>
+            <span class="c1"># Exclude unrecognized parameters as feature store team has</span>
+            <span class="c1"># dependency on this behavior. They might pass additional parameters</span>
+            <span class="c1"># that cannot be passed to the model.</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="n">_exclude_unrecognized_kwargs</span><span class="p">(</span><span class="n">predict_fn</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">predict_fn</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_exclude_unrecognized_kwargs</span><span class="p">(</span><span class="n">predict_fn</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">filtered_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">allowed_params</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">predict_fn</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span>
+    <span class="c1"># avoid excluding kwargs when predict function uses args or kwargs</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="n">p</span><span class="o">.</span><span class="n">VAR_POSITIONAL</span> <span class="ow">or</span> <span class="n">p</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="n">p</span><span class="o">.</span><span class="n">VAR_KEYWORD</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">allowed_params</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+        <span class="k">return</span> <span class="n">kwargs</span>
+    <span class="n">invalid_params</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">allowed_params</span><span class="p">:</span>
+            <span class="n">filtered_kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">invalid_params</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">invalid_params</span><span class="p">:</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Params </span><span class="si">{</span><span class="n">invalid_params</span><span class="si">}</span><span class="s2"> are not accepted by the xgboost model, &quot;</span>
+            <span class="s2">&quot;ignoring them during predict.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">filtered_kwargs</span>
 
 
 <span class="k">def</span> <span class="nf">_wrapped_xgboost_model_predict_fn</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">validate_features</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
@@ -576,8 +606,9 @@
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">xgb</span><span class="o">.</span><span class="n">Booster</span><span class="p">):</span>
         <span class="c1"># we need to wrap the predict function to accept data in pandas format</span>
         <span class="k">def</span> <span class="nf">wrapped_predict_fn</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="n">filtered_kwargs</span> <span class="o">=</span> <span class="n">_exclude_unrecognized_kwargs</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span>
-                <span class="n">xgb</span><span class="o">.</span><span class="n">DMatrix</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">validate_features</span><span class="o">=</span><span class="n">validate_features</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+                <span class="n">xgb</span><span class="o">.</span><span class="n">DMatrix</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">validate_features</span><span class="o">=</span><span class="n">validate_features</span><span class="p">,</span> <span class="o">**</span><span class="n">filtered_kwargs</span>
             <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">wrapped_predict_fn</span>

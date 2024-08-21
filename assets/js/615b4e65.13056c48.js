@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkwebsite=self.webpackChunkwebsite||[]).push([[6870],{2154:e=>{e.exports=JSON.parse('{"label":"genai","permalink":"/mlflow-website/blog/tags/genai","allTagsPath":"/mlflow-website/blog/tags","count":2,"unlisted":false}')}}]);

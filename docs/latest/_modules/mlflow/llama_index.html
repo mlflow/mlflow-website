@@ -202,6 +202,7 @@
   <h1>Source code for mlflow.llama_index</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">yaml</span>
@@ -209,10 +210,15 @@
 <span class="kn">import</span> <span class="nn">mlflow</span>
 <span class="kn">from</span> <span class="nn">mlflow</span> <span class="kn">import</span> <span class="n">pyfunc</span>
 <span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
+<span class="kn">from</span> <span class="nn">mlflow.llama_index.pyfunc_wrapper</span> <span class="kn">import</span> <span class="n">create_engine_wrapper</span>
 <span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">Model</span><span class="p">,</span> <span class="n">ModelInputExample</span><span class="p">,</span> <span class="n">ModelSignature</span>
-<span class="kn">from</span> <span class="nn">mlflow.models.model</span> <span class="kn">import</span> <span class="n">MLMODEL_FILE_NAME</span>
+<span class="kn">from</span> <span class="nn">mlflow.models.model</span> <span class="kn">import</span> <span class="n">MLMODEL_FILE_NAME</span><span class="p">,</span> <span class="n">MODEL_CODE_PATH</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.signature</span> <span class="kn">import</span> <span class="n">_infer_signature_from_input_example</span>
-<span class="kn">from</span> <span class="nn">mlflow.models.utils</span> <span class="kn">import</span> <span class="n">_save_example</span>
+<span class="kn">from</span> <span class="nn">mlflow.models.utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_load_model_code_path</span><span class="p">,</span>
+    <span class="n">_save_example</span><span class="p">,</span>
+    <span class="n">_validate_and_get_model_code_path</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracing.provider</span> <span class="kn">import</span> <span class="n">trace_disabled</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracking._model_registry</span> <span class="kn">import</span> <span class="n">DEFAULT_AWAIT_MAX_SLEEP_SECONDS</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracking.artifact_utils</span> <span class="kn">import</span> <span class="n">_download_artifact_from_uri</span>
@@ -235,6 +241,7 @@
     <span class="n">_add_code_from_conf_to_system_path</span><span class="p">,</span>
     <span class="n">_get_flavor_configuration</span><span class="p">,</span>
     <span class="n">_validate_and_copy_code_paths</span><span class="p">,</span>
+    <span class="n">_validate_and_copy_file_to_directory</span><span class="p">,</span>
     <span class="n">_validate_and_prepare_target_save_path</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.requirements_utils</span> <span class="kn">import</span> <span class="n">_get_pinned_requirement</span>
@@ -289,13 +296,22 @@
         <span class="p">)</span>
 
 
+<span class="k">def</span> <span class="nf">_supported_classes</span><span class="p">():</span>
+    <span class="kn">from</span> <span class="nn">llama_index.core.base.base_query_engine</span> <span class="kn">import</span> <span class="n">BaseQueryEngine</span>
+    <span class="kn">from</span> <span class="nn">llama_index.core.chat_engine.types</span> <span class="kn">import</span> <span class="n">BaseChatEngine</span>
+    <span class="kn">from</span> <span class="nn">llama_index.core.indices.base</span> <span class="kn">import</span> <span class="n">BaseIndex</span>
+    <span class="kn">from</span> <span class="nn">llama_index.core.retrievers</span> <span class="kn">import</span> <span class="n">BaseRetriever</span>
+
+    <span class="k">return</span> <span class="n">BaseIndex</span><span class="p">,</span> <span class="n">BaseChatEngine</span><span class="p">,</span> <span class="n">BaseQueryEngine</span><span class="p">,</span> <span class="n">BaseRetriever</span>
+
+
 <div class="viewcode-block" id="save_model"><a class="viewcode-back" href="../../python_api/mlflow.llama_index.html#mlflow.llama_index.save_model">[docs]</a><span class="nd">@experimental</span>
 <span class="nd">@format_docstring</span><span class="p">(</span><span class="n">LOG_MODEL_PARAM_DOCS</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">package_name</span><span class="o">=</span><span class="n">FLAVOR_NAME</span><span class="p">))</span>
 <span class="nd">@trace_disabled</span>  <span class="c1"># Suppress traces while loading model</span>
 <span class="k">def</span> <span class="nf">save_model</span><span class="p">(</span>
-    <span class="n">index</span><span class="p">,</span>
+    <span class="n">llama_index_model</span><span class="p">,</span>
     <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">engine_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">engine_type</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">model_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">code_paths</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">mlflow_model</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Model</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -307,13 +323,15 @@
     <span class="n">metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Save a LlamaIndex index to a path on the local file system.</span>
+<span class="sd">    Save a LlamaIndex model to a path on the local file system.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        index: LlamaIndex index to be saved.</span>
+<span class="sd">        llama_index_model: An LlamaIndex object to be saved, or a string representing the path to</span>
+<span class="sd">            a script contains LlamaIndex index/engine definition.</span>
 <span class="sd">        path: Local path where the serialized model (as YAML) is to be saved.</span>
-<span class="sd">        engine_type: Determine the inference interface for the index when loaded as a pyfunc</span>
-<span class="sd">            model. The supported types are as follows:</span>
+<span class="sd">        engine_type: Required when saving an index object to determine the inference interface</span>
+<span class="sd">            for the index when loaded as a pyfunc model. This field is **not** required when</span>
+<span class="sd">            saving an engine directly. The supported types are as follows:</span>
 
 <span class="sd">            - ``&quot;chat&quot;``: load the index as an instance of the LlamaIndex</span>
 <span class="sd">              `ChatEngine &lt;https://docs.llamaindex.ai/en/stable/module_guides/deploying/chat_engines/&gt;`_.</span>
@@ -338,15 +356,44 @@
 <span class="sd">        conda_env: {{ conda_env }}</span>
 <span class="sd">        metadata: {{ metadata }}</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">mlflow.llama_index.pyfunc_wrapper</span> <span class="kn">import</span> <span class="n">create_engine_wrapper</span>
+    <span class="kn">from</span> <span class="nn">llama_index.core.indices.base</span> <span class="kn">import</span> <span class="n">BaseIndex</span>
+
     <span class="kn">from</span> <span class="nn">mlflow.llama_index.serialize_objects</span> <span class="kn">import</span> <span class="n">serialize_settings</span>
 
-    <span class="n">_validate_engine_type</span><span class="p">(</span><span class="n">engine_type</span><span class="p">)</span>
-    <span class="n">_validate_index</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
-    <span class="n">_validate_env_arguments</span><span class="p">(</span><span class="n">conda_env</span><span class="p">,</span> <span class="n">pip_requirements</span><span class="p">,</span> <span class="n">extra_pip_requirements</span><span class="p">)</span>
+    <span class="c1"># TODO: make this logic cleaner and maybe a util</span>
+    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">temp_dir</span><span class="p">:</span>
+        <span class="n">model_or_code_path</span> <span class="o">=</span> <span class="n">_validate_and_prepare_llama_index_model_or_path</span><span class="p">(</span>
+            <span class="n">llama_index_model</span><span class="p">,</span> <span class="n">temp_dir</span>
+        <span class="p">)</span>
 
-    <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-    <span class="n">_validate_and_prepare_target_save_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">_validate_env_arguments</span><span class="p">(</span><span class="n">conda_env</span><span class="p">,</span> <span class="n">pip_requirements</span><span class="p">,</span> <span class="n">extra_pip_requirements</span><span class="p">)</span>
+
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">_validate_and_prepare_target_save_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+        <span class="n">model_code_path</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_or_code_path</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">model_code_path</span> <span class="o">=</span> <span class="n">model_or_code_path</span>
+            <span class="n">llama_index_model</span> <span class="o">=</span> <span class="n">_load_model_code_path</span><span class="p">(</span><span class="n">model_code_path</span><span class="p">,</span> <span class="n">model_config</span><span class="p">)</span>
+            <span class="n">_validate_and_copy_file_to_directory</span><span class="p">(</span><span class="n">model_code_path</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="s2">&quot;code&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Warn when user provides `engine_type` argument while saving an engine directly</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">llama_index_model</span><span class="p">,</span> <span class="n">BaseIndex</span><span class="p">)</span> <span class="ow">and</span> <span class="n">engine_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;The `engine_type` argument is ignored when saving an engine.&quot;</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_or_code_path</span><span class="p">,</span> <span class="n">BaseIndex</span><span class="p">):</span>
+            <span class="n">_validate_engine_type</span><span class="p">(</span><span class="n">engine_type</span><span class="p">)</span>
+            <span class="n">llama_index_model</span> <span class="o">=</span> <span class="n">model_or_code_path</span>
+
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_or_code_path</span><span class="p">,</span> <span class="n">_supported_classes</span><span class="p">()):</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
+                <span class="s2">&quot;Saving an engine object is only supported in the &#39;Model-from-Code&#39; saving mode. &quot;</span>
+                <span class="s2">&quot;The legacy serialization method is exclusively for saving index objects. Please &quot;</span>
+                <span class="s2">&quot;pass the path to the script containing the engine definition to save an engine &quot;</span>
+                <span class="s2">&quot;object. For more information, see &quot;</span>
+                <span class="s2">&quot;https://www.mlflow.org/docs/latest/model/models-from-code.html&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
     <span class="n">code_dir_subpath</span> <span class="o">=</span> <span class="n">_validate_and_copy_code_paths</span><span class="p">(</span><span class="n">code_paths</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">mlflow_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -354,7 +401,7 @@
     <span class="n">saved_example</span> <span class="o">=</span> <span class="n">_save_example</span><span class="p">(</span><span class="n">mlflow_model</span><span class="p">,</span> <span class="n">input_example</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">signature</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">saved_example</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">wrapped_model</span> <span class="o">=</span> <span class="n">create_engine_wrapper</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">engine_type</span><span class="p">,</span> <span class="n">model_config</span><span class="p">)</span>
+        <span class="n">wrapped_model</span> <span class="o">=</span> <span class="n">create_engine_wrapper</span><span class="p">(</span><span class="n">llama_index_model</span><span class="p">,</span> <span class="n">engine_type</span><span class="p">,</span> <span class="n">model_config</span><span class="p">)</span>
         <span class="n">signature</span> <span class="o">=</span> <span class="n">_infer_signature_from_input_example</span><span class="p">(</span><span class="n">saved_example</span><span class="p">,</span> <span class="n">wrapped_model</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">signature</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
         <span class="n">signature</span> <span class="o">=</span> <span class="kc">None</span>
@@ -373,7 +420,9 @@
     <span class="n">settings_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">_SETTINGS_FILE</span><span class="p">)</span>
     <span class="n">serialize_settings</span><span class="p">(</span><span class="n">settings_path</span><span class="p">)</span>
 
-    <span class="n">_save_index</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+    <span class="c1"># Do not save the index/engine object in model-from-code saving mode</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_code_path</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">llama_index_model</span><span class="p">,</span> <span class="n">BaseIndex</span><span class="p">):</span>
+        <span class="n">_save_index</span><span class="p">(</span><span class="n">llama_index_model</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
 
     <span class="n">pyfunc</span><span class="o">.</span><span class="n">add_to_model</span><span class="p">(</span>
         <span class="n">mlflow_model</span><span class="p">,</span>
@@ -381,6 +430,7 @@
         <span class="n">conda_env</span><span class="o">=</span><span class="n">_CONDA_ENV_FILE_NAME</span><span class="p">,</span>
         <span class="n">python_env</span><span class="o">=</span><span class="n">_PYTHON_ENV_FILE_NAME</span><span class="p">,</span>
         <span class="n">code</span><span class="o">=</span><span class="n">code_dir_subpath</span><span class="p">,</span>
+        <span class="n">model_code_path</span><span class="o">=</span><span class="n">model_code_path</span><span class="p">,</span>
         <span class="n">model_config</span><span class="o">=</span><span class="n">model_config</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">mlflow_model</span><span class="o">.</span><span class="n">add_flavor</span><span class="p">(</span>
@@ -426,9 +476,9 @@
 <span class="nd">@format_docstring</span><span class="p">(</span><span class="n">LOG_MODEL_PARAM_DOCS</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">package_name</span><span class="o">=</span><span class="n">FLAVOR_NAME</span><span class="p">))</span>
 <span class="nd">@trace_disabled</span>  <span class="c1"># Suppress traces while loading model</span>
 <span class="k">def</span> <span class="nf">log_model</span><span class="p">(</span>
-    <span class="n">index</span><span class="p">,</span>
+    <span class="n">llama_index_model</span><span class="p">,</span>
     <span class="n">artifact_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">engine_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">engine_type</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">model_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">code_paths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">registered_model_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -442,13 +492,15 @@
     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Log a LlamaIndex index as an MLflow artifact for the current run.</span>
+<span class="sd">    Log a LlamaIndex model as an MLflow artifact for the current run.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        index: LlamaIndex index to be saved.</span>
+<span class="sd">        llama_index_model: An LlamaIndex object to be saved, or a string representing the path to</span>
+<span class="sd">            a script contains LlamaIndex index/engine definition.</span>
 <span class="sd">        artifact_path: Local path where the serialized model (as YAML) is to be saved.</span>
-<span class="sd">        engine_type: Determine the inference interface for the index when loaded as a pyfunc</span>
-<span class="sd">            model. The supported types are as follows:</span>
+<span class="sd">        engine_type: Required when saving an index object to determine the inference interface</span>
+<span class="sd">            for the index when loaded as a pyfunc model. This field is **not** required when</span>
+<span class="sd">            saving an engine directly. The supported types are as follows:</span>
 
 <span class="sd">            - ``&quot;chat&quot;``: load the index as an instance of the LlamaIndex</span>
 <span class="sd">              `ChatEngine &lt;https://docs.llamaindex.ai/en/stable/module_guides/deploying/chat_engines/&gt;`_.</span>
@@ -487,7 +539,7 @@
         <span class="n">model_config</span><span class="o">=</span><span class="n">model_config</span><span class="p">,</span>
         <span class="n">flavor</span><span class="o">=</span><span class="n">mlflow</span><span class="o">.</span><span class="n">llama_index</span><span class="p">,</span>
         <span class="n">registered_model_name</span><span class="o">=</span><span class="n">registered_model_name</span><span class="p">,</span>
-        <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span>
+        <span class="n">llama_index_model</span><span class="o">=</span><span class="n">llama_index_model</span><span class="p">,</span>
         <span class="n">conda_env</span><span class="o">=</span><span class="n">conda_env</span><span class="p">,</span>
         <span class="n">code_paths</span><span class="o">=</span><span class="n">code_paths</span><span class="p">,</span>
         <span class="n">signature</span><span class="o">=</span><span class="n">signature</span><span class="p">,</span>
@@ -500,14 +552,19 @@
     <span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">_validate_index</span><span class="p">(</span><span class="n">index</span><span class="p">):</span>
-    <span class="kn">from</span> <span class="nn">llama_index.core.indices.base</span> <span class="kn">import</span> <span class="n">BaseIndex</span>
+<span class="k">def</span> <span class="nf">_validate_and_prepare_llama_index_model_or_path</span><span class="p">(</span><span class="n">llama_index_model</span><span class="p">,</span> <span class="n">temp_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">llama_index_model</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_validate_and_get_model_code_path</span><span class="p">(</span><span class="n">llama_index_model</span><span class="p">,</span> <span class="n">temp_dir</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">BaseIndex</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">llama_index_model</span><span class="p">,</span> <span class="n">_supported_classes</span><span class="p">()):</span>
+        <span class="n">supported_cls_names</span> <span class="o">=</span> <span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span> <span class="k">for</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="n">_supported_classes</span><span class="p">()]</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
-            <span class="n">message</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;The provided object of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> is not a valid &quot;</span>
-            <span class="s2">&quot;index. MLflow llama-index flavor only supports saving LlamaIndex indices.&quot;</span>
+            <span class="n">message</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;The provided object of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">llama_index_model</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> is not &quot;</span>
+            <span class="s2">&quot;supported. MLflow llama-index flavor only supports saving LlamaIndex objects &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;subclassed from one of the following classes: </span><span class="si">{</span><span class="n">supported_cls_names</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span>
         <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">llama_index_model</span>
 
 
 <span class="k">def</span> <span class="nf">_save_index</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
@@ -516,22 +573,34 @@
     <span class="n">index</span><span class="o">.</span><span class="n">storage_context</span><span class="o">.</span><span class="n">persist</span><span class="p">(</span><span class="n">persist_dir</span><span class="o">=</span><span class="n">index_path</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_load_index</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">flavor_conf</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Deserialize the index.&quot;&quot;&quot;</span>
+<span class="k">def</span> <span class="nf">_load_llama_model</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">flavor_conf</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load the LlamaIndex index or engine from either model code or serialized index.&quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">llama_index.core</span> <span class="kn">import</span> <span class="n">StorageContext</span><span class="p">,</span> <span class="n">load_index_from_storage</span>
 
     <span class="n">_add_code_from_conf_to_system_path</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">flavor_conf</span><span class="p">)</span>
 
-    <span class="n">index_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">_INDEX_PERSIST_FOLDER</span><span class="p">)</span>
-    <span class="n">storage_context</span> <span class="o">=</span> <span class="n">StorageContext</span><span class="o">.</span><span class="n">from_defaults</span><span class="p">(</span><span class="n">persist_dir</span><span class="o">=</span><span class="n">index_path</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">load_index_from_storage</span><span class="p">(</span><span class="n">storage_context</span><span class="p">)</span>
+    <span class="c1"># Handle model-from-code</span>
+    <span class="n">pyfunc_flavor_conf</span> <span class="o">=</span> <span class="n">_get_flavor_configuration</span><span class="p">(</span><span class="n">model_path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">flavor_name</span><span class="o">=</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">FLAVOR_NAME</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">model_code_path</span> <span class="o">:=</span> <span class="n">pyfunc_flavor_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">MODEL_CODE_PATH</span><span class="p">):</span>
+        <span class="c1"># TODO: The code path saved in the MLModel file is the local absolute path to the code</span>
+        <span class="c1"># file when it is saved. We should update the relative path in artifact directory.</span>
+        <span class="n">model_code_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">path</span><span class="p">,</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">model_code_path</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">_load_model_code_path</span><span class="p">(</span><span class="n">model_code_path</span><span class="p">,</span> <span class="n">flavor_conf</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Use default vector store when loading from the serialized index</span>
+        <span class="n">index_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">_INDEX_PERSIST_FOLDER</span><span class="p">)</span>
+        <span class="n">storage_context</span> <span class="o">=</span> <span class="n">StorageContext</span><span class="o">.</span><span class="n">from_defaults</span><span class="p">(</span><span class="n">persist_dir</span><span class="o">=</span><span class="n">index_path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">load_index_from_storage</span><span class="p">(</span><span class="n">storage_context</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="load_model"><a class="viewcode-back" href="../../python_api/mlflow.llama_index.html#mlflow.llama_index.load_model">[docs]</a><span class="nd">@experimental</span>
 <span class="nd">@trace_disabled</span>  <span class="c1"># Suppress traces while loading model</span>
 <span class="k">def</span> <span class="nf">load_model</span><span class="p">(</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">dst_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Load a LlamaIndex index from a local file or a run.</span>
+<span class="sd">    Load a LlamaIndex index or engine from a local file or a run.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        model_uri: The location, in URI format, of the MLflow model. For example:</span>
@@ -560,7 +629,7 @@
     <span class="n">settings_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">,</span> <span class="n">_SETTINGS_FILE</span><span class="p">)</span>
     <span class="c1"># NB: Settings is a singleton and can be loaded via llama_index.core.Settings</span>
     <span class="n">deserialize_settings</span><span class="p">(</span><span class="n">settings_path</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">_load_index</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">,</span> <span class="n">flavor_conf</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">_load_llama_model</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">,</span> <span class="n">flavor_conf</span><span class="p">)</span></div>
 
 
 <span class="k">def</span> <span class="nf">_load_pyfunc</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">model_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
@@ -568,7 +637,7 @@
 
     <span class="n">index</span> <span class="o">=</span> <span class="n">load_model</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
     <span class="n">flavor_conf</span> <span class="o">=</span> <span class="n">_get_flavor_configuration</span><span class="p">(</span><span class="n">model_path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">flavor_name</span><span class="o">=</span><span class="n">FLAVOR_NAME</span><span class="p">)</span>
-    <span class="n">engine_type</span> <span class="o">=</span> <span class="n">flavor_conf</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;engine_type&quot;</span><span class="p">)</span>
+    <span class="n">engine_type</span> <span class="o">=</span> <span class="n">flavor_conf</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;engine_type&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># Not present when saving an engine object</span>
     <span class="k">return</span> <span class="n">create_engine_wrapper</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">engine_type</span><span class="p">,</span> <span class="n">model_config</span><span class="p">)</span>
 
 
@@ -583,9 +652,8 @@
 <span class="sd">    only supports autologging for tracing.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        log_traces: If ``True``, traces are logged for Langchain models by using</span>
-<span class="sd">            MlflowLangchainTracer as a callback during inference. If ``False``, no traces are</span>
-<span class="sd">            collected during inference. Default to ``True``.</span>
+<span class="sd">        log_traces: If ``True``, traces are logged for LlamaIndex models by using. If ``False``,</span>
+<span class="sd">            no traces are collected during inference. Default to ``True``.</span>
 <span class="sd">        disable: If ``True``, disables the LlamaIndex autologging integration. If ``False``,</span>
 <span class="sd">            enables the LlamaIndex autologging integration.</span>
 <span class="sd">        silent: If ``True``, suppress all event logs and warnings from MLflow during LlamaIndex</span>

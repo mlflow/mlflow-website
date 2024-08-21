@@ -1842,12 +1842,10 @@
     <span class="k">return</span> <span class="n">output_code</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
 
 
-<span class="c1"># Convert llm input data:</span>
-<span class="c1"># numpy array is not json serializable, so we convert it to list</span>
-<span class="c1"># then send it to the model</span>
 <span class="k">def</span> <span class="nf">_convert_llm_ndarray_to_list</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
-    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert numpy array in the input data to list, because numpy array is not json serializable.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
@@ -1857,10 +1855,18 @@
     <span class="k">return</span> <span class="n">data</span>
 
 
-<span class="k">def</span> <span class="nf">_convert_llm_input_data</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
-    <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="k">def</span> <span class="nf">_convert_llm_input_data</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert input data to a format that can be passed to the model with GenAI flavors such as</span>
+<span class="sd">    LangChain and LLamaIndex.</span>
 
-    <span class="c1"># This handles spark_udf inputs and input_example inputs</span>
+<span class="sd">    Args</span>
+<span class="sd">        data: Input data to be converted. We assume it is a single request payload, but it can be</span>
+<span class="sd">            in any format such as a single scalar value, a dictionary, list (with one element),</span>
+<span class="sd">            Pandas DataFrame, etc.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># This handles pyfunc / spark_udf inputs with model signature. Schema enforcement convert</span>
+    <span class="c1"># the input data to pandas DataFrame, so we convert it back.</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
         <span class="c1"># if the data only contains a single key as 0, we assume the input</span>
         <span class="c1"># is either a string or list of strings</span>

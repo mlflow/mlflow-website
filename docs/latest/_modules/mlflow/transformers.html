@@ -1369,14 +1369,6 @@
     <span class="k">if</span> <span class="n">framework</span> <span class="o">:=</span> <span class="n">flavor_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">FlavorKey</span><span class="o">.</span><span class="n">FRAMEWORK</span><span class="p">):</span>
         <span class="n">conf</span><span class="p">[</span><span class="s2">&quot;framework&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">framework</span>
 
-    <span class="k">if</span> <span class="n">device</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">MLFLOW_DEFAULT_PREDICTION_DEVICE</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">device</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">MLFLOW_DEFAULT_PREDICTION_DEVICE</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
-            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-                <span class="n">device</span> <span class="o">=</span> <span class="n">_TRANSFORMERS_DEFAULT_CPU_DEVICE_ID</span>
-        <span class="k">elif</span> <span class="n">is_gpu_available</span><span class="p">():</span>
-            <span class="n">device</span> <span class="o">=</span> <span class="n">_TRANSFORMERS_DEFAULT_GPU_DEVICE_ID</span>
     <span class="c1"># Note that we don&#39;t set the device in the conf yet because device is</span>
     <span class="c1"># incompatible with device_map.</span>
     <span class="n">accelerate_model_conf</span> <span class="o">=</span> <span class="p">{}</span>
@@ -1385,7 +1377,23 @@
         <span class="n">conf</span><span class="p">[</span><span class="s2">&quot;device_map&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">device_map_strategy</span>
         <span class="n">accelerate_model_conf</span><span class="p">[</span><span class="s2">&quot;device_map&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">device_map_strategy</span>
         <span class="c1"># Cannot use device with device_map</span>
+        <span class="k">if</span> <span class="n">device</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
+                <span class="s2">&quot;The environment variable MLFLOW_HUGGINGFACE_USE_DEVICE_MAP is set to True, but &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;the `device` argument is provided with value </span><span class="si">{</span><span class="n">device</span><span class="si">}</span><span class="s2">. The device_map and &quot;</span>
+                <span class="s2">&quot;`device` argument cannot be used together. Set MLFLOW_HUGGINGFACE_USE_DEVICE_MAP &quot;</span>
+                <span class="s2">&quot;to False to specify a particular device ID, or pass None for the `device` &quot;</span>
+                <span class="s2">&quot;argument to use device_map.&quot;</span>
+            <span class="p">)</span>
         <span class="n">device</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">elif</span> <span class="n">device</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">MLFLOW_DEFAULT_PREDICTION_DEVICE</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">device</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">MLFLOW_DEFAULT_PREDICTION_DEVICE</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="n">device</span> <span class="o">=</span> <span class="n">_TRANSFORMERS_DEFAULT_CPU_DEVICE_ID</span>
+        <span class="k">elif</span> <span class="n">is_gpu_available</span><span class="p">():</span>
+            <span class="n">device</span> <span class="o">=</span> <span class="n">_TRANSFORMERS_DEFAULT_GPU_DEVICE_ID</span>
 
     <span class="k">if</span> <span class="n">device</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">conf</span><span class="p">[</span><span class="s2">&quot;device&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">device</span>

@@ -308,10 +308,6 @@ curl<span class="w"> </span>-L<span class="w"> </span>https://raw.githubusercont
 <span class="n">index</span> <span class="o">=</span> <span class="n">VectorStoreIndex</span><span class="o">.</span><span class="n">from_documents</span><span class="p">(</span><span class="n">documents</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Currently, MLflow LlamaIndex flavor only support logging and loading the index with the default in-memory vector store. The support for external vector stores such as <code class="docutils literal notranslate"><span class="pre">FaissVectorStore</span></code> and <code class="docutils literal notranslate"><span class="pre">DatabricksVectorSearch</span></code> will be added in future releases.</p>
-</div>
 </div>
 <div class="section" id="logging-the-index-to-mlflow">
 <h4>Logging the Index to MLflow<a class="headerlink" href="#logging-the-index-to-mlflow" title="Permalink to this headline"> </a></h4>
@@ -336,6 +332,13 @@ but dictates the interface of how you query the index when you load it back for 
         <span class="n">input_example</span><span class="o">=</span><span class="s2">&quot;What did the author do growing up?&quot;</span><span class="p">,</span>
     <span class="p">)</span>
 </pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The above code snippet passes the index object directly to the <code class="docutils literal notranslate"><span class="pre">log_model</span></code> function.
+This method only works with the default <code class="docutils literal notranslate"><span class="pre">SimpleVectorStore</span></code> vector store, which
+simply keeps the embedded documents in memory. If your index uses <strong>external vector stores</strong> such as <code class="docutils literal notranslate"><span class="pre">QdrantVectorStore</span></code> or <code class="docutils literal notranslate"><span class="pre">DatabricksVectorSearch</span></code>, you can use the Model-from-Code
+logging method. See the <a class="reference external" href="#how-to-log-an-index-with-external-vector-stores">How to log an index with external vector stores</a> for more details.</p>
 </div>
 <div class="figure align-center">
 <a class="reference internal image-reference" href="../../_images/llama-index-artifacts.png"><img alt="MLflow artifacts for the LlamaIndex index" src="../../_images/llama-index-artifacts.png" style="width: 80%;" /></a>
@@ -400,6 +403,53 @@ support the combination of async and streaming, such as the <code class="docutil
 </div>
 <div class="section" id="faq">
 <h2>FAQ<a class="headerlink" href="#faq" title="Permalink to this headline"> </a></h2>
+<div class="section" id="how-to-log-and-load-an-index-with-external-vector-stores">
+<h3>How to log and load an index with external vector stores?<a class="headerlink" href="#how-to-log-and-load-an-index-with-external-vector-stores" title="Permalink to this headline"> </a></h3>
+<p>If your index uses the default <code class="docutils literal notranslate"><span class="pre">SimpleVectorStore</span></code>, you can log the index directly to MLflow using the <a class="reference internal" href="../../python_api/mlflow.llama_index.html#mlflow.llama_index.log_model" title="mlflow.llama_index.log_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.llama_index.log_model()</span></code></a> function. MLflow persists the in-memory index data (embedded documents) to MLflow artifact store, which allows loading the index back with the same data without re-indexing the documents.</p>
+<p>However, when the index uses external vector stores like <code class="docutils literal notranslate"><span class="pre">DatabricksVectorSearch</span></code> and <code class="docutils literal notranslate"><span class="pre">QdrantVectorStore</span></code>, the index data is stored remotely and they do not support local serialization. Thereby, you cannot log the index with these stores directly. For such cases, you can use the <a class="reference external" href="../../../models.html#models-from-code">Model-from-Code</a> logging that provides more control over the index saving process and allow you to use the external vector store.</p>
+<p>To use model-from-code logging, you first need to create a separate Python file that defines the index. If you are on Jupyter notebook, you can use the <code class="docutils literal notranslate"><span class="pre">%%writefile</span></code> magic command to save the cell code to a Python file.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">writefile</span> <span class="n">index</span><span class="o">.</span><span class="n">py</span>
+
+<span class="c1"># Create Qdrant client with your own settings.</span>
+<span class="n">client</span> <span class="o">=</span> <span class="n">qdrant_client</span><span class="o">.</span><span class="n">QdrantClient</span><span class="p">(</span>
+    <span class="n">host</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span><span class="p">,</span>
+    <span class="n">port</span><span class="o">=</span><span class="mi">6333</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Here we simply load vector store from the existing collection to avoid</span>
+<span class="c1"># re-indexing documents, because this Python file is executed every time</span>
+<span class="c1"># when the model is loaded. If you don&#39;t have an existing collection, create</span>
+<span class="c1"># a new one by following the official tutorial:</span>
+<span class="c1"># https://docs.llamaindex.ai/en/stable/examples/vector_stores/QdrantIndexDemo/</span>
+<span class="n">vector_store</span> <span class="o">=</span> <span class="n">QdrantVectorStore</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">collection_name</span><span class="o">=</span><span class="s2">&quot;my_collection&quot;</span><span class="p">)</span>
+<span class="n">index</span> <span class="o">=</span> <span class="n">VectorStoreIndex</span><span class="o">.</span><span class="n">from_vector_store</span><span class="p">(</span><span class="n">vector_store</span><span class="o">=</span><span class="n">vector_store</span><span class="p">)</span>
+
+<span class="c1"># IMPORTANT: call set_model() method to tell MLflow to log this index</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">set_model</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Then you can log the index by passing the Python file path to the <a class="reference internal" href="../../python_api/mlflow.llama_index.html#mlflow.llama_index.log_model" title="mlflow.llama_index.log_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.llama_index.log_model()</span></code></a> function. The global <a class="reference external" href="https://docs.llamaindex.ai/en/stable/module_guides/supporting_modules/settings/">Settings</a> object is saved normally as part of the model.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="n">model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">llama_index</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+        <span class="s2">&quot;index.py&quot;</span><span class="p">,</span>
+        <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;index&quot;</span><span class="p">,</span>
+        <span class="n">engine_type</span><span class="o">=</span><span class="s2">&quot;query&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<p>The logged index can be loaded back using the <a class="reference internal" href="../../python_api/mlflow.llama_index.html#mlflow.llama_index.load_model" title="mlflow.llama_index.load_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.llama_index.load_model()</span></code></a> or <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.load_model" title="mlflow.pyfunc.load_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.pyfunc.load_model()</span></code></a> function, in the same way as with the local index.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">index</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">llama_index</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
+<span class="n">index</span><span class="o">.</span><span class="n">as_query_engine</span><span class="p">()</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;What is MLflow?&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The object that is passed to the <code class="docutils literal notranslate"><span class="pre">set_model()</span></code> method must be a LlamaIndex index that is compatible with the engine type specified during logging. More
+objects support will be added in the future releases.</p>
+</div>
+</div>
 <div class="section" id="i-have-an-index-logged-with-query-engine-type-can-i-load-it-back-a-chat-engine">
 <h3>I have an index logged with <code class="docutils literal notranslate"><span class="pre">query</span></code> engine type. Can I load it back a <code class="docutils literal notranslate"><span class="pre">chat</span></code> engine?<a class="headerlink" href="#i-have-an-index-logged-with-query-engine-type-can-i-load-it-back-a-chat-engine" title="Permalink to this headline"> </a></h3>
 <p>While it is not possible to update the engine type of the logged model in-place,
