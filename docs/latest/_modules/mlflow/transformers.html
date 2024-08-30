@@ -1387,10 +1387,15 @@
             <span class="p">)</span>
         <span class="n">device</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">elif</span> <span class="n">device</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">MLFLOW_DEFAULT_PREDICTION_DEVICE</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">device_value</span> <span class="o">:=</span> <span class="n">MLFLOW_DEFAULT_PREDICTION_DEVICE</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">device</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">MLFLOW_DEFAULT_PREDICTION_DEVICE</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+                <span class="n">device</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">device_value</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Invalid value for </span><span class="si">{</span><span class="n">MLFLOW_DEFAULT_PREDICTION_DEVICE</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">device_value</span><span class="si">}</span><span class="s2">. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">MLFLOW_DEFAULT_PREDICTION_DEVICE</span><span class="si">}</span><span class="s2"> value must be an integer. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Setting to: </span><span class="si">{</span><span class="n">_TRANSFORMERS_DEFAULT_CPU_DEVICE_ID</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="p">)</span>
                 <span class="n">device</span> <span class="o">=</span> <span class="n">_TRANSFORMERS_DEFAULT_CPU_DEVICE_ID</span>
         <span class="k">elif</span> <span class="n">is_gpu_available</span><span class="p">():</span>
             <span class="n">device</span> <span class="o">=</span> <span class="n">_TRANSFORMERS_DEFAULT_GPU_DEVICE_ID</span>

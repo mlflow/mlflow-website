@@ -238,6 +238,8 @@ subject to change, and new features may be added as the flavor evolves.</p>
 resource for understanding and leveraging the combined capabilities of LangChain and MLflow in developing advanced language model applications.</p>
 <p><a class="reference external" href="https://www.langchain.com/">LangChain</a> is a versatile framework designed for building applications powered by language models. It excels in creating context-aware applications
 that utilize language models for reasoning and generating responses, enabling the development of sophisticated NLP applications.</p>
+<p><a class="reference external" href="https://langchain-ai.github.io/langgraph/">LangGraph</a> is a complementary agent-based framework from the creators of Langchain, supporting the creation of
+stateful agent and multi-agent GenAI applications. LangGraph utilizes LangChain in order to interface with GenAI agent components.</p>
 <div class="section" id="why-use-mlflow-with-langchain">
 <h2>Why use MLflow with LangChain?<a class="headerlink" href="#why-use-mlflow-with-langchain" title="Permalink to this headline"> </a></h2>
 <p>Aside from the benefits of using MLflow for managing and deploying machine learning models, the integration of LangChain with MLflow provides a number of
@@ -528,6 +530,69 @@ After having this set within your code that defines your chain, when logging you
 </div></blockquote>
 </li>
 </ul>
+</div>
+<div class="section" id="how-can-i-log-an-agent-built-with-langgraph-to-mlflow">
+<h3>How can I log an agent built with LangGraph to MLflow?<a class="headerlink" href="#how-can-i-log-an-agent-built-with-langgraph-to-mlflow" title="Permalink to this headline"> </a></h3>
+<p>The LangGraph integration with MLflow is designed to utilize the <a class="reference external" href="../../model/models-from-code.html">Models From Code feature</a>
+in MLflow to broaden and simplify the support of agent serialization.</p>
+<p>To log a LangGraph agent, you can define your agent code within a script, as shown below, saved to a file <code class="docutils literal notranslate"><span class="pre">langgraph.py</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Literal</span>
+
+<span class="kn">from</span> <span class="nn">langchain_core.tools</span> <span class="kn">import</span> <span class="n">tool</span>
+<span class="kn">from</span> <span class="nn">langchain_openai</span> <span class="kn">import</span> <span class="n">ChatOpenAI</span>
+<span class="kn">from</span> <span class="nn">langgraph.prebuilt</span> <span class="kn">import</span> <span class="n">create_react_agent</span>
+
+<span class="kn">import</span> <span class="nn">mlflow</span>
+
+
+<span class="nd">@tool</span>
+<span class="k">def</span> <span class="nf">get_weather</span><span class="p">(</span><span class="n">city</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;seattle&quot;</span><span class="p">,</span> <span class="s2">&quot;sf&quot;</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Use this to get weather information.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">city</span> <span class="o">==</span> <span class="s2">&quot;seattle&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;It&#39;s probably raining. Again.&quot;</span>
+    <span class="k">elif</span> <span class="n">city</span> <span class="o">==</span> <span class="s2">&quot;sf&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;It&#39;s always sunny in sf&quot;</span>
+
+
+<span class="n">llm</span> <span class="o">=</span> <span class="n">ChatOpenAI</span><span class="p">()</span>
+<span class="n">tools</span> <span class="o">=</span> <span class="p">[</span><span class="n">get_weather</span><span class="p">]</span>
+<span class="n">graph</span> <span class="o">=</span> <span class="n">create_react_agent</span><span class="p">(</span><span class="n">llm</span><span class="p">,</span> <span class="n">tools</span><span class="p">)</span>
+
+<span class="c1"># specify the Agent as the model interface to be loaded when executing the script</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">set_model</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>When you’re ready to log this agent script definition to MLflow, you can refer to
+this saved script directly when defining the model:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="n">input_example</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;what is the weather in seattle today?&quot;</span><span class="p">}]</span>
+<span class="p">}</span>
+
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="n">model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">langchain</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+        <span class="n">lc_model</span><span class="o">=</span><span class="s2">&quot;./langgraph.py&quot;</span><span class="p">,</span>  <span class="c1"># specify the path to the LangGraph agent script definition</span>
+        <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;langgraph&quot;</span><span class="p">,</span>
+        <span class="n">input_example</span><span class="o">=</span><span class="n">input_example</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<p>When the agent is loaded from MLflow, the script will be executed and the defined agent will be
+made available for use for invocation.</p>
+<p>The agent can be loaded and used for inference as follows:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">agent</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">langchain</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
+<span class="n">query</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;Should I bring an umbrella today when I go to work in San Francisco?&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+<span class="n">agent</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 </div>
 </div>

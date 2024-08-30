@@ -217,7 +217,9 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">VECTOR_SEARCH_INDEX</span> <span class="o">=</span> <span class="s2">&quot;vector_search_index&quot;</span>
-    <span class="n">SERVING_ENDPOINT</span> <span class="o">=</span> <span class="s2">&quot;serving_endpoint&quot;</span></div>
+    <span class="n">SERVING_ENDPOINT</span> <span class="o">=</span> <span class="s2">&quot;serving_endpoint&quot;</span>
+    <span class="n">SQL_WAREHOUSE</span> <span class="o">=</span> <span class="s2">&quot;sql_warehouse&quot;</span>
+    <span class="n">FUNCTION</span> <span class="o">=</span> <span class="s2">&quot;function&quot;</span></div>
 
 
 <div class="viewcode-block" id="Resource"><a class="viewcode-back" href="../../../python_api/mlflow.models.html#mlflow.models.Resource">[docs]</a><span class="nd">@dataclass</span>
@@ -298,11 +300,53 @@
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">index_name</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
 
 
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">DatabricksSQLWarehouse</span><span class="p">(</span><span class="n">DatabricksResource</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Define Databricks sql warehouse resource to serve a model.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        warehouse_id (str): The id of the sql warehouse used by the model</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nb">type</span><span class="p">:</span> <span class="n">ResourceType</span> <span class="o">=</span> <span class="n">ResourceType</span><span class="o">.</span><span class="n">SQL_WAREHOUSE</span>
+    <span class="n">warehouse_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">value</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">warehouse_id</span><span class="p">}]}</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">warehouse_id</span> <span class="k">else</span> <span class="p">{}</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">warehouse_id</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
+
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">DatabricksFunction</span><span class="p">(</span><span class="n">DatabricksResource</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Define Databricks UC Function to serve a model.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        function_name (str): The name of the function used by the model</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nb">type</span><span class="p">:</span> <span class="n">ResourceType</span> <span class="o">=</span> <span class="n">ResourceType</span><span class="o">.</span><span class="n">FUNCTION</span>
+    <span class="n">function_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">value</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">function_name</span><span class="p">}]}</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">function_name</span> <span class="k">else</span> <span class="p">{}</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">function_name</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
+
+
 <span class="k">def</span> <span class="nf">_get_resource_class_by_type</span><span class="p">(</span><span class="n">target_uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">resource_type</span><span class="p">:</span> <span class="n">ResourceType</span><span class="p">):</span>
     <span class="n">resource_classes</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;databricks&quot;</span><span class="p">:</span> <span class="p">{</span>
             <span class="n">ResourceType</span><span class="o">.</span><span class="n">SERVING_ENDPOINT</span><span class="o">.</span><span class="n">value</span><span class="p">:</span> <span class="n">DatabricksServingEndpoint</span><span class="p">,</span>
             <span class="n">ResourceType</span><span class="o">.</span><span class="n">VECTOR_SEARCH_INDEX</span><span class="o">.</span><span class="n">value</span><span class="p">:</span> <span class="n">DatabricksVectorSearchIndex</span><span class="p">,</span>
+            <span class="n">ResourceType</span><span class="o">.</span><span class="n">SQL_WAREHOUSE</span><span class="o">.</span><span class="n">value</span><span class="p">:</span> <span class="n">DatabricksSQLWarehouse</span><span class="p">,</span>
+            <span class="n">ResourceType</span><span class="o">.</span><span class="n">FUNCTION</span><span class="o">.</span><span class="n">value</span><span class="p">:</span> <span class="n">DatabricksFunction</span><span class="p">,</span>
         <span class="p">}</span>
     <span class="p">}</span>
     <span class="n">resource</span> <span class="o">=</span> <span class="n">resource_classes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">target_uri</span><span class="p">)</span>

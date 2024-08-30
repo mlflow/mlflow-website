@@ -2111,56 +2111,76 @@ Peyton Manning’s Wikipedia page for several years. A sample of the dataset is 
 </table>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">prophet</span> <span class="kn">import</span> <span class="n">Prophet</span>
+<span class="kn">from</span> <span class="nn">prophet</span> <span class="kn">import</span> <span class="n">Prophet</span><span class="p">,</span> <span class="n">serialize</span>
 <span class="kn">from</span> <span class="nn">prophet.diagnostics</span> <span class="kn">import</span> <span class="n">cross_validation</span><span class="p">,</span> <span class="n">performance_metrics</span>
 
 <span class="kn">import</span> <span class="nn">mlflow</span>
 <span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">infer_signature</span>
 
-<span class="c1"># starts on 2007-12-10, ends on 2016-01-20</span>
-<span class="n">train_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
-    <span class="s2">&quot;https://raw.githubusercontent.com/facebook/prophet/main/examples/example_wp_log_peyton_manning.csv&quot;</span>
-<span class="p">)</span>
+<span class="c1"># URL to the dataset</span>
+<span class="n">SOURCE_DATA</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/facebook/prophet/main/examples/example_wp_log_peyton_manning.csv&quot;</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">12345</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">extract_params</span><span class="p">(</span><span class="n">pr_model</span><span class="p">):</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="n">attr</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">pr_model</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span> <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">serialize</span><span class="o">.</span><span class="n">SIMPLE_ATTRIBUTES</span><span class="p">}</span>
+    <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">))}</span>
+
+
+<span class="c1"># Load the training data</span>
+<span class="n">train_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">SOURCE_DATA</span><span class="p">)</span>
 
 <span class="c1"># Create a &quot;test&quot; DataFrame with the &quot;ds&quot; column containing 10 days after the end date in train_df</span>
 <span class="n">test_dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s2">&quot;2016-01-21&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2016-01-31&quot;</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s2">&quot;D&quot;</span><span class="p">)</span>
-<span class="n">test_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">test_dates</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;ds&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
+<span class="n">test_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;ds&quot;</span><span class="p">:</span> <span class="n">test_dates</span><span class="p">})</span>
 
+<span class="c1"># Initialize Prophet model with specific parameters</span>
 <span class="n">prophet_model</span> <span class="o">=</span> <span class="n">Prophet</span><span class="p">(</span><span class="n">changepoint_prior_scale</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">uncertainty_samples</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
 
 <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="c1"># Fit the model on the training data</span>
     <span class="n">prophet_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_df</span><span class="p">)</span>
 
-    <span class="c1"># extract and log parameters such as changepoint_prior_scale in the mlflow run</span>
-    <span class="n">model_params</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="n">name</span><span class="p">:</span> <span class="n">value</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">(</span><span class="n">prophet_model</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-    <span class="p">}</span>
-    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_params</span><span class="p">(</span><span class="n">model_params</span><span class="p">)</span>
+    <span class="c1"># Extract and log model parameters</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="n">extract_params</span><span class="p">(</span><span class="n">prophet_model</span><span class="p">)</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_params</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 
-    <span class="c1"># cross validate with 900 days of data initially, predictions for next 30 days</span>
-    <span class="c1"># walk forward by 30 days</span>
+    <span class="c1"># Perform cross-validation</span>
     <span class="n">cv_results</span> <span class="o">=</span> <span class="n">cross_validation</span><span class="p">(</span>
-        <span class="n">prophet_model</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="s2">&quot;900 days&quot;</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="s2">&quot;30 days&quot;</span><span class="p">,</span> <span class="n">horizon</span><span class="o">=</span><span class="s2">&quot;30 days&quot;</span>
+        <span class="n">prophet_model</span><span class="p">,</span>
+        <span class="n">initial</span><span class="o">=</span><span class="s2">&quot;900 days&quot;</span><span class="p">,</span>
+        <span class="n">period</span><span class="o">=</span><span class="s2">&quot;30 days&quot;</span><span class="p">,</span>
+        <span class="n">horizon</span><span class="o">=</span><span class="s2">&quot;30 days&quot;</span><span class="p">,</span>
+        <span class="n">parallel</span><span class="o">=</span><span class="s2">&quot;threads&quot;</span><span class="p">,</span>
+        <span class="n">disable_tqdm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="c1"># Calculate metrics from cv_results, then average each metric across all backtesting windows and log to mlflow</span>
-    <span class="n">cv_metrics</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;mse&quot;</span><span class="p">,</span> <span class="s2">&quot;rmse&quot;</span><span class="p">,</span> <span class="s2">&quot;mape&quot;</span><span class="p">]</span>
-    <span class="n">metrics_results</span> <span class="o">=</span> <span class="n">performance_metrics</span><span class="p">(</span><span class="n">cv_results</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="n">cv_metrics</span><span class="p">)</span>
-    <span class="n">average_metrics</span> <span class="o">=</span> <span class="n">metrics_results</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">cv_metrics</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+    <span class="c1"># Calculate and log performance metrics</span>
+    <span class="n">cv_metrics</span> <span class="o">=</span> <span class="n">performance_metrics</span><span class="p">(</span><span class="n">cv_results</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;mse&quot;</span><span class="p">,</span> <span class="s2">&quot;rmse&quot;</span><span class="p">,</span> <span class="s2">&quot;mape&quot;</span><span class="p">])</span>
+    <span class="n">average_metrics</span> <span class="o">=</span> <span class="n">cv_metrics</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;horizon&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
     <span class="n">mlflow</span><span class="o">.</span><span class="n">log_metrics</span><span class="p">(</span><span class="n">average_metrics</span><span class="p">)</span>
 
-    <span class="c1"># Calculate model signature</span>
+    <span class="c1"># Generate predictions and infer model signature</span>
     <span class="n">train</span> <span class="o">=</span> <span class="n">prophet_model</span><span class="o">.</span><span class="n">history</span>
-    <span class="n">predictions</span> <span class="o">=</span> <span class="n">prophet_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">prophet_model</span><span class="o">.</span><span class="n">make_future_dataframe</span><span class="p">(</span><span class="mi">30</span><span class="p">))</span>
-    <span class="n">signature</span> <span class="o">=</span> <span class="n">infer_signature</span><span class="p">(</span><span class="n">train</span><span class="p">,</span> <span class="n">predictions</span><span class="p">)</span>
 
+    <span class="c1"># Log the Prophet model with MLflow</span>
     <span class="n">model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">prophet</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
-        <span class="n">prophet_model</span><span class="p">,</span> <span class="s2">&quot;prophet-model&quot;</span><span class="p">,</span> <span class="n">signature</span><span class="o">=</span><span class="n">signature</span>
+        <span class="n">prophet_model</span><span class="p">,</span>
+        <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;prophet_model&quot;</span><span class="p">,</span>
+        <span class="n">input_example</span><span class="o">=</span><span class="n">train</span><span class="p">[[</span><span class="s2">&quot;ds&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>
     <span class="p">)</span>
 
-<span class="c1"># Load saved model</span>
+<span class="c1"># Load the saved model as a pyfunc</span>
 <span class="n">prophet_model_saved</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
+
+<span class="c1"># Generate predictions for the test set</span>
 <span class="n">predictions</span> <span class="o">=</span> <span class="n">prophet_model_saved</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_df</span><span class="p">)</span>
+
+<span class="c1"># Truncate and display the forecast if needed</span>
+<span class="n">forecast</span> <span class="o">=</span> <span class="n">predictions</span><span class="p">[[</span><span class="s2">&quot;ds&quot;</span><span class="p">,</span> <span class="s2">&quot;yhat&quot;</span><span class="p">]]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;forecast:</span><span class="se">\n</span><span class="si">{</span><span class="n">forecast</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Output (<code class="docutils literal notranslate"><span class="pre">Pandas</span> <span class="pre">DataFrame</span></code>):</p>
