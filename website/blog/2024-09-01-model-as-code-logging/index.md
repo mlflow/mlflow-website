@@ -26,17 +26,39 @@ I'll explain the detailed workflow of how to log mode-as-code later in tehe post
 
 ## How Model-as-Code Differs From Model-as-Artifact Logging?
 
-In the previous section, we discussed what is meant by model-as-code logging. In my experience, concepts often become clearer when contrasted with their alternatives—a technique known as _contrast learning_. So, the alternative will be model-as-artifact logging, which is the most commonly used approach for logging models.
+In the previous section, we discussed what is meant by Model-as-Code logging. In my experience, concepts often become clearer when contrasted with their alternatives—a technique known as _contrast learning_. So, the alternative will be Model-as-Artifact logging, which is the most commonly used approach for logging models.
 
-You're probably familiar with the process of writing training code, training a model, and then saving the trained model as an artifact to be reused later by loading it back into your application. This what I refer to here as model-as-artifact logging. In its simplest form, this involves calling the function `mlflow.log_model()`, after which MLflow typically handles the serialization process for you. If you're using a Python-based model, this might involve using Pickle or a similar method under the hood to store the model so it can be easily loaded later.
+You're probably familiar with the process of writing training code, training a model, and then saving the trained model as an artifact to be reused later by loading it back into your application. This what I refer to here as Model-as-Artifact logging. In its simplest form, this involves calling the function `mlflow.log_model()`, after which MLflow typically handles the serialization process for you. If you're using a Python-based model, this might involve using Pickle or a similar method under the hood to store the model so it can be easily loaded later.
 
-The model-as-artifact logging can be broken down into three high-level steps as in the following figure: first, creating the model as an object (whether by training it or acquiring it), second, serializing it (usually with Pickle or a similar tool), and third, logging it as an artifact.
+The Model-as-Artifact logging can be broken down into three high-level steps as in the following figure: first, creating the model as an object (whether by training it or acquiring it), second, serializing it (usually with Pickle or a similar tool), and third, logging it as an artifact.
 
 ![High Level Model-as-Artifact Logging Workflow](model_as_code2.png)
 
-🟢 So, the main distinction between the popular model-as-artifact logging and model-as-code logging is that in the former, we log the model object itself—whether it's a model you've trained or a pre-trained model you've acquired. In the latter, however, we log the code that represents your model. In the model-as-artifact approach, the model exists as an object, which you either create through training or acquire as a pre-trained model.
+🟢 So, the main distinction between the popular Model-as-Artifact logging and Model-as-Code logging is that in the former, we log the model object itself—whether it's a model you've trained or a pre-trained model you've acquired. In the latter, however, we log the code that represents your model. In the Model-as-Artifact approach, the model exists as an object, which you either create through training or acquire as a pre-trained model.
 
 ## When Do You Need Model-as-Code Logging?
+
+I hope by now you have a clear understanding of what Model-as-Code logging is! At the same time, you might be wondering about the specific use cases where you can apply this approach. This section is about that.
+
+While we mentioned GenAI as a motivational use case in the introduction, we also highlighted that MLflow has approached Model-as-Code logging in a more generic way and we will see that in the examples in the next section. This means you can leverage the generalizability of Model-as-Code logging for a wide range of scenarios. I’ve identified three key usage patterns that I believe are particularly relevant:
+
+### 1️⃣ When Your Model Relies on External Services:
+
+This is one of the obvious and common use cases, especially with the rise of modern AI applications. It’s becoming increasingly clear that we are shifting from building AI at the "model" granularity to the "system" granularity.
+
+In other words, AI is no longer just about individual models; it’s about how those models interact within a broader ecosystem. As we become more dependent on external AI services and APIs, the need for Model-as-Code logging becomes more pronounced.
+
+For instance, frameworks like LangChain allow developers to build applications that chain together various AI models and services to perform complex tasks, such as language understanding and information retrieval. In such scenarios, the "model" is not just a set of trained parameters that can be pickled but a system of interconnected services, often orchestrated by code that makes API calls to external platforms.
+
+Logging the model as code in these situations ensures that the entire workflow, including the logic and dependencies, is preserved. It offers is the ability to maintain the same model-like experience by capturing the code making it possible to faithfully recreate the model’s behavior, even when the actual computational work is performed outside your domain.
+
+### 2️⃣ When Your Model Is Part of a Complex Pipeline:
+
+In situations where your model is integrated into a larger, multi-step pipeline—such as one involving data preprocessing, model stacking, or custom post-processing—the entire process is more than just the final model object. Model-as-Code logging allows you to capture the full pipeline as code, including all dependencies and interactions, ensuring that every step can be faithfully reproduced.
+
+### 3️⃣ When Security and Transparency Are Critical:
+
+Serialized models can pose security risks, particularly when sourced from external or untrusted entities. Model-as-Code logging enhances security by focusing on the codebase, making it easier to inspect, audit, and verify the logic before deployment. This approach also promotes transparency, as the code used to define and run the model is clearly visible and can be scrutinized for potential issues.
 
 ## How To Implement Model-as-Code Logging With Examples
 
