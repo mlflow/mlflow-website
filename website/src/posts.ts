@@ -27,7 +27,7 @@ export type Release = {
 // Sort by date descending
 export const BLOGS: Blog[] = [
   {
-    title: "Model as Code Logging in MLflow for Enhanced Model Management",
+    title: "Model-as-Code Logging in MLflow for Enhanced Model Management",
     path: "/blog/model_as_code",
     tags: ["pyfunc", "genai"],
     authors: [
@@ -38,9 +38,15 @@ export const BLOGS: Blog[] = [
         url: "https://www.linkedin.com/in/awadelrahman/",
         image_url: "/img/authors/awadelrahman_ahmed.png",
       },
+      {
+        name: "Daniel Liden",
+        title: "Developer Advocate at Databricks",
+        url: "https://www.linkedin.com/in/danielliden",
+        image_url: "/img/authors/daniel_liden.png",
+      },
     ],
     date: "2024-09-01",
-    thumbnail: "img/blog/release-candidates.png",
+    thumbnail: "img/blog/thumbnail_model_as_code.gif",
   },
   {
     title: "AutoGen with Custom PyFunc",
