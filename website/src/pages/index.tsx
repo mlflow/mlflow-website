@@ -344,6 +344,11 @@ export default function Home(): JSX.Element {
             href="docs/latest/llms/index.html"
           />
           <ConceptCard
+            logo="img/concepts/observability.svg"
+            title="Observability"
+            href="docs/latest/llms/tracing/index.html"
+          />
+          <ConceptCard
             logo="img/concepts/evaluation.svg"
             title="Evaluation"
             href="docs/latest/model-evaluation/index.html"
@@ -404,8 +409,12 @@ export default function Home(): JSX.Element {
                     "Track progress during fine tuning",
                     "Package and deploy models",
                     "Securely host LLMs at scale with MLflow Deployments",
+                    "Improve LLM observability with tracing",
                   ]}
-                  img="img/media/generative-ai.png"
+                  imgs={[
+                    "img/media/tracing.png",
+                    "img/media/generative-ai.png",
+                  ]}
                   href="docs/latest/llms/index.html"
                 />
               ),
@@ -419,7 +428,7 @@ export default function Home(): JSX.Element {
                     "Simple, low-code performance tracking with autologging",
                     "State-of-the-art UI for deep learning model analysis and comparison",
                   ]}
-                  img="img/media/deep-learning.png"
+                  imgs={["img/media/deep-learning.png"]}
                   href="docs/latest/deep-learning/index.html"
                 />
               ),
@@ -433,7 +442,7 @@ export default function Home(): JSX.Element {
                     "Simple, low-code performance tracking with autologging",
                     "State-of-the-art UI for model analysis and comparison",
                   ]}
-                  img="img/media/traditional-ml.png"
+                  imgs={["img/media/traditional-ml.png"]}
                   href="docs/latest/traditional-ml/index.html"
                 />
               ),
@@ -448,7 +457,7 @@ export default function Home(): JSX.Element {
                     "Compare performance against a baseline to prevent regressions",
                     "Simplify and automate performance evaluation",
                   ]}
-                  img="img/media/evaluation.png"
+                  imgs={["img/media/evaluation.png"]}
                   href="docs/latest/model-evaluation/index.html"
                 />
               ),
@@ -463,7 +472,7 @@ export default function Home(): JSX.Element {
                     "Orchestrate model rollouts to staging and production",
                     "Deploy models for large scale batch and real-time inference",
                   ]}
-                  img="img/media/model-management.png"
+                  imgs={["img/media/model-management.png"]}
                   href="docs/latest/model-registry/index.html"
                 />
               ),
