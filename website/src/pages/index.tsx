@@ -405,11 +405,11 @@ export default function Home(): JSX.Element {
                 <FeatureCard
                   items={[
                     "Improve generative AI quality",
+                    "Enhance LLM observability with tracing",
                     "Build applications with prompt engineering",
                     "Track progress during fine tuning",
                     "Package and deploy models",
                     "Securely host LLMs at scale with MLflow Deployments",
-                    "Improve LLM observability with tracing",
                   ]}
                   imgs={[
                     "img/media/tracing.png",
