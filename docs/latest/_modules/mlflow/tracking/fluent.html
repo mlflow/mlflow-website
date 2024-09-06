@@ -55,7 +55,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="MLflow 2.15.2.dev0 documentation" href="../../../index.html"/>
+    <link rel="top" title="MLflow 2.16.1.dev0 documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
   
@@ -86,7 +86,7 @@
     <a href="../../../index.html" class="wy-nav-top-logo"
       ><img src="../../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.15.2.dev0</span>
+    <span class="version">2.16.1.dev0</span>
   </li>
 </ul>
   </nav>
@@ -204,6 +204,7 @@
 <span class="sd">Internal module implementing the fluent API, allowing management of an active</span>
 <span class="sd">MLflow run. This module is exposed to users at the top-level :py:mod:`mlflow` module.</span>
 <span class="sd">&quot;&quot;&quot;</span>
+
 <span class="kn">import</span> <span class="nn">atexit</span>
 <span class="kn">import</span> <span class="nn">contextlib</span>
 <span class="kn">import</span> <span class="nn">importlib</span>
@@ -365,9 +366,9 @@
     <span class="k">if</span> <span class="n">experiment</span><span class="o">.</span><span class="n">lifecycle_stage</span> <span class="o">!=</span> <span class="n">LifecycleStage</span><span class="o">.</span><span class="n">ACTIVE</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
             <span class="n">message</span><span class="o">=</span><span class="p">(</span>
-                <span class="s2">&quot;Cannot set a deleted experiment &#39;</span><span class="si">%s</span><span class="s2">&#39; as the active experiment. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Cannot set a deleted experiment </span><span class="si">{</span><span class="n">experiment</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> as the active experiment. &quot;</span>
                 <span class="s2">&quot;You can restore the experiment, or permanently delete the &quot;</span>
-                <span class="s2">&quot;experiment to create a new one.&quot;</span> <span class="o">%</span> <span class="n">experiment</span><span class="o">.</span><span class="n">name</span>
+                <span class="s2">&quot;experiment to create a new one.&quot;</span>
             <span class="p">),</span>
             <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
         <span class="p">)</span>
@@ -579,12 +580,12 @@
             <span class="n">_validate_run_id</span><span class="p">(</span><span class="n">parent_run_id</span><span class="p">)</span>
             <span class="c1"># Make sure parent_run_id matches the current run id, if there is an active run</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">_active_run_stack</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">parent_run_id</span> <span class="o">!=</span> <span class="n">_active_run_stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">run_id</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
-                    <span class="p">(</span>
-                        <span class="s2">&quot;Current run with UUID </span><span class="si">{}</span><span class="s2"> does not match the specified parent_run_id </span><span class="si">{}</span><span class="s2">&quot;</span>
-                        <span class="o">+</span> <span class="s2">&quot; To start a new nested run under the parent run with UUID </span><span class="si">{}</span><span class="s2">, &quot;</span>
-                        <span class="o">+</span> <span class="s2">&quot;first end the current run with mlflow.end_run().&quot;</span>
-                    <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">_active_run_stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">run_id</span><span class="p">,</span> <span class="n">parent_run_id</span><span class="p">)</span>
+                <span class="n">current_run_id</span> <span class="o">=</span> <span class="n">_active_run_stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">run_id</span>
+                <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Current run with UUID </span><span class="si">{</span><span class="n">current_run_id</span><span class="si">}</span><span class="s2"> does not match the specified &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;parent_run_id </span><span class="si">{</span><span class="n">parent_run_id</span><span class="si">}</span><span class="s2">. To start a new nested run under &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;the parent run with UUID </span><span class="si">{</span><span class="n">current_run_id</span><span class="si">}</span><span class="s2">, first end the current run &quot;</span>
+                    <span class="s2">&quot;with mlflow.end_run().&quot;</span>
                 <span class="p">)</span>
             <span class="n">parent_run_obj</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_run</span><span class="p">(</span><span class="n">parent_run_id</span><span class="p">)</span>
             <span class="c1"># Check if the specified parent_run has been deleted.</span>
@@ -2311,8 +2312,8 @@
         <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;Unsupported output format: </span><span class="si">%s</span><span class="s2">. Supported string values are &#39;pandas&#39; or &#39;list&#39;&quot;</span>
-            <span class="o">%</span> <span class="n">output_format</span>
+            <span class="sa">f</span><span class="s2">&quot;Unsupported output format: </span><span class="si">{</span><span class="n">output_format</span><span class="si">}</span><span class="s2">. Supported string values are &#39;pandas&#39; &quot;</span>
+            <span class="s2">&quot;or &#39;list&#39;&quot;</span>
         <span class="p">)</span></div>
 
 
@@ -2615,7 +2616,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../../',
-      VERSION:'2.15.2.dev0',
+      VERSION:'2.16.1.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

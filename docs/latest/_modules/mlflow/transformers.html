@@ -55,7 +55,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="MLflow 2.15.2.dev0 documentation" href="../../index.html"/>
+    <link rel="top" title="MLflow 2.16.1.dev0 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
@@ -86,7 +86,7 @@
     <a href="../../index.html" class="wy-nav-top-logo"
       ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.15.2.dev0</span>
+    <span class="version">2.16.1.dev0</span>
   </li>
 </ul>
   </nav>
@@ -219,6 +219,7 @@
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">string</span>
 <span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
 <span class="kn">from</span> <span class="nn">types</span> <span class="kn">import</span> <span class="n">MappingProxyType</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 <span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urlparse</span>
@@ -255,9 +256,12 @@
 <span class="kn">from</span> <span class="nn">mlflow.transformers.flavor_config</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">FlavorKey</span><span class="p">,</span>
     <span class="n">build_flavor_config</span><span class="p">,</span>
+    <span class="n">build_flavor_config_from_local_checkpoint</span><span class="p">,</span>
     <span class="n">update_flavor_conf_to_persist_pretrained_model</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.transformers.hub_utils</span> <span class="kn">import</span> <span class="n">is_valid_hf_repo_id</span>
+<span class="kn">from</span> <span class="nn">mlflow.transformers.hub_utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">is_valid_hf_repo_id</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.transformers.llm_inference_utils</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">_LLM_INFERENCE_TASK_CHAT</span><span class="p">,</span>
     <span class="n">_LLM_INFERENCE_TASK_COMPLETIONS</span><span class="p">,</span>
@@ -279,6 +283,7 @@
     <span class="n">_MODEL_BINARY_FILE_NAME</span><span class="p">,</span>
     <span class="n">load_model_and_components_from_huggingface_hub</span><span class="p">,</span>
     <span class="n">load_model_and_components_from_local</span><span class="p">,</span>
+    <span class="n">save_local_checkpoint</span><span class="p">,</span>
     <span class="n">save_pipeline_pretrained_weights</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.transformers.peft</span> <span class="kn">import</span> <span class="p">(</span>
@@ -496,14 +501,35 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        transformers_model:</span>
-<span class="sd">            A trained transformers `Pipeline` or a dictionary that maps required components of a</span>
-<span class="sd">            pipeline to the named keys of [&quot;model&quot;, &quot;image_processor&quot;, &quot;tokenizer&quot;,</span>
-<span class="sd">            &quot;feature_extractor&quot;]. The `model` key in the dictionary must map to a value that</span>
-<span class="sd">            inherits from `PreTrainedModel`, `TFPreTrainedModel`, or `FlaxPreTrainedModel`.</span>
-<span class="sd">            All other component entries in the dictionary must support the defined task type that is</span>
-<span class="sd">            associated with the base model type configuration.</span>
+<span class="sd">            The transformers model to save. This can be one of the following format:</span>
 
-<span class="sd">            An example of supplying component-level parts of a transformers model is shown below:</span>
+<span class="sd">                1. A transformers `Pipeline` instance.</span>
+<span class="sd">                2. A dictionary that maps required components of a pipeline to the named keys</span>
+<span class="sd">                    of [&quot;model&quot;, &quot;image_processor&quot;, &quot;tokenizer&quot;, &quot;feature_extractor&quot;].</span>
+<span class="sd">                    The `model` key in the dictionary must map to a value that inherits from</span>
+<span class="sd">                    `PreTrainedModel`, `TFPreTrainedModel`, or `FlaxPreTrainedModel`.</span>
+<span class="sd">                    All other component entries in the dictionary must support the defined task</span>
+<span class="sd">                    type that is associated with the base model type configuration.</span>
+<span class="sd">                3. A string that represents a path to a local/DBFS directory containing a model</span>
+<span class="sd">                    checkpoint. The directory must contain a `config.json` file that is required</span>
+<span class="sd">                    for loading the transformers model. This is particularly useful when logging</span>
+<span class="sd">                    a model that cannot be loaded into memory for serialization.</span>
+
+<span class="sd">            An example of specifying a `Pipeline` from a default pipeline instantiation:</span>
+
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                from transformers import pipeline</span>
+
+<span class="sd">                qa_pipe = pipeline(&quot;question-answering&quot;, &quot;csarron/mobilebert-uncased-squad-v2&quot;)</span>
+
+<span class="sd">                with mlflow.start_run():</span>
+<span class="sd">                    mlflow.transformers.save_model(</span>
+<span class="sd">                        transformers_model=qa_pipe,</span>
+<span class="sd">                        path=&quot;path/to/save/model&quot;,</span>
+<span class="sd">                    )</span>
+
+<span class="sd">            An example of specifying component-level parts of a transformers model is shown below:</span>
 
 <span class="sd">            .. code-block:: python</span>
 
@@ -523,17 +549,13 @@
 <span class="sd">                        path=&quot;path/to/save/model&quot;,</span>
 <span class="sd">                    )</span>
 
-<span class="sd">            An example of submitting a `Pipeline` from a default pipeline instantiation:</span>
+<span class="sd">            An example of specifying a local checkpoint path is shown below:</span>
 
 <span class="sd">            .. code-block:: python</span>
 
-<span class="sd">                from transformers import pipeline</span>
-
-<span class="sd">                qa_pipe = pipeline(&quot;question-answering&quot;, &quot;csarron/mobilebert-uncased-squad-v2&quot;)</span>
-
 <span class="sd">                with mlflow.start_run():</span>
 <span class="sd">                    mlflow.transformers.save_model(</span>
-<span class="sd">                        transformers_model=qa_pipe,</span>
+<span class="sd">                        transformers_model=&quot;path/to/local/checkpoint&quot;,</span>
 <span class="sd">                        path=&quot;path/to/save/model&quot;,</span>
 <span class="sd">                    )</span>
 
@@ -677,15 +699,42 @@
 
     <span class="n">code_dir_subpath</span> <span class="o">=</span> <span class="n">_validate_and_copy_code_paths</span><span class="p">(</span><span class="n">code_paths</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
 
-    <span class="n">_validate_transformers_model_dict</span><span class="p">(</span><span class="n">transformers_model</span><span class="p">)</span>
-
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transformers_model</span><span class="p">,</span> <span class="n">transformers</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+        <span class="n">_validate_transformers_model_dict</span><span class="p">(</span><span class="n">transformers_model</span><span class="p">)</span>
         <span class="n">built_pipeline</span> <span class="o">=</span> <span class="n">transformers_model</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transformers_model</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">_validate_transformers_model_dict</span><span class="p">(</span><span class="n">transformers_model</span><span class="p">)</span>
         <span class="n">built_pipeline</span> <span class="o">=</span> <span class="n">_build_pipeline_from_model_input</span><span class="p">(</span><span class="n">transformers_model</span><span class="p">,</span> <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transformers_model</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="c1"># When a string is passed, it should be a path to model checkpoint in local storage or DBFS</span>
+        <span class="k">if</span> <span class="n">transformers_model</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;dbfs:&quot;</span><span class="p">):</span>
+            <span class="c1"># Replace the DBFS URI to the actual mount point</span>
+            <span class="n">transformers_model</span> <span class="o">=</span> <span class="n">transformers_model</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;dbfs:&quot;</span><span class="p">,</span> <span class="s2">&quot;/dbfs&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">task</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                <span class="s2">&quot;The `task` argument must be specified when logging a model from a local &quot;</span>
+                <span class="s2">&quot;checkpoint. Please provide the task type of the pipeline.&quot;</span><span class="p">,</span>
+                <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">save_pretrained</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                <span class="s2">&quot;The `save_pretrained` argument must be set to True when logging a model from a &quot;</span>
+                <span class="s2">&quot;local checkpoint. Please set `save_pretrained=True`.&quot;</span><span class="p">,</span>
+                <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Create a dummy pipeline object to be used for saving the model</span>
+        <span class="n">DummyModel</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;DummyModel&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;name_or_path&quot;</span><span class="p">])</span>
+        <span class="n">DummyPipeline</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;DummyPipeline&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;task&quot;</span><span class="p">,</span> <span class="s2">&quot;model&quot;</span><span class="p">])</span>
+        <span class="n">built_pipeline</span> <span class="o">=</span> <span class="n">DummyPipeline</span><span class="p">(</span><span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">DummyModel</span><span class="p">(</span><span class="n">name_or_path</span><span class="o">=</span><span class="n">transformers_model</span><span class="p">))</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
-            <span class="s2">&quot;The `transformers_model` must be a Transformers Pipeline or a dictionary, &quot;</span>
+            <span class="s2">&quot;The `transformers_model` must be one of the following types: </span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot; (1) a transformers Pipeline</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot; (2) a dictionary of components for a transformers Pipeline</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot; (3) a path to a local/DBFS directory containing a transformers model checkpoint.</span><span class="se">\n</span><span class="s2">&quot;</span>
             <span class="sa">f</span><span class="s2">&quot;received: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">transformers_model</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
             <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
         <span class="p">)</span>
@@ -711,7 +760,15 @@
 
     <span class="k">if</span> <span class="n">task</span> <span class="ow">and</span> <span class="n">task</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">_LLM_INFERENCE_TASK_PREFIX</span><span class="p">):</span>
         <span class="n">llm_inference_task</span> <span class="o">=</span> <span class="n">task</span>
-        <span class="n">_validate_llm_inference_task_type</span><span class="p">(</span><span class="n">llm_inference_task</span><span class="p">,</span> <span class="n">built_pipeline</span><span class="p">)</span>
+
+        <span class="c1"># For local checkpoint saving, we set built_pipeline.task to the original `task`</span>
+        <span class="c1"># argument value earlier, which is LLM v1 task. Thereby here we update it to the</span>
+        <span class="c1"># corresponding Transformers task type.</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transformers_model</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">default_task</span> <span class="o">=</span> <span class="n">_get_default_task_for_llm_inference_task</span><span class="p">(</span><span class="n">llm_inference_task</span><span class="p">)</span>
+            <span class="n">built_pipeline</span> <span class="o">=</span> <span class="n">built_pipeline</span><span class="o">.</span><span class="n">_replace</span><span class="p">(</span><span class="n">task</span><span class="o">=</span><span class="n">default_task</span><span class="p">)</span>
+
+        <span class="n">_validate_llm_inference_task_type</span><span class="p">(</span><span class="n">llm_inference_task</span><span class="p">,</span> <span class="n">built_pipeline</span><span class="o">.</span><span class="n">task</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">llm_inference_task</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -780,7 +837,12 @@
         <span class="n">save_pretrained</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="c1"># Create the flavor configuration</span>
-    <span class="n">flavor_conf</span> <span class="o">=</span> <span class="n">build_flavor_config</span><span class="p">(</span><span class="n">built_pipeline</span><span class="p">,</span> <span class="n">processor</span><span class="p">,</span> <span class="n">torch_dtype</span><span class="p">,</span> <span class="n">save_pretrained</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transformers_model</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">flavor_conf</span> <span class="o">=</span> <span class="n">build_flavor_config_from_local_checkpoint</span><span class="p">(</span>
+            <span class="n">transformers_model</span><span class="p">,</span> <span class="n">built_pipeline</span><span class="o">.</span><span class="n">task</span><span class="p">,</span> <span class="n">processor</span><span class="p">,</span> <span class="n">torch_dtype</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">flavor_conf</span> <span class="o">=</span> <span class="n">build_flavor_config</span><span class="p">(</span><span class="n">built_pipeline</span><span class="p">,</span> <span class="n">processor</span><span class="p">,</span> <span class="n">torch_dtype</span><span class="p">,</span> <span class="n">save_pretrained</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">llm_inference_task</span><span class="p">:</span>
         <span class="n">flavor_conf</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">_LLM_INFERENCE_TASK_KEY</span><span class="p">:</span> <span class="n">llm_inference_task</span><span class="p">})</span>
@@ -801,12 +863,16 @@
 
     <span class="c1"># Save pipeline model and components weights</span>
     <span class="k">if</span> <span class="n">save_pretrained</span><span class="p">:</span>
-        <span class="n">save_pipeline_pretrained_weights</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">built_pipeline</span><span class="p">,</span> <span class="n">flavor_conf</span><span class="p">,</span> <span class="n">processor</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transformers_model</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">save_local_checkpoint</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">transformers_model</span><span class="p">,</span> <span class="n">flavor_conf</span><span class="p">,</span> <span class="n">processor</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">save_pipeline_pretrained_weights</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">built_pipeline</span><span class="p">,</span> <span class="n">flavor_conf</span><span class="p">,</span> <span class="n">processor</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">repo</span> <span class="o">=</span> <span class="n">built_pipeline</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">name_or_path</span>
         <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-            <span class="s2">&quot;Skipping saving pretrained model weights to disk as the save_pretrained is set to &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;False. The reference to HuggingFace Hub repository </span><span class="si">{</span><span class="n">repo</span><span class="si">}</span><span class="s2"> will be logged instead.&quot;</span>
+            <span class="s2">&quot;Skipping saving pretrained model weights to disk as the save_pretrained argument&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;is set to False. The reference to the HuggingFace Hub repository </span><span class="si">{</span><span class="n">repo</span><span class="si">}</span><span class="s2"> &quot;</span>
+            <span class="s2">&quot;will be logged instead.&quot;</span>
         <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">inference_config</span><span class="p">:</span>
@@ -832,7 +898,11 @@
     <span class="c1"># Only allow a subset of task types to have a pyfunc definition.</span>
     <span class="c1"># Currently supported types are NLP-based language tasks which have a pipeline definition</span>
     <span class="c1"># consisting exclusively of a Model and a Tokenizer.</span>
-    <span class="k">if</span> <span class="n">_should_add_pyfunc_to_model</span><span class="p">(</span><span class="n">built_pipeline</span><span class="p">):</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="c1"># TODO: when a local checkpoint path is provided as a model, we assume it is eligible</span>
+        <span class="c1"># for pyfunc prediction. This may not be true for all cases, so we should revisit this.</span>
+        <span class="nb">isinstance</span><span class="p">(</span><span class="n">transformers_model</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="n">_should_add_pyfunc_to_model</span><span class="p">(</span><span class="n">built_pipeline</span><span class="p">)</span>
+    <span class="p">):</span>
         <span class="k">if</span> <span class="n">mlflow_model</span><span class="o">.</span><span class="n">signature</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">mlflow_model</span><span class="o">.</span><span class="n">signature</span> <span class="o">=</span> <span class="n">infer_or_get_default_signature</span><span class="p">(</span>
                 <span class="n">pipeline</span><span class="o">=</span><span class="n">built_pipeline</span><span class="p">,</span>
@@ -880,11 +950,15 @@
     <span class="k">if</span> <span class="n">conda_env</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">pip_requirements</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">default_reqs</span> <span class="o">=</span> <span class="n">get_default_pip_requirements</span><span class="p">(</span><span class="n">built_pipeline</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
-            <span class="c1"># NB: Skip inferring requirements for PEFT models to avoid loading the full pretrained</span>
-            <span class="c1"># model into memory. PEFT is mainly designed for fine-tuning large models under limited</span>
-            <span class="c1"># computational resources, so loading the full model is not preferred and can even crash</span>
-            <span class="c1"># the process due to OOM.</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">is_peft_model</span><span class="p">(</span><span class="n">built_pipeline</span><span class="o">.</span><span class="n">model</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transformers_model</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="n">is_peft_model</span><span class="p">(</span><span class="n">built_pipeline</span><span class="o">.</span><span class="n">model</span><span class="p">):</span>
+                <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="s2">&quot;A local checkpoint path or PEFT model is given as the `transformers_model`. &quot;</span>
+                    <span class="s2">&quot;To avoid loading the full model into memory, we don&#39;t infer the pip &quot;</span>
+                    <span class="s2">&quot;requirement for the model. Instead, we will use the default requirements, &quot;</span>
+                    <span class="s2">&quot;but it may not capture all required pip libraries for the model. Consider &quot;</span>
+                    <span class="s2">&quot;providing the pip requirements explicitly.&quot;</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># Infer the pip requirements with a timeout to avoid hanging at prediction</span>
                 <span class="n">inferred_reqs</span> <span class="o">=</span> <span class="n">infer_pip_requirements</span><span class="p">(</span>
                     <span class="n">model_uri</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">),</span>
@@ -946,14 +1020,35 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        transformers_model:</span>
-<span class="sd">            A trained transformers `Pipeline` or a dictionary that maps required components of a</span>
-<span class="sd">            pipeline to the named keys of [&quot;model&quot;, &quot;image_processor&quot;, &quot;tokenizer&quot;,</span>
-<span class="sd">            &quot;feature_extractor&quot;]. The `model` key in the dictionary must map to a value that</span>
-<span class="sd">            inherits from `PreTrainedModel`, `TFPreTrainedModel`, or `FlaxPreTrainedModel`.</span>
-<span class="sd">            All other component entries in the dictionary must support the defined task type that is</span>
-<span class="sd">            associated with the base model type configuration.</span>
+<span class="sd">            The transformers model to save. This can be one of the following format:</span>
 
-<span class="sd">            An example of supplying component-level parts of a transformers model is shown below:</span>
+<span class="sd">                1. A transformers `Pipeline` instance.</span>
+<span class="sd">                2. A dictionary that maps required components of a pipeline to the named keys</span>
+<span class="sd">                    of [&quot;model&quot;, &quot;image_processor&quot;, &quot;tokenizer&quot;, &quot;feature_extractor&quot;].</span>
+<span class="sd">                    The `model` key in the dictionary must map to a value that inherits from</span>
+<span class="sd">                    `PreTrainedModel`, `TFPreTrainedModel`, or `FlaxPreTrainedModel`.</span>
+<span class="sd">                    All other component entries in the dictionary must support the defined task</span>
+<span class="sd">                    type that is associated with the base model type configuration.</span>
+<span class="sd">                3. A string that represents a path to a local/DBFS directory containing a model</span>
+<span class="sd">                    checkpoint. The directory must contain a `config.json` file that is required</span>
+<span class="sd">                    for loading the transformers model. This is particularly useful when logging</span>
+<span class="sd">                    a model that cannot be loaded into memory for serialization.</span>
+
+<span class="sd">            An example of specifying a `Pipeline` from a default pipeline instantiation:</span>
+
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                from transformers import pipeline</span>
+
+<span class="sd">                qa_pipe = pipeline(&quot;question-answering&quot;, &quot;csarron/mobilebert-uncased-squad-v2&quot;)</span>
+
+<span class="sd">                with mlflow.start_run():</span>
+<span class="sd">                    mlflow.transformers.log_model(</span>
+<span class="sd">                        transformers_model=qa_pipe,</span>
+<span class="sd">                        artifact_path=&quot;model&quot;,</span>
+<span class="sd">                    )</span>
+
+<span class="sd">            An example of specifying component-level parts of a transformers model is shown below:</span>
 
 <span class="sd">            .. code-block:: python</span>
 
@@ -970,21 +1065,17 @@
 <span class="sd">                    }</span>
 <span class="sd">                    mlflow.transformers.log_model(</span>
 <span class="sd">                        transformers_model=components,</span>
-<span class="sd">                        artifact_path=&quot;my_model&quot;,</span>
+<span class="sd">                        artifact_path=&quot;model&quot;,</span>
 <span class="sd">                    )</span>
 
-<span class="sd">            An example of submitting a `Pipeline` from a default pipeline instantiation:</span>
+<span class="sd">            An example of specifying a local checkpoint path is shown below:</span>
 
 <span class="sd">            .. code-block:: python</span>
 
-<span class="sd">                from transformers import pipeline</span>
-
-<span class="sd">                qa_pipe = pipeline(&quot;question-answering&quot;, &quot;csarron/mobilebert-uncased-squad-v2&quot;)</span>
-
 <span class="sd">                with mlflow.start_run():</span>
 <span class="sd">                    mlflow.transformers.log_model(</span>
-<span class="sd">                        transformers_model=qa_pipe,</span>
-<span class="sd">                        artifact_path=&quot;my_pipeline&quot;,</span>
+<span class="sd">                        transformers_model=&quot;path/to/local/checkpoint&quot;,</span>
+<span class="sd">                        artifact_path=&quot;model&quot;,</span>
 <span class="sd">                    )</span>
 
 <span class="sd">        artifact_path: Local path destination for the serialized model to be saved.</span>
@@ -1142,6 +1233,12 @@
         <span class="n">code_paths</span><span class="o">=</span><span class="n">code_paths</span><span class="p">,</span>
         <span class="n">signature</span><span class="o">=</span><span class="n">signature</span><span class="p">,</span>
         <span class="n">input_example</span><span class="o">=</span><span class="n">input_example</span><span class="p">,</span>
+        <span class="c1"># NB: We don&#39;t validate the serving input if the provided model is a path</span>
+        <span class="c1"># to a local checkpoint. This is because the purpose of supporting that</span>
+        <span class="c1"># input format is to avoid loading large model into memory. Serving input</span>
+        <span class="c1"># validation loads the model into memory and make prediction, which is</span>
+        <span class="c1"># expensive and can cause OOM errors.</span>
+        <span class="n">validate_serving_input</span><span class="o">=</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transformers_model</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span>
         <span class="n">pip_requirements</span><span class="o">=</span><span class="n">pip_requirements</span><span class="p">,</span>
         <span class="n">extra_pip_requirements</span><span class="o">=</span><span class="n">extra_pip_requirements</span><span class="p">,</span>
         <span class="n">model_config</span><span class="o">=</span><span class="n">model_config</span><span class="p">,</span>
@@ -1633,18 +1730,18 @@
         <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
 
 
-<span class="k">def</span> <span class="nf">_validate_llm_inference_task_type</span><span class="p">(</span><span class="n">llm_inference_task</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">:</span> <span class="n">Pipeline</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">_validate_llm_inference_task_type</span><span class="p">(</span><span class="n">llm_inference_task</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pipeline_task</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Validates that an ``inference_task`` type is supported by ``transformers`` pipeline type.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">supported_llm_inference_tasks</span> <span class="o">=</span> <span class="n">_SUPPORTED_LLM_INFERENCE_TASK_TYPES_BY_PIPELINE_TASK</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-        <span class="n">pipeline</span><span class="o">.</span><span class="n">task</span><span class="p">,</span> <span class="p">[]</span>
+        <span class="n">pipeline_task</span><span class="p">,</span> <span class="p">[]</span>
     <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">llm_inference_task</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">supported_llm_inference_tasks</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;The task provided is invalid. &#39;</span><span class="si">{</span><span class="n">llm_inference_task</span><span class="si">}</span><span class="s2">&#39; is not a supported task for &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;the </span><span class="si">{</span><span class="n">pipeline</span><span class="o">.</span><span class="n">task</span><span class="si">}</span><span class="s2"> pipeline. Must be one of </span><span class="si">{</span><span class="n">supported_llm_inference_tasks</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;the </span><span class="si">{</span><span class="n">pipeline_task</span><span class="si">}</span><span class="s2"> pipeline. Must be one of </span><span class="si">{</span><span class="n">supported_llm_inference_tasks</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
             <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
         <span class="p">)</span>
 
@@ -1655,6 +1752,7 @@
 <span class="sd">    deep learning framework backends: ``tensorflow``, ``torch``, or ``flax``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">FlaxPreTrainedModel</span><span class="p">,</span> <span class="n">PreTrainedModel</span><span class="p">,</span> <span class="n">TFPreTrainedModel</span>
+    <span class="kn">from</span> <span class="nn">transformers.utils</span> <span class="kn">import</span> <span class="n">is_torch_available</span>
 
     <span class="k">if</span> <span class="n">is_peft_model</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
         <span class="n">model</span> <span class="o">=</span> <span class="n">get_peft_base_model</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
@@ -1666,6 +1764,9 @@
             <span class="k">return</span> <span class="s2">&quot;torch&quot;</span>
         <span class="k">elif</span> <span class="nb">issubclass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">FlaxPreTrainedModel</span><span class="p">):</span>
             <span class="k">return</span> <span class="s2">&quot;flax&quot;</span>
+
+    <span class="c1"># As a fallback, we check current environment to determine the engine type</span>
+    <span class="k">return</span> <span class="s2">&quot;torch&quot;</span> <span class="k">if</span> <span class="n">is_torch_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;tensorflow&quot;</span>
 
 
 <span class="k">def</span> <span class="nf">_should_add_pyfunc_to_model</span><span class="p">(</span><span class="n">pipeline</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
@@ -3102,7 +3203,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../',
-      VERSION:'2.15.2.dev0',
+      VERSION:'2.16.1.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',
