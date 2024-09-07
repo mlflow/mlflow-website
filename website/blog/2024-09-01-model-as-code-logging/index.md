@@ -8,33 +8,33 @@ thumbnail: img/blog/thumbnail_model_as_code.gif
 
 We all (well, most of us) remember November 2022 when the public release of ChatGPT by OpenAI marked a significant turning point in the world of AI. While GenAI had been evolving for some time, ChatGPT, built on OpenAI's GPT-3.5 architecture, quickly captured the public’s imagination. This led to an explosion of interest in GenAI, both within the tech industry and among the general public.
 
-On the tools side, MLflow continues to solidify its position as the favorite tool for MLOps among the ML community. However, the rise of GenAI has introduced new needs in how we use MLflow. One of these new challenges is how we log model artifacts in MLflow. If you’ve used MLflow before (and we bet you have), you’re probably familiar with the `mlflow.log_model()` function and how it efficiently [pickles](https://github.com/cloudpipe/cloudpickle) model artifacts.
+On the tools side, MLflow continues to solidify its position as the favorite tool for MLOps among the ML community. However, the rise of GenAI has introduced new needs in how we use MLflow. One of these new challenges is how we log model artifacts in MLflow. If you’ve used MLflow before (and I bet you have), you’re probably familiar with the `mlflow.log_model()` function and how it efficiently [pickles](https://github.com/cloudpipe/cloudpickle) model artifacts.
 
-Particularly with GenAI, there’s a new requirement: logging the model by converting its "reference from code", instead of serializing it into a pickle file! And guess what?. And guess what? This need isn’t limited to GenAI models. So, in this post we will explore this concept and how MLflow has adapted to meet this new requirment.
+Particularly with GenAI, there’s a new requirement: logging the [model "from code"](https://mlflow.org/docs/latest/models.html#models-from-code), instead of serializing it into a pickle file! And guess what?. This need isn’t limited to GenAI models! So, in this post I will explore this concept and how MLflow has adapted to meet this new requirment.
 
-You will notice that this feature is implemented at a very abstract level, allowing you to log any model "as code", whether it’s GenAI or not! We like to think of it as a generic approach, with GenAI models being just one of its use cases. So, in this post, we’ll explore this new approach, "Model-as-Code logging".
+You will notice that this feature is implemented at a very abstract level, allowing you to log any model "as code", whether it’s GenAI or not! I like to think of it as a generic approach, with GenAI models being just one of its use cases. So, in this post, I’ll explore this new feature, "Models-from-Code logging".
 
-By the end of this post you should be able to answer the three main questions: "what", "why" and "how" to do Model-as-Code logging.
+By the end of this post you should be able to answer the three main questions: "what", "why" and "how" to log models from code logging.
 
-## What Is Model-as-Code Logging?
+## What Is Models-from-Code Logging?
 
-In fact, when MLflow announced this feature, it got us thinking in a more abstract way about the concept of a "model"! You might find it interesting, too, if you zoom out and consider a model as a mathematical representation or function that describes the relationship between input and output variables. At this level of abstraction, a model can be many things!
+In fact, when MLflow announced this feature, it got me thinking in a more abstract way about the concept of a "model"! You might find it interesting, too, if you zoom out and consider a model as a mathematical representation or function that describes the relationship between input and output variables. At this level of abstraction, a model can be many things!
 
-At this level, one might recognize that a model, as an object or artifact, represents just one form of what a model can be, even if it’s the most popular in the ML community. But if you think about it, a model can also be a simple mapping function—just a piece of code—or even code that sends API requests to another service that doesn’t necessarily reside within your "premises" (e.g., OpenAI APIs).
+One might recognize that a model, as an object or artifact, represents just one form of what a model can be, even if it’s the most popular in the ML community. But if you think about it, a model can also be a simple mapping function—just a piece of code—or even code that sends API requests to another service that doesn’t necessarily reside within your "premises" (e.g., OpenAI APIs).
 
-We'll explain the detailed workflow of how to log Mode-as-Code later in the post, but for now, let's consider it at a high level with two main steps: first, writing your model code, and second, logging your model as code. This will look like the folowing figure:
+I'll explain the detailed workflow of how to log models from code later in the post, but for now, let's consider it at a high level with two main steps: first, writing your model code, and second, logging your model as code. This will look like the folowing figure:
 
-#### High Level Model-from-Code Logging Workflow:
+#### High Level Models-from-Code Logging Workflow:
 
-![High Level Model-as-Code Logging Workflow](model_as_code1.png)
+![High Level Models-from-Code Logging Workflow](model_as_code1.png)
 
 🔴 It's important to note that when we refer to "model code," we're talking about code that can be treated as a model itself. This means it's **not** your training code that generates a trained model object, but rather the step-by-step code that is executed as a model itself.
 
-## How Model-as-Code Differs From Model-as-Artifact Logging?
+## How Models-from-Code Differs From Model-as-Artifact Logging?
 
-In the previous section, we discussed what is meant by Model-as-Code logging. In our experience, concepts often become clearer when contrasted with their alternatives—a technique known as _contrast learning_. So, the alternative will be Model-as-Artifact logging, which is the most commonly used approach for logging models in MLflow.
+In the previous section, we discussed what is meant by Models-from-Code logging. In my experience, concepts often become clearer when contrasted with their alternatives—a technique known as _contrast learning_. So, the alternative will be Model-as-Artifact logging, which is the most commonly used approach for logging models in MLflow.
 
-You're probably familiar with the process of writing training code, training a model, and then saving the trained model as an artifact to be reused later by loading it back into your application. This what we refer to here as Model-as-Artifact logging. In its simplest form, this involves calling the function `mlflow.log_model()`, after which MLflow typically handles the serialization process for you. If you're using a Python-based model, this might involve using Pickle or a similar method under the hood to store the model so it can be easily loaded later.
+Model-as-Artifact logging treats a trained model as an object that can be stored and reused. After training, the model is saved as an artifact and can be easily loaded back into an application. This process can be initiated by calling `mlflow.log_model()`, where MLflow handles the serialization, often using [Pickle](https://github.com/cloudpipe/cloudpickle) or similar methods. This ensures the model is preserved as a reusable object, ready for future deployments or evaluations.
 
 The Model-as-Artifact logging can be broken down into three high-level steps as in the following figure: first, creating the model as an object (whether by training it or acquiring it), second, serializing it (usually with Pickle or a similar tool), and third, logging it as an object.
 
