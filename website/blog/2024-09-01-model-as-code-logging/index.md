@@ -2,27 +2,29 @@
 title: Model-as-Code Logging in MLflow for Enhanced Model Management
 tags: [pyfunc, genai]
 slug: model_as_code
-authors: [awadelrahman-ahmed, daniel-liden]
+authors: [awadelrahman-ahmed]
 thumbnail: img/blog/thumbnail_model_as_code.gif
 ---
 
-We all—well, most of us—remember November 2022 when the public release of ChatGPT by OpenAI marked a significant turning point in the world of AI. While GenAI had been evolving for some time, ChatGPT, built on OpenAI's GPT-3.5 architecture, quickly captured the public’s imagination. This led to an explosion of interest in GenAI, both within the tech industry and among the general public.
+We all (well, most of us) remember November 2022 when the public release of ChatGPT by OpenAI marked a significant turning point in the world of AI. While GenAI had been evolving for some time, ChatGPT, built on OpenAI's GPT-3.5 architecture, quickly captured the public’s imagination. This led to an explosion of interest in GenAI, both within the tech industry and among the general public.
 
-On the tools side, MLflow continues to solidify its position as the favorite tool for MLOps among the ML community. However, the rise of GenAI has introduced new needs in how we use MLflow. One of these new challenges is how we log model artifacts in MLflow. If you’ve used MLflow before (and we bet you have), you’re probably familiar with the `mlflow.log_model()` function and how it efficiently **pickles** model artifacts (I’ve bolded "pickles" because it’s a key term in this post).
+On the tools side, MLflow continues to solidify its position as the favorite tool for MLOps among the ML community. However, the rise of GenAI has introduced new needs in how we use MLflow. One of these new challenges is how we log model artifacts in MLflow. If you’ve used MLflow before (and we bet you have), you’re probably familiar with the `mlflow.log_model()` function and how it efficiently [pickles](https://github.com/cloudpipe/cloudpickle) model artifacts.
 
-Particularly with GenAI, there’s a new requirement: logging the model "as code," instead of serializing it into a pickle file. And guess what? This need isn’t limited to GenAI models. So, in this post we will explore this concept and how MLflow has adapted to meet this new requirment.
+Particularly with GenAI, there’s a new requirement: logging the model by converting its "reference from code", instead of serializing it into a pickle file! And guess what?. And guess what? This need isn’t limited to GenAI models. So, in this post we will explore this concept and how MLflow has adapted to meet this new requirment.
 
 You will notice that this feature is implemented at a very abstract level, allowing you to log any model "as code", whether it’s GenAI or not! We like to think of it as a generic approach, with GenAI models being just one of its use cases. So, in this post, we’ll explore this new approach, "Model-as-Code logging".
 
 By the end of this post you should be able to answer the three main questions: "what", "why" and "how" to do Model-as-Code logging.
 
-## What Is Actually Model-as-Code Logging?
+## What Is Model-as-Code Logging?
 
 In fact, when MLflow announced this feature, it got us thinking in a more abstract way about the concept of a "model"! You might find it interesting, too, if you zoom out and consider a model as a mathematical representation or function that describes the relationship between input and output variables. At this level of abstraction, a model can be many things!
 
-At this level, one might recognize that a model, as an object or artifact, represents just one form of what a model can be, even if it’s the most popular in the ML community. But if you think about it, a model can also be a simple mapping function — just a piece of code — or even code that sends API requests to another service that doesn’t necessarily reside within your "premises" (e.g., OpenAI APIs).
+At this level, one might recognize that a model, as an object or artifact, represents just one form of what a model can be, even if it’s the most popular in the ML community. But if you think about it, a model can also be a simple mapping function—just a piece of code—or even code that sends API requests to another service that doesn’t necessarily reside within your "premises" (e.g., OpenAI APIs).
 
 We'll explain the detailed workflow of how to log Mode-as-Code later in the post, but for now, let's consider it at a high level with two main steps: first, writing your model code, and second, logging your model as code. This will look like the folowing figure:
+
+#### High Level Model-from-Code Logging Workflow:
 
 ![High Level Model-as-Code Logging Workflow](model_as_code1.png)
 
@@ -35,6 +37,8 @@ In the previous section, we discussed what is meant by Model-as-Code logging. In
 You're probably familiar with the process of writing training code, training a model, and then saving the trained model as an artifact to be reused later by loading it back into your application. This what we refer to here as Model-as-Artifact logging. In its simplest form, this involves calling the function `mlflow.log_model()`, after which MLflow typically handles the serialization process for you. If you're using a Python-based model, this might involve using Pickle or a similar method under the hood to store the model so it can be easily loaded later.
 
 The Model-as-Artifact logging can be broken down into three high-level steps as in the following figure: first, creating the model as an object (whether by training it or acquiring it), second, serializing it (usually with Pickle or a similar tool), and third, logging it as an object.
+
+#### High Level Model-as-Artifact Logging Workflow:
 
 ![High Level Model-as-Artifact Logging Workflow](model_as_code2.png)
 
@@ -101,7 +105,7 @@ Now, each time we need to implement Model-as-Code logging, we create _Two_ separ
 
     📌 But wait! IMPORTANT:
 
-                - Yout `model_code.py` needs to call (i,e; include) `mlflow.models.set_model()` to set the model, which is crucial for loading the model back using `load_model` for inference. You will notice this in the example.
+                - Your `model_code.py` script needs to call (i,e; include) `mlflow.models.set_model()` to set the model, which is crucial for loading the model back using `load_model` for inference. You will notice this in the example.
 
 2.  The second file logs your class (that you defined in `model_code.py`). Think of it as the driver code; it can be either a notebook or a Python script (let's call it `driver.py`).
     In this file, you'll include the code that is responsible for logging your model code (you will provide the path to `model_code.py`) .
@@ -114,11 +118,8 @@ This figure gives a generic template of these two files.
 
 ### A 101 Example of Model-as-Code Logging :
 
-As members of the tech community, we're captivated by the elegance of the mathematical constant π (pi). But what if we didn’t take this discovery for granted?
-
-Imagine a scenario where π (pi) had never been discovered. In today’s world of deep learning and AI (regardless to the argument that you might have on without π (pi) we could never have AI), instead of deriving formulas, we’d rely on models to make predictions.
-
-We could propose a novel machine learning model to **predict** the area of a circle based on its diameter, rather than relying on the traditional formula (because nothing called π (pi) has been discovered).
+To understand how abstract the concept of a model can be, let's consider this fictitious example: What if π (pi) had never been discovered?
+In today's AI-driven world, instead of using a formula, we might rely on ML models to **predict** the area of a circle based on its diameter!
 
 While this idea might seem humorous, it serves as a good example of how abstract the concept of a model can be. If you agree that **calculating** the area of a circle without the discovery of π (pi) could be treated as a **prediction** problem, then we’ve reached a point of understanding the notion of MLflow treating models as code.
 
@@ -143,7 +144,7 @@ mlflow.models.set_model(model=CircleAreaModel())
 
 #### 2. Our `driver.py` file :
 
-This can be a notebook as well. Here is it essential contents:
+This can be defined within a notebook as well. Here are its essential contents:
 
 ```python
 import mlflow
