@@ -105,7 +105,7 @@ Now, each time we need to implement Model-as-Code logging, we create _Two_ separ
 
     📌 But wait! IMPORTANT:
 
-                - Your `model_code.py` script needs to call (i,e; include) `mlflow.models.set_model()` to set the model, which is crucial for loading the model back using `load_model` for inference. You will notice this in the example.
+                - Your `model_code.py` script needs to call (i.e., include) `mlflow.models.set_model()` to set the model, which is crucial for loading the model back using `load_model` for inference. You will notice this in the example.
 
 2.  The second file logs your class (that you defined in `model_code.py`). Think of it as the driver code; it can be either a notebook or a Python script (let's call it `driver.py`).
     In this file, you'll include the code that is responsible for logging your model code (you will provide the path to `model_code.py`) .
