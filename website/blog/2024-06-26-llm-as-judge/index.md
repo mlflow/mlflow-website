@@ -17,11 +17,7 @@ One major difficulty is creating metrics that comprehensively measure performanc
 
 An LLM acting as a judge can address these issues by leveraging its extensive training data to provide a more nuanced evaluation, offering insights into model behavior and areas needing improvement. For instance, an LLM can analyze whether a model generates text that is not only grammatically correct but also contextually appropriate and engaging, something more static metrics might miss. 
 
-Moreover, **standardized experimentation setups** are crucial for advancing model development.
-They ensure that comparisons between different models are fair and consistent, allowing researchers to isolate improvements and understand their impacts. By having a uniform framework for testing and evaluation,replicate results, and build upon each other's work, leading to more robust models.
-
-![MLflow Metrics](metrics-comparision-v3.svg)
-
+However, to move forward effectively, we need more than just better evaluation methods. Standardized experimentation setups are essential to ensure that comparisons between models are both fair and replicable. A uniform framework for testing and evaluation would enable researchers to build on each other's work, leading to more consistent progress and the development of more robust models.
 
 ## Introducing MLflow LLM Evaluate
 
@@ -70,20 +66,16 @@ We'll start by evaluating a language translation model, focusing on the "cultura
 ### Cultural Sensitivity Metric
 
 The travel agency wants to ensure their translations are not only accurate but also culturally appropriate. 
-
 To achieve this they are considering creating a custom metric that allows Worldwide WanderAgency to quantify how well their translations maintain cultural context and idiomatic expressions.
 
 For instance, a phrase that is polite in one culture might be inappropriate in another. 
-
 In English, addressing someone as "Dear" in a professional email might be seen as polite. However, in Spanish, using "Querido" in a professional context can be too personal and inappropriate.
 
 How can we evaluate such an abstract concept in a systematic way? Traditional Metrics would fall short so we need a better way of doing it. In this case LLM as a judge would be a great fit!
-
 For this use case let's create a "cultural_sensitivity" metric.
 
 
 Here's a brief overview of the process:
-
 Start by installing all the necessary libraries for this demo to work.
 
 
@@ -108,18 +100,18 @@ import openai
 import pandas as pd
 ```
 
-When using mlflow.evaluate(), your LLM can be either:
-1.	A `mlflow.pyfunc.PyFuncModel()` . Generally speaking an MLflow model. 
-2.	A `python function` that has strings as inputs and outputs a single string. 
-3.	An `MLflow Deployments` endpoint URI.
-4.	Set `model=None` when you only want to provide the data which has already been scored by the model.
+When using the [`mlflow.evaluate()`](https://mlflow.org/docs/latest/python_api/mlflow.html#mlflow.evaluate) function, your large language model (LLM) can take one of the following forms:
+1. A `mlflow.pyfunc.PyFuncModel()` — typically an MLflow model.
+2. A Python function that accepts strings as inputs and returns a single string as output.
+3. An `MLflow Deployments` endpoint URI.
+4. `model=None` if the data you are providing has already been scored by a model, and you do not need to specify one.
 
-For this case let's use an MLflow model.
+For this example, we will use an MLflow model.
 
-Let's start by logging our translation model on MLflow.
-For this tutorial let's use a gpt3.5 with a system prompt.
+We’ll begin by logging a translation model in MLflow. For this tutorial, we'll use GPT-3.5 with a defined system prompt.
 
-In a production setting typically this would be something you would experiment with and do some careful prompting / different model selections to figure out which one is best for your use case. Check MLflow's [Prompt Engineering UI](https://mlflow.org/docs/latest/llms/prompt-engineering/index.html) for more info on this.
+In a production environment, you would typically experiment with different prompts and models to determine the most suitable configuration for your use case. For more details, refer to MLflow’s [Prompt Engineering UI](https://mlflow.org/docs/latest/llms/prompt-engineering/index.html).
+
 
 ```python
 
@@ -148,9 +140,10 @@ model.predict("Hello, how are you?")
 # Output = ['¡Hola, ¿cómo estás?']
 ```
 
-To use MLflow evaluate we need to prepare some sample data to provide as input to our LLM. In our scenario this would be the material the company is trying to translate.
+To use [`mlflow.evaluate()`](https://mlflow.org/docs/latest/python_api/mlflow.html#mlflow.evaluate), we first need to prepare sample data that will serve as input to our LLM. In this scenario, the input would consist of the content the company is aiming to translate.
 
-In this example we will define some common English expressions which we want translated.
+For demonstration purposes, we will define a set of common English expressions that we want the model to translate.
+
 
 ```python
 # Prepare evaluation data
@@ -167,15 +160,14 @@ eval_data = pd.DataFrame(
 )
 ```
 
-To achieve the travel agency goals let's define some custom metrics. 
-We want to address how faithful the translation is, for that we have to consider cultural factors and not only a literal translation.
+To meet the objectives of the travel agency, we will define custom metrics that evaluate the quality of translations. In particular, we need to assess how faithfully the translations capture not only the literal meaning but also cultural nuances.
 
-By default MLflow evaluate uses openai:/gpt-4 as a judge. However you can choose also choose a [local model to do this evaluation](https://mlflow.org/docs/latest/llms/llm-evaluate/index.html#selecting-the-llm-as-judge-model) (for example using ollama wrapped in a pyfync).
+By default, [`mlflow.evaluate()`](https://mlflow.org/docs/latest/python_api/mlflow.html#mlflow.evaluate) uses `openai:/gpt-4` as the evaluation model. However, you also have the option to use a [local model for evaluation](https://mlflow.org/docs/latest/llms/llm-evaluate/index.html#selecting-the-llm-as-judge-model), such as a model wrapped in a PyFunc (e.g., Ollama).
 
+For this example, we will use GPT-4 as the evaluation model.
 
-For this example we will use GPT4.
+To begin, provide a few examples that illustrate good and poor translation scores.
 
-Begin by providing a few examples of good and bad scores.
 
 
 ```python
@@ -253,7 +245,7 @@ cultural_sensitivity = mlflow.metrics.genai.make_genai_metric(
 
 ### The Toxicity Metric
 
-On top of this let's use MLflow default metrics for the evaluators. In this case MLflow wll use roberta-hate-speech model to detect the [toxicity](https://huggingface.co/spaces/evaluate-measurement/toxicity). This metric evaluates responses for any harmful or inappropriate content, reinforcing the company's commitment to a positive customer experience.
+In addition to this custom metric let's use MLflow built-in metrics for the evaluators. In this case MLflow wll use roberta-hate-speech model to detect the [toxicity](https://huggingface.co/spaces/evaluate-measurement/toxicity). This metric evaluates responses for any harmful or inappropriate content, reinforcing the company's commitment to a positive customer experience.
 
 ```python
 # Log and evaluate the model
@@ -278,20 +270,6 @@ You can retrieve the final results as such:
 ```python
 results.tables["eval_results_table"]
 ```
-
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 
 |    | llm_inputs                     | outputs                  | token_count   | toxicity/v1/score   | flesch_kincaid_grade_level/v1/score   | ari_grade_level/v1/score   | cultural_sensitivity/v1/score   | cultural_sensitivity/v1/justification                          |
 |----|--------------------------------|--------------------------|---------------|---------------------|--------------------------------------|----------------------------|--------------------------------|----------------------------------------------------------------|
@@ -352,7 +330,9 @@ def create_gauge_chart(value1, title1, value2, title2):
 
     # Show figure
     fig.show()
+```
 
+```python
 create_gauge_chart(cultural_sensitive_score, "Cultural Sensitivity Score", float(non_toxicity_score), "Non Toxicity Score")
 ```
 
@@ -364,14 +344,11 @@ As Worldwide WanderAgency's AI grows, they add a customer service chatbot that h
 
 It's important that the answers provided by the chatbot stay true to the information it retrieves. To make sure of this, we create a "faithfulness" metric. This metric checks how well the chatbot's responses match the materials it’s supposed to be based on, ensuring the information given to customers is accurate.
 
-**Bad Faithfulness Example:** If the retrieved document says "Returns are accepted within 30 days," and the chatbot replies with "Our return policy is flexible and varies by region," it is not aligning well with the retrieved material. This inaccurate response could mislead customers and create confusion.
+For example, If the retrieved document says "Returns are accepted within 30 days," and the chatbot replies with "Our return policy is flexible and varies by region," it is not aligning well with the retrieved material. This inaccurate response (bad faithfulness) could mislead customers and create confusion.
 
 ### Using MLflow to Evaluate RAG - Faithfulness
 
 Let's evaluate how well our chatbot is doing in sticking to the retrieved information. Instead of using an MLflow model this time, we’ll use a custom function to define the faithfulness metric and see how aligned the chatbot's answers are with the data it pulls from.
-
-
-
 
 ```python
 # Prepare evaluation data
@@ -432,7 +409,7 @@ faithfulness = mlflow.metrics.genai.make_genai_metric(
 
 ```
 
-Define out LLM function (in this case it can be any function that follows certain input /output formats that MLflow evalaute supports).
+Define out LLM function (in this case it can be any function that follows certain input/output formats that [`mlflow.evaluate()`](https://mlflow.org/docs/latest/python_api/mlflow.html#mlflow.evaluate)).
 
 ```python
 # Using custom function
@@ -453,7 +430,7 @@ def my_llm(inputs):
     return answers
 ```
 
-Then our evaluation is similar to what we did before...
+Resulting in a code that is similar to what we did before...
 
 ```python
 with mlflow.start_run() as run:
@@ -473,11 +450,11 @@ mlflow.end_run()
 
 ### GenAI Metrics
 
-As an alternative we can use MLflow built in metrics for genai using the same examples.
+Alternatively, we can leverage MLflow's built-in metrics for generative AI, using the same examples.
 
-MLflow offers a few [built-in metrics](https://mlflow.org/docs/latest/python_api/mlflow.metrics.html?highlight=genai%20answer#generative-ai-metrics) which uses LLM as the judge. Despite the difference under the hood, the usage is the same - put these metrics in the extra_metrics argument in mlflow.evaluate().
+MLflow provides several [built-in metrics](https://mlflow.org/docs/latest/python_api/mlflow.metrics.html?highlight=genai%20answer#generative-ai-metrics) that use an LLM as a judge. Despite differences in implementation, these metrics are used in the same way. Simply include them in the `extra_metrics` argument of the [`mlflow.evaluate()`](https://mlflow.org/docs/latest/python_api/mlflow.html#mlflow.evaluate) function.
 
-Let's use MLflow's built-in [faithfulness metric](https://mlflow.org/docs/latest/python_api/mlflow.metrics.html?highlight=genai%20answer#mlflow.metrics.genai.faithfulness).
+In this case, we will use MLflow’s built-in [faithfulness metric](https://mlflow.org/docs/latest/python_api/mlflow.metrics.html?highlight=genai%20answer#mlflow.metrics.genai.faithfulness).
 
 
 ```python
@@ -486,11 +463,9 @@ faithfulness_metric = faithfulness(model="openai:/gpt-4")
 print(faithfulness_metric)
 ```
 
-This metric works quite well in synergy with LangChain retrievals since you can provide the grading context separately from the llm_input column if you prefer.
+[`mlflow.evaluate()`](https://mlflow.org/docs/latest/python_api/mlflow.html#mlflow.evaluate) simplifies the process of providing grading context, such as the documents retrieved by our system, directly into the evaluation. This feature integrates seamlessly with [LangChain's retrievers](https://python.langchain.com/v0.1/docs/modules/data_connection/retrievers/), allowing you to supply the context for evaluation as a dedicated column. For more details, refer to [this example](https://mlflow.org/docs/latest/llms/llm-evaluate/notebooks/rag-evaluation-llama2.html).
 
-Since in this example we are doing everything in the same input column let's map out the context column to our input column.
-
-
+In this case, since our retrieved documents are already included within the final prompt and we are not leveraging LangChain for this tutorial, we will simply map the `llm_input` column as our grading context.
 
 ```python
 with mlflow.start_run() as run:
@@ -509,6 +484,7 @@ with mlflow.start_run() as run:
 mlflow.end_run()
 ```
 
+After the evaluation we get the following results:
 ![Gauge faithfulness Chart](faithfulness.png)
 
 
@@ -516,7 +492,7 @@ mlflow.end_run()
 
 By combining the Cultural Sensitivity score with our other calculated metrics, our travel agency can further refine its model to ensure the delivery of high-quality content across all languages. Moving forward, we can revisit and adjust the prompts used to boost our Cultural Sensitivity score. Alternatively, we could fine-tune a smaller model to maintain the same high level of cultural sensitivity while reducing costs. These steps will help us provide even better service to the agency's diverse customer base.
 
-MLflow evaluate, combined with LLMs as judges, opens up new possibilities for nuanced and context-aware model evaluation. By creating custom metrics tailored to specific aspects of model performance, data scientists can gain deeper insights into their models' strengths and weaknesses.
+[`mlflow.evaluate()`](https://mlflow.org/docs/latest/python_api/mlflow.html#mlflow.evaluate), combined with LLMs as judges, opens up new possibilities for nuanced and context-aware model evaluation. By creating custom metrics tailored to specific aspects of model performance, data scientists can gain deeper insights into their models' strengths and weaknesses.
 
 The flexibility offered by `make_genai_metric()` allows you to create evaluation criteria that are perfectly suited to your specific use case. Whether you need structured guidance for your LLM judge or want full control over the prompting process, MLflow provides the tools you need.
 
@@ -525,4 +501,4 @@ As you explore MLflow evaluate and LLM-based metrics, remember that the key lies
 
 The built-in metrics, such as toxicity, offer standardized assessments that are crucial for ensuring the safety and accessibility of model outputs. 
 
-Here's a final challenge, re-run all the tests we did but this time with "gpt-4o-mini" and see how the performance is affected.
+As a final challenge, re-run all the tests performed but this time with "gpt-4o-mini" and see how the performance is affected.
