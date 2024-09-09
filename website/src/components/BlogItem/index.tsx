@@ -3,6 +3,10 @@ import { Blog as BlogType } from "../../posts";
 import clsx from "clsx";
 import Link from "@docusaurus/Link";
 
+function formatTag(tag: string): string {
+  return tag.replace(/\s+/g, "-").toLowerCase();
+}
+
 function Blog({ blog }: { blog: BlogType }): JSX.Element {
   const { title, path, tags, authors, date, thumbnail } = blog;
   const author = authors[0];
@@ -33,7 +37,9 @@ function Blog({ blog }: { blog: BlogType }): JSX.Element {
                       "button button--sm button--outline button--primary",
                       styles.tag,
                     )}
-                    href={`/blog/tags/${tag}`}
+                    key={tag}
+                    href={`/blog/tags/${formatTag(tag)}`}
+                    onClick={(e) => e.stopPropagation()}
                   >
                     {tag}
                   </a>

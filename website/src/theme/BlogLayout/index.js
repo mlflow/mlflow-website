@@ -4,7 +4,6 @@ import Layout from "@theme/Layout";
 import BlogSidebar from "@theme/BlogSidebar";
 export default function BlogLayout(props) {
   const { sidebar, toc, children, ...layoutProps } = props;
-  console.log(sidebar.items);
   const isBlog = sidebar.items.some(({ permalink }) =>
     permalink.startsWith("/blog/"),
   );

@@ -3,7 +3,7 @@ title: "Automatic Metric, Parameter, and Artifact Logging with mlflow.autolog"
 slug: mlflow-autolog
 tags: [autolog]
 authors: [daniel-liden]
-thumbnail: img/blog/mlflow-autolog.png
+thumbnail: /img/blog/mlflow-autolog.png
 ---
 
 Looking to learn more about the autologging functionality included in MLflow? Look no further than this primer on the basics of using this powerful and time-saving feature!

@@ -4,7 +4,7 @@ description: Using MLflow's Deep Learning tracking features for fine tuning an L
 slug: deep-learning-part-2
 authors: [puneet-jain, avinash-sooriyarachchi, abe-omorogbe, ben]
 tags: [Deep Learning]
-thumbnail: img/blog/dl-blog-2.png
+thumbnail: /img/blog/dl-blog-2.png
 ---
 
 In the realm of deep learning, finetuning of pre-trained Large Language Models (LLMs) on private datasets is an excellent customization

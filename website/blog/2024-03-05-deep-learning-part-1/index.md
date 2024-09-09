@@ -4,7 +4,7 @@ description: Highlighting the recent improvements in MLflow for Deep Learning wo
 slug: deep-learning-part-1
 authors: [abe-omorogbe, hubert-zub, yun-park, chen-qian, jesse-chan]
 tags: [Deep Learning]
-thumbnail: img/blog/dl-chart-grouping.gif
+thumbnail: /img/blog/dl-chart-grouping.gif
 ---
 
 In the quickly evolving world of artificial intelligence, where generative AI has taken center stage, the landscape of machine learning is
