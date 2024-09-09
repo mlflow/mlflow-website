@@ -3,7 +3,7 @@ title: MLflow AI Gateway renamed to MLflow Deployments for LLMs
 tags: [ai]
 slug: ai-gateway-rename
 authors: [mlflow-maintainers]
-thumbnail: img/blog/ai-gateway.png
+thumbnail: /img/blog/ai-gateway.png
 ---
 
 If you are currently using the MLflow AI Gateway, please read this in full to get critically important information about this feature!

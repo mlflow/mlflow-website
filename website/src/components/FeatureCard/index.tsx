@@ -1,14 +1,15 @@
 import styles from "./styles.module.css";
 import Arrow from "../community-section/Arrow";
 import clsx from "clsx";
+import ImageCarousel from "../ImageCarousel";
 
 const FeatureCard = ({
   items,
-  img,
+  imgs,
   href,
 }: {
   items: string[];
-  img: string;
+  imgs: string[];
   href: string;
 }) => {
   return (
@@ -31,7 +32,7 @@ const FeatureCard = ({
             </div>
           </div>
           <div className={styles.body}>
-            <img src={img} className={styles.img} />
+            <ImageCarousel images={imgs} />
           </div>
         </div>
       </div>

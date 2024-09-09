@@ -3,7 +3,7 @@ title: MLflow Release Candidates
 tags: [mlflow]
 slug: release-candidates
 authors: [mlflow-maintainers]
-thumbnail: img/blog/release-candidates.png
+thumbnail: /img/blog/release-candidates.png
 ---
 
 # Announcing MLflow Release Candidates

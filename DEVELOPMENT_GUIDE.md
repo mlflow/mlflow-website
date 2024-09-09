@@ -117,6 +117,14 @@ mkdir -p /path/to/mlflow-website/website/static/docs/latest
 cp -r build/html/* /path/to/mlflow-website/website/docs/latest
 ```
 
+### Release tooling
+
+If you are adding a new blog entry, ensure that you have compiled the indexing file by running, from the ``website`` directory, the ``yarn compile`` script.
+This ensures that the main page listing will be updated with the most recent entry.
+
+If you are manually editing release notes or updating an existing release note, you can validate the generated links locally prior to pushing a PR by
+running the script ``yarn fmt-notes`` to run local generation for all release notes that are within the ``releases`` directory.
+
 ### Preview
 
 When a new commit is pushed to the `main` branch, the website is automatically built and deployed to the `gh-pages` branch. You can preview the website at the following URL:
@@ -153,4 +161,7 @@ yarn fmt
 
 # Convert blog post and release notes into typescript code
 yarn compile
+
+# Generate links within release notes
+yarn fmt-notes
 ```

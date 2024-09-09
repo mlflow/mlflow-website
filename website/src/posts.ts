@@ -27,6 +27,60 @@ export type Release = {
 // Sort by date descending
 export const BLOGS: Blog[] = [
   {
+    title: "LangGraph with Custom PyFunc",
+    path: "/blog/mlflow",
+    tags: ["genai", "mlops"],
+    authors: [
+      {
+        name: "Michael Berk",
+        title: "Sr. Resident Solutions Architect at Databricks",
+        url: "https://www.linkedin.com/in/-michael-berk/",
+        image_url: "/img/authors/michael_berk.png",
+      },
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2024-08-06",
+    thumbnail: "/img/blog/release-candidates.png",
+  },
+  {
+    title: "PyFunc in Practice",
+    path: "/blog/pyfunc-in-practice",
+    tags: ["pyfunc", "mlflow", "ensemble-models"],
+    authors: [
+      {
+        name: "Hugo Carvalho",
+        title: "Machine Learning Analyst at adidas",
+        url: "https://www.linkedin.com/in/hugodscarvalho/",
+        image_url: "/img/authors/hugo_carvalho.png",
+      },
+      {
+        name: "Joana Ferreira",
+        title: "Machine Learning Engineer at adidas",
+        url: "https://www.linkedin.com/in/joanaferreira96/",
+        image_url: "/img/authors/joana_ferreira.png",
+      },
+      {
+        name: "Rahul Pandey",
+        title: "Sr. Solutions Architect at adidas",
+        url: "https://www.linkedin.com/in/rahulpandey1901/",
+        image_url: "/img/ambassadors/Rahul_Pandey.png",
+      },
+      {
+        name: "Filipe Miranda",
+        title: "Sr. Data Engineer at adidas",
+        url: "https://www.linkedin.com/in/filipe-miranda-b576b186/",
+        image_url: "/img/authors/filipe_miranda.png",
+      },
+    ],
+    date: "2024-07-26",
+    thumbnail: "/img/blog/pyfunc-in-practice.png",
+  },
+  {
     title: "Introducing MLflow Tracing",
     path: "/blog/mlflow-tracing",
     tags: ["tracing", "genai", "mlops"],
@@ -39,7 +93,7 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2024-06-10",
-    thumbnail: "img/blog/trace-intro.gif",
+    thumbnail: "/img/blog/trace-intro.gif",
   },
   {
     title: "Deep Learning with MLflow (Part 2)",
@@ -72,7 +126,7 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2024-04-26",
-    thumbnail: "img/blog/dl-blog-2.png",
+    thumbnail: "/img/blog/dl-blog-2.png",
   },
   {
     title: "MLflow Release Candidates",
@@ -87,7 +141,7 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2024-04-17",
-    thumbnail: "img/blog/release-candidates.png",
+    thumbnail: "/img/blog/release-candidates.png",
   },
   {
     title:
@@ -125,7 +179,7 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2024-03-05",
-    thumbnail: "img/blog/dl-chart-grouping.gif",
+    thumbnail: "/img/blog/dl-chart-grouping.gif",
   },
   {
     title: "2023 Year in Review",
@@ -140,7 +194,7 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2024-01-26",
-    thumbnail: "img/blog/2023-year-in-review.png",
+    thumbnail: "/img/blog/2023-year-in-review.png",
   },
   {
     title: "Streamline your MLflow Projects with Free Hosted MLflow",
@@ -155,7 +209,7 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2024-01-25",
-    thumbnail: "img/blog/databricks-ce.png",
+    thumbnail: "/img/blog/databricks-ce.png",
   },
   {
     title: "Custom MLflow Models with mlflow.pyfunc",
@@ -170,7 +224,7 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2024-01-23",
-    thumbnail: "img/blog/custom-pyfunc.png",
+    thumbnail: "/img/blog/custom-pyfunc.png",
   },
   {
     title: "MLflow AI Gateway renamed to MLflow Deployments for LLMs",
@@ -185,7 +239,7 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2023-12-01",
-    thumbnail: "img/blog/ai-gateway.png",
+    thumbnail: "/img/blog/ai-gateway.png",
   },
   {
     title:
@@ -201,7 +255,7 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2023-11-30",
-    thumbnail: "img/blog/mlflow-autolog.png",
+    thumbnail: "/img/blog/mlflow-autolog.png",
   },
   {
     title: "MLflow Docs Overhaul",
@@ -216,12 +270,82 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2023-10-31",
-    thumbnail: "img/blog/docs-overhaul.png",
+    thumbnail: "/img/blog/docs-overhaul.png",
   },
 ];
 
 // Sort by date descending
 export const RELEASES: Release[] = [
+  {
+    title: "MLflow 2.16.0",
+    path: "/releases/2.16.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2024-08-30",
+    version: "2.16.0",
+  },
+  {
+    title: "MLflow 2.15.1",
+    path: "/releases/2.15.1",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2024-08-06",
+    version: "2.15.1",
+  },
+  {
+    title: "MLflow 2.15.0",
+    path: "/releases/2.15.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2024-07-29",
+    version: "2.15.0",
+  },
+  {
+    title: "MLflow 2.14.3",
+    path: "/releases/2.14.3",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2024-07-12",
+    version: "2.14.3",
+  },
+  {
+    title: "MLflow 2.14.2",
+    path: "/releases/2.14.2",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2024-07-03",
+    version: "2.14.2",
+  },
   {
     title: "MLflow 2.14.1",
     path: "/releases/2.14.1",
