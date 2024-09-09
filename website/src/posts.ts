@@ -45,7 +45,7 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2024-08-06",
-    thumbnail: "img/blog/release-candidates.png",
+    thumbnail: "/img/blog/release-candidates.png",
   },
   {
     title: "PyFunc in Practice",
@@ -78,7 +78,7 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2024-07-26",
-    thumbnail: "img/blog/pyfunc-in-practice.png",
+    thumbnail: "/img/blog/pyfunc-in-practice.png",
   },
   {
     title: "Introducing MLflow Tracing",
@@ -93,7 +93,7 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2024-06-10",
-    thumbnail: "img/blog/trace-intro.gif",
+    thumbnail: "/img/blog/trace-intro.gif",
   },
   {
     title: "Deep Learning with MLflow (Part 2)",
@@ -126,7 +126,7 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2024-04-26",
-    thumbnail: "img/blog/dl-blog-2.png",
+    thumbnail: "/img/blog/dl-blog-2.png",
   },
   {
     title: "MLflow Release Candidates",
@@ -141,7 +141,7 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2024-04-17",
-    thumbnail: "img/blog/release-candidates.png",
+    thumbnail: "/img/blog/release-candidates.png",
   },
   {
     title:
@@ -179,7 +179,7 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2024-03-05",
-    thumbnail: "img/blog/dl-chart-grouping.gif",
+    thumbnail: "/img/blog/dl-chart-grouping.gif",
   },
   {
     title: "2023 Year in Review",
@@ -194,7 +194,7 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2024-01-26",
-    thumbnail: "img/blog/2023-year-in-review.png",
+    thumbnail: "/img/blog/2023-year-in-review.png",
   },
   {
     title: "Streamline your MLflow Projects with Free Hosted MLflow",
@@ -209,7 +209,7 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2024-01-25",
-    thumbnail: "img/blog/databricks-ce.png",
+    thumbnail: "/img/blog/databricks-ce.png",
   },
   {
     title: "Custom MLflow Models with mlflow.pyfunc",
@@ -224,7 +224,7 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2024-01-23",
-    thumbnail: "img/blog/custom-pyfunc.png",
+    thumbnail: "/img/blog/custom-pyfunc.png",
   },
   {
     title: "MLflow AI Gateway renamed to MLflow Deployments for LLMs",
@@ -239,7 +239,7 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2023-12-01",
-    thumbnail: "img/blog/ai-gateway.png",
+    thumbnail: "/img/blog/ai-gateway.png",
   },
   {
     title:
@@ -255,7 +255,7 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2023-11-30",
-    thumbnail: "img/blog/mlflow-autolog.png",
+    thumbnail: "/img/blog/mlflow-autolog.png",
   },
   {
     title: "MLflow Docs Overhaul",
@@ -270,7 +270,7 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2023-10-31",
-    thumbnail: "img/blog/docs-overhaul.png",
+    thumbnail: "/img/blog/docs-overhaul.png",
   },
 ];
 

@@ -3,7 +3,7 @@ title: Introducing MLflow Tracing
 tags: [tracing, genai, mlops]
 slug: mlflow-tracing
 authors: [mlflow-maintainers]
-thumbnail: img/blog/trace-intro.gif
+thumbnail: /img/blog/trace-intro.gif
 ---
 
 We're excited to announce the release of a powerful new feature in MLflow: [MLflow Tracing](https://mlflow.org/docs/latest/llms/tracing/index.html).

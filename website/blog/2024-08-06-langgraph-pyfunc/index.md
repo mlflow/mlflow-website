@@ -3,7 +3,7 @@ title: LangGraph with Custom PyFunc
 tags: [genai, mlops]
 slug: mlflow
 authors: [michael-berk, mlflow-maintainers]
-thumbnail: img/blog/release-candidates.png
+thumbnail: /img/blog/release-candidates.png
 ---
 
 In this blog, we'll guide you through creating a LangGraph chatbot within an MLflow custom PyFunc. By combining MLflow with LangGraph's ability to create and manage cyclical graphs, you can create powerful stateful, multi-actor applications in a scalable fashion.
