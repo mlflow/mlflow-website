@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Tracing in MLflow</title>
+  <title>Introduction to MLflow Tracing</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -130,7 +130,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../new-features/index.html">New Features</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">LLMs</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="../index.html#id1">MLflow Tracing</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Tracing in MLflow</a><ul>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Introduction to MLflow Tracing</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#automatic-tracing">Automatic Tracing</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tracing-fluent-apis">Tracing Fluent APIs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tracing-client-apis">Tracing Client APIs</a></li>
@@ -150,6 +150,53 @@
 <li class="toctree-l2"><a class="reference internal" href="../index.html#native-mlflow-flavors-for-llms">Native MLflow Flavors for LLMs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../index.html#id5">LLM Tracking in MLflow</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../index.html#tutorials-and-use-case-guides-for-llms-in-mlflow">Tutorials and Use Case Guides for LLMs in MLflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">MLflow Tracing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#automatic-tracing">Automatic Tracing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tracing-fluent-apis">Tracing Fluent APIs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#initiating-a-trace">Initiating a Trace</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#trace-decorator">Trace Decorator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#what-is-captured">What is captured?</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#error-handling-with-traces">Error Handling with Traces</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#how-to-handle-parent-child-relationships">How to handle parent-child relationships</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#span-type">Span Type</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#context-handler">Context Handler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#function-wrapping">Function wrapping</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#tracing-client-apis">Tracing Client APIs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#starting-a-trace">Starting a Trace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#adding-a-child-span">Adding a Child Span</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ending-a-span">Ending a Span</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ending-a-trace">Ending a Trace</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#searching-and-retrieving-traces">Searching and Retrieving Traces</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#searching-for-traces">Searching for Traces</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#retrieving-a-specific-trace">Retrieving a Specific Trace</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#managing-trace-data">Managing Trace Data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#deleting-traces">Deleting Traces</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#setting-and-deleting-trace-tags">Setting and Deleting Trace Tags</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#async-logging">Async Logging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#faq">FAQ</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#q-can-i-disable-and-re-enable-tracing-globally">Q: Can I disable and re-enable tracing globally?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#q-how-can-i-associate-a-trace-with-an-mlflow-run">Q: How can I associate a trace with an MLflow Run?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#q-can-i-use-the-fluent-api-and-the-client-api-together">Q: Can I use the fluent API and the client API together?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#q-how-can-i-add-custom-metadata-to-a-span">Q: How can I add custom metadata to a span?</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#fluent-api">Fluent API</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#client-api">Client API</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#q-how-can-i-see-the-stack-trace-of-a-span-that-captured-an-exception">Q: How can I see the stack trace of a Span that captured an Exception?</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../model-evaluation/index.html">Model Evaluation</a></li>
@@ -212,7 +259,7 @@
         <li><a href="../index.html">LLMs</a> <span class="db-icon db-icon-chevron-right"></span></li>
     
     
-      <li>Tracing in MLflow</li>
+      <li>Introduction to MLflow Tracing</li>
     
     
     <!-- <li class="wy-breadcrumbs-aside">
@@ -224,12 +271,14 @@
             <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
               <div itemprop="articleBody">
                 
-  <div class="section" id="tracing-in-mlflow">
-<h1>Tracing in MLflow<a class="headerlink" href="#tracing-in-mlflow" title="Permalink to this headline"> </a></h1>
+  <div class="section" id="introduction-to-mlflow-tracing">
+<h1>Introduction to MLflow Tracing<a class="headerlink" href="#introduction-to-mlflow-tracing" title="Permalink to this headline"> </a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>MLflow Tracing is currently in <strong>Experimental Status</strong> and is subject to change without deprecation warning or notification.</p>
 </div>
+<p>MLflow Tracing is a feature that enhances LLM observability in your Generative AI (GenAI) applications by capturing detailed information about the execution of your application’s services.
+Tracing provides a way to record the inputs, outputs, and metadata associated with each intermediate step of a request, enabling you to easily pinpoint the source of bugs and unexpected behaviors.</p>
 <p>MLflow offers a number of different options to enable tracing of your GenAI applications.</p>
 <ul class="simple">
 <li><p><strong>Automated tracing</strong>: MLflow provides a fully automated integration with integrated libraries such as LangChain, OpenAI, LlamaIndex, and AutoGen, that can activate by simply enabling <code class="docutils literal notranslate"><span class="pre">mlflow.&lt;library&gt;.autolog()</span></code>.</p></li>
