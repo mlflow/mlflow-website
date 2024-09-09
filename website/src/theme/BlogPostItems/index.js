@@ -14,8 +14,11 @@ export default function BlogPostItems({
   if (isBlog) {
     return (
       <>
-        {BLOGS.map((blog) => (
-          <BlogItem key={blog.id} blog={blog} />
+        {items.map(({ content }) => (
+          <BlogItem
+            key={content.metadata.permalink}
+            blog={content.metadata.frontMatter}
+          />
         ))}
       </>
     );
