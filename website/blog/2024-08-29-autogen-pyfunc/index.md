@@ -49,9 +49,9 @@ You don't have to worry about the specifics of the implementation. At a high lev
 
 1. Takes a prompt.
 2. Leverages [OpenAI's DALLE](https://openai.com/index/dall-e-3/) to create an image based on that prompt.
-3. Iteratively catifies e.g. adds fluffy cats to the image.
+3. Iteratively "catifies" e.g. adds fluffy cats to the image.
 
-Step 3 is where AutoGen shines. We're able to leverage AutoGen's [MultimodalConversableAgent](https://microsoft.github.io/autogen/docs/reference/agentchat/contrib/multimodal_conversable_agent#multimodalconversableagent) to create a critic agent that observes the images and, based on a system prompt provided by the user to "add fluffy cats", gives feedback on how the prompt should be changed.
+Step 3 is where AutoGen shines. We're able to leverage AutoGen's [MultimodalConversableAgent](https://microsoft.github.io/autogen/docs/reference/agentchat/contrib/multimodal_conversable_agent#multimodalconversableagent) to create a critic agent that observes the images and, based on a system prompt provided by the user to "add fluffy cats", gives feedback on how the prompt should be improved.
 
 ```python
 import os
@@ -282,10 +282,15 @@ creator = CatifyWithDalle(
     llm_config={"model": "gpt-4"},
 )
 
-user_proxy = UserProxyAgent(name="User", human_input_mode="NEVER", max_consecutive_auto_reply=0, code_execution_config={
+user_proxy = UserProxyAgent(
+    name="User", 
+    human_input_mode="NEVER", 
+    max_consecutive_auto_reply=0, 
+    code_execution_config={
         "work_dir": "output", # Location where code will be written
         "use_docker": False # Use local jupyter execution environment instead of docker
-    })
+    }
+)
 
 _ = user_proxy.initiate_chat(
     creator, message="Show me something boring"
@@ -371,16 +376,16 @@ result.jpg
 
 ### 2.2 - MLflow Model From Code
 
-Now that we've proven the concept, it's time to leverage MLflow to manage our ML modeling lifecycle. For instance, it's highly likely that we'd want to take this model to production, so strong dependency management, model versioning, and support for iterative tracking between development cycles would all be highly useful.
+Now that we've proven the concept, it's time to leverage MLflow to manage our ML modeling lifecycle. For instance, it's highly likely that we'd want to take this model to production, so strong dependency management, model versioning, and support for tracking between development cycles would all be useful.
 
-In this blog we will leverage the [Models from Code](https://mlflow.org/docs/latest/models.html#models-from-code) feature to achieve the above functionality. MLflow Model from Code allows you to define and log models directly from a stand-alone python script. This feature is particularly useful when you want to log models that can be effectively stored as a code representation (models that do not need optimized weights through training) or applications that rely on external services (e.g., LangChain chains). Another benefit is that this approach entirely bypasses the use of the `pickle` or `cloudpickle` modules within Python, which can carry security
+In this blog we will leverage the [Model from Code](https://mlflow.org/docs/latest/models.html#models-from-code) feature to achieve the above functionality. MLflow Model from Code allows you to define and log models directly from a stand-alone python script. This feature is particularly useful when you want to log models that can be effectively stored as a code representation (models that do not need optimized weights through training) or applications that rely on external services (e.g., LangChain chains). Another benefit is that this approach entirely bypasses the use of the `pickle` or `cloudpickle` modules within Python, which can carry security
 
 To leverage Model from Code, we must perform the following steps:
 
 1. Declare a [custom PyFunc](https://mlflow.org/docs/latest/traditional-ml/creating-custom-pyfunc/index.html)
 2. Leverage [mlflow.models.set_model](https://mlflow.org/docs/latest/python_api/mlflow.models.html?highlight=set_model#mlflow.models.set_model) to indicate which python object is our model.
 
-So, we will simply copy the above and below code to a python file. For simplicity, you can just create a single python file with both code snippets, but MLflow also supports specifying local depdencies when logging our model via the `code_paths` parameter in [mlflow.pyfunc.lod_model](https://mlflow.org/docs/latest/python_api/mlflow.pyfunc.html?highlight=pyfunc%20log_model#mlflow.pyfunc.log_model)
+To achieve these steps, we simply copy the above and below code to a python file. For simplicity, you can just create a single Python file with both code snippets, but MLflow also supports specifying local dependencies when logging our model via the `code_paths` parameter in [mlflow.pyfunc.lod_model](https://mlflow.org/docs/latest/python_api/mlflow.pyfunc.html?highlight=pyfunc%20log_model#mlflow.pyfunc.log_model)
 
 **This step was omitted for brevity and must be done manually.**
 
@@ -410,7 +415,7 @@ class CatifyPyfunc(mlflow.pyfunc.PythonModel):
 mlflow.models.set_model(CatifyPyfunc())
 ```
 
-At the end of this step, you should have a Python file that has both code snippets. The name is up to the users, but for this blog we will use "catify_model.py".
+At the end of this step, you should have a Python file that has both code snippets. The name is up to the user, but for this blog we will use "catify_model.py".
 
 ## 3 Use Our Agent Framework
 
@@ -427,18 +432,18 @@ mlflow.autogen.autolog() # Enable logging of traces
 with mlflow.start_run() as run:
     mlflow.pyfunc.log_model(
         artifact_path="autogen_pyfunc",
-        python_model="catify_model.py",
+        python_model="catify_model.py", # Our model from code python file
 
     )
 
     run_id = run.info.run_id
 ```
 
-With our model logged, let's reload it and perform inference, this time with something more interesting.
+With our model logged, let's reload it and perform inference, this time with a more cool prompt.
 
 ```python
 loaded = mlflow.pyfunc.load_model(f"runs:/{run_id}/autogen_pyfunc")
-loaded.predict("Show me a picture of something cool.")
+loaded.predict("The matrix with a cat")
 ```
 
 <div style="overflow-y: scroll; height: 50vh; border: 1px solid black; padding: 10px;">
@@ -532,11 +537,12 @@ A little dystopian but we'll take it! We have successfully demonstrated that we 
 
 ### 3.2 - Show MLflow Traces
 
-[MLflow Tracing](https://mlflow.org/docs/latest/llms/tracing/index.html) provides a thread-safe API to track the execution of complex applications. The MLflow AutoGen flavor has tracing built in as an autologging feature. So, simply by running `mlflow.autogen.autolog()` we will get tracing automatically when performing inference.
+[MLflow Tracing](https://mlflow.org/docs/latest/llms/tracing/index.html) provides a thread-safe API to track the execution of complex applications. The MLflow AutoGen flavor has tracing built in as an autologging feature. So, simply by running `mlflow.autogen.autolog()` prior to doing inference, we will get traces logged automatically.
 
-Traces can be accessed via fluent APIs, MLflow client, and manually via the MLflow UI. For more, please visit the documentation linked above.
+Traces can be accessed via the fluent APIs, MLflow client, and manually via the MLflow UI. For more, please visit the documentation linked above.
 
 ```python
+# Example with fluent APIs
 last_active_trace = mlflow.get_last_active_trace()
 print(last_active_trace)
 
@@ -557,7 +563,7 @@ IFrame(src="http://127.0.0.1:5000", width="100%", height="600")
 # mlflow_ui_server.terminate()
 ```
 
-If you're not running interactively, you can simply run the follow shell command.
+If you're not running interactively, you can simply run the follow shell command and navigate to the associated host and port in your web browser.
 
 ```bash
 mlflow ui
@@ -567,7 +573,7 @@ If we navigate to the tracing tab, as shown in the image below, we can see our l
 
 ![The MLflow Tracing UI](./_img/tracing_main_page.png)
 
-By clicking on that trace ID, we can see a detailed execution plan. At the bottom, we can see our prompt `"The matrix with a cat."` which kicked off the chat session. From there, many agents interacted to create images and provide feedback to "catify" them. Also, note that the trace ID is the same as the one returned by `mlflow.get_last_active_trace()` above.
+By clicking on that trace ID, we can see a detailed execution plan. At the bottom, we can see our prompt `"The matrix with a cat"` which kicked off the chat session. From there, many agents interacted to create images and provide feedback to "catify" them. Also, note that the trace ID is the same as the one returned by `mlflow.get_last_active_trace()` above.
 
 ![The MLflow Tracing UI](./_img/tracing_detail.png)
 
@@ -577,11 +583,11 @@ Finally, let's dig a bit deeper on the tracing LLM call. As you can see, we have
 
 ### 3.3 - Additional Benefits of MLflow
 
-There is more more happening behind the scenes that is out of the scope of this tutorial, but here's a quick list of additional MLflow features that are useful when building agentic frameworks.
+There is a lot more happening behind the scenes that is out of the scope of this tutorial, but here's a quick list of additional MLflow features that are useful when building agentic frameworks.
 
-1. **Dependency management**: when you log a model, MLflow will automatically try to infer your pip requirements. These requirements are written in several formats that makes remote serving of your model much simpler. If you have local dependencies, as noted above, you can specify additional paths via the `code_paths` argument.
-2. **Model aliasing**: when iteratively building your agentic framework, you want an easy way to compare models. MLflow model [aliases and tags](https://mlflow.org/docs/latest/model-registry.html#deploy-and-organize-models-with-aliases-and-tags) facilitate lookups to the MLflow model registry and allow you to easy load and deploy an exact model version.
-3. **Nested Runs**: with agentic frameworks, especially when training underlying LLM components, you will often have complex nested structures. MLflow supports [nested runs](https://mlflow.org/docs/latest/traditional-ml/hyperparameter-tuning-with-child-runs/part1-child-runs.html) to facilitate aggregating your run information.
+1. **Dependency management**: when you log a model, MLflow will automatically try to infer your pip requirements. These requirements are written in several formats that makes remote serving of your model much simpler. If you have local dependencies, as noted above, you can specify additional paths for MLflow to serialize via the `code_paths` argument when logging your model.
+2. **Model aliasing**: when iteratively building your agentic framework, you want an easy way to compare models. MLflow model [aliases and tags](https://mlflow.org/docs/latest/model-registry.html#deploy-and-organize-models-with-aliases-and-tags) facilitate lookups to the MLflow model registry and allow you to easily load and deploy an specific model version.
+3. **Nested Runs**: with agentic frameworks, especially when training underlying LLM components, you will often have complex nested structures. MLflow supports [nested runs](https://mlflow.org/docs/latest/traditional-ml/hyperparameter-tuning-with-child-runs/part1-child-runs.html) to facilitate aggregating your run information. This can be especially useful with LLM training and fine tuning.
 
 ## 4 - Summary
 
