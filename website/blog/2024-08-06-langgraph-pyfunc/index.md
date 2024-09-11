@@ -12,7 +12,7 @@ Throughout this post we will demonstrate how to leverage MLflow's ChatModel to c
 
 ### What is a Custom PyFunc?
 
-While MLflow strives to cover many popular machine learning libraries, there has been a proliferation of open source packages. If users want MLflow's myriad benefits paired with a package that doesn't have native support, users can create a [custom PyFunc model](https://mlflow.org/docs/latest/traditional-ml/creating-custom-pyfunc/index.html or https://mlflow.org/blog/custom-pyfunc).
+While MLflow strives to cover many popular machine learning libraries, there has been a proliferation of open source packages. If users want MLflow's myriad benefits paired with a package that doesn't have native support, users can create a [custom PyFunc model](https://mlflow.org/docs/latest/traditional-ml/creating-custom-pyfunc/index.html).
 Custom PyFunc models allow you to integrate any Python code, providing flexibility in defining GenAI apps and AI models. These models can be easily logged, managed, and deployed using the typical MLflow APIs, enhancing flexibility and portability in machine learning workflows.
 
 Within the category of custom PyFunc models, MLflow supports a specialized model called [ChatModel](https://mlflow.org/docs/latest/llms/transformers/tutorials/conversational/pyfunc-chat-model.html). It extends the base PyFunc functionality to specifically support messages. For this demo, we will use ChatModel to create a LangGraph chatbot.
