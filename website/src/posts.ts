@@ -28,7 +28,7 @@ export type Release = {
 export const BLOGS: Blog[] = [
   {
     title: "LangGraph with Custom PyFunc",
-    path: "/blog/mlflow",
+    path: "/blog/langgraph-custom-pyfunc",
     tags: ["genai", "mlops"],
     authors: [
       {

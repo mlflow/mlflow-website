@@ -111,6 +111,10 @@ const config: Config = {
             from: "/blog/Deep Learning",
             to: "/blog/deep-learning-part-1",
           },
+          {
+            from: "/blog/mlflow",
+            to: "/blog/langgraph-custom-pyfunc",
+          },
         ],
       },
     ],
