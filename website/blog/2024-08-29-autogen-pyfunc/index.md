@@ -701,7 +701,7 @@ with mlflow.start_run(run_name="log_image_during_inferfence"):
 
 ![Logged Images and JSON Artifacts](./_img/logged_images.png)
 
-We now can share these images with teammates, perform analyses on prompt quality, and much more!
+As you can see, we have logged three the three images of interest and a lookup dict. The keys of the dict correspond to the image names and the values correspond to additional information for how the image was generated. With these artifacts we can perform detailed analyses on prompt quality and make iterative improvements on our "catify" agent!
 
 ### 3.4 - Additional Benefits of MLflow
 
