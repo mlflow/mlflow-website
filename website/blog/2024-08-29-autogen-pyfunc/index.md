@@ -254,7 +254,7 @@ PROMPT: here is the updated prompt!
 
             self.msg_to_critics = f"""Here is the prompt: {img_prompt}.
             Here is the figure <img result.png>.
-            Now, critic and create a prompt so that DALLE can give me a better image.
+            Now, critique and create a prompt so that DALLE can give me a better image.
             Show me both "CRITICS" and "PROMPT"!
             """
             self.send(message=self.msg_to_critics, recipient=self.critics, request_reply=True)
