@@ -1,0 +1,598 @@
+
+
+<!DOCTYPE html>
+<!-- source: docs/source/llms/transformers/large-models.rst -->
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Working with Large Models in MLflow Transformers flavor</title>
+  
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/llms/transformers/large-models.html">
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    
+
+    
+
+  
+    
+        <!-- Google Tag Manager -->
+        <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer',"GTM-N6WMTTJ");</script>
+        <!-- End Google Tag Manager -->
+    
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/grids.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/mobile.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/simple-cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/tabs.css" type="text/css" />
+    
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="MLflow 2.16.1.dev0 documentation" href="../../index.html"/>
+        <link rel="up" title="MLflow Transformers Flavor" href="index.html"/>
+        <link rel="next" title="Tasks in MLflow Transformers Flavor" href="/task.html"/>
+        <link rel="prev" title="Prompt Templating with MLflow and Transformers" href="/tutorials/prompt-templating/prompt-templating.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+<script type="text/javascript" src="../../_static/jquery.js"></script>
+<script type="text/javascript" src="../../_static/underscore.js"></script>
+<script type="text/javascript" src="../../_static/doctools.js"></script>
+<script type="text/javascript" src="../../_static/languagesections.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+<script type="text/javascript" src="../../_static/runllm.js"></script>
+
+<body class="wy-body-for-nav" role="document">
+  
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N6WMTTJ"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+  
+
+  
+  <nav class="wy-nav-top header" role="navigation" aria-label="top navigation">
+    <ul>
+  <li class="menu-toggle">
+    <i data-toggle="wy-nav-top" class="wy-nav-top-menu-button db-icon db-icon-menu pull-left"></i>
+    <a href="../../index.html" class="wy-nav-top-logo"
+      ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
+    /></a>
+    <span class="version">2.16.1.dev0</span>
+  </li>
+</ul>
+  </nav>
+  <page>
+    
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side relative">
+      <div class="wy-side-scroll">
+  <div class="wy-side-nav-search">
+    
+
+    
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+    
+  </div>
+
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+    
+      <a href="../../index.html" class="main-navigation-home"><img src="../../_static/icons/nav-home.svg"> MLflow</a>
+    
+
+    
+      
+
+      
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../introduction/index.html">What is MLflow?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started/index.html">Getting Started with MLflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../new-features/index.html">New Features</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">LLMs</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#id1">MLflow Tracing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#id2">MLflow Deployments Server for LLMs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#id3">LLM Evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#id4">Prompt Engineering UI</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#native-mlflow-flavors-for-llms">Native MLflow Flavors for LLMs</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="index.html">MLflow Transformers Flavor</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="index.html#introduction">Introduction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="index.html#getting-started-with-the-mlflow-transformers-flavor-tutorials-and-guides">Getting Started with the MLflow Transformers Flavor - Tutorials and Guides</a></li>
+<li class="toctree-l4"><a class="reference internal" href="index.html#important-details-to-be-aware-of-with-the-transformers-flavor">Important Details to be aware of with the transformers flavor</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="index.html#logging-large-models">Logging Large Models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="index.html#working-with-tasks-for-transformer-pipelines">Working with <code class="docutils literal notranslate"><span class="pre">tasks</span></code> for Transformer Pipelines</a></li>
+<li class="toctree-l4"><a class="reference internal" href="index.html#id1">Detailed Documentation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="index.html#learn-more-about-transformers">Learn more about Transformers</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../openai/index.html">MLflow OpenAI Flavor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../sentence-transformers/index.html">MLflow Sentence-Transformers Flavor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../langchain/index.html">MLflow LangChain Flavor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../llama-index/index.html">MLflow LlamaIndex Flavor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../index.html#explore-the-native-llm-flavors">Explore the Native LLM Flavors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#id5">LLM Tracking in MLflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#tutorials-and-use-case-guides-for-llms-in-mlflow">Tutorials and Use Case Guides for LLMs in MLflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tracing/index.html">MLflow Tracing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../model-evaluation/index.html">Model Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../deep-learning/index.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../traditional-ml/index.html">Traditional ML</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../deployment/index.html">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tracking.html">MLflow Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../system-metrics/index.html">System Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../projects.html">MLflow Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../models.html">MLflow Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../model-registry.html">MLflow Model Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../recipes.html">MLflow Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plugins.html">MLflow Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auth/index.html">MLflow Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../search-runs.html">Search Runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../search-experiments.html">Search Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../python_api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../R-api.html">R API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../java_api/index.html">Java API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rest-api.html">REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../docker.html">Official MLflow Docker Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../community-model-flavors.html">Community Model Flavors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials-and-examples/index.html">Tutorials and Examples</a></li>
+</ul>
+
+      
+    
+  </div>
+
+  <div role="contentinfo">
+    
+
+    <p>
+      <a id='feedbacklink' href="https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a>
+    </p>
+  </div>
+</div>
+    </nav>
+
+    <main class="wy-grid-for-nav">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+          <div class="rst-content">
+            
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Documentation</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../index.html">LLMs</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="index.html">MLflow Transformers Flavor</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+    
+      <li>Working with Large Models in MLflow Transformers flavor</li>
+    
+    
+    <!-- <li class="wy-breadcrumbs-aside">
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/llms/transformers/large-models.rst" class="fa fa-github"> Edit on GitHub</a>
+    </li> -->
+    
+  </ul>
+</div>
+            <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <div itemprop="articleBody">
+                
+  <div class="section" id="working-with-large-models-in-mlflow-transformers-flavor">
+<h1>Working with Large Models in MLflow Transformers flavor<a class="headerlink" href="#working-with-large-models-in-mlflow-transformers-flavor" title="Permalink to this headline"> </a></h1>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The features described in this guide are intended for advanced users familiar with Transformers and MLflow. Please understand the limitations and potential risks associated with these features before use.</p>
+</div>
+<p>The <a class="reference external" href="../index.html">MLflow Transformers flavor</a> allows you to track various Transformers models in MLflow. However, logging large models such as Large Language Models (LLMs) can be resource-intensive due to their size and memory requirements. This guide outlines MLflow’s features for reducing memory and disk usage when logging models, enabling you to work with large models in resource-constrained environments.</p>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline"> </a></h2>
+<p>The following table summarizes the different methods for logging models with the Transformers flavor. Please be aware that each method has certain limitations and requirements, as described in the following sections.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Save method</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Memory Usage</p></th>
+<th class="head"><p>Disk Usage</p></th>
+<th class="head"><p>Example</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Normal pipeline-based logging</p></td>
+<td><p>Log a model using a pipeline instance or a dictionary of pipeline components.</p></td>
+<td><p>High</p></td>
+<td><p>High</p></td>
+<td><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">import</span> <span class="nn">transformers</span>
+
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">pipeline</span><span class="p">(</span>
+    <span class="n">task</span><span class="o">=</span><span class="s2">&quot;text-generation&quot;</span><span class="p">,</span>
+    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;meta-llama/Meta-Llama-3.1-70B&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">transformers</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+        <span class="n">transformers_model</span><span class="o">=</span><span class="n">pipeline</span><span class="p">,</span>
+        <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#transformers-memory-efficient-logging"><span class="std std-ref">Memory-Efficient Model Logging</span></a></p></td>
+<td><p>Log a model by specifying a path to a local checkpoint, avoiding loading the model into memory.</p></td>
+<td><p><strong>Low</strong></p></td>
+<td><p>High</p></td>
+<td><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">transformers</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+        <span class="c1"># Pass a path to local checkpoint as a model</span>
+        <span class="n">transformers_model</span><span class="o">=</span><span class="s2">&quot;/path/to/local/checkpoint&quot;</span><span class="p">,</span>
+        <span class="c1"># Task argument is required for this saving mode.</span>
+        <span class="n">task</span><span class="o">=</span><span class="s2">&quot;text-generation&quot;</span><span class="p">,</span>
+        <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#transformers-save-pretrained-guide"><span class="std std-ref">Storage-Efficient Model Logging</span></a></p></td>
+<td><p>Log a model by saving a reference to the HuggingFace Hub repository instead of the model weights.</p></td>
+<td><p>High</p></td>
+<td><p><strong>Low</strong></p></td>
+<td><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">import</span> <span class="nn">transformers</span>
+
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">pipeline</span><span class="p">(</span>
+    <span class="n">task</span><span class="o">=</span><span class="s2">&quot;text-generation&quot;</span><span class="p">,</span>
+    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;meta-llama/Meta-Llama-3.1-70B&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">transformers</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+        <span class="n">transformers_model</span><span class="o">=</span><span class="n">pipeline</span><span class="p">,</span>
+        <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
+        <span class="c1"># Set save_pretrained to False to save storage space</span>
+        <span class="n">save_pretrained</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="memory-efficient-model-logging">
+<span id="transformers-memory-efficient-logging"></span><h2>Memory-Efficient Model Logging<a class="headerlink" href="#memory-efficient-model-logging" title="Permalink to this headline"> </a></h2>
+<p>Introduced in MLflow 2.16.1, this method allows you to log a model without loading it into memory:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">transformers</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+        <span class="c1"># Pass a path to local checkpoint as a model to avoid loading the model instance</span>
+        <span class="n">transformers_model</span><span class="o">=</span><span class="s2">&quot;path/to/local/checkpoint&quot;</span><span class="p">,</span>
+        <span class="c1"># Task argument is required for this saving mode.</span>
+        <span class="n">task</span><span class="o">=</span><span class="s2">&quot;text-generation&quot;</span><span class="p">,</span>
+        <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<p>In the above example, we pass a path to the local model checkpoint/weight as the model argument in the  <a class="reference internal" href="../../python_api/mlflow.transformers.html#mlflow.transformers.log_model" title="mlflow.transformers.log_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.transformers.log_model()</span></code></a> API, instead of a pipeline instance. MLflow will inspect the model metadata of the checkpoint and log the model weights without loading them into memory. This way, you can log an enormous multi-billion parameter model  to MLflow with minimal computational resources.</p>
+<div class="section" id="important-notes">
+<h3>Important Notes<a class="headerlink" href="#important-notes" title="Permalink to this headline"> </a></h3>
+<p>Please be aware of the following requirements and limitations when using this feature:</p>
+<ol class="arabic simple">
+<li><p>The checkpoint directory <strong>must</strong> contain a valid config.json file and the model weight files. If a tokenizer is required, its state file must also be present in the checkpoint directory. You can save the tokenizer state in your checkpoint directory by calling <code class="docutils literal notranslate"><span class="pre">tokenizer.save_pretrained(&quot;path/to/local/checkpoint&quot;)</span></code> method.</p></li>
+<li><p>You <strong>must</strong> specify the <code class="docutils literal notranslate"><span class="pre">task</span></code> argument with the appropriate task name that the model is designed for.</p></li>
+<li><p>MLflow may not accurately infer model dependencies in this mode. Please refer to <a class="reference external" href="../../model/dependencies.html">Managing Dependencies in MLflow Models</a> for more information on managing dependencies for your model.</p></li>
+</ol>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Ensure you specify the correct task argument, as an incompatible task will cause the model to <strong>fail at the load time</strong>. You can check the valid task type for your model on the HuggingFace Hub.</p>
+</div>
+</div>
+</div>
+<div class="section" id="storage-efficient-model-logging">
+<span id="transformers-save-pretrained-guide"></span><h2>Storage-Efficient Model Logging<a class="headerlink" href="#storage-efficient-model-logging" title="Permalink to this headline"> </a></h2>
+<p>Typically, when MLflow logs an ML model, it saves a copy of the model weight to the artifact store.
+However, this is not optimal when you use a pretrained model from HuggingFace Hub and have no intention of fine-tuning or otherwise manipulating the model or its weights before logging it. For this very common case, copying the (typically very large) model weights is redundant while developing prompts, testing inference parameters, and otherwise is little more than an unnecessary waste of storage space.</p>
+<p>To address this issue, MLflow 2.11.0 introduced a new argument <code class="docutils literal notranslate"><span class="pre">save_pretrained</span></code> in the <a class="reference internal" href="../../python_api/mlflow.transformers.html#mlflow.transformers.save_model" title="mlflow.transformers.save_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.transformers.save_model()</span></code></a> and <a class="reference internal" href="../../python_api/mlflow.transformers.html#mlflow.transformers.log_model" title="mlflow.transformers.log_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.transformers.log_model()</span></code></a> APIs. When with argument is set to <code class="docutils literal notranslate"><span class="pre">False</span></code>, MLflow will forego saving the pretrained model weights, opting instead to store a reference to the underlying repository entry on the HuggingFace Hub; specifically, the repository name and the unique commit hash of the model weights are stored when your components or pipeline are logged. When loading back such a <em>reference-only</em> model, MLflow will check the repository name and commit hash from the saved metadata, and either download the model weight from the HuggingFace Hub or use the locally cached model from your HuggingFace local cache directory.</p>
+<p>Here is the example of using <code class="docutils literal notranslate"><span class="pre">save_pretrained</span></code> argument for logging a model</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">transformers</span>
+
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">pipeline</span><span class="p">(</span>
+    <span class="n">task</span><span class="o">=</span><span class="s2">&quot;text-generation&quot;</span><span class="p">,</span>
+    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;meta-llama/Meta-Llama-3.1-70B&quot;</span><span class="p">,</span>
+    <span class="n">torch_dtype</span><span class="o">=</span><span class="s2">&quot;torch.float16&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">transformers</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+        <span class="n">transformers_model</span><span class="o">=</span><span class="n">pipeline</span><span class="p">,</span>
+        <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
+        <span class="c1"># Set save_pretrained to False to save storage space</span>
+        <span class="n">save_pretrained</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<p>In the above example, MLflow will not save a copy of the <strong>Llama-3.1-70B</strong> model’s weights and will instead log the following metadata as a reference to the HuggingFace Hub model. This will save roughly 150GB of storage space and reduce the logging latency significantly as well for each run that you initiate during development.</p>
+<p>By navigating to the MLflow UI, you can see the model logged with the repository ID and commit hash:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>flavors:
+<span class="w">    </span>...
+<span class="w">    </span>transformers:
+<span class="w">        </span>source_model_name:<span class="w"> </span>meta-llama/Meta-Llama-3.1-70B-Instruct
+<span class="w">        </span>source_model_revision:<span class="w"> </span>33101ce6ccc08fa6249c10a543ebfcac65173393
+<span class="w">        </span>...
+</pre></div>
+</div>
+<p>Before production deployments, you may want to persist the model weight instead of the repository reference. To do so, you can use the <a class="reference internal" href="../../python_api/mlflow.transformers.html#mlflow.transformers.persist_pretrained_model" title="mlflow.transformers.persist_pretrained_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.transformers.persist_pretrained_model()</span></code></a> API to download the model weight from the HuggingFace Hub and save it to the artifact location. Please refer to the <a class="reference internal" href="#persist-pretrained-guide"><span class="std std-ref">OSS Model Registry or Legacy Workspace Model Registry</span></a> section for more information.</p>
+<div class="section" id="registering-reference-only-models-for-production">
+<h3>Registering Reference-Only Models for Production<a class="headerlink" href="#registering-reference-only-models-for-production" title="Permalink to this headline"> </a></h3>
+<p>The models logged with either of the above optimized methods are “reference-only”, meaning that the model weight is not saved to the artifact store and only the reference to the HuggingFace Hub repository is saved. When you load the model back normally, MLflow will download the model weight from the HuggingFace Hub.</p>
+<p>However, this may not be suitable for production use cases, as the model weight may be unavailable or the download may fail due to network issues. MLflow provides a solution to address this issue when registering reference-models to the Model Registry.</p>
+<div class="section" id="databricks-unity-catalog">
+<h4>Databricks Unity Catalog<a class="headerlink" href="#databricks-unity-catalog" title="Permalink to this headline"> </a></h4>
+<p>Registering reference-only models to <a class="reference external" href="https://docs.databricks.com/en/machine-learning/manage-model-lifecycle/index.html">Databricks Unity Catalog Model Registry</a> requires <strong>no additional steps</strong> than the normal model registration process. MLflow automatically downloads and registers the model weights to Unity Catalog along with the model metadata.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_registry_uri</span><span class="p">(</span><span class="s2">&quot;databricks-uc&quot;</span><span class="p">)</span>
+
+<span class="c1"># Log the repository ID as a model. The model weight will not be saved to the artifact store</span>
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="n">model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">transformers</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+        <span class="n">transformers_model</span><span class="o">=</span><span class="s2">&quot;meta-llama/Meta-Llama-3.1-70B-Instruct&quot;</span><span class="p">,</span>
+        <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+<span class="c1"># When registering the model to Unity Catalog Model Registry, MLflow will automatically</span>
+<span class="c1"># persist the model weight files. This may take a several minutes for large models.</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">register_model</span><span class="p">(</span><span class="n">model_info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">,</span> <span class="s2">&quot;your.model.name&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="oss-model-registry-or-legacy-workspace-model-registry">
+<span id="persist-pretrained-guide"></span><h4>OSS Model Registry or Legacy Workspace Model Registry<a class="headerlink" href="#oss-model-registry-or-legacy-workspace-model-registry" title="Permalink to this headline"> </a></h4>
+<p>For OSS Model Registry or the legacy Workspace Model Registry in Databricks, you need to manually persist the
+model weight to the artifact store before registering the model. You can use the <a class="reference internal" href="../../python_api/mlflow.transformers.html#mlflow.transformers.persist_pretrained_model" title="mlflow.transformers.persist_pretrained_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.transformers.persist_pretrained_model()</span></code></a> API to download the model weight from the HuggingFace Hub and save it to the artifact location. The process <strong>does NOT require re-logging a model</strong> but efficiently update the existing model and metadata in-place.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="c1"># Log the repository ID as a model. The model weight will not be saved to the artifact store</span>
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="n">model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">transformers</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+        <span class="n">transformers_model</span><span class="o">=</span><span class="s2">&quot;meta-llama/Meta-Llama-3.1-70B-Instruct&quot;</span><span class="p">,</span>
+        <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+<span class="c1"># Before registering the model to the non-UC model registry, persist the model weight</span>
+<span class="c1"># from the HuggingFace Hub to the artifact location.</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">transformers</span><span class="o">.</span><span class="n">persist_pretrained_model</span><span class="p">(</span><span class="n">model_info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
+
+<span class="c1"># Register the model</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">register_model</span><span class="p">(</span><span class="n">model_info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">,</span> <span class="s2">&quot;your.model.name&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="caveats-for-skipping-saving-of-pretrained-model-weights">
+<span id="caveats-of-save-pretrained"></span><h3>Caveats for Skipping Saving of Pretrained Model Weights<a class="headerlink" href="#caveats-for-skipping-saving-of-pretrained-model-weights" title="Permalink to this headline"> </a></h3>
+<p>While these features are useful for saving computational resources and storage space for logging large models, there are some caveats to be aware of:</p>
+<ul class="simple">
+<li><p><strong>Change in Model Availability</strong>: If you are using a model from other users’ repository, the model may be deleted or become private in the HuggingFace Hub. In such cases, MLflow cannot load the model back. For production use cases, it is recommended to save a  copy of the model weights to the artifact store prior to moving from development or staging to production for your model.</p></li>
+<li><p><strong>HuggingFace Hub Access</strong>: Downloading a model from the HuggingFace Hub might be slow or unstable due to the network latency or the HuggingFace Hub service status. MLflow doesn’t provide any retry mechanism or robust error handling for model downloading from the HuggingFace Hub. As such, you should not rely on this functionality for your final production-candidate run.</p></li>
+</ul>
+<p>By understanding these methods and their limitations, you can effectively work with large Transformers models in MLflow while optimizing resource usage.</p>
+</div>
+</div>
+</div>
+
+
+              </div>
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="tutorials/prompt-templating/prompt-templating.html" class="btn btn-neutral" title="Prompt Templating with MLflow and Transformers" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+      
+      
+        <a href="task.html" class="btn btn-neutral" title="Tasks in MLflow Transformers Flavor" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+      <p class="copyright">
+          &copy; MLflow Project, a Series of LF Projects, LLC. All rights reserved.
+      </p>
+
+  </div> 
+
+</footer>
+          </div>
+        </div>
+      </section>
+    </main>
+  </page>
+
+  
+
+
+  
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+      URL_ROOT:'../../',
+      VERSION:'2.16.1.dev0',
+      COLLAPSE_INDEX:false,
+      FILE_SUFFIX:'.html',
+      LINK_SUFFIX: '.html',
+      HAS_SOURCE:  true
+    };
+  </script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/clipboard.min.js"></script>
+  <script type="text/javascript" src="../../_static/js/jquery.waypoints.min.js"></script>
+
+  
+  
+  
+  <script type="text/javascript">var CLIPPY_SVG_PATH = "../../_static/clippy.svg";</script>
+  <script type="text/javascript" src="../../_static/js/custom.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.StickyNav.enable();
+    });
+
+  </script>
+  
+
+  
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        // Get the code block designator class entries
+        const allHighlights = document.querySelectorAll('.highlight');
+        // Disable copyable links for notebook cell numbering and for cell outputs
+        const highlights = Array.from(allHighlights).filter(highlight => !highlight.closest('.highlight-none') && 
+            !highlight.closest('.nboutput'));
+    
+        highlights.forEach(function(highlight) {
+            const copyIcon = document.createElement('span');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.innerHTML = '&#xf0ea;';
+
+            copyIcon.addEventListener('click', function() {
+                const code = highlight.querySelector('pre').textContent;
+                copyToClipboard(code);
+
+                // Flash effect on click
+                this.style.color = '#0194E2';
+                setTimeout(() => {
+                    this.style.color = ''; 
+                }, 100);
+
+                // Display "Code copied to clipboard" near the clicked icon
+                const message = document.createElement('span');
+                message.textContent = "Copied!";
+                message.classList.add('copy-message'); 
+
+                // Append the message to the icon
+                this.appendChild(message);
+
+                setTimeout(() => {
+                    this.removeChild(message);
+                }, 500);
+            });
+
+            highlight.appendChild(copyIcon);
+        });
+    });
+  </script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Force download for notebook-download-btn
+        const downloadButtons = document.querySelectorAll('.notebook-download-btn');
+        downloadButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                // Fetch the raw content of the notebook from GitHub
+                fetch(button.href)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = url;
+                        const filename = button.href.split('/').pop();
+                        link.download = filename; 
+
+                        document.body.appendChild(link);
+                        link.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    })
+                    .catch(err => console.error('Error fetching the notebook:', err));
+            });
+        });
+    });
+</script> 
+</body>
+</html>

@@ -69,6 +69,7 @@
 <script type="text/javascript" src="../../../_static/languagesections.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+<script type="text/javascript" src="../../../_static/runllm.js"></script>
 
 <body class="wy-body-for-nav" role="document">
   
@@ -222,6 +223,7 @@
 <span class="kn">from</span> <span class="nn">mlflow.tracing.constant</span> <span class="kn">import</span> <span class="n">SpanAttributeKey</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracing.utils.exception</span> <span class="kn">import</span> <span class="n">raise_as_trace_exception</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracing.utils.once</span> <span class="kn">import</span> <span class="n">Once</span>
+<span class="kn">from</span> <span class="nn">mlflow.tracing.utils.otlp</span> <span class="kn">import</span> <span class="n">get_otlp_exporter</span><span class="p">,</span> <span class="n">should_use_otlp_exporter</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.databricks_utils</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">is_in_databricks_model_serving_environment</span><span class="p">,</span>
     <span class="n">is_mlflow_tracing_enabled_in_model_serving</span><span class="p">,</span>
@@ -321,7 +323,15 @@
         <span class="n">_MLFLOW_TRACER_PROVIDER</span> <span class="o">=</span> <span class="n">trace</span><span class="o">.</span><span class="n">NoOpTracerProvider</span><span class="p">()</span>
         <span class="k">return</span>
 
-    <span class="k">if</span> <span class="n">is_in_databricks_model_serving_environment</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">should_use_otlp_exporter</span><span class="p">():</span>
+        <span class="c1"># Export to OpenTelemetry Collector when configured</span>
+        <span class="kn">from</span> <span class="nn">mlflow.tracing.processor.otel</span> <span class="kn">import</span> <span class="n">OtelSpanProcessor</span>
+
+        <span class="n">exporter</span> <span class="o">=</span> <span class="n">get_otlp_exporter</span><span class="p">()</span>
+        <span class="n">processor</span> <span class="o">=</span> <span class="n">OtelSpanProcessor</span><span class="p">(</span><span class="n">exporter</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">is_in_databricks_model_serving_environment</span><span class="p">():</span>
+        <span class="c1"># Export to Inference Table when running in Databricks Model Serving</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">is_mlflow_tracing_enabled_in_model_serving</span><span class="p">():</span>
             <span class="n">_MLFLOW_TRACER_PROVIDER</span> <span class="o">=</span> <span class="n">trace</span><span class="o">.</span><span class="n">NoOpTracerProvider</span><span class="p">()</span>
             <span class="k">return</span>
@@ -331,7 +341,9 @@
 
         <span class="n">exporter</span> <span class="o">=</span> <span class="n">InferenceTableSpanExporter</span><span class="p">()</span>
         <span class="n">processor</span> <span class="o">=</span> <span class="n">InferenceTableSpanProcessor</span><span class="p">(</span><span class="n">exporter</span><span class="p">)</span>
+
     <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Default to MLflow Tracking Server</span>
         <span class="kn">from</span> <span class="nn">mlflow.tracing.export.mlflow</span> <span class="kn">import</span> <span class="n">MlflowSpanExporter</span>
         <span class="kn">from</span> <span class="nn">mlflow.tracing.processor.mlflow</span> <span class="kn">import</span> <span class="n">MlflowSpanProcessor</span>
 
