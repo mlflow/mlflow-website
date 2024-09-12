@@ -3,7 +3,7 @@ title: AutoGen with Custom PyFunc
 tags: [genai, mlops]
 slug: mlflow
 authors: [michael-berk, mlflow-maintainers]
-thumbnail: img/blog/autogen-blog.png
+thumbnail: /img/blog/autogen-blog.png
 ---
 
 In this blog, we'll guide you through creating an [AutoGen](https://microsoft.github.io/autogen/) agent framework within an MLflow custom PyFunc. By combining MLflow with AutoGen's ability to create multi-agent frameworks, we are able to create scalable and stable GenAI applications.
@@ -85,7 +85,7 @@ def dalle_call(client: OpenAI, model: str, prompt: str, size: str, quality: str,
         client (OpenAI): The OpenAI client instance for making API calls.
         model (str): The specific DALL-E model to use for image generation.
         prompt (str): The text prompt based on which the image is generated.
-        size (str): The size specification of the image. TODO: This should allow specifying landscape, square, or portrait modes.
+        size (str): The size specification of the image. 
         quality (str): The quality setting for the image generation.
         n (int): The number of images to generate.
 
@@ -177,12 +177,11 @@ class DALLEAgent(ConversableAgent):
             messages = self._oai_messages[sender]
 
         prompt = messages[-1]["content"]
-        # TODO: integrate with autogen.oai. For instance, with caching for the API call
         img_data = dalle_call(
             client=client,
             model="dall-e-3",
             prompt=prompt,
-            size="1024x1024",  # TODO: the size should be flexible, deciding landscape, square, or portrait mode.
+            size="1024x1024",  
             quality="standard",
             n=1,
         )
@@ -443,7 +442,7 @@ With our model logged, let's reload it and perform inference, this time with a m
 
 ```python
 loaded = mlflow.pyfunc.load_model(f"runs:/{run_id}/autogen_pyfunc")
-loaded.predict("The matrix with a cat")
+out = loaded.predict("The matrix with a cat")
 ```
 
 <div style="overflow-y: scroll; height: 50vh; border: 1px solid black; padding: 10px;">
@@ -581,7 +580,130 @@ Finally, let's dig a bit deeper on the tracing LLM call. As you can see, we have
 
 ![The MLflow Tracing UI](./_img/tracing_chat_completion_1.png)
 
-### 3.3 - Additional Benefits of MLflow
+### 3.3 - Logging Artifacts with MLflow
+Tracing's primary purpose is to provide robust lightweight summaries of complex agent executions. For larger or custom payloads, MLflow exposes a variety of artifact-logging APIs that can store images, text, tables, and more in the MLflow tracking server. Let's quickly demonstrate this functionality by logging the prompts and their associated images.
+
+Within our `CatifyWithDalle` class, we will make 5 modifications...
+1. Create an instance variable in the init to save metadata about our objects.
+2. Create a utility to increment our metadata and log and image with [mlflow.log_image](https://mlflow.org/docs/latest/python_api/mlflow.html?highlight=log_image#mlflow.log_image).
+3. Add this utility to logging locations of interest.
+4. Log our metadata object as JSON with [mlflow.log_dict](https://mlflow.org/docs/latest/python_api/mlflow.html?highlight=log_image#mlflow.log_dict).
+
+```diff
++ import uuid
+
+class CatifyWithDalle(AssistantAgent):
+    def __init__(self, n_iters=2, **kwargs):
+        """
+        Initializes a CatifyWithDalle instance.
+
+        This agent facilitates the creation of visualizations through a collaborative effort among
+        its child agents: dalle and critics.
+
+        Parameters:
+            - n_iters (int, optional): The number of "improvement" iterations to run. Defaults to 2.
+            - **kwargs: keyword arguments for the parent AssistantAgent.
+        """
+        super().__init__(**kwargs)
+        self.register_reply([Agent, None], reply_func=CatifyWithDalle._reply_user, position=0)
+        self._n_iters = n_iters
++       self.dict_to_log = {}
+
++   def _log_image_and_append_to_dict(self, img: Image, img_prompt: str, image_index: int)-> None:
++      # Generate a unique ID
++     _id = str(uuid.uuid1())
+
++       # Append to class variable to log once at the end of all inference
++       self.dict_to_log[_id] = {"prompt": img_prompt, "index": image_index}
+
++       # Log image to MLflow tracking server
++       mlflow.log_image(img, f"{_id}.png")
+
+    def _reply_user(self, messages=None, sender=None, config=None):
+        if all((messages is None, sender is None)):
+            error_msg = f"Either {messages=} or {sender=} must be provided."
+            raise AssertionError(error_msg)
+
+        if messages is None:
+            messages = self._oai_messages[sender]
+
+        img_prompt = messages[-1]["content"]
+
+        ## Define the agents
+        self.critics = MultimodalConversableAgent(
+            name="Critics",
+            system_message=f"""You need to improve the prompt of the figures you saw.
+{CRITIC_PROMPT}
+Reply with the following format:
+
+CRITICS: the image needs to improve...
+PROMPT: here is the updated prompt!
+
+""",
+            llm_config={"max_tokens": 1000, "model": "gpt-4o"},
+            human_input_mode="NEVER",
+            max_consecutive_auto_reply=3,
+        )
+
+        self.dalle = DALLEAgent(
+            name="Dalle", llm_config={"model": "dalle"}, max_consecutive_auto_reply=0
+        )
+
+        # Data flow begins
+        self.send(message=img_prompt, recipient=self.dalle, request_reply=True)
+        img = extract_img(self.dalle)
+        plt.imshow(img)
+        plt.axis("off")  # Turn off axis numbers
+        plt.show()
+        print("Image PLOTTED")
+
++       self._log_image_and_append_to_dict(img, img_prompt, -1)
+
+        for i in range(self._n_iters):
+            # Downsample the image s.t. GPT-4V can take
+            img = extract_img(self.dalle)
+            smaller_image = img.resize((128, 128), Image.Resampling.LANCZOS)
+            smaller_image.save("result.png")
+
+            self.msg_to_critics = f"""Here is the prompt: {img_prompt}.
+            Here is the figure <img result.png>.
+            Now, critic and create a prompt so that DALLE can give me a better image.
+            Show me both "CRITICS" and "PROMPT"!
+            """
+            self.send(message=self.msg_to_critics, recipient=self.critics, request_reply=True)
+            feedback = self._oai_messages[self.critics][-1]["content"]
+            img_prompt = re.findall("PROMPT: (.*)", feedback)[0]
+
+            self.send(message=img_prompt, recipient=self.dalle, request_reply=True)
+            img = extract_img(self.dalle)
+            plt.imshow(img)
+            plt.axis("off")  # Turn off axis numbers
+            plt.show()
+            print(f"Image {i} PLOTTED")
++           self._log_image_and_append_to_dict(img, img_prompt, i)
+
+
+
++       mlflow.log_dict(self.dict_to_log, "image_lookup.json")
+        return True, "result.jpg"
+```
+
+Now, if we rerun the above logging code, every time we load the newest version of our model, images generated by inference will be logged and a JSON object with all prompts, indexes of the prompts, and image names (for lookup purposes) will be logged.
+
+Let's demonstrate this and wrap infernce in a single MLflow run for easy aggregation. Also note that we will be leveraging Autogen's [caching](https://microsoft.github.io/autogen/docs/reference/cache/) functionality, so given we've already done inference with this prompt, we won't actually be making LLM calls again; we're just reading from cache and logging with our new MLflow code.
+
+```python
+# Be sure to re-log the model by rerunning the above code
+with mlflow.start_run(run_name="log_image_during_inferfence"):
+    loaded = mlflow.pyfunc.load_model(f"runs:/{run_id}/autogen_pyfunc")
+    loaded.predict("The matrix with a cat")
+```
+
+![Logged Images and JSON Artifacts](./_img/logged_images.png)
+
+We now can share these images with teammates, perform analyses on prompt quality, and much more!
+
+### 3.4 - Additional Benefits of MLflow
 
 There is a lot more happening behind the scenes that is out of the scope of this tutorial, but here's a quick list of additional MLflow features that are useful when building agentic frameworks.
 
