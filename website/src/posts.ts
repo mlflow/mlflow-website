@@ -27,6 +27,27 @@ export type Release = {
 // Sort by date descending
 export const BLOGS: Blog[] = [
   {
+    title: "AutoGen with Custom PyFunc",
+    path: "/blog/autogen-image-agent",
+    tags: ["genai", "mlops"],
+    authors: [
+      {
+        name: "Michael Berk",
+        title: "Sr. Resident Solutions Architect at Databricks",
+        url: "https://www.linkedin.com/in/-michael-berk/",
+        image_url: "/img/authors/michael_berk.png",
+      },
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2024-08-29",
+    thumbnail: "/img/blog/autogen-blog.png",
+  },
+  {
     title: "LangGraph with Custom PyFunc",
     path: "/blog/langgraph-custom-pyfunc",
     tags: ["genai", "mlops"],
