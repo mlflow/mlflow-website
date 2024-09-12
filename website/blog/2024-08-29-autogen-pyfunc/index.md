@@ -37,7 +37,7 @@ os.environ["OPENAI_API_KEY"] = getpass("OPENAI_API_KEY:")
 assert os.getenv("OPENAI_API_KEY"), "Please set an OPENAI_API_KEY environment variable."
 ```
 
-Great! We've authenticated and are ready to start building an agent framework.
+Great! We've setup our authentication configuration and are ready to start building an agent framework.
 
 ## 2 - Create Our Agent Framework with AutoGen and MLflow
 
