@@ -1,26 +1,29 @@
 ---
 title: AutoGen with Custom PyFunc
+description: A guide for building an autonomous image generation agent
 tags: [genai, mlops]
-slug: mlflow
+slug: autogen-image-agent
 authors: [michael-berk, mlflow-maintainers]
 thumbnail: /img/blog/autogen-blog.png
 ---
 
 In this blog, we'll guide you through creating an [AutoGen](https://microsoft.github.io/autogen/) agent framework within an MLflow custom PyFunc. By combining MLflow with AutoGen's ability to create multi-agent frameworks, we are able to create scalable and stable GenAI applications.
 
-### Agent Frameworks
+## Agent Frameworks
 
 Agent frameworks enable autonomous agents to handle complex, multi-turn tasks by integrating discrete logic at each step. These frameworks are crucial for LLM-driven workflows, where agents manage dynamic interactions across multiple stages. Each agent operates based on specific logic, enabling precise task automation, decision-making, and coordination. This is ideal for applications like workflow orchestration, customer support, and multi-agent systems, where LLMs must interpret evolving context and respond accordingly.
 
-### Agent Frameworks with AutoGen
+<!-- truncate -->
+
+## Agent Frameworks with AutoGen
 
 AutoGen is an open-source programming framework designed for building agent-based AI systems. It offers a multi-agent conversation framework, allowing users to build [complex LLM workflows](https://microsoft.github.io/autogen/docs/Examples/) using high-level abstractions. AutoGen simplifies the creation of diverse applications across various domains by providing pre-built systems. Additionally, it enhances LLM inference and optimization through specialized APIs, improving performance and reducing operational costs. The framework is tailored to streamline the development and deployment of agentic AI solutions.
 
-## 1 - Setup
+## Setup
 
 First, let's install the required dependencies. Note that pyautogen requires `python>=3.9`.
 
-### 1.1 - Environment Setup
+### Environment Setup
 
 ```shell
 %pip install pyautogen mlflow -U -q
@@ -39,11 +42,11 @@ assert os.getenv("OPENAI_API_KEY"), "Please set an OPENAI_API_KEY environment va
 
 Great! We've setup our authentication configuration and are ready to start building an agent framework.
 
-## 2 - Create Our Agent Framework with AutoGen and MLflow
+## Create Our Agent Framework with AutoGen and MLflow
 
 In this tutorial we will be creating an image generation agent framework. There is a lot of code copied and modified from the [autogen tutorial](https://github.com/microsoft/autogen/blob/main/notebook/agentchat_dalle_and_gpt4v.ipynb), but the core agent functionality remains the same.
 
-### 2.1 - Agent Code
+### Agent Code
 
 You don't have to worry about the specifics of the implementation. At a high level, we are creating an agent framework that...
 
@@ -85,7 +88,7 @@ def dalle_call(client: OpenAI, model: str, prompt: str, size: str, quality: str,
         client (OpenAI): The OpenAI client instance for making API calls.
         model (str): The specific DALL-E model to use for image generation.
         prompt (str): The text prompt based on which the image is generated.
-        size (str): The size specification of the image. 
+        size (str): The size specification of the image.
         quality (str): The quality setting for the image generation.
         n (int): The number of images to generate.
 
@@ -181,7 +184,7 @@ class DALLEAgent(ConversableAgent):
             client=client,
             model="dall-e-3",
             prompt=prompt,
-            size="1024x1024",  
+            size="1024x1024",
             quality="standard",
             n=1,
         )
@@ -282,9 +285,9 @@ creator = CatifyWithDalle(
 )
 
 user_proxy = UserProxyAgent(
-    name="User", 
-    human_input_mode="NEVER", 
-    max_consecutive_auto_reply=0, 
+    name="User",
+    human_input_mode="NEVER",
+    max_consecutive_auto_reply=0,
     code_execution_config={
         "work_dir": "output", # Location where code will be written
         "use_docker": False # Use local jupyter execution environment instead of docker
@@ -296,31 +299,31 @@ _ = user_proxy.initiate_chat(
 )
 ```
 
-<div style="overflow-y: scroll; height: 50vh; border: 1px solid black; padding: 10px;">
+The initial result from the first iteration from the user prompt:
 
+```text
 User (to creator):
 
 Show me something boring
-
----
 
 creator (to Dalle):
 
 Show me something boring
 
----
+```
 
-<img src="_img/boring_0.png" alt="boring image 0" />
+![An uninspired image](_img/boring_0.png)
 
+This is definitely a boring room. Notice the responses of the critics and how the critics enhance the submission prompt in the following iterations.
+
+```text
 Image PLOTTED
 creator (to Critics):
 
 Here is the prompt: Show me something boring.
 Here is the figure `<image>`.
-Now, critic and create a prompt so that DALLE can give me a better image.
+Now, critique and create a prompt so that DALLE can give me a better image.
 Show me both "CRITICS" and "PROMPT"!
-
----
 
 Critics (to creator):
 
@@ -328,25 +331,24 @@ CRITICS: The image is simple and mundane, with a plain room and basic furniture,
 
 PROMPT: Show me a boring living room with plain furniture, but add 100 cats in various places around the room.
 
----
-
 creator (to Dalle):
 
 Show me a boring living room with plain furniture, but add 100 cats in various places around the room.
+```
 
----
+![A mild improvement](_img/boring_1.png)
 
-<img src="_img/boring_1.png" alt="boring image 1" />
+On the final iteration, we can see a more refined instruction set to add additional details.
+
+```text
 
 Image 0 PLOTTED
 creator (to Critics):
 
 Here is the prompt: Show me a boring living room with plain furniture, but add 100 cats in various places around the room..
 Here is the figure `<image>`.
-Now, critic and create a prompt so that DALLE can give me a better image.
+Now, critique and create a prompt so that DALLE can give me a better image.
 Show me both "CRITICS" and "PROMPT"!
-
----
 
 Critics (to creator):
 
@@ -354,26 +356,18 @@ CRITICS: The image has successfully incorporated cats into a boring living room,
 
 PROMPT: Show me a colorful, boring living room with plain furniture, but add 100 cats in various imaginative and playful positions around the room.
 
----
-
 creator (to Dalle):
 
 Show me a colorful, boring living room with plain furniture, but add 100 cats in various imaginative and playful positions around the room.
 
----
+```
 
-<img src="_img/boring_2.png" alt="boring image 2" />
+![Final cat room](_img/boring_2.png)
 
-Image 1 PLOTTED
-creator (to User):
+Without any direct intervention, we now have an image that is remarkably different in style than the original user instruction. The agent has successfully
+introduced elements of whimsy into the original instruction set.
 
-result.jpg
-
----
-
-</div>
-
-### 2.2 - MLflow Model From Code
+### MLflow Model From Code
 
 Now that we've proven the concept, it's time to leverage MLflow to manage our ML modeling lifecycle. For instance, it's highly likely that we'd want to take this model to production, so strong dependency management, model versioning, and support for tracking between development cycles would all be useful.
 
@@ -416,11 +410,11 @@ mlflow.models.set_model(CatifyPyfunc())
 
 At the end of this step, you should have a Python file that has both code snippets. The name is up to the user, but for this blog we will use "catify_model.py".
 
-## 3 Use Our Agent Framework
+## Use Our Agent Framework
 
 We are now positioned to leverage MLflow to interact with our powerful "catify" agent.
 
-### 3.1 - Log and Load
+### Log and Load
 
 First, let's demonstrate the standard user journey of logging model to MLflow's tracking server. We will then load it back and perform inference.
 
@@ -445,31 +439,30 @@ loaded = mlflow.pyfunc.load_model(f"runs:/{run_id}/autogen_pyfunc")
 out = loaded.predict("The matrix with a cat")
 ```
 
-<div style="overflow-y: scroll; height: 50vh; border: 1px solid black; padding: 10px;">
+The initial stage's results:
 
+```text
 User (to creator):
 
 The matrix with a cat
 
----
-
 creator (to Dalle):
 
 The matrix with a cat
+```
 
----
+![Initial Matrix Cat](_img/cool_0.png)
 
-<img src="_img/cool_0.png" alt="cool image 0" />
+On the next stage, the generation prompt is greatly enhanced by the critic agent.
 
+```text
 Image PLOTTED
 creator (to Critics):
 
 Here is the prompt: The matrix with a cat.
 Here is the figure `<image>`.
-Now, critic and create a prompt so that DALLE can give me a better image.
+Now, critique and create a prompt so that DALLE can give me a better image.
 Show me both "CRITICS" and "PROMPT"!
-
----
 
 Critics (to creator):
 
@@ -482,25 +475,25 @@ CRITICS: The image effectively captures the Matrix-themed aesthetic with a cat, 
 
 PROMPT: "Create a Matrix-themed scene set in a cyberpunk alleyway, with digital and neon elements filling the atmosphere. The scene should feature around 100 cats of various sizes, colors, and positions—some sitting, some walking, and some interacting with the digital elements. Make the digital grid and floating code more prominent, and add dynamic elements such as digital rain or floating holograms to create a more immersive and lively environment."
 
----
-
 creator (to Dalle):
 
 "Create a Matrix-themed scene set in a cyberpunk alleyway, with digital and neon elements filling the atmosphere. The scene should feature around 100 cats of various sizes, colors, and positions—some sitting, some walking, and some interacting with the digital elements. Make the digital grid and floating code more prominent, and add dynamic elements such as digital rain or floating holograms to create a more immersive and lively environment."
+```
 
----
+![First Matrix Iteration](_img/cool_1.png)
 
-<img src="_img/cool_1.png" alt="cool image 1" />
+This is definitely an improvement, show casing the power of multi-turn agents.
 
+The final stage enhances the instruction set even further.
+
+```text
 Image 0 PLOTTED
 creator (to Critics):
 
 Here is the prompt: "Create a Matrix-themed scene set in a cyberpunk alleyway, with digital and neon elements filling the atmosphere. The scene should feature around 100 cats of various sizes, colors, and positions—some sitting, some walking, and some interacting with the digital elements. Make the digital grid and floating code more prominent, and add dynamic elements such as digital rain or floating holograms to create a more immersive and lively environment.".
 Here is the figure `<image>`.
-Now, critic and create a prompt so that DALLE can give me a better image.
+Now, critique and create a prompt so that DALLE can give me a better image.
 Show me both "CRITICS" and "PROMPT"!
-
----
 
 Critics (to creator):
 
@@ -513,28 +506,18 @@ CRITICS: The image significantly improves the Matrix-themed atmosphere with a cy
 
 PROMPT: "Craft a highly detailed, Matrix-themed scene set in a cyberpunk alleyway. The atmosphere should be rich with diverse digital and neon elements, including various shapes of holograms and a range of vivid colors. Populate the scene with around 100 dynamic cats of different sizes, colors, and actions—some sitting, some walking, some jumping, playing, or chasing digital elements. Enhance the depth and perspective of the scene to create a more immersive three-dimensional experience. Include detailed futuristic environment elements like posters, graffiti, and neon signs to intensify the cyberpunk feel."
 
----
-
 creator (to Dalle):
 
 "Craft a highly detailed, Matrix-themed scene set in a cyberpunk alleyway. The atmosphere should be rich with diverse digital and neon elements, including various shapes of holograms and a range of vivid colors. Populate the scene with around 100 dynamic cats of different sizes, colors, and actions—some sitting, some walking, some jumping, playing, or chasing digital elements. Enhance the depth and perspective of the scene to create a more immersive three-dimensional experience. Include detailed futuristic environment elements like posters, graffiti, and neon signs to intensify the cyberpunk feel."
+```
 
----
+![2nd cool image](_img/cool_2.png)
 
-<img src="_img/cool_2.png" alt="cool image 2" />
+A little dystopian, but we'll take it!
 
-Image 1 PLOTTED
-creator (to User):
+We have successfully demonstrated that we can log and load our model, then perform inference from the loaded model.
 
-result.jpg
-
----
-
-</div>
-
-A little dystopian but we'll take it! We have successfully demonstrated that we can log and load our model, then perform inference from the loaded model.
-
-### 3.2 - Show MLflow Traces
+### Show MLflow Traces
 
 [MLflow Tracing](https://mlflow.org/docs/latest/llms/tracing/index.html) provides a thread-safe API to track the execution of complex applications. The MLflow AutoGen flavor has tracing built in as an autologging feature. So, simply by running `mlflow.autogen.autolog()` prior to doing inference, we will get traces logged automatically.
 
@@ -580,17 +563,19 @@ Finally, let's dig a bit deeper on the tracing LLM call. As you can see, we have
 
 ![The MLflow Tracing UI](./_img/tracing_chat_completion_1.png)
 
-### 3.3 - Logging Artifacts with MLflow
+### Logging Artifacts with MLflow
+
 Tracing's primary purpose is to provide robust lightweight summaries of complex agent executions. For larger or custom payloads, MLflow exposes a variety of artifact-logging APIs that can store images, text, tables, and more in the MLflow tracking server. Let's quickly demonstrate this functionality by logging the prompts and their associated images.
 
 Within our `CatifyWithDalle` class, we will make 4 modifications...
+
 1. Create an instance variable in the class `__init__` to save metadata about our objects.
 2. Create a private utility to increment our metadata and log and images with [mlflow.log_image](https://mlflow.org/docs/latest/python_api/mlflow.html?highlight=log_image#mlflow.log_image).
 3. Call the above utility after new images have been generated.
 4. Finally, log our metadata object as JSON with [mlflow.log_dict](https://mlflow.org/docs/latest/python_api/mlflow.html?highlight=log_image#mlflow.log_dict).
 
-```diff
-+ import uuid
+```python
+import uuid  # Add to generate artifact file names and indeces for prompt mapping to generated images
 
 class CatifyWithDalle(AssistantAgent):
     def __init__(self, n_iters=2, **kwargs):
@@ -607,17 +592,19 @@ class CatifyWithDalle(AssistantAgent):
         super().__init__(**kwargs)
         self.register_reply([Agent, None], reply_func=CatifyWithDalle._reply_user, position=0)
         self._n_iters = n_iters
-+       self.dict_to_log = {}
+        self.dict_to_log = {}  # Add a buffer for storing mapping information
 
-+   def _log_image_and_append_to_dict(self, img: Image, img_prompt: str, image_index: int)-> None:
-+      # Generate a unique ID
-+     _id = str(uuid.uuid1())
+    # Adding this method to log the generated images and the prompt-to-image mapping file
+    def _log_image_and_append_to_dict(self, img: Image, img_prompt: str, image_index: int)-> None:
+        """ Method for logging generated images to MLflow and building a prompt mapping file """
+        # Generate a unique ID
+        _id = str(uuid.uuid1())
 
-+       # Append to class variable to log once at the end of all inference
-+       self.dict_to_log[_id] = {"prompt": img_prompt, "index": image_index}
+        # Append to class variable to log once at the end of all inference
+        self.dict_to_log[_id] = {"prompt": img_prompt, "index": image_index}
 
-+       # Log image to MLflow tracking server
-+       mlflow.log_image(img, f"{_id}.png")
+        # Log image to MLflow tracking server
+        mlflow.log_image(img, f"{_id}.png")
 
     def _reply_user(self, messages=None, sender=None, config=None):
         if all((messages is None, sender is None)):
@@ -657,7 +644,7 @@ PROMPT: here is the updated prompt!
         plt.show()
         print("Image PLOTTED")
 
-+       self._log_image_and_append_to_dict(img, img_prompt, -1)
+        self._log_image_and_append_to_dict(img, img_prompt, -1)  # Add image logging and buffer updates
 
         for i in range(self._n_iters):
             # Downsample the image s.t. GPT-4V can take
@@ -680,11 +667,11 @@ PROMPT: here is the updated prompt!
             plt.axis("off")  # Turn off axis numbers
             plt.show()
             print(f"Image {i} PLOTTED")
-+           self._log_image_and_append_to_dict(img, img_prompt, i)
+            self._log_image_and_append_to_dict(img, img_prompt, i)  # Log the image in the iteration
 
 
 
-+       mlflow.log_dict(self.dict_to_log, "image_lookup.json")
+        mlflow.log_dict(self.dict_to_log, "image_lookup.json")  # Log the prompt-to-image mapping buffer
         return True, "result.jpg"
 ```
 
@@ -703,15 +690,15 @@ with mlflow.start_run(run_name="log_image_during_inferfence"):
 
 As you can see, we have logged three images of interest and a lookup dict. The keys of the dict correspond to the image names and the values correspond to additional information for how the image was generated. With these artifacts we can perform detailed analyses on prompt quality and make iterative improvements to our "catify" agent!
 
-### 3.4 - Additional Benefits of MLflow
+### Additional Benefits of MLflow
 
 There is a lot more happening behind the scenes that is out of the scope of this tutorial, but here's a quick list of additional MLflow features that are useful when building agentic frameworks.
 
-1. **Dependency management**: when you log a model, MLflow will automatically try to infer your pip requirements. These requirements are written in several formats that makes remote serving of your model much simpler. If you have local dependencies, as noted above, you can specify additional paths for MLflow to serialize via the `code_paths` argument when logging your model.
-2. **Model aliasing**: when iteratively building your agentic framework, you want an easy way to compare models. MLflow model [aliases and tags](https://mlflow.org/docs/latest/model-registry.html#deploy-and-organize-models-with-aliases-and-tags) facilitate lookups to the MLflow model registry and allow you to easily load and deploy an specific model version.
-3. **Nested Runs**: with agentic frameworks, especially when training underlying LLM components, you will often have complex nested structures. MLflow supports [nested runs](https://mlflow.org/docs/latest/traditional-ml/hyperparameter-tuning-with-child-runs/part1-child-runs.html) to facilitate aggregating your run information. This can be especially useful with LLM training and fine tuning.
+- **Dependency management**: when you log a model, MLflow will automatically try to infer your pip requirements. These requirements are written in several formats that makes remote serving of your model much simpler. If you have local dependencies, as noted above, you can specify additional paths for MLflow to serialize via the `code_paths` argument when logging your model.
+- **Model aliasing**: when iteratively building your agentic framework, you want an easy way to compare models. MLflow model [aliases and tags](https://mlflow.org/docs/latest/model-registry.html#deploy-and-organize-models-with-aliases-and-tags) facilitate lookups to the MLflow model registry and allow you to easily load and deploy an specific model version.
+- **Nested Runs**: with agentic frameworks, especially when training underlying LLM components, you will often have complex nested structures. MLflow supports [nested runs](https://mlflow.org/docs/latest/traditional-ml/hyperparameter-tuning-with-child-runs/part1-child-runs.html) to facilitate aggregating your run information. This can be especially useful with LLM training and fine tuning.
 
-## 4 - Summary
+## Summary
 
 In this blog we outlined how to create a complex agent with AutoGen. We also showed how to leverage the MLflow [Model from Code](https://mlflow.org/docs/latest/models.html#models-from-code) feature to log and load our model. Finally, we leveraged the MLflow AutoGen's autologging capabilities to automatically leverage MLflow tracing to get fine-grained and thread-safe agent execution information.
 
