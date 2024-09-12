@@ -1,7 +1,7 @@
 ---
 title: LangGraph with Custom PyFunc
 tags: [genai, mlops]
-slug: mlflow
+slug: langgraph-custom-pyfunc
 authors: [michael-berk, mlflow-maintainers]
 thumbnail: /img/blog/release-candidates.png
 ---
