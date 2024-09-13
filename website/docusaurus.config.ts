@@ -113,7 +113,7 @@ const config: Config = {
           },
           {
             from: "/blog/mlflow",
-            to: "/blog/langgraph-custom-pyfunc",
+            to: "/blog/langgraph-model-from-code",
           },
         ],
       },
