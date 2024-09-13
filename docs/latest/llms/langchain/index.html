@@ -131,7 +131,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../new-features/index.html">New Features</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">LLMs</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../index.html#id1">MLflow Tracing</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../index.html#id2">MLflow Deployments Server for LLMs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#id2">MLflow AI Gateway for LLMs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../index.html#id3">LLM Evaluation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../index.html#id4">Prompt Engineering UI</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../index.html#native-mlflow-flavors-for-llms">Native MLflow Flavors for LLMs</a><ul class="current">
@@ -144,7 +144,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#supported-elements-in-mlflow-langchain-integration">Supported Elements in MLflow LangChain Integration</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#overview-of-chains-agents-and-retrievers">Overview of Chains, Agents, and Retrievers</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#getting-started-with-the-mlflow-langchain-flavor-tutorials-and-guides">Getting Started with the MLflow LangChain Flavor - Tutorials and Guides</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id3">Detailed Documentation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id4">Detailed Documentation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#faq">FAQ</a></li>
 </ul>
 </li>
@@ -276,7 +276,14 @@ benefits that are associated with using LangChain within the broader MLflow ecos
 <li><p><a class="reference external" href="https://python.langchain.com/docs/modules/agents/">Agents</a></p></li>
 <li><p><a class="reference external" href="https://js.langchain.com/docs/modules/chains/popular/vector_db_qa">RetrievalQA</a></p></li>
 <li><p><a class="reference external" href="https://python.langchain.com/docs/modules/data_connection/retrievers/">Retrievers</a></p></li>
+<li><p><a class="reference external" href="https://python.langchain.com/v0.1/docs/expression_language/interface/">Runnables</a></p></li>
+<li><p><a class="reference external" href="https://langchain-ai.github.io/langgraph/reference/graphs/">LangGraph Complied Graph</a> (only supported via <a class="reference external" href="#logging-models-from-code">Model-from-Code</a>)</p></li>
 </ul>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>There is a known deserialization issue when logging chains or agents dependent upon LangChain components from <a class="reference external" href="https://python.langchain.com/v0.1/docs/integrations/platforms/#partner-packages">the partner packages</a> such as <code class="docutils literal notranslate"><span class="pre">langchain-openai</span></code>. If you log such models using the legacy serialization based logging, some components may be loaded from the respective <code class="docutils literal notranslate"><span class="pre">langchain-community</span></code> package instead of the partner package library, which can lead to unexpected behavior or import errors when executing your code.
+To avoid this issue, we strongly recommend using the <a class="reference external" href="#logging-models-from-code">Model-from-Code</a> method for logging such models. This method allows you to bypass the model serialization and robustly save the model definition.</p>
+</div>
 <div class="admonition attention">
 <p class="admonition-title">Attention</p>
 <p>Logging chains/agents that include <a class="reference external" href="https://python.langchain.com/docs/integrations/chat/openai">ChatOpenAI</a> and <a class="reference external" href="https://python.langchain.com/docs/integrations/chat/azure_chat_openai">AzureChatOpenAI</a> requires <code class="docutils literal notranslate"><span class="pre">MLflow&gt;=2.12.0</span></code> and <code class="docutils literal notranslate"><span class="pre">LangChain&gt;=0.0.307</span></code>.</p>
@@ -343,9 +350,131 @@ exploring these more advanced use cases.</p>
         </div>
     </article>
 </section></div>
+<div class="section" id="logging-models-from-code">
+<h3>Logging models from Code<a class="headerlink" href="#logging-models-from-code" title="Permalink to this headline"> </a></h3>
+<p>Since MLflow 2.12.2, MLflow introduced the ability to log LangChain models directly from a code definition.</p>
+<p>The feature provides several benefits to manage LangChain models:</p>
+<ol class="arabic simple">
+<li><p><strong>Avoid Serialization Complication</strong>: File handles, sockets, external connections, dynamic references, lambda functions and system resources are unpicklable. Some LangChain components do not support native serialization, e.g. <code class="docutils literal notranslate"><span class="pre">RunnableLambda</span></code>.</p></li>
+<li><p><strong>No Pickling</strong>: Loading a pickle or cloudpickle file in a Python version that was different than the one used to serialize the object does not guarantee compatibility.</p></li>
+<li><p><strong>Readability</strong>: The serialized objects are often hardly readable by humans. Model-from-code allows you to review your model definition via code.</p></li>
+</ol>
+<p>Refer to the <a class="reference external" href="../../models.html#models-from-code">Models From Code feature documentation</a> for more information about this feature.</p>
+<p>In order to use this feature, you will utilize the <a class="reference internal" href="../../python_api/mlflow.models.html#mlflow.models.set_model" title="mlflow.models.set_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.models.set_model()</span></code></a> API to define the chain that you would like to log as an MLflow model.
+After having this set within your code that defines your chain, when logging your model, you will specify the <strong>path</strong> to the file that defines your chain.</p>
+<p>The following example demonstrates how to log a simple chain with this method:</p>
+<ol class="arabic">
+<li><p>Define the chain in a separate Python file.**</p>
+<blockquote>
+<div><div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>If you are using Jupyter Notebook, you can use the <cite>%%writefile</cite> magic command to write the code cell directly to a file, without leaving the notebook to create it manually.</p>
 </div>
-<div class="section" id="id3">
-<h2><a class="reference external" href="guide/index.html">Detailed Documentation</a><a class="headerlink" href="#id3" title="Permalink to this headline"> </a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">writefile</span> <span class="n">chain</span><span class="o">.</span><span class="n">py</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">itemgetter</span>
+
+<span class="kn">from</span> <span class="nn">langchain_core.output_parsers</span> <span class="kn">import</span> <span class="n">StrOutputParser</span>
+<span class="kn">from</span> <span class="nn">langchain_core.prompts</span> <span class="kn">import</span> <span class="n">PromptTemplate</span>
+<span class="kn">from</span> <span class="nn">langchain_core.runnables</span> <span class="kn">import</span> <span class="n">RunnableLambda</span>
+<span class="kn">from</span> <span class="nn">langchain_openai</span> <span class="kn">import</span> <span class="n">OpenAI</span>
+
+<span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s2">&quot;Homework Helper&quot;</span><span class="p">)</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">langchain</span><span class="o">.</span><span class="n">autolog</span><span class="p">()</span>
+
+<span class="n">prompt</span> <span class="o">=</span> <span class="n">PromptTemplate</span><span class="p">(</span>
+    <span class="n">template</span><span class="o">=</span><span class="s2">&quot;You are a helpful tutor that evaluates my homework assignments and provides suggestions on areas for me to study further.&quot;</span>
+    <span class="s2">&quot; Here is the question: </span><span class="si">{question}</span><span class="s2"> and my answer which I got wrong: </span><span class="si">{answer}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="n">input_variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;question&quot;</span><span class="p">,</span> <span class="s2">&quot;answer&quot;</span><span class="p">],</span>
+<span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">get_question</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+    <span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;What is your name?&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">input_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;content&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;question&quot;</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">default</span>
+
+
+<span class="k">def</span> <span class="nf">get_answer</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+    <span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;My name is Bobo&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">input_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;content&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;answer&quot;</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">default</span>
+
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">OpenAI</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="mf">0.95</span><span class="p">)</span>
+
+<span class="n">chain</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;question&quot;</span><span class="p">:</span> <span class="n">itemgetter</span><span class="p">(</span><span class="s2">&quot;messages&quot;</span><span class="p">)</span> <span class="o">|</span> <span class="n">RunnableLambda</span><span class="p">(</span><span class="n">get_question</span><span class="p">),</span>
+        <span class="s2">&quot;answer&quot;</span><span class="p">:</span> <span class="n">itemgetter</span><span class="p">(</span><span class="s2">&quot;messages&quot;</span><span class="p">)</span> <span class="o">|</span> <span class="n">RunnableLambda</span><span class="p">(</span><span class="n">get_answer</span><span class="p">),</span>
+    <span class="p">}</span>
+    <span class="o">|</span> <span class="n">prompt</span>
+    <span class="o">|</span> <span class="n">model</span>
+    <span class="o">|</span> <span class="n">StrOutputParser</span><span class="p">()</span>
+<span class="p">)</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">set_model</span><span class="p">(</span><span class="n">chain</span><span class="p">)</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>Then from the main notebook, log the model via supplying the path to the file that defines the chain:</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
+
+<span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="n">chain_path</span> <span class="o">=</span> <span class="s2">&quot;chain.py&quot;</span>
+
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="n">info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">langchain</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span><span class="n">lc_model</span><span class="o">=</span><span class="n">chain_path</span><span class="p">,</span> <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;chain&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>The model defined in <code class="docutils literal notranslate"><span class="pre">chain.py</span></code> is now logged to MLflow. You can load the model back and run inference:</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load the model and run inference</span>
+<span class="n">homework_chain</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">langchain</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_uri</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
+
+<span class="n">exam_question</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;question&quot;</span><span class="p">:</span> <span class="s2">&quot;What is the primary function of control rods in a nuclear reactor?&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;answer&quot;</span><span class="p">:</span> <span class="s2">&quot;To stir the primary coolant so that the neutrons are mixed well.&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">},</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">homework_chain</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="n">exam_question</span><span class="p">)</span>
+
+<span class="n">pprint</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You can see the model is logged as a code on MLflow UI:</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="../../_images/langchain-code-model.png"><img alt="Logging a LangChain model from a code script file" src="../../_images/langchain-code-model.png" style="width: 100%;" /></a>
+</div>
+</div></blockquote>
+</li>
+</ol>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>When logging models from code, make sure that your code does not contain any sensitive information, such as API keys, passwords, or other confidential data. The code will be stored in plain text in the MLflow model artifact, and anyone with access to the artifact will be able to view the code.</p>
+</div>
+</div>
+</div>
+<div class="section" id="id4">
+<h2><a class="reference external" href="guide/index.html">Detailed Documentation</a><a class="headerlink" href="#id4" title="Permalink to this headline"> </a></h2>
 <p>To learn more about the details of the MLflow LangChain flavor, read the detailed guide below.</p>
 <a href="guide/index.html" class="download-btn">View the Comprehensive Guide</a><div class="toctree-wrapper compound">
 </div>
@@ -433,102 +562,6 @@ are required to use the langchain model for inference (the other core dependenci
 <div><p>As of the MLflow 2.12.2 release, LangChain models that support streaming responses that have been saved using MLflow 2.12.2 (or higher) can be loaded and used for
 streamable inference using the <code class="docutils literal notranslate"><span class="pre">predict_stream</span></code> API. Ensure that you are consuming the return type correctly, as the return from these models is a <code class="docutils literal notranslate"><span class="pre">Generator</span></code> object.
 To learn more, refer to the <a class="reference external" href="https://mlflow.org/docs/latest/models.html#how-to-load-and-score-python-function-models">predict_stream guide</a>.</p>
-</div></blockquote>
-</li>
-</ul>
-</div>
-<div class="section" id="how-can-i-log-my-chain-from-code">
-<h3>How can I log my chain from code?<a class="headerlink" href="#how-can-i-log-my-chain-from-code" title="Permalink to this headline"> </a></h3>
-<ul>
-<li><p><strong>Models from Code</strong>: MLflow 2.12.2 introduced the ability to log LangChain models directly from a code definition.</p>
-<blockquote>
-<div><p>In order to use this feature, you will utilize the <a class="reference internal" href="../../python_api/mlflow.models.html#mlflow.models.set_model" title="mlflow.models.set_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.models.set_model()</span></code></a> API to define the chain that you would like to log as an MLflow model.
-After having this set within your code that defines your chain, when logging your model, you will specify the <strong>path</strong> to the file that defines your chain.</p>
-<p>For example, here is a simple chain defined in a file named <code class="docutils literal notranslate"><span class="pre">langchain_code_chain.py</span></code>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">itemgetter</span>
-
-<span class="kn">from</span> <span class="nn">langchain_core.output_parsers</span> <span class="kn">import</span> <span class="n">StrOutputParser</span>
-<span class="kn">from</span> <span class="nn">langchain_core.prompts</span> <span class="kn">import</span> <span class="n">PromptTemplate</span>
-<span class="kn">from</span> <span class="nn">langchain_core.runnables</span> <span class="kn">import</span> <span class="n">RunnableLambda</span>
-<span class="kn">from</span> <span class="nn">langchain_openai</span> <span class="kn">import</span> <span class="n">OpenAI</span>
-
-<span class="kn">import</span> <span class="nn">mlflow</span>
-
-<span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s2">&quot;Homework Helper&quot;</span><span class="p">)</span>
-
-<span class="n">mlflow</span><span class="o">.</span><span class="n">langchain</span><span class="o">.</span><span class="n">autolog</span><span class="p">()</span>
-
-<span class="n">prompt</span> <span class="o">=</span> <span class="n">PromptTemplate</span><span class="p">(</span>
-    <span class="n">template</span><span class="o">=</span><span class="s2">&quot;You are a helpful tutor that evaluates my homework assignments and provides suggestions on areas for me to study further.&quot;</span>
-    <span class="s2">&quot; Here is the question: </span><span class="si">{question}</span><span class="s2"> and my answer which I got wrong: </span><span class="si">{answer}</span><span class="s2">&quot;</span><span class="p">,</span>
-    <span class="n">input_variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;question&quot;</span><span class="p">,</span> <span class="s2">&quot;answer&quot;</span><span class="p">],</span>
-<span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">get_question</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
-    <span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;What is your name?&quot;</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">input_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;content&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;question&quot;</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">default</span>
-
-
-<span class="k">def</span> <span class="nf">get_answer</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
-    <span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;My name is Bobo&quot;</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">input_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;content&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;answer&quot;</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">default</span>
-
-
-<span class="n">model</span> <span class="o">=</span> <span class="n">OpenAI</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="mf">0.95</span><span class="p">)</span>
-
-<span class="n">chain</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="p">{</span>
-        <span class="s2">&quot;question&quot;</span><span class="p">:</span> <span class="n">itemgetter</span><span class="p">(</span><span class="s2">&quot;messages&quot;</span><span class="p">)</span> <span class="o">|</span> <span class="n">RunnableLambda</span><span class="p">(</span><span class="n">get_question</span><span class="p">),</span>
-        <span class="s2">&quot;answer&quot;</span><span class="p">:</span> <span class="n">itemgetter</span><span class="p">(</span><span class="s2">&quot;messages&quot;</span><span class="p">)</span> <span class="o">|</span> <span class="n">RunnableLambda</span><span class="p">(</span><span class="n">get_answer</span><span class="p">),</span>
-    <span class="p">}</span>
-    <span class="o">|</span> <span class="n">prompt</span>
-    <span class="o">|</span> <span class="n">model</span>
-    <span class="o">|</span> <span class="n">StrOutputParser</span><span class="p">()</span>
-<span class="p">)</span>
-
-<span class="n">mlflow</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">set_model</span><span class="p">(</span><span class="n">chain</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>From a different file (in this case, a Jupyter Notebook), logging the model directly via supplying the path to the file that defines the chain:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
-
-<span class="kn">import</span> <span class="nn">mlflow</span>
-
-<span class="n">chain_path</span> <span class="o">=</span> <span class="s2">&quot;langchain_code_chain.py&quot;</span>
-
-<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
-    <span class="n">info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">langchain</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span><span class="n">lc_model</span><span class="o">=</span><span class="n">chain_path</span><span class="p">,</span> <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;chain&quot;</span><span class="p">)</span>
-
-<span class="c1"># Load the model and run inference</span>
-<span class="n">homework_chain</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">langchain</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_uri</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
-
-<span class="n">exam_question</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[</span>
-        <span class="p">{</span>
-            <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s2">&quot;question&quot;</span><span class="p">:</span> <span class="s2">&quot;What is the primary function of control rods in a nuclear reactor?&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;answer&quot;</span><span class="p">:</span> <span class="s2">&quot;To stir the primary coolant so that the neutrons are mixed well.&quot;</span><span class="p">,</span>
-            <span class="p">},</span>
-        <span class="p">},</span>
-    <span class="p">]</span>
-<span class="p">}</span>
-
-<span class="n">response</span> <span class="o">=</span> <span class="n">homework_chain</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="n">exam_question</span><span class="p">)</span>
-
-<span class="n">pprint</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>The model will be logged as a script within the MLflow UI:</p>
-<div class="figure align-center">
-<a class="reference internal image-reference" href="../../_images/langchain-code-model.png"><img alt="Logging a LangChain model from a code script file" src="../../_images/langchain-code-model.png" style="width: 100%;" /></a>
-</div>
 </div></blockquote>
 </li>
 </ul>

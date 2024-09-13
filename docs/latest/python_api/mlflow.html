@@ -434,6 +434,65 @@ to access such attributes, use the <a class="reference internal" href="mlflow.cl
 </dd></dl>
 
 <dl class="py function">
+<dt id="mlflow.add_trace">
+<code class="sig-prename descclassname"><span class="pre">mlflow.</span></code><code class="sig-name descname"><span class="pre">add_trace</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trace</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="mlflow.entities.html#mlflow.entities.Trace" title="mlflow.entities.Trace"><span class="pre">Trace</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="mlflow.entities.html#mlflow.entities.LiveSpan" title="mlflow.entities.LiveSpan"><span class="pre">LiveSpan</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mlflow/tracing/fluent.html#add_trace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.add_trace" title="Permalink to this definition"> </a></dt>
+<dd><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Experimental: This function may change or be removed in a future release without warning.</p>
+</div>
+<p>Add a completed trace object into another trace.</p>
+<p>This is particularly useful when you call a remote service instrumented by
+MLflow Tracing. By using this function, you can merge the trace from the remote
+service into the current active local trace, so that you can see the full
+trace including what happens inside the remote service call.</p>
+<p>The following example demonstrates how to use this function to merge a trace from a remote
+service to the current active trace in the function.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@mlflow</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;predict&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+    <span class="c1"># Call a remote service that returns a trace in the response</span>
+    <span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://your-service-endpoint&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+
+    <span class="c1"># Extract the trace from the response</span>
+    <span class="n">trace_json</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">json</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;trace&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Use the remote trace as a part of the current active trace.</span>
+    <span class="c1"># It will be merged under the span &quot;predict&quot; and exported together when it is ended.</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span><span class="n">trace_json</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If you have a specific target span to merge the trace under, you can pass the target span</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+    <span class="c1"># Create a local span</span>
+    <span class="n">span</span> <span class="o">=</span> <span class="n">MlflowClient</span><span class="p">()</span><span class="o">.</span><span class="n">start_span</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;predict&quot;</span><span class="p">)</span>
+
+    <span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://your-service-endpoint&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+    <span class="n">trace_json</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">json</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;trace&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Merge the remote trace under the span created above</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span><span class="n">trace_json</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">span</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trace</strong> – <p>A <a class="reference internal" href="mlflow.entities.html#mlflow.entities.Trace" title="mlflow.entities.Trace"><code class="xref py py-class docutils literal notranslate"><span class="pre">Trace</span></code></a> object or a dictionary representation
+of the trace. The trace <strong>must</strong> be already completed i.e. no further updates should
+be made to it. Otherwise, this function will raise an exception.</p>
+</p></li>
+<li><p><strong>target</strong> – <p>The target span to merge the given trace.</p>
+<ul>
+<li><p>If provided, the trace will be merged under the target span.</p></li>
+<li><p>If not provided, the trace will be merged under the current active span.</p></li>
+<li><p>If not provided and there is no active span, a new span named “Remote Trace &lt;…&gt;”
+will be created and the trace will be merged under it.</p></li>
+</ul>
+</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt id="mlflow.autolog">
 <code class="sig-prename descclassname"><span class="pre">mlflow.</span></code><code class="sig-name descname"><span class="pre">autolog</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_input_examples</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_model_signatures</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_models</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_datasets</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disable</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclusive</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disable_for_unsupported_versions</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_tags</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">None</span><a class="reference internal" href="../_modules/mlflow/tracking/fluent.html#autolog"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.autolog" title="Permalink to this definition"> </a></dt>
 <dd><p>Enables (or disables) and configures autologging for all supported integrations.</p>

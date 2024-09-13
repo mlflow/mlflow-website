@@ -210,9 +210,10 @@
 
 <span class="kn">from</span> <span class="nn">opentelemetry.sdk.trace</span> <span class="kn">import</span> <span class="n">Event</span> <span class="k">as</span> <span class="n">OTelEvent</span>
 <span class="kn">from</span> <span class="nn">opentelemetry.sdk.trace</span> <span class="kn">import</span> <span class="n">ReadableSpan</span> <span class="k">as</span> <span class="n">OTelReadableSpan</span>
-<span class="kn">from</span> <span class="nn">opentelemetry.trace</span> <span class="kn">import</span> <span class="n">NonRecordingSpan</span>
+<span class="kn">from</span> <span class="nn">opentelemetry.trace</span> <span class="kn">import</span> <span class="n">NonRecordingSpan</span><span class="p">,</span> <span class="n">SpanContext</span><span class="p">,</span> <span class="n">TraceFlags</span>
 <span class="kn">from</span> <span class="nn">opentelemetry.trace</span> <span class="kn">import</span> <span class="n">Span</span> <span class="k">as</span> <span class="n">OTelSpan</span>
 
+<span class="kn">import</span> <span class="nn">mlflow</span>
 <span class="kn">from</span> <span class="nn">mlflow.entities.span_event</span> <span class="kn">import</span> <span class="n">SpanEvent</span>
 <span class="kn">from</span> <span class="nn">mlflow.entities.span_status</span> <span class="kn">import</span> <span class="n">SpanStatus</span><span class="p">,</span> <span class="n">SpanStatusCode</span>
 <span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
@@ -593,7 +594,78 @@
 <span class="sd">        :meta private:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># All state of the live span is already persisted in the OpenTelemetry span object.</span>
-        <span class="k">return</span> <span class="n">Span</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_span</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">Span</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_span</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_immutable_span</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">span</span><span class="p">:</span> <span class="n">Span</span><span class="p">,</span>
+        <span class="n">parent_span_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">request_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">trace_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;LiveSpan&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a new LiveSpan object from the given immutable span by</span>
+<span class="sd">        cloning the underlying OpenTelemetry span within current context.</span>
+
+<span class="sd">        This is particularly useful when we merging a remote trace into the current trace.</span>
+<span class="sd">        We cannot merge the remote trace directly, because it is already stored as an immutable</span>
+<span class="sd">        span, meaning that we cannot update metadata like request ID, trace ID, parent span ID,</span>
+<span class="sd">        which are necessary for merging the trace.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            span: The immutable span object to clone.</span>
+<span class="sd">            parent_span_id: The parent span ID of the new span.</span>
+<span class="sd">                If it is None, the span will be created as a root span.</span>
+<span class="sd">            request_id: The request ID to be set on the new span. Specify this if you want to</span>
+<span class="sd">                create the new span with a different request ID from the original span.</span>
+<span class="sd">            trace_id: The trace ID of the new span in hex encoded format. Specify this if you</span>
+<span class="sd">                want to create the new span with a different trace ID from the original span</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The new LiveSpan object with the same state as the original span.</span>
+
+<span class="sd">        :meta private:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">mlflow.tracing.trace_manager</span> <span class="kn">import</span> <span class="n">InMemoryTraceManager</span>
+
+        <span class="n">trace_manager</span> <span class="o">=</span> <span class="n">InMemoryTraceManager</span><span class="o">.</span><span class="n">get_instance</span><span class="p">()</span>
+        <span class="n">request_id</span> <span class="o">=</span> <span class="n">request_id</span> <span class="ow">or</span> <span class="n">span</span><span class="o">.</span><span class="n">request_id</span>
+        <span class="n">parent_span</span> <span class="o">=</span> <span class="n">trace_manager</span><span class="o">.</span><span class="n">get_span_from_id</span><span class="p">(</span><span class="n">request_id</span><span class="p">,</span> <span class="n">parent_span_id</span><span class="p">)</span>
+
+        <span class="c1"># Create a new span with the same name, parent, and start time</span>
+        <span class="n">otel_span</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">tracing</span><span class="o">.</span><span class="n">provider</span><span class="o">.</span><span class="n">start_detached_span</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">span</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">parent</span><span class="o">=</span><span class="n">parent_span</span><span class="o">.</span><span class="n">_span</span> <span class="k">if</span> <span class="n">parent_span</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">start_time_ns</span><span class="o">=</span><span class="n">span</span><span class="o">.</span><span class="n">start_time_ns</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="c1"># otel_span._span_processor = span._span._span_processor</span>
+        <span class="n">clone_span</span> <span class="o">=</span> <span class="n">LiveSpan</span><span class="p">(</span><span class="n">otel_span</span><span class="p">,</span> <span class="n">request_id</span><span class="p">,</span> <span class="n">span</span><span class="o">.</span><span class="n">span_type</span><span class="p">)</span>
+
+        <span class="c1"># Copy all the attributes, inputs, outputs, and events from the original span</span>
+        <span class="n">clone_span</span><span class="o">.</span><span class="n">set_status</span><span class="p">(</span><span class="n">span</span><span class="o">.</span><span class="n">status</span><span class="p">)</span>
+        <span class="n">clone_span</span><span class="o">.</span><span class="n">set_attributes</span><span class="p">(</span>
+            <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">span</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="n">SpanAttributeKey</span><span class="o">.</span><span class="n">REQUEST_ID</span><span class="p">}</span>
+        <span class="p">)</span>
+        <span class="n">clone_span</span><span class="o">.</span><span class="n">set_inputs</span><span class="p">(</span><span class="n">span</span><span class="o">.</span><span class="n">inputs</span><span class="p">)</span>
+        <span class="n">clone_span</span><span class="o">.</span><span class="n">set_outputs</span><span class="p">(</span><span class="n">span</span><span class="o">.</span><span class="n">outputs</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">span</span><span class="o">.</span><span class="n">events</span><span class="p">:</span>
+            <span class="n">clone_span</span><span class="o">.</span><span class="n">add_event</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+
+        <span class="c1"># Update trace ID and span ID</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="n">span</span><span class="o">.</span><span class="n">_span</span><span class="o">.</span><span class="n">get_span_context</span><span class="p">()</span>
+        <span class="n">clone_span</span><span class="o">.</span><span class="n">_span</span><span class="o">.</span><span class="n">_context</span> <span class="o">=</span> <span class="n">SpanContext</span><span class="p">(</span>
+            <span class="c1"># Override trace_id if provided, otherwise use the original trace ID</span>
+            <span class="n">trace_id</span><span class="o">=</span><span class="n">decode_id</span><span class="p">(</span><span class="n">trace_id</span><span class="p">)</span> <span class="ow">or</span> <span class="n">context</span><span class="o">.</span><span class="n">trace_id</span><span class="p">,</span>
+            <span class="n">span_id</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">span_id</span><span class="p">,</span>
+            <span class="n">is_remote</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">is_remote</span><span class="p">,</span>
+            <span class="c1"># Override trace flag as if it is sampled within current context.</span>
+            <span class="n">trace_flags</span><span class="o">=</span><span class="n">TraceFlags</span><span class="p">(</span><span class="n">TraceFlags</span><span class="o">.</span><span class="n">SAMPLED</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Mark the span completed with the original end time</span>
+        <span class="n">clone_span</span><span class="o">.</span><span class="n">end</span><span class="p">(</span><span class="n">end_time</span><span class="o">=</span><span class="n">span</span><span class="o">.</span><span class="n">end_time_ns</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">clone_span</span></div>
 
 
 <span class="n">NO_OP_SPAN_REQUEST_ID</span> <span class="o">=</span> <span class="s2">&quot;MLFLOW_NO_OP_SPAN_REQUEST_ID&quot;</span>

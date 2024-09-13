@@ -728,6 +728,7 @@
         <span class="n">attributes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">tags</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">experiment_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">start_time_ns</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Span</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a new trace object and start a root span under it.</span>
@@ -755,6 +756,7 @@
 <span class="sd">                :py:func:`mlflow.set_experiment() &lt;mlflow.set_experiment&gt;`,</span>
 <span class="sd">                ``MLFLOW_EXPERIMENT_NAME`` environment variable, ``MLFLOW_EXPERIMENT_ID``</span>
 <span class="sd">                environment variable, or the default experiment as defined by the tracking server.</span>
+<span class="sd">            start_time_ns: The start time of the trace in nanoseconds since the UNIX epoch.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            An :py:class:`Span &lt;mlflow.entities.Span&gt;` object</span>
@@ -804,7 +806,7 @@
             <span class="c1"># Once OTel span is created, SpanProcessor.on_start is invoked</span>
             <span class="c1"># TraceInfo is created and logged into backend store inside on_start method</span>
             <span class="n">otel_span</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">tracing</span><span class="o">.</span><span class="n">provider</span><span class="o">.</span><span class="n">start_detached_span</span><span class="p">(</span>
-                <span class="n">name</span><span class="p">,</span> <span class="n">experiment_id</span><span class="o">=</span><span class="n">experiment_id</span>
+                <span class="n">name</span><span class="p">,</span> <span class="n">experiment_id</span><span class="o">=</span><span class="n">experiment_id</span><span class="p">,</span> <span class="n">start_time_ns</span><span class="o">=</span><span class="n">start_time_ns</span>
             <span class="p">)</span>
             <span class="n">request_id</span> <span class="o">=</span> <span class="n">get_otel_attribute</span><span class="p">(</span><span class="n">otel_span</span><span class="p">,</span> <span class="n">SpanAttributeKey</span><span class="o">.</span><span class="n">REQUEST_ID</span><span class="p">)</span>
             <span class="n">mlflow_span</span> <span class="o">=</span> <span class="n">create_mlflow_span</span><span class="p">(</span><span class="n">otel_span</span><span class="p">,</span> <span class="n">request_id</span><span class="p">,</span> <span class="n">span_type</span><span class="p">)</span>
@@ -841,6 +843,7 @@
         <span class="n">outputs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">attributes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">status</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpanStatus</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;OK&quot;</span><span class="p">,</span>
+        <span class="n">end_time_ns</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        End the trace with the given trace ID. This will end the root span of the trace and</span>
@@ -861,6 +864,7 @@
 <span class="sd">                representing the status code defined in</span>
 <span class="sd">                :py:class:`SpanStatusCode &lt;mlflow.entities.SpanStatusCode&gt;`</span>
 <span class="sd">                e.g. ``&quot;OK&quot;``, ``&quot;ERROR&quot;``. The default status is OK.</span>
+<span class="sd">            end_time_ns: The end time of the trace in nanoseconds since the UNIX epoch.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># NB: If the specified request ID is of no-op span, this means something went wrong in</span>
         <span class="c1">#     the span start logic. We should simply ignore it as the upstream should already</span>
@@ -884,7 +888,7 @@
                     <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
                 <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">end_span</span><span class="p">(</span><span class="n">request_id</span><span class="p">,</span> <span class="n">root_span_id</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">attributes</span><span class="p">,</span> <span class="n">status</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end_span</span><span class="p">(</span><span class="n">request_id</span><span class="p">,</span> <span class="n">root_span_id</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">attributes</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span> <span class="n">end_time_ns</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_upload_trace_spans_as_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace_info</span><span class="p">:</span> <span class="n">TraceInfo</span><span class="p">,</span> <span class="n">trace_data</span><span class="p">:</span> <span class="n">TraceData</span><span class="p">):</span>
         <span class="c1"># When a trace is logged, we set a mlflow.traceSpans tag via SetTraceTag API</span>
@@ -1058,19 +1062,15 @@
 
         <span class="k">try</span><span class="p">:</span>
             <span class="n">otel_span</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">tracing</span><span class="o">.</span><span class="n">provider</span><span class="o">.</span><span class="n">start_detached_span</span><span class="p">(</span>
-                <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">parent_span</span><span class="o">.</span><span class="n">_span</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">parent</span><span class="o">=</span><span class="n">parent_span</span><span class="o">.</span><span class="n">_span</span><span class="p">,</span>
+                <span class="n">start_time_ns</span><span class="o">=</span><span class="n">start_time_ns</span><span class="p">,</span>
             <span class="p">)</span>
-
-            <span class="c1"># We have to set the custom start time here after the span is created,</span>
-            <span class="c1"># because span processor may override the start time in the on_start() method.</span>
-            <span class="k">if</span> <span class="n">start_time_ns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">otel_span</span><span class="o">.</span><span class="n">_start_time</span> <span class="o">=</span> <span class="n">start_time_ns</span>
 
             <span class="n">span</span> <span class="o">=</span> <span class="n">create_mlflow_span</span><span class="p">(</span><span class="n">otel_span</span><span class="p">,</span> <span class="n">request_id</span><span class="p">,</span> <span class="n">span_type</span><span class="p">)</span>
             <span class="n">span</span><span class="o">.</span><span class="n">set_attributes</span><span class="p">(</span><span class="n">attributes</span> <span class="ow">or</span> <span class="p">{})</span>
             <span class="k">if</span> <span class="n">inputs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">span</span><span class="o">.</span><span class="n">set_inputs</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
-
             <span class="n">trace_manager</span><span class="o">.</span><span class="n">register_span</span><span class="p">(</span><span class="n">span</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">span</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>

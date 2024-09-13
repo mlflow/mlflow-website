@@ -210,7 +210,7 @@
 <span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Generator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Generator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">from</span> <span class="nn">cachetools</span> <span class="kn">import</span> <span class="n">TTLCache</span>
 <span class="kn">from</span> <span class="nn">opentelemetry</span> <span class="kn">import</span> <span class="n">trace</span> <span class="k">as</span> <span class="n">trace_api</span>
@@ -218,6 +218,7 @@
 <span class="kn">from</span> <span class="nn">mlflow</span> <span class="kn">import</span> <span class="n">MlflowClient</span>
 <span class="kn">from</span> <span class="nn">mlflow.entities</span> <span class="kn">import</span> <span class="n">NoOpSpan</span><span class="p">,</span> <span class="n">SpanType</span><span class="p">,</span> <span class="n">Trace</span>
 <span class="kn">from</span> <span class="nn">mlflow.entities.span</span> <span class="kn">import</span> <span class="n">LiveSpan</span><span class="p">,</span> <span class="n">create_mlflow_span</span>
+<span class="kn">from</span> <span class="nn">mlflow.entities.trace_status</span> <span class="kn">import</span> <span class="n">TraceStatus</span>
 <span class="kn">from</span> <span class="nn">mlflow.environment_variables</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">MLFLOW_TRACE_BUFFER_MAX_SIZE</span><span class="p">,</span>
     <span class="n">MLFLOW_TRACE_BUFFER_TTL_SECONDS</span><span class="p">,</span>
@@ -753,6 +754,178 @@
         <span class="k">return</span> <span class="n">TRACE_BUFFER</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">last_active_request_id</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="add_trace"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.add_trace">[docs]</a><span class="nd">@experimental</span>
+<span class="k">def</span> <span class="nf">add_trace</span><span class="p">(</span><span class="n">trace</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Trace</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">LiveSpan</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Add a completed trace object into another trace.</span>
+
+<span class="sd">    This is particularly useful when you call a remote service instrumented by</span>
+<span class="sd">    MLflow Tracing. By using this function, you can merge the trace from the remote</span>
+<span class="sd">    service into the current active local trace, so that you can see the full</span>
+<span class="sd">    trace including what happens inside the remote service call.</span>
+
+<span class="sd">    The following example demonstrates how to use this function to merge a trace from a remote</span>
+<span class="sd">    service to the current active trace in the function.</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        @mlflow.trace(name=&quot;predict&quot;)</span>
+<span class="sd">        def predict(input):</span>
+<span class="sd">            # Call a remote service that returns a trace in the response</span>
+<span class="sd">            resp = requests.get(&quot;https://your-service-endpoint&quot;, ...)</span>
+
+<span class="sd">            # Extract the trace from the response</span>
+<span class="sd">            trace_json = resp.json().get(&quot;trace&quot;)</span>
+
+<span class="sd">            # Use the remote trace as a part of the current active trace.</span>
+<span class="sd">            # It will be merged under the span &quot;predict&quot; and exported together when it is ended.</span>
+<span class="sd">            mlflow.add_trace(trace_json)</span>
+
+<span class="sd">    If you have a specific target span to merge the trace under, you can pass the target span</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        def predict(input):</span>
+<span class="sd">            # Create a local span</span>
+<span class="sd">            span = MlflowClient().start_span(name=&quot;predict&quot;)</span>
+
+<span class="sd">            resp = requests.get(&quot;https://your-service-endpoint&quot;, ...)</span>
+<span class="sd">            trace_json = resp.json().get(&quot;trace&quot;)</span>
+
+<span class="sd">            # Merge the remote trace under the span created above</span>
+<span class="sd">            mlflow.add_trace(trace_json, target=span)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        trace: A :py:class:`Trace &lt;mlflow.entities.Trace&gt;` object or a dictionary representation</span>
+<span class="sd">            of the trace. The trace **must** be already completed i.e. no further updates should</span>
+<span class="sd">            be made to it. Otherwise, this function will raise an exception.</span>
+
+<span class="sd">            .. attention:</span>
+
+<span class="sd">                The spans in the trace must be ordered in a way that the parent span comes</span>
+<span class="sd">                before its children. If the spans are not ordered correctly, this function</span>
+<span class="sd">                will raise an exception.</span>
+
+<span class="sd">        target: The target span to merge the given trace.</span>
+
+<span class="sd">            - If provided, the trace will be merged under the target span.</span>
+<span class="sd">            - If not provided, the trace will be merged under the current active span.</span>
+<span class="sd">            - If not provided and there is no active span, a new span named &quot;Remote Trace &lt;...&gt;&quot;</span>
+<span class="sd">              will be created and the trace will be merged under it.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">trace</span> <span class="o">=</span> <span class="n">Trace</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">trace</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
+                <span class="s2">&quot;Failed to load a trace object from the given dictionary. Please ensure the &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;dictionary is in the correct MLflow Trace format. Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="n">Trace</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Invalid trace object: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">trace</span><span class="p">)</span><span class="si">}</span><span class="s2">. Please provide a valid MLflow Trace object &quot;</span>
+            <span class="s2">&quot;to use it as a remote trace. You can create a Trace object from its json format by &quot;</span>
+            <span class="s2">&quot;using the Trace.from_dict() method.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">trace</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">status</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">TraceStatus</span><span class="o">.</span><span class="n">end_statuses</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
+            <span class="s2">&quot;The trace must be ended before adding it to another trace. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Current status: </span><span class="si">{</span><span class="n">trace</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">status</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">target_span</span> <span class="o">:=</span> <span class="n">target</span> <span class="ow">or</span> <span class="n">get_current_active_span</span><span class="p">():</span>
+        <span class="n">_merge_trace</span><span class="p">(</span>
+            <span class="n">trace</span><span class="o">=</span><span class="n">trace</span><span class="p">,</span>
+            <span class="n">target_request_id</span><span class="o">=</span><span class="n">target_span</span><span class="o">.</span><span class="n">request_id</span><span class="p">,</span>
+            <span class="n">target_parent_span_id</span><span class="o">=</span><span class="n">target_span</span><span class="o">.</span><span class="n">span_id</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># If there is no target span, create a new root span named &quot;Remote Trace &lt;...&gt;&quot;</span>
+        <span class="c1"># and put the remote trace under it. This design aims to keep the trace export</span>
+        <span class="c1"># logic simpler and consistent, rather than directly exporting the remote trace.</span>
+        <span class="n">client</span> <span class="o">=</span> <span class="n">MlflowClient</span><span class="p">()</span>
+        <span class="n">remote_root_span</span> <span class="o">=</span> <span class="n">trace</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">spans</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">span</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">start_trace</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Remote Trace &lt;</span><span class="si">{</span><span class="n">remote_root_span</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&gt;&quot;</span><span class="p">,</span>
+            <span class="n">inputs</span><span class="o">=</span><span class="n">remote_root_span</span><span class="o">.</span><span class="n">inputs</span><span class="p">,</span>
+            <span class="n">attributes</span><span class="o">=</span><span class="p">{</span>
+                <span class="c1"># Exclude request ID attribute not to reuse same request ID</span>
+                <span class="n">k</span><span class="p">:</span> <span class="n">v</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">remote_root_span</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="n">SpanAttributeKey</span><span class="o">.</span><span class="n">REQUEST_ID</span>
+            <span class="p">},</span>
+            <span class="n">start_time_ns</span><span class="o">=</span><span class="n">remote_root_span</span><span class="o">.</span><span class="n">start_time_ns</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">_merge_trace</span><span class="p">(</span>
+            <span class="n">trace</span><span class="o">=</span><span class="n">trace</span><span class="p">,</span>
+            <span class="n">target_request_id</span><span class="o">=</span><span class="n">span</span><span class="o">.</span><span class="n">request_id</span><span class="p">,</span>
+            <span class="n">target_parent_span_id</span><span class="o">=</span><span class="n">span</span><span class="o">.</span><span class="n">span_id</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">client</span><span class="o">.</span><span class="n">end_trace</span><span class="p">(</span>
+            <span class="n">request_id</span><span class="o">=</span><span class="n">span</span><span class="o">.</span><span class="n">request_id</span><span class="p">,</span>
+            <span class="n">status</span><span class="o">=</span><span class="n">trace</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">status</span><span class="p">,</span>
+            <span class="n">outputs</span><span class="o">=</span><span class="n">remote_root_span</span><span class="o">.</span><span class="n">outputs</span><span class="p">,</span>
+            <span class="n">end_time_ns</span><span class="o">=</span><span class="n">remote_root_span</span><span class="o">.</span><span class="n">end_time_ns</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_merge_trace</span><span class="p">(</span>
+    <span class="n">trace</span><span class="p">:</span> <span class="n">Trace</span><span class="p">,</span>
+    <span class="n">target_request_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">target_parent_span_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Merge the given trace object under an existing trace in the in-memory trace registry.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        trace: The trace object to be merged.</span>
+<span class="sd">        paretarget_request_idnt_request_id: The request ID of the parent trace.</span>
+<span class="sd">        target_parent_span_id: The parent span ID, under which the child trace should be merged.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">trace_manager</span> <span class="o">=</span> <span class="n">InMemoryTraceManager</span><span class="o">.</span><span class="n">get_instance</span><span class="p">()</span>
+
+    <span class="c1"># The merged trace should have the same trace ID as the parent trace.</span>
+    <span class="k">with</span> <span class="n">trace_manager</span><span class="o">.</span><span class="n">get_trace</span><span class="p">(</span><span class="n">target_request_id</span><span class="p">)</span> <span class="k">as</span> <span class="n">parent_trace</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">parent_trace</span><span class="p">:</span>
+            <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Parent trace with request ID </span><span class="si">{</span><span class="n">target_request_id</span><span class="si">}</span><span class="s2"> not found. Skipping merge.&quot;</span>
+            <span class="p">)</span>
+        <span class="n">new_trace_id</span> <span class="o">=</span> <span class="n">parent_trace</span><span class="o">.</span><span class="n">span_dict</span><span class="p">[</span><span class="n">target_parent_span_id</span><span class="p">]</span><span class="o">.</span><span class="n">_trace_id</span>
+
+    <span class="k">for</span> <span class="n">span</span> <span class="ow">in</span> <span class="n">trace</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">spans</span><span class="p">:</span>
+        <span class="n">parent_span_id</span> <span class="o">=</span> <span class="n">span</span><span class="o">.</span><span class="n">parent_id</span> <span class="ow">or</span> <span class="n">target_parent_span_id</span>
+
+        <span class="c1"># NB: We clone span one by one in the order it was saved in the original trace. This</span>
+        <span class="c1"># works upon the assumption that the parent span always comes before its children.</span>
+        <span class="c1"># This is guaranteed in current implementation, but if it changes in the future,</span>
+        <span class="c1"># we have to traverse the tree to determine the order.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">trace_manager</span><span class="o">.</span><span class="n">get_span_from_id</span><span class="p">(</span><span class="n">target_request_id</span><span class="p">,</span> <span class="n">parent_span_id</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Span with ID </span><span class="si">{</span><span class="n">parent_span_id</span><span class="si">}</span><span class="s2"> not found. Please make sure the &quot;</span>
+                <span class="s2">&quot;spans in the trace are ordered correctly i.e. the parent span comes before &quot;</span>
+                <span class="s2">&quot;its children.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">cloned_span</span> <span class="o">=</span> <span class="n">LiveSpan</span><span class="o">.</span><span class="n">from_immutable_span</span><span class="p">(</span>
+            <span class="n">span</span><span class="o">=</span><span class="n">span</span><span class="p">,</span>
+            <span class="n">parent_span_id</span><span class="o">=</span><span class="n">parent_span_id</span><span class="p">,</span>
+            <span class="n">request_id</span><span class="o">=</span><span class="n">target_request_id</span><span class="p">,</span>
+            <span class="n">trace_id</span><span class="o">=</span><span class="n">new_trace_id</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">trace_manager</span><span class="o">.</span><span class="n">register_span</span><span class="p">(</span><span class="n">cloned_span</span><span class="p">)</span>
+
+    <span class="c1"># Merge the tags and metadata from the child trace to the parent trace.</span>
+    <span class="k">with</span> <span class="n">trace_manager</span><span class="o">.</span><span class="n">get_trace</span><span class="p">(</span><span class="n">target_request_id</span><span class="p">)</span> <span class="k">as</span> <span class="n">parent_trace</span><span class="p">:</span>
+        <span class="c1"># Order of merging is important to ensure the parent trace&#39;s metadata is</span>
+        <span class="c1"># not overwritten by the child trace&#39;s metadata if they have the same key.</span>
+        <span class="n">parent_trace</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">tags</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">trace</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">tags</span><span class="p">,</span> <span class="o">**</span><span class="n">parent_trace</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">tags</span><span class="p">}</span>
+        <span class="n">parent_trace</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">request_metadata</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="o">**</span><span class="n">trace</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">request_metadata</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">parent_trace</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">request_metadata</span><span class="p">,</span>
+        <span class="p">}</span>
 </pre></div>
 
               </div>
