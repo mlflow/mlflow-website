@@ -48,8 +48,8 @@ export const BLOGS: Blog[] = [
     thumbnail: "/img/blog/autogen-blog.png",
   },
   {
-    title: "LangGraph with Custom PyFunc",
-    path: "/blog/langgraph-custom-pyfunc",
+    title: "LangGraph with Model From Code",
+    path: "/blog/langgraph-model-from-code",
     tags: ["genai", "mlops"],
     authors: [
       {
