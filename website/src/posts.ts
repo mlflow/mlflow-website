@@ -248,21 +248,6 @@ export const BLOGS: Blog[] = [
     thumbnail: "/img/blog/custom-pyfunc.png",
   },
   {
-    title: "MLflow AI Gateway renamed to MLflow Deployments for LLMs",
-    path: "/blog/ai-gateway-rename",
-    tags: ["ai"],
-    authors: [
-      {
-        name: "MLflow maintainers",
-        title: "MLflow maintainers",
-        url: "https://github.com/mlflow/mlflow.git",
-        image_url: "https://github.com/mlflow-automation.png",
-      },
-    ],
-    date: "2023-12-01",
-    thumbnail: "/img/blog/ai-gateway.png",
-  },
-  {
     title:
       "Automatic Metric, Parameter, and Artifact Logging with mlflow.autolog",
     path: "/blog/mlflow-autolog",

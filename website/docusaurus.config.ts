@@ -96,10 +96,6 @@ const config: Config = {
             to: "/blog/mlflow-year-in-review",
           },
           {
-            from: "/blog/2023/11/30/ai-gateway-rename",
-            to: "/blog/ai-gateway-rename",
-          },
-          {
             from: "/blog/2023/11/30/mlflow-autolog",
             to: "/blog/mlflow-autolog",
           },
