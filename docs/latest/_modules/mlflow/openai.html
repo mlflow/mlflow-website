@@ -236,6 +236,7 @@
 <span class="sd">for how to set up secrets on Databricks.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
+<span class="kn">import</span> <span class="nn">importlib.metadata</span>
 <span class="kn">import</span> <span class="nn">itertools</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
@@ -324,38 +325,20 @@
 
 
 <span class="k">def</span> <span class="nf">_get_obj_to_task_mapping</span><span class="p">():</span>
-    <span class="k">if</span> <span class="n">Version</span><span class="p">(</span><span class="n">_get_openai_package_version</span><span class="p">())</span><span class="o">.</span><span class="n">major</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="kn">from</span> <span class="nn">openai</span> <span class="kn">import</span> <span class="n">api_resources</span> <span class="k">as</span> <span class="n">ar</span>
+    <span class="kn">from</span> <span class="nn">openai</span> <span class="kn">import</span> <span class="n">resources</span> <span class="k">as</span> <span class="n">r</span>
 
-        <span class="k">return</span> <span class="p">{</span>
-            <span class="n">ar</span><span class="o">.</span><span class="n">Audio</span><span class="p">:</span> <span class="n">ar</span><span class="o">.</span><span class="n">Audio</span><span class="o">.</span><span class="n">OBJECT_NAME</span><span class="p">,</span>
-            <span class="n">ar</span><span class="o">.</span><span class="n">ChatCompletion</span><span class="p">:</span> <span class="n">ar</span><span class="o">.</span><span class="n">ChatCompletion</span><span class="o">.</span><span class="n">OBJECT_NAME</span><span class="p">,</span>
-            <span class="n">ar</span><span class="o">.</span><span class="n">Completion</span><span class="p">:</span> <span class="n">ar</span><span class="o">.</span><span class="n">Completion</span><span class="o">.</span><span class="n">OBJECT_NAME</span><span class="p">,</span>
-            <span class="n">ar</span><span class="o">.</span><span class="n">Edit</span><span class="p">:</span> <span class="n">ar</span><span class="o">.</span><span class="n">Edit</span><span class="o">.</span><span class="n">OBJECT_NAME</span><span class="p">,</span>
-            <span class="n">ar</span><span class="o">.</span><span class="n">Deployment</span><span class="p">:</span> <span class="n">ar</span><span class="o">.</span><span class="n">Deployment</span><span class="o">.</span><span class="n">OBJECT_NAME</span><span class="p">,</span>
-            <span class="n">ar</span><span class="o">.</span><span class="n">Embedding</span><span class="p">:</span> <span class="n">ar</span><span class="o">.</span><span class="n">Embedding</span><span class="o">.</span><span class="n">OBJECT_NAME</span><span class="p">,</span>
-            <span class="n">ar</span><span class="o">.</span><span class="n">Engine</span><span class="p">:</span> <span class="n">ar</span><span class="o">.</span><span class="n">Engine</span><span class="o">.</span><span class="n">OBJECT_NAME</span><span class="p">,</span>
-            <span class="n">ar</span><span class="o">.</span><span class="n">File</span><span class="p">:</span> <span class="n">ar</span><span class="o">.</span><span class="n">File</span><span class="o">.</span><span class="n">OBJECT_NAME</span><span class="p">,</span>
-            <span class="n">ar</span><span class="o">.</span><span class="n">Image</span><span class="p">:</span> <span class="n">ar</span><span class="o">.</span><span class="n">Image</span><span class="o">.</span><span class="n">OBJECT_NAME</span><span class="p">,</span>
-            <span class="n">ar</span><span class="o">.</span><span class="n">FineTune</span><span class="p">:</span> <span class="n">ar</span><span class="o">.</span><span class="n">FineTune</span><span class="o">.</span><span class="n">OBJECT_NAME</span><span class="p">,</span>
-            <span class="n">ar</span><span class="o">.</span><span class="n">Model</span><span class="p">:</span> <span class="n">ar</span><span class="o">.</span><span class="n">Model</span><span class="o">.</span><span class="n">OBJECT_NAME</span><span class="p">,</span>
-            <span class="n">ar</span><span class="o">.</span><span class="n">Moderation</span><span class="p">:</span> <span class="s2">&quot;moderations&quot;</span><span class="p">,</span>
-        <span class="p">}</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="kn">from</span> <span class="nn">openai</span> <span class="kn">import</span> <span class="n">resources</span> <span class="k">as</span> <span class="n">r</span>
-
-        <span class="k">return</span> <span class="p">{</span>
-            <span class="n">r</span><span class="o">.</span><span class="n">Audio</span><span class="p">:</span> <span class="s2">&quot;audio&quot;</span><span class="p">,</span>
-            <span class="n">r</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">Completions</span><span class="p">:</span> <span class="s2">&quot;chat.completions&quot;</span><span class="p">,</span>
-            <span class="n">r</span><span class="o">.</span><span class="n">Completions</span><span class="p">:</span> <span class="s2">&quot;completions&quot;</span><span class="p">,</span>
-            <span class="n">r</span><span class="o">.</span><span class="n">Images</span><span class="o">.</span><span class="n">edit</span><span class="p">:</span> <span class="s2">&quot;images.edit&quot;</span><span class="p">,</span>
-            <span class="n">r</span><span class="o">.</span><span class="n">Embeddings</span><span class="p">:</span> <span class="s2">&quot;embeddings&quot;</span><span class="p">,</span>
-            <span class="n">r</span><span class="o">.</span><span class="n">Files</span><span class="p">:</span> <span class="s2">&quot;files&quot;</span><span class="p">,</span>
-            <span class="n">r</span><span class="o">.</span><span class="n">Images</span><span class="p">:</span> <span class="s2">&quot;images&quot;</span><span class="p">,</span>
-            <span class="n">r</span><span class="o">.</span><span class="n">FineTuning</span><span class="p">:</span> <span class="s2">&quot;fine_tuning&quot;</span><span class="p">,</span>
-            <span class="n">r</span><span class="o">.</span><span class="n">Moderations</span><span class="p">:</span> <span class="s2">&quot;moderations&quot;</span><span class="p">,</span>
-            <span class="n">r</span><span class="o">.</span><span class="n">Models</span><span class="p">:</span> <span class="s2">&quot;models&quot;</span><span class="p">,</span>
-        <span class="p">}</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="n">r</span><span class="o">.</span><span class="n">Audio</span><span class="p">:</span> <span class="s2">&quot;audio&quot;</span><span class="p">,</span>
+        <span class="n">r</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">Completions</span><span class="p">:</span> <span class="s2">&quot;chat.completions&quot;</span><span class="p">,</span>
+        <span class="n">r</span><span class="o">.</span><span class="n">Completions</span><span class="p">:</span> <span class="s2">&quot;completions&quot;</span><span class="p">,</span>
+        <span class="n">r</span><span class="o">.</span><span class="n">Images</span><span class="o">.</span><span class="n">edit</span><span class="p">:</span> <span class="s2">&quot;images.edit&quot;</span><span class="p">,</span>
+        <span class="n">r</span><span class="o">.</span><span class="n">Embeddings</span><span class="p">:</span> <span class="s2">&quot;embeddings&quot;</span><span class="p">,</span>
+        <span class="n">r</span><span class="o">.</span><span class="n">Files</span><span class="p">:</span> <span class="s2">&quot;files&quot;</span><span class="p">,</span>
+        <span class="n">r</span><span class="o">.</span><span class="n">Images</span><span class="p">:</span> <span class="s2">&quot;images&quot;</span><span class="p">,</span>
+        <span class="n">r</span><span class="o">.</span><span class="n">FineTuning</span><span class="p">:</span> <span class="s2">&quot;fine_tuning&quot;</span><span class="p">,</span>
+        <span class="n">r</span><span class="o">.</span><span class="n">Moderations</span><span class="p">:</span> <span class="s2">&quot;moderations&quot;</span><span class="p">,</span>
+        <span class="n">r</span><span class="o">.</span><span class="n">Models</span><span class="p">:</span> <span class="s2">&quot;models&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
 
 
 <span class="k">def</span> <span class="nf">_get_model_name</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
@@ -424,13 +407,7 @@
 
 
 <span class="k">def</span> <span class="nf">_get_openai_package_version</span><span class="p">():</span>
-    <span class="kn">import</span> <span class="nn">openai</span>
-
-    <span class="k">try</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">openai</span><span class="o">.</span><span class="n">__version__</span>
-    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-        <span class="c1"># openai &lt; 0.27.5 doesn&#39;t have a __version__ attribute</span>
-        <span class="k">return</span> <span class="n">openai</span><span class="o">.</span><span class="n">version</span><span class="o">.</span><span class="n">VERSION</span>
+    <span class="k">return</span> <span class="n">importlib</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="s2">&quot;openai&quot;</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_log_secrets_yaml</span><span class="p">(</span><span class="n">local_model_dir</span><span class="p">,</span> <span class="n">scope</span><span class="p">):</span>
@@ -536,6 +513,9 @@
 <span class="sd">            path=&quot;model&quot;,</span>
 <span class="sd">        )</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">Version</span><span class="p">(</span><span class="n">_get_openai_package_version</span><span class="p">())</span><span class="o">.</span><span class="n">major</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="s2">&quot;Only openai&gt;=1.0 is supported.&quot;</span><span class="p">)</span>
+
     <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
     <span class="n">_validate_env_arguments</span><span class="p">(</span><span class="n">conda_env</span><span class="p">,</span> <span class="n">pip_requirements</span><span class="p">,</span> <span class="n">extra_pip_requirements</span><span class="p">)</span>
