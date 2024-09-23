@@ -27,6 +27,22 @@ export type Release = {
 // Sort by date descending
 export const BLOGS: Blog[] = [
   {
+    title: "Model as Code Logging in MLflow for Enhanced Model Management",
+    path: "/blog/model_as_code",
+    tags: ["pyfunc", "genai"],
+    authors: [
+      {
+        name: "Awadelrahman M. A. Ahmed",
+        title:
+          "MLflow Ambassador | Cloud Data & Analytics Architect at REMA 1000",
+        url: "https://www.linkedin.com/in/awadelrahman/",
+        image_url: "/img/authors/awadelrahman_ahmed.png",
+      },
+    ],
+    date: "2024-09-01",
+    thumbnail: "img/blog/release-candidates.png",
+  },
+  {
     title: "AutoGen with Custom PyFunc",
     path: "/blog/autogen-image-agent",
     tags: ["genai", "mlops"],
