@@ -20,7 +20,7 @@ By the end of this post you should be able to answer the three main questions: "
 
 In fact, when MLflow announced this feature, it got me thinking in a more abstract way about the concept of a "model"! You might find it interesting, too, if you zoom out and consider a model as a mathematical representation or function that describes the relationship between input and output variables. At this level of abstraction, a model can be many things!
 
-One might recognize that a model, as an object or artifact, represents just one form of what a model can be, even if it’s the most popular in the ML community. But if you think about it, a model can also be a simple mapping function—just a piece of code—or even code that sends API requests to another service that doesn’t necessarily reside within your "premises" (e.g., OpenAI APIs).
+One might even recognize that a model, as an object or artifact, represents just one form of what a model can be, even if it’s the most popular in the ML community. But if you think about it, a model can also be a simple mapping function—just a piece of code—or even code that sends API requests to another service that doesn’t necessarily reside within your "premises" (e.g., OpenAI APIs).
 
 I'll explain the detailed workflow of how to log models from code later in the post, but for now, let's consider it at a high level with two main steps: first, writing your model code, and second, logging your model as code. This will look like the folowing figure:
 
@@ -34,7 +34,7 @@ I'll explain the detailed workflow of how to log models from code later in the p
 
 In the previous section, we discussed what is meant by Models-from-Code logging. In my experience, concepts often become clearer when contrasted with their alternatives—a technique known as _contrast learning_. So, the alternative will be Model-as-Artifact logging, which is the most commonly used approach for logging models in MLflow.
 
-Model-as-Artifact logging treats a trained model as an object that can be stored and reused. After training, the model is saved as an artifact and can be easily loaded back into an application. This process can be initiated by calling `mlflow.log_model()`, where MLflow handles the serialization, often using [Pickle](https://github.com/cloudpipe/cloudpickle) or similar methods. This ensures the model is preserved as a reusable object, ready for future deployments or evaluations.
+Model-as-Artifact logging treats a trained model as an object that can be stored and reused. After training, the model object is saved and can be easily loaded back for deployment. This process, for instance, can be initiated by calling `mlflow.log_model()`, where MLflow handles the serialization, often using [Pickle](https://github.com/cloudpipe/cloudpickle) or similar methods.
 
 The Model-as-Artifact logging can be broken down into three high-level steps as in the following figure: first, creating the model as an object (whether by training it or acquiring it), second, serializing it (usually with Pickle or a similar tool), and third, logging it as an object.
 
@@ -42,13 +42,13 @@ The Model-as-Artifact logging can be broken down into three high-level steps as 
 
 ![High Level Model-as-Artifact Logging Workflow](model_as_code2.png)
 
-💡 So, the main distinction between the popular Model-as-Artifact logging and Model-as-Code logging is that in the former, we log the model object itself—whether it's a model you've trained or a pre-trained model you've acquired. In the latter, however, we log the code that _represents_ your model.
+💡 So, the main distinction between the popular Model-as-Artifact logging and Models-from-Code logging is that in the former, we log the model object itself—whether it's a model you've trained or a pre-trained model you've acquired. In the latter, however, we log the code that _represents_ your model.
 
-## When Do You Need Model-as-Code Logging?
+## When Do You Need Models-from-Code?
 
-We hope by now you have a clear understanding of _what_ Model-as-Code logging is! At the same time, you might be wondering about the specific use cases where you can apply this approach. This section is about that, about the _why_!
+I hope by now you have a clear understanding of _what_ Model-as-Code logging is! At the same time, you might be wondering about the specific use cases where you can apply this approach. This section is about that, about the _why_!
 
-While we mentioned GenAI as a motivational use case in the introduction, we also highlighted that MLflow has approached Model-as-Code logging in a more generic way and we will see that in the next section. This means you can leverage the generalizability of Model-as-Code logging for a wide range of scenarios. We’ve identified three key usage patterns that we believe are particularly relevant:
+While we mentioned GenAI as a motivational use case in the introduction, we also highlighted that MLflow has approached Model-as-Code logging in a more generic way and we will see that in the next section. This means you can leverage the generalizability of Model-as-Code logging for a wide range of scenarios. I’ve identified three key usage patterns that I believe are particularly relevant:
 
 ### 1️⃣ When Your Model Relies on External Services:
 
@@ -58,13 +58,13 @@ In other words, AI is no longer just about individual models; it’s about how t
 
 For instance, frameworks like [LangChain](https://github.com/langchain-ai/langchain/) allow developers to build applications that chain together various AI models and services to perform complex tasks, such as language understanding and information retrieval. In such scenarios, the "model" is not just a set of trained parameters that can be _pickled_ but a "system" of interconnected services, often orchestrated by code that makes API calls to external platforms.
 
-Logging the model as code in these situations ensures that the entire workflow, including the logic and dependencies, is preserved. It offers is the ability to maintain the same model-like experience by capturing the code making it possible to faithfully recreate the model’s behavior, even when the actual computational work is performed outside your domain.
+Logging the models from code in these situations ensures that the entire workflow, including the logic and dependencies, is preserved. It offers is the ability to maintain the same model-like experience by capturing the code making it possible to faithfully recreate the model’s behavior, even when the actual computational work is performed outside your domain.
 
 ### 2️⃣ When You’re Combining Multiple Models to Calculate a Complex Metric:
 
 Apart from Generative AI, you can still benefit from Model-as-Code logging in various other domains. There are many situations where multiple specialized models are combined to produce a comprehensive output. Note that we are not just referring to traditional ensemble modeling (predicting the same variable); often, you need to combine multiple models to predict different components of a complex metric.
 
-For this, we would like to give a concrete example: Customer Lifetime Value (CLV) in customer analytics. In the context of CLV, you might have separate models for:
+One concrete example could be Customer Lifetime Value (CLV) in customer analytics. In the context of CLV, you might have separate models for:
 
 - Customer Retention: Forecasting how long a customer will continue to engage with the business.
 - Purchase Frequency: Predicting how often a customer will make a purchase.
@@ -72,25 +72,25 @@ For this, we would like to give a concrete example: Customer Lifetime Value (CLV
 
 Each of these models might already be logged and tracked properly using MLflow. Now, you need to "combine" these models into a single "system" that calculates CLV. We refer to it as a "system" because it contains multiple components.
 
-The beauty of MLflow's Model-as-Code logging is that it allows you to treat this "CLV system" as a "CLV model". It enables you to leverage MLflow's capabilities, maintaining the MLflow-like model structure with all the advantages of tracking, versioning, and deploying your CLV model as a cohesive unit, even though it's built on top of other models.
+The beauty of MLflow's Models-from-Code logging is that it allows you to treat this "CLV system" as a "CLV model". It enables you to leverage MLflow's capabilities, maintaining the MLflow-like model structure with all the advantages of tracking, versioning, and deploying your CLV model as a cohesive unit, even though it's built on top of other models.
 
 ### 3️⃣ When You Don’t Have Serialization at All:
 
-Despite the rise of deep learning, many industries still rely on rule-based algorithms that don’t produce serialized models. In these cases, Model-as-Code logging is very beneficial for integrating these processes into the MLflow ecosystem.
+Despite the rise of deep learning, many industries still rely on rule-based algorithms that don’t produce serialized models. In these cases, Models-from-Code logging can be beneficial for integrating these processes into the MLflow ecosystem.
 
-One example is in industrial quality control, where the Canny edge detection algorithm is often used to identify defects. This rule-based algorithm doesn’t involve serialization but is defined by specific steps.
+One example is in industrial quality control, where the [Canny edge detection algorithm](https://en.wikipedia.org/wiki/Canny_edge_detector) is often used to identify defects. This rule-based algorithm doesn’t involve serialization but is defined by specific steps.
 
 Another example, which is gaining attention nowadays, is [Causal AI](https://en.wikipedia.org/wiki/Causal_AI). Constraint-based causal discovery algorithms like the [PC (Peter-Clark)](https://causal-learn.readthedocs.io/en/latest/search_methods_index/Constraint-based%20causal%20discovery%20methods/PC.html) algorithm that discover causal relationships in data but are implemented as code rather than as models.
 
-In either case, with Model-as-Code logging, you can log the entire process as a "model" in MLflow, preserving the logic and parameters while benefiting from MLflow’s tracking and versioning features.
+In either case, with Models-from-Code logging, you can log the entire process as a "model" in MLflow, preserving the logic and parameters while benefiting from MLflow’s tracking and versioning features.
 
 ## How To Implement Model-as-Code Logging? With Examples:
 
-We hope that by this point, you have a clear understanding of the "what" and "why" of Model-as-Code logging, and now you might be eager to get hands-on and focus on the _how_!
+I hope that by this point, you have a clear understanding of the "what" and "why" of Model-as-Code logging, and now you might be eager to get hands-on and focus on the _how_!
 
-In this section, we'll provide a generic workflow for implementing MLflow's Model-as-Code logging, followed by a basic yet broadly applicable example. We hope the workflow provides a broad understanding that allows you to address a wide range of scenarios. We will also include links to resources that help with more specific use cases (e.g., AI models).
+In this section, I'll provide a generic workflow for implementing MLflow's Model-as-Code logging, followed by a basic yet broadly applicable example. I hope the workflow provides a broad understanding that allows you to address a wide range of scenarios. I will also include links to resources that help with more specific use cases (e.g., AI models).
 
-### Model-as-Code Logging Workflow:
+### Models-from-Code Logging Workflow:
 
 A key "ingredient" of the implementation is MLflow's component `pyfunc`. If you're not familiar with it, think of `pyfunc` as a universal interface in MLflow that lets you turn any model, from any framework, into an MLflow model by defining a _custom_ Python function. You can also refer to [this earlier post](https://mlflow.org/blog/custom-pyfunc) if you wish to gain a deeper understanding.
 
@@ -105,7 +105,7 @@ Now, each time we need to implement Model-as-Code logging, we create _Two_ separ
 
     📌 But wait! IMPORTANT:
 
-                - Your `model_code.py` script needs to call (i.e., include) `mlflow.models.set_model()` to set the model, which is crucial for loading the model back using `load_model` for inference. You will notice this in the example.
+        - Your `model_code.py` script needs to call (i.e.,; include) `mlflow.models.set_model()` to set the model, which is crucial for loading the model back using `load_model` for inference. You will notice this in the example.
 
 2.  The second file logs your class (that you defined in `model_code.py`). Think of it as the driver code; it can be either a notebook or a Python script (let's call it `driver.py`).
     In this file, you'll include the code that is responsible for logging your model code (you will provide the path to `model_code.py`) .
@@ -170,7 +170,7 @@ Executing the `driver.py` will start an MLflow run and log our model as code, he
 
 ## Conclusion and Further Learning
 
-We hope that by this point, we have fulfilled the promises we made earlier! You should now have a clearer understanding of _what_ Model-as-Code logging is and how it differs from the popular method of logging models as serialized objects. You should also have a solid grasp of _why_ and _when_ to use it, as well as an understanding of _how_ to implement it through out general example.
+I hope that by this point, I have fulfilled the promises I made earlier! You should now have a clearer understanding of _what_ Model-as-Code logging is and how it differs from the popular method of logging models as serialized objects. You should also have a solid grasp of _why_ and _when_ to use it, as well as an understanding of _how_ to implement it through out general example.
 
 As we mentioned in the introduction and throughout the post, there are various use cases where Model-as-Code logging can be beneficial. Our 101 example is just the beginning—there is much more to explore. Below is a list of code examples that you may find helpful:
 
