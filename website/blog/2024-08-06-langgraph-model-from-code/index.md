@@ -265,3 +265,5 @@ To summarize, here's what was covered in this tutorial:
 - Creating a simple LangGraph chain.
 - Leveraging MLflow [model from code](https://mlflow.org/docs/latest/models.html#models-from-code) functionality to log our graph.
 - Loading the model via the standard MLflow APIs.
+
+Happy coding!
