@@ -32,9 +32,8 @@ First, we must install the required dependencies. We will use OpenAI for our LLM
 
 ```python
 %%capture
-%pip install langgraph==0.2.3 langsmith==0.1.98 mlflow>=2.15.1
-%pip install -U typing_extensions
-%pip install langchain_openai==0.1.21
+%pip install langsmith==0.1.125 langchain_openai==0.2.0 langchain==0.3.0 langgraph==0.2.24
+%pip install -U mlflow
 ```
 
 Next, let's get our relevant secrets. `getpass`, as demonstrated in the [LangGraph quickstart](https://langchain-ai.github.io/langgraph/tutorials/introduction/#setup) is a great way to insert your keys into an interactive jupyter environment.
@@ -191,7 +190,7 @@ from langgraph_utils import (
 # Save the model
 with mlflow.start_run() as run:
     # Log the model to the mlflow tracking server
-    mlflow.langgraph.log_model(
+    mlflow.langchain.log_model(
         python_model="graph.py", # Path to our custom model
         artifact_path="langgraph_model",
     )
