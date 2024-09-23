@@ -40,7 +40,7 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2024-09-13",
-    thumbnail: "img/blog/thumbnail-models-from-code.gif",
+    thumbnail: "/img/blog/thumbnail-models-from-code.gif",
   },
   {
     title: "AutoGen with Custom PyFunc",
