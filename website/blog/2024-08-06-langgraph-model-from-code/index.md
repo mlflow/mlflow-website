@@ -89,14 +89,14 @@ def _langgraph_message_to_mlflow_message(
     }
 
     if type_clean := langgraph_type_to_mlflow_role.get(langgraph_message.type):
-        return {"type": type_clean, "content": langgraph_message.content}
+        return {"role": type_clean, "content": langgraph_message.content}
     else:
         raise ValueError(f"Incorrect role specified: {langgraph_message.type}")
 
 
 def get_most_recent_message(response: AddableValuesDict) -> dict:
     most_recent_message = response.get("messages")[-1]
-    return _langgraph_message_to_mlflow_message(most_recent_message)
+    return _langgraph_message_to_mlflow_message(most_recent_message)["content"]
 
 
 def increment_message_history(
@@ -187,16 +187,14 @@ from langgraph_utils import (
     get_most_recent_message,
 )
 
-# Save the model
-with mlflow.start_run() as run:
-    # Log the model to the mlflow tracking server
-    mlflow.langchain.log_model(
-        python_model="graph.py", # Path to our custom model
-        artifact_path="langgraph_model",
+
+with mlflow.start_run() as run_id:
+    model_info = mlflow.langchain.log_model(
+        lc_model="graph.py",
+        artifact_path="langgraph",
     )
 
-    # Store the run id for later loading
-    run_id = run.info.run_id
+    model_uri = model_info.model_uri 
 ```
 
 ## 4 - Use the Logged Model
@@ -208,36 +206,41 @@ In the code below, we demonstrate that our chain has chatbot functionality!
 ```python
 import mlflow
 
+# Enable tracing
+mlflow.set_experiment("Tracing example")
+mlflow.langchain.autolog()
+
 # Load the model
 # NOTE: you need the run_id from the above step or another model URI format
-loaded_model = mlflow.langchain.load_model(f"runs:/{run_id}/graph")
+with mlflow.start_run():
+    loaded_model = mlflow.langchain.load_model(model_uri)
 
-# Show inference and message history functionality
-print("-------- Message 1 -----------")
-message = "What's my name?"
-payload = {"messages": [{"role": "user", "content": message}]}
-response = loaded_model.invoke(payload)
+    # Show inference and message history functionality
+    print("-------- Message 1 -----------")
+    message = "What's my name?"
+    payload = {"messages": [{"role": "user", "content": message}]}
+    response = loaded_model.invoke(payload)
 
-print(f"User: {message}")
-print(f"Agent: {get_most_recent_message(response)}")
+    print(f"User: {message}")
+    print(f"Agent: {get_most_recent_message(response)}")
 
-print("\n-------- Message 2 -----------")
-message = "My name is Morpheus."
-new_messages = increment_message_history(response, {"role": "user", "content": message})
-payload = {"messages": new_messages}
-response = loaded_model.invoke(payload)
+    print("\n-------- Message 2 -----------")
+    message = "My name is Morpheus."
+    new_messages = increment_message_history(response, {"role": "user", "content": message})
+    payload = {"messages": new_messages}
+    response = loaded_model.invoke(payload)
 
-print(f"User: {message}")
-print(f"Agent: {get_most_recent_message(response)}")
+    print(f"User: {message}")
+    print(f"Agent: {get_most_recent_message(response)}")
 
-print("\n-------- Message 3 -----------")
-message = "What is my name?"
-new_messages = increment_message_history(response, {"role": "user", "content": message})
-payload = {"messages": new_messages}
-response = loaded_model.invoke(payload)
+    print("\n-------- Message 3 -----------")
+    message = "What is my name?"
+    new_messages = increment_message_history(response, {"role": "user", "content": message})
+    payload = {"messages": new_messages}
+    response = loaded_model.invoke(payload)
 
-print(f"User: {message}")
-print(f"Agent: {get_most_recent_message(response)}")
+    print(f"User: {message}")
+    print(f"Agent: {get_most_recent_message(response)}")
 ```
 
 Ouput:
@@ -245,16 +248,37 @@ Ouput:
 ```text
 -------- Message 1 -----------
 User: What's my name?
-Agent: I'm sorry, I don't know your name. Can you please tell me?
+Agent: I'm sorry, I cannot guess your name as I do not have access to that information. If you would like to share your name with me, feel free to do so.
 
 -------- Message 2 -----------
 User: My name is Morpheus.
 Agent: Nice to meet you, Morpheus! How can I assist you today?
 
 -------- Message 3 -----------
-User: What's my name?
-Agent: Your name is Morpheus!
+User: What is my name?
+Agent: Your name is Morpheus.
 ```
+
+### 4.1 - MLflow Tracing
+Before concluding, let's demonstrate [MLflow tracing](https://mlflow.org/docs/latest/llms/tracing/index.html).
+
+MLflow Tracing is a feature that enhances LLM observability in your Generative AI (GenAI) applications by capturing detailed information about the execution of your application’s services. Tracing provides a way to record the inputs, outputs, and metadata associated with each intermediate step of a request, enabling you to easily pinpoint the source of bugs and unexpected behaviors.
+
+Let's enter the mlflow UI by running the below command in your working directory. It must contain the auto-generated `mlruns` directory.
+
+```shell
+mlflow ui
+```
+
+With that running, we can go to the provided url which defaults to `http://127.0.0.1:5000` in our browser. This is the MLflow UI.
+
+![MLflow UI Experiment Traces](_img/mlflow_ui_experiment_traces.png)
+
+As you can see, we've logged our traces and can easily see them by clicking our experiment of interest and the then the "Tracing" tab.
+
+![MLflow UI Trace](_img/mlflow_ui_trace.png)
+
+After clicking on one of the traces, we can now see run execution for a single query. Notice that we log inputs, outputs, and lots of great metadata such as usage and invocation parameters. As we scale our application both from a usage and complexity perspective, this thread-safe and highly-performant tracking system will ensure robust monitoring of the app.
 
 ## 5 - Summary
 
@@ -265,5 +289,6 @@ To summarize, here's what was covered in this tutorial:
 - Creating a simple LangGraph chain.
 - Leveraging MLflow [model from code](https://mlflow.org/docs/latest/models.html#models-from-code) functionality to log our graph.
 - Loading the model via the standard MLflow APIs.
+- Leveraging [MLflow tracing](https://mlflow.org/docs/latest/llms/tracing/index.html) to view graph execution.
 
 Happy coding!
