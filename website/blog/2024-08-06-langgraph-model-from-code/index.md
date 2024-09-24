@@ -194,7 +194,7 @@ with mlflow.start_run() as run_id:
         artifact_path="langgraph",
     )
 
-    model_uri = model_info.model_uri 
+    model_uri = model_info.model_uri
 ```
 
 ## 4 - Use the Logged Model
@@ -260,6 +260,7 @@ Agent: Your name is Morpheus.
 ```
 
 ### 4.1 - MLflow Tracing
+
 Before concluding, let's demonstrate [MLflow tracing](https://mlflow.org/docs/latest/llms/tracing/index.html).
 
 MLflow Tracing is a feature that enhances LLM observability in your Generative AI (GenAI) applications by capturing detailed information about the execution of your application’s services. Tracing provides a way to record the inputs, outputs, and metadata associated with each intermediate step of a request, enabling you to easily pinpoint the source of bugs and unexpected behaviors.
