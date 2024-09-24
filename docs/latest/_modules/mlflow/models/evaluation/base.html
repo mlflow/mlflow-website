@@ -202,7 +202,8 @@
               <div itemprop="articleBody">
                 
   <h1>Source code for mlflow.models.evaluation.base</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">json</span>
+<span></span><span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">keyword</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">operator</span>
@@ -215,12 +216,16 @@
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
 <span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
 <span class="kn">from</span> <span class="nn">decimal</span> <span class="kn">import</span> <span class="n">Decimal</span>
+<span class="kn">from</span> <span class="nn">inspect</span> <span class="kn">import</span> <span class="n">Parameter</span><span class="p">,</span> <span class="n">Signature</span>
 <span class="kn">from</span> <span class="nn">types</span> <span class="kn">import</span> <span class="n">FunctionType</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">mlflow</span>
 <span class="kn">from</span> <span class="nn">mlflow.data.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
-<span class="kn">from</span> <span class="nn">mlflow.data.evaluation_dataset</span> <span class="kn">import</span> <span class="n">EvaluationDataset</span><span class="p">,</span> <span class="n">convert_data_to_mlflow_dataset</span>
+<span class="kn">from</span> <span class="nn">mlflow.data.evaluation_dataset</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">EvaluationDataset</span><span class="p">,</span>
+    <span class="n">convert_data_to_mlflow_dataset</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.entities.dataset_input</span> <span class="kn">import</span> <span class="n">DatasetInput</span>
 <span class="kn">from</span> <span class="nn">mlflow.entities.input_tag</span> <span class="kn">import</span> <span class="n">InputTag</span>
 <span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
@@ -355,6 +360,172 @@
         <span class="k">return</span> <span class="s2">&quot;EvaluationMetric(&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span></div>
 
 
+<span class="c1"># NB: we need this function because we cannot modify the signature of</span>
+<span class="c1"># a class&#39;s __call__ method after the class has been defined.</span>
+<span class="c1"># This is also useful to distinguish between the metric signatures with different eval_fn signatures</span>
+<span class="k">def</span> <span class="nf">_generate_eval_metric_class</span><span class="p">(</span><span class="n">eval_fn</span><span class="p">,</span> <span class="n">require_strict_signature</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Dynamically generate a GenAIEvaluationMetric class that can be used to evaluate the metric</span>
+<span class="sd">    on the given input data. The generated class is callable with a __call__ method that</span>
+<span class="sd">    takes the arguments specified in the signature of the eval_fn function.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        eval_fn: the evaluation function of the EvaluationMetric.</span>
+<span class="sd">        require_strict_signature: (Optional) Whether the eval_fn needs to follow a strict signature.</span>
+<span class="sd">            If True, then the eval_fn must follow below signature:</span>
+
+<span class="sd">                .. code-block:: python</span>
+
+<span class="sd">                    def eval_fn(</span>
+<span class="sd">                        predictions: &quot;pd.Series&quot;,</span>
+<span class="sd">                        metrics: Dict[str, MetricValue],</span>
+<span class="sd">                        inputs: &quot;pd.Series&quot;,</span>
+<span class="sd">                        *args,</span>
+<span class="sd">                    ) -&gt; MetricValue:</span>
+<span class="sd">                        pass</span>
+
+<span class="sd">            When generating a metric from `make_genai_metric`, this should be set to True.</span>
+<span class="sd">            Default to False.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A dynamically generated callable CallableEvaluationMetric class.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">mlflow.metrics.base</span> <span class="kn">import</span> <span class="n">MetricValue</span>
+
+    <span class="k">if</span> <span class="n">require_strict_signature</span><span class="p">:</span>
+        <span class="n">allowed_kwargs_names</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">param_name</span>
+            <span class="k">for</span> <span class="n">param_name</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">eval_fn</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">param_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;predictions&quot;</span><span class="p">,</span> <span class="s2">&quot;metrics&quot;</span><span class="p">,</span> <span class="s2">&quot;inputs&quot;</span><span class="p">]</span>
+        <span class="p">]</span>
+
+        <span class="k">def</span> <span class="nf">genai_call_method</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="o">*</span><span class="p">,</span>
+            <span class="n">predictions</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+            <span class="n">inputs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+            <span class="n">metrics</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">MetricValue</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MetricValue</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">missed_kwargs</span> <span class="o">:=</span> <span class="nb">set</span><span class="p">(</span><span class="n">allowed_kwargs_names</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+                <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Missing required arguments: </span><span class="si">{</span><span class="n">missed_kwargs</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="n">extra_kwargs</span> <span class="o">:=</span> <span class="nb">set</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">allowed_kwargs_names</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Unexpected arguments: </span><span class="si">{</span><span class="n">extra_kwargs</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_fn</span><span class="p">(</span>
+                <span class="n">_convert_val_to_pd_Series</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="s2">&quot;predictions&quot;</span><span class="p">),</span>
+                <span class="n">metrics</span> <span class="ow">or</span> <span class="p">{},</span>
+                <span class="n">_convert_val_to_pd_Series</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="s2">&quot;inputs&quot;</span><span class="p">),</span>
+                <span class="c1"># Note: based on https://github.com/mlflow/mlflow/blob/4fef77afdbe4d76302cb0b1aad2bd72b5cde64e9/mlflow/metrics/genai/genai_metric.py#L49-L53</span>
+                <span class="c1"># the extra params passed https://github.com/mlflow/mlflow/blob/4fef77afdbe4d76302cb0b1aad2bd72b5cde64e9/mlflow/metrics/genai/genai_metric.py#L513</span>
+                <span class="c1"># should always be pandas Series</span>
+                <span class="o">*</span><span class="p">[</span>
+                    <span class="n">_convert_val_to_pd_Series</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="n">arg_name</span><span class="p">],</span> <span class="n">arg_name</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">arg_name</span> <span class="ow">in</span> <span class="n">allowed_kwargs_names</span>
+                <span class="p">],</span>
+            <span class="p">)</span>
+
+        <span class="n">genai_call_method</span><span class="o">.</span><span class="n">__signature__</span> <span class="o">=</span> <span class="n">Signature</span><span class="p">(</span>
+            <span class="n">parameters</span><span class="o">=</span><span class="p">[</span>
+                <span class="n">Parameter</span><span class="p">(</span><span class="s2">&quot;self&quot;</span><span class="p">,</span> <span class="n">Parameter</span><span class="o">.</span><span class="n">POSITIONAL_OR_KEYWORD</span><span class="p">),</span>
+                <span class="n">Parameter</span><span class="p">(</span>
+                    <span class="s2">&quot;predictions&quot;</span><span class="p">,</span>
+                    <span class="n">Parameter</span><span class="o">.</span><span class="n">KEYWORD_ONLY</span><span class="p">,</span>
+                    <span class="n">annotation</span><span class="o">=</span><span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+                <span class="p">),</span>
+                <span class="n">Parameter</span><span class="p">(</span>
+                    <span class="s2">&quot;inputs&quot;</span><span class="p">,</span>
+                    <span class="n">Parameter</span><span class="o">.</span><span class="n">KEYWORD_ONLY</span><span class="p">,</span>
+                    <span class="n">annotation</span><span class="o">=</span><span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+                <span class="p">),</span>
+                <span class="n">Parameter</span><span class="p">(</span>
+                    <span class="s2">&quot;metrics&quot;</span><span class="p">,</span>
+                    <span class="n">Parameter</span><span class="o">.</span><span class="n">KEYWORD_ONLY</span><span class="p">,</span>
+                    <span class="n">annotation</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">MetricValue</span><span class="p">]],</span>
+                    <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="o">*</span><span class="p">[</span>
+                    <span class="n">Parameter</span><span class="p">(</span>
+                        <span class="n">name</span><span class="p">,</span> <span class="n">Parameter</span><span class="o">.</span><span class="n">KEYWORD_ONLY</span><span class="p">,</span> <span class="n">annotation</span><span class="o">=</span><span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
+                    <span class="p">)</span>
+                    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">allowed_kwargs_names</span>
+                <span class="p">],</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">genai_call_method</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">            Evaluate the metric on the given inputs and predictions.</span>
+<span class="s2">            Note: only keyword arguments are supported.</span>
+
+<span class="s2">            Args:</span>
+<span class="s2">                predictions: predictions made by the model.</span>
+<span class="s2">                inputs: inputs used to make the predictions.</span>
+<span class="s2">                metrics: metrics calculated by the default evaluator.</span>
+<span class="s2">                kwargs: additional arguments used to compute the metric.</span>
+<span class="s2">                    Required arguments: </span><span class="si">{</span><span class="n">allowed_kwargs_names</span><span class="si">}</span>
+
+<span class="s2">            Returns:</span>
+<span class="s2">                evaluation result as MetricValue object.</span>
+<span class="s2">            &quot;&quot;&quot;</span>
+        <span class="n">call_method</span> <span class="o">=</span> <span class="n">genai_call_method</span>
+
+    <span class="k">else</span><span class="p">:</span>
+
+        <span class="k">def</span> <span class="nf">_call_method</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MetricValue</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_fn</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="n">allowed_kwargs_params</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">eval_fn</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span>
+        <span class="n">_call_method</span><span class="o">.</span><span class="n">__signature__</span> <span class="o">=</span> <span class="n">Signature</span><span class="p">(</span>
+            <span class="n">parameters</span><span class="o">=</span><span class="p">[</span>
+                <span class="n">Parameter</span><span class="p">(</span><span class="s2">&quot;self&quot;</span><span class="p">,</span> <span class="n">Parameter</span><span class="o">.</span><span class="n">POSITIONAL_OR_KEYWORD</span><span class="p">),</span>
+                <span class="o">*</span><span class="p">[</span>
+                    <span class="n">Parameter</span><span class="p">(</span>
+                        <span class="n">name</span><span class="p">,</span>
+                        <span class="n">Parameter</span><span class="o">.</span><span class="n">KEYWORD_ONLY</span><span class="p">,</span>
+                        <span class="n">annotation</span><span class="o">=</span><span class="n">allowed_kwargs_params</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">annotation</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">allowed_kwargs_params</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+                <span class="p">],</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">_call_method</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">            Evaluate the metric on the given inputs and predictions.</span>
+<span class="s2">            Note: only keyword arguments are supported.</span>
+
+<span class="s2">            Args:</span>
+<span class="s2">                kwargs: additional arguments used to compute the metric.</span>
+<span class="s2">                    Required arguments: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">allowed_kwargs_params</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span>
+
+<span class="s2">            Returns:</span>
+<span class="s2">                evaluation result as MetricValue object.</span>
+<span class="s2">            &quot;&quot;&quot;</span>
+        <span class="n">call_method</span> <span class="o">=</span> <span class="n">_call_method</span>
+
+    <span class="k">return</span> <span class="nb">type</span><span class="p">(</span>
+        <span class="s2">&quot;CallableEvaluationMetric&quot;</span><span class="p">,</span>
+        <span class="p">(</span><span class="n">EvaluationMetric</span><span class="p">,),</span>
+        <span class="p">{</span><span class="s2">&quot;__call__&quot;</span><span class="p">:</span> <span class="n">call_method</span><span class="p">},</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_convert_val_to_pd_Series</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="n">val</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Expected </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> to be a string, list, or Pandas Series, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">val</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+    <span class="k">return</span> <span class="n">val</span>
+
+
 <div class="viewcode-block" id="make_metric"><a class="viewcode-back" href="../../../../python_api/mlflow.models.html#mlflow.make_metric">[docs]</a><span class="k">def</span> <span class="nf">make_metric</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">eval_fn</span><span class="p">,</span>
@@ -422,6 +593,102 @@
 <span class="sd">        - :py:class:`mlflow.models.EvaluationMetric`</span>
 <span class="sd">        - :py:func:`mlflow.evaluate`</span>
 <span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">_make_metric</span><span class="p">(</span>
+        <span class="n">eval_fn</span><span class="o">=</span><span class="n">eval_fn</span><span class="p">,</span>
+        <span class="n">greater_is_better</span><span class="o">=</span><span class="n">greater_is_better</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+        <span class="n">long_name</span><span class="o">=</span><span class="n">long_name</span><span class="p">,</span>
+        <span class="n">version</span><span class="o">=</span><span class="n">version</span><span class="p">,</span>
+        <span class="n">metric_details</span><span class="o">=</span><span class="n">metric_details</span><span class="p">,</span>
+        <span class="n">metric_metadata</span><span class="o">=</span><span class="n">metric_metadata</span><span class="p">,</span>
+        <span class="n">genai_metric_args</span><span class="o">=</span><span class="n">genai_metric_args</span><span class="p">,</span>
+        <span class="n">require_strict_signature</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_make_metric</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">eval_fn</span><span class="p">,</span>
+    <span class="n">greater_is_better</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">long_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">metric_details</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">metric_metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">genai_metric_args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">require_strict_signature</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    A factory function to create an :py:class:`EvaluationMetric` object.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        eval_fn: A function that computes the metric with the following signature:</span>
+
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                def eval_fn(</span>
+<span class="sd">                    predictions: pandas.Series,</span>
+<span class="sd">                    targets: pandas.Series,</span>
+<span class="sd">                    metrics: Dict[str, MetricValue],</span>
+<span class="sd">                    **kwargs,</span>
+<span class="sd">                ) -&gt; Union[float, MetricValue]:</span>
+<span class="sd">                    &quot;&quot;&quot;</span>
+<span class="sd">                    Args:</span>
+<span class="sd">                        predictions: A pandas Series containing the predictions made by the model.</span>
+<span class="sd">                        targets: (Optional) A pandas Series containing the corresponding labels</span>
+<span class="sd">                            for the predictions made on that input.</span>
+<span class="sd">                        metrics: (Optional) A dictionary containing the metrics calculated by the</span>
+<span class="sd">                            default evaluator.  The keys are the names of the metrics and the values</span>
+<span class="sd">                            are the metric values.  To access the MetricValue for the metrics</span>
+<span class="sd">                            calculated by the system, make sure to specify the type hint for this</span>
+<span class="sd">                            parameter as Dict[str, MetricValue].  Refer to the DefaultEvaluator</span>
+<span class="sd">                            behavior section for what metrics will be returned based on the type of</span>
+<span class="sd">                            model (i.e. classifier or regressor).  kwargs: Includes a list of args</span>
+<span class="sd">                            that are used to compute the metric. These args could information coming</span>
+<span class="sd">                            from input data, model outputs or parameters specified in the</span>
+<span class="sd">                            `evaluator_config` argument of the `mlflow.evaluate` API.</span>
+<span class="sd">                        kwargs: Includes a list of args that are used to compute the metric. These</span>
+<span class="sd">                            args could be information coming from input data, model outputs,</span>
+<span class="sd">                            other metrics, or parameters specified in the `evaluator_config`</span>
+<span class="sd">                            argument of the `mlflow.evaluate` API.</span>
+
+<span class="sd">                    Returns: MetricValue with per-row scores, per-row justifications, and aggregate</span>
+<span class="sd">                        results.</span>
+<span class="sd">                    &quot;&quot;&quot;</span>
+<span class="sd">                    ...</span>
+
+<span class="sd">        greater_is_better: Whether a higher value of the metric is better.</span>
+<span class="sd">        name: The name of the metric. This argument must be specified if ``eval_fn`` is a lambda</span>
+<span class="sd">                    function or the ``eval_fn.__name__`` attribute is not available.</span>
+<span class="sd">        long_name: (Optional) The long name of the metric. For example, ``&quot;mean_squared_error&quot;``</span>
+<span class="sd">            for ``&quot;mse&quot;``.</span>
+<span class="sd">        version: (Optional) The metric version. For example ``v1``.</span>
+<span class="sd">        metric_details: (Optional) A description of the metric and how it is calculated.</span>
+<span class="sd">        metric_metadata: (Optional) A dictionary containing metadata for the metric.</span>
+<span class="sd">        genai_metric_args: (Optional) A dictionary containing arguments specified by users</span>
+<span class="sd">            when calling make_genai_metric or make_genai_metric_from_prompt. Those args</span>
+<span class="sd">            are persisted so that we can deserialize the same metric object later.</span>
+<span class="sd">        require_strict_signature: (Optional) Whether the eval_fn needs to follow a strict signature.</span>
+<span class="sd">            If True, then the eval_fn must follow below signature:</span>
+
+<span class="sd">                .. code-block:: python</span>
+
+<span class="sd">                    def eval_fn(</span>
+<span class="sd">                        predictions: &quot;pd.Series&quot;,</span>
+<span class="sd">                        metrics: Dict[str, MetricValue],</span>
+<span class="sd">                        inputs: &quot;pd.Series&quot;,</span>
+<span class="sd">                        *args,</span>
+<span class="sd">                    ) -&gt; MetricValue:</span>
+<span class="sd">                        pass</span>
+
+<span class="sd">            When generating a metric from `make_genai_metric`, this should be set to True.</span>
+<span class="sd">            Default to False.</span>
+
+<span class="sd">    .. seealso::</span>
+
+<span class="sd">        - :py:class:`mlflow.models.EvaluationMetric`</span>
+<span class="sd">        - :py:func:`mlflow.evaluate`</span>
+<span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">eval_fn</span><span class="p">,</span> <span class="n">FunctionType</span><span class="p">)</span> <span class="ow">and</span> <span class="n">eval_fn</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;&lt;lambda&gt;&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
@@ -462,16 +729,16 @@
             <span class="s2">&quot;name to enable creation of derived metrics that use the given metric.&quot;</span>
         <span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">EvaluationMetric</span><span class="p">(</span>
-        <span class="n">eval_fn</span><span class="p">,</span>
-        <span class="n">name</span><span class="p">,</span>
-        <span class="n">greater_is_better</span><span class="p">,</span>
-        <span class="n">long_name</span><span class="p">,</span>
-        <span class="n">version</span><span class="p">,</span>
-        <span class="n">metric_details</span><span class="p">,</span>
-        <span class="n">metric_metadata</span><span class="p">,</span>
-        <span class="n">genai_metric_args</span><span class="p">,</span>
-    <span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">_generate_eval_metric_class</span><span class="p">(</span><span class="n">eval_fn</span><span class="p">,</span> <span class="n">require_strict_signature</span><span class="o">=</span><span class="n">require_strict_signature</span><span class="p">)(</span>
+        <span class="n">eval_fn</span><span class="o">=</span><span class="n">eval_fn</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+        <span class="n">greater_is_better</span><span class="o">=</span><span class="n">greater_is_better</span><span class="p">,</span>
+        <span class="n">long_name</span><span class="o">=</span><span class="n">long_name</span><span class="p">,</span>
+        <span class="n">version</span><span class="o">=</span><span class="n">version</span><span class="p">,</span>
+        <span class="n">metric_details</span><span class="o">=</span><span class="n">metric_details</span><span class="p">,</span>
+        <span class="n">metric_metadata</span><span class="o">=</span><span class="n">metric_metadata</span><span class="p">,</span>
+        <span class="n">genai_metric_args</span><span class="o">=</span><span class="n">genai_metric_args</span><span class="p">,</span>
+    <span class="p">)</span>
 
 
 <div class="viewcode-block" id="EvaluationArtifact"><a class="viewcode-back" href="../../../../python_api/mlflow.models.html#mlflow.EvaluationArtifact">[docs]</a><span class="nd">@developer_stable</span>
@@ -1050,87 +1317,8 @@
 <span class="k">def</span> <span class="nf">_get_model_from_deployment_endpoint_uri</span><span class="p">(</span>
     <span class="n">endpoint_uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">):</span>
-    <span class="kn">from</span> <span class="nn">mlflow.metrics.genai.model_utils</span> <span class="kn">import</span> <span class="n">_call_deployments_api</span><span class="p">,</span> <span class="n">_parse_model_uri</span>
-    <span class="kn">from</span> <span class="nn">mlflow.pyfunc.model</span> <span class="kn">import</span> <span class="n">_PythonModelPyfuncWrapper</span>
-
-    <span class="k">class</span> <span class="nc">ModelFromDeploymentEndpoint</span><span class="p">(</span><span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">PythonModel</span><span class="p">):</span>
-        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span> <span class="o">=</span> <span class="n">endpoint</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">params</span>
-
-        <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span>  <span class="c1"># noqa: D417</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">model_input</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span>
-        <span class="p">):</span>
-<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">            Run prediction on the input data.</span>
-
-<span class="sd">            Args:</span>
-<span class="sd">                model_input: The input data for prediction, either of the following:</span>
-<span class="sd">                    - Pandas DataFrame: If the default evaluator is used, input is a DF</span>
-<span class="sd">                        that contains the multiple request payloads in a single column.</span>
-<span class="sd">                    - A dictionary: If the model_type is &quot;databricks-agents&quot; and the</span>
-<span class="sd">                        Databricks RAG evaluator is used, this PythonModel can be invoked</span>
-<span class="sd">                        with a single dict corresponding to the ChatCompletionsRequest schema.</span>
-<span class="sd">                    - A list of dictionaries: Currently we don&#39;t have any evaluator that</span>
-<span class="sd">                        gives this input format, but we keep this for future use cases and</span>
-<span class="sd">                        compatibility with normal pyfunc models.</span>
-
-<span class="sd">            Return:</span>
-<span class="sd">                The prediction result. The return type will be consistent with the model input type,</span>
-<span class="sd">                e.g., if the input is a Pandas DataFrame, the return will be a Pandas Series.</span>
-<span class="sd">            &quot;&quot;&quot;</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_input</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_single</span><span class="p">(</span><span class="n">model_input</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_input</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span>
-                <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">model_input</span>
-            <span class="p">):</span>
-                <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_predict_single</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">model_input</span><span class="p">]</span>
-            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_input</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">model_input</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;The number of input columns must be 1, but got </span><span class="si">{</span><span class="n">model_input</span><span class="o">.</span><span class="n">columns</span><span class="si">}</span><span class="s2">. &quot;</span>
-                        <span class="s2">&quot;Multi-column input is not supported for evaluating an MLflow Deployments &quot;</span>
-                        <span class="s2">&quot;endpoint. Please include the input text or payload in a single column.&quot;</span><span class="p">,</span>
-                        <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
-                    <span class="p">)</span>
-                <span class="n">input_column</span> <span class="o">=</span> <span class="n">model_input</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-
-                <span class="n">predictions</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_predict_single</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">model_input</span><span class="p">[</span><span class="n">input_column</span><span class="p">]]</span>
-                <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">predictions</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Invalid input data type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">model_input</span><span class="p">)</span><span class="si">}</span><span class="s2">. The input data must be either &quot;</span>
-                    <span class="s2">&quot;a Pandas DataFrame, a dictionary, or a list of dictionaries containing the &quot;</span>
-                    <span class="s2">&quot;request payloads for evaluating an MLflow Deployments endpoint.&quot;</span><span class="p">,</span>
-                    <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
-                <span class="p">)</span>
-
-        <span class="k">def</span> <span class="nf">_predict_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">            Send a single prediction request to the MLflow Deployments endpoint.</span>
-
-<span class="sd">            Args:</span>
-<span class="sd">                data: The single input data for prediction. If the input data is a string, we will</span>
-<span class="sd">                    construct the request payload from it. If the input data is a dictionary, we</span>
-<span class="sd">                    will directly use it as the request payload.</span>
-
-<span class="sd">            Returns:</span>
-<span class="sd">                The prediction result from the MLflow Deployments endpoint as a dictionary.</span>
-<span class="sd">            &quot;&quot;&quot;</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                <span class="n">prediction</span> <span class="o">=</span> <span class="n">_call_deployments_api</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-                <span class="n">prediction</span> <span class="o">=</span> <span class="n">_call_deployments_api</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="n">wrap_payload</span><span class="o">=</span><span class="kc">False</span>
-                <span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Invalid input data type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s2">. The feature column of the evaluation &quot;</span>
-                    <span class="s2">&quot;dataset must contain only strings or dictionaries containing the request &quot;</span>
-                    <span class="s2">&quot;payload for evaluating an MLflow Deployments endpoint.&quot;</span><span class="p">,</span>
-                    <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
-                <span class="p">)</span>
-            <span class="k">return</span> <span class="n">prediction</span>
+    <span class="kn">from</span> <span class="nn">mlflow.metrics.genai.model_utils</span> <span class="kn">import</span> <span class="n">_parse_model_uri</span>
+    <span class="kn">from</span> <span class="nn">mlflow.pyfunc.model</span> <span class="kn">import</span> <span class="n">ModelFromDeploymentEndpoint</span><span class="p">,</span> <span class="n">_PythonModelPyfuncWrapper</span>
 
     <span class="n">_</span><span class="p">,</span> <span class="n">endpoint</span> <span class="o">=</span> <span class="n">_parse_model_uri</span><span class="p">(</span><span class="n">endpoint_uri</span><span class="p">)</span>
     <span class="n">params</span> <span class="o">=</span> <span class="n">params</span> <span class="ow">or</span> <span class="p">{}</span>

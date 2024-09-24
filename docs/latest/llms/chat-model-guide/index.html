@@ -1,0 +1,1128 @@
+
+
+<!DOCTYPE html>
+<!-- source: docs/source/llms/chat-model-guide/index.rst -->
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Tutorial: Custom GenAI Models using ChatModel</title>
+  
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/llms/chat-model-guide/index.html">
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    
+
+    
+
+  
+    
+        <!-- Google Tag Manager -->
+        <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer',"GTM-N6WMTTJ");</script>
+        <!-- End Google Tag Manager -->
+    
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/grids.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/mobile.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/simple-cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/tabs.css" type="text/css" />
+    
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="MLflow 2.16.3.dev0 documentation" href="../../index.html"/>
+        <link rel="up" title="LLMs" href="../index.html"/>
+        <link rel="next" title="Introduction to MLflow Tracing" href="/../tracing/index.html"/>
+        <link rel="prev" title="Evaluate a Hugging Face LLM with mlflow.evaluate()" href="/../llm-evaluate/notebooks/huggingface-evaluation.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+<script type="text/javascript" src="../../_static/jquery.js"></script>
+<script type="text/javascript" src="../../_static/underscore.js"></script>
+<script type="text/javascript" src="../../_static/doctools.js"></script>
+<script type="text/javascript" src="../../_static/tabs.js"></script>
+<script type="text/javascript" src="../../_static/languagesections.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+<script type="text/javascript" src="../../_static/runllm.js"></script>
+
+<body class="wy-body-for-nav" role="document">
+  
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N6WMTTJ"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+  
+
+  
+  <nav class="wy-nav-top header" role="navigation" aria-label="top navigation">
+    <ul>
+  <li class="menu-toggle">
+    <i data-toggle="wy-nav-top" class="wy-nav-top-menu-button db-icon db-icon-menu pull-left"></i>
+    <a href="../../index.html" class="wy-nav-top-logo"
+      ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
+    /></a>
+    <span class="version">2.16.3.dev0</span>
+  </li>
+</ul>
+  </nav>
+  <page>
+    
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side relative">
+      <div class="wy-side-scroll">
+  <div class="wy-side-nav-search">
+    
+
+    
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+    
+  </div>
+
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+    
+      <a href="../../index.html" class="main-navigation-home"><img src="../../_static/icons/nav-home.svg"> MLflow</a>
+    
+
+    
+      
+
+      
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../introduction/index.html">MLflow Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started/index.html">Getting Started with MLflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../new-features/index.html">New Features</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">LLMs</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#tutorials-and-use-case-guides-for-genai-applications-in-mlflow">Tutorials and Use Case Guides for GenAI applications in MLflow</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../rag/index.html">Retrieval Augmented Generation (RAG)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../custom-pyfunc-for-llms/index.html">Deploying Advanced LLMs with Custom PyFuncs in MLflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../llm-evaluate/notebooks/index.html">LLM Evaluation Examples</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Tutorial: Custom GenAI Models using ChatModel</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#choosing-between-chatmodel-and-pythonmodel">Choosing Between ChatModel and PythonModel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#purpose-of-this-tutorial">Purpose of this tutorial</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core-concepts">Core Concepts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#key-classes-and-methods-in-our-example">Key Classes and Methods in our example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#example-of-a-custom-chatmodel">Example of a custom ChatModel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#setting-our-model-config-values">Setting our <code class="docutils literal notranslate"><span class="pre">model_config</span></code> values</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#defining-an-input-example">Defining an Input Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#logging-and-loading-our-custom-agent">Logging and Loading our custom Agent</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#conclusion">Conclusion</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#id1">MLflow Tracing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#id2">MLflow AI Gateway for LLMs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#id3">LLM Evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#id4">Prompt Engineering UI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#native-mlflow-flavors-for-llms">Native MLflow Flavors for LLMs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#id5">LLM Tracking in MLflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tracing/index.html">MLflow Tracing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../model-evaluation/index.html">Model Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../deep-learning/index.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../traditional-ml/index.html">Traditional ML</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../deployment/index.html">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tracking.html">MLflow Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../system-metrics/index.html">System Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../projects.html">MLflow Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../models.html">MLflow Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../model-registry.html">MLflow Model Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../recipes.html">MLflow Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plugins.html">MLflow Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auth/index.html">MLflow Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../search-runs.html">Search Runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../search-experiments.html">Search Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../python_api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../R-api.html">R API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../java_api/index.html">Java API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rest-api.html">REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../docker.html">Official MLflow Docker Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../community-model-flavors.html">Community Model Flavors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials-and-examples/index.html">Tutorials and Examples</a></li>
+</ul>
+
+      
+    
+  </div>
+
+  <div role="contentinfo">
+    
+
+    <p>
+      <a id='feedbacklink' href="https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a>
+    </p>
+  </div>
+</div>
+    </nav>
+
+    <main class="wy-grid-for-nav">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+          <div class="rst-content">
+            
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Documentation</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../index.html">LLMs</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+    
+      <li>Tutorial: Custom GenAI Models using ChatModel</li>
+    
+    
+    <!-- <li class="wy-breadcrumbs-aside">
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/llms/chat-model-guide/index.rst" class="fa fa-github"> Edit on GitHub</a>
+    </li> -->
+    
+  </ul>
+</div>
+            <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <div itemprop="articleBody">
+                
+  <div class="section" id="tutorial-custom-genai-models-using-chatmodel">
+<h1>Tutorial: Custom GenAI Models using ChatModel<a class="headerlink" href="#tutorial-custom-genai-models-using-chatmodel" title="Permalink to this headline"> </a></h1>
+<p>The rapidly evolving landscape of Generative Artificial Intelligence (GenAI) presents exciting opportunities and integration challenges.
+To leverage the latest GenAI advancements effectively, developers need a framework that balances flexibility with standardization.
+MLflow addresses this need with the <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.ChatModel" title="mlflow.pyfunc.ChatModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.pyfunc.ChatModel</span></code></a> class introduced in
+<a class="reference external" href="https://mlflow.org/releases/2.11.0#chatmodel-interface-for-a-unified-chat-experience-with-pyfunc-models">version 2.11.0</a>, providing a
+consistent interface for GenAI applications while simplifying deployment and testing.</p>
+<div class="section" id="choosing-between-chatmodel-and-pythonmodel">
+<h2>Choosing Between ChatModel and PythonModel<a class="headerlink" href="#choosing-between-chatmodel-and-pythonmodel" title="Permalink to this headline"> </a></h2>
+<p>When building GenAI applications in MLflow, it’s essential to choose the right model abstraction that balances ease of use with the level of
+customization you need. MLflow offers two primary classes for this purpose: <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.ChatModel" title="mlflow.pyfunc.ChatModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.pyfunc.ChatModel</span></code></a> and
+<a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PythonModel" title="mlflow.pyfunc.PythonModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.pyfunc.PythonModel</span></code></a>. Each has its own strengths and trade-offs, making it crucial to understand which one best suits your use case.</p>
+<p><strong>When to Use ChatModel</strong></p>
+<ul class="simple">
+<li><p><strong>Simplified Interface</strong>: <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.ChatModel" title="mlflow.pyfunc.ChatModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.pyfunc.ChatModel</span></code></a> provides a streamlined interface specifically designed for conversational AI applications.
+It adheres to a standardized input-output format compatible with popular GenAI services like OpenAI, ensuring consistency across deployments.</p></li>
+<li><p><strong>Standardization</strong>: This model type enforces the widely adopted OpenAI API specification, which simplifies model deployment and integration
+by reducing the need to handle complex input schemas manually.</p></li>
+<li><p><strong>Quick Start</strong>: If your goal is to get started quickly with minimal setup, <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.ChatModel" title="mlflow.pyfunc.ChatModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.pyfunc.ChatModel</span></code></a> is an excellent choice. It abstracts away
+much of the complexity, allowing you to focus on your application logic rather than on managing detailed model signatures.</p></li>
+<li><p><strong>Less Customization</strong>: The trade-off for this simplicity is a more rigid structure. <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.ChatModel" title="mlflow.pyfunc.ChatModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.pyfunc.ChatModel</span></code></a> is ideal when your use case aligns
+well with the standardized interface, but it might restrict you if you need to deviate from the prescribed input-output patterns.</p></li>
+</ul>
+<p><strong>When to Use PythonModel</strong></p>
+<ul class="simple">
+<li><p><strong>Full Customization</strong>: <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PythonModel" title="mlflow.pyfunc.PythonModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.pyfunc.PythonModel</span></code></a> offers complete control over the input, output, and processing logic of your model. This makes
+it the preferred choice when building highly customized applications or when integrating with models and services that don’t follow a standardized API.</p></li>
+<li><p><strong>Complex Integrations</strong>: If your application requires complex data processing, multiple steps of data transformation, or integration with
+unique APIs that don’t conform to a standard schema, <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PythonModel" title="mlflow.pyfunc.PythonModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.pyfunc.PythonModel</span></code></a> provides the flexibility needed to handle these tasks.</p></li>
+<li><p><strong>Increased Complexity</strong>: However, with great flexibility comes increased complexity. Using <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PythonModel" title="mlflow.pyfunc.PythonModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.pyfunc.PythonModel</span></code></a> requires you to define and manage
+your model’s input and output signatures, which can be more challenging, particularly when handling JSON structures common in GenAI use cases.</p></li>
+</ul>
+<p><strong>Key Considerations</strong></p>
+<ul class="simple">
+<li><p><strong>ChatModel Pros</strong>: Simplicity, standardization, faster deployment, less code to manage.</p></li>
+<li><p><strong>ChatModel Cons</strong>: Limited flexibility, standardized inputs may not fit all custom needs.</p></li>
+<li><p><strong>PythonModel Pros</strong>: Highly customizable, can handle any input/output format, adaptable to complex requirements.</p></li>
+<li><p><strong>PythonModel Cons</strong>: More setup required, potentially more prone to errors in defining custom signatures, requires careful management of input transformations.</p></li>
+</ul>
+<p><strong>Recommendation</strong>: Use <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.ChatModel" title="mlflow.pyfunc.ChatModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.pyfunc.ChatModel</span></code></a> when you need a quick, standardized, and reliable solution for conversational agents that align with
+popular GenAI interfaces. Opt for <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PythonModel" title="mlflow.pyfunc.PythonModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.pyfunc.PythonModel</span></code></a> when your project demands flexibility and the ability to customize every aspect of your
+model’s behavior.</p>
+</div>
+<div class="section" id="purpose-of-this-tutorial">
+<h2>Purpose of this tutorial<a class="headerlink" href="#purpose-of-this-tutorial" title="Permalink to this headline"> </a></h2>
+<p>This tutorial will guide you through the process of creating a custom chat agent using MLflow’s <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.ChatModel" title="mlflow.pyfunc.ChatModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.pyfunc.ChatModel</span></code></a> class.</p>
+<p>By the end of this tutorial you will:</p>
+<ul class="simple">
+<li><p>Integrate <a class="reference external" href="../tracing/index.html">MLflow Tracing</a> into a custom <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.ChatModel" title="mlflow.pyfunc.ChatModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.pyfunc.ChatModel</span></code></a> instance.</p></li>
+<li><p>Customize your model using the <code class="docutils literal notranslate"><span class="pre">model_config</span></code> parameter within <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.log_model" title="mlflow.pyfunc.log_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.pyfunc.log_model()</span></code></a>.</p></li>
+<li><p>Leverage standardized signature interfaces for simplified deployment.</p></li>
+<li><p>Recognize and avoid common pitfalls when extending the <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.ChatModel" title="mlflow.pyfunc.ChatModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.pyfunc.ChatModel</span></code></a> class.</p></li>
+</ul>
+</div>
+<div class="section" id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline"> </a></h2>
+<ul class="simple">
+<li><p>Familiarity with MLflow logging APIs and GenAI concepts.</p></li>
+<li><p>MLflow version 2.11.0 or higher installed for use of <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.ChatModel" title="mlflow.pyfunc.ChatModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.pyfunc.ChatModel</span></code></a>.</p></li>
+<li><p>MLflow version 2.14.0 or higher installed for use of <a class="reference external" href="../tracing/index.html">MLflow Tracing</a>.</p></li>
+</ul>
+<p>This tutorial uses the <a class="reference external" href="https://docs.databricks.com/en/machine-learning/foundation-models/index.html">Databricks Foundation Model APIs</a> purely as
+an example of interfacing with an external service. You can easily swap the
+provider example to use any managed LLM hosting service with ease (<a class="reference external" href="https://docs.aws.amazon.com/bedrock/latest/userguide/what-is-bedrock.html">Amazon Bedrock</a>,
+<a class="reference external" href="https://learn.microsoft.com/en-us/azure/ai-studio/concepts/deployments-overview">Azure AI Studio</a>,
+<a class="reference external" href="https://platform.openai.com/docs/libraries/python-library">OpenAI</a>, <a class="reference external" href="https://docs.anthropic.com/en/api/client-sdks#python">Anthropic</a>, and many others).</p>
+</div>
+<div class="section" id="core-concepts">
+<h2>Core Concepts<a class="headerlink" href="#core-concepts" title="Permalink to this headline"> </a></h2>
+<div class="sphinx-tabs docutils container">
+<div aria-label="Tabbed content" role="tablist"><button aria-controls="panel-0-0-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-0-0-0" name="0-0" role="tab" tabindex="0">Tracing</button><button aria-controls="panel-0-0-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-1" name="0-1" role="tab" tabindex="-1">Customization</button><button aria-controls="panel-0-0-2" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-2" name="0-2" role="tab" tabindex="-1">Standardization</button><button aria-controls="panel-0-0-3" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-3" name="0-3" role="tab" tabindex="-1">Pitfalls</button></div><div aria-labelledby="tab-0-0-0" class="sphinx-tabs-panel" id="panel-0-0-0" name="0-0" role="tabpanel" tabindex="0"><h3>Tracing Customization for GenAI</h3><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><a class="reference external" href="../tracing/index.html">MLflow Tracing</a> allows you to monitor and log the execution of your model’s methods, providing valuable insights during debugging and performance optimization.</p>
+<p>In our example <code class="docutils literal notranslate"><span class="pre">BasicAgent</span></code> implementation we utilize two separate APIs for the initiation of trace spans: the decorator API and the fluent API.</p>
+<h4>Decorator API</h4><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@mlflow</span><span class="o">.</span><span class="n">trace</span>
+<span class="k">def</span> <span class="nf">_get_system_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">role</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">role</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown role: </span><span class="si">{</span><span class="n">role</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">instruction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">role</span><span class="p">][</span><span class="s2">&quot;instruction&quot;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">ChatMessage</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">instruction</span><span class="p">)</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Using the <a class="reference internal" href="../../python_api/mlflow.html#mlflow.trace" title="mlflow.trace"><code class="xref py py-func docutils literal notranslate"><span class="pre">&#64;mlflow.trace</span></code></a> tracing decorator is the simplest way to add tracing functionality to functions and methods. By default, a span that is generated from
+the application of this decorator will utilize the name of the function as the name of the span. It is possible to override this naming, as well as
+other parameters associated with the span, as follows:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@mlflow</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;custom_span_name&quot;</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="s2">&quot;value&quot;</span><span class="p">},</span> <span class="n">span_type</span><span class="o">=</span><span class="s2">&quot;func&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_get_system_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">role</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">role</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown role: </span><span class="si">{</span><span class="n">role</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">instruction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">role</span><span class="p">][</span><span class="s2">&quot;instruction&quot;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">ChatMessage</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">instruction</span><span class="p">)</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>It is always advised to set a human-readable name for any span that you generate, particularly if you are instrumenting private or generically
+named functions or methods. The MLflow Trace UI will display the name of the function or method by default, which can be confusing to follow
+if your functions and methods are ambiguously named.</p>
+</div>
+<h4>Fluent API</h4><p>The <a class="reference internal" href="../../python_api/mlflow.html#mlflow.start_span" title="mlflow.start_span"><code class="xref py py-func docutils literal notranslate"><span class="pre">fluent</span> <span class="pre">APIs</span></code></a> context handler implementation for initiating spans is useful when you need full control of the logging of each aspect of the span’s data.</p>
+<p>The example from our application for ensuring that we’re capturing the parameters that are set when loading the model via the <code class="docutils literal notranslate"><span class="pre">load_context</span></code> method is
+shown below. We are pulling from the instance attributes <code class="docutils literal notranslate"><span class="pre">self.models_config</span></code> and <code class="docutils literal notranslate"><span class="pre">self.models</span></code> to set the attributes of the span.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_span</span><span class="p">(</span><span class="s2">&quot;Audit Agent&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">root_span</span><span class="p">:</span>
+    <span class="n">root_span</span><span class="o">.</span><span class="n">set_inputs</span><span class="p">(</span><span class="n">messages</span><span class="p">)</span>
+    <span class="n">attributes</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">params</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">models_config</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">}</span>
+    <span class="n">root_span</span><span class="o">.</span><span class="n">set_attributes</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+    <span class="c1"># More span manipulation...</span>
+</pre></div>
+</div>
+<h4>Traces in the MLflow UI</h4><p>After running our example that includes these combined usage patterns for trace span generation and instrumentation,</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="../../_images/agent-trace-ui.png"><img alt="Traces in the MLflow UI for the Agent example" src="../../_images/agent-trace-ui.png" style="width: 100%;" /></a>
+</div>
+</div><div aria-labelledby="tab-0-0-1" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-1" name="0-1" role="tabpanel" tabindex="0"><h3>Model Customization for GenAI</h3><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>In order to control the behavior of our <code class="docutils literal notranslate"><span class="pre">BasicAgent</span></code> model without having to hard-code configuration values directly into our model logic, specifying
+configurations within the <code class="docutils literal notranslate"><span class="pre">model_config</span></code> parameter when logging the model gives some flexibility and versatility to our model definition.</p>
+<p>This functionality allows us to:</p>
+<ul class="simple">
+<li><p><strong>Rapidly test</strong> different configurations without having to make changes to source code</p></li>
+<li><p><strong>See the configuration</strong> that was used when logging different iterations directly in the MLflow UI</p></li>
+<li><p><strong>Simplify the model code</strong> by decoupling the configuration from the implementation</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In our example model, we set a standard set of configurations that control the behavior of the <code class="docutils literal notranslate"><span class="pre">BasicAgent</span></code>. The configuration
+structure expected by the code is a dictionary with the following components:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">models</span></code>: Defines the per-agent configurations.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">(model_name)</span></code>: Represents the role of the agent. This section contains:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">endpoint</span></code>: The specific model type being used by the agent.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">instruction</span></code>: The prompt given to the model, describing its role and responsibilities.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">temperature</span></code>: The temperature setting controlling response variability.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">max_tokens</span></code>: The maximum token limit for generating responses.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">configuration</span></code>: Contains miscellaneous settings for the agent application.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">user_response_instruction</span></code>: Provides context for the second agent by simulating a user response based on the first agent’s output.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div>
+<p>This configuration structure definition will be:</p>
+<ul class="simple">
+<li><p><strong>Defined when logging the model</strong> and structured to support the needs of the model’s behavior</p></li>
+<li><p><strong>Used by the load_context method</strong> and applied to the model when loading</p></li>
+<li><p><strong>Logged within the MLmodel file</strong> and will be visible within the artifact viewer in the MLflow UI</p></li>
+</ul>
+<p>The <code class="docutils literal notranslate"><span class="pre">model_config</span></code> values that are submitted for our <code class="docutils literal notranslate"><span class="pre">BasicAgent</span></code> example within this tutorial can be seen within the logged model’s
+<code class="docutils literal notranslate"><span class="pre">MLmodel</span></code> file in the UI:</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="../../_images/model-config-in-ui.png"><img alt="Model configuration in the MLflow UI" src="../../_images/model-config-in-ui.png" style="width: 50%;" /></a>
+</div>
+</div><div aria-labelledby="tab-0-0-2" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-2" name="0-2" role="tabpanel" tabindex="0"><h3>Standardization for GenAI Models</h3><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>One of the more complex tasks associated with deploying a GenAI application with MLflow arises when attempting to build a custom implementation
+that is based on subclassing the <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PythonModel" title="mlflow.pyfunc.PythonModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.pyfunc.PythonModel</span></code></a> abstraction.</p>
+<p>While <code class="docutils literal notranslate"><span class="pre">PythonModel</span></code> is recommended for custom Deep Learning and traditional Maching Learning models (such as <code class="docutils literal notranslate"><span class="pre">sklearn</span></code> or <code class="docutils literal notranslate"><span class="pre">torch</span></code> models that require
+additional processing logic apart from that of a base model), there are internal manipulations of the input data that occur
+when serving these models that introduce unneccessary complications with GenAI applications.</p>
+<p>Due to the fact that DL and traditional ML models largely rely on structured data, when input data is passed via a REST interface for model serving,
+the <code class="docutils literal notranslate"><span class="pre">PythonModel</span></code> implementation will convert JSON data into <code class="docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code> or <code class="docutils literal notranslate"><span class="pre">numpy</span></code> objects. This conversion creates a confusing and difficult to
+debug scenario when using GenAI models. GenAI implementations generally deal exclusively with JSON-conformant data structures and have no tabular
+representation that makes intuitive sense, thereby creating a frustrating and complex conversion interface needed to make application deployment function
+correctly.</p>
+<p>To simplify this problem, the <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.ChatModel" title="mlflow.pyfunc.ChatModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.pyfunc.ChatModel</span></code></a> class was created to provide a simpler interface for handling of the data
+passed into and returned from a call to the <code class="docutils literal notranslate"><span class="pre">predict()</span></code> method on custom Python models serving GenAI use cases.</p>
+<p>In the example tutorial code below, we subclass <code class="docutils literal notranslate"><span class="pre">ChatModel</span></code> in order to utilize this simplified interface with its immutable input and output
+formats. Because of this immutability, we don’t have to reason about model signatures, and can instead directly use API standards that have
+been broadly accepted throughout the GenAI industry.</p>
+<p>To illustrate why it is preferred to use <code class="docutils literal notranslate"><span class="pre">ChatModel</span></code> as a super class to custom GenAI implementations in MLflow, here is the signature that
+would otherwise need to be defined and supplied during model logging to conform to the <code class="docutils literal notranslate"><span class="pre">OpenAI</span></code> API spec as of September 2024:</p>
+<p><strong>Input Schema</strong> as a <code class="docutils literal notranslate"><span class="pre">dict</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;array&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;items&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
+                <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+            <span class="p">},</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;messages&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;double&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;temperature&quot;</span><span class="p">,</span> <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;long&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;max_tokens&quot;</span><span class="p">,</span> <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;array&quot;</span><span class="p">,</span> <span class="s2">&quot;items&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;stop&quot;</span><span class="p">,</span> <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;long&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;n&quot;</span><span class="p">,</span> <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;stream&quot;</span><span class="p">,</span> <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;double&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;top_p&quot;</span><span class="p">,</span> <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;long&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;top_k&quot;</span><span class="p">,</span> <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;double&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;frequency_penalty&quot;</span><span class="p">,</span> <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;double&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;presence_penalty&quot;</span><span class="p">,</span> <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Agent-based (tool-calling) schemas are significantly more complex than the simpler chat interface example shown above. As GenAI frameworks and services
+evolve with increasingly sophisticated capabilities and features, the complexity of these interfaces will grow, making manual schema definitions a
+challenging and time-consuming task. The structured input validation provided by the MLflow <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.ChatModel" title="mlflow.pyfunc.ChatModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.pyfunc.ChatModel</span></code></a> interface removes the burden of defining and
+managing these intricate signatures manually. By leveraging these pre-defined schemas, you gain robust input type safety and validation, ensuring your
+deployed applications handle inputs consistently and correctly without additional effort. This approach not only reduces the risk of errors but also
+streamlines the development process, allowing you to focus on building impactful GenAI solutions without the overhead of managing complex input specifications.</p>
+</div>
+<p>By using <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.ChatModel" title="mlflow.pyfunc.ChatModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.pyfunc.ChatModel</span></code></a> to base a custom implementation off of, we don’t have to reason about this complex signature.
+It is provided for us.</p>
+<p>The only two considerations to be aware of when interfacing with the static signatures of <code class="docutils literal notranslate"><span class="pre">ChatModel</span></code> are:</p>
+<ul class="simple">
+<li><p>If the service that your custom implementation is interfacing with doesn’t adhere to the <code class="docutils literal notranslate"><span class="pre">OpenAI</span></code> spec, you will need to extract data from the
+standard structure of <a class="reference internal" href="../../python_api/mlflow.types.html#mlflow.types.llm.ChatMessage" title="mlflow.types.llm.ChatMessage"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.types.llm.ChatMessage</span></code></a> and <a class="reference internal" href="../../python_api/mlflow.types.html#mlflow.types.llm.ChatParams" title="mlflow.types.llm.ChatParams"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.types.llm.ChatParams</span></code></a> and ensure that it conforms to what
+your service is expecting.</p></li>
+<li><p>The returned response from <code class="docutils literal notranslate"><span class="pre">predict</span></code> should adhere to the output structure defined within the <code class="docutils literal notranslate"><span class="pre">ChatModel</span></code> output signature:
+<a class="reference internal" href="../../python_api/mlflow.types.html#mlflow.types.llm.ChatResponse" title="mlflow.types.llm.ChatResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.types.llm.ChatResponse</span></code></a>.</p></li>
+</ul>
+</div><div aria-labelledby="tab-0-0-3" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-3" name="0-3" role="tabpanel" tabindex="0"><h3>Common GenAI pitfalls in MLflow</h3><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>There are a number of ways that building a custom implementation for a GenAI use case can be frustrating or not intuitive. Here are some of the
+most common that we’ve heard from our users:</p>
+<h4>Not using a supported flavor</h4><p>If you’re working with a library that is natively supported in MLflow, leveraging the built-in support for logging and loading your implementation
+will always be easier than implementing a custom model. It is recommended to check the <a class="reference external" href="../index.html#native-mlflow-flavors-for-llms">supported GenAI flavors</a>
+to see if there is a built-in solution that will meet your use case needs in one of the many integrations that are available.</p>
+<h4>Misinterpreting what <code>load_context</code> does</h4><p>While subclassing one of the base model types for a custom model, it may appear that the class definition is a “what you see is what you get” standard
+Python class. However, when loading your custom model instance, the <code class="docutils literal notranslate"><span class="pre">load_context</span></code> method is actually called by another loader object.</p>
+<p>Because of the implementation, you <strong>cannot have direct assignment of undefined instance attributes</strong> within <code class="docutils literal notranslate"><span class="pre">load_context</span></code>.</p>
+<p>For example, this does not work:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.pyfunc</span> <span class="kn">import</span> <span class="n">ChatModel</span>
+
+
+<span class="k">class</span> <span class="nc">MyModel</span><span class="p">(</span><span class="n">ChatModel</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">load_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="c1"># This will fail on load as the instance attribute self.my_model_config is not defined</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">my_model_config</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;my_model_config&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Instead, ensure that any instance attributes that are set by the <code class="docutils literal notranslate"><span class="pre">load_context</span></code> method are defined in the class constructor with a
+placeholder value:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.pyfunc</span> <span class="kn">import</span> <span class="n">ChatModel</span>
+
+
+<span class="k">class</span> <span class="nc">MyModel</span><span class="p">(</span><span class="n">ChatModel</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">my_model_config</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Define the attribute here</span>
+
+    <span class="k">def</span> <span class="nf">load_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">my_model_config</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;my_model_config&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<h4>Failing to Handle Secrets securely</h4><p>It might be tempting to simplify your model’s deployment by specifying authentication secrets within a configuration. However, any configuration
+data that is defined within your <code class="docutils literal notranslate"><span class="pre">model_config</span></code> parameters <strong>is directly visible in the MLflow UI</strong> and is not stored securely.</p>
+<p>The recommended approach for handling sensitive configuration data such as API keys or access tokens is to utilize a Secret Manager.
+The configuration for <strong>what to fetch</strong> from your secrets management system can be stored within the <code class="docutils literal notranslate"><span class="pre">model_config</span></code> definition and
+your deployment environment can utilize a secure means of accessing the key reference for your secrets management service.</p>
+<p>An effective place to handle secrets assignment (generally set as environment variables or passed as a part of request headers) is to
+handle the acquisition and per-session setting within <code class="docutils literal notranslate"><span class="pre">load_context</span></code>. If you have rotating tokens, it is worthwhile to embed the acquisition
+of secrets and re-fetching of them upon expiry as part of a retry mechanism within the call stack of <code class="docutils literal notranslate"><span class="pre">predict</span></code>.</p>
+<h4>Failing to use <code>input_example</code></h4><p>While it may seem that providing an <code class="docutils literal notranslate"><span class="pre">input_example</span></code> when logging a model in MLflow is purely for cosmetic purposes within the artifact view
+display within the MLflow UI, there is an additional bit of functionality that makes providing this data very useful, particularly for GenAI
+use cases.</p>
+<p>When an <code class="docutils literal notranslate"><span class="pre">input_example</span></code> is provided, MLflow will call your model’s <code class="docutils literal notranslate"><span class="pre">predict</span></code> method with the example data to validate that the input is
+compatible with the model object that you are logging. If there are any failures that occur, you will receive an error message detailing
+what is wrong with the input syntax. This is very beneficial to ensure that, at the point of logging, you can ensure that your expected
+input interface structure is what will be allowable for the deployed model, thereby saving you hours of debugging and troubleshooting later
+when attempting to deploy your solution.</p>
+<p>It is <strong>highly recommended</strong> to supply this example during logging.</p>
+<h4>Failing to handle retries for Rate Limits being hit</h4><p>Nearly all GenAI provider services impose rate limits and token-based usage limits to prevent disruption to their service or to help protect
+users from unexpected bills. When limits are reached, it is important that your prediction logic is robust to handle these failures to ensure
+that a user of your deployed application understands why their request was not successful.</p>
+<p>It can be beneficial to introduce retry logic for certain errors, particularly those involving transient connection issues or per-unit-of-time
+request limits.</p>
+<h4>Not validating before deployment</h4><p>The process of deploying a GenAI application can a significant amount of time. When an implementation is finally ready to be submitted to a
+serving environment, the last thing that you want to deal with is a model that is incapable of being served due to some issue with a decoded
+JSON payload being submitted to your model’s <code class="docutils literal notranslate"><span class="pre">predict()</span></code> method.</p>
+<p>MLflow offers the <a class="reference internal" href="../../python_api/mlflow.models.html#mlflow.models.validate_serving_input" title="mlflow.models.validate_serving_input"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.models.validate_serving_input()</span></code></a> API to ensure that the model that you have logged is capable of being interacted
+with by emulating the data processing that occurs with a deployed model.</p>
+<p>To use this API, simply navigate to your logged model with the MLflow UI’s artifact viewer. The model display pane on the right side of
+the artifact viewer contains the code snippet that you can execute in an interactive environment to ensure that your model is ready to
+deploy.</p>
+<p>For the example in this tutorial, this is the generated code that is copied from the artifact viewer display:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">validate_serving_input</span>
+
+<span class="n">model_uri</span> <span class="o">=</span> <span class="s2">&quot;runs:/8935b7aff5a84f559b5fcc2af3e2ea31/model&quot;</span>
+
+<span class="c1"># The model is logged with an input example. MLflow converts</span>
+<span class="c1"># it into the serving payload format for the deployed model endpoint,</span>
+<span class="c1"># and saves it to &#39;serving_input_payload.json&#39;</span>
+<span class="n">serving_payload</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;{</span>
+<span class="s2">&quot;messages&quot;: [</span>
+<span class="s2">    {</span>
+<span class="s2">    &quot;role&quot;: &quot;user&quot;,</span>
+<span class="s2">    &quot;content&quot;: &quot;What is a good recipe for baking scones that doesn&#39;t require a lot of skill?&quot;</span>
+<span class="s2">    }</span>
+<span class="s2">],</span>
+<span class="s2">&quot;temperature&quot;: 1.0,</span>
+<span class="s2">&quot;n&quot;: 1,</span>
+<span class="s2">&quot;stream&quot;: false</span>
+<span class="s2">}&quot;&quot;&quot;</span>
+
+<span class="c1"># Validate the serving payload works on the model</span>
+<span class="n">validate_serving_input</span><span class="p">(</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">serving_payload</span><span class="p">)</span>
+</pre></div>
+</div>
+</div></div>
+</div>
+<div class="section" id="key-classes-and-methods-in-our-example">
+<h2>Key Classes and Methods in our example<a class="headerlink" href="#key-classes-and-methods-in-our-example" title="Permalink to this headline"> </a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">BasicAgent</span></code>: Our custom chat agent class that extends <code class="docutils literal notranslate"><span class="pre">ChatModel</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">_get_system_message</span></code>: Retrieves the system message configuration for a specific role.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">_get_agent_response`</span></code>: Sends messages to an endpoint and retrieves responses.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">_call_agent</span></code>: Manages the conversation flow between the agent roles.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">_prepare_message_list`</span></code>: Prepares the list of messages for sending.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">load_context</span></code>: Initializes the model context and configurations.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">predict`</span></code>: Handles the prediction logic for the chat model.</p></li>
+</ul>
+<p>Of these methods listed above, the methods <code class="docutils literal notranslate"><span class="pre">load_context</span></code> and <code class="docutils literal notranslate"><span class="pre">predict</span></code> override the base abstracted implementations of <code class="docutils literal notranslate"><span class="pre">ChatModel</span></code>. In order to
+define a subclass of <code class="docutils literal notranslate"><span class="pre">ChatModel</span></code>, you must implement (at a minimum), the <code class="docutils literal notranslate"><span class="pre">predict</span></code> method. The <code class="docutils literal notranslate"><span class="pre">load_context</span></code> method is only used if you are implementing (as we
+will be below) custom loading logic where a static configuration needs to be loaded for the model object to work, or additional dependent logic needs
+to execute in order for the object instantiation to function correctly.</p>
+</div>
+<div class="section" id="example-of-a-custom-chatmodel">
+<h2>Example of a custom ChatModel<a class="headerlink" href="#example-of-a-custom-chatmodel" title="Permalink to this headline"> </a></h2>
+<p>In the full example below, we’re creating a custom chat agent by subclassing the <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.ChatModel" title="mlflow.pyfunc.ChatModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.pyfunc.ChatModel</span></code></a>. This agent, named <code class="docutils literal notranslate"><span class="pre">BasicAgent</span></code>,
+takes advantage of several important features that help streamline the development, deployment, and tracking of GenAI applications. By subclassing <code class="docutils literal notranslate"><span class="pre">ChatModel</span></code>,
+we ensure a consistent interface for handling conversational agents, while also avoiding common pitfalls associated with more general-purpose models.</p>
+<p>The implementation below highlights the following key aspects:</p>
+<ul>
+<li><p><strong>Tracing</strong>: We leverage MLflow’s tracing functionality to track and log critical operations using both the decorator and fluent API context handler approaches.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Decorator API</strong>: This is used to easily trace methods such as <cite>_get_agent_response</cite> and <cite>_call_agent</cite> for automatic span creation.</p></li>
+<li><p><strong>Fluent API</strong>: Provides fine-grained control over span creation, as shown in the <cite>predict</cite> method for auditing key inputs and outputs during agent interactions.</p></li>
+<li><p><strong>Tip</strong>: We ensure human-readable span names for easier debugging in the MLflow Trace UI and when fetching logged traces via the client API.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>Custom Configuration</strong>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Model Configuration</strong>: By passing custom configurations during model logging (using the <cite>model_config</cite> parameter), we decouple model behavior from
+hard-coded values. This allows rapid testing of different agent configurations without modifying the source code.</p></li>
+<li><p><strong>load_context Method</strong>: Ensures that configurations are loaded at runtime, initializing the agent with the necessary settings and preventing runtime
+failures due to missing configurations.</p></li>
+<li><p><strong>Tip</strong>: We avoid directly setting undefined instance attributes within <cite>load_context</cite>. Instead, all attributes are initialized with default
+values in the class constructor to ensure proper loading of our model.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>Conversation Management</strong>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>We implement a multi-step agent interaction pattern using methods like <cite>_get_system_message</cite>, <cite>_get_agent_response</cite>, and <cite>_call_agent</cite>. These
+methods manage the flow of communication between multiple agents, such as an “oracle” and a “judge” role, each configured with specific instructions
+and parameters.</p></li>
+<li><p><strong>Static Input/Output Structures</strong>: By adhering to the <code class="docutils literal notranslate"><span class="pre">ChatModel</span></code>’s required input (<cite>List[ChatMessage]</cite>) and output (<cite>ChatResponse</cite>) formats,
+we eliminate the complexities associated with converting JSON or tabular data, which is common in more general models like <code class="docutils literal notranslate"><span class="pre">PythonModel</span></code>.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>Common Pitfalls Avoided</strong>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Model Validation via Input Examples</strong>: We provide an input example during model logging, allowing MLflow to validate the input interface and catch
+structural issues early, reducing debugging time during deployment.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">from</span> <span class="nn">mlflow.types.llm</span> <span class="kn">import</span> <span class="n">ChatResponse</span><span class="p">,</span> <span class="n">ChatMessage</span><span class="p">,</span> <span class="n">ChatParams</span><span class="p">,</span> <span class="n">ChatChoice</span>
+<span class="kn">from</span> <span class="nn">mlflow.pyfunc</span> <span class="kn">import</span> <span class="n">ChatModel</span>
+<span class="kn">from</span> <span class="nn">mlflow</span> <span class="kn">import</span> <span class="n">deployments</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Dict</span>
+
+
+<span class="k">class</span> <span class="nc">BasicAgent</span><span class="p">(</span><span class="n">ChatModel</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the BasicAgent with placeholder values.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deploy_client</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">models</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">models_config</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conversation_history</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">load_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the connectors and model configurations.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deploy_client</span> <span class="o">=</span> <span class="n">deployments</span><span class="o">.</span><span class="n">get_deploy_client</span><span class="p">(</span><span class="s2">&quot;databricks&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">models</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">model_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;models&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">models_config</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">model_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;configuration&quot;</span><span class="p">,</span> <span class="p">{})</span>
+
+    <span class="k">def</span> <span class="nf">_get_system_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">role</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the system message configuration for the specified role.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            role (str): The role of the agent (e.g., &quot;oracle&quot; or &quot;judge&quot;).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: The system message for the given role.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">role</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown role: </span><span class="si">{</span><span class="n">role</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">instruction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">role</span><span class="p">][</span><span class="s2">&quot;instruction&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">ChatMessage</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">instruction</span><span class="p">)</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+
+    <span class="nd">@mlflow</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Raw Agent Response&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_get_agent_response</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">message_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">],</span> <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Call the agent endpoint to get a response.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            message_list (List[Dict]): List of messages for the agent.</span>
+<span class="sd">            endpoint (str): The agent&#39;s endpoint.</span>
+<span class="sd">            params (Optional[dict]): Additional parameters for the call.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: The response from the agent.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deploy_client</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span>
+            <span class="n">endpoint</span><span class="o">=</span><span class="n">endpoint</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="n">message_list</span><span class="p">,</span> <span class="o">**</span><span class="p">(</span><span class="n">params</span> <span class="ow">or</span> <span class="p">{})}</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;choices&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;message&quot;</span><span class="p">]</span>
+
+    <span class="nd">@mlflow</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Agent Call&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_call_agent</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="n">ChatMessage</span><span class="p">,</span> <span class="n">role</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prepares and sends the request to a specific agent based on the role.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            message (ChatMessage): The message to be processed.</span>
+<span class="sd">            role (str): The role of the agent (e.g., &quot;oracle&quot; or &quot;judge&quot;).</span>
+<span class="sd">            params (Optional[dict]): Additional parameters for the call.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: The response from the agent.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">system_message</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_system_message</span><span class="p">(</span><span class="n">role</span><span class="p">)</span>
+        <span class="n">message_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_message_list</span><span class="p">(</span><span class="n">system_message</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+
+        <span class="c1"># Fetch agent response</span>
+        <span class="n">agent_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">role</span><span class="p">]</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_agent_response</span><span class="p">(</span>
+            <span class="n">message_list</span><span class="p">,</span> <span class="n">agent_config</span><span class="p">[</span><span class="s2">&quot;endpoint&quot;</span><span class="p">],</span> <span class="n">params</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Update conversation history</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conversation_history</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">message</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span> <span class="n">response</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">response</span>
+
+    <span class="nd">@mlflow</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Assemble Conversation&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_prepare_message_list</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">system_message</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">user_message</span><span class="p">:</span> <span class="n">ChatMessage</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prepare the list of messages to send to the agent.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            system_message (dict): The system message dictionary.</span>
+<span class="sd">            user_message (ChatMessage): The user message.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List[dict]: The complete list of messages to send.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">user_prompt</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">models_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="s2">&quot;user_response_instruction&quot;</span><span class="p">,</span> <span class="s2">&quot;Can you make the answer better?&quot;</span>
+            <span class="p">),</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">conversation_history</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">system_message</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">conversation_history</span><span class="p">,</span> <span class="n">user_prompt</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">system_message</span><span class="p">,</span> <span class="n">user_message</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()]</span>
+
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">messages</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ChatMessage</span><span class="p">],</span> <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ChatParams</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ChatResponse</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Predict method to handle agent conversation.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            context: The MLflow context.</span>
+<span class="sd">            messages (List[ChatMessage]): List of messages to process.</span>
+<span class="sd">            params (Optional[ChatParams]): Additional parameters for the conversation.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            ChatResponse: The structured response object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Use the fluent API context handler to have added control over what is included in the span</span>
+        <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_span</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Audit Agent&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">root_span</span><span class="p">:</span>
+            <span class="c1"># Add the user input to the root span</span>
+            <span class="n">root_span</span><span class="o">.</span><span class="n">set_inputs</span><span class="p">(</span><span class="n">messages</span><span class="p">)</span>
+
+            <span class="c1"># Add attributes to the root span</span>
+            <span class="n">attributes</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">params</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">models_config</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">}</span>
+            <span class="n">root_span</span><span class="o">.</span><span class="n">set_attributes</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+
+            <span class="c1"># Initiate the conversation with the oracle</span>
+            <span class="n">oracle_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_model_params</span><span class="p">(</span><span class="s2">&quot;oracle&quot;</span><span class="p">)</span>
+            <span class="n">oracle_response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_call_agent</span><span class="p">(</span><span class="n">messages</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;oracle&quot;</span><span class="p">,</span> <span class="n">oracle_params</span><span class="p">)</span>
+
+            <span class="c1"># Process the response with the judge</span>
+            <span class="n">judge_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_model_params</span><span class="p">(</span><span class="s2">&quot;judge&quot;</span><span class="p">)</span>
+            <span class="n">judge_response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_call_agent</span><span class="p">(</span>
+                <span class="n">ChatMessage</span><span class="p">(</span><span class="o">**</span><span class="n">oracle_response</span><span class="p">),</span> <span class="s2">&quot;judge&quot;</span><span class="p">,</span> <span class="n">judge_params</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Reset the conversation history and return the final response</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">conversation_history</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="n">output</span> <span class="o">=</span> <span class="n">ChatResponse</span><span class="p">(</span>
+                <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="n">ChatChoice</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">ChatMessage</span><span class="p">(</span><span class="o">**</span><span class="n">judge_response</span><span class="p">))],</span>
+                <span class="n">usage</span><span class="o">=</span><span class="p">{},</span>
+                <span class="n">model</span><span class="o">=</span><span class="n">judge_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;endpoint&quot;</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">),</span>
+            <span class="p">)</span>
+
+            <span class="n">root_span</span><span class="o">.</span><span class="n">set_outputs</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">output</span>
+
+    <span class="k">def</span> <span class="nf">_get_model_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">role</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves model parameters for a given role.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            role (str): The role of the agent (e.g., &quot;oracle&quot; or &quot;judge&quot;).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: A dictionary of parameters for the agent.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">role_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">role</span><span class="p">,</span> <span class="p">{})</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="n">role_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;temperature&quot;</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
+            <span class="s2">&quot;max_tokens&quot;</span><span class="p">:</span> <span class="n">role_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max_tokens&quot;</span><span class="p">,</span> <span class="mi">500</span><span class="p">),</span>
+        <span class="p">}</span>
+</pre></div>
+</div>
+<p>Now that we have our model defined, the process of logging it has only a single step that is required to be taken before logging:
+we need to define the configuration for our model to be initialized with. This is done by defining our <code class="docutils literal notranslate"><span class="pre">model_config</span></code> configuration.</p>
+</div>
+<div class="section" id="setting-our-model-config-values">
+<h2>Setting our <code class="docutils literal notranslate"><span class="pre">model_config</span></code> values<a class="headerlink" href="#setting-our-model-config-values" title="Permalink to this headline"> </a></h2>
+<p>Before logging the model, we need to define the configuration that governs the behavior of our model’s agents. This decoupling of configuration from the core logic of the model allows us to easily test and compare different agent behaviors without needing to modify the model implementation. By using a flexible configuration system, we can efficiently experiment with different settings, making it much easier to iterate and fine-tune our model.</p>
+<div class="section" id="why-decouple-configuration">
+<h3>Why Decouple Configuration?<a class="headerlink" href="#why-decouple-configuration" title="Permalink to this headline"> </a></h3>
+<p>In the context of Generative AI (GenAI), agent behavior can vary greatly depending on the instruction sets and parameters (such as <code class="docutils literal notranslate"><span class="pre">temperature</span></code> or
+<code class="docutils literal notranslate"><span class="pre">max_tokens</span></code>) given to each agent. If we hardcoded these configurations directly into our model’s logic, each new test would require changing the
+model’s source code, leading to:</p>
+<ul class="simple">
+<li><p><strong>Inefficiency</strong>: Changing source code for each test slows down the experimentation process.</p></li>
+<li><p><strong>Increased Risk of Errors</strong>: Constantly modifying the source increases the chance of introducing bugs or unintended side effects.</p></li>
+<li><p><strong>Lack of Reproducibility</strong>: Without a clear separation between code and configuration, tracking and reproducing the exact configuration used for
+a particular result becomes challenging.</p></li>
+</ul>
+<p>By setting these values externally via the <code class="docutils literal notranslate"><span class="pre">model_config</span></code> parameter, we make the model flexible and adaptable to different test scenarios.
+This approach also integrates seamlessly with MLflow’s evaluation tools, such as <a class="reference internal" href="../../python_api/mlflow.html#mlflow.evaluate" title="mlflow.evaluate"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code></a>, which allows you to compare model
+outputs across different configurations systematically.</p>
+</div>
+<div class="section" id="defining-the-model-configuration">
+<h3>Defining the Model Configuration<a class="headerlink" href="#defining-the-model-configuration" title="Permalink to this headline"> </a></h3>
+<p>The configuration consists of two main sections:</p>
+<ol class="arabic simple">
+<li><p><strong>Models</strong>: This section defines agent-specific configurations, such as the <code class="docutils literal notranslate"><span class="pre">judge</span></code> and <code class="docutils literal notranslate"><span class="pre">oracle</span></code> roles in this example. Each agent has:</p>
+<ul class="simple">
+<li><p>An <strong>endpoint</strong>: Specifies the model type or service being used for this agent.</p></li>
+<li><p>An <strong>instruction</strong>: Defines the role and responsibilities of the agent (e.g., answering questions, evaluating responses).</p></li>
+<li><p><strong>Temperature and Max Tokens</strong>: Controls the generation variability (<code class="docutils literal notranslate"><span class="pre">temperature</span></code>) and token limit for responses.</p></li>
+</ul>
+</li>
+<li><p><strong>General Configuration</strong>: Additional settings for the overall behavior of the model, such as how user responses should be framed for subsequent agents.</p></li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>There are two options available for setting a model configuration: directly within the logging code (shown below) or by writing a configuration file
+in <code class="docutils literal notranslate"><span class="pre">yaml</span></code> format to a local location whose path can be specified when defining the <code class="docutils literal notranslate"><span class="pre">model_config</span></code> argument during logging. To learn more about
+how the <code class="docutils literal notranslate"><span class="pre">model_config</span></code> parameter is utilized, <a class="reference external" href="../../models.html#python-function-model-interfaces">see the guide on model_config usage</a>.</p>
+</div>
+<p>Here’s how we set the configuration for our agents:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;models&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;judge&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;endpoint&quot;</span><span class="p">:</span> <span class="s2">&quot;databricks-meta-llama-3-1-405b-instruct&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;instruction&quot;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="s2">&quot;You are an evaluator of answers provided by others. Based on the context of both the question and the answer, &quot;</span>
+                <span class="s2">&quot;provide a corrected answer if it is incorrect; otherwise, enhance the answer with additional context and explanation.&quot;</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+            <span class="s2">&quot;max_tokens&quot;</span><span class="p">:</span> <span class="mi">2000</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;oracle&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;endpoint&quot;</span><span class="p">:</span> <span class="s2">&quot;databricks-mixtral-8x7b-instruct&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;instruction&quot;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="s2">&quot;You are a knowledgeable source of information that excels at providing detailed, but brief answers to questions. &quot;</span>
+                <span class="s2">&quot;Provide an answer to the question based on the information provided.&quot;</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">,</span>
+            <span class="s2">&quot;max_tokens&quot;</span><span class="p">:</span> <span class="mi">5000</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;configuration&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;user_response_instruction&quot;</span><span class="p">:</span> <span class="s2">&quot;Can you evaluate and enhance this answer with the provided contextual history?&quot;</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="benefits-of-external-configuration">
+<h3>Benefits of External Configuration<a class="headerlink" href="#benefits-of-external-configuration" title="Permalink to this headline"> </a></h3>
+<ul class="simple">
+<li><p><strong>Flexibility</strong>: The decoupled configuration allows us to easily switch or adjust model behavior without modifying the core logic. For example, we can
+change the model’s instructions or adjust the <code class="docutils literal notranslate"><span class="pre">temperature</span></code> to test different levels of creativity in the responses.</p></li>
+<li><p><strong>Scalability</strong>: As more agents are added to the system or new roles are introduced, we can extend this configuration without cluttering the model’s
+code. This separation keeps the codebase cleaner and more maintainable.</p></li>
+<li><p><strong>Reproducibility and Comparison</strong>: By keeping configuration external, we can log the specific settings used in each run with MLflow. This makes it
+easier to reproduce results and compare different experiments, ensuring a robust evaluation and adjudication process to select the best performing
+configuration.</p></li>
+</ul>
+<p>With the configuration in place, we’re now ready to log the model and run experiments using these settings. By leveraging MLflow’s powerful tracking
+and logging features, we’ll be able to manage the experiments efficiently and extract valuable insights from the agent’s responses.</p>
+</div>
+</div>
+<div class="section" id="defining-an-input-example">
+<h2>Defining an Input Example<a class="headerlink" href="#defining-an-input-example" title="Permalink to this headline"> </a></h2>
+<p>Before logging our model, it’s important to provide an <code class="docutils literal notranslate"><span class="pre">input_example</span></code> that demonstrates how to interact with the model. This example serves several key purposes:</p>
+<ul class="simple">
+<li><p><strong>Validation at Logging Time</strong>: Including an <code class="docutils literal notranslate"><span class="pre">input_example</span></code> allows MLflow to execute the <code class="docutils literal notranslate"><span class="pre">predict</span></code> method using this example during the logging
+process. This helps validate that your model can handle the expected input format and catch any issues early.</p></li>
+<li><p><strong>UI Representation</strong>: The <code class="docutils literal notranslate"><span class="pre">input_example</span></code> is displayed in the MLflow UI under the model’s artifacts. This provides a convenient reference for
+users to understand the expected input structure when interacting with the deployed model.</p></li>
+</ul>
+<p>By providing an input example, you ensure that your model is tested with real data, increasing confidence that it will behave as expected when deployed.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>When defining your GenAI application using the <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.ChatModel" title="mlflow.pyfunc.ChatModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.pyfunc.ChatModel</span></code></a>, a default placeholder input example will be used if none is provided.
+If you notice an unfamiliar or generic input example in the MLflow UI’s artifact viewer, it’s likely the default placeholder assigned by the system.
+To avoid this, ensure you specify a custom input example when saving your model.</p>
+</div>
+<p>Here’s the input example we’ll use:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">input_example</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;What is a good recipe for baking scones that doesn&#39;t require a lot of skill?&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This example represents a user asking for an easy scone recipe. It aligns with the input structure expected by our <code class="docutils literal notranslate"><span class="pre">BasicAgent</span></code> model, which processes a
+list of messages where each message includes a <code class="docutils literal notranslate"><span class="pre">role</span></code> and <code class="docutils literal notranslate"><span class="pre">content</span></code>.</p>
+<p><strong>Benefits of Providing an Input Example:</strong></p>
+<ul class="simple">
+<li><p><strong>Execution and Validation</strong>: MLflow will pass this <code class="docutils literal notranslate"><span class="pre">input_example</span></code> to the model’s <code class="docutils literal notranslate"><span class="pre">predict</span></code> method during logging to ensure that it can process
+the input without errors. Any issues with input handling, such as incorrect data types or missing fields, will be caught at this stage, saving you time
+debugging later.</p></li>
+<li><p><strong>User Interface Display</strong>: The <code class="docutils literal notranslate"><span class="pre">input_example</span></code> will be visible in the MLflow UI within the model artifact view section. This helps users understand
+the format of input data the model expects, making it easier to interact with the model once it’s deployed.</p></li>
+<li><p><strong>Deployment Confidence</strong>: By validating the model with an example input upfront, you gain additional assurance that the model will function correctly
+in a production environment, reducing the risk of unexpected behavior after deployment.</p></li>
+</ul>
+<p>Including an <code class="docutils literal notranslate"><span class="pre">input_example</span></code> is a simple yet powerful step to verify that your model is ready for deployment and will behave as expected when
+receiving input from users.</p>
+</div>
+<div class="section" id="logging-and-loading-our-custom-agent">
+<h2>Logging and Loading our custom Agent<a class="headerlink" href="#logging-and-loading-our-custom-agent" title="Permalink to this headline"> </a></h2>
+<p>To log and load the model using MLflow, use:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="n">model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+        <span class="s2">&quot;model&quot;</span><span class="p">,</span>
+        <span class="n">python_model</span><span class="o">=</span><span class="n">BasicAgent</span><span class="p">(),</span>
+        <span class="n">model_config</span><span class="o">=</span><span class="n">model_config</span><span class="p">,</span>
+        <span class="n">input_example</span><span class="o">=</span><span class="n">input_example</span><span class="p">,</span>
+    <span class="p">)</span>
+
+<span class="n">loaded</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;What is the best material to make a baseball bat out of?&quot;</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">]</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline"> </a></h2>
+<p>In this tutorial, you have explored the process of creating a custom GenAI chat agent using MLflow’s <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.ChatModel" title="mlflow.pyfunc.ChatModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.pyfunc.ChatModel</span></code></a> class.
+We demonstrated how to implement a flexible, scalable, and standardized approach to managing the deployment of GenAI applications, enabling you
+to harness the latest advancements in AI, even for libraries and frameworks that are not yet natively supported with a named flavor in MLflow.</p>
+<p>By using <code class="docutils literal notranslate"><span class="pre">ChatModel</span></code> instead of the more generic <code class="docutils literal notranslate"><span class="pre">PythonModel</span></code>, you can avoid many of the common pitfalls associated with deploying GenAI by
+leveraging the benefits of immutable signature interfaces that are consistent across any of your deployed GenAI interfaces, simplifying the
+use of all of your solutions by providing a consistent experience.</p>
+<p>Key takeaways from this tutorial include:</p>
+<ul class="simple">
+<li><p><strong>Tracing and Monitoring</strong>: By integrating tracing directly into the model, you gain valuable insights into the internal workings of your application,
+making debugging and optimization more straightforward. Both the decorator and fluent API approaches offer versatile ways to manage tracing for
+critical operations.</p></li>
+<li><p><strong>Flexible Configuration Management</strong>: Decoupling configurations from your model code ensures that you can rapidly test and iterate without
+modifying source code. This approach not only streamlines experimentation but also enhances reproducibility and scalability as your application evolves.</p></li>
+<li><p><strong>Standardized Input and Output Structures</strong>: Leveraging the static signatures of <code class="docutils literal notranslate"><span class="pre">ChatModel</span></code> simplifies the complexities of deploying and
+serving GenAI models. By adhering to established standards, you reduce the friction typically associated with integrating and validating input/output formats.</p></li>
+<li><p><strong>Avoiding Common Pitfalls</strong>: Throughout the implementation, we highlighted best practices to avoid common issues, such as proper handling
+of secrets, validating input examples, and understanding the nuances of loading context. Following these practices ensures that your model
+remains secure, robust, and reliable in production environments.</p></li>
+<li><p><strong>Validation and Deployment Readiness</strong>: The importance of validating your model before deployment cannot be overstated. By using tools
+like <a class="reference internal" href="../../python_api/mlflow.models.html#mlflow.models.validate_serving_input" title="mlflow.models.validate_serving_input"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.models.validate_serving_input()</span></code></a>, you can catch and resolve potential deployment issues early, saving time and effort
+during the production deployment process.</p></li>
+</ul>
+<p>As the landscape of Generative AI continues to evolve, building adaptable and standardized models will be crucial to leveraging the exciting
+and powerful capabilities that will be unlocked in the months and years ahead. The approach covered in this tutorial equips you with a robust
+framework for integrating and managing GenAI technologies within MLflow, empowering you to develop, track, and deploy sophisticated AI solutions with ease.</p>
+<p>We encourage you to extend and customize this foundational example to suit your specific needs and explore further enhancements. By leveraging
+MLflow’s growing capabilities, you can continue to refine your GenAI models, ensuring they deliver impactful and reliable results in any application.</p>
+</div>
+</div>
+
+
+              </div>
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../llm-evaluate/notebooks/huggingface-evaluation.html" class="btn btn-neutral" title="Evaluate a Hugging Face LLM with mlflow.evaluate()" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+      
+      
+        <a href="../tracing/index.html" class="btn btn-neutral" title="Introduction to MLflow Tracing" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+      <p class="copyright">
+          &copy; MLflow Project, a Series of LF Projects, LLC. All rights reserved.
+      </p>
+
+  </div> 
+
+</footer>
+          </div>
+        </div>
+      </section>
+    </main>
+  </page>
+
+  
+
+
+  
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+      URL_ROOT:'../../',
+      VERSION:'2.16.3.dev0',
+      COLLAPSE_INDEX:false,
+      FILE_SUFFIX:'.html',
+      LINK_SUFFIX: '.html',
+      HAS_SOURCE:  true
+    };
+  </script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/clipboard.min.js"></script>
+  <script type="text/javascript" src="../../_static/js/jquery.waypoints.min.js"></script>
+
+  
+  
+  
+  <script type="text/javascript">var CLIPPY_SVG_PATH = "../../_static/clippy.svg";</script>
+  <script type="text/javascript" src="../../_static/js/custom.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.StickyNav.enable();
+    });
+
+  </script>
+  
+
+  
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        // Get the code block designator class entries
+        const allHighlights = document.querySelectorAll('.highlight');
+        // Disable copyable links for notebook cell numbering and for cell outputs
+        const highlights = Array.from(allHighlights).filter(highlight => !highlight.closest('.highlight-none') && 
+            !highlight.closest('.nboutput'));
+    
+        highlights.forEach(function(highlight) {
+            const copyIcon = document.createElement('span');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.innerHTML = '&#xf0ea;';
+
+            copyIcon.addEventListener('click', function() {
+                const code = highlight.querySelector('pre').textContent;
+                copyToClipboard(code);
+
+                // Flash effect on click
+                this.style.color = '#0194E2';
+                setTimeout(() => {
+                    this.style.color = ''; 
+                }, 100);
+
+                // Display "Code copied to clipboard" near the clicked icon
+                const message = document.createElement('span');
+                message.textContent = "Copied!";
+                message.classList.add('copy-message'); 
+
+                // Append the message to the icon
+                this.appendChild(message);
+
+                setTimeout(() => {
+                    this.removeChild(message);
+                }, 500);
+            });
+
+            highlight.appendChild(copyIcon);
+        });
+    });
+  </script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Force download for notebook-download-btn
+        const downloadButtons = document.querySelectorAll('.notebook-download-btn');
+        downloadButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                // Fetch the raw content of the notebook from GitHub
+                fetch(button.href)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = url;
+                        const filename = button.href.split('/').pop();
+                        link.download = filename; 
+
+                        document.body.appendChild(link);
+                        link.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    })
+                    .catch(err => console.error('Error fetching the notebook:', err));
+            });
+        });
+    });
+</script> 
+</body>
+</html>

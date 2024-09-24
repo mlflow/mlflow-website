@@ -215,9 +215,10 @@
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">cloudpickle</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">yaml</span>
 
 <span class="kn">import</span> <span class="nn">mlflow.pyfunc</span>
@@ -867,6 +868,89 @@
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">python_model</span><span class="p">,</span> <span class="n">ChatModel</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">loaders</span><span class="o">.</span><span class="n">chat_model</span><span class="o">.</span><span class="vm">__name__</span>
     <span class="k">return</span> <span class="vm">__name__</span>
+
+
+<span class="k">class</span> <span class="nc">ModelFromDeploymentEndpoint</span><span class="p">(</span><span class="n">PythonModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A PythonModel wrapper for invoking an MLflow Deployments endpoint.</span>
+<span class="sd">    This class is particularly used for running evaluation against an MLflow Deployments endpoint.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span> <span class="o">=</span> <span class="n">endpoint</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">params</span>
+
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span>  <span class="c1"># noqa: D417</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">model_input</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run prediction on the input data.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            model_input: The input data for prediction, either of the following:</span>
+<span class="sd">                - Pandas DataFrame: If the default evaluator is used, input is a DF</span>
+<span class="sd">                    that contains the multiple request payloads in a single column.</span>
+<span class="sd">                - A dictionary: If the model_type is &quot;databricks-agents&quot; and the</span>
+<span class="sd">                    Databricks RAG evaluator is used, this PythonModel can be invoked</span>
+<span class="sd">                    with a single dict corresponding to the ChatCompletionsRequest schema.</span>
+<span class="sd">                - A list of dictionaries: Currently we don&#39;t have any evaluator that</span>
+<span class="sd">                    gives this input format, but we keep this for future use cases and</span>
+<span class="sd">                    compatibility with normal pyfunc models.</span>
+
+<span class="sd">        Return:</span>
+<span class="sd">            The prediction result. The return type will be consistent with the model input type,</span>
+<span class="sd">            e.g., if the input is a Pandas DataFrame, the return will be a Pandas Series.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_input</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_single</span><span class="p">(</span><span class="n">model_input</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_input</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">model_input</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_predict_single</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">model_input</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_input</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">model_input</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;The number of input columns must be 1, but got </span><span class="si">{</span><span class="n">model_input</span><span class="o">.</span><span class="n">columns</span><span class="si">}</span><span class="s2">. &quot;</span>
+                    <span class="s2">&quot;Multi-column input is not supported for evaluating an MLflow Deployments &quot;</span>
+                    <span class="s2">&quot;endpoint. Please include the input text or payload in a single column.&quot;</span><span class="p">,</span>
+                    <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="n">input_column</span> <span class="o">=</span> <span class="n">model_input</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="n">predictions</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_predict_single</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">model_input</span><span class="p">[</span><span class="n">input_column</span><span class="p">]]</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">predictions</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Invalid input data type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">model_input</span><span class="p">)</span><span class="si">}</span><span class="s2">. The input data must be either &quot;</span>
+                <span class="s2">&quot;a Pandas DataFrame, a dictionary, or a list of dictionaries containing the &quot;</span>
+                <span class="s2">&quot;request payloads for evaluating an MLflow Deployments endpoint.&quot;</span><span class="p">,</span>
+                <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_predict_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Send a single prediction request to the MLflow Deployments endpoint.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data: The single input data for prediction. If the input data is a string, we will</span>
+<span class="sd">                construct the request payload from it. If the input data is a dictionary, we</span>
+<span class="sd">                will directly use it as the request payload.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The prediction result from the MLflow Deployments endpoint as a dictionary.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">mlflow.metrics.genai.model_utils</span> <span class="kn">import</span> <span class="n">_call_deployments_api</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">prediction</span> <span class="o">=</span> <span class="n">_call_deployments_api</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">prediction</span> <span class="o">=</span> <span class="n">_call_deployments_api</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="n">wrap_payload</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Invalid input data type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s2">. The feature column of the evaluation &quot;</span>
+                <span class="s2">&quot;dataset must contain only strings or dictionaries containing the request &quot;</span>
+                <span class="s2">&quot;payload for evaluating an MLflow Deployments endpoint.&quot;</span><span class="p">,</span>
+                <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">prediction</span>
 </pre></div>
 
               </div>

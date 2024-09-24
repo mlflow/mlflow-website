@@ -229,6 +229,7 @@
 <span class="kn">from</span> <span class="nn">mlflow.tracing</span> <span class="kn">import</span> <span class="n">provider</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracing.constant</span> <span class="kn">import</span> <span class="n">SpanAttributeKey</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracing.display</span> <span class="kn">import</span> <span class="n">get_display_handler</span>
+<span class="kn">from</span> <span class="nn">mlflow.tracing.provider</span> <span class="kn">import</span> <span class="n">is_tracing_enabled</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracing.trace_manager</span> <span class="kn">import</span> <span class="n">InMemoryTraceManager</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracing.utils</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">SPANS_COLUMN_NAME</span><span class="p">,</span>
@@ -815,6 +816,10 @@
 <span class="sd">            - If not provided and there is no active span, a new span named &quot;Remote Trace &lt;...&gt;&quot;</span>
 <span class="sd">              will be created and the trace will be merged under it.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_tracing_enabled</span><span class="p">():</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Tracing is disabled. Skipping add_trace.&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">trace</span> <span class="o">=</span> <span class="n">Trace</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">trace</span><span class="p">)</span>
@@ -893,6 +898,8 @@
             <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Parent trace with request ID </span><span class="si">{</span><span class="n">target_request_id</span><span class="si">}</span><span class="s2"> not found. Skipping merge.&quot;</span>
             <span class="p">)</span>
+            <span class="k">return</span>
+
         <span class="n">new_trace_id</span> <span class="o">=</span> <span class="n">parent_trace</span><span class="o">.</span><span class="n">span_dict</span><span class="p">[</span><span class="n">target_parent_span_id</span><span class="p">]</span><span class="o">.</span><span class="n">_trace_id</span>
 
     <span class="k">for</span> <span class="n">span</span> <span class="ow">in</span> <span class="n">trace</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">spans</span><span class="p">:</span>

@@ -1120,30 +1120,31 @@
             <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_inspect_module_and_patch_cls</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">inspected_modules</span><span class="p">,</span> <span class="n">patched_classes</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_inspect_module_and_patch_cls</span><span class="p">(</span><span class="n">module_name</span><span class="p">,</span> <span class="n">inspected_modules</span><span class="p">,</span> <span class="n">patched_classes</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Internal method to inspect the module and patch classes that are</span>
 <span class="sd">    subclasses of Runnable for autologging.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">langchain.schema.runnable</span> <span class="kn">import</span> <span class="n">Runnable</span>
 
-    <span class="k">if</span> <span class="n">module</span><span class="o">.</span><span class="vm">__name__</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">inspected_modules</span><span class="p">:</span>
-        <span class="n">inspected_modules</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">module</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">ismodule</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="vm">__name__</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;langchain&quot;</span><span class="p">)):</span>
-                <span class="c1"># NB: Sometimes child modules require additional packages</span>
-                <span class="c1"># e.g. langchain.chat_models requires langchain_community.</span>
-                <span class="k">try</span><span class="p">:</span>
-                    <span class="n">_inspect_module_and_patch_cls</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">inspected_modules</span><span class="p">,</span> <span class="n">patched_classes</span><span class="p">)</span>
-                <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-                    <span class="k">pass</span>
-            <span class="k">elif</span> <span class="p">(</span>
-                <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
-                <span class="ow">and</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__name__</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">patched_classes</span>
-                <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">Runnable</span><span class="p">)</span>
-            <span class="p">):</span>
-                <span class="n">_patch_runnable_cls</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
-                <span class="n">patched_classes</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">module_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">inspected_modules</span><span class="p">:</span>
+        <span class="n">inspected_modules</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">module_name</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">module_name</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">ismodule</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
+                    <span class="n">obj</span><span class="o">.</span><span class="vm">__name__</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;langchain&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__name__</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;langgraph&quot;</span><span class="p">)</span>
+                <span class="p">):</span>
+                    <span class="n">_inspect_module_and_patch_cls</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">inspected_modules</span><span class="p">,</span> <span class="n">patched_classes</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="p">(</span>
+                    <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+                    <span class="ow">and</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__name__</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">patched_classes</span>
+                    <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">Runnable</span><span class="p">)</span>
+                <span class="p">):</span>
+                    <span class="n">_patch_runnable_cls</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+                    <span class="n">patched_classes</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
 
 
 <div class="viewcode-block" id="autolog"><a class="viewcode-back" href="../../python_api/mlflow.langchain.html#mlflow.langchain.autolog">[docs]</a><span class="nd">@experimental</span>
@@ -1228,11 +1229,18 @@
         <span class="k">for</span> <span class="n">pkg</span> <span class="ow">in</span> <span class="n">importlib</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">distributions</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">pkg</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;Name&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;langchain&quot;</span><span class="p">):</span>
                 <span class="n">module_name</span> <span class="o">=</span> <span class="n">pkg</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;Name&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
-                <span class="k">try</span><span class="p">:</span>
-                    <span class="n">module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">module_name</span><span class="p">)</span>
-                    <span class="n">_inspect_module_and_patch_cls</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">inspected_modules</span><span class="p">,</span> <span class="n">patched_classes</span><span class="p">)</span>
-                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-                    <span class="k">pass</span>
+                <span class="n">_inspect_module_and_patch_cls</span><span class="p">(</span><span class="n">module_name</span><span class="p">,</span> <span class="n">inspected_modules</span><span class="p">,</span> <span class="n">patched_classes</span><span class="p">)</span>
+
+            <span class="c1"># If LangGraph is installed, patch the classes. LangGraph does not define members</span>
+            <span class="c1"># under the top level module, so we need to hardcode the submodules to patch.</span>
+            <span class="k">if</span> <span class="n">pkg</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;Name&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;langgraph&quot;</span><span class="p">:</span>
+                <span class="n">langgraph_submodules</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="s2">&quot;langgraph.graph&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;langgraph.prebuilt&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;langgraph.pregel&quot;</span><span class="p">,</span>
+                <span class="p">]</span>
+                <span class="k">for</span> <span class="n">submodule</span> <span class="ow">in</span> <span class="n">langgraph_submodules</span><span class="p">:</span>
+                    <span class="n">_inspect_module_and_patch_cls</span><span class="p">(</span><span class="n">submodule</span><span class="p">,</span> <span class="n">inspected_modules</span><span class="p">,</span> <span class="n">patched_classes</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">extra_model_classes</span><span class="p">:</span>
             <span class="kn">from</span> <span class="nn">langchain_core.runnables</span> <span class="kn">import</span> <span class="n">Runnable</span>
