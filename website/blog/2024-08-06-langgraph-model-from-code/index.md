@@ -190,7 +190,7 @@ from langgraph_utils import (
 
 with mlflow.start_run() as run_id:
     model_info = mlflow.langchain.log_model(
-        lc_model="graph.py",
+        lc_model="graph.py", # Path to our model Python file
         artifact_path="langgraph",
     )
 
@@ -211,7 +211,7 @@ mlflow.set_experiment("Tracing example")
 mlflow.langchain.autolog()
 
 # Load the model
-# NOTE: you need the run_id from the above step or another model URI format
+# NOTE: you need the model_uri from the above step or another model URI format
 with mlflow.start_run():
     loaded_model = mlflow.langchain.load_model(model_uri)
 
