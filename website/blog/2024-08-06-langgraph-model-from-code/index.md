@@ -208,7 +208,6 @@ mlflow.set_experiment("Tracing example") # In Databricks, use an absolute path. 
 mlflow.langchain.autolog()
 
 # Load the model
-# NOTE: you need the run_id from the above step or another model URI format
 with mlflow.start_run():
     loaded_model = mlflow.langchain.load_model(model_uri)
 
