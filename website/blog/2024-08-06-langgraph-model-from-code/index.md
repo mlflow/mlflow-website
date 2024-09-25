@@ -187,7 +187,7 @@ from langgraph_utils import (
 
 with mlflow.start_run() as run_id:
     model_info = mlflow.langchain.log_model(
-        lc_model="graph.py",
+        lc_model="graph.py", # Path to our model Python file
         artifact_path="langgraph",
     )
 
@@ -204,7 +204,7 @@ In the code below, we demonstrate that our chain has chatbot functionality!
 import mlflow
 
 # Enable tracing
-mlflow.set_experiment("Tracing example")
+mlflow.set_experiment("Tracing example") # In Databricks, use an absolute path. Visit Databricks docs for more.
 mlflow.langchain.autolog()
 
 # Load the model
@@ -262,13 +262,7 @@ Before concluding, let's demonstrate [MLflow tracing](https://mlflow.org/docs/la
 
 MLflow Tracing is a feature that enhances LLM observability in your Generative AI (GenAI) applications by capturing detailed information about the execution of your application’s services. Tracing provides a way to record the inputs, outputs, and metadata associated with each intermediate step of a request, enabling you to easily pinpoint the source of bugs and unexpected behaviors.
 
-Let's enter the mlflow UI by running the below command in your working directory. It must contain the auto-generated `mlruns` directory.
-
-```shell
-mlflow ui
-```
-
-With that running, we can go to the provided url which defaults to `http://127.0.0.1:5000` in our browser. This is the MLflow UI.
+Start the MLflow server as outlined in the [tracking server docs](https://mlflow.org/docs/latest/tracking/server.html). After entering the MLflow UI, we can see our experiment and corresponding traces.
 
 ![MLflow UI Experiment Traces](_img/mlflow_ui_experiment_traces.png)
 
