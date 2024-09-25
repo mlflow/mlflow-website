@@ -32,7 +32,7 @@ First, we must install the required dependencies. We will use OpenAI for our LLM
 
 ```python
 %%capture
-%pip install langsmith==0.1.125 langchain_openai==0.2.0 langchain==0.3.0 langgraph==0.2.24
+%pip install langchain_openai==0.2.0 langchain==0.3.0 langgraph==0.2.27
 %pip install -U mlflow
 ```
 
@@ -60,22 +60,6 @@ Note that we use the magic `%%writefile` command to create a new file in a jupyt
 import os
 from typing import Union
 from langgraph.pregel.io import AddableValuesDict
-
-
-def validate_langgraph_environment_variables():
-    """Ensure that required secrets and project environment variables are present."""
-
-    # Validate enviornment variable secrets are present
-    required_secrets = ["OPENAI_API_KEY"]
-
-    if missing_keys := [key for key in required_secrets if not os.environ.get(key)]:
-        raise ValueError(f"The following keys are missing: {missing_keys}")
-
-    # Add project environent variables if not present
-    os.environ["LANGCHAIN_PROJECT"] = os.environ.get(
-        "LANGCHAIN_TRACING_V2", "LangGraph MLflow Tutorial"
-    )
-
 
 def _langgraph_message_to_mlflow_message(
     langgraph_message: AddableValuesDict,
@@ -142,15 +126,13 @@ from langgraph.graph.state import CompiledStateGraph
 
 import mlflow
 
+import os
 from typing import TypedDict, Annotated
-
-# Our custom utilities
-from langgraph_utils import validate_langgraph_environment_variables
 
 def load_graph() -> CompiledStateGraph:
     """Create example chatbot from LangGraph Quickstart."""
 
-    validate_langgraph_environment_variables()
+    assert "OPENAI_API_KEY" in os.environ, "Please set the OPENAI_API_KEY environment variable."
 
     class State(TypedDict):
         messages: Annotated[list, add_messages]
@@ -178,13 +160,6 @@ After creating this implementation, we can leverage the standard MLflow APIs to 
 ```python
 import mlflow
 
-# Custom utilities for handling chat history
-from langgraph_utils import (
-    increment_message_history,
-    get_most_recent_message,
-)
-
-
 with mlflow.start_run() as run_id:
     model_info = mlflow.langchain.log_model(
         lc_model="graph.py", # Path to our model Python file
@@ -203,40 +178,45 @@ In the code below, we demonstrate that our chain has chatbot functionality!
 ```python
 import mlflow
 
+# Custom utilities for handling chat history
+from langgraph_utils import (
+    increment_message_history,
+    get_most_recent_message,
+)
+
 # Enable tracing
 mlflow.set_experiment("Tracing example") # In Databricks, use an absolute path. Visit Databricks docs for more.
 mlflow.langchain.autolog()
 
 # Load the model
-with mlflow.start_run():
-    loaded_model = mlflow.langchain.load_model(model_uri)
+loaded_model = mlflow.langchain.load_model(model_uri)
 
-    # Show inference and message history functionality
-    print("-------- Message 1 -----------")
-    message = "What's my name?"
-    payload = {"messages": [{"role": "user", "content": message}]}
-    response = loaded_model.invoke(payload)
+# Show inference and message history functionality
+print("-------- Message 1 -----------")
+message = "What's my name?"
+payload = {"messages": [{"role": "user", "content": message}]}
+response = loaded_model.invoke(payload)
 
-    print(f"User: {message}")
-    print(f"Agent: {get_most_recent_message(response)}")
+print(f"User: {message}")
+print(f"Agent: {get_most_recent_message(response)}")
 
-    print("\n-------- Message 2 -----------")
-    message = "My name is Morpheus."
-    new_messages = increment_message_history(response, {"role": "user", "content": message})
-    payload = {"messages": new_messages}
-    response = loaded_model.invoke(payload)
+print("\n-------- Message 2 -----------")
+message = "My name is Morpheus."
+new_messages = increment_message_history(response, {"role": "user", "content": message})
+payload = {"messages": new_messages}
+response = loaded_model.invoke(payload)
 
-    print(f"User: {message}")
-    print(f"Agent: {get_most_recent_message(response)}")
+print(f"User: {message}")
+print(f"Agent: {get_most_recent_message(response)}")
 
-    print("\n-------- Message 3 -----------")
-    message = "What is my name?"
-    new_messages = increment_message_history(response, {"role": "user", "content": message})
-    payload = {"messages": new_messages}
-    response = loaded_model.invoke(payload)
+print("\n-------- Message 3 -----------")
+message = "What is my name?"
+new_messages = increment_message_history(response, {"role": "user", "content": message})
+payload = {"messages": new_messages}
+response = loaded_model.invoke(payload)
 
-    print(f"User: {message}")
-    print(f"Agent: {get_most_recent_message(response)}")
+print(f"User: {message}")
+print(f"Agent: {get_most_recent_message(response)}")
 ```
 
 Ouput:
