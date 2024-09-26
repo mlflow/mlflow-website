@@ -532,7 +532,7 @@
             <span class="k">yield</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="DatabricksDeploymentClient.create_endpoint"><a class="viewcode-back" href="../../../python_api/mlflow.deployments.html#mlflow.deployments.DatabricksDeploymentClient.create_endpoint">[docs]</a>    <span class="nd">@experimental</span>
-    <span class="k">def</span> <span class="nf">create_endpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">create_endpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">route_optimized</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a new serving endpoint with the provided name and configuration.</span>
 
@@ -542,6 +542,9 @@
 <span class="sd">        Args:</span>
 <span class="sd">            name: The name of the serving endpoint to create.</span>
 <span class="sd">            config: A dictionary containing the configuration of the serving endpoint to create.</span>
+<span class="sd">            route_optimized: A boolean which defines whether databricks serving endpoint</span>
+<span class="sd">                in optimized for routing traffic. Refer to the following doc for more details.</span>
+<span class="sd">                https://docs.databricks.com/en/machine-learning/model-serving/route-optimization.html#enable-route-optimization-on-a-feature-serving-endpoint</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            A :py:class:`DatabricksEndpoint` object containing the request response.</span>
@@ -570,6 +573,7 @@
 <span class="sd">                        }</span>
 <span class="sd">                    ],</span>
 <span class="sd">                },</span>
+<span class="sd">                route_optimized: True</span>
 <span class="sd">            )</span>
 <span class="sd">            assert endpoint == {</span>
 <span class="sd">                &quot;name&quot;: &quot;chat&quot;,</span>
@@ -588,7 +592,7 @@
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;tags&quot;</span><span class="p">,</span> <span class="s2">&quot;rate_limits&quot;</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">tags</span> <span class="o">:=</span> <span class="n">config</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
                 <span class="n">extras</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">tags</span>
-        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s2">&quot;config&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">,</span> <span class="o">**</span><span class="n">extras</span><span class="p">}</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s2">&quot;config&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">,</span> <span class="s2">&quot;route_optimized&quot;</span><span class="p">:</span> <span class="n">route_optimized</span><span class="p">,</span> <span class="o">**</span><span class="n">extras</span><span class="p">}</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_call_endpoint</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="n">json_body</span><span class="o">=</span><span class="n">payload</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="DatabricksDeploymentClient.update_endpoint"><a class="viewcode-back" href="../../../python_api/mlflow.deployments.html#mlflow.deployments.DatabricksDeploymentClient.update_endpoint">[docs]</a>    <span class="nd">@experimental</span>
