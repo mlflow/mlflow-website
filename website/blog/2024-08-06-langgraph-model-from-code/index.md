@@ -18,7 +18,7 @@ Throughout this post we will demonstrate how to leverage MLflow's capabilities t
 - **Persistence**: Automatically save state after each step in the graph. Pause and resume the graph execution at any point to support error recovery, human-in-the-loop workflows, time travel and more.
 - **Human-in-the-Loop**: Interrupt graph execution to approve or edit next action planned by the agent.
 - **Streaming Support**: Stream outputs as they are produced by each node (including token streaming).
-- **Integration with LangChain**: LangGraph integrates seamlessly with LangChain and LangSmith (but does not require them).
+- **Integration with LangChain**: LangGraph integrates seamlessly with LangChain.
 
 LangGraph allows you to define flows that involve cycles, essential for most agentic architectures, differentiating it from DAG-based solutions. As a very low-level framework, it provides fine-grained control over both the flow and state of your application, crucial for creating reliable agents. Additionally, LangGraph includes built-in persistence, enabling advanced human-in-the-loop and memory features.
 
@@ -32,7 +32,7 @@ First, we must install the required dependencies. We will use OpenAI for our LLM
 
 ```python
 %%capture
-%pip install langsmith==0.1.125 langchain_openai==0.2.0 langchain==0.3.0 langgraph==0.2.24
+%pip install langchain_openai==0.2.0 langchain==0.3.0 langgraph==0.2.27
 %pip install -U mlflow
 ```
 
@@ -41,11 +41,10 @@ Next, let's get our relevant secrets. `getpass`, as demonstrated in the [LangGra
 ```python
 import os
 
-# Set required environment variables for authenticating to OpenAI and LangSmith
+# Set required environment variables for authenticating to OpenAI
 # Check additional MLflow tutorials for examples of authentication if needed
 # https://mlflow.org/docs/latest/llms/openai/guide/index.html#direct-openai-service-usage
 assert "OPENAI_API_KEY" in os.environ, "Please set the OPENAI_API_KEY environment variable."
-assert "LANGSMITH_API_KEY" in os.environ, "Please set the LANGSMITH_API_KEY environment variable."
 ```
 
 ## 2 - Custom Utilities
@@ -61,23 +60,6 @@ Note that we use the magic `%%writefile` command to create a new file in a jupyt
 import os
 from typing import Union
 from langgraph.pregel.io import AddableValuesDict
-
-
-def validate_langgraph_environment_variables():
-    """Ensure that required secrets and project environment variables are present."""
-
-    # Validate enviornment variable secrets are present
-    required_secrets = ["OPENAI_API_KEY", "LANGSMITH_API_KEY"]
-
-    if missing_keys := [key for key in required_secrets if not os.environ.get(key)]:
-        raise ValueError(f"The following keys are missing: {missing_keys}")
-
-    # Add project environent variables if not present
-    os.environ["LANCHAIN_TRACING_V2"] = os.environ.get("LANGCHAIN_TRACING_V2", "true")
-    os.environ["LANGCHAIN_PROJECT"] = os.environ.get(
-        "LANGCHAIN_TRACING_V2", "LangGraph MLflow Tutorial"
-    )
-
 
 def _langgraph_message_to_mlflow_message(
     langgraph_message: AddableValuesDict,
@@ -111,7 +93,6 @@ def increment_message_history(
     ]
 
     return message_history + [new_message]
-
 ```
 
 By the end of this step, you should see a new file in your current directory with the name `langgraph_utils.py`.
@@ -145,15 +126,13 @@ from langgraph.graph.state import CompiledStateGraph
 
 import mlflow
 
+import os
 from typing import TypedDict, Annotated
-
-# Our custom utilities
-from langgraph_utils import validate_langgraph_environment_variables
 
 def load_graph() -> CompiledStateGraph:
     """Create example chatbot from LangGraph Quickstart."""
 
-    validate_langgraph_environment_variables()
+    assert "OPENAI_API_KEY" in os.environ, "Please set the OPENAI_API_KEY environment variable."
 
     class State(TypedDict):
         messages: Annotated[list, add_messages]
@@ -181,13 +160,6 @@ After creating this implementation, we can leverage the standard MLflow APIs to 
 ```python
 import mlflow
 
-# Custom utilities for handling chat history
-from langgraph_utils import (
-    increment_message_history,
-    get_most_recent_message,
-)
-
-
 with mlflow.start_run() as run_id:
     model_info = mlflow.langchain.log_model(
         lc_model="graph.py", # Path to our model Python file
@@ -206,40 +178,45 @@ In the code below, we demonstrate that our chain has chatbot functionality!
 ```python
 import mlflow
 
+# Custom utilities for handling chat history
+from langgraph_utils import (
+    increment_message_history,
+    get_most_recent_message,
+)
+
 # Enable tracing
 mlflow.set_experiment("Tracing example") # In Databricks, use an absolute path. Visit Databricks docs for more.
 mlflow.langchain.autolog()
 
 # Load the model
-with mlflow.start_run():
-    loaded_model = mlflow.langchain.load_model(model_uri)
+loaded_model = mlflow.langchain.load_model(model_uri)
 
-    # Show inference and message history functionality
-    print("-------- Message 1 -----------")
-    message = "What's my name?"
-    payload = {"messages": [{"role": "user", "content": message}]}
-    response = loaded_model.invoke(payload)
+# Show inference and message history functionality
+print("-------- Message 1 -----------")
+message = "What's my name?"
+payload = {"messages": [{"role": "user", "content": message}]}
+response = loaded_model.invoke(payload)
 
-    print(f"User: {message}")
-    print(f"Agent: {get_most_recent_message(response)}")
+print(f"User: {message}")
+print(f"Agent: {get_most_recent_message(response)}")
 
-    print("\n-------- Message 2 -----------")
-    message = "My name is Morpheus."
-    new_messages = increment_message_history(response, {"role": "user", "content": message})
-    payload = {"messages": new_messages}
-    response = loaded_model.invoke(payload)
+print("\n-------- Message 2 -----------")
+message = "My name is Morpheus."
+new_messages = increment_message_history(response, {"role": "user", "content": message})
+payload = {"messages": new_messages}
+response = loaded_model.invoke(payload)
 
-    print(f"User: {message}")
-    print(f"Agent: {get_most_recent_message(response)}")
+print(f"User: {message}")
+print(f"Agent: {get_most_recent_message(response)}")
 
-    print("\n-------- Message 3 -----------")
-    message = "What is my name?"
-    new_messages = increment_message_history(response, {"role": "user", "content": message})
-    payload = {"messages": new_messages}
-    response = loaded_model.invoke(payload)
+print("\n-------- Message 3 -----------")
+message = "What is my name?"
+new_messages = increment_message_history(response, {"role": "user", "content": message})
+payload = {"messages": new_messages}
+response = loaded_model.invoke(payload)
 
-    print(f"User: {message}")
-    print(f"Agent: {get_most_recent_message(response)}")
+print(f"User: {message}")
+print(f"Agent: {get_most_recent_message(response)}")
 ```
 
 Ouput:
@@ -264,7 +241,7 @@ Before concluding, let's demonstrate [MLflow tracing](https://mlflow.org/docs/la
 
 MLflow Tracing is a feature that enhances LLM observability in your Generative AI (GenAI) applications by capturing detailed information about the execution of your application’s services. Tracing provides a way to record the inputs, outputs, and metadata associated with each intermediate step of a request, enabling you to easily pinpoint the source of bugs and unexpected behaviors.
 
-Start the MLflow server as outlined in the [tracking server docs](https://mlflow.org/docs/latest/tracking/server.html). After entering the MLflow UI, we can see our experiment and corresdponding traces.
+Start the MLflow server as outlined in the [tracking server docs](https://mlflow.org/docs/latest/tracking/server.html). After entering the MLflow UI, we can see our experiment and corresponding traces.
 
 ![MLflow UI Experiment Traces](_img/mlflow_ui_experiment_traces.png)
 
