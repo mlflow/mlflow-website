@@ -299,8 +299,8 @@ export const BLOGS: Blog[] = [
 // Sort by date descending
 export const RELEASES: Release[] = [
   {
-    title: "MLflow 2.17.0rc0",
-    path: "/releases/2.17.0rc0",
+    title: "MLflow 2.17.0",
+    path: "/releases/2.17.0",
     authors: [
       {
         name: "MLflow maintainers",
