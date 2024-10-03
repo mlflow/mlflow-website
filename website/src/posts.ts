@@ -27,8 +27,45 @@ export type Release = {
 // Sort by date descending
 export const BLOGS: Blog[] = [
   {
-    title: "LangGraph with Custom PyFunc",
-    path: "/blog/mlflow",
+    title: "Models from Code Logging in MLflow - What, Why, and How",
+    path: "/blog/models_from_code",
+    tags: ["genai", "pyfunc", "mlops"],
+    authors: [
+      {
+        name: "Awadelrahman M. A. Ahmed",
+        title:
+          "MLflow Ambassador | Cloud Data & Analytics Architect at REMA 1000",
+        url: "https://www.linkedin.com/in/awadelrahman/",
+        image_url: "/img/authors/awadelrahman_ahmed.png",
+      },
+    ],
+    date: "2024-09-13",
+    thumbnail: "/img/blog/thumbnail-models-from-code.gif",
+  },
+  {
+    title: "AutoGen with Custom PyFunc",
+    path: "/blog/autogen-image-agent",
+    tags: ["genai", "mlops"],
+    authors: [
+      {
+        name: "Michael Berk",
+        title: "Sr. Resident Solutions Architect at Databricks",
+        url: "https://www.linkedin.com/in/-michael-berk/",
+        image_url: "/img/authors/michael_berk.png",
+      },
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2024-08-29",
+    thumbnail: "/img/blog/autogen-blog.png",
+  },
+  {
+    title: "LangGraph with Model From Code",
+    path: "/blog/langgraph-model-from-code",
     tags: ["genai", "mlops"],
     authors: [
       {
@@ -227,21 +264,6 @@ export const BLOGS: Blog[] = [
     thumbnail: "/img/blog/custom-pyfunc.png",
   },
   {
-    title: "MLflow AI Gateway renamed to MLflow Deployments for LLMs",
-    path: "/blog/ai-gateway-rename",
-    tags: ["ai"],
-    authors: [
-      {
-        name: "MLflow maintainers",
-        title: "MLflow maintainers",
-        url: "https://github.com/mlflow/mlflow.git",
-        image_url: "https://github.com/mlflow-automation.png",
-      },
-    ],
-    date: "2023-12-01",
-    thumbnail: "/img/blog/ai-gateway.png",
-  },
-  {
     title:
       "Automatic Metric, Parameter, and Artifact Logging with mlflow.autolog",
     path: "/blog/mlflow-autolog",
@@ -276,6 +298,48 @@ export const BLOGS: Blog[] = [
 
 // Sort by date descending
 export const RELEASES: Release[] = [
+  {
+    title: "MLflow 2.17.0",
+    path: "/releases/2.17.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2024-09-26",
+    version: "2.17.0",
+  },
+  {
+    title: "MLflow 2.16.2",
+    path: "/releases/2.16.2",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2024-09-17",
+    version: "2.16.2",
+  },
+  {
+    title: "MLflow 2.16.1",
+    path: "/releases/2.16.1",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2024-09-13",
+    version: "2.16.1",
+  },
   {
     title: "MLflow 2.16.0",
     path: "/releases/2.16.0",

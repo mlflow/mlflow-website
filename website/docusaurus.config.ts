@@ -96,10 +96,6 @@ const config: Config = {
             to: "/blog/mlflow-year-in-review",
           },
           {
-            from: "/blog/2023/11/30/ai-gateway-rename",
-            to: "/blog/ai-gateway-rename",
-          },
-          {
             from: "/blog/2023/11/30/mlflow-autolog",
             to: "/blog/mlflow-autolog",
           },
@@ -110,6 +106,10 @@ const config: Config = {
           {
             from: "/blog/Deep Learning",
             to: "/blog/deep-learning-part-1",
+          },
+          {
+            from: "/blog/mlflow",
+            to: "/blog/langgraph-model-from-code",
           },
         ],
       },
