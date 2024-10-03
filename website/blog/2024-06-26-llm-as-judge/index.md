@@ -2,8 +2,8 @@
 title: LLM as judge
 description: Perform LLM Evaluations with custom metrics
 slug: llm-as-judge
-authors: [pedro-azevedo,rahul-pandey]
-tags: [genai,mlflow-evalaute]
+authors: [pedro-azevedo, rahul-pandey]
+tags: [genai, mlflow-evalaute]
 thumbnail: /img/blog/llm-as-judge.png
 ---
 
@@ -11,11 +11,11 @@ In this blog post, we'll dive on a journey to revolutionize how we evaluate lang
 
 ## The Challenge of Evaluating Language Models
 
-Evaluating large language models (LLMs) and natural language processing (NLP) systems presents several challenges, primarily due to their complexity and the diversity of tasks they can perform. 
+Evaluating large language models (LLMs) and natural language processing (NLP) systems presents several challenges, primarily due to their complexity and the diversity of tasks they can perform.
 
 One major difficulty is creating metrics that comprehensively measure performance across varied applications, from generating coherent text to understanding nuanced human emotions. Traditional benchmarks often fail to capture these subtleties, leading to incomplete assessments.
 
-An LLM acting as a judge can address these issues by leveraging its extensive training data to provide a more nuanced evaluation, offering insights into model behavior and areas needing improvement. For instance, an LLM can analyze whether a model generates text that is not only grammatically correct but also contextually appropriate and engaging, something more static metrics might miss. 
+An LLM acting as a judge can address these issues by leveraging its extensive training data to provide a more nuanced evaluation, offering insights into model behavior and areas needing improvement. For instance, an LLM can analyze whether a model generates text that is not only grammatically correct but also contextually appropriate and engaging, something more static metrics might miss.
 
 However, to move forward effectively, we need more than just better evaluation methods. Standardized experimentation setups are essential to ensure that comparisons between models are both fair and replicable. A uniform framework for testing and evaluation would enable researchers to build on each other's work, leading to more consistent progress and the development of more robust models.
 
@@ -26,24 +26,20 @@ However, to move forward effectively, we need more than just better evaluation m
 - Evaluate models against multiple metrics simultaneously
 - Use pre-defined metrics for specific model types (e.g., question-answering, text-summarization and pure text)
 - Create custom metrics, including those that use LLMs as judges using [mlflow.metrics.genai.make_genai_metric()](https://mlflow.org/docs/latest/python_api/mlflow.metrics.html#mlflow.metrics.genai.make_genai_metric)
-and
-[mlflow.metrics.genai.make_genai_metric_from_prompt()](https://mlflow.org/docs/latest/python_api/mlflow.metrics.html#mlflow.metrics.genai.make_genai_metric_from_prompt)
-
+  and
+  [mlflow.metrics.genai.make_genai_metric_from_prompt()](https://mlflow.org/docs/latest/python_api/mlflow.metrics.html#mlflow.metrics.genai.make_genai_metric_from_prompt)
 
 ![MLflow Evaluate](mlflow_evaluate.drawio.svg)
 
-
 ## Conquering new markets with an LLM as a judge
 
-Imagine you're part of a global travel agency, "WorldWide Wandercorp," that's expanding its reach to Spanish-speaking countries. 
+Imagine you're part of a global travel agency, "WorldWide Wandercorp," that's expanding its reach to Spanish-speaking countries.
 
 Your team has developed an AI-powered translation system to help create culturally appropriate marketing materials and customer communications. However, as you begin to use this system, you realize that traditional evaluation metrics, such as BLEU (Bilingual Evaluation Understudy), fall short in capturing the nuances of language translation, especially when it comes to preserving cultural context and idiomatic expressions.
 
 For instance, consider the phrase "kick the bucket." A direct translation might focus on the literal words, but the idiom actually means "to die." A traditional metric like BLEU may incorrectly evaluate the translation as adequate if the translated words match a reference translation, even if the cultural meaning is lost. In such cases, the metric might score the translation highly despite it being completely inappropriate in context. This could lead to embarrassing or culturally insensitive marketing content, which is something your team wants to avoid.
 
 You need a way to evaluate whether the translation not only is accurate but also preserves the intended meaning, tone, and cultural context. This is where [MLflow Evaluate](https://mlflow.org/docs/latest/python_api/mlflow.html#mlflow.evaluate) and LLMs (Large Language Models) as judges come into play. These tools can assess translations more holistically by considering context, idiomatic expressions, and cultural relevance, providing a more reliable evaluation of the AI’s output.
-
-
 
 ## Custom Metrics: Tailoring Evaluation to Your Needs
 
@@ -54,40 +50,35 @@ In the following section, we’ll implement three metrics:
 - The `"toxicity"` metric evaluates responses for harmful or inappropriate content, ensuring respectful customer interactions.
 
 These metrics will help Worldwide WanderAgency ensure their AI-driven translations and interactions meet their specific needs.
- 
 
 ## Evaluating Worldwide WanderAgency's AI Systems
 
 Now that we understand WanderAgency's challenges, let's dive into a code walkthrough to address them. We'll implement custom metrics to measure AI performance and build a gauge visualization chart for sharing results with stakeholders.
 
 We'll start by evaluating a language translation model, focusing on the "cultural_sensitivity" metric to ensure it preserves cultural nuances. This will help WanderAgency maintain high standards in global communication.
- 
 
 ### Cultural Sensitivity Metric
 
-The travel agency wants to ensure their translations are not only accurate but also culturally appropriate. 
+The travel agency wants to ensure their translations are not only accurate but also culturally appropriate.
 To achieve this they are considering creating a custom metric that allows Worldwide WanderAgency to quantify how well their translations maintain cultural context and idiomatic expressions.
 
-For instance, a phrase that is polite in one culture might be inappropriate in another. 
+For instance, a phrase that is polite in one culture might be inappropriate in another.
 In English, addressing someone as "Dear" in a professional email might be seen as polite. However, in Spanish, using "Querido" in a professional context can be too personal and inappropriate.
 
 How can we evaluate such an abstract concept in a systematic way? Traditional Metrics would fall short so we need a better way of doing it. In this case LLM as a judge would be a great fit!
 For this use case let's create a "cultural_sensitivity" metric.
 
-
 Here's a brief overview of the process:
 Start by installing all the necessary libraries for this demo to work.
-
-
 
 ```bash
 pip install mlflow>=2.14.1 openai  transformers torch torchvision evaluate datasets tiktoken fastapi rouge_score textstat tenacity plotly ipykernel nbformat>=5.10.4
 ```
 
-
 We will be using gpt3.5 and gpt4 during this example for that let's start by making sure our [OpenAI key is setup](https://mlflow.org/docs/latest/llms/openai/notebooks/openai-quickstart.html#API-Key-Security-Overview).
 
 Import the necessary libraries.
+
 ```python
 import mlflow
 import os
@@ -101,6 +92,7 @@ import pandas as pd
 ```
 
 When using the [`mlflow.evaluate()`](https://mlflow.org/docs/latest/python_api/mlflow.html#mlflow.evaluate) function, your large language model (LLM) can take one of the following forms:
+
 1. A `mlflow.pyfunc.PyFuncModel()` — typically an MLflow model.
 2. A Python function that accepts strings as inputs and returns a single string as output.
 3. An `MLflow Deployments` endpoint URI.
@@ -111,7 +103,6 @@ For this example, we will use an MLflow model.
 We’ll begin by logging a translation model in MLflow. For this tutorial, we'll use GPT-3.5 with a defined system prompt.
 
 In a production environment, you would typically experiment with different prompts and models to determine the most suitable configuration for your use case. For more details, refer to MLflow’s [Prompt Engineering UI](https://mlflow.org/docs/latest/llms/prompt-engineering/index.html).
-
 
 ```python
 
@@ -144,7 +135,6 @@ To use [`mlflow.evaluate()`](https://mlflow.org/docs/latest/python_api/mlflow.ht
 
 For demonstration purposes, we will define a set of common English expressions that we want the model to translate.
 
-
 ```python
 # Prepare evaluation data
 eval_data = pd.DataFrame(
@@ -154,7 +144,7 @@ eval_data = pd.DataFrame(
             "Spill the beans.",
             "Bite the bullet.",
             "Better late than never.",
-            
+
         ]
     }
 )
@@ -167,8 +157,6 @@ By default, [`mlflow.evaluate()`](https://mlflow.org/docs/latest/python_api/mlfl
 For this example, we will use GPT-4 as the evaluation model.
 
 To begin, provide a few examples that illustrate good and poor translation scores.
-
-
 
 ```python
 # Define the custom metric
@@ -261,7 +249,7 @@ with mlflow.start_run() as run:
             "inputs": "llm_inputs",
            }}
    )
-    
+
 mlflow.end_run()
 ```
 
@@ -271,13 +259,12 @@ You can retrieve the final results as such:
 results.tables["eval_results_table"]
 ```
 
-|    | llm_inputs                     | outputs                  | token_count   | toxicity/v1/score   | flesch_kincaid_grade_level/v1/score   | ari_grade_level/v1/score   | cultural_sensitivity/v1/score   | cultural_sensitivity/v1/justification                          |
-|----|--------------------------------|--------------------------|---------------|---------------------|--------------------------------------|----------------------------|--------------------------------|----------------------------------------------------------------|
-| 0  | I'm over the moon about the news! | ¡Estoy feliz por la noticia! | 9             | 0.000258            | 5.2                                  | 3.7                        | 4                              | The translation captures the general sentiment...              |
-| 1  | Spill the beans.                | Revela el secreto.       | 7             | 0.001017            | 9.2                                  | 5.2                        | 5                              | The translation accurately captures the idioma...               |
-| 2  | Bite the bullet.                | Morder la bala.        | 7             | 0.001586            | 0.9                                  | 3.6                        | 2                              | The translation "Morder la bala" is a litera...               |
-| 3  | Better late than never.         | Más vale tarde que nunca. | 7             | 0.004947            | 0.5                                  | 0.9                        | 5                              | The translation accurately captures the idioma...               |
-
+|     | llm_inputs                        | outputs                      | token_count | toxicity/v1/score | flesch_kincaid_grade_level/v1/score | ari_grade_level/v1/score | cultural_sensitivity/v1/score | cultural_sensitivity/v1/justification             |
+| --- | --------------------------------- | ---------------------------- | ----------- | ----------------- | ----------------------------------- | ------------------------ | ----------------------------- | ------------------------------------------------- |
+| 0   | I'm over the moon about the news! | ¡Estoy feliz por la noticia! | 9           | 0.000258          | 5.2                                 | 3.7                      | 4                             | The translation captures the general sentiment... |
+| 1   | Spill the beans.                  | Revela el secreto.           | 7           | 0.001017          | 9.2                                 | 5.2                      | 5                             | The translation accurately captures the idioma... |
+| 2   | Bite the bullet.                  | Morder la bala.              | 7           | 0.001586          | 0.9                                 | 3.6                      | 2                             | The translation "Morder la bala" is a litera...   |
+| 3   | Better late than never.           | Más vale tarde que nunca.    | 7           | 0.004947          | 0.5                                 | 0.9                      | 5                             | The translation accurately captures the idioma... |
 
 Let's analyze the final metrics...
 
@@ -285,13 +272,15 @@ Let's analyze the final metrics...
 cultural_sensitivity_score = results.metrics['cultural_sensitivity/v1/mean']
 print(f"Cultural Sensitivity Score: {cultural_sensitivity_score}")
 
-toxicity_score = results.metrics['toxicity/v1/mean'] 
+toxicity_score = results.metrics['toxicity/v1/mean']
 # Calculate non-toxicity score
 non_toxicity_score = "{:.2f}".format((1 - toxicity_score) * 100)
 print(f"Non-Toxicity Score: {non_toxicity_score}%")
 
 ```
+
 Output:
+
 ```bash
 Cultural Sensitivity Score: 3.75
 Pureness Score: 99.80
@@ -456,14 +445,13 @@ MLflow provides several [built-in metrics](https://mlflow.org/docs/latest/python
 
 In this case, we will use MLflow’s built-in [faithfulness metric](https://mlflow.org/docs/latest/python_api/mlflow.metrics.html?highlight=genai%20answer#mlflow.metrics.genai.faithfulness).
 
-
 ```python
 from mlflow.metrics.genai import EvaluationExample, faithfulness
 faithfulness_metric = faithfulness(model="openai:/gpt-4")
 print(faithfulness_metric)
 ```
 
-[`mlflow.evaluate()`](https://mlflow.org/docs/latest/python_api/mlflow.html#mlflow.evaluate) simplifies the process of providing grading context, such as the documents retrieved by our system, directly into the evaluation. This feature integrates seamlessly with [LangChain's retrievers](https://python.langchain.com/v0.1/docs/modules/data_connection/retrievers/), allowing you to supply the context for evaluation as a dedicated column. For more details, refer to [this example](https://mlflow.org/docs/latest/llms/llm-evaluate/notebooks/rag-evaluation-llama2.html).
+[`mlflow.evaluate()`](https://mlflow.org/docs/latest/python_api/mlflow.html#mlflow.evaluate) simplifies the process of providing grading context, such as the documents retrieved by our system, directly into the evaluation. This feature integrates seamlessly with [LangChain's retrievers](https://python.langchain.com/docs/concepts/#retrievers), allowing you to supply the context for evaluation as a dedicated column. For more details, refer to [this example](https://mlflow.org/docs/latest/llms/llm-evaluate/notebooks/rag-evaluation-llama2.html).
 
 In this case, since our retrieved documents are already included within the final prompt and we are not leveraging LangChain for this tutorial, we will simply map the `llm_input` column as our grading context.
 
@@ -487,7 +475,6 @@ mlflow.end_run()
 After the evaluation we get the following results:
 ![Gauge faithfulness Chart](faithfulness.png)
 
-
 ## Conclusion
 
 By combining the Cultural Sensitivity score with our other calculated metrics, our travel agency can further refine its model to ensure the delivery of high-quality content across all languages. Moving forward, we can revisit and adjust the prompts used to boost our Cultural Sensitivity score. Alternatively, we could fine-tune a smaller model to maintain the same high level of cultural sensitivity while reducing costs. These steps will help us provide even better service to the agency's diverse customer base.
@@ -498,7 +485,6 @@ The flexibility offered by `make_genai_metric()` allows you to create evaluation
 
 As you explore MLflow evaluate and LLM-based metrics, remember that the key lies in designing thoughtful evaluation criteria and providing clear instructions to your LLM judge. With these tools at your disposal, you're well-equipped to take your model evaluation to the next level, ensuring that your language models not only perform well on traditional metrics but also meet the nuanced requirements of real-world applications.
 
-
-The built-in metrics, such as toxicity, offer standardized assessments that are crucial for ensuring the safety and accessibility of model outputs. 
+The built-in metrics, such as toxicity, offer standardized assessments that are crucial for ensuring the safety and accessibility of model outputs.
 
 As a final challenge, re-run all the tests performed but this time with "gpt-4o-mini" and see how the performance is affected.

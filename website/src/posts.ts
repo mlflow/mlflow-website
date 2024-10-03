@@ -27,6 +27,27 @@ export type Release = {
 // Sort by date descending
 export const BLOGS: Blog[] = [
   {
+    title: "LLM as judge",
+    path: "/blog/llm-as-judge",
+    tags: ["genai", "mlflow-evalaute"],
+    authors: [
+      {
+        name: "Pedro Azevedo",
+        title: "Machine Learning Analyst at Adidas",
+        url: "https://www.linkedin.com/in/pedro-azevedo-/",
+        image_url: "/img/authors/pedro.png",
+      },
+      {
+        name: "Rahul Pandey",
+        title: "Sr. Solutions Architect at adidas",
+        url: "https://www.linkedin.com/in/rahulpandey1901/",
+        image_url: "/img/ambassadors/Rahul_Pandey.png",
+      },
+    ],
+    date: "2024-10-03",
+    thumbnail: "/img/blog/llm-as-judge.png",
+  },
+  {
     title: "Models from Code Logging in MLflow - What, Why, and How",
     path: "/blog/models_from_code",
     tags: ["genai", "pyfunc", "mlops"],
