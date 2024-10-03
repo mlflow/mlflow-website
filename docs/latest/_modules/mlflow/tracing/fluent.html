@@ -55,7 +55,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="MLflow 2.16.3.dev0 documentation" href="../../../index.html"/>
+    <link rel="top" title="MLflow 2.17.1.dev0 documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
   
@@ -87,7 +87,7 @@
     <a href="../../../index.html" class="wy-nav-top-logo"
       ><img src="../../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.16.3.dev0</span>
+    <span class="version">2.17.1.dev0</span>
   </li>
 </ul>
   </nav>
@@ -538,6 +538,7 @@
     <span class="n">max_results</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">order_by</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">extract_fields</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">run_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;pandas.DataFrame&quot;</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return traces that match the given list of search expressions within the experiments.</span>
@@ -578,6 +579,9 @@
 
 <span class="sd">                # span name and field name contain a dot</span>
 <span class="sd">                extract_fields = [&quot;`span.name`.inputs.`field.name`&quot;]</span>
+<span class="sd">        run_id: A run id to scope the search. When a trace is created under an active run,</span>
+<span class="sd">            it will be associated with the run and you can filter on the run id to retrieve the</span>
+<span class="sd">            trace. See the example below for how to filter traces by run id.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A Pandas DataFrame containing information about traces that satisfy the search expressions.</span>
@@ -610,6 +614,24 @@
 <span class="sd">        mlflow.search_traces(</span>
 <span class="sd">            extract_fields=[&quot;non_dict_span.inputs&quot;, &quot;non_dict_span.outputs&quot;],</span>
 <span class="sd">        )</span>
+
+<span class="sd">    .. code-block:: python</span>
+<span class="sd">        :test:</span>
+<span class="sd">        :caption: Search traces by run ID</span>
+
+<span class="sd">        import mlflow</span>
+
+
+<span class="sd">        @mlflow.trace</span>
+<span class="sd">        def traced_func(x):</span>
+<span class="sd">            return x + 1</span>
+
+
+<span class="sd">        with mlflow.start_run() as run:</span>
+<span class="sd">            traced_func(1)</span>
+
+<span class="sd">        mlflow.search_traces(run_id=run.info.run_id)</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Check if pandas is installed early to avoid unnecessary computation</span>
     <span class="k">if</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">find_spec</span><span class="p">(</span><span class="s2">&quot;pandas&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -632,6 +654,7 @@
     <span class="k">def</span> <span class="nf">pagination_wrapper_func</span><span class="p">(</span><span class="n">number_to_get</span><span class="p">,</span> <span class="n">next_page_token</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">MlflowClient</span><span class="p">()</span><span class="o">.</span><span class="n">search_traces</span><span class="p">(</span>
             <span class="n">experiment_ids</span><span class="o">=</span><span class="n">experiment_ids</span><span class="p">,</span>
+            <span class="n">run_id</span><span class="o">=</span><span class="n">run_id</span><span class="p">,</span>
             <span class="n">max_results</span><span class="o">=</span><span class="n">number_to_get</span><span class="p">,</span>
             <span class="n">filter_string</span><span class="o">=</span><span class="n">filter_string</span><span class="p">,</span>
             <span class="n">order_by</span><span class="o">=</span><span class="n">order_by</span><span class="p">,</span>
@@ -963,7 +986,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../../',
-      VERSION:'2.16.3.dev0',
+      VERSION:'2.17.1.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

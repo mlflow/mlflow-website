@@ -55,7 +55,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="MLflow 2.16.3.dev0 documentation" href="../../../index.html"/>
+    <link rel="top" title="MLflow 2.17.1.dev0 documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
   
@@ -87,7 +87,7 @@
     <a href="../../../index.html" class="wy-nav-top-logo"
       ><img src="../../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.16.3.dev0</span>
+    <span class="version">2.17.1.dev0</span>
   </li>
 </ul>
   </nav>
@@ -208,13 +208,9 @@
 <span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
 
+<span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
+<span class="kn">from</span> <span class="nn">mlflow.protos.databricks_pb2</span> <span class="kn">import</span> <span class="n">ALREADY_EXISTS</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.annotations</span> <span class="kn">import</span> <span class="n">experimental</span>
-
-<span class="n">_RETRIEVER_PRIMARY_KEY</span> <span class="o">=</span> <span class="s2">&quot;__retriever_primary_key__&quot;</span>
-<span class="n">_RETRIEVER_TEXT_COLUMN</span> <span class="o">=</span> <span class="s2">&quot;__retriever_text_column__&quot;</span>
-<span class="n">_RETRIEVER_DOC_URI</span> <span class="o">=</span> <span class="s2">&quot;__retriever_doc_uri__&quot;</span>
-<span class="n">_RETRIEVER_OTHER_COLUMNS</span> <span class="o">=</span> <span class="s2">&quot;__retriever_other_columns__&quot;</span>
-<span class="n">_RETRIEVER_NAME</span> <span class="o">=</span> <span class="s2">&quot;__retriever_name__&quot;</span>
 
 
 <span class="k">class</span> <span class="nc">DependenciesSchemasType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
@@ -246,7 +242,7 @@
 <span class="sd">        doc_uri: The name of the column that contains the document URI.</span>
 <span class="sd">        other_columns: A list of other columns that are part of the vector index</span>
 <span class="sd">                          that need to be retrieved during trace logging.</span>
-<span class="sd">        name: The name of the retriever or vector store.</span>
+<span class="sd">        name: The name of the retriever tool or vector store index.</span>
 
 <span class="sd">    .. code-block:: Python</span>
 <span class="sd">            :caption: Example</span>
@@ -260,11 +256,27 @@
 <span class="sd">                other_columns=[&quot;title&quot;],</span>
 <span class="sd">            )</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="nb">globals</span><span class="p">()[</span><span class="n">_RETRIEVER_PRIMARY_KEY</span><span class="p">]</span> <span class="o">=</span> <span class="n">primary_key</span>
-    <span class="nb">globals</span><span class="p">()[</span><span class="n">_RETRIEVER_TEXT_COLUMN</span><span class="p">]</span> <span class="o">=</span> <span class="n">text_column</span>
-    <span class="nb">globals</span><span class="p">()[</span><span class="n">_RETRIEVER_DOC_URI</span><span class="p">]</span> <span class="o">=</span> <span class="n">doc_uri</span>
-    <span class="nb">globals</span><span class="p">()[</span><span class="n">_RETRIEVER_OTHER_COLUMNS</span><span class="p">]</span> <span class="o">=</span> <span class="n">other_columns</span> <span class="ow">or</span> <span class="p">[]</span>
-    <span class="nb">globals</span><span class="p">()[</span><span class="n">_RETRIEVER_NAME</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span></div>
+    <span class="n">retriever_schema</span> <span class="o">=</span> <span class="nb">globals</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">DependenciesSchemasType</span><span class="o">.</span><span class="n">RETRIEVERS</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="p">[])</span>
+
+    <span class="c1"># Check if a retriever schema with the same name already exists</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">schema</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">name</span> <span class="k">for</span> <span class="n">schema</span> <span class="ow">in</span> <span class="n">retriever_schema</span><span class="p">):</span>
+        <span class="c1"># reset if there is an error to clear the global state for next run</span>
+        <span class="n">_clear_retriever_schema</span><span class="p">()</span>
+        <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;A retriever schema with the name &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; already exists.&quot;</span><span class="p">,</span>
+            <span class="n">error_code</span><span class="o">=</span><span class="n">ALREADY_EXISTS</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="n">retriever_schema</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;primary_key&quot;</span><span class="p">:</span> <span class="n">primary_key</span><span class="p">,</span>
+            <span class="s2">&quot;text_column&quot;</span><span class="p">:</span> <span class="n">text_column</span><span class="p">,</span>
+            <span class="s2">&quot;doc_uri&quot;</span><span class="p">:</span> <span class="n">doc_uri</span><span class="p">,</span>
+            <span class="s2">&quot;other_columns&quot;</span><span class="p">:</span> <span class="n">other_columns</span> <span class="ow">or</span> <span class="p">[],</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+    <span class="nb">globals</span><span class="p">()[</span><span class="n">DependenciesSchemasType</span><span class="o">.</span><span class="n">RETRIEVERS</span><span class="o">.</span><span class="n">value</span><span class="p">]</span> <span class="o">=</span> <span class="n">retriever_schema</span></div>
 
 
 <span class="k">def</span> <span class="nf">_get_retriever_schema</span><span class="p">():</span>
@@ -274,19 +286,19 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        VectorSearchIndex: The vector search index schema.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">globals</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">_RETRIEVER_PRIMARY_KEY</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">globals</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-        <span class="n">_RETRIEVER_TEXT_COLUMN</span><span class="p">,</span> <span class="kc">None</span>
-    <span class="p">):</span>
+    <span class="n">retriever_schema_list</span> <span class="o">=</span> <span class="nb">globals</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">DependenciesSchemasType</span><span class="o">.</span><span class="n">RETRIEVERS</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="p">[])</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">retriever_schema_list</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">[]</span>
 
     <span class="k">return</span> <span class="p">[</span>
         <span class="n">RetrieverSchema</span><span class="p">(</span>
-            <span class="n">name</span><span class="o">=</span><span class="nb">globals</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">_RETRIEVER_NAME</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
-            <span class="n">primary_key</span><span class="o">=</span><span class="nb">globals</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">_RETRIEVER_PRIMARY_KEY</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
-            <span class="n">text_column</span><span class="o">=</span><span class="nb">globals</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">_RETRIEVER_TEXT_COLUMN</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
-            <span class="n">doc_uri</span><span class="o">=</span><span class="nb">globals</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">_RETRIEVER_DOC_URI</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
-            <span class="n">other_columns</span><span class="o">=</span><span class="nb">globals</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">_RETRIEVER_OTHER_COLUMNS</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">retriever</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">),</span>
+            <span class="n">primary_key</span><span class="o">=</span><span class="n">retriever</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;primary_key&quot;</span><span class="p">),</span>
+            <span class="n">text_column</span><span class="o">=</span><span class="n">retriever</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;text_column&quot;</span><span class="p">),</span>
+            <span class="n">doc_uri</span><span class="o">=</span><span class="n">retriever</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;doc_uri&quot;</span><span class="p">),</span>
+            <span class="n">other_columns</span><span class="o">=</span><span class="n">retriever</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;other_columns&quot;</span><span class="p">),</span>
         <span class="p">)</span>
+        <span class="k">for</span> <span class="n">retriever</span> <span class="ow">in</span> <span class="n">retriever_schema_list</span>
     <span class="p">]</span>
 
 
@@ -294,11 +306,7 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Clear the vector search schema defined by the user.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="nb">globals</span><span class="p">()</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">_RETRIEVER_PRIMARY_KEY</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-    <span class="nb">globals</span><span class="p">()</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">_RETRIEVER_TEXT_COLUMN</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-    <span class="nb">globals</span><span class="p">()</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">_RETRIEVER_DOC_URI</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-    <span class="nb">globals</span><span class="p">()</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">_RETRIEVER_OTHER_COLUMNS</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-    <span class="nb">globals</span><span class="p">()</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">_RETRIEVER_NAME</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="nb">globals</span><span class="p">()</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">DependenciesSchemasType</span><span class="o">.</span><span class="n">RETRIEVERS</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_clear_dependencies_schemas</span><span class="p">():</span>
@@ -443,7 +451,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../../',
-      VERSION:'2.16.3.dev0',
+      VERSION:'2.17.1.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

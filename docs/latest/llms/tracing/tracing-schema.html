@@ -55,7 +55,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="MLflow 2.16.3.dev0 documentation" href="../../index.html"/>
+    <link rel="top" title="MLflow 2.17.1.dev0 documentation" href="../../index.html"/>
         <link rel="up" title="LLMs" href="../index.html"/>
         <link rel="next" title="MLflow AI Gateway (Experimental)" href="/../deployments/index.html"/>
         <link rel="prev" title="Tracing Concepts" href="/overview.html"/> 
@@ -89,7 +89,7 @@
     <a href="../../index.html" class="wy-nav-top-logo"
       ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.16.3.dev0</span>
+    <span class="version">2.17.1.dev0</span>
   </li>
 </ul>
   </nav>
@@ -140,6 +140,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#trace-info">Trace Info</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#trace-data">Trace Data</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#span-schema">Span Schema</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schema-for-specific-span-types">Schema for specific span types</a></li>
 </ul>
 </li>
 </ul>
@@ -488,6 +489,61 @@ the following elements:</p>
 </tbody>
 </table>
 </div>
+<div class="section" id="schema-for-specific-span-types">
+<h2>Schema for specific span types<a class="headerlink" href="#schema-for-specific-span-types" title="Permalink to this headline"> </a></h2>
+<p>MLflow has a set of 10 predefined types of spans (see <a class="reference internal" href="../../python_api/mlflow.entities.html#mlflow.entities.SpanType" title="mlflow.entities.SpanType"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.entities.SpanType</span></code></a>), and
+certain span types have properties that are required in order to enable additional functionality
+within the UI and downstream tasks such as evaluation.</p>
+<div class="section" id="retriever-spans">
+<h3>Retriever Spans<a class="headerlink" href="#retriever-spans" title="Permalink to this headline"> </a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">RETRIEVER</span></code> span type is used for operations involving retrieving data from a data store (for example, querying
+documents from a vector store). The <code class="docutils literal notranslate"><span class="pre">RETRIEVER</span></code> span type has the following schema:</p>
+<table class="colwidths-given wrap-table docutils align-default">
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 40%" />
+<col style="width: 40%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>Property</strong></p></th>
+<th class="head"><p><strong>Description</strong></p></th>
+<th class="head"><p><strong>Note</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Input</strong></p></td>
+<td><p>There are no restrictions on the span inputs</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Output</strong></p></td>
+<td><p>The output must be of type <code class="docutils literal notranslate"><span class="pre">List[</span></code> <a class="reference internal" href="../../python_api/mlflow.entities.html#mlflow.entities.Document" title="mlflow.entities.Document"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.entities.Document</span></code></a> <code class="docutils literal notranslate"><span class="pre">]</span></code>, or a dict matching the structure of the dataclass*.
+The dataclass contains the following properties:</p>
+<ul class="simple">
+<li><p><strong>id</strong> (<code class="docutils literal notranslate"><span class="pre">Optional[str]</span></code>) - An optional unique identifier for the document.</p></li>
+<li><p><strong>page_content</strong> (<code class="docutils literal notranslate"><span class="pre">str</span></code>) - The text content of the document.</p></li>
+<li><p><strong>metadata</strong> (<code class="docutils literal notranslate"><span class="pre">Optional[Dict[str,any]]</span></code>) - The metadata associated with the document. There are two important metadata keys that are reserved for the MLflow UI and evaluation metrics:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;doc_uri&quot;</span> <span class="pre">(str)</span></code>: The URI for the document. This is used for rendering a link in the UI.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;chunk_id&quot;</span> <span class="pre">(str)</span></code>: If your document is broken up into chunks in your data store, this key can be used to
+identify the chunk that the document is a part of. This is used by some evaluation metrics.</p></li>
+</ul>
+</li>
+</ul>
+</td>
+<td><p>This output structure is guaranteed to be provided if the traces are generated via MLflow autologging for the LangChain and LlamaIndex flavors.
+By conforming to this specification, <code class="docutils literal notranslate"><span class="pre">RETRIEVER</span></code> spans will be rendered in a more user-friendly manner in the MLflow UI, and downstream tasks
+such as evaluation will function as expected.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Attributes</strong></p></td>
+<td><p>There are no restrictions on the span attributes</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>* For example, both <code class="docutils literal notranslate"><span class="pre">[Document(page_content=&quot;Hello</span> <span class="pre">world&quot;,</span> <span class="pre">metadata={&quot;doc_uri&quot;:</span> <span class="pre">&quot;https://example.com&quot;})]</span></code> and
+<code class="docutils literal notranslate"><span class="pre">[{&quot;page_content&quot;:</span> <span class="pre">&quot;Hello</span> <span class="pre">world&quot;,</span> <span class="pre">&quot;metadata&quot;:</span> <span class="pre">{&quot;doc_uri&quot;:</span> <span class="pre">&quot;https://example.com&quot;}}]</span></code> are valid outputs for a <code class="docutils literal notranslate"><span class="pre">RETRIEVER</span></code> span.</p>
+</div>
+</div>
 </div>
 
 
@@ -528,7 +584,7 @@ the following elements:</p>
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../',
-      VERSION:'2.16.3.dev0',
+      VERSION:'2.17.1.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

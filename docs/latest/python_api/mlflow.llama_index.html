@@ -55,7 +55,7 @@
         <link rel="index" title="Index"
               href="../genindex.html"/>
         <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="MLflow 2.16.3.dev0 documentation" href="../index.html"/>
+    <link rel="top" title="MLflow 2.17.1.dev0 documentation" href="../index.html"/>
         <link rel="up" title="Python API" href="index.html"/>
         <link rel="next" title="mlflow.metrics" href="/mlflow.metrics.html"/>
         <link rel="prev" title="mlflow.lightgbm" href="/mlflow.lightgbm.html"/> 
@@ -88,7 +88,7 @@
     <a href="../index.html" class="wy-nav-top-logo"
       ><img src="../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.16.3.dev0</span>
+    <span class="version">2.17.1.dev0</span>
   </li>
 </ul>
   </nav>
@@ -156,6 +156,7 @@
 <li class="toctree-l2"><a class="reference internal" href="mlflow.data.html">mlflow.data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.deployments.html">mlflow.deployments</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.diviner.html">mlflow.diviner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mlflow.dspy.html">mlflow.dspy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.entities.html">mlflow.entities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.environment_variables.html">mlflow.environment_variables</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.fastai.html">mlflow.fastai</a></li>
@@ -310,7 +311,7 @@ that, at a minimum, contains these requirements.</p>
 <p class="admonition-title">Note</p>
 <p>Experimental: This function may change or be removed in a future release without warning.</p>
 </div>
-<p>Load a LlamaIndex index or engine from a local file or a run.</p>
+<p>Load a LlamaIndex index/engine/workflow from a local file or a run.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -344,15 +345,31 @@ path will be created.</p></li>
 <p>Experimental: This function may change or be removed in a future release without warning.</p>
 </div>
 <p>Log a LlamaIndex model as an MLflow artifact for the current run.</p>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<p>Saving a non-index object is only supported in the ‘Model-from-Code’ saving mode.
+Please refer to the <a class="reference external" href="https://www.mlflow.org/docs/latest/model/models-from-code.html">Models From Code Guide</a>
+for more information.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>llama_index_model</strong> – An LlamaIndex object to be saved, or a string representing the path to
-a script contains LlamaIndex index/engine definition.</p></li>
+<li><p><strong>llama_index_model</strong> – <p>A LlamaIndex object to be saved. Supported model types are:</p>
+<ol class="arabic simple">
+<li><p>An Index object.</p></li>
+<li><p>An Engine object e.g. ChatEngine, QueryEngine, Retriever.</p></li>
+<li><p>A <a class="reference external" href="https://docs.llamaindex.ai/en/stable/module_guides/workflow/">Workflow</a> object.</p></li>
+<li><dl class="simple">
+<dt>A string representing the path to a script contains LlamaIndex model definition</dt><dd><p>of the one of the above types.</p>
+</dd>
+</dl>
+</li>
+</ol>
+</p></li>
 <li><p><strong>artifact_path</strong> – Local path where the serialized model (as YAML) is to be saved.</p></li>
-<li><p><strong>engine_type</strong> – <p>Required when saving an index object to determine the inference interface
+<li><p><strong>engine_type</strong> – <p>Required when saving an Index object to determine the inference interface
 for the index when loaded as a pyfunc model. This field is <strong>not</strong> required when
-saving an engine directly. The supported types are as follows:</p>
+saving other LlamaIndex objects. The supported values are as follows:</p>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">&quot;chat&quot;</span></code>: load the index as an instance of the LlamaIndex
 <a class="reference external" href="https://docs.llamaindex.ai/en/stable/module_guides/deploying/chat_engines/">ChatEngine</a>.</p></li>
@@ -461,15 +478,31 @@ The following is an <em>example</em> dictionary representation of a conda enviro
 <p>Experimental: This function may change or be removed in a future release without warning.</p>
 </div>
 <p>Save a LlamaIndex model to a path on the local file system.</p>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<p>Saving a non-index object is only supported in the ‘Model-from-Code’ saving mode.
+Please refer to the <a class="reference external" href="https://www.mlflow.org/docs/latest/model/models-from-code.html">Models From Code Guide</a>
+for more information.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>llama_index_model</strong> – An LlamaIndex object to be saved, or a string representing the path to
-a script contains LlamaIndex index/engine definition.</p></li>
+<li><p><strong>llama_index_model</strong> – <p>A LlamaIndex object to be saved. Supported model types are:</p>
+<ol class="arabic simple">
+<li><p>An Index object.</p></li>
+<li><p>An Engine object e.g. ChatEngine, QueryEngine, Retriever.</p></li>
+<li><p>A <a class="reference external" href="https://docs.llamaindex.ai/en/stable/module_guides/workflow/">Workflow</a> object.</p></li>
+<li><dl class="simple">
+<dt>A string representing the path to a script contains LlamaIndex model definition</dt><dd><p>of the one of the above types.</p>
+</dd>
+</dl>
+</li>
+</ol>
+</p></li>
 <li><p><strong>path</strong> – Local path where the serialized model (as YAML) is to be saved.</p></li>
-<li><p><strong>engine_type</strong> – <p>Required when saving an index object to determine the inference interface
+<li><p><strong>engine_type</strong> – <p>Required when saving an Index object to determine the inference interface
 for the index when loaded as a pyfunc model. This field is <strong>not</strong> required when
-saving an engine directly. The supported types are as follows:</p>
+saving other LlamaIndex objects. The supported values are as follows:</p>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">&quot;chat&quot;</span></code>: load the index as an instance of the LlamaIndex
 <a class="reference external" href="https://docs.llamaindex.ai/en/stable/module_guides/deploying/chat_engines/">ChatEngine</a>.</p></li>
@@ -603,7 +636,7 @@ The following is an <em>example</em> dictionary representation of a conda enviro
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../',
-      VERSION:'2.16.3.dev0',
+      VERSION:'2.17.1.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',
