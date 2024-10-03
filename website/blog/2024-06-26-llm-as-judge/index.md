@@ -4,7 +4,7 @@ description: Perform LLM Evaluations with custom metrics
 slug: llm-as-judge
 authors: [pedro-azevedo,rahul-pandey]
 tags: [genai,mlflow-evalaute]
-thumbnail: img/blog/llm-as-judge.png
+thumbnail: /img/blog/llm-as-judge.png
 ---
 
 In this blog post, we'll dive on a journey to revolutionize how we evaluate language models. We'll explore the power of MLflow Evaluate and harness the capabilities of Large Language Models (LLMs) as judges. By the end, you'll learn how to create custom metrics, implement LLM-based evaluation, and apply these techniques to real-world scenarios. Get ready to transform your model assessment process and gain deeper insights into your AI's performance!
