@@ -330,7 +330,7 @@ export const RELEASES: Release[] = [
         image_url: "https://github.com/mlflow-automation.png",
       },
     ],
-    date: "2024-09-26",
+    date: "2024-10-11",
     version: "2.17.0",
   },
   {
