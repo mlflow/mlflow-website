@@ -1,0 +1,1197 @@
+
+
+<!DOCTYPE html>
+<!-- source: docs/source/llms/llama-index/notebooks/llama_index_workflow_tutorial.ipynb -->
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Building a Tool-calling Agent with LlamaIndex Workflow and MLflow</title>
+  
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/llms/llama-index/notebooks/llama_index_workflow_tutorial.html">
+  
+  
+    <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
+    
+
+    
+
+  
+    
+        <!-- Google Tag Manager -->
+        <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer',"GTM-N6WMTTJ");</script>
+        <!-- End Google Tag Manager -->
+    
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/grids.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/mobile.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/simple-cards.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/tabs.css" type="text/css" />
+    
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="MLflow 2.17.1.dev0 documentation" href="../../../index.html"/>
+        <link rel="up" title="MLflow LlamaIndex Flavor" href="../index.html"/>
+        <link rel="next" title="Introduction to Using LlamaIndex with MLflow" href="/llama_index_quickstart.html"/>
+        <link rel="prev" title="MLflow LlamaIndex Flavor" href="/../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+<script type="text/javascript" src="../../../_static/jquery.js"></script>
+<script type="text/javascript" src="../../../_static/underscore.js"></script>
+<script type="text/javascript" src="../../../_static/doctools.js"></script>
+<script type="text/javascript" src="../../../_static/languagesections.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript" src="../../../None"></script>
+<script type="text/javascript" src="../../../_static/runllm.js"></script>
+
+<body class="wy-body-for-nav" role="document">
+  
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N6WMTTJ"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+  
+
+  
+  <nav class="wy-nav-top header" role="navigation" aria-label="top navigation">
+    <ul>
+  <li class="menu-toggle">
+    <i data-toggle="wy-nav-top" class="wy-nav-top-menu-button db-icon db-icon-menu pull-left"></i>
+    <a href="../../../index.html" class="wy-nav-top-logo"
+      ><img src="../../../_static/MLflow-logo-final-black.png" alt="MLflow"
+    /></a>
+    <span class="version">2.17.1.dev0</span>
+  </li>
+</ul>
+  </nav>
+  <page>
+    
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side relative">
+      <div class="wy-side-scroll">
+  <div class="wy-side-nav-search">
+    
+
+    
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+    
+  </div>
+
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+    
+      <a href="../../../index.html" class="main-navigation-home"><img src="../../../_static/icons/nav-home.svg"> MLflow</a>
+    
+
+    
+      
+
+      
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../introduction/index.html">MLflow Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting-started/index.html">Getting Started with MLflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../new-features/index.html">New Features</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">LLMs</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#tutorials-and-use-case-guides-for-genai-applications-in-mlflow">Tutorials and Use Case Guides for GenAI applications in MLflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#id1">MLflow Tracing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#id2">MLflow AI Gateway for LLMs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#id3">LLM Evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#id4">Prompt Engineering UI</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../index.html#native-mlflow-flavors-for-llms">Native MLflow Flavors for LLMs</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../../transformers/index.html">MLflow Transformers Flavor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../openai/index.html">MLflow OpenAI Flavor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../sentence-transformers/index.html">MLflow Sentence-Transformers Flavor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../langchain/index.html">MLflow LangChain Flavor</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../index.html">MLflow LlamaIndex Flavor</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../index.html#introduction">Introduction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../index.html#why-use-llamaindex-with-mlflow">Why use LlamaIndex with MLflow?</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../index.html#getting-started">Getting Started</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../index.html#concepts">Concepts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../index.html#usage">Usage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../index.html#faq">FAQ</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../index.html#explore-the-native-llm-flavors">Explore the Native LLM Flavors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#id5">LLM Tracking in MLflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../tracing/index.html">MLflow Tracing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../model-evaluation/index.html">Model Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deep-learning/index.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../traditional-ml/index.html">Traditional ML</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deployment/index.html">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tracking.html">MLflow Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../system-metrics/index.html">System Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../projects.html">MLflow Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../models.html">MLflow Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../model-registry.html">MLflow Model Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../recipes.html">MLflow Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../plugins.html">MLflow Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../auth/index.html">MLflow Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../search-runs.html">Search Runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../search-experiments.html">Search Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../python_api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../R-api.html">R API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../java_api/index.html">Java API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rest-api.html">REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docker.html">Official MLflow Docker Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../community-model-flavors.html">Community Model Flavors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials-and-examples/index.html">Tutorials and Examples</a></li>
+</ul>
+
+      
+    
+  </div>
+
+  <div role="contentinfo">
+    
+
+    <p>
+      <a id='feedbacklink' href="https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a>
+    </p>
+  </div>
+</div>
+    </nav>
+
+    <main class="wy-grid-for-nav">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+          <div class="rst-content">
+            
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Documentation</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../../index.html">LLMs</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../index.html">MLflow LlamaIndex Flavor</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+    
+      <li>Building a Tool-calling Agent with LlamaIndex Workflow and MLflow</li>
+    
+    
+    <!-- <li class="wy-breadcrumbs-aside">
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/llms/llama-index/notebooks/llama_index_workflow_tutorial.ipynb" class="fa fa-github"> Edit on GitHub</a>
+    </li> -->
+    
+  </ul>
+</div>
+            <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <div itemprop="articleBody">
+                
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div class="section" id="Building-a-Tool-calling-Agent-with-LlamaIndex-Workflow-and-MLflow">
+<h1>Building a Tool-calling Agent with LlamaIndex Workflow and MLflow<a class="headerlink" href="#Building-a-Tool-calling-Agent-with-LlamaIndex-Workflow-and-MLflow" title="Permalink to this headline"> </a></h1>
+<p>Welcome to this interactive tutorial designed to introduce you to LlamaIndex Workflow and its integration with MLflow. This tutorial is structured as a notebook to provide a hands-on, practical learning experience with <strong>Workflow</strong>, LlamaIndex’s novel approach to design LLM applications, and managing the development process with MLflow.</p>
+<div style="text-align: center;"><p><img alt="LlamaIndex Workflow Graph" class="no-scaled-link" src="../../../_images/llama_index_workflow_graph.png" style="width: 60%;" /></p>
+</div><div class="section" id="What-you-will-learn">
+<h2>What you will learn<a class="headerlink" href="#What-you-will-learn" title="Permalink to this headline"> </a></h2>
+<p>By the end of this tutorial you will have:</p>
+<ul class="simple">
+<li><p>Created an MVP agentic application with tool calling functionality in a LlamaIndex Workflow.</p></li>
+<li><p>Observed the agent actions with MLflow Tracing.</p></li>
+<li><p>Logged that workflow to the MLflow Experiment.</p></li>
+<li><p>Loaded the model back and performed inference.</p></li>
+<li><p>Explored the MLflow UI to learn about logged artifacts.</p></li>
+</ul>
+<a href="https://raw.githubusercontent.com/mlflow/mlflow/master/docs/source/llms/llama-index/notebooks/llama_index_workflow_tutorial.ipynb" class="notebook-download-btn"><i class="fas fa-download"></i>Download this Notebook</a><br></div>
+<div class="section" id="Installation">
+<h2>Installation<a class="headerlink" href="#Installation" title="Permalink to this headline"> </a></h2>
+<p>MLflow’s integration with LlamaIndex’s Workflow API is available in MLflow &gt;= 2.17.0 and LlamaIndex (core) &gt;= 0.11.16. After installing the packages, you may need to restart the Python kernel to correctly load modules.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">pip</span> install mlflow&gt;=2.17.0 llama-index&gt;=0.11.16 -qqqU
+<span class="c1"># Workflow util is required for rendering Workflow as HTML</span>
+<span class="o">%</span><span class="k">pip</span> install llama-index-utils-workflow -qqqU
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Choose-your-favorite-LLM">
+<h2>Choose your favorite LLM<a class="headerlink" href="#Choose-your-favorite-LLM" title="Permalink to this headline"> </a></h2>
+<p>By default, LlamaIndex uses OpenAI as the source for LLms and embedding models. If you are signing up with different LLM providers or using a local model, configure them for use by using the <code class="docutils literal notranslate"><span class="pre">Settings</span></code> object.</p>
+<div class="section" id="Option-1:-OpenAI-(default)">
+<h3>Option 1: OpenAI (default)<a class="headerlink" href="#Option-1:-OpenAI-(default)" title="Permalink to this headline"> </a></h3>
+<p>LlamaIndex by default uses OpenAI APIs for LLMs and embeddings models. To proceed with this setting, you just need to set the API key in the environment variable.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;OPENAI_API_KEY&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&lt;YOUR_OPENAI_API_KEY&gt;&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Option-2:-Other-Hosted-LLMs">
+<h3>Option 2: Other Hosted LLMs<a class="headerlink" href="#Option-2:-Other-Hosted-LLMs" title="Permalink to this headline"> </a></h3>
+<p>If you want to use other hosted LLMs,</p>
+<ol class="arabic simple">
+<li><p>Download the integration package for the model provider of your choice.</p></li>
+<li><p>Set up required environment variables as specified in the integration documentation.</p></li>
+<li><p>Instantiate the LLM instance and set it to the global <code class="docutils literal notranslate"><span class="pre">Settings</span></code> object.</p></li>
+</ol>
+<p>The following cells show an example for using Databricks hosted LLMs (Llama3.1 70B instruct).</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">pip</span> install llama-index-llms-databricks
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;DATABRICKS_TOKEN&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&lt;YOUR_DATABRICKS_API_TOKEN&gt;&quot;</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;DATABRICKS_SERVING_ENDPOINT&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;https://YOUR_DATABRICKS_HOST/serving-endpoints/&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">llama_index.core</span> <span class="kn">import</span> <span class="n">Settings</span>
+<span class="kn">from</span> <span class="nn">llama_index.llms.databricks</span> <span class="kn">import</span> <span class="n">Databricks</span>
+
+<span class="n">llm</span> <span class="o">=</span> <span class="n">Databricks</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="s2">&quot;databricks-meta-llama-3-1-70b-instruct&quot;</span><span class="p">)</span>
+<span class="n">Settings</span><span class="o">.</span><span class="n">llm</span> <span class="o">=</span> <span class="n">llm</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Option-3:-Local-LLM">
+<h3>Option 3: Local LLM<a class="headerlink" href="#Option-3:-Local-LLM" title="Permalink to this headline"> </a></h3>
+<p>LlamaIndex also support locally hosted LLMs. Please refer to the <a class="reference external" href="https://docs.llamaindex.ai/en/stable/getting_started/starter_example_local/">Starter Tutorial (Local Models)</a> for how to set them up.</p>
+</div>
+</div>
+<div class="section" id="Create-an-MLflow-Experiemnt">
+<h2>Create an MLflow Experiemnt<a class="headerlink" href="#Create-an-MLflow-Experiemnt" title="Permalink to this headline"> </a></h2>
+<p><em>Skip this step if you are running this tutorial on a Databricks Notebook. An MLflow experiment is automatically set up when you created any notebook.</em></p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s2">&quot;MLflow LlamaIndex Workflow Tutorial&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Define-tools">
+<h2>Define tools<a class="headerlink" href="#Define-tools" title="Permalink to this headline"> </a></h2>
+<p>The agents access with various functions and resources via <code class="docutils literal notranslate"><span class="pre">tool</span></code> objects. In this example, we define the simplest possible math tools <code class="docutils literal notranslate"><span class="pre">add</span></code> and <code class="docutils literal notranslate"><span class="pre">multiply</span></code> based on Python functions. For a real-world application, you can create arbitrary tools such as vector search retrieval, web search, or even calling another agent as a tool. Please refer to the <a class="reference external" href="https://docs.llamaindex.ai/en/stable/module_guides/deploying/agents/tools/">Tools documentation</a> for more details.</p>
+<p>Please ignore the <code class="docutils literal notranslate"><span class="pre">###</span> <span class="pre">[USE</span> <span class="pre">IN</span> <span class="pre">MODEL]</span></code> comment at the beginning of some cells like below. This will be used in later steps in this tutorial!</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># [USE IN MODEL]</span>
+<span class="kn">from</span> <span class="nn">llama_index.core.tools</span> <span class="kn">import</span> <span class="n">FunctionTool</span>
+
+
+<span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Useful function to add two numbers.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
+
+
+<span class="k">def</span> <span class="nf">multiply</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Useful function to multiply two numbers.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="n">y</span>
+
+
+<span class="n">tools</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">FunctionTool</span><span class="o">.</span><span class="n">from_defaults</span><span class="p">(</span><span class="n">add</span><span class="p">),</span>
+    <span class="n">FunctionTool</span><span class="o">.</span><span class="n">from_defaults</span><span class="p">(</span><span class="n">multiply</span><span class="p">),</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Define-Workflow">
+<h2>Define Workflow<a class="headerlink" href="#Define-Workflow" title="Permalink to this headline"> </a></h2>
+<div class="section" id="Workflow-Primer">
+<h3>Workflow Primer<a class="headerlink" href="#Workflow-Primer" title="Permalink to this headline"> </a></h3>
+<p>LlamaIndex Workflow is an event-driven orchestration framework. At its core, a workflow consists of two fundamental components: <strong>Steps</strong> and <strong>Events</strong>.</p>
+<ul class="simple">
+<li><p><strong>Steps</strong>: Units of execution within the workflow. Steps are defined as methods marked with the <code class="docutils literal notranslate"><span class="pre">&#64;step</span></code> decorator in a class that implements the <code class="docutils literal notranslate"><span class="pre">Workflow</span></code> base class.</p></li>
+<li><p><strong>Events</strong>: Custom objects that trigger steps. Two special events, <code class="docutils literal notranslate"><span class="pre">StartEvent</span></code> and <code class="docutils literal notranslate"><span class="pre">EndEvent</span></code>, are reserved for dispatch at the beginning and end of the workflow.</p></li>
+</ul>
+<p>Each step specifies its input and output events through its function signature.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@step</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">my_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">StartEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FooEvent</span><span class="p">:</span>
+    <span class="c1"># This method triggers when a StartEvent is emitted at the workflow&#39;s start,</span>
+    <span class="c1"># and then dispatches a FooEvent.</span>
+</pre></div>
+</div>
+<p>Based on each step’s signature and defined events, LlamaIndex automatically constructs the workflow’s execution flow.</p>
+<p>You may notice that the <code class="docutils literal notranslate"><span class="pre">my_step</span></code> function is defined as an async function. LlamaIndex Workflow makes asynchronous operations a first-class feature, enabling easy parallel execution and scalable workflows.</p>
+<p>Another essential component of the workflow is the <strong>Context</strong> object. This global registry, accessible from any step, allows shared information to be defined without the need to pass it through multiple events.</p>
+</div>
+<div class="section" id="Define-a-ReAct-Agent-as-a-Workflow">
+<h3>Define a ReAct Agent as a Workflow<a class="headerlink" href="#Define-a-ReAct-Agent-as-a-Workflow" title="Permalink to this headline"> </a></h3>
+<p>The Workflow definition below models a ReAct Agent that utilizes the simple math tools we defined.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># [USE IN MODEL]</span>
+
+<span class="c1"># Event definitions</span>
+<span class="kn">from</span> <span class="nn">llama_index.core.llms</span> <span class="kn">import</span> <span class="n">ChatMessage</span><span class="p">,</span> <span class="n">ChatResponse</span>
+<span class="kn">from</span> <span class="nn">llama_index.core.tools</span> <span class="kn">import</span> <span class="n">ToolOutput</span><span class="p">,</span> <span class="n">ToolSelection</span>
+<span class="kn">from</span> <span class="nn">llama_index.core.workflow</span> <span class="kn">import</span> <span class="n">Event</span>
+
+
+<span class="k">class</span> <span class="nc">PrepEvent</span><span class="p">(</span><span class="n">Event</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;An event to handle new messages and prepare the chat history&quot;&quot;&quot;</span>
+
+
+<span class="k">class</span> <span class="nc">LLMInputEvent</span><span class="p">(</span><span class="n">Event</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;An event to prmopt the LLM with the react prompt (chat history)&quot;&quot;&quot;</span>
+
+    <span class="nb">input</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ChatMessage</span><span class="p">]</span>
+
+
+<span class="k">class</span> <span class="nc">LLMOutputEvent</span><span class="p">(</span><span class="n">Event</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;An event represents LLM generation&quot;&quot;&quot;</span>
+
+    <span class="n">response</span><span class="p">:</span> <span class="n">ChatResponse</span>
+
+
+<span class="k">class</span> <span class="nc">ToolCallEvent</span><span class="p">(</span><span class="n">Event</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;An event to trigger tool calls, if any&quot;&quot;&quot;</span>
+
+    <span class="n">tool_calls</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ToolSelection</span><span class="p">]</span>
+
+
+<span class="k">class</span> <span class="nc">ToolOutputEvent</span><span class="p">(</span><span class="n">Event</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;An event to handle the results of tool calls, if any&quot;&quot;&quot;</span>
+
+    <span class="n">output</span><span class="p">:</span> <span class="n">ToolOutput</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># [USE IN MODEL]</span>
+
+<span class="c1"># Workflow definition</span>
+<span class="kn">from</span> <span class="nn">llama_index.core</span> <span class="kn">import</span> <span class="n">Settings</span>
+<span class="kn">from</span> <span class="nn">llama_index.core.agent.react</span> <span class="kn">import</span> <span class="n">ReActChatFormatter</span><span class="p">,</span> <span class="n">ReActOutputParser</span>
+<span class="kn">from</span> <span class="nn">llama_index.core.agent.react.types</span> <span class="kn">import</span> <span class="n">ActionReasoningStep</span><span class="p">,</span> <span class="n">ObservationReasoningStep</span>
+<span class="kn">from</span> <span class="nn">llama_index.core.memory</span> <span class="kn">import</span> <span class="n">ChatMemoryBuffer</span>
+<span class="kn">from</span> <span class="nn">llama_index.core.workflow</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Context</span><span class="p">,</span>
+    <span class="n">StartEvent</span><span class="p">,</span>
+    <span class="n">StopEvent</span><span class="p">,</span>
+    <span class="n">Workflow</span><span class="p">,</span>
+    <span class="n">step</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">ReActAgent</span><span class="p">(</span><span class="n">Workflow</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tools</span> <span class="o">=</span> <span class="n">tools</span>
+        <span class="c1"># Store the chat history in memory so the agent can handle multiple interactions with users.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">memory</span> <span class="o">=</span> <span class="n">ChatMemoryBuffer</span><span class="o">.</span><span class="n">from_defaults</span><span class="p">(</span><span class="n">llm</span><span class="o">=</span><span class="n">Settings</span><span class="o">.</span><span class="n">llm</span><span class="p">)</span>
+
+    <span class="nd">@step</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">new_user_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ctx</span><span class="p">:</span> <span class="n">Context</span><span class="p">,</span> <span class="n">ev</span><span class="p">:</span> <span class="n">StartEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PrepEvent</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Start workflow with the new user messsage&quot;&quot;&quot;</span>
+        <span class="c1"># StartEvent carries whatever keys passed to the workflow&#39;s run() method as attributes.</span>
+        <span class="n">user_input</span> <span class="o">=</span> <span class="n">ev</span><span class="o">.</span><span class="n">input</span>
+        <span class="n">user_msg</span> <span class="o">=</span> <span class="n">ChatMessage</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">user_input</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">memory</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">user_msg</span><span class="p">)</span>
+
+        <span class="c1"># We store the executed reasoning steps in the context. Clear it at the start.</span>
+        <span class="k">await</span> <span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;steps&quot;</span><span class="p">,</span> <span class="p">[])</span>
+
+        <span class="k">return</span> <span class="n">PrepEvent</span><span class="p">()</span>
+
+    <span class="nd">@step</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">prepare_llm_prompt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ctx</span><span class="p">:</span> <span class="n">Context</span><span class="p">,</span> <span class="n">ev</span><span class="p">:</span> <span class="n">PrepEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LLMInputEvent</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Prepares the react prompt, using the chat history, tools, and current reasoning (if any)&quot;&quot;&quot;</span>
+        <span class="n">steps</span> <span class="o">=</span> <span class="k">await</span> <span class="n">ctx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;steps&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[])</span>
+        <span class="n">chat_history</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">memory</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+
+        <span class="c1"># Construct an LLM from the chat history, tools, and current reasoning, using the</span>
+        <span class="c1"># built-in prompt template.</span>
+        <span class="n">llm_input</span> <span class="o">=</span> <span class="n">ReActChatFormatter</span><span class="p">()</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tools</span><span class="p">,</span> <span class="n">chat_history</span><span class="p">,</span> <span class="n">current_reasoning</span><span class="o">=</span><span class="n">steps</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">LLMInputEvent</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="n">llm_input</span><span class="p">)</span>
+
+    <span class="nd">@step</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">invoke_llm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ev</span><span class="p">:</span> <span class="n">LLMInputEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LLMOutputEvent</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Call the LLM with the react prompt&quot;&quot;&quot;</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">Settings</span><span class="o">.</span><span class="n">llm</span><span class="o">.</span><span class="n">achat</span><span class="p">(</span><span class="n">ev</span><span class="o">.</span><span class="n">input</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">LLMOutputEvent</span><span class="p">(</span><span class="n">response</span><span class="o">=</span><span class="n">response</span><span class="p">)</span>
+
+    <span class="nd">@step</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">handle_llm_response</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">ctx</span><span class="p">:</span> <span class="n">Context</span><span class="p">,</span> <span class="n">ev</span><span class="p">:</span> <span class="n">LLMOutputEvent</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ToolCallEvent</span> <span class="o">|</span> <span class="n">PrepEvent</span> <span class="o">|</span> <span class="n">StopEvent</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse the LLM response to extract any tool calls requested.</span>
+<span class="sd">        If theere is no tool call, we can stop and emit a StopEvent. Otherwise, we emit a ToolCallEvent to handle tool calls.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">step</span> <span class="o">=</span> <span class="n">ReActOutputParser</span><span class="p">()</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">ev</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+            <span class="p">(</span><span class="k">await</span> <span class="n">ctx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;steps&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[]))</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">step</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">step</span><span class="o">.</span><span class="n">is_done</span><span class="p">:</span>
+                <span class="c1"># No additional tool call is required. Ending the workflow by emitting StopEvent.</span>
+                <span class="k">return</span> <span class="n">StopEvent</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">response</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">ActionReasoningStep</span><span class="p">):</span>
+                <span class="c1"># Tool calls are returned from LLM, trigger the tool call event.</span>
+                <span class="k">return</span> <span class="n">ToolCallEvent</span><span class="p">(</span>
+                    <span class="n">tool_calls</span><span class="o">=</span><span class="p">[</span>
+                        <span class="n">ToolSelection</span><span class="p">(</span>
+                            <span class="n">tool_id</span><span class="o">=</span><span class="s2">&quot;fake&quot;</span><span class="p">,</span>
+                            <span class="n">tool_name</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">action</span><span class="p">,</span>
+                            <span class="n">tool_kwargs</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">action_input</span><span class="p">,</span>
+                        <span class="p">)</span>
+                    <span class="p">]</span>
+                <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">error_step</span> <span class="o">=</span> <span class="n">ObservationReasoningStep</span><span class="p">(</span>
+                <span class="n">observation</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;There was an error in parsing my reasoning: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="p">(</span><span class="k">await</span> <span class="n">ctx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;steps&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[]))</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">error_step</span><span class="p">)</span>
+
+        <span class="c1"># if no tool calls or final response, iterate again</span>
+        <span class="k">return</span> <span class="n">PrepEvent</span><span class="p">()</span>
+
+    <span class="nd">@step</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">handle_tool_calls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ctx</span><span class="p">:</span> <span class="n">Context</span><span class="p">,</span> <span class="n">ev</span><span class="p">:</span> <span class="n">ToolCallEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PrepEvent</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Safely calls tools with error handling, adding the tool outputs to the current reasoning. Then, by emitting a PrepEvent, we loop around for another round of ReAct prompting and parsing.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tool_calls</span> <span class="o">=</span> <span class="n">ev</span><span class="o">.</span><span class="n">tool_calls</span>
+        <span class="n">tools_by_name</span> <span class="o">=</span> <span class="p">{</span><span class="n">tool</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get_name</span><span class="p">():</span> <span class="n">tool</span> <span class="k">for</span> <span class="n">tool</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tools</span><span class="p">}</span>
+
+        <span class="c1"># call tools -- safely!</span>
+        <span class="k">for</span> <span class="n">tool_call</span> <span class="ow">in</span> <span class="n">tool_calls</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">tool</span> <span class="o">:=</span> <span class="n">tools_by_name</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">tool_call</span><span class="o">.</span><span class="n">tool_name</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">tool_output</span> <span class="o">=</span> <span class="n">tool</span><span class="p">(</span><span class="o">**</span><span class="n">tool_call</span><span class="o">.</span><span class="n">tool_kwargs</span><span class="p">)</span>
+                    <span class="n">step</span> <span class="o">=</span> <span class="n">ObservationReasoningStep</span><span class="p">(</span><span class="n">observation</span><span class="o">=</span><span class="n">tool_output</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">step</span> <span class="o">=</span> <span class="n">ObservationReasoningStep</span><span class="p">(</span>
+                        <span class="n">observation</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Error calling tool </span><span class="si">{</span><span class="n">tool</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">step</span> <span class="o">=</span> <span class="n">ObservationReasoningStep</span><span class="p">(</span>
+                    <span class="n">observation</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Tool </span><span class="si">{</span><span class="n">tool_call</span><span class="o">.</span><span class="n">tool_name</span><span class="si">}</span><span class="s2"> does not exist&quot;</span>
+                <span class="p">)</span>
+            <span class="p">(</span><span class="k">await</span> <span class="n">ctx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;steps&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[]))</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">step</span><span class="p">)</span>
+
+        <span class="c1"># prep the next iteration</span>
+        <span class="k">return</span> <span class="n">PrepEvent</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Check-the-Workflow-Visually">
+<h3>Check the Workflow Visually<a class="headerlink" href="#Check-the-Workflow-Visually" title="Permalink to this headline"> </a></h3>
+<p>Before instantiating the agent object, let’s pause and validate if the workflow is constructed as we expect.</p>
+<p>To check that, we can render the graphical representation of the workflow by using the <code class="docutils literal notranslate"><span class="pre">draw_all_possible_flows</span></code> utility function.</p>
+<p>(Note: If the rendered HTML is blank, it might be due to the safety feature in Jupyter. In that case, you can trust the notebook by <code class="docutils literal notranslate"><span class="pre">!jupyter</span> <span class="pre">trust</span> <span class="pre">llama_index_workflow_tutorial.ipynb</span></code>. See <a class="reference external" href="https://jupyter-notebook.readthedocs.io/en/latest/notebook.html#signing-notebooks">Jupyter documentation</a> for more details.)</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">HTML</span>
+<span class="kn">from</span> <span class="nn">llama_index.utils.workflow</span> <span class="kn">import</span> <span class="n">draw_all_possible_flows</span>
+
+<span class="n">draw_all_possible_flows</span><span class="p">(</span><span class="n">ReActAgent</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;workflow.html&quot;</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;workflow.html&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+    <span class="n">html_content</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+<span class="n">HTML</span><span class="p">(</span><span class="n">html_content</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># [USE IN MODEL]</span>
+<span class="n">agent</span> <span class="o">=</span> <span class="n">ReActAgent</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">180</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Run-the-Workflow-(with-Trace)">
+<h2>Run the Workflow (with Trace)<a class="headerlink" href="#Run-the-Workflow-(with-Trace)" title="Permalink to this headline"> </a></h2>
+<p>Now your workflow is all set! But before running that, let’s not forget to turn on <a class="reference external" href="https://mlflow.org/docs/latest/llms/tracing/index.html">MLflow Tracing</a>, so you get observability into each step during the agent run, and record it for the review later.</p>
+<p>Mlflow supports automatic tracing for LlamaIndex Workflow. To enable it, you just need to call the <code class="docutils literal notranslate"><span class="pre">mlflow.llama_index.autolog()</span></code> function.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">llama_index</span><span class="o">.</span><span class="n">autolog</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Run the workflow</span>
+<span class="k">await</span> <span class="n">agent</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="s2">&quot;What is (123 + 456) * 789?&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&#39;The result of (123 + 456) * 789 is 579,027.&#39;
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Review-the-Trace">
+<h2>Review the Trace<a class="headerlink" href="#Review-the-Trace" title="Permalink to this headline"> </a></h2>
+<p>The generated traces are automatically recorded to your MLflow Experiment.</p>
+<ol class="arabic simple">
+<li><p>Open a terminal, run <code class="docutils literal notranslate"><span class="pre">mlflow</span> <span class="pre">ui</span> <span class="pre">--port</span> <span class="pre">5000</span></code> within the current directory (and keep it running).</p></li>
+<li><p>Navigate to <code class="docutils literal notranslate"><span class="pre">http://127.0.0.1:5000</span></code> in your browser.</p></li>
+<li><p>Open the experiment “MLflow LlamaIndex Workflow Tutorial”.</p></li>
+<li><p>Navigate to the “Trace” tab below the experiment name header.</p></li>
+</ol>
+<p><img alt="LlamaIndex Workflow Trace" src="../../../_images/llama_index_workflow_trace.png" /></p>
+<p>The Trace records the individual steps inside the workflow execution with its inputs, outputs, and additional metadata such as latency. Let’s do a quick exercise to find the following information on the Trace UI.</p>
+<html><details><summary><ol class="arabic">
+<li><p>Token count used for the first LLM invocation</p>
+</summary><div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;p&gt;You can find token counts for LLm call in the &lt;strong&gt;Attribtues&lt;/strong&gt; section of the LLM call span, inside the &lt;code&gt;usage&lt;/code&gt; field.&lt;/p&gt;
+</pre></div>
+</div>
+</details><details><summary><ol class="arabic" start="2">
+<li><p>Input numbers for the “add” tool call.</p>
+</summary><p><p>You can find input numbers x=123 and y=456 in the Inputs field of the span named FunctionTool.call. That span is located under the ReActAgent.handle_tool_calls step span.</p>
+</p></details></html></li>
+</ol>
+</li>
+</ol>
+</div>
+<div class="section" id="Log-the-Workflow-to-an-MLflow-Experiment">
+<h2>Log the Workflow to an MLflow Experiment<a class="headerlink" href="#Log-the-Workflow-to-an-MLflow-Experiment" title="Permalink to this headline"> </a></h2>
+<p>Now that you’ve built your first ReAct Agent using LlamaIndex Workflow, it’s essential to iteratively refine and optimize for better performance. An <strong>MLflow Experiment</strong> is the ideal place to record and manage these improvements</p>
+<div class="section" id="Prepare-a-Model-script">
+<h3>Prepare a Model script<a class="headerlink" href="#Prepare-a-Model-script" title="Permalink to this headline"> </a></h3>
+<p>MLflow supports logging LlamaIndex workflows using the <strong>Models from Code</strong> method, allowing models to be defined and logged directly from a standalone Python script. This approach bypasses the need for risky and brittle serialization methods like <code class="docutils literal notranslate"><span class="pre">pickle</span></code>, using code as the single source of truth for the model definition. Combined with MLflow’s environment-freezing capability, this provides a reliable way to persist the model.</p>
+<p>For more details, see the <a class="reference external" href="https://mlflow.org/docs/latest/models.html#models-from-code">MLflow documentation</a>.</p>
+<p>You could manually create a separate Python file by copying the code from this notebook. However, for convenience, we define a utility function to generate a model script automatically from this notebook’s content in one step. Running the cell below will create this script in the current directory, ready for MLflow logging.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">generate_model_script</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">notebook_path</span><span class="o">=</span><span class="s2">&quot;llama_index_workflow_tutorial.ipynb&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A utility function to generate a ready-to-log .py script that</span>
+<span class="sd">    contains necessary library imports and model definitions.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">       output_path: The path to write the .py file to.</span>
+<span class="sd">       notebook_path: The path to the tutorial notebook.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">nbformat</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">notebook_path</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">notebook</span> <span class="o">=</span> <span class="n">nbformat</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">as_version</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+
+    <span class="c1"># Filter cells that are code cells and contain the specified marker</span>
+    <span class="n">merged_code</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">cell</span><span class="o">.</span><span class="n">source</span>
+                <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">notebook</span><span class="o">.</span><span class="n">cells</span>
+                <span class="k">if</span> <span class="n">cell</span><span class="o">.</span><span class="n">cell_type</span> <span class="o">==</span> <span class="s2">&quot;code&quot;</span> <span class="ow">and</span> <span class="n">cell</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;# [USE IN MODEL]&quot;</span><span class="p">)</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+        <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">import mlflow</span><span class="se">\n\n</span><span class="s2">mlflow.models.set_model(agent)&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Write to the output .py file</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">merged_code</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Model code saved to </span><span class="si">{</span><span class="n">output_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="c1"># Pass `notebook_path` argument if you changed the notebook name</span>
+<span class="n">generate_model_script</span><span class="p">(</span><span class="n">output_path</span><span class="o">=</span><span class="s2">&quot;react_agent.py&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Model code saved to react_agent.py
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Logging-the-Model">
+<h3>Logging the Model<a class="headerlink" href="#Logging-the-Model" title="Permalink to this headline"> </a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">(</span><span class="n">run_name</span><span class="o">=</span><span class="s2">&quot;react-agent-workflow&quot;</span><span class="p">):</span>
+    <span class="n">model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">llama_index</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+        <span class="s2">&quot;react_agent.py&quot;</span><span class="p">,</span>
+        <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
+        <span class="c1"># Logging with an input example help MLflow to record dependency and signature information accurately.</span>
+        <span class="n">input_example</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="s2">&quot;What is (123 + 456) * 789?&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Explore-the-MLflow-UI">
+<h2>Explore the MLflow UI<a class="headerlink" href="#Explore-the-MLflow-UI" title="Permalink to this headline"> </a></h2>
+<p>Let’s open the MLflow UI again to see which information is being tracked in the experiment.</p>
+<ol class="arabic simple">
+<li><p>Access the MLflow UI like we did for reviewing traces.</p></li>
+<li><p>Open the experiment “MLflow LlamaIndex Workflow Tutorial”.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">Runs</span></code> tab in the experiment should contain a run named “react-agent-workflow”. Open it.</p></li>
+<li><p>On the run page, navigate to the <code class="docutils literal notranslate"><span class="pre">&quot;Artifacts&quot;</span></code> tab.</p></li>
+</ol>
+<p>The artifacts tab shows various files saved by MLflow in the Run. See the below image and open the annotated files to check which information is stored in each file.</p>
+<p><img alt="LlamaIndex Workflow Artifacts" src="../../../_images/llama_index_workflow_artifacts.png" /></p>
+</div>
+<div class="section" id="Load-the-Model-Back-for-Inference">
+<h2>Load the Model Back for Inference<a class="headerlink" href="#Load-the-Model-Back-for-Inference" title="Permalink to this headline"> </a></h2>
+<p>With all necessary metadata logged to MLflow, you can load the model in a different notebook or deploy it for inference without concerns about environment inconsistencies. Let’s do a quick exercise to demonstrate how this helps in reproducing experiment results.</p>
+<p>To simulate a different environment, we’ll remove the <code class="docutils literal notranslate"><span class="pre">llm</span></code> configuration from the global <code class="docutils literal notranslate"><span class="pre">Settings</span></code> object.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">llama_index.core.llms</span> <span class="kn">import</span> <span class="n">MockLLM</span>
+
+<span class="n">Settings</span><span class="o">.</span><span class="n">llm</span> <span class="o">=</span> <span class="n">MockLLM</span><span class="p">(</span><span class="n">max_tokens</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">await</span> <span class="n">agent</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="s2">&quot;What is (123 + 456) * 789?&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&#39;text&#39;
+</pre></div></div>
+</div>
+<p>Since the dummy LLM is configured, the workflow could not generate the correct output but just returns “text”.</p>
+<p>Now try loading the model back from the MLflow Experiment by calling <code class="docutils literal notranslate"><span class="pre">mlflow.llama_index.load_model()</span></code> API and run the workflow again.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">loaded_model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">llama_index</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="s2">&quot;runs:/f8e0a0d2dd5546d5ac93ce126358c444/model&quot;</span><span class="p">)</span>
+<span class="k">await</span> <span class="n">loaded_model</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="s2">&quot;What is (123 + 456) * 789?&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "2f9d4e32ea5748dd8708942f3194f755", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&#39;(123 + 456) * 789 = 456831&#39;
+</pre></div></div>
+</div>
+<p>This time, the output is computed correctly, because MLflow automatically restores the original LLM setting at the time of logging.</p>
+</div>
+<div class="section" id="Learning-More">
+<h2>Learning More<a class="headerlink" href="#Learning-More" title="Permalink to this headline"> </a></h2>
+<p>Congratulations! 🎉 You’ve successfully learned how to build a tool-calling agent using LlamaIndex Workflow and MLflow.</p>
+<p>Continue your journey with these advanced resources:</p>
+<ul class="simple">
+<li><p><strong>Improve Workflow Quality</strong>: Evaluate your workflow to enhance performance with <a class="reference external" href="https://mlflow.org/docs/latest/llms/llm-evaluate/index.html">MLflow LLM Evaluation</a>.</p></li>
+<li><p><strong>Deploy Your Model</strong>: Deploy your MLflow model to a serving endpoint with <a class="reference external" href="https://mlflow.org/docs/latest/deployment/index.html">MLflow Deployment</a>.</p></li>
+<li><p><strong>Explore More Examples</strong>: Discover additional examples of LlamaIndex Workflow in the <a class="reference external" href="https://docs.llamaindex.ai/en/stable/module_guides/workflow/#examples">official documentation</a>.</p></li>
+</ul>
+</div>
+</div>
+
+
+              </div>
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../index.html" class="btn btn-neutral" title="MLflow LlamaIndex Flavor" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+      
+      
+        <a href="llama_index_quickstart.html" class="btn btn-neutral" title="Introduction to Using LlamaIndex with MLflow" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+      <p class="copyright">
+          &copy; MLflow Project, a Series of LF Projects, LLC. All rights reserved.
+      </p>
+
+  </div> 
+
+</footer>
+          </div>
+        </div>
+      </section>
+    </main>
+  </page>
+
+  
+
+
+  
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+      URL_ROOT:'../../../',
+      VERSION:'2.17.1.dev0',
+      COLLAPSE_INDEX:false,
+      FILE_SUFFIX:'.html',
+      LINK_SUFFIX: '.html',
+      HAS_SOURCE:  true
+    };
+  </script>
+
+  
+
+  <script type="text/javascript" src="../../../_static/js/clipboard.min.js"></script>
+  <script type="text/javascript" src="../../../_static/js/jquery.waypoints.min.js"></script>
+
+  
+  
+  
+  <script type="text/javascript">var CLIPPY_SVG_PATH = "../../../_static/clippy.svg";</script>
+  <script type="text/javascript" src="../../../_static/js/custom.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.StickyNav.enable();
+    });
+
+  </script>
+  
+
+  
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        // Get the code block designator class entries
+        const allHighlights = document.querySelectorAll('.highlight');
+        // Disable copyable links for notebook cell numbering and for cell outputs
+        const highlights = Array.from(allHighlights).filter(highlight => !highlight.closest('.highlight-none') && 
+            !highlight.closest('.nboutput'));
+    
+        highlights.forEach(function(highlight) {
+            const copyIcon = document.createElement('span');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.innerHTML = '&#xf0ea;';
+
+            copyIcon.addEventListener('click', function() {
+                const code = highlight.querySelector('pre').textContent;
+                copyToClipboard(code);
+
+                // Flash effect on click
+                this.style.color = '#0194E2';
+                setTimeout(() => {
+                    this.style.color = ''; 
+                }, 100);
+
+                // Display "Code copied to clipboard" near the clicked icon
+                const message = document.createElement('span');
+                message.textContent = "Copied!";
+                message.classList.add('copy-message'); 
+
+                // Append the message to the icon
+                this.appendChild(message);
+
+                setTimeout(() => {
+                    this.removeChild(message);
+                }, 500);
+            });
+
+            highlight.appendChild(copyIcon);
+        });
+    });
+  </script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Force download for notebook-download-btn
+        const downloadButtons = document.querySelectorAll('.notebook-download-btn');
+        downloadButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                // Fetch the raw content of the notebook from GitHub
+                fetch(button.href)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = url;
+                        const filename = button.href.split('/').pop();
+                        link.download = filename; 
+
+                        document.body.appendChild(link);
+                        link.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    })
+                    .catch(err => console.error('Error fetching the notebook:', err));
+            });
+        });
+    });
+</script> 
+</body>
+</html>

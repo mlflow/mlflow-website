@@ -629,6 +629,91 @@ made available for use for invocation.</p>
 </pre></div>
 </div>
 </div>
+<div class="section" id="how-can-i-evaluate-a-langgraph-agent">
+<h3>How can I evaluate a LangGraph Agent?<a class="headerlink" href="#how-can-i-evaluate-a-langgraph-agent" title="Permalink to this headline"> </a></h3>
+<p>The <a class="reference external" href="https://mlflow.org/docs/latest/model-evaluation/index.html">mlflow.evaluate</a> function provides
+a robust way to evaluate model performance.</p>
+<p>LangGraph agents, especially those with chat functionality, can return multiple messages in one
+inference call. Given <code class="docutils literal notranslate"><span class="pre">mlflow.evaluate</span></code> performs naive comparisons between raw predictions and a specified
+ground truth value, it is the user’s responsibility to reconcile potential differences prediction output
+and ground truth.</p>
+<p>Often, the best approach is to use a <a class="reference external" href="https://mlflow.org/docs/latest/llms/llm-evaluate/index.html#evaluating-with-a-custom-function">custom function</a>
+to process the response. Below we provide an example of a custom function that extracts the last chat
+message from a LangGraph model. This function is then used in mlflow.evaluate to return a single
+string response, which can be compared to the <cite>“ground_truth”</cite> column.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+
+<span class="c1"># Note that we assume the `model_uri` variable is present</span>
+<span class="c1"># Also note that registering and loading the model is optional and you</span>
+<span class="c1"># can simply leverage your langgraph object in the custom function.</span>
+<span class="n">loaded_model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">langchain</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_uri</span><span class="p">)</span>
+
+<span class="n">eval_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;inputs&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;What is MLflow?&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;What is Spark?&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="s2">&quot;ground_truth&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;MLflow is an open-source platform for managing the end-to-end machine learning (ML) lifecycle. It was developed by Databricks, a company that specializes in big data and machine learning solutions. MLflow is designed to address the challenges that data scientists and machine learning engineers face when developing, training, and deploying machine learning models.&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Apache Spark is an open-source, distributed computing system designed for big data processing and analytics. It was developed in response to limitations of the Hadoop MapReduce computing model, offering improvements in speed and ease of use. Spark provides libraries for various tasks such as data ingestion, processing, and analysis through its components like Spark SQL for structured data, Spark Streaming for real-time data processing, and MLlib for machine learning tasks&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">custom_langgraph_wrapper</span><span class="p">(</span><span class="n">inputs</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extract the predictions from a chat message sequence.&quot;&quot;&quot;</span>
+    <span class="n">answers</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">content</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">[</span><span class="s2">&quot;inputs&quot;</span><span class="p">]:</span>
+        <span class="n">prediction</span> <span class="o">=</span> <span class="n">loaded_model</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span>
+            <span class="p">{</span><span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">content</span><span class="p">}]}</span>
+        <span class="p">)</span>
+        <span class="n">last_message_content</span> <span class="o">=</span> <span class="n">prediction</span><span class="p">[</span><span class="s2">&quot;messages&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">content</span>
+        <span class="n">answers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">last_message_content</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">answers</span>
+
+
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">()</span> <span class="k">as</span> <span class="n">run</span><span class="p">:</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+        <span class="n">custom_langgraph_wrapper</span><span class="p">,</span>  <span class="c1"># Pass our function defined above</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">eval_data</span><span class="p">,</span>
+        <span class="n">targets</span><span class="o">=</span><span class="s2">&quot;ground_truth&quot;</span><span class="p">,</span>
+        <span class="n">model_type</span><span class="o">=</span><span class="s2">&quot;question-answering&quot;</span><span class="p">,</span>
+        <span class="n">extra_metrics</span><span class="o">=</span><span class="p">[</span>
+            <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">latency</span><span class="p">(),</span>
+            <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">genai</span><span class="o">.</span><span class="n">answer_correctness</span><span class="p">(</span><span class="s2">&quot;openai:/gpt-4o&quot;</span><span class="p">),</span>
+        <span class="p">],</span>
+    <span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">metrics</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">Output</span><a class="headerlink" href="#id6" title="Permalink to this code"> </a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;latency/mean&quot;</span><span class="p">:</span> <span class="mf">1.8976624011993408</span><span class="p">,</span>
+    <span class="s2">&quot;latency/variance&quot;</span><span class="p">:</span> <span class="mf">0.10328687906900313</span><span class="p">,</span>
+    <span class="s2">&quot;latency/p90&quot;</span><span class="p">:</span> <span class="mf">2.1547686100006103</span><span class="p">,</span>
+    <span class="s2">&quot;flesch_kincaid_grade_level/v1/mean&quot;</span><span class="p">:</span> <span class="mf">12.1</span><span class="p">,</span>
+    <span class="s2">&quot;flesch_kincaid_grade_level/v1/variance&quot;</span><span class="p">:</span> <span class="mf">0.25</span><span class="p">,</span>
+    <span class="s2">&quot;flesch_kincaid_grade_level/v1/p90&quot;</span><span class="p">:</span> <span class="mf">12.5</span><span class="p">,</span>
+    <span class="s2">&quot;ari_grade_level/v1/mean&quot;</span><span class="p">:</span> <span class="mf">15.850000000000001</span><span class="p">,</span>
+    <span class="s2">&quot;ari_grade_level/v1/variance&quot;</span><span class="p">:</span> <span class="mf">0.06250000000000044</span><span class="p">,</span>
+    <span class="s2">&quot;ari_grade_level/v1/p90&quot;</span><span class="p">:</span> <span class="mf">16.05</span><span class="p">,</span>
+    <span class="s2">&quot;exact_match/v1&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="s2">&quot;answer_correctness/v1/mean&quot;</span><span class="p">:</span> <span class="mf">5.0</span><span class="p">,</span>
+    <span class="s2">&quot;answer_correctness/v1/variance&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="s2">&quot;answer_correctness/v1/p90&quot;</span><span class="p">:</span> <span class="mf">5.0</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>For a complete example of a LangGraph model that works with this evaluation example, see the
+<a class="reference external" href="https://mlflow.org/blog/langgraph-model-from-code">MLflow LangGraph blog</a>.</p>
+</div>
 </div>
 </div>
 

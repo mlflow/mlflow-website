@@ -245,7 +245,12 @@
 <li class="toctree-l3"><a class="reference internal" href="#evaluating-with-extra-metrics">Evaluating with Extra Metrics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#evaluating-with-a-function">Evaluating with a Function</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#evaluating-with-a-static-dataset">Evaluating with a Static Dataset</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#performing-model-validation">Performing Model Validation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#performing-model-validation">Performing Model Validation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#validating-a-model-agasint-a-baseline-model">Validating a Model Agasint a Baseline Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#validating-a-model-against-static-thresholds">Validating a Model Against Static Thresholds</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reusing-baseline-result-for-multiple-validations">Reusing Baseline Result For Multiple Validations</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#model-validation-with-giskard-s-plugin">Model Validation with Giskard’s plugin</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#model-validation-with-trubrics-plugin">Model Validation with Trubrics’ plugin</a></li>
 </ul>
@@ -494,7 +499,7 @@ that rely on external services (e.g., LangChain chains). Another benefit is that
 <code class="docutils literal notranslate"><span class="pre">cloudpickle</span></code> modules within Python, which can carry security risks when loading untrusted models.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This feature is only supported for <strong>LangChain</strong> and <strong>PythonModel</strong> models.</p>
+<p>This feature is only supported for <strong>LangChain</strong>, <strong>LlamaIndex</strong>, and <strong>PythonModel</strong> models.</p>
 </div>
 <p>In order to log a model from code, you can leverage the <a class="reference internal" href="python_api/mlflow.models.html#mlflow.models.set_model" title="mlflow.models.set_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.models.set_model()</span></code></a> API. This API allows you to define a model by specifying
 an instance of the model class directly within the file where the model is defined. When logging such a model, a
@@ -3437,19 +3442,20 @@ has two outputs named <code class="docutils literal notranslate"><span class="pr
 </div>
 <div class="section" id="performing-model-validation">
 <span id="model-validation"></span><h3>Performing Model Validation<a class="headerlink" href="#performing-model-validation" title="Permalink to this headline"> </a></h3>
-<p>You can also use the <a class="reference internal" href="python_api/mlflow.html#mlflow.evaluate" title="mlflow.evaluate"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code></a> API to perform some checks on the metrics
-generated during model evaluation to validate the quality of your model. By specifying a
-<code class="docutils literal notranslate"><span class="pre">validation_thresholds</span></code> dictionary mapping metric names to <a class="reference internal" href="python_api/mlflow.models.html#mlflow.models.MetricThreshold" title="mlflow.models.MetricThreshold"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.models.MetricThreshold</span></code></a>
-objects, you can specify value thresholds that your model’s evaluation metrics must exceed as well
-as absolute and relative gains your model must have in comparison to a specified
-<code class="docutils literal notranslate"><span class="pre">baseline_model</span></code>. If your model fails to clear specified thresholds, <a class="reference internal" href="python_api/mlflow.html#mlflow.evaluate" title="mlflow.evaluate"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code></a>
-will throw a <code class="docutils literal notranslate"><span class="pre">ModelValidationFailedException</span></code> detailing the validation failure.</p>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<p>MLflow 2.18.0 has moved the model validation functionality from the <a class="reference internal" href="python_api/mlflow.html#mlflow.evaluate" title="mlflow.evaluate"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code></a> API to a dedicated <a class="reference internal" href="python_api/mlflow.html#mlflow.validate_evaluation_results" title="mlflow.validate_evaluation_results"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.validate_evaluation_results()</span></code></a> API. The relevant parameters, such as baseline_model, are deprecated and will be removed from the older API in future versions.</p>
+</div>
+<p>With the <a class="reference internal" href="python_api/mlflow.html#mlflow.validate_evaluation_results" title="mlflow.validate_evaluation_results"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.validate_evaluation_results()</span></code></a> API, you can validate metrics generated during model evaluation to assess the quality of your model against a baseline. To achieve this, first evaluate both the candidate and baseline models using <a class="reference internal" href="python_api/mlflow.html#mlflow.evaluate" title="mlflow.evaluate"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code></a> (or load persisted evaluation results from local storage). Then, pass the results along with a validation_thresholds dictionary that maps metric names to <a class="reference internal" href="python_api/mlflow.models.html#mlflow.models.MetricThreshold" title="mlflow.models.MetricThreshold"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.models.MetricThreshold</span></code></a> objects. If your model fails to meet the specified thresholds, <a class="reference internal" href="python_api/mlflow.html#mlflow.validate_evaluation_results" title="mlflow.validate_evaluation_results"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.validate_evaluation_results()</span></code></a> will raise a <code class="docutils literal notranslate"><span class="pre">ModelValidationFailedException</span></code> with details about the validation failure.</p>
+<p>More information on model evaluation behavior and outputs can be found in the <a class="reference internal" href="python_api/mlflow.html#mlflow.evaluate" title="mlflow.evaluate"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code></a> API documentation.</p>
+<div class="section" id="validating-a-model-agasint-a-baseline-model">
+<h4>Validating a Model Agasint a Baseline Model<a class="headerlink" href="#validating-a-model-agasint-a-baseline-model" title="Permalink to this headline"> </a></h4>
+<p>Below is an example of how to validate a candidate model’s performance against a baseline using predefined thresholds.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">xgboost</span>
 <span class="kn">import</span> <span class="nn">shap</span>
 <span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
 <span class="kn">from</span> <span class="nn">sklearn.dummy</span> <span class="kn">import</span> <span class="n">DummyClassifier</span>
 <span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">infer_signature</span>
 <span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">MetricThreshold</span>
 
 <span class="c1"># load UCI Adult Data Set; segment it into training and test sets</span>
@@ -3458,18 +3464,39 @@ will throw a <code class="docutils literal notranslate"><span class="pre">ModelV
     <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.33</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span>
 <span class="p">)</span>
 
-<span class="c1"># train a candidate XGBoost model</span>
-<span class="n">candidate_model</span> <span class="o">=</span> <span class="n">xgboost</span><span class="o">.</span><span class="n">XGBClassifier</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
-
-<span class="c1"># train a baseline dummy model</span>
-<span class="n">baseline_model</span> <span class="o">=</span> <span class="n">DummyClassifier</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="s2">&quot;uniform&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
-
-<span class="c1"># create signature that is shared by the two models</span>
-<span class="n">signature</span> <span class="o">=</span> <span class="n">infer_signature</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
-
 <span class="c1"># construct an evaluation dataset from the test set</span>
 <span class="n">eval_data</span> <span class="o">=</span> <span class="n">X_test</span>
 <span class="n">eval_data</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_test</span>
+
+<span class="c1"># Log and evaluate the candidate model</span>
+<span class="n">candidate_model</span> <span class="o">=</span> <span class="n">xgboost</span><span class="o">.</span><span class="n">XGBClassifier</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">(</span><span class="n">run_name</span><span class="o">=</span><span class="s2">&quot;candidate&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">run</span><span class="p">:</span>
+    <span class="n">candidate_model_uri</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">sklearn</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+        <span class="n">candidate_model</span><span class="p">,</span> <span class="s2">&quot;candidate_model&quot;</span><span class="p">,</span> <span class="n">signature</span><span class="o">=</span><span class="n">signature</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">model_uri</span>
+
+    <span class="n">candidate_result</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+        <span class="n">candidate_model_uri</span><span class="p">,</span>
+        <span class="n">eval_data</span><span class="p">,</span>
+        <span class="n">targets</span><span class="o">=</span><span class="s2">&quot;label&quot;</span><span class="p">,</span>
+        <span class="n">model_type</span><span class="o">=</span><span class="s2">&quot;classifier&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+<span class="c1"># Log and evaluate the baseline model</span>
+<span class="n">baseline_model</span> <span class="o">=</span> <span class="n">DummyClassifier</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="s2">&quot;uniform&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">(</span><span class="n">run_name</span><span class="o">=</span><span class="s2">&quot;baseline&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">run</span><span class="p">:</span>
+    <span class="n">baseline_model_uri</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">sklearn</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+        <span class="n">baseline_model</span><span class="p">,</span> <span class="s2">&quot;baseline_model&quot;</span><span class="p">,</span> <span class="n">signature</span><span class="o">=</span><span class="n">signature</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">model_uri</span>
+
+    <span class="n">baseline_result</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+        <span class="n">baseline_model_uri</span><span class="p">,</span>
+        <span class="n">eval_data</span><span class="p">,</span>
+        <span class="n">targets</span><span class="o">=</span><span class="s2">&quot;label&quot;</span><span class="p">,</span>
+        <span class="n">model_type</span><span class="o">=</span><span class="s2">&quot;classifier&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
 
 <span class="c1"># Define criteria for model to be validated against</span>
 <span class="n">thresholds</span> <span class="o">=</span> <span class="p">{</span>
@@ -3481,40 +3508,63 @@ will throw a <code class="docutils literal notranslate"><span class="pre">ModelV
     <span class="p">),</span>
 <span class="p">}</span>
 
-<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">()</span> <span class="k">as</span> <span class="n">run</span><span class="p">:</span>
-    <span class="n">candidate_model_uri</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">sklearn</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
-        <span class="n">candidate_model</span><span class="p">,</span> <span class="s2">&quot;candidate_model&quot;</span><span class="p">,</span> <span class="n">signature</span><span class="o">=</span><span class="n">signature</span>
-    <span class="p">)</span><span class="o">.</span><span class="n">model_uri</span>
-    <span class="n">baseline_model_uri</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">sklearn</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
-        <span class="n">baseline_model</span><span class="p">,</span> <span class="s2">&quot;baseline_model&quot;</span><span class="p">,</span> <span class="n">signature</span><span class="o">=</span><span class="n">signature</span>
-    <span class="p">)</span><span class="o">.</span><span class="n">model_uri</span>
-
-    <span class="n">mlflow</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
-        <span class="n">candidate_model_uri</span><span class="p">,</span>
-        <span class="n">eval_data</span><span class="p">,</span>
-        <span class="n">targets</span><span class="o">=</span><span class="s2">&quot;label&quot;</span><span class="p">,</span>
-        <span class="n">model_type</span><span class="o">=</span><span class="s2">&quot;classifier&quot;</span><span class="p">,</span>
-        <span class="n">validation_thresholds</span><span class="o">=</span><span class="n">thresholds</span><span class="p">,</span>
-        <span class="n">baseline_model</span><span class="o">=</span><span class="n">baseline_model_uri</span><span class="p">,</span>
-    <span class="p">)</span>
+<span class="c1"># Validate the candidate model agaisnt baseline</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">validate_evaluation_results</span><span class="p">(</span>
+    <span class="n">candidate_result</span><span class="o">=</span><span class="n">candidate_result</span><span class="p">,</span>
+    <span class="n">baseline_result</span><span class="o">=</span><span class="n">baseline_result</span><span class="p">,</span>
+    <span class="n">validation_thresholds</span><span class="o">=</span><span class="n">thresholds</span><span class="p">,</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 <p>Refer to <a class="reference internal" href="python_api/mlflow.models.html#mlflow.models.MetricThreshold" title="mlflow.models.MetricThreshold"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.models.MetricThreshold</span></code></a> to see details on how the thresholds are specified
-and checked. For a more comprehensive demonstration on how to use <a class="reference internal" href="python_api/mlflow.html#mlflow.evaluate" title="mlflow.evaluate"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code></a> to perform model validation, refer to
-<a class="reference external" href="https://github.com/mlflow/mlflow/blob/master/examples/evaluation/evaluate_with_model_validation.py">the Model Validation example from the MLflow GitHub Repository</a>.</p>
-<p>The logged output within the MLflow UI for the comprehensive example is shown below. Note the two model artifacts that have
-been logged: ‘baseline_model’ and ‘candidate_model’ for comparison purposes in the example.</p>
+and checked.</p>
+<p>The logged output within the MLflow UI for the comprehensive example is shown below.</p>
 <p><a class="reference internal" href="_images/model_evaluation_compare_feature_importance.png"><img alt="eval_importance_compare_img" src="_images/model_evaluation_compare_feature_importance.png" style="width: 99%;" /></a></p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Limitations (when the default evaluator is used):</p>
-<ul class="simple">
-<li><p>Model validation results are not included in the active MLflow run.</p></li>
-<li><p>No metrics are logged nor artifacts produced for the baseline model in the active MLflow run.</p></li>
-</ul>
+<p>Model validation results are not included in the active MLflow run.</p>
 </div>
-<p>Additional information about model evaluation behaviors and outputs is available in the
-<a class="reference internal" href="python_api/mlflow.html#mlflow.evaluate" title="mlflow.evaluate"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code></a> API docs.</p>
+</div>
+<div class="section" id="validating-a-model-against-static-thresholds">
+<h4>Validating a Model Against Static Thresholds<a class="headerlink" href="#validating-a-model-against-static-thresholds" title="Permalink to this headline"> </a></h4>
+<p>The <a class="reference internal" href="python_api/mlflow.html#mlflow.validate_evaluation_results" title="mlflow.validate_evaluation_results"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.validate_evaluation_results()</span></code></a> API can also be used to validate a candidate model against static thresholds, instead of comparing it to a baseline model, by passing <code class="docutils literal notranslate"><span class="pre">None</span></code> to the <code class="docutils literal notranslate"><span class="pre">baseline_result</span></code> parameter.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">MetricThreshold</span>
+
+<span class="n">thresholds</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;accuracy_score&quot;</span><span class="p">:</span> <span class="n">MetricThreshold</span><span class="p">(</span>
+        <span class="n">threshold</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>  <span class="c1"># accuracy should be &gt;=0.8</span>
+        <span class="n">greater_is_better</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">),</span>
+<span class="p">}</span>
+
+<span class="c1"># Validate the candidate model agaisnt static threshold</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">validate_evaluation_results</span><span class="p">(</span>
+    <span class="n">candidate_result</span><span class="o">=</span><span class="n">candidate_result</span><span class="p">,</span>
+    <span class="n">baseline_result</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">validation_thresholds</span><span class="o">=</span><span class="n">thresholds</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="reusing-baseline-result-for-multiple-validations">
+<h4>Reusing Baseline Result For Multiple Validations<a class="headerlink" href="#reusing-baseline-result-for-multiple-validations" title="Permalink to this headline"> </a></h4>
+<p>The <a class="reference internal" href="python_api/mlflow.models.html#mlflow.models.EvaluationResult" title="mlflow.models.EvaluationResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.models.EvaluationResult</span></code></a> object returned by <a class="reference internal" href="python_api/mlflow.html#mlflow.evaluate" title="mlflow.evaluate"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code></a> can be saved to and loaded from local storage. This feature allows you to reuse the same baseline result across different candidate models, which is particularly useful for automating model quality monitoring.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">from</span> <span class="nn">mlflow.models.evaluation</span> <span class="kn">import</span> <span class="n">EvaluationResult</span>
+
+<span class="n">baseline_result</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+    <span class="n">baseline_model_uri</span><span class="p">,</span>
+    <span class="n">eval_data</span><span class="p">,</span>
+    <span class="n">targets</span><span class="o">=</span><span class="s2">&quot;label&quot;</span><span class="p">,</span>
+    <span class="n">model_type</span><span class="o">=</span><span class="s2">&quot;classifier&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">baseline_result</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;RESULT_PATH&quot;</span><span class="p">)</span>
+
+<span class="c1"># Load the evaluation result for validation</span>
+<span class="n">baseline_result</span> <span class="o">=</span> <span class="n">EvaluationResult</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;RESULT_PATH&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>There are plugins that support in-depth model validation with features that are not supported
@@ -3544,6 +3594,7 @@ well as links to the papers that informed the implementation of these metrics wi
 <a class="reference external" href="https://scikit-learn.org/stable/modules/model_evaluation.html#precision-recall-f-measure-metrics">the documentation</a>.</p>
 <p>For simplicity purposes, both methodologies evaluation metric results (whether for multi-class
 or binary classification) are unified in the single metric: <code class="docutils literal notranslate"><span class="pre">precision_recall_auc</span></code>.</p>
+</div>
 </div>
 </div>
 <div class="section" id="model-validation-with-giskard-s-plugin">

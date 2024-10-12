@@ -57,7 +57,7 @@
         <link rel="search" title="Search" href="../../search.html"/>
     <link rel="top" title="MLflow 2.17.1.dev0 documentation" href="../../index.html"/>
         <link rel="up" title="LLMs" href="../index.html"/>
-        <link rel="next" title="MLflow AI Gateway (Experimental)" href="/../deployments/index.html"/>
+        <link rel="next" title="Contributing to MLflow Tracing" href="/contribute.html"/>
         <link rel="prev" title="Tracing Concepts" href="/overview.html"/> 
 
   
@@ -136,13 +136,14 @@
 <li class="toctree-l3"><a class="reference internal" href="overview.html">Tracing Concepts</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">MLflow Tracing Schema</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#structure-of-traces">Structure of Traces</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#trace-schema">Trace Schema</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#trace">Trace</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#trace-info">Trace Info</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#trace-data">Trace Data</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#span-schema">Span Schema</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schema-for-specific-span-types">Schema for specific span types</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="contribute.html">Contributing to MLflow Tracing</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../index.html#id2">MLflow AI Gateway for LLMs</a></li>
@@ -227,13 +228,15 @@
                 
   <div class="section" id="mlflow-tracing-schema">
 <h1>MLflow Tracing Schema<a class="headerlink" href="#mlflow-tracing-schema" title="Permalink to this headline"> </a></h1>
+<p>This document provides a detailed view of the schema for traces and its ingredients. MLflow traces are <strong>compatible to OpenTelemetry specs</strong>, but we also define a few additional layers of structure upon the OpenTelemetry Spans to provide additional metadata about the trace.</p>
 <div class="section" id="structure-of-traces">
 <h2>Structure of Traces<a class="headerlink" href="#structure-of-traces" title="Permalink to this headline"> </a></h2>
+<p><strong>TL;DR</strong>: <code class="docutils literal notranslate"><span class="pre">Trace</span> <span class="pre">=</span> <span class="pre">TraceInfo</span> <span class="pre">+</span> <span class="pre">TraceData</span></code> where <code class="docutils literal notranslate"><span class="pre">TraceData</span> <span class="pre">=</span> <span class="pre">List[Span]</span></code></p>
 <div class="tracing-responsive-tabs docutils container">
 <div class="sphinx-tabs docutils container">
-<div aria-label="Tabbed content" role="tablist"><button aria-controls="panel-0-0-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-0-0-0" name="0-0" role="tab" tabindex="0">Trace Architecture</button><button aria-controls="panel-0-0-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-1" name="0-1" role="tab" tabindex="-1">Trace Info</button><button aria-controls="panel-0-0-2" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-2" name="0-2" role="tab" tabindex="-1">Trace Data</button><button aria-controls="panel-0-0-3" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-3" name="0-3" role="tab" tabindex="-1">Span Architecture</button></div><div aria-labelledby="tab-0-0-0" class="sphinx-tabs-panel" id="panel-0-0-0" name="0-0" role="tabpanel" tabindex="0"><p><div class=""main-container"">
+<div aria-label="Tabbed content" role="tablist"><button aria-controls="panel-0-0-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-0-0-0" name="0-0" role="tab" tabindex="0">Trace</button><button aria-controls="panel-0-0-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-1" name="0-1" role="tab" tabindex="-1">Trace Info</button><button aria-controls="panel-0-0-2" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-2" name="0-2" role="tab" tabindex="-1">Trace Data</button><button aria-controls="panel-0-0-3" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-3" name="0-3" role="tab" tabindex="-1">Span</button></div><div aria-labelledby="tab-0-0-0" class="sphinx-tabs-panel" id="panel-0-0-0" name="0-0" role="tabpanel" tabindex="0"><p><div class=""main-container"">
     <div>
-        <h4>Trace Architecture</h4>
+        <h4>Trace Structure</h4>
         <p>A <a href="../../python_api/mlflow.entities.html#mlflow.entities.Trace">Trace</a> in MLflow consists of two components:
            <a href="../../python_api/mlflow.entities.html#mlflow.entities.TraceInfo">Trace Info</a> and
            <a href="../../python_api/mlflow.entities.html#mlflow.entities.TraceData">Trace Data</a>.
@@ -277,7 +280,7 @@
 </div><div aria-labelledby="tab-0-0-3" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-3" name="0-3" role="tabpanel" tabindex="0"><p><div class=""main-container"">
     <div>
       <h4>Span Structure</h4>
-      <p> The Span object within MLflow's tracing feature provides detailed information about the individual steps of the trace.
+      <p> The Span object within MLflow's tracing feature provides detailed information about the individual steps of the trace. It complies to the <a href="https://opentelemetry.io/docs/concepts/signals/traces/#spans">OpenTelemetry Span spec</a>.
         Each Span object contains information about the step being instrumented, including the span_id, name, start_time, parent_id, status,
         inputs, outputs, attributes, and events.
       </p>
@@ -289,9 +292,9 @@
 </div></div>
 </div>
 </div>
-<div class="section" id="trace-schema">
-<h2>Trace Schema<a class="headerlink" href="#trace-schema" title="Permalink to this headline"> </a></h2>
-<p>A trace is composed of two components:</p>
+<div class="section" id="trace">
+<h2>Trace<a class="headerlink" href="#trace" title="Permalink to this headline"> </a></h2>
+<p>A trace is a root object composed of two components:</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="../../python_api/mlflow.entities.html#mlflow.entities.TraceInfo" title="mlflow.entities.TraceInfo"><code class="xref py py-func docutils literal notranslate"><span class="pre">TraceInfo</span></code></a></p></li>
 <li><p><a class="reference internal" href="../../python_api/mlflow.entities.html#mlflow.entities.TraceData" title="mlflow.entities.TraceData"><code class="xref py py-func docutils literal notranslate"><span class="pre">TraceData</span></code></a></p></li>
@@ -556,7 +559,7 @@ such as evaluation will function as expected.</p></td>
         <a href="overview.html" class="btn btn-neutral" title="Tracing Concepts" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
       
       
-        <a href="../deployments/index.html" class="btn btn-neutral" title="MLflow AI Gateway (Experimental)" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+        <a href="contribute.html" class="btn btn-neutral" title="Contributing to MLflow Tracing" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
       
     </div>
   

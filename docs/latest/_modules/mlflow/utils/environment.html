@@ -588,7 +588,7 @@
 <span class="p">)</span>
 
 
-<div class="viewcode-block" id="infer_pip_requirements"><a class="viewcode-back" href="../../../python_api/mlflow.models.html#mlflow.models.infer_pip_requirements">[docs]</a><span class="k">def</span> <span class="nf">infer_pip_requirements</span><span class="p">(</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">flavor</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="infer_pip_requirements"><a class="viewcode-back" href="../../../python_api/mlflow.models.html#mlflow.models.infer_pip_requirements">[docs]</a><span class="k">def</span> <span class="nf">infer_pip_requirements</span><span class="p">(</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">flavor</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">extra_env_vars</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Infers the pip requirements of the specified model by creating a subprocess and loading</span>
 <span class="sd">    the model in it to determine which packages are imported.</span>
 
@@ -598,6 +598,8 @@
 <span class="sd">        fallback: If provided, an unexpected error during the inference procedure is swallowed</span>
 <span class="sd">            and the value of ``fallback`` is returned. Otherwise, the error is raised.</span>
 <span class="sd">        timeout: If specified, the inference operation is bound by the timeout (in seconds).</span>
+<span class="sd">        extra_env_vars: A dictionary of extra environment variables to pass to the subprocess.</span>
+<span class="sd">            Default to None.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A list of inferred pip requirements (e.g. ``[&quot;scikit-learn==0.24.2&quot;, ...]``).</span>
@@ -616,9 +618,13 @@
     <span class="k">try</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">timeout</span><span class="p">:</span>
             <span class="k">with</span> <span class="n">run_with_timeout</span><span class="p">(</span><span class="n">timeout</span><span class="p">):</span>
-                <span class="k">return</span> <span class="n">_infer_requirements</span><span class="p">(</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">flavor</span><span class="p">,</span> <span class="n">raise_on_error</span><span class="o">=</span><span class="n">raise_on_error</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">_infer_requirements</span><span class="p">(</span>
+                    <span class="n">model_uri</span><span class="p">,</span> <span class="n">flavor</span><span class="p">,</span> <span class="n">raise_on_error</span><span class="o">=</span><span class="n">raise_on_error</span><span class="p">,</span> <span class="n">extra_env_vars</span><span class="o">=</span><span class="n">extra_env_vars</span>
+                <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">_infer_requirements</span><span class="p">(</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">flavor</span><span class="p">,</span> <span class="n">raise_on_error</span><span class="o">=</span><span class="n">raise_on_error</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">_infer_requirements</span><span class="p">(</span>
+                <span class="n">model_uri</span><span class="p">,</span> <span class="n">flavor</span><span class="p">,</span> <span class="n">raise_on_error</span><span class="o">=</span><span class="n">raise_on_error</span><span class="p">,</span> <span class="n">extra_env_vars</span><span class="o">=</span><span class="n">extra_env_vars</span>
+            <span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">raise_on_error</span> <span class="ow">or</span> <span class="p">(</span><span class="n">fallback</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">raise</span>

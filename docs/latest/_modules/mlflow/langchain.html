@@ -254,7 +254,7 @@
     <span class="n">_get_dependencies_schemas</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.model</span> <span class="kn">import</span> <span class="n">MLMODEL_FILE_NAME</span><span class="p">,</span> <span class="n">MODEL_CODE_PATH</span><span class="p">,</span> <span class="n">MODEL_CONFIG</span>
-<span class="kn">from</span> <span class="nn">mlflow.models.resources</span> <span class="kn">import</span> <span class="n">_ResourceBuilder</span>
+<span class="kn">from</span> <span class="nn">mlflow.models.resources</span> <span class="kn">import</span> <span class="n">DatabricksFunction</span><span class="p">,</span> <span class="n">_ResourceBuilder</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.signature</span> <span class="kn">import</span> <span class="n">_infer_signature_from_input_example</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.utils</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">_convert_llm_input_data</span><span class="p">,</span>
@@ -275,6 +275,7 @@
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.databricks_utils</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">is_in_databricks_model_serving_environment</span><span class="p">,</span>
+    <span class="n">is_in_databricks_serverless</span><span class="p">,</span>
     <span class="n">is_mlflow_tracing_enabled_in_model_serving</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.docstring_utils</span> <span class="kn">import</span> <span class="p">(</span>
@@ -329,6 +330,28 @@
 <span class="sd">        :func:`save_model()` and :func:`log_model()`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">_mlflow_conda_env</span><span class="p">(</span><span class="n">additional_pip_deps</span><span class="o">=</span><span class="n">get_default_pip_requirements</span><span class="p">())</span></div>
+
+
+<span class="k">def</span> <span class="nf">_get_databricks_serverless_env_vars</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the environment variables required to to initialize WorkspaceClient in a subprocess</span>
+<span class="sd">    with serverless compute.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        Databricks authentication related environment variables are set in the</span>
+<span class="sd">        _capture_imported_modules function.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">envs</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="s2">&quot;SPARK_REMOTE&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+        <span class="n">envs</span><span class="p">[</span><span class="s2">&quot;SPARK_LOCAL_REMOTE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;SPARK_REMOTE&quot;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;Missing required environment variable `SPARK_LOCAL_REMOTE` or `SPARK_REMOTE`.&quot;</span>
+            <span class="s2">&quot;These are necessary to initialize the WorkspaceClient with serverless compute in &quot;</span>
+            <span class="s2">&quot;a subprocess in Databricks for UC function execution. Setting the value to &#39;true&#39;.&quot;</span>
+        <span class="p">)</span>
+        <span class="n">envs</span><span class="p">[</span><span class="s2">&quot;SPARK_LOCAL_REMOTE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;true&quot;</span>
+    <span class="k">return</span> <span class="n">envs</span>
 
 
 <div class="viewcode-block" id="save_model"><a class="viewcode-back" href="../../python_api/mlflow.langchain.html#mlflow.langchain.save_model">[docs]</a><span class="nd">@experimental</span>
@@ -563,10 +586,14 @@
         <span class="o">**</span><span class="n">model_data_kwargs</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">Version</span><span class="p">(</span><span class="n">langchain</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">Version</span><span class="p">(</span><span class="s2">&quot;0.0.311&quot;</span><span class="p">):</span>
+    <span class="n">needs_databricks_auth</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">Version</span><span class="p">(</span><span class="n">langchain</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">Version</span><span class="p">(</span><span class="s2">&quot;0.0.311&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">mlflow_model</span><span class="o">.</span><span class="n">resources</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">databricks_resources</span> <span class="o">:=</span> <span class="n">_detect_databricks_dependencies</span><span class="p">(</span><span class="n">lc_model</span><span class="p">):</span>
             <span class="n">serialized_databricks_resources</span> <span class="o">=</span> <span class="n">_ResourceBuilder</span><span class="o">.</span><span class="n">from_resources</span><span class="p">(</span><span class="n">databricks_resources</span><span class="p">)</span>
             <span class="n">mlflow_model</span><span class="o">.</span><span class="n">resources</span> <span class="o">=</span> <span class="n">serialized_databricks_resources</span>
+            <span class="n">needs_databricks_auth</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span>
+                <span class="nb">isinstance</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">DatabricksFunction</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">databricks_resources</span>
+            <span class="p">)</span>
 
     <span class="n">mlflow_model</span><span class="o">.</span><span class="n">add_flavor</span><span class="p">(</span>
         <span class="n">FLAVOR_NAME</span><span class="p">,</span>
@@ -582,8 +609,13 @@
     <span class="k">if</span> <span class="n">conda_env</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">pip_requirements</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">default_reqs</span> <span class="o">=</span> <span class="n">get_default_pip_requirements</span><span class="p">()</span>
+            <span class="n">extra_env_vars</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">_get_databricks_serverless_env_vars</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">needs_databricks_auth</span> <span class="ow">and</span> <span class="n">is_in_databricks_serverless</span><span class="p">()</span>
+                <span class="k">else</span> <span class="kc">None</span>
+            <span class="p">)</span>
             <span class="n">inferred_reqs</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">infer_pip_requirements</span><span class="p">(</span>
-                <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="n">FLAVOR_NAME</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="n">default_reqs</span>
+                <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="n">FLAVOR_NAME</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="n">default_reqs</span><span class="p">,</span> <span class="n">extra_env_vars</span><span class="o">=</span><span class="n">extra_env_vars</span>
             <span class="p">)</span>
             <span class="n">default_reqs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">inferred_reqs</span><span class="p">)</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">default_reqs</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
@@ -627,6 +659,7 @@
     <span class="n">run_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">model_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">streamable</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">resources</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Log a LangChain model as an MLflow artifact for the current run.</span>
@@ -746,6 +779,11 @@
 <span class="sd">        streamable: A boolean value indicating if the model supports streaming prediction. If</span>
 <span class="sd">            True, the model must implement `stream` method. If None, If None, streamable is</span>
 <span class="sd">            set to True if the model implements `stream` method. Default to `None`.</span>
+<span class="sd">        resources: A list of model resources or a resources.yaml file containing a list of</span>
+<span class="sd">                    resources required to serve the model.</span>
+
+<span class="sd">            .. Note:: Experimental: This parameter may change or be removed in a future</span>
+<span class="sd">                                    release without warning.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A :py:class:`ModelInfo &lt;mlflow.models.model.ModelInfo&gt;` instance that contains the</span>
@@ -770,6 +808,7 @@
         <span class="n">run_id</span><span class="o">=</span><span class="n">run_id</span><span class="p">,</span>
         <span class="n">model_config</span><span class="o">=</span><span class="n">model_config</span><span class="p">,</span>
         <span class="n">streamable</span><span class="o">=</span><span class="n">streamable</span><span class="p">,</span>
+        <span class="n">resources</span><span class="o">=</span><span class="n">resources</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 
