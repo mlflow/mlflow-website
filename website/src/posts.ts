@@ -27,6 +27,21 @@ export type Release = {
 // Sort by date descending
 export const BLOGS: Blog[] = [
   {
+    title: "Building Advanced RAG with MLflow and LlamaIndex Workflow",
+    path: "/blog/mlflow-llama-index-workflow",
+    tags: ["genai", "mlops", "mlflow-evalaute"],
+    authors: [
+      {
+        name: "Yuki Watanabe",
+        title: "Software Engineer at Databricks",
+        url: "https://www.linkedin.com/in/yuki-watanabe-a04528164/",
+        image_url: "/img/authors/yuki_watanabe.png",
+      },
+    ],
+    date: "2024-10-25",
+    thumbnail: "/img/blog/llama_index_thumbnail.png",
+  },
+  {
     title: "LLM as judge",
     path: "/blog/llm-as-judge",
     tags: ["genai", "mlflow-evalaute"],
