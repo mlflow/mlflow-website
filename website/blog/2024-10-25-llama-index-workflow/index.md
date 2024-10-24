@@ -4,46 +4,46 @@ description: A guide for using LlamaIndex Workflow with MLflow for building adva
 slug: mlflow-llama-index-workflow
 authors: [yuki-watanabe]
 tags: [genai, mlops, mlflow-evaluate]
+thumbnail: /img/blog/llama-index-thumbnail.png
 ---
 
-Augmenting LLMs with various data sources is a strong strategy to build LLM applications. However, as the system grows more complex, it is challenging to xxx and running quick development cycle for improvement.
+![Thumbnail](llama_index_workflow_title.png)
 
-LlamaIndex Workflow is a great framework to build such compound system, and combined with MLflow brings efficiency and robustness in the development cycle, featuring debugging, tracking experiment, and evaluation for continuous improvement.
+Augmenting LLMs with various data sources is a strong strategy to build LLM applications. However, as the system grows more complex, it becomes challenging to prototype and iteratively build improvements to these more complex systems.
 
-In this blog, we will go through the journey of building an sophisticated chatbot with LlamaIndex Workflow and MLflow.
+LlamaIndex Workflow is a great framework to build such compound systems. Combined with MLflow, the Workflow API brings efficiency and robustness in the development cycle, enabling easy debugging, experiment tracking, and evaluation for continuous improvement.
+
+In this blog, we will go through the journey of building a sophisticated chatbot with LlamaIndex's Workflow API and MLflow.
 
 ## What is LlamaIndex Workflow?
 
 [LlamaIndex Workflow](https://docs.llamaindex.ai/en/stable/module_guides/workflow/) is an event-driven orchestration framework for designing dynamic AI applications. The core of LlamaIndex Workflow consists of:
 
-* `Steps` are units of execution, representing distinct actions in the workflow.
+- `Steps` are units of execution, representing distinct actions in the workflow.
 
-* `Events` trigger these steps, acting as signals that control the workflow’s flow.
+- `Events` trigger these steps, acting as signals that control the workflow’s flow.
 
-* `Workflow` connects these two as a Python class. Each step is implemented as a method of the workflow class, defined with input and output events.
+- `Workflow` connects these two as a Python class. Each step is implemented as a method of the workflow class, defined with input and output events.
 
-This simple yet powerful abstraction allows you to break down complex tasks into manageable steps, enabling greater flexibility and scalability. As a nature of event-driven design, it is super easy to design parallel/asynchronous execution flow, which significantly enhances efficiency involve long-running tasks and provides production-ready scalability.
+This simple yet powerful abstraction allows you to break down complex tasks into manageable steps, enabling greater flexibility and scalability. As a framework embodying event-driven design, using the `Workflow` APIs makes it intuitive to design parallel and asynchronous execution flows, significantly enhancing the efficiency of long-running tasks and aids in providing production-ready scalability.
 
 ## Why Use MLflow with LlamaIndex Workflow?
 
-Workflow provides great flexibility to design nearly arbitral execution flow. However, the great power comes with great responsibility. Without managing your change properly, it can become a chaos of states and configurations. A few weeks of later, "why did my workflow work?".
+Workflow provides great flexibility to design nearly arbitrary execution flows. However, with this great power comes a great responsibility. Without managing your changes properly, it can become a chaotic mess of indeterminate states and confusing configurations. After a few dozen changes, you may be asking yourself, "how did my workflow even work?".
 
-**MLflow** brings powerful MLOps harness to LlamaIndex Workflow throughout the end-to-end development cycle.
+**MLflow** brings a powerful MLOps harness to LlamaIndex Workflows throughout the end-to-end development cycle.
 
 - **Experiment Tracking**: MLflow allows you to record various components like steps, prompts, LLMs, and tools, making it easy to improve the system iteratively.
 
 - **Reproducibility**: MLflow packages environment information such as global configurations (`Settings`), library versions, and metadata to ensure consistent deployment across different stages of the ML lifecycle.
 
-- **Tracing**: Debugging issues in a complex event-driven workflow is cumbersome. MLflow Tracing is a production-ready observability solution that natively integrated with LlamaIndex.
+- **Tracing**: Debugging issues in a complex event-driven workflow is cumbersome. MLflow Tracing is a production-ready observability solution that natively integrates with LlamaIndex, giving you observability into each internal stage within your Workflow.
 
-- **Evaluation**: Measuring is a crucial task for improving your model. MLflow Evaluation is great tool to evaluate the quality, speed, and cost of your LLM application. It is tightly integrated with experiment tracking capability, streamlining the iterative improvement.
-
-
+- **Evaluation**: Measuring is a crucial task for improving your model. MLflow Evaluation is great tool to evaluate the quality, speed, and cost of your LLM application. It is tightly integrated with MLflow's experiment tracking capabilities, streamlining the process of making iterative improvements.
 
 ## Let's Build!🛠️
 
-### Strategy: Hybrid Approach Using Vector Search and Web Search
-
+### Strategy: Hybrid Approach Using Multiple Retrieval Methods
 
 Retrieval-Augmented Generation (RAG) is a powerful framework, but the retrieval step can often become a bottleneck, because embedding-based retrieval may not always capture the most relevant context. While many techniques exist to improve retrieval quality, no single solution works universally. Therefore, an effective strategy is to combine multiple retrieval approaches.
 
@@ -55,28 +55,27 @@ How do we bring this concept to life? Let’s dive in and build this hybrid RAG 
 
 ## 1. Set Up Repository
 
-The sample code, including the environment setup script, is available in the [GitHub repository](https://github.com/B-Step62/mlflow-llama-index-workflow-example). It contains a complete workflow definition, a hands-on notebook, and a sample dataset for running experiments. To clone it to your working environment, use the following command:
+The sample code, including the environment setup script, is available in the [GitHub repository](https://github.com/mlflow/examples/llama_index/workflow). It contains a complete workflow definition, a hands-on notebook, and a sample dataset for running experiments. To clone it to your working environment, use the following command:
 
 ```shell
-git clone https://github.com/B-Step62/mlflow-llama-index-workflow-example.git
+git clone https://github.com/mlflow/mlflow.git
 ```
 
 After cloning the repository, set up the virtual environment by running:
 
-```
+```shell
+cd mlflow/examples/llama_index/workflow
 chmod +x install.sh
 ./install.sh
 ```
 
 Once the installation is complete, start Jupyter Notebook within the Poetry environment using:
 
-
-```
+```shell
 poetry run jupyter notebook
 ```
 
 Next, open the `Tutorial.ipynb` notebook located in the root directory. Throughout this blog, we will walk through this notebook to guide you through the development process.
-
 
 ## 2. Start an MLflow Experiment
 
@@ -96,14 +95,13 @@ poetry run mlflow ui
 
 ![Empty MLflow Experiment](llama_index_workflow_empty_experiment.png)
 
-
 ## 3. Choose your LLM and Embeddings
 
 Now, set up your preferred LLM and embeddings models to LlamaIndex's Settings object. These models will be used throughout the LlamaIndex components.
 
 For this demonstration, we’ll use OpenAI models, but you can easily switch to different LLM providers or local models by following the instructions in the notebook.
 
-```
+```python
 import getpass
 import os
 
@@ -120,23 +118,34 @@ Settings.embed_model = OpenAIEmbedding(model="text-embedding-3-large")
 Settings.llm = OpenAI(model="gpt-4o-mini")
 ```
 
-💡 *MLflow will automatically log the `Settings` configuration into your MLflow Experiment when logging models, ensuring reproducibility and reducing the risk of discrepancies between environments.*
+💡 _MLflow will automatically log the `Settings` configuration into your MLflow Experiment when logging models, ensuring reproducibility and reducing the risk of discrepancies between environments._
 
-## 4. Create a Vector Index
+## 4. Set Up Web Search API
 
-The next step is to build a vector index from MLflow documentation for retrieval. The `urls.txt` file in the `data` directory contains a list of MLflow documentation pages. These pages can be loaded as document objects using the web page reader utility.
+Later in this blog, we will add a web search capability to the QA bot. We will use Tavily AI, a search API
+optimized for LLM application and natively integrated with LlamaIndex. Visit [their website](https://tavily.com/) to
+get an API key for free-tier use, or use different search engine integrated with LlamaIndex, e.g. [GoogleSearchToolSpec](https://docs.llamaindex.ai/en/stable/api_reference/tools/google/#llama_index.tools.google.GoogleSearchToolSpec).
 
+Once you get the API key, set it to the environment variable:
+
+```python
+os.environ["TAVILY_AI_API_KEY"] = getpass.getpass("Enter Tavily AI API Key")
 ```
+
+## 5. Set Up Document Indices for Retrieval
+
+The next step is to build a document index for retrieval from MLflow documentation. The `urls.txt` file in the `data` directory contains a list of MLflow documentation pages. These pages can be loaded as document objects using the web page reader utility.
+
+```python
 from llama_index.readers.web import SimpleWebPageReader
 
-with open('urls.txt', 'r') as file:
+with open("data/urls.txt", "r") as file:
     urls = [line.strip() for line in file if line.strip()]
 
 documents = SimpleWebPageReader(html_to_text=True).load_data(urls)
 ```
 
 Next, ingest these documents into a vector database. In this tutorial, we’ll use the [Qdrant](https://qdrant.tech/) vector store, which is free if self-hosted. If Docker is installed on your machine, you can start the Qdrant database by running the official Docker container:
-
 
 ```shell
 $ docker pull qdrant/qdrant
@@ -165,9 +174,19 @@ index = VectorStoreIndex.from_documents(
 
 Of course, you can use your preferred vector store here. LlamaIndex supports a variety of vector databases, such as [FAISS](https://docs.llamaindex.ai/en/stable/examples/vector_stores/FaissIndexDemo/), [Chroma](https://docs.llamaindex.ai/en/stable/examples/vector_stores/ChromaIndexDemo/), and [Databricks Vector Search](https://docs.llamaindex.ai/en/stable/examples/vector_stores/DatabricksVectorSearchDemo/). If you choose an alternative, follow the relevant LlamaIndex documentation and update the `workflow/workflow.py` file accordingly.
 
+In addition to evaluating the vector search retrieval, we will assess the keyword-based retriever (BM25) later. Let's set up local document storage to enable BM25 retrieval in the workflow.
 
+```python
+from llama_index.core.node_parser import SentenceSplitter
+from llama_index.retrievers.bm25 import BM25Retriever
 
-## 5. Define a Workflow
+splitter = SentenceSplitter(chunk_size=512)
+nodes = splitter.get_nodes_from_documents(documents)
+bm25_retriever = BM25Retriever.from_defaults(nodes=nodes)
+bm25_retriever.persist(".bm25_retriever")
+```
+
+## 6. Define a Workflow
 
 Now that the environment and data sources are ready, we can build the workflow and experiment with it. The complete workflow code is defined in the `workflow` directory. Let's explore some key components of the implementation.
 
@@ -185,14 +204,13 @@ class VectorSearchRetrieveEvent(Event):
 
 Throughout the workflow execution, we call LLMs multiple times. The prompt templates for these LLM calls are defined in the `workflow/prompts.py` file.
 
-
 ### Workflow Class
 
 The main workflow class is defined in `workflow/workflow.py`. Let's break down how it works.
 
 The constructor accepts a retrievers argument, which specifies the retrieval methods to be used in the workflow. For instance, if `["vector_search", "bm25"]` is passed, the workflow performs vector search and keyword-based search, skipping web search.
 
-💡 Deciding retrievers dynamically allows us to experiment different retrieval strategies without replicating model code with almost same definition.
+💡 Deciding which retrievers to utilize dynamically allows us to experiment with different retrieval strategies without needing to replicate nearly identical model code.
 
 ```python
 class HybridRAGWorkflow(Workflow):
@@ -225,7 +243,6 @@ class HybridRAGWorkflow(Workflow):
 ```
 
 The workflow begins by executing a step that takes the `StartEvent` as input, which is the `route_retrieval` step in this case. This step inspects the retrievers parameter and triggers the necessary retrieval steps. By using the `send_event()` method of the context object, multiple events can be dispatched in parallel from this single step.
-
 
 ```python
     # If no retriever is specified, proceed directly to the final query step with an empty context
@@ -281,9 +298,9 @@ response = await workflow.run(query="Why use MLflow with LlamaIndex?")
 print(response)
 ```
 
-## 6. Log the Workflow in MLflow Experiment
+## 7. Log the Workflow in an MLflow Experiment
 
-Now we want to run the workflow with various different retrieval strategy and evaluate the performance. However, before running the evaluation, we'll log the model in MLflow to track both the model and its performance within an **MLflow Experiment**.
+Now we want to run the workflow with various different retrieval strategies and evaluate the performance of each. However, before running the evaluation, we'll log the model in MLflow to track both the model and its performance within an **MLflow Experiment**.
 
 For the LlamaIndex Workflow, we use the new [Model-from-code](https://mlflow.org/docs/latest/models.html#models-from-code) method, which logs models as standalone Python scripts. This approach avoids the risks and instability associated with serialization methods like pickle, relying instead on code as the single source of truth for the model definition. When combined with MLflow's environment-freezing capability, it provides a reliable way to persist models. For more details, refer to the [MLflow documentation](https://mlflow.org/docs/latest/models.html#models-from-code).
 
@@ -291,9 +308,9 @@ For the LlamaIndex Workflow, we use the new [Model-from-code](https://mlflow.org
 
 We'll start an MLflow Run and log the model script `model.py` with different configurations using the [mlflow.llama_index.log_model()](https://mlflow.org/docs/latest/python_api/mlflow.llama_index.html#mlflow.llama_index.log_model) API.
 
-
 ```python
-# Different configurations we will evaluate.
+# Different configurations we will evaluate. We don't run evaluation for all permutation
+# for demonstration purpose, but you can add as many patterns as you want.
 run_name_to_retrievers = {
     # 1. No retrievers (prior knowledge in LLM).
     "none": [],
@@ -326,8 +343,7 @@ Now open the MLflow UI again, and this time it should show 4 MLflow Runs are rec
 
 ![MLflow Runs](llama_index_workflow_runs.png)
 
-
-## 7. Enable MLflow Tracing
+## 8. Enable MLflow Tracing
 
 Before running the evaluation, there’s one final step: enabling **MLflow Tracing**. We'll dive into this feature and why we do this here later, but for now, you can enable it with a simple one-line command. MLflow will automatically trace every LlamaIndex execution.
 
@@ -335,7 +351,7 @@ Before running the evaluation, there’s one final step: enabling **MLflow Traci
 mlflow.llama_index.autolog()
 ```
 
-## 8. Evaluate the Workflow with Different Retriever Strategies
+## 9. Evaluate the Workflow with Different Retriever Strategies
 
 The example repository includes a sample evaluation dataset, `mlflow_qa_dataset.csv`, containing 30 question-answer pairs related to MLflow.
 
@@ -348,14 +364,12 @@ display(eval_df.head(3))
 
 To evaluate the workflow, use the [mlflow.evaluate()](https://mlflow.org/docs/latest/python_api/mlflow.html#mlflow.evaluate) API, which requires (1) your dataset, (2) the logged model, and (3) the metrics you want to compute.
 
-
 ```python
 from mlflow.metrics import latency
-from mlflow.metrics.genai import answer_correctness, faithfulness
+from mlflow.metrics.genai import answer_correctness
 
 
 for model_info in models:
-
     with mlflow.start_run(run_id=model_info.run_id):
         result = mlflow.evaluate(
             # Pass the URI of the logged model above
@@ -380,21 +394,24 @@ In this example, we evaluate the model with two metrics:
 1. **Latency**: Measures the time taken to execute a workflow for a single query.
 2. **Answer Correctness**: Evaluates the accuracy of answers based on the ground truth, scored by the OpenAI GPT-4o model on a 1–5 scale.
 
-These metrics are just for demonstration purposes—you can add additional metrics like toxicity or faithfulness, or even create your own.
+These metrics are just for demonstration purposes—you can add additional metrics like toxicity or faithfulness, or even create your own. See the MLflow documentation for the full set of [built-in metrics](https://mlflow.org/docs/latest/llms/llm-evaluate/index.html#llm-evaluation-metrics)
+and how to define [custom metrics](https://mlflow.org/docs/latest/llms/llm-evaluate/index.html#creating-custom-llm-evaluation-metrics).
 
 The evaluation process will take a few minutes. Once completed, you can view the results in the MLflow UI. Open the Experiment page and click on the chart icon 📈 above the Run list.
 
 ![Evaluation Result](llama_index_workflow_result_chart.png)
 
+\*💡 The evaluation results can be different depending on model set up and some randomness.
+
 The first row shows bar charts for the answer correctness metrics, while the second row displays latency results. The best-performing combination is "Vector Search + BM25". Interestingly, adding web search not only increases latency significantly but also decreases answer correctness.
 
-Why does this happen? It appears some answers from the web-search-enabled model are off-topic. For example, in response to a question about starting Model Registry, the web-search model provides an unrelated answer about model deployment, while the "vs + bm25" model offers a correct response.
+Why does this happen? It appears some answers from the web-search-enabled model are off-topic. For example, in response to a question about starting the Model Registry, the web-search model provides an unrelated answer about model deployment, while the "vs + bm25" model offers a correct response.
 
 ![Answer Comparison](llama_index_workflow_answer_comparison.png)
 
 Where did this incorrect answer come from? This seems to be a retriever issue, as we only changed the retrieval strategy. However, it's difficult to see what each retriever returned from the final result. To gain deeper insights into what's happening behind the scenes, MLflow Tracing is the perfect solution.
 
-## 9. Inspecting Quality Issues with MLflow Trace
+## 10. Inspecting Quality Issues with MLflow Trace
 
 [MLflow Tracing](https://mlflow.org/docs/latest/llms/tracing/index.html) is a new feature that brings observability to LLM applications. It integrates seamlessly with LlamaIndex, recording all inputs, outputs, and metadata about intermediate steps during workflow execution. Since we called `mlflow.llama_index.autolog()` at the start, every LlamaIndex operation has been traced and recorded in the MLflow Experiment.
 
@@ -406,7 +423,7 @@ In this case, we identified the issue by examining the reranker step. The web se
 
 ## Conclusion
 
-In this blog, we explored how the combination of LlamaIndex and MLflow can elevate the development of Retrieval-Augmented Generation (RAG) workflows, bringing together powerful model management and observability capabilities. By integrating multiple retrieval strategies—such as vector search, BM25, and web search—we demonstrated how flexible retrieval can enhance the performance of LLM-driven applications.
+In this blog, we explored how the combination of LlamaIndex and MLflow can elevate the development of Retrieval-Augmented Generation (RAG) workflows, bringing together powerful model management and observability capabilities. By integrating multiple retrieval strategies (such as vector search, BM25, and web search) we demonstrated how flexible retrieval can enhance the performance of LLM-driven applications.
 
 - **Experiment Tracking** allowed us to organize and log different workflow configurations, ensuring reproducibility and enabling us to track model performance across multiple runs.
 - **MLflow Evaluate** enabled us to easily log and evaluate the workflow with different retriever strategies, using key metrics like latency and answer correctness to compare performance.
@@ -417,7 +434,7 @@ With these tools, you have a complete framework for building, logging, and optim
 
 To continue learning, explore the following resources:
 
-* Learn more about the [MLflow LlamaIndex integration](https://mlflow.org/docs/latest/llms/llama-index/index.html).
-* Discover additional MLflow LLM features at [LLMs in MLflow](https://mlflow.org/docs/latest/llms/index.html).
-* Deploy your workflow to a serving endpoint with [MLflow Deployment](https://mlflow.org/docs/latest/deployment/index.html).
-* Check out more [Workflow examples](https://docs.llamaindex.ai/en/stable/module_guides/workflow/#examples) from LlamaIndex.
+- Learn more about the [MLflow LlamaIndex integration](https://mlflow.org/docs/latest/llms/llama-index/index.html).
+- Discover additional MLflow LLM features at [LLMs in MLflow](https://mlflow.org/docs/latest/llms/index.html).
+- Deploy your workflow to a serving endpoint with [MLflow Deployment](https://mlflow.org/docs/latest/deployment/index.html).
+- Check out more [Workflow examples](https://docs.llamaindex.ai/en/stable/module_guides/workflow/#examples) from LlamaIndex.

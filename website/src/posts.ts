@@ -39,7 +39,7 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2024-10-25",
-    thumbnail: "/img/blog/llama_index_thumbnail.png",
+    thumbnail: "/img/blog/llama-index-thumbnail.png",
   },
   {
     title: "LLM as judge",
