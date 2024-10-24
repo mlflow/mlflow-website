@@ -620,10 +620,12 @@
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">lru_cache</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urlparse</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span>
 <span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">from</span> <span class="nn">databricks.sdk</span> <span class="kn">import</span> <span class="n">WorkspaceClient</span>
 <span class="kn">from</span> <span class="nn">packaging.version</span> <span class="kn">import</span> <span class="n">Version</span>
 
 <span class="kn">import</span> <span class="nn">mlflow</span>
@@ -632,6 +634,7 @@
 <span class="kn">from</span> <span class="nn">mlflow.environment_variables</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">_MLFLOW_IN_CAPTURE_MODULE_PROCESS</span><span class="p">,</span>
     <span class="n">_MLFLOW_TESTING</span><span class="p">,</span>
+    <span class="n">MLFLOW_MODEL_ENV_DOWNLOADING_TEMP_DIR</span><span class="p">,</span>
     <span class="n">MLFLOW_SCORING_SERVER_REQUEST_TIMEOUT</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
@@ -1950,6 +1953,44 @@
         <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">env_root_dir</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 
+<span class="k">def</span> <span class="nf">_download_prebuilt_env_if_needed</span><span class="p">(</span><span class="n">prebuilt_env_uri</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">mlflow.utils.file_utils</span> <span class="kn">import</span> <span class="n">get_or_create_tmp_dir</span>
+
+    <span class="n">parsed_url</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">prebuilt_env_uri</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="ow">or</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s2">&quot;file&quot;</span><span class="p">:</span>
+        <span class="c1"># local path</span>
+        <span class="k">return</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">path</span>
+    <span class="k">if</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s2">&quot;dbfs&quot;</span><span class="p">:</span>
+        <span class="n">tmp_dir</span> <span class="o">=</span> <span class="n">MLFLOW_MODEL_ENV_DOWNLOADING_TEMP_DIR</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="ow">or</span> <span class="n">get_or_create_tmp_dir</span><span class="p">()</span>
+        <span class="n">model_env_uc_path</span> <span class="o">=</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">path</span>
+
+        <span class="c1"># download file from DBFS.</span>
+        <span class="n">local_model_env_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmp_dir</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">model_env_uc_path</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">local_model_env_path</span><span class="p">):</span>
+            <span class="c1"># file is already downloaded.</span>
+            <span class="k">return</span> <span class="n">local_model_env_path</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ws</span> <span class="o">=</span> <span class="n">WorkspaceClient</span><span class="p">()</span>
+            <span class="c1"># Download model env file from UC volume.</span>
+            <span class="k">with</span> <span class="n">ws</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">model_env_uc_path</span><span class="p">)</span><span class="o">.</span><span class="n">contents</span> <span class="k">as</span> <span class="n">rf</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span>
+                <span class="n">local_model_env_path</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span>
+            <span class="p">)</span> <span class="k">as</span> <span class="n">wf</span><span class="p">:</span>
+                <span class="k">while</span> <span class="n">chunk</span> <span class="o">:=</span> <span class="n">rf</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4096</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">):</span>
+                    <span class="n">wf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">local_model_env_path</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">Exception</span><span class="p">,</span> <span class="ne">KeyboardInterrupt</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">local_model_env_path</span><span class="p">):</span>
+                <span class="c1"># clean the partially saved file if downloading fails.</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">local_model_env_path</span><span class="p">)</span>
+            <span class="k">raise</span>
+
+    <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Unsupported prebuilt env file path &#39;</span><span class="si">{</span><span class="n">prebuilt_env_uri</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;invalid scheme: &#39;</span><span class="si">{</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">scheme</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+    <span class="p">)</span>
+
+
 <div class="viewcode-block" id="build_model_env"><a class="viewcode-back" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.build_model_env">[docs]</a><span class="k">def</span> <span class="nf">build_model_env</span><span class="p">(</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">save_path</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Prebuild model python environment and generate an archive file saved to provided</span>
@@ -1983,13 +2024,16 @@
 
 <span class="sd">        from mlflow.pyfunc import build_model_env</span>
 
-<span class="sd">        # Create a python environment archive file at the path `prebuilt_env_path`</span>
-<span class="sd">        prebuilt_env_path = build_model_env(f&quot;runs:/{run_id}/model&quot;, &quot;/path/to/save_directory&quot;)</span>
+<span class="sd">        # Create a python environment archive file at the path `prebuilt_env_uri`</span>
+<span class="sd">        prebuilt_env_uri = build_model_env(f&quot;runs:/{run_id}/model&quot;, &quot;/path/to/save_directory&quot;)</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        model_uri: URI to the model that is used to build the python environment.</span>
 <span class="sd">        save_path: The directory path that is used to save the prebuilt model environment</span>
 <span class="sd">            archive file path.</span>
+<span class="sd">            The path can be either local directory path or</span>
+<span class="sd">            mounted DBFS path such as &#39;/dbfs/...&#39; or</span>
+<span class="sd">            mounted UC volume path such as &#39;/Volumes/...&#39;.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Return the path of an archive file containing the python environment data.</span>
@@ -2044,7 +2088,7 @@
     <span class="n">env_manager</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">extra_env</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">prebuilt_env_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">prebuilt_env_uri</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">model_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -2078,7 +2122,7 @@
 <span class="sd">    .. note::</span>
 <span class="sd">        When using Databricks Connect to connect to a remote Databricks cluster,</span>
 <span class="sd">        the Databricks cluster must use runtime version &gt;= 16, and when &#39;spark_udf&#39;</span>
-<span class="sd">        param &#39;env_manager&#39; is set as &#39;virtualenv&#39;, the &#39;prebuilt_env_path&#39; param is</span>
+<span class="sd">        param &#39;env_manager&#39; is set as &#39;virtualenv&#39;, the &#39;prebuilt_env_uri&#39; param is</span>
 <span class="sd">        required to be specified.</span>
 
 <span class="sd">    .. note::</span>
@@ -2156,7 +2200,7 @@
 <span class="sd">        env_manager: The environment manager to use in order to create the python environment</span>
 <span class="sd">            for model inference. Note that environment is only restored in the context</span>
 <span class="sd">            of the PySpark UDF; the software environment outside of the UDF is</span>
-<span class="sd">            unaffected. If `prebuilt_env_path` parameter is not set, the default value</span>
+<span class="sd">            unaffected. If `prebuilt_env_uri` parameter is not set, the default value</span>
 <span class="sd">            is ``local``, and the following values are supported:</span>
 
 <span class="sd">            - ``virtualenv``: Use virtualenv to restore the python environment that</span>
@@ -2167,19 +2211,25 @@
 <span class="sd">              may differ from the environment used to train the model and may lead to</span>
 <span class="sd">              errors or invalid predictions.</span>
 
-<span class="sd">            If the `prebuilt_env_path` parameter is set, `env_manager` parameter should not</span>
+<span class="sd">            If the `prebuilt_env_uri` parameter is set, `env_manager` parameter should not</span>
 <span class="sd">            be set.</span>
 
 <span class="sd">        params: Additional parameters to pass to the model for inference.</span>
 
 <span class="sd">        extra_env: Extra environment variables to pass to the UDF executors.</span>
 
-<span class="sd">        prebuilt_env_path: The path of the prebuilt env archive file created by</span>
+<span class="sd">        prebuilt_env_uri: The path of the prebuilt env archive file created by</span>
 <span class="sd">            `mlflow.pyfunc.build_model_env` API.</span>
 <span class="sd">            This parameter can only be used in Databricks Serverless notebook REPL,</span>
 <span class="sd">            Databricks Shared cluster notebook REPL, and Databricks Connect client</span>
 <span class="sd">            environment.</span>
-<span class="sd">            If this parameter is set, `env_manger` is ignored.</span>
+<span class="sd">            The path can be either local file path or DBFS path such as</span>
+<span class="sd">            &#39;dbfs:/Volumes/...&#39;, in this case, MLflow automatically downloads it</span>
+<span class="sd">            to local temporary directory, &quot;MLFLOW_MODEL_ENV_DOWNLOADING_TEMP_DIR&quot;</span>
+<span class="sd">            environmental variable can be set to specify the temporary directory</span>
+<span class="sd">            to use.</span>
+
+<span class="sd">            If this parameter is set, `env_manger` parameter must not be set.</span>
 
 <span class="sd">        model_config: The model configuration to set when loading the model.</span>
 <span class="sd">            See &#39;model_config&#39; argument in `mlflow.pyfunc.load_model` API for details.</span>
@@ -2212,10 +2262,10 @@
     <span class="n">openai_env_vars</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">openai</span><span class="o">.</span><span class="n">_OpenAIEnvVar</span><span class="o">.</span><span class="n">read_environ</span><span class="p">()</span>
     <span class="n">mlflow_testing</span> <span class="o">=</span> <span class="n">_MLFLOW_TESTING</span><span class="o">.</span><span class="n">get_raw</span><span class="p">()</span>
 
-    <span class="k">if</span> <span class="n">prebuilt_env_path</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">prebuilt_env_uri</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">env_manager</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
-                <span class="s2">&quot;If &#39;prebuilt_env_path&#39; parameter is set, &#39;env_manager&#39; parameter can&#39;t be set.&quot;</span>
+                <span class="s2">&quot;If &#39;prebuilt_env_uri&#39; parameter is set, &#39;env_manager&#39; parameter can&#39;t be set.&quot;</span>
             <span class="p">)</span>
         <span class="n">env_manager</span> <span class="o">=</span> <span class="n">_EnvManager</span><span class="o">.</span><span class="n">VIRTUALENV</span>
     <span class="k">else</span><span class="p">:</span>
@@ -2231,16 +2281,16 @@
         <span class="n">is_spark_in_local_mode</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;spark.master&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;local&quot;</span><span class="p">)</span>
 
     <span class="n">is_dbconnect_mode</span> <span class="o">=</span> <span class="n">is_databricks_connect</span><span class="p">(</span><span class="n">spark</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">prebuilt_env_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_dbconnect_mode</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">prebuilt_env_uri</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_dbconnect_mode</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
             <span class="s2">&quot;&#39;prebuilt_env&#39; parameter can only be used in Databricks Serverless &quot;</span>
             <span class="s2">&quot;notebook REPL, atabricks Shared cluster notebook REPL, and Databricks Connect client &quot;</span>
             <span class="s2">&quot;environment.&quot;</span>
         <span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">prebuilt_env_path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">is_dbconnect_mode</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_in_databricks_runtime</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">prebuilt_env_uri</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">is_dbconnect_mode</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_in_databricks_runtime</span><span class="p">():</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-            <span class="s2">&quot;&#39;prebuilt_env_path&#39; param is required if using Databricks Connect to connect &quot;</span>
+            <span class="s2">&quot;&#39;prebuilt_env_uri&#39; param is required if using Databricks Connect to connect &quot;</span>
             <span class="s2">&quot;to Databricks cluster from your own machine.&quot;</span>
         <span class="p">)</span>
 
@@ -2278,8 +2328,9 @@
         <span class="n">output_path</span><span class="o">=</span><span class="n">_create_model_downloading_tmp_dir</span><span class="p">(</span><span class="n">should_use_nfs</span><span class="p">),</span>
     <span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">prebuilt_env_path</span><span class="p">:</span>
-        <span class="n">_verify_prebuilt_env</span><span class="p">(</span><span class="n">spark</span><span class="p">,</span> <span class="n">local_model_path</span><span class="p">,</span> <span class="n">prebuilt_env_path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">prebuilt_env_uri</span><span class="p">:</span>
+        <span class="n">prebuilt_env_uri</span> <span class="o">=</span> <span class="n">_download_prebuilt_env_if_needed</span><span class="p">(</span><span class="n">prebuilt_env_uri</span><span class="p">)</span>
+        <span class="n">_verify_prebuilt_env</span><span class="p">(</span><span class="n">spark</span><span class="p">,</span> <span class="n">local_model_path</span><span class="p">,</span> <span class="n">prebuilt_env_uri</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">use_dbconnect_artifact</span> <span class="ow">and</span> <span class="n">env_manager</span> <span class="o">==</span> <span class="n">_EnvManager</span><span class="o">.</span><span class="n">CONDA</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
             <span class="s2">&quot;Databricks connect mode or Databricks Serverless python REPL doesn&#39;t &quot;</span>
@@ -2313,14 +2364,14 @@
                 <span class="s2">&quot;processes cannot be cleaned up if the Spark Job is canceled.&quot;</span>
             <span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">prebuilt_env_path</span><span class="p">:</span>
-        <span class="n">env_cache_key</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">prebuilt_env_path</span><span class="p">)[:</span><span class="o">-</span><span class="mi">7</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">prebuilt_env_uri</span><span class="p">:</span>
+        <span class="n">env_cache_key</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">prebuilt_env_uri</span><span class="p">)[:</span><span class="o">-</span><span class="mi">7</span><span class="p">]</span>
     <span class="k">elif</span> <span class="n">use_dbconnect_artifact</span><span class="p">:</span>
         <span class="n">env_cache_key</span> <span class="o">=</span> <span class="n">_gen_prebuilt_env_archive_name</span><span class="p">(</span><span class="n">spark</span><span class="p">,</span> <span class="n">local_model_path</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">env_cache_key</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">if</span> <span class="n">use_dbconnect_artifact</span> <span class="ow">or</span> <span class="n">prebuilt_env_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">use_dbconnect_artifact</span> <span class="ow">or</span> <span class="n">prebuilt_env_uri</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">prebuilt_env_root_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_PREBUILD_ENV_ROOT_LOCATION</span><span class="p">,</span> <span class="n">env_cache_key</span><span class="p">)</span>
         <span class="n">pyfunc_backend_env_root_config</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;create_env_root_dir&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
@@ -2340,8 +2391,8 @@
         <span class="c1"># Upload model artifacts and python environment to NFS as DBConncet artifacts.</span>
         <span class="k">if</span> <span class="n">env_manager</span> <span class="o">==</span> <span class="n">_EnvManager</span><span class="o">.</span><span class="n">VIRTUALENV</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">dbconnect_artifact_cache</span><span class="o">.</span><span class="n">has_cache_key</span><span class="p">(</span><span class="n">env_cache_key</span><span class="p">):</span>
-                <span class="k">if</span> <span class="n">prebuilt_env_path</span><span class="p">:</span>
-                    <span class="n">env_archive_path</span> <span class="o">=</span> <span class="n">prebuilt_env_path</span>
+                <span class="k">if</span> <span class="n">prebuilt_env_uri</span><span class="p">:</span>
+                    <span class="n">env_archive_path</span> <span class="o">=</span> <span class="n">prebuilt_env_uri</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">env_archive_path</span> <span class="o">=</span> <span class="n">_prebuild_env_internal</span><span class="p">(</span>
                         <span class="n">local_model_path</span><span class="p">,</span> <span class="n">env_cache_key</span><span class="p">,</span> <span class="n">get_or_create_tmp_dir</span><span class="p">()</span>
@@ -2356,13 +2407,13 @@
             <span class="n">dbconnect_artifact_cache</span><span class="o">.</span><span class="n">add_artifact_archive</span><span class="p">(</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">model_archive_path</span><span class="p">)</span>
 
     <span class="k">elif</span> <span class="ow">not</span> <span class="n">should_use_spark_to_broadcast_file</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">prebuilt_env_path</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">prebuilt_env_uri</span><span class="p">:</span>
             <span class="c1"># Extract prebuilt env archive file to NFS directory.</span>
             <span class="n">prebuilt_env_nfs_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
                 <span class="n">get_or_create_nfs_tmp_dir</span><span class="p">(),</span> <span class="s2">&quot;prebuilt_env&quot;</span><span class="p">,</span> <span class="n">env_cache_key</span>
             <span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">prebuilt_env_nfs_dir</span><span class="p">):</span>
-                <span class="n">extract_archive_to_dir</span><span class="p">(</span><span class="n">prebuilt_env_path</span><span class="p">,</span> <span class="n">prebuilt_env_nfs_dir</span><span class="p">)</span>
+                <span class="n">extract_archive_to_dir</span><span class="p">(</span><span class="n">prebuilt_env_uri</span><span class="p">,</span> <span class="n">prebuilt_env_nfs_dir</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Prepare restored environment in driver side if possible.</span>
             <span class="c1"># Note: In databricks runtime, because databricks notebook cell output cannot capture</span>
@@ -2549,7 +2600,7 @@
                     <span class="c1"># Create symlink if it does not exist</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">prebuilt_env_root_dir</span><span class="p">):</span>
                         <span class="n">os</span><span class="o">.</span><span class="n">symlink</span><span class="p">(</span><span class="n">env_src_dir</span><span class="p">,</span> <span class="n">prebuilt_env_root_dir</span><span class="p">)</span>
-                <span class="k">elif</span> <span class="n">prebuilt_env_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">elif</span> <span class="n">prebuilt_env_uri</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="c1"># prebuilt env is extracted to `prebuilt_env_nfs_dir` directory,</span>
                     <span class="c1"># and model is downloaded to `local_model_path` which points to an NFS</span>
                     <span class="c1"># directory too.</span>
