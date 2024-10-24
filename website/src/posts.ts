@@ -29,7 +29,7 @@ export const BLOGS: Blog[] = [
   {
     title: "Building Advanced RAG with MLflow and LlamaIndex Workflow",
     path: "/blog/mlflow-llama-index-workflow",
-    tags: ["genai", "mlops", "mlflow-evalaute"],
+    tags: ["genai", "mlops", "mlflow-evaluate"],
     authors: [
       {
         name: "Yuki Watanabe",
