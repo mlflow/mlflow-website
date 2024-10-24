@@ -434,11 +434,13 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="ChatModel.predict"><a class="viewcode-back" href="../../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.ChatModel.predict">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">messages</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ChatMessage</span><span class="p">],</span> <span class="n">params</span><span class="p">:</span> <span class="n">ChatParams</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ChatResponse</span><span class="p">:</span>  <span class="c1"># noqa: D417</span>
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">messages</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ChatMessage</span><span class="p">],</span> <span class="n">params</span><span class="p">:</span> <span class="n">ChatParams</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ChatResponse</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Evaluates a chat input and produces a chat output.</span>
 
 <span class="sd">        Args:</span>
+<span class="sd">            context: A :class:`~PythonModelContext` instance containing artifacts that the model</span>
+<span class="sd">                can use to perform inference.</span>
 <span class="sd">            messages (List[:py:class:`ChatMessage &lt;mlflow.types.llm.ChatMessage&gt;`]):</span>
 <span class="sd">                A list of :py:class:`ChatMessage &lt;mlflow.types.llm.ChatMessage&gt;`</span>
 <span class="sd">                objects representing chat history.</span>
@@ -452,7 +454,7 @@
 <span class="sd">            the model&#39;s response(s), as well as other metadata.</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
-<div class="viewcode-block" id="ChatModel.predict_stream"><a class="viewcode-back" href="../../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.ChatModel.predict_stream">[docs]</a>    <span class="k">def</span> <span class="nf">predict_stream</span><span class="p">(</span>  <span class="c1"># noqa: D417</span>
+<div class="viewcode-block" id="ChatModel.predict_stream"><a class="viewcode-back" href="../../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.ChatModel.predict_stream">[docs]</a>    <span class="k">def</span> <span class="nf">predict_stream</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">messages</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ChatMessage</span><span class="p">],</span> <span class="n">params</span><span class="p">:</span> <span class="n">ChatParams</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">ChatResponse</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -461,6 +463,8 @@
 <span class="sd">        By default, this function just yields result of `predict` function.</span>
 
 <span class="sd">        Args:</span>
+<span class="sd">            context: A :class:`~PythonModelContext` instance containing artifacts that the model</span>
+<span class="sd">                can use to perform inference.</span>
 <span class="sd">            messages (List[:py:class:`ChatMessage &lt;mlflow.types.llm.ChatMessage&gt;`]):</span>
 <span class="sd">                A list of :py:class:`ChatMessage &lt;mlflow.types.llm.ChatMessage&gt;`</span>
 <span class="sd">                objects representing chat history.</span>
@@ -880,13 +884,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span> <span class="o">=</span> <span class="n">endpoint</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">params</span>
 
-    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span>  <span class="c1"># noqa: D417</span>
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">model_input</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Run prediction on the input data.</span>
 
 <span class="sd">        Args:</span>
+<span class="sd">            context: A :class:`~PythonModelContext` instance containing artifacts that the model</span>
+<span class="sd">                can use to perform inference.</span>
 <span class="sd">            model_input: The input data for prediction, either of the following:</span>
 <span class="sd">                - Pandas DataFrame: If the default evaluator is used, input is a DF</span>
 <span class="sd">                    that contains the multiple request payloads in a single column.</span>

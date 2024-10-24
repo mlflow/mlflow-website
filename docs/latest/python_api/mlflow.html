@@ -1142,6 +1142,25 @@ should be specified via the <code class="docutils literal notranslate"><span cla
 </li>
 </ul>
 </p></li>
+<li><p><strong>model_type</strong> – <p>(Optional) A string describing the model type. The default evaluator
+supports the following model types:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">'classifier'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'regressor'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'question-answering'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'text-summarization'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'text'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'retriever'</span></code></p></li>
+</ul>
+<p>If no <code class="docutils literal notranslate"><span class="pre">model_type</span></code> is specified, then you must provide a a list of
+metrics to compute via the <code class="docutils literal notranslate"><span class="pre">extra_metrics</span></code> param.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">'question-answering'</span></code>, <code class="docutils literal notranslate"><span class="pre">'text-summarization'</span></code>, <code class="docutils literal notranslate"><span class="pre">'text'</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">'retriever'</span></code> are experimental and may be changed or removed in a
+future release.</p>
+</div>
+</p></li>
 <li><p><strong>targets</strong> – If <code class="docutils literal notranslate"><span class="pre">data</span></code> is a numpy array or list, a numpy array or list of evaluation
 labels. If <code class="docutils literal notranslate"><span class="pre">data</span></code> is a DataFrame, the string name of a column from <code class="docutils literal notranslate"><span class="pre">data</span></code>
 that contains evaluation labels. Required for classifier and regressor models,
@@ -1185,28 +1204,6 @@ contains model outputs.</p></li>
 </div>
 </div>
 </p></li>
-<li><p><strong>model_type</strong> – <p>(Optional) A string describing the model type. The default evaluator
-supports the following model types:</p>
-<ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">'classifier'</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">'regressor'</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">'question-answering'</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">'text-summarization'</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">'text'</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">'retriever'</span></code></p></li>
-</ul>
-<p>If no <code class="docutils literal notranslate"><span class="pre">model_type</span></code> is specified, then you must provide a a list of
-metrics to compute via the <code class="docutils literal notranslate"><span class="pre">extra_metrics</span></code> param.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p><code class="docutils literal notranslate"><span class="pre">'question-answering'</span></code>, <code class="docutils literal notranslate"><span class="pre">'text-summarization'</span></code>, <code class="docutils literal notranslate"><span class="pre">'text'</span></code>, and
-<code class="docutils literal notranslate"><span class="pre">'retriever'</span></code> are experimental and may be changed or removed in a
-future release.</p>
-</div>
-</p></li>
-<li><p><strong>inference_params</strong> – (Optional) A dictionary of inference parameters to be passed to the model
-when making predictions, such as <code class="docutils literal notranslate"><span class="pre">{&quot;max_tokens&quot;:</span> <span class="pre">100}</span></code>. This is only used when
-the <code class="docutils literal notranslate"><span class="pre">model</span></code> is an MLflow Deployments endpoint URI e.g. <code class="docutils literal notranslate"><span class="pre">&quot;endpoints:/my-chat&quot;</span></code></p></li>
 <li><p><strong>dataset_path</strong> – (Optional) The path where the data is stored. Must not contain double
 quotes (<code class="docutils literal notranslate"><span class="pre">“</span></code>). If specified, the path is logged to the <code class="docutils literal notranslate"><span class="pre">mlflow.datasets</span></code>
 tag for lineage tracking purposes.</p></li>
@@ -1226,6 +1223,7 @@ evaluators, call <a class="reference internal" href="mlflow.models.html#mlflow.m
 <li><p><strong>evaluator_config</strong> – A dictionary of additional configurations to supply to the evaluator.
 If multiple evaluators are specified, each configuration should be
 supplied as a nested dictionary whose key is the evaluator name.</p></li>
+<li><p><strong>custom_metrics</strong> – Deprecated. Use <code class="docutils literal notranslate"><span class="pre">extra_metrics</span></code> instead.</p></li>
 <li><p><strong>extra_metrics</strong> – <p>(Optional) A list of <a class="reference internal" href="mlflow.models.html#mlflow.models.EvaluationMetric" title="mlflow.models.EvaluationMetric"><code class="xref py py-class docutils literal notranslate"><span class="pre">EvaluationMetric</span></code></a>
 objects.  These metrics are computed in addition to the default metrics associated with
 pre-defined <cite>model_type</cite>, and setting <cite>model_type=None</cite> will only compute the metrics
@@ -1327,8 +1325,6 @@ its file path or define customizations through environment variables in
 API instead for running model validation against baseline.</p></li>
 <li><p><strong>baseline_model</strong> – DEPRECATED. Please use <a class="reference internal" href="#mlflow.validate_evaluation_results" title="mlflow.validate_evaluation_results"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.validate_evaluation_results()</span></code></a>
 API instead for running model validation against baseline.</p></li>
-<li><p><strong>baseline_config</strong> – DEPRECATED. Please use <a class="reference internal" href="#mlflow.validate_evaluation_results" title="mlflow.validate_evaluation_results"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.validate_evaluation_results()</span></code></a>
-API instead for running model validation against baseline.</p></li>
 <li><p><strong>env_manager</strong> – <p>Specify an environment manager to load the candidate <code class="docutils literal notranslate"><span class="pre">model</span></code> in
 isolated Python environments and restore their
 dependencies. Default value is <code class="docutils literal notranslate"><span class="pre">local</span></code>, and the following values are
@@ -1347,6 +1343,11 @@ errors or invalid predictions.</p></li>
 the model’s pyfunc flavor to know which keys are supported for your
 specific model. If not indicated, the default model configuration
 from the model is used (if any).</p></li>
+<li><p><strong>baseline_config</strong> – DEPRECATED. Please use <a class="reference internal" href="#mlflow.validate_evaluation_results" title="mlflow.validate_evaluation_results"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.validate_evaluation_results()</span></code></a>
+API instead for running model validation against baseline.</p></li>
+<li><p><strong>inference_params</strong> – (Optional) A dictionary of inference parameters to be passed to the model
+when making predictions, such as <code class="docutils literal notranslate"><span class="pre">{&quot;max_tokens&quot;:</span> <span class="pre">100}</span></code>. This is only used when
+the <code class="docutils literal notranslate"><span class="pre">model</span></code> is an MLflow Deployments endpoint URI e.g. <code class="docutils literal notranslate"><span class="pre">&quot;endpoints:/my-chat&quot;</span></code></p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -2001,7 +2002,6 @@ artifact.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>run_id</strong> – String ID of run.</p></li>
 <li><p><strong>image</strong> – The image object to be logged.</p></li>
 <li><p><strong>artifact_file</strong> – Specifies the path, in POSIX format, where the image
 will be stored as an artifact relative to the run’s root directory (for
@@ -2129,11 +2129,11 @@ SQLAlchemy store replaces +/- Infinity with max / min float values.
 All backend stores will support values up to length 5000, but some
 may support larger values.</p></li>
 <li><p><strong>step</strong> – Metric step. Defaults to zero if unspecified.</p></li>
-<li><p><strong>timestamp</strong> – Time when this metric was calculated. Defaults to the current system time.</p></li>
 <li><p><strong>synchronous</strong> – <em>Experimental</em> If True, blocks until the metric is logged
 successfully. If False, logs the metric asynchronously and
 returns a future representing the logging operation. If None, read from environment
 variable <cite>MLFLOW_ENABLE_ASYNC_LOGGING</cite>, which defaults to False if not set.</p></li>
+<li><p><strong>timestamp</strong> – Time when this metric was calculated. Defaults to the current system time.</p></li>
 <li><p><strong>run_id</strong> – If specified, log the metric to the specified run. If not specified, log the metric
 to the currently active run.</p></li>
 </ul>
@@ -2684,6 +2684,8 @@ The following fields are supported:</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><strong>max_results</strong> – If passed, specifies the maximum number of models desired. If not
+passed, all models will be returned.</p></li>
 <li><p><strong>filter_string</strong> – <p>Filter query string
 (e.g., <code class="docutils literal notranslate"><span class="pre">&quot;name</span> <span class="pre">=</span> <span class="pre">'a_model_name'</span> <span class="pre">and</span> <span class="pre">tag.key</span> <span class="pre">=</span> <span class="pre">'value1'&quot;</span></code>),
 defaults to searching for all model versions. The following identifiers, comparators,
@@ -2711,8 +2713,6 @@ wrapped with backticks (e.g., <code class="docutils literal notranslate"><span c
 </dd>
 </dl>
 </p></li>
-<li><p><strong>max_results</strong> – If passed, specifies the maximum number of models desired. If not
-passed, all models will be returned.</p></li>
 <li><p><strong>order_by</strong> – List of column names with ASC|DESC annotation, to be used for ordering
 matching search results.</p></li>
 </ul>
@@ -2773,6 +2773,8 @@ name=CordobaWeatherForecastModel; run_id=ae9a606a12834c04a8ef1006d0cff779; versi
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><strong>max_results</strong> – If passed, specifies the maximum number of models desired. If not
+passed, all models will be returned.</p></li>
 <li><p><strong>filter_string</strong> – <p>Filter query string (e.g., “name = ‘a_model_name’ and tag.key = ‘value1’”),
 defaults to searching for all registered models. The following identifiers, comparators,
 and logical operators are supported.</p>
@@ -2796,8 +2798,6 @@ wrapped with backticks (e.g., “tags.`extra key`”).</p></li>
 </dd>
 </dl>
 </p></li>
-<li><p><strong>max_results</strong> – If passed, specifies the maximum number of models desired. If not
-passed, all models will be returned.</p></li>
 <li><p><strong>order_by</strong> – List of column names with ASC|DESC annotation, to be used for ordering
 matching search results.</p></li>
 </ul>

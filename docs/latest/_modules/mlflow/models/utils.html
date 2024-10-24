@@ -519,16 +519,6 @@
                 <span class="n">model_input</span> <span class="o">=</span> <span class="n">_handle_ndarray_input</span><span class="p">(</span><span class="n">model_input</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">serving_input</span> <span class="o">=</span> <span class="p">{</span><span class="n">INPUTS</span><span class="p">:</span> <span class="n">model_input</span><span class="p">}</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="c1"># TODO: remove this warning after 2.17.0 release</span>
-                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                    <span class="s2">&quot;Since MLflow 2.16.0, we no longer convert dictionary input example &quot;</span>
-                    <span class="s2">&quot;to pandas Dataframe, and directly save it as a json object. &quot;</span>
-                    <span class="s2">&quot;If the model expects a pandas DataFrame input instead, please &quot;</span>
-                    <span class="s2">&quot;pass the pandas DataFrame as input example directly.&quot;</span><span class="p">,</span>
-                    <span class="ne">FutureWarning</span><span class="p">,</span>
-                    <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-                <span class="p">)</span>
-
                 <span class="kn">from</span> <span class="nn">mlflow.pyfunc.utils.serving_data_parser</span> <span class="kn">import</span> <span class="n">is_unified_llm_input</span>
 
                 <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;json_object&quot;</span>
@@ -2000,8 +1990,8 @@
 <span class="c1"># This function addresses this by dynamically importing the `code path` module under a unique,</span>
 <span class="c1"># dynamically generated module name. This bypasses the caching mechanism, as each import is</span>
 <span class="c1"># considered a separate module by the Python interpreter.</span>
-<span class="k">def</span> <span class="nf">_load_model_code_path</span><span class="p">(</span><span class="n">code_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]):</span>
-    <span class="k">with</span> <span class="n">_config_context</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_load_model_code_path</span><span class="p">(</span><span class="n">code_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">model_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]):</span>
+    <span class="k">with</span> <span class="n">_config_context</span><span class="p">(</span><span class="n">model_config</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">new_module_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;code_model_</span><span class="si">{</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="n">spec</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spec_from_file_location</span><span class="p">(</span><span class="n">new_module_name</span><span class="p">,</span> <span class="n">code_path</span><span class="p">)</span>

@@ -255,7 +255,11 @@
 <span class="kn">from</span> <span class="nn">mlflow.models.model</span> <span class="kn">import</span> <span class="n">MLMODEL_FILE_NAME</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.signature</span> <span class="kn">import</span> <span class="n">_infer_signature_from_input_example</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.utils</span> <span class="kn">import</span> <span class="n">_save_example</span>
-<span class="kn">from</span> <span class="nn">mlflow.openai._openai_autolog</span> <span class="kn">import</span> <span class="n">patched_call</span>
+<span class="kn">from</span> <span class="nn">mlflow.openai._openai_autolog</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">patched_agent_get_chat_completion</span><span class="p">,</span>
+    <span class="n">patched_call</span><span class="p">,</span>
+    <span class="n">patched_swarm_run</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.protos.databricks_pb2</span> <span class="kn">import</span> <span class="n">INVALID_PARAMETER_VALUE</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracking._model_registry</span> <span class="kn">import</span> <span class="n">DEFAULT_AWAIT_MAX_SLEEP_SECONDS</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracking.artifact_utils</span> <span class="kn">import</span> <span class="n">_download_artifact_from_uri</span>
@@ -382,7 +386,9 @@
 
     <span class="n">api_type</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">_OpenAIEnvVar</span><span class="o">.</span><span class="n">OPENAI_API_TYPE</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">openai</span><span class="o">.</span><span class="n">api_type</span><span class="p">)</span>
     <span class="n">api_version</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">_OpenAIEnvVar</span><span class="o">.</span><span class="n">OPENAI_API_VERSION</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">openai</span><span class="o">.</span><span class="n">api_version</span><span class="p">)</span>
-    <span class="n">api_base</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">_OpenAIEnvVar</span><span class="o">.</span><span class="n">OPENAI_API_BASE</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">api_base</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">_OpenAIEnvVar</span><span class="o">.</span><span class="n">OPENAI_API_BASE</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span>
+        <span class="n">_OpenAIEnvVar</span><span class="o">.</span><span class="n">OPENAI_BASE_URL</span><span class="o">.</span><span class="n">value</span>
+    <span class="p">)</span>
     <span class="n">engine</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">_OpenAIEnvVar</span><span class="o">.</span><span class="n">OPENAI_ENGINE</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="n">deployment_id</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">_OpenAIEnvVar</span><span class="o">.</span><span class="n">OPENAI_DEPLOYMENT_NAME</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">api_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;azure&quot;</span><span class="p">,</span> <span class="s2">&quot;azure_ad&quot;</span><span class="p">,</span> <span class="s2">&quot;azuread&quot;</span><span class="p">):</span>
@@ -898,7 +904,7 @@
 
     <span class="k">def</span> <span class="nf">_construct_request_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_url</span><span class="p">,</span> <span class="n">default_url</span><span class="p">):</span>
         <span class="n">api_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request_configs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;api_type&quot;</span><span class="p">)</span>
-        <span class="n">api_base</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request_configs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;api_base&quot;</span><span class="p">)</span>
+        <span class="n">api_base</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">base</span> <span class="o">:=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request_configs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;api_base&quot;</span><span class="p">))</span> <span class="k">else</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">api_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;azure&quot;</span><span class="p">,</span> <span class="s2">&quot;azure_ad&quot;</span><span class="p">,</span> <span class="s2">&quot;azuread&quot;</span><span class="p">):</span>
             <span class="n">api_version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request_configs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;api_version&quot;</span><span class="p">)</span>
             <span class="n">deployment_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request_configs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;deployment_id&quot;</span><span class="p">)</span>
@@ -1111,7 +1117,27 @@
             <span class="n">task</span><span class="p">,</span>
             <span class="s2">&quot;create&quot;</span><span class="p">,</span>
             <span class="n">patched_call</span><span class="p">,</span>
-        <span class="p">)</span></div>
+        <span class="p">)</span>
+
+    <span class="c1"># Patch Swarm agent to generate traces</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">swarm</span> <span class="kn">import</span> <span class="n">Swarm</span>
+
+        <span class="n">safe_patch</span><span class="p">(</span>
+            <span class="n">FLAVOR_NAME</span><span class="p">,</span>
+            <span class="n">Swarm</span><span class="p">,</span>
+            <span class="s2">&quot;get_chat_completion&quot;</span><span class="p">,</span>
+            <span class="n">patched_agent_get_chat_completion</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">safe_patch</span><span class="p">(</span>
+            <span class="n">FLAVOR_NAME</span><span class="p">,</span>
+            <span class="n">Swarm</span><span class="p">,</span>
+            <span class="s2">&quot;run&quot;</span><span class="p">,</span>
+            <span class="n">patched_swarm_run</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="k">pass</span></div>
 </pre></div>
 
               </div>

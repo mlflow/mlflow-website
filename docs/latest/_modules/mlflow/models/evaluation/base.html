@@ -213,8 +213,8 @@
 <span class="kn">import</span> <span class="nn">urllib.parse</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
 <span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span> <span class="nn">inspect</span> <span class="kn">import</span> <span class="n">Parameter</span><span class="p">,</span> <span class="n">Signature</span>
 <span class="kn">from</span> <span class="nn">types</span> <span class="kn">import</span> <span class="n">FunctionType</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
@@ -893,8 +893,9 @@
 
 <span class="nd">@developer_stable</span>
 <span class="k">class</span> <span class="nc">ModelEvaluator</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="nd">@classmethod</span>
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">can_evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">model_type</span><span class="p">,</span> <span class="n">evaluator_config</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">can_evaluate</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">model_type</span><span class="p">,</span> <span class="n">evaluator_config</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            model_type: A string describing the model type (e.g., &quot;regressor&quot;, &quot;classifier&quot;, …).</span>
@@ -910,7 +911,7 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span>  <span class="c1"># noqa: D417</span>
+    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">model_type</span><span class="p">,</span>
@@ -937,13 +938,14 @@
 <span class="sd">                the evaluator.</span>
 <span class="sd">            model: A pyfunc model instance. If None, the model output is supposed to be found in</span>
 <span class="sd">                ``dataset.predictions_data``.</span>
+<span class="sd">            custom_metrics: Deprecated. Use ``extra_metrics`` instead.</span>
 <span class="sd">            extra_metrics: A list of :py:class:`EvaluationMetric` objects.</span>
 <span class="sd">            custom_artifacts: A list of callable custom artifact functions.</span>
-<span class="sd">            kwargs: For forwards compatibility, a placeholder for additional arguments that</span>
-<span class="sd">                may be added to the evaluation interface in the future.</span>
 <span class="sd">            predictions: The column name of the model output column that is used for evaluation.</span>
 <span class="sd">                This is only used when a model returns a pandas dataframe that contains</span>
 <span class="sd">                multiple columns.</span>
+<span class="sd">            kwargs: For forwards compatibility, a placeholder for additional arguments that</span>
+<span class="sd">                may be added to the evaluation interface in the future.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            A :py:class:`mlflow.models.EvaluationResult` instance containing</span>
@@ -979,11 +981,71 @@
         <span class="k">yield</span> <span class="n">active_run</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">run_id</span>
 
 
-<span class="k">def</span> <span class="nf">_normalize_evaluators_and_evaluator_config_args</span><span class="p">(</span>
-    <span class="n">evaluators</span><span class="p">,</span>
-    <span class="n">evaluator_config</span><span class="p">,</span>
-<span class="p">):</span>
+<span class="c1"># NB: We often pass around evaluator name, config, and its instance together. Ideally, the</span>
+<span class="c1"># evaluator class should have name and config as class attributes, however, it was not</span>
+<span class="c1"># designed that way. Adding them while keeping backward compatibility is not trivial.</span>
+<span class="c1"># So, we use a dataclass to bundle them together.</span>
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">EvaluatorBundle</span><span class="p">:</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">evaluator</span><span class="p">:</span> <span class="n">ModelEvaluator</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">_resolve_default_evaluator</span><span class="p">(</span><span class="n">model_type</span><span class="p">,</span> <span class="n">default_config</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">EvaluatorBundle</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Determine which built-in evaluators should be used for the given model type by default.</span>
+
+<span class="sd">    Previously, MLflow evaluate API only had a single &quot;default&quot; evaluator used for all models like</span>
+<span class="sd">    classifier, regressor, etc. We split it into multiple built-in evaluators for different model</span>
+<span class="sd">    types for maintainability, but in order to maintain backward compatibility, we need to map</span>
+<span class="sd">    the &quot;default&quot; provided by users to the correct built-in evaluators.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        model_type: A string describing the model type (e.g., &quot;regressor&quot;, &quot;classifier&quot;, …).</span>
+<span class="sd">        default_config: A dictionary of configurations for the &quot;default&quot; evaluator. If any</span>
+<span class="sd">            non-default built-in evaluator is applicable, this config will be applied to them.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">mlflow.models.evaluation.evaluator_registry</span> <span class="kn">import</span> <span class="n">_model_evaluation_registry</span>
+
+    <span class="n">builtin_evaluators</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">_model_evaluation_registry</span><span class="o">.</span><span class="n">_registry</span><span class="p">:</span>
+        <span class="n">evaluator</span> <span class="o">=</span> <span class="n">_model_evaluation_registry</span><span class="o">.</span><span class="n">get_evaluator</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;default&quot;</span>
+            <span class="ow">and</span> <span class="n">_model_evaluation_registry</span><span class="o">.</span><span class="n">is_builtin</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">evaluator</span><span class="o">.</span><span class="n">can_evaluate</span><span class="p">(</span><span class="n">model_type</span><span class="o">=</span><span class="n">model_type</span><span class="p">,</span> <span class="n">evaluator_config</span><span class="o">=</span><span class="n">default_config</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="n">builtin_evaluators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">EvaluatorBundle</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">evaluator</span><span class="p">,</span> <span class="n">default_config</span><span class="p">))</span>
+
+    <span class="c1"># We should use DefaultEvaluator only if there is no other built-in evaluator applicable.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">builtin_evaluators</span><span class="p">:</span>
+        <span class="n">default_evaluator</span> <span class="o">=</span> <span class="n">_model_evaluation_registry</span><span class="o">.</span><span class="n">get_evaluator</span><span class="p">(</span><span class="s2">&quot;default&quot;</span><span class="p">)</span>
+        <span class="n">builtin_evaluators</span> <span class="o">=</span> <span class="p">[</span><span class="n">EvaluatorBundle</span><span class="p">(</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="n">default_evaluator</span><span class="p">,</span> <span class="n">default_config</span><span class="p">)]</span>
+
+    <span class="k">return</span> <span class="n">builtin_evaluators</span>
+
+
+<span class="k">def</span> <span class="nf">resolve_evaluators_and_configs</span><span class="p">(</span>
+    <span class="n">evaluators</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="kc">None</span><span class="p">],</span>
+    <span class="n">evaluator_config</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="kc">None</span><span class="p">],</span>
+    <span class="n">model_type</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">EvaluatorBundle</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The `evaluators` and `evaluator_config` arguments of the `evaluate` API can be specified</span>
+<span class="sd">    in multiple ways. This function normalizes the arguments into a single format for easier</span>
+<span class="sd">    downstream processing.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        evaluators: A string or a list of strings specifying the evaluators to use for model</span>
+<span class="sd">            evaluation. If None, all available evaluators will be used.</span>
+<span class="sd">        evaluator_config: A dictionary containing configuration items for the evaluators.</span>
+<span class="sd">        model_type: A string describing the model type (e.g., &quot;regressor&quot;, &quot;classifier&quot;, …).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A list of EvaluatorBundle that contains name, evaluator, config for each evaluator.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">mlflow.models.evaluation.evaluator_registry</span> <span class="kn">import</span> <span class="n">_model_evaluation_registry</span> <span class="k">as</span> <span class="n">rg</span>
 
     <span class="k">def</span> <span class="nf">check_nesting_config_dict</span><span class="p">(</span><span class="n">_evaluator_name_list</span><span class="p">,</span> <span class="n">_evaluator_name_to_conf_map</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_evaluator_name_to_conf_map</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span>
@@ -992,67 +1054,94 @@
         <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">evaluators</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">evaluator_name_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">_model_evaluation_registry</span><span class="o">.</span><span class="n">_registry</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">evaluator_name_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Multiple registered evaluators have been configured: </span><span class="si">{</span><span class="n">evaluator_name_list</span><span class="si">}</span><span class="s2">. &quot;</span>
-                <span class="s2">&quot;Each evaluator will be used for evaluation if the specified model type is &quot;</span>
-                <span class="s2">&quot;compatible with the evaluator definition. If you are intending to override &quot;</span>
-                <span class="s2">&quot;the default evaluator, define your custom evaluator by declaring it via the &quot;</span>
-                <span class="s2">&quot;`evaluator` argument. If your evaluator requires additional configuration, &quot;</span>
-                <span class="s2">&quot;ensure that it is provided by specifying the `evaluator_config` argument.&quot;</span>
-            <span class="p">)</span>
-        <span class="k">if</span> <span class="n">evaluator_config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">conf_dict_value_error</span> <span class="o">=</span> <span class="n">MlflowException</span><span class="p">(</span>
-                <span class="n">message</span><span class="o">=</span><span class="s2">&quot;If `evaluators` argument is None, all available evaluators will be used. &quot;</span>
-                <span class="s2">&quot;If only the default evaluator is available, the `evaluator_config` argument is &quot;</span>
-                <span class="s2">&quot;interpreted as the config dictionary for the default evaluator. Otherwise, the &quot;</span>
-                <span class="s2">&quot;`evaluator_config` argument must be a dictionary mapping each evaluator&#39;s name &quot;</span>
-                <span class="s2">&quot;to its own evaluator config dictionary.&quot;</span><span class="p">,</span>
-                <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="k">if</span> <span class="n">evaluator_name_list</span> <span class="o">==</span> <span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]:</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">evaluator_config</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-                    <span class="k">raise</span> <span class="n">conf_dict_value_error</span>
-                <span class="k">elif</span> <span class="s2">&quot;default&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">evaluator_config</span><span class="p">:</span>
-                    <span class="n">evaluator_name_to_conf_map</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="n">evaluator_config</span><span class="p">}</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">evaluator_name_to_conf_map</span> <span class="o">=</span> <span class="n">evaluator_config</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">check_nesting_config_dict</span><span class="p">(</span><span class="n">evaluator_name_list</span><span class="p">,</span> <span class="n">evaluator_config</span><span class="p">):</span>
-                    <span class="k">raise</span> <span class="n">conf_dict_value_error</span>
-                <span class="n">evaluator_name_to_conf_map</span> <span class="o">=</span> <span class="n">evaluator_config</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">evaluator_name_to_conf_map</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># If no evaluators are specified, use all available evaluators.</span>
+        <span class="n">evaluators</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">rg</span><span class="o">.</span><span class="n">_registry</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+        <span class="n">evaluator_config</span> <span class="o">=</span> <span class="n">evaluator_config</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">evaluator_config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span>
+            <span class="n">name</span> <span class="ow">in</span> <span class="n">evaluator_config</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">evaluators</span>
+        <span class="p">):</span>
+            <span class="c1"># If evaluator config is passed but any of available evaluator key is not</span>
+            <span class="c1"># in the evaluator config, we assume the evaluator config to be a flat dict,</span>
+            <span class="c1"># which is globally applied to all evaluators.</span>
+            <span class="n">evaluator_config</span> <span class="o">=</span> <span class="p">{</span><span class="n">ev</span><span class="p">:</span> <span class="n">evaluator_config</span> <span class="k">for</span> <span class="n">ev</span> <span class="ow">in</span> <span class="n">evaluators</span><span class="p">}</span>
+
+        <span class="c1"># Filter out evaluators that cannot evaluate the model type.</span>
+        <span class="n">resolved</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">evaluators</span><span class="p">:</span>
+            <span class="n">evaluator</span> <span class="o">=</span> <span class="n">rg</span><span class="o">.</span><span class="n">get_evaluator</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">config</span> <span class="o">=</span> <span class="n">evaluator_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="k">if</span> <span class="n">evaluator</span><span class="o">.</span><span class="n">can_evaluate</span><span class="p">(</span><span class="n">model_type</span><span class="o">=</span><span class="n">model_type</span><span class="p">,</span> <span class="n">evaluator_config</span><span class="o">=</span><span class="n">config</span><span class="p">):</span>
+                <span class="n">resolved</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">EvaluatorBundle</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">evaluator</span><span class="o">=</span><span class="n">evaluator</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">))</span>
+
+        <span class="c1"># If any of built-in evaluator can apply, skip &quot;default&quot; evaluator.</span>
+        <span class="n">default</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">ev</span> <span class="k">for</span> <span class="n">ev</span> <span class="ow">in</span> <span class="n">resolved</span> <span class="k">if</span> <span class="n">ev</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;default&quot;</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">non_default_builtins</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">ev</span> <span class="k">for</span> <span class="n">ev</span> <span class="ow">in</span> <span class="n">resolved</span> <span class="k">if</span> <span class="n">ev</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;default&quot;</span> <span class="ow">and</span> <span class="n">rg</span><span class="o">.</span><span class="n">is_builtin</span><span class="p">(</span><span class="n">ev</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="k">if</span> <span class="n">default</span> <span class="ow">and</span> <span class="n">non_default_builtins</span><span class="p">:</span>
+            <span class="n">resolved</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">default</span><span class="p">)</span>
+            <span class="c1"># Apply default config (passed like `evaluator_config={&quot;default&quot;: config}`) to</span>
+            <span class="c1"># non-default built-in evaluators (e.g., ClassifierEvaluator) if they don&#39;t have</span>
+            <span class="c1"># explicitly specified configs. This is for backward compatibility where we only</span>
+            <span class="c1"># had a single &quot;default&quot; evaluator used for all models.</span>
+            <span class="c1"># For example, if the user passes this for a classifier model:</span>
+            <span class="c1">#     evaluator_config = {&quot;default&quot;: my_config}</span>
+            <span class="c1"># it should be equivalent to</span>
+            <span class="c1">#    evaluator_config = {&quot;classifier&quot;: my_config, &quot;shap&quot;: my_config}</span>
+            <span class="k">for</span> <span class="n">ev</span> <span class="ow">in</span> <span class="n">non_default_builtins</span><span class="p">:</span>
+                <span class="n">ev</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">ev</span><span class="o">.</span><span class="n">config</span> <span class="ow">or</span> <span class="n">default</span><span class="o">.</span><span class="n">config</span>
+
+        <span class="k">return</span> <span class="n">resolved</span>
+
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">evaluators</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="c1"># Single evaluator name specified</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">evaluator_config</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">evaluator_config</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
                 <span class="n">message</span><span class="o">=</span><span class="s2">&quot;If `evaluators` argument is the name of an evaluator, evaluator_config&quot;</span>
                 <span class="s2">&quot; must be None or a dict containing config items for the evaluator.&quot;</span><span class="p">,</span>
                 <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="n">evaluator_name_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">evaluators</span><span class="p">]</span>
-        <span class="n">evaluator_name_to_conf_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">evaluators</span><span class="p">:</span> <span class="n">evaluator_config</span><span class="p">}</span>
+
+        <span class="n">evaluator_config</span> <span class="o">=</span> <span class="n">evaluator_config</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">evaluators</span> <span class="o">==</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span>
+            <span class="c1"># Previously we only had a single &quot;default&quot; evaluator used for all models.</span>
+            <span class="c1"># We need to map &quot;default&quot; to the new dedicated builtin evaluators.</span>
+            <span class="k">return</span> <span class="n">_resolve_default_evaluator</span><span class="p">(</span><span class="n">model_type</span><span class="p">,</span> <span class="n">evaluator_config</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">rg</span><span class="o">.</span><span class="n">is_registered</span><span class="p">(</span><span class="n">evaluators</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">EvaluatorBundle</span><span class="p">(</span><span class="n">evaluators</span><span class="p">,</span> <span class="n">rg</span><span class="o">.</span><span class="n">get_evaluator</span><span class="p">(</span><span class="n">evaluators</span><span class="p">),</span> <span class="n">evaluator_config</span><span class="p">)]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">evaluators</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">evaluator_config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">check_nesting_config_dict</span><span class="p">(</span><span class="n">evaluators</span><span class="p">,</span> <span class="n">evaluator_config</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
-                    <span class="n">message</span><span class="o">=</span><span class="s2">&quot;If `evaluators` argument is an evaluator name list, evaluator_config &quot;</span>
-                    <span class="s2">&quot;must be a dict contains mapping from evaluator name to individual &quot;</span>
-                    <span class="s2">&quot;evaluator config dict.&quot;</span><span class="p">,</span>
-                    <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
-                <span class="p">)</span>
-        <span class="c1"># Use `OrderedDict.fromkeys` to deduplicate elements but keep elements order.</span>
-        <span class="n">evaluator_name_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">OrderedDict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">evaluators</span><span class="p">))</span>
-        <span class="n">evaluator_name_to_conf_map</span> <span class="o">=</span> <span class="n">evaluator_config</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">evaluator_config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">check_nesting_config_dict</span><span class="p">(</span>
+            <span class="n">evaluators</span><span class="p">,</span> <span class="n">evaluator_config</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                <span class="n">message</span><span class="o">=</span><span class="s2">&quot;If `evaluators` argument is an evaluator name list, evaluator_config &quot;</span>
+                <span class="s2">&quot;must be a dict containing mapping from evaluator name to individual &quot;</span>
+                <span class="s2">&quot;evaluator config dict.&quot;</span><span class="p">,</span>
+                <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="n">evaluator_config</span> <span class="o">=</span> <span class="n">evaluator_config</span> <span class="ow">or</span> <span class="p">{}</span>
+
+        <span class="c1"># Previously we only had a single &quot;default&quot; evaluator used for all models.</span>
+        <span class="c1"># We need to map &quot;default&quot; to the new dedicated builtin evaluators.</span>
+        <span class="n">resolved</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">evaluators</span><span class="p">:</span>
+            <span class="n">config</span> <span class="o">=</span> <span class="n">evaluator_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span>
+                <span class="n">builtin_evaluators</span> <span class="o">=</span> <span class="n">_resolve_default_evaluator</span><span class="p">(</span><span class="n">model_type</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+                <span class="n">resolved</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">builtin_evaluators</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">resolved</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">EvaluatorBundle</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">rg</span><span class="o">.</span><span class="n">get_evaluator</span><span class="p">(</span><span class="n">name</span><span class="p">),</span> <span class="n">config</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">resolved</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
-            <span class="n">message</span><span class="o">=</span><span class="s2">&quot;`evaluators` argument must be None, an evaluator name string, or a list of &quot;</span>
-            <span class="s2">&quot;evaluator names.&quot;</span><span class="p">,</span>
+            <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Invalid `evaluators` and `evaluator_config` arguments. &quot;</span>
+            <span class="s2">&quot;Please refer to the documentation for correct usage.&quot;</span><span class="p">,</span>
             <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
         <span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">evaluator_name_list</span><span class="p">,</span> <span class="n">evaluator_name_to_conf_map</span>
 
 
 <span class="k">def</span> <span class="nf">_model_validation_contains_model_comparison</span><span class="p">(</span><span class="n">validation_thresholds</span><span class="p">):</span>
@@ -1079,26 +1168,29 @@
     <span class="k">return</span> <span class="n">_last_failed_evaluator</span>
 
 
+<span class="c1"># DO NOT CHANGE THE ORDER OF THE ARGUMENTS</span>
+<span class="c1"># The order of the arguments need to be preserved. You can add new arguments at the end</span>
+<span class="c1"># of the argument list, but do not change the order of the existing arguments.</span>
 <span class="k">def</span> <span class="nf">_evaluate</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">model</span><span class="p">,</span>
     <span class="n">model_type</span><span class="p">,</span>
     <span class="n">dataset</span><span class="p">,</span>
     <span class="n">run_id</span><span class="p">,</span>
+    <span class="c1"># The `evaluator_name_list` and `evaluator_name_to_conf_map` are not used by MLflow at all,</span>
+    <span class="c1"># but we need to keep these for backward compatibility.</span>
     <span class="n">evaluator_name_list</span><span class="p">,</span>
     <span class="n">evaluator_name_to_conf_map</span><span class="p">,</span>
     <span class="n">custom_metrics</span><span class="p">,</span>
     <span class="n">extra_metrics</span><span class="p">,</span>
     <span class="n">custom_artifacts</span><span class="p">,</span>
     <span class="n">predictions</span><span class="p">,</span>
+    <span class="n">evaluators</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The public API &quot;evaluate&quot; will verify argument first, and then pass normalized arguments</span>
 <span class="sd">    to the _evaluate method.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># import _model_evaluation_registry and PyFuncModel inside function to avoid circuit importing</span>
-    <span class="kn">from</span> <span class="nn">mlflow.models.evaluation.evaluator_registry</span> <span class="kn">import</span> <span class="n">_model_evaluation_registry</span>
-
     <span class="k">global</span> <span class="n">_last_failed_evaluator</span>
     <span class="n">_last_failed_evaluator</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -1111,29 +1203,23 @@
         <span class="n">dataset</span><span class="o">.</span><span class="n">_log_dataset_tag</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">run_id</span><span class="p">,</span> <span class="n">model_uuid</span><span class="p">)</span>
 
     <span class="n">eval_results</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">evaluator_name</span> <span class="ow">in</span> <span class="n">evaluator_name_list</span><span class="p">:</span>
-        <span class="n">config</span> <span class="o">=</span> <span class="n">evaluator_name_to_conf_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">evaluator_name</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{}</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">evaluator</span> <span class="o">=</span> <span class="n">_model_evaluation_registry</span><span class="o">.</span><span class="n">get_evaluator</span><span class="p">(</span><span class="n">evaluator_name</span><span class="p">)</span>
-        <span class="k">except</span> <span class="n">MlflowException</span><span class="p">:</span>
-            <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Evaluator &#39;</span><span class="si">{</span><span class="n">evaluator_name</span><span class="si">}</span><span class="s2">&#39; is not registered.&quot;</span><span class="p">)</span>
-            <span class="k">continue</span>
-
-        <span class="n">_last_failed_evaluator</span> <span class="o">=</span> <span class="n">evaluator_name</span>
-        <span class="k">if</span> <span class="n">evaluator</span><span class="o">.</span><span class="n">can_evaluate</span><span class="p">(</span><span class="n">model_type</span><span class="o">=</span><span class="n">model_type</span><span class="p">,</span> <span class="n">evaluator_config</span><span class="o">=</span><span class="n">config</span><span class="p">):</span>
-            <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Evaluating the model with the </span><span class="si">{</span><span class="n">evaluator_name</span><span class="si">}</span><span class="s2"> evaluator.&quot;</span><span class="p">)</span>
-            <span class="n">eval_result</span> <span class="o">=</span> <span class="n">evaluator</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+    <span class="k">for</span> <span class="n">eval_</span> <span class="ow">in</span> <span class="n">evaluators</span><span class="p">:</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Evaluating the model with the </span><span class="si">{</span><span class="n">eval_</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> evaluator.&quot;</span><span class="p">)</span>
+        <span class="n">_last_failed_evaluator</span> <span class="o">=</span> <span class="n">eval_</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">if</span> <span class="n">eval_</span><span class="o">.</span><span class="n">evaluator</span><span class="o">.</span><span class="n">can_evaluate</span><span class="p">(</span><span class="n">model_type</span><span class="o">=</span><span class="n">model_type</span><span class="p">,</span> <span class="n">evaluator_config</span><span class="o">=</span><span class="n">eval_</span><span class="o">.</span><span class="n">config</span><span class="p">):</span>
+            <span class="n">eval_result</span> <span class="o">=</span> <span class="n">eval_</span><span class="o">.</span><span class="n">evaluator</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
                 <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
                 <span class="n">model_type</span><span class="o">=</span><span class="n">model_type</span><span class="p">,</span>
                 <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span>
                 <span class="n">run_id</span><span class="o">=</span><span class="n">run_id</span><span class="p">,</span>
-                <span class="n">evaluator_config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
+                <span class="n">evaluator_config</span><span class="o">=</span><span class="n">eval_</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
                 <span class="n">custom_metrics</span><span class="o">=</span><span class="n">custom_metrics</span><span class="p">,</span>
                 <span class="n">extra_metrics</span><span class="o">=</span><span class="n">extra_metrics</span><span class="p">,</span>
                 <span class="n">custom_artifacts</span><span class="o">=</span><span class="n">custom_artifacts</span><span class="p">,</span>
                 <span class="n">predictions</span><span class="o">=</span><span class="n">predictions</span><span class="p">,</span>
             <span class="p">)</span>
-            <span class="n">eval_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">eval_result</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">eval_result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">eval_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">eval_result</span><span class="p">)</span>
 
     <span class="n">_last_failed_evaluator</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -1147,8 +1233,6 @@
     <span class="n">merged_eval_result</span> <span class="o">=</span> <span class="n">EvaluationResult</span><span class="p">({},</span> <span class="p">{},</span> <span class="kc">None</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">eval_result</span> <span class="ow">in</span> <span class="n">eval_results</span><span class="p">:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">eval_result</span><span class="p">:</span>
-            <span class="k">continue</span>
         <span class="n">merged_eval_result</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">eval_result</span><span class="o">.</span><span class="n">metrics</span><span class="p">)</span>
         <span class="n">merged_eval_result</span><span class="o">.</span><span class="n">artifacts</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">eval_result</span><span class="o">.</span><span class="n">artifacts</span><span class="p">)</span>
 
@@ -1477,6 +1561,24 @@
 <span class="sd">                with a PandasDataset. Model outputs are required when model is unspecified, and</span>
 <span class="sd">                should be specified via the ``predictions`` prerty of the PandasDataset.</span>
 
+<span class="sd">        model_type: (Optional) A string describing the model type. The default evaluator</span>
+<span class="sd">            supports the following model types:</span>
+
+<span class="sd">            - ``&#39;classifier&#39;``</span>
+<span class="sd">            - ``&#39;regressor&#39;``</span>
+<span class="sd">            - ``&#39;question-answering&#39;``</span>
+<span class="sd">            - ``&#39;text-summarization&#39;``</span>
+<span class="sd">            - ``&#39;text&#39;``</span>
+<span class="sd">            - ``&#39;retriever&#39;``</span>
+
+<span class="sd">            If no ``model_type`` is specified, then you must provide a a list of</span>
+<span class="sd">            metrics to compute via the ``extra_metrics`` param.</span>
+
+<span class="sd">            .. note::</span>
+<span class="sd">                ``&#39;question-answering&#39;``, ``&#39;text-summarization&#39;``, ``&#39;text&#39;``, and</span>
+<span class="sd">                ``&#39;retriever&#39;`` are experimental and may be changed or removed in a</span>
+<span class="sd">                future release.</span>
+
 <span class="sd">        targets: If ``data`` is a numpy array or list, a numpy array or list of evaluation</span>
 <span class="sd">            labels. If ``data`` is a DataFrame, the string name of a column from ``data``</span>
 <span class="sd">            that contains evaluation labels. Required for classifier and regressor models,</span>
@@ -1518,29 +1620,6 @@
 <span class="sd">                    predictions=&quot;answer&quot;,</span>
 <span class="sd">                    # other arguments if needed</span>
 <span class="sd">                )</span>
-
-<span class="sd">        model_type: (Optional) A string describing the model type. The default evaluator</span>
-<span class="sd">            supports the following model types:</span>
-
-<span class="sd">            - ``&#39;classifier&#39;``</span>
-<span class="sd">            - ``&#39;regressor&#39;``</span>
-<span class="sd">            - ``&#39;question-answering&#39;``</span>
-<span class="sd">            - ``&#39;text-summarization&#39;``</span>
-<span class="sd">            - ``&#39;text&#39;``</span>
-<span class="sd">            - ``&#39;retriever&#39;``</span>
-
-<span class="sd">            If no ``model_type`` is specified, then you must provide a a list of</span>
-<span class="sd">            metrics to compute via the ``extra_metrics`` param.</span>
-
-<span class="sd">            .. note::</span>
-<span class="sd">                ``&#39;question-answering&#39;``, ``&#39;text-summarization&#39;``, ``&#39;text&#39;``, and</span>
-<span class="sd">                ``&#39;retriever&#39;`` are experimental and may be changed or removed in a</span>
-<span class="sd">                future release.</span>
-
-<span class="sd">        inference_params: (Optional) A dictionary of inference parameters to be passed to the model</span>
-<span class="sd">            when making predictions, such as ``{&quot;max_tokens&quot;: 100}``. This is only used when</span>
-<span class="sd">            the ``model`` is an MLflow Deployments endpoint URI e.g. ``&quot;endpoints:/my-chat&quot;``</span>
-
 <span class="sd">        dataset_path: (Optional) The path where the data is stored. Must not contain double</span>
 <span class="sd">            quotes (``“``). If specified, the path is logged to the ``mlflow.datasets``</span>
 <span class="sd">            tag for lineage tracking purposes.</span>
@@ -1564,6 +1643,7 @@
 <span class="sd">            If multiple evaluators are specified, each configuration should be</span>
 <span class="sd">            supplied as a nested dictionary whose key is the evaluator name.</span>
 
+<span class="sd">        custom_metrics: Deprecated. Use ``extra_metrics`` instead.</span>
 <span class="sd">        extra_metrics:</span>
 <span class="sd">            (Optional) A list of :py:class:`EvaluationMetric &lt;mlflow.models.EvaluationMetric&gt;`</span>
 <span class="sd">            objects.  These metrics are computed in addition to the default metrics associated with</span>
@@ -1666,9 +1746,6 @@
 <span class="sd">        baseline_model: DEPRECATED. Please use :py:func:`mlflow.validate_evaluation_results`</span>
 <span class="sd">            API instead for running model validation against baseline.</span>
 
-<span class="sd">        baseline_config: DEPRECATED. Please use :py:func:`mlflow.validate_evaluation_results`</span>
-<span class="sd">            API instead for running model validation against baseline.</span>
-
 <span class="sd">        env_manager: Specify an environment manager to load the candidate ``model`` in</span>
 <span class="sd">            isolated Python environments and restore their</span>
 <span class="sd">            dependencies. Default value is ``local``, and the following values are</span>
@@ -1687,10 +1764,18 @@
 <span class="sd">            specific model. If not indicated, the default model configuration</span>
 <span class="sd">            from the model is used (if any).</span>
 
+<span class="sd">        baseline_config: DEPRECATED. Please use :py:func:`mlflow.validate_evaluation_results`</span>
+<span class="sd">            API instead for running model validation against baseline.</span>
+
+<span class="sd">        inference_params: (Optional) A dictionary of inference parameters to be passed to the model</span>
+<span class="sd">            when making predictions, such as ``{&quot;max_tokens&quot;: 100}``. This is only used when</span>
+<span class="sd">            the ``model`` is an MLflow Deployments endpoint URI e.g. ``&quot;endpoints:/my-chat&quot;``</span>
+
 <span class="sd">    Returns:</span>
 <span class="sd">        An :py:class:`mlflow.models.EvaluationResult` instance containing</span>
 <span class="sd">        metrics of evaluating the model with the given dataset.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
+    <span class="kn">from</span> <span class="nn">mlflow.models.evaluation.evaluator_registry</span> <span class="kn">import</span> <span class="n">_model_evaluation_registry</span>
     <span class="kn">from</span> <span class="nn">mlflow.pyfunc</span> <span class="kn">import</span> <span class="n">PyFuncModel</span><span class="p">,</span> <span class="n">_load_model_or_server</span><span class="p">,</span> <span class="n">_ServedPyFuncModel</span>
     <span class="kn">from</span> <span class="nn">mlflow.utils</span> <span class="kn">import</span> <span class="n">env_manager</span> <span class="k">as</span> <span class="n">_EnvManager</span>
 
@@ -1808,10 +1893,14 @@
             <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="p">(</span>
-        <span class="n">evaluator_name_list</span><span class="p">,</span>
-        <span class="n">evaluator_name_to_conf_map</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">=</span> <span class="n">_normalize_evaluators_and_evaluator_config_args</span><span class="p">(</span><span class="n">evaluators</span><span class="p">,</span> <span class="n">evaluator_config</span><span class="p">)</span>
+    <span class="n">evaluators</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">EvaluatorBundle</span><span class="p">]</span> <span class="o">=</span> <span class="n">resolve_evaluators_and_configs</span><span class="p">(</span>
+        <span class="n">evaluators</span><span class="p">,</span> <span class="n">evaluator_config</span><span class="p">,</span> <span class="n">model_type</span>
+    <span class="p">)</span>
+
+    <span class="c1"># NB: MLflow do not use either of these two variables. However, we need to pass these to</span>
+    <span class="c1"># _evaluate() function for backward compatibility.</span>
+    <span class="n">evaluator_name_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">evaluator</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">evaluator</span> <span class="ow">in</span> <span class="n">evaluators</span><span class="p">]</span>
+    <span class="n">evaluator_name_to_conf_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">evaluator</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">evaluator</span><span class="o">.</span><span class="n">config</span> <span class="k">for</span> <span class="n">evaluator</span> <span class="ow">in</span> <span class="n">evaluators</span><span class="p">}</span>
 
     <span class="k">with</span> <span class="n">_start_run_or_reuse_active_run</span><span class="p">()</span> <span class="k">as</span> <span class="n">run_id</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">):</span>
@@ -1827,10 +1916,14 @@
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">PyFuncConvertibleDatasetMixin</span><span class="p">):</span>
             <span class="n">dataset</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to_evaluation_dataset</span><span class="p">(</span><span class="n">dataset_path</span><span class="p">,</span> <span class="n">feature_names</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">evaluator_name_to_conf_map</span> <span class="ow">and</span> <span class="n">evaluator_name_to_conf_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
-                <span class="n">context</span> <span class="o">=</span> <span class="n">evaluator_name_to_conf_map</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;metric_prefix&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">context</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="c1"># Use metrix_prefix configured for builtin evaluators as a dataset tag</span>
+            <span class="n">context</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">evaluators</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">_model_evaluation_registry</span><span class="o">.</span><span class="n">is_builtin</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="ow">and</span> <span class="n">e</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;metric_prefix&quot;</span><span class="p">):</span>
+                    <span class="n">context</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;metric_prefix&quot;</span><span class="p">)</span>
+                    <span class="k">break</span>
+
             <span class="n">client</span> <span class="o">=</span> <span class="n">MlflowClient</span><span class="p">()</span>
             <span class="n">tags</span> <span class="o">=</span> <span class="p">[</span><span class="n">InputTag</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">MLFLOW_DATASET_CONTEXT</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">context</span><span class="p">)]</span> <span class="k">if</span> <span class="n">context</span> <span class="k">else</span> <span class="p">[]</span>
             <span class="n">dataset_input</span> <span class="o">=</span> <span class="n">DatasetInput</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">_to_mlflow_entity</span><span class="p">(),</span> <span class="n">tags</span><span class="o">=</span><span class="n">tags</span><span class="p">)</span>
@@ -1857,6 +1950,7 @@
                 <span class="n">extra_metrics</span><span class="o">=</span><span class="n">extra_metrics</span><span class="p">,</span>
                 <span class="n">custom_artifacts</span><span class="o">=</span><span class="n">custom_artifacts</span><span class="p">,</span>
                 <span class="n">predictions</span><span class="o">=</span><span class="n">predictions_expected_in_model_output</span><span class="p">,</span>
+                <span class="n">evaluators</span><span class="o">=</span><span class="n">evaluators</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">finally</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">_ServedPyFuncModel</span><span class="p">):</span>
@@ -1891,6 +1985,7 @@
             <span class="n">extra_metrics</span><span class="o">=</span><span class="n">extra_metrics</span><span class="p">,</span>
             <span class="n">custom_artifacts</span><span class="o">=</span><span class="n">custom_artifacts</span><span class="p">,</span>
             <span class="n">predictions</span><span class="o">=</span><span class="n">predictions_expected_in_model_output</span><span class="p">,</span>
+            <span class="n">evaluators</span><span class="o">=</span><span class="n">evaluators</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">validate_evaluation_results</span><span class="p">(</span>
             <span class="n">validation_thresholds</span><span class="o">=</span><span class="n">validation_thresholds</span><span class="p">,</span>

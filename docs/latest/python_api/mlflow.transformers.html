@@ -353,7 +353,7 @@ produce a pip environment that contain these requirements at a minimum.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The ‘transformers’ MLflow Models integration is known to be compatible with the following package version ranges: <code class="docutils literal notranslate"><span class="pre">4.25.1</span></code> -  <code class="docutils literal notranslate"><span class="pre">4.45.2</span></code>. MLflow Models integrations with transformers may not succeed when used with package versions outside of this range.</p>
+<p>The ‘transformers’ MLflow Models integration is known to be compatible with <code class="docutils literal notranslate"><span class="pre">4.25.1</span></code> &lt;= <code class="docutils literal notranslate"><span class="pre">transformers</span></code> &lt;= <code class="docutils literal notranslate"><span class="pre">4.45.2</span></code>. MLflow Models integrations with transformers may not succeed when used with package versions outside of this range.</p>
 </div>
 <p>Load a <code class="docutils literal notranslate"><span class="pre">transformers</span></code> object from a local file or a run.</p>
 <dl class="field-list simple">
@@ -415,7 +415,7 @@ For information on parameters and their usage, see
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The ‘transformers’ MLflow Models integration is known to be compatible with the following package version ranges: <code class="docutils literal notranslate"><span class="pre">4.25.1</span></code> -  <code class="docutils literal notranslate"><span class="pre">4.45.2</span></code>. MLflow Models integrations with transformers may not succeed when used with package versions outside of this range.</p>
+<p>The ‘transformers’ MLflow Models integration is known to be compatible with <code class="docutils literal notranslate"><span class="pre">4.25.1</span></code> &lt;= <code class="docutils literal notranslate"><span class="pre">transformers</span></code> &lt;= <code class="docutils literal notranslate"><span class="pre">4.45.2</span></code>. MLflow Models integrations with transformers may not succeed when used with package versions outside of this range.</p>
 </div>
 <p>Log a <code class="docutils literal notranslate"><span class="pre">transformers</span></code> object as an MLflow artifact for the current run. Note that
 logging transformers models with custom code (i.e. models that require
@@ -524,57 +524,6 @@ must be &gt;=0.10.0</p>
 <li><p><strong>inference_config</strong> – <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Deprecated. <cite>inference_config</cite> is deprecated in favor of <cite>model_config</cite>.</p>
-</div>
-</p></li>
-<li><p><strong>model_config</strong> – <p>A dict of valid overrides that can be applied to a pipeline instance during inference.
-These arguments are used exclusively for the case of loading the model as a <code class="docutils literal notranslate"><span class="pre">pyfunc</span></code>
-Model or for use in Spark. These values are not applied to a returned Pipeline from a
-call to <code class="docutils literal notranslate"><span class="pre">mlflow.transformers.load_model()</span></code></p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>If the key provided is not compatible with either the
-Pipeline instance for the task provided or is not a valid
-override to any arguments available in the Model, an
-Exception will be raised at runtime. It is very important
-to validate the entries in this dictionary to ensure
-that they are valid prior to saving or logging.</p>
-</div>
-<p>An example of providing overrides for a question generation model:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">pipeline</span><span class="p">,</span> <span class="n">AutoTokenizer</span>
-
-<span class="n">task</span> <span class="o">=</span> <span class="s2">&quot;text-generation&quot;</span>
-<span class="n">architecture</span> <span class="o">=</span> <span class="s2">&quot;gpt2&quot;</span>
-
-<span class="n">sentence_pipeline</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span>
-    <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span>
-    <span class="n">tokenizer</span><span class="o">=</span><span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">architecture</span><span class="p">),</span>
-    <span class="n">model</span><span class="o">=</span><span class="n">architecture</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="c1"># Validate that the overrides function</span>
-<span class="n">prompts</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Generative models are&quot;</span><span class="p">,</span> <span class="s2">&quot;I&#39;d like a coconut so that I can&quot;</span><span class="p">]</span>
-
-<span class="c1"># validation of config prior to save or log</span>
-<span class="n">model_config</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;top_k&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-    <span class="s2">&quot;num_beams&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
-    <span class="s2">&quot;max_length&quot;</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span>
-    <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="mf">0.62</span><span class="p">,</span>
-    <span class="s2">&quot;top_p&quot;</span><span class="p">:</span> <span class="mf">0.85</span><span class="p">,</span>
-    <span class="s2">&quot;repetition_penalty&quot;</span><span class="p">:</span> <span class="mf">1.15</span><span class="p">,</span>
-<span class="p">}</span>
-
-<span class="c1"># Verify that no exceptions are thrown</span>
-<span class="n">sentence_pipeline</span><span class="p">(</span><span class="n">prompts</span><span class="p">,</span> <span class="o">**</span><span class="n">model_config</span><span class="p">)</span>
-
-<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
-    <span class="n">mlflow</span><span class="o">.</span><span class="n">transformers</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
-        <span class="n">transformers_model</span><span class="o">=</span><span class="n">sentence_pipeline</span><span class="p">,</span>
-        <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;my_sentence_generator&quot;</span><span class="p">,</span>
-        <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span>
-        <span class="n">model_config</span><span class="o">=</span><span class="n">model_config</span><span class="p">,</span>
-    <span class="p">)</span>
-</pre></div>
 </div>
 </p></li>
 <li><p><strong>code_paths</strong> – <p>A list of local filesystem paths to Python file dependencies (or directories
@@ -693,6 +642,57 @@ The following is an <em>example</em> dictionary representation of a conda enviro
 </div>
 </p></li>
 <li><p><strong>metadata</strong> – Custom metadata dictionary passed to the model and stored in the MLmodel file.</p></li>
+<li><p><strong>model_config</strong> – <p>A dict of valid overrides that can be applied to a pipeline instance during inference.
+These arguments are used exclusively for the case of loading the model as a <code class="docutils literal notranslate"><span class="pre">pyfunc</span></code>
+Model or for use in Spark. These values are not applied to a returned Pipeline from a
+call to <code class="docutils literal notranslate"><span class="pre">mlflow.transformers.load_model()</span></code></p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If the key provided is not compatible with either the
+Pipeline instance for the task provided or is not a valid
+override to any arguments available in the Model, an
+Exception will be raised at runtime. It is very important
+to validate the entries in this dictionary to ensure
+that they are valid prior to saving or logging.</p>
+</div>
+<p>An example of providing overrides for a question generation model:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">pipeline</span><span class="p">,</span> <span class="n">AutoTokenizer</span>
+
+<span class="n">task</span> <span class="o">=</span> <span class="s2">&quot;text-generation&quot;</span>
+<span class="n">architecture</span> <span class="o">=</span> <span class="s2">&quot;gpt2&quot;</span>
+
+<span class="n">sentence_pipeline</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span>
+    <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span>
+    <span class="n">tokenizer</span><span class="o">=</span><span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">architecture</span><span class="p">),</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">architecture</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Validate that the overrides function</span>
+<span class="n">prompts</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Generative models are&quot;</span><span class="p">,</span> <span class="s2">&quot;I&#39;d like a coconut so that I can&quot;</span><span class="p">]</span>
+
+<span class="c1"># validation of config prior to save or log</span>
+<span class="n">model_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;top_k&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s2">&quot;num_beams&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+    <span class="s2">&quot;max_length&quot;</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span>
+    <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="mf">0.62</span><span class="p">,</span>
+    <span class="s2">&quot;top_p&quot;</span><span class="p">:</span> <span class="mf">0.85</span><span class="p">,</span>
+    <span class="s2">&quot;repetition_penalty&quot;</span><span class="p">:</span> <span class="mf">1.15</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="c1"># Verify that no exceptions are thrown</span>
+<span class="n">sentence_pipeline</span><span class="p">(</span><span class="n">prompts</span><span class="p">,</span> <span class="o">**</span><span class="n">model_config</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">transformers</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+        <span class="n">transformers_model</span><span class="o">=</span><span class="n">sentence_pipeline</span><span class="p">,</span>
+        <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;my_sentence_generator&quot;</span><span class="p">,</span>
+        <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span>
+        <span class="n">model_config</span><span class="o">=</span><span class="n">model_config</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</p></li>
 <li><p><strong>example_no_conversion</strong> – This parameter is deprecated and will be removed in a future release.
 It’s no longer used and can be safely removed. Input examples are not converted anymore.</p></li>
 <li><p><strong>prompt_template</strong> – <p>A string that, if provided, will be used to format the user’s input prior
@@ -794,7 +794,7 @@ It must be logged/saved with save_pretrained=False.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The ‘transformers’ MLflow Models integration is known to be compatible with the following package version ranges: <code class="docutils literal notranslate"><span class="pre">4.25.1</span></code> -  <code class="docutils literal notranslate"><span class="pre">4.45.2</span></code>. MLflow Models integrations with transformers may not succeed when used with package versions outside of this range.</p>
+<p>The ‘transformers’ MLflow Models integration is known to be compatible with <code class="docutils literal notranslate"><span class="pre">4.25.1</span></code> &lt;= <code class="docutils literal notranslate"><span class="pre">transformers</span></code> &lt;= <code class="docutils literal notranslate"><span class="pre">4.45.2</span></code>. MLflow Models integrations with transformers may not succeed when used with package versions outside of this range.</p>
 </div>
 <p>Save a trained transformers model to a path on the local file system. Note that
 saving transformers models with custom code (i.e. models that require
@@ -901,57 +901,6 @@ must be &gt;=0.10.0</p>
 <li><p><strong>inference_config</strong> – <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Deprecated. <cite>inference_config</cite> is deprecated in favor of <cite>model_config</cite>.</p>
-</div>
-</p></li>
-<li><p><strong>model_config</strong> – <p>A dict of valid overrides that can be applied to a pipeline instance during inference.
-These arguments are used exclusively for the case of loading the model as a <code class="docutils literal notranslate"><span class="pre">pyfunc</span></code>
-Model or for use in Spark.
-These values are not applied to a returned Pipeline from a call to
-<code class="docutils literal notranslate"><span class="pre">mlflow.transformers.load_model()</span></code></p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>If the key provided is not compatible with either the
-Pipeline instance for the task provided or is not a valid
-override to any arguments available in the Model, an
-Exception will be raised at runtime. It is very important
-to validate the entries in this dictionary to ensure
-that they are valid prior to saving or logging.</p>
-</div>
-<p>An example of providing overrides for a question generation model:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">pipeline</span><span class="p">,</span> <span class="n">AutoTokenizer</span>
-
-<span class="n">task</span> <span class="o">=</span> <span class="s2">&quot;text-generation&quot;</span>
-<span class="n">architecture</span> <span class="o">=</span> <span class="s2">&quot;gpt2&quot;</span>
-
-<span class="n">sentence_pipeline</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span>
-    <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span>
-    <span class="n">tokenizer</span><span class="o">=</span><span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">architecture</span><span class="p">),</span>
-    <span class="n">model</span><span class="o">=</span><span class="n">architecture</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="c1"># Validate that the overrides function</span>
-<span class="n">prompts</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Generative models are&quot;</span><span class="p">,</span> <span class="s2">&quot;I&#39;d like a coconut so that I can&quot;</span><span class="p">]</span>
-
-<span class="c1"># validation of config prior to save or log</span>
-<span class="n">model_config</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;top_k&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-    <span class="s2">&quot;num_beams&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
-    <span class="s2">&quot;max_length&quot;</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span>
-    <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="mf">0.62</span><span class="p">,</span>
-    <span class="s2">&quot;top_p&quot;</span><span class="p">:</span> <span class="mf">0.85</span><span class="p">,</span>
-    <span class="s2">&quot;repetition_penalty&quot;</span><span class="p">:</span> <span class="mf">1.15</span><span class="p">,</span>
-<span class="p">}</span>
-
-<span class="c1"># Verify that no exceptions are thrown</span>
-<span class="n">sentence_pipeline</span><span class="p">(</span><span class="n">prompts</span><span class="p">,</span> <span class="o">**</span><span class="n">model_config</span><span class="p">)</span>
-
-<span class="n">mlflow</span><span class="o">.</span><span class="n">transformers</span><span class="o">.</span><span class="n">save_model</span><span class="p">(</span>
-    <span class="n">transformers_model</span><span class="o">=</span><span class="n">sentence_pipeline</span><span class="p">,</span>
-    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;/path/for/model&quot;</span><span class="p">,</span>
-    <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span>
-    <span class="n">model_config</span><span class="o">=</span><span class="n">model_config</span><span class="p">,</span>
-<span class="p">)</span>
-</pre></div>
 </div>
 </p></li>
 <li><p><strong>code_paths</strong> – <p>A list of local filesystem paths to Python file dependencies (or directories
@@ -1061,6 +1010,57 @@ The following is an <em>example</em> dictionary representation of a conda enviro
 </div>
 </p></li>
 <li><p><strong>metadata</strong> – Custom metadata dictionary passed to the model and stored in the MLmodel file.</p></li>
+<li><p><strong>model_config</strong> – <p>A dict of valid overrides that can be applied to a pipeline instance during inference.
+These arguments are used exclusively for the case of loading the model as a <code class="docutils literal notranslate"><span class="pre">pyfunc</span></code>
+Model or for use in Spark.
+These values are not applied to a returned Pipeline from a call to
+<code class="docutils literal notranslate"><span class="pre">mlflow.transformers.load_model()</span></code></p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If the key provided is not compatible with either the
+Pipeline instance for the task provided or is not a valid
+override to any arguments available in the Model, an
+Exception will be raised at runtime. It is very important
+to validate the entries in this dictionary to ensure
+that they are valid prior to saving or logging.</p>
+</div>
+<p>An example of providing overrides for a question generation model:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">pipeline</span><span class="p">,</span> <span class="n">AutoTokenizer</span>
+
+<span class="n">task</span> <span class="o">=</span> <span class="s2">&quot;text-generation&quot;</span>
+<span class="n">architecture</span> <span class="o">=</span> <span class="s2">&quot;gpt2&quot;</span>
+
+<span class="n">sentence_pipeline</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span>
+    <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span>
+    <span class="n">tokenizer</span><span class="o">=</span><span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">architecture</span><span class="p">),</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">architecture</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Validate that the overrides function</span>
+<span class="n">prompts</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Generative models are&quot;</span><span class="p">,</span> <span class="s2">&quot;I&#39;d like a coconut so that I can&quot;</span><span class="p">]</span>
+
+<span class="c1"># validation of config prior to save or log</span>
+<span class="n">model_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;top_k&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s2">&quot;num_beams&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+    <span class="s2">&quot;max_length&quot;</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span>
+    <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="mf">0.62</span><span class="p">,</span>
+    <span class="s2">&quot;top_p&quot;</span><span class="p">:</span> <span class="mf">0.85</span><span class="p">,</span>
+    <span class="s2">&quot;repetition_penalty&quot;</span><span class="p">:</span> <span class="mf">1.15</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="c1"># Verify that no exceptions are thrown</span>
+<span class="n">sentence_pipeline</span><span class="p">(</span><span class="n">prompts</span><span class="p">,</span> <span class="o">**</span><span class="n">model_config</span><span class="p">)</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">transformers</span><span class="o">.</span><span class="n">save_model</span><span class="p">(</span>
+    <span class="n">transformers_model</span><span class="o">=</span><span class="n">sentence_pipeline</span><span class="p">,</span>
+    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;/path/for/model&quot;</span><span class="p">,</span>
+    <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span>
+    <span class="n">model_config</span><span class="o">=</span><span class="n">model_config</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</p></li>
 <li><p><strong>example_no_conversion</strong> – This parameter is deprecated and will be removed in a future release.
 It’s no longer used and can be safely removed. Input examples are not converted anymore.</p></li>
 <li><p><strong>prompt_template</strong> – <p>A string that, if provided, will be used to format the user’s input prior

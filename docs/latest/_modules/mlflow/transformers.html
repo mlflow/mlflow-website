@@ -594,6 +594,48 @@
 
 <span class="sd">            .. Warning:: Deprecated. `inference_config` is deprecated in favor of `model_config`.</span>
 
+<span class="sd">        code_paths: {{ code_paths }}</span>
+<span class="sd">        mlflow_model: An MLflow model object that specifies the flavor that this model is being</span>
+<span class="sd">            added to.</span>
+<span class="sd">        signature: A Model Signature object that describes the input and output Schema of the</span>
+<span class="sd">            model. The model signature can be inferred using `infer_signature` function</span>
+<span class="sd">            of `mlflow.models.signature`.</span>
+
+<span class="sd">            .. code-block:: python</span>
+<span class="sd">                :caption: Example</span>
+
+<span class="sd">                from mlflow.models import infer_signature</span>
+<span class="sd">                from mlflow.transformers import generate_signature_output</span>
+<span class="sd">                from transformers import pipeline</span>
+
+<span class="sd">                en_to_de = pipeline(&quot;translation_en_to_de&quot;)</span>
+
+<span class="sd">                data = &quot;MLflow is great!&quot;</span>
+<span class="sd">                output = generate_signature_output(en_to_de, data)</span>
+<span class="sd">                signature = infer_signature(data, output)</span>
+
+<span class="sd">                mlflow.transformers.save_model(</span>
+<span class="sd">                    transformers_model=en_to_de,</span>
+<span class="sd">                    path=&quot;/path/to/save/model&quot;,</span>
+<span class="sd">                    signature=signature,</span>
+<span class="sd">                    input_example=data,</span>
+<span class="sd">                )</span>
+
+<span class="sd">                loaded = mlflow.pyfunc.load_model(&quot;/path/to/save/model&quot;)</span>
+<span class="sd">                print(loaded.predict(data))</span>
+<span class="sd">                # MLflow ist großartig!</span>
+
+<span class="sd">            If an input_example is provided and the signature is not, a signature will</span>
+<span class="sd">            be inferred automatically and applied to the MLmodel file iff the</span>
+<span class="sd">            pipeline type is a text-based model (NLP). If the pipeline type is not</span>
+<span class="sd">            a supported type, this inference functionality will not function correctly</span>
+<span class="sd">            and a warning will be issued. In order to ensure that a precise signature</span>
+<span class="sd">            is logged, it is recommended to explicitly provide one.</span>
+<span class="sd">        input_example: {{ input_example }}</span>
+<span class="sd">        pip_requirements: {{ pip_requirements }}</span>
+<span class="sd">        extra_pip_requirements: {{ extra_pip_requirements }}</span>
+<span class="sd">        conda_env: {{ conda_env }}</span>
+<span class="sd">        metadata: {{ metadata }}</span>
 <span class="sd">        model_config:</span>
 <span class="sd">            A dict of valid overrides that can be applied to a pipeline instance during inference.</span>
 <span class="sd">            These arguments are used exclusively for the case of loading the model as a ``pyfunc``</span>
@@ -645,49 +687,6 @@
 <span class="sd">                    task=task,</span>
 <span class="sd">                    model_config=model_config,</span>
 <span class="sd">                )</span>
-
-<span class="sd">        code_paths: {{ code_paths }}</span>
-<span class="sd">        mlflow_model: An MLflow model object that specifies the flavor that this model is being</span>
-<span class="sd">            added to.</span>
-<span class="sd">        signature: A Model Signature object that describes the input and output Schema of the</span>
-<span class="sd">            model. The model signature can be inferred using `infer_signature` function</span>
-<span class="sd">            of `mlflow.models.signature`.</span>
-
-<span class="sd">            .. code-block:: python</span>
-<span class="sd">                :caption: Example</span>
-
-<span class="sd">                from mlflow.models import infer_signature</span>
-<span class="sd">                from mlflow.transformers import generate_signature_output</span>
-<span class="sd">                from transformers import pipeline</span>
-
-<span class="sd">                en_to_de = pipeline(&quot;translation_en_to_de&quot;)</span>
-
-<span class="sd">                data = &quot;MLflow is great!&quot;</span>
-<span class="sd">                output = generate_signature_output(en_to_de, data)</span>
-<span class="sd">                signature = infer_signature(data, output)</span>
-
-<span class="sd">                mlflow.transformers.save_model(</span>
-<span class="sd">                    transformers_model=en_to_de,</span>
-<span class="sd">                    path=&quot;/path/to/save/model&quot;,</span>
-<span class="sd">                    signature=signature,</span>
-<span class="sd">                    input_example=data,</span>
-<span class="sd">                )</span>
-
-<span class="sd">                loaded = mlflow.pyfunc.load_model(&quot;/path/to/save/model&quot;)</span>
-<span class="sd">                print(loaded.predict(data))</span>
-<span class="sd">                # MLflow ist großartig!</span>
-
-<span class="sd">            If an input_example is provided and the signature is not, a signature will</span>
-<span class="sd">            be inferred automatically and applied to the MLmodel file iff the</span>
-<span class="sd">            pipeline type is a text-based model (NLP). If the pipeline type is not</span>
-<span class="sd">            a supported type, this inference functionality will not function correctly</span>
-<span class="sd">            and a warning will be issued. In order to ensure that a precise signature</span>
-<span class="sd">            is logged, it is recommended to explicitly provide one.</span>
-<span class="sd">        input_example: {{ input_example }}</span>
-<span class="sd">        pip_requirements: {{ pip_requirements }}</span>
-<span class="sd">        extra_pip_requirements: {{ extra_pip_requirements }}</span>
-<span class="sd">        conda_env: {{ conda_env }}</span>
-<span class="sd">        metadata: {{ metadata }}</span>
 <span class="sd">        example_no_conversion: {{ example_no_conversion }}</span>
 <span class="sd">        prompt_template: {{ prompt_template }}</span>
 <span class="sd">        save_pretrained: {{ save_pretrained }}</span>
@@ -1113,57 +1112,6 @@
 <span class="sd">        inference_config:</span>
 
 <span class="sd">            .. Warning:: Deprecated. `inference_config` is deprecated in favor of `model_config`.</span>
-<span class="sd">        model_config:</span>
-<span class="sd">            A dict of valid overrides that can be applied to a pipeline instance during inference.</span>
-<span class="sd">            These arguments are used exclusively for the case of loading the model as a ``pyfunc``</span>
-<span class="sd">            Model or for use in Spark. These values are not applied to a returned Pipeline from a</span>
-<span class="sd">            call to ``mlflow.transformers.load_model()``</span>
-
-<span class="sd">            .. Warning:: If the key provided is not compatible with either the</span>
-<span class="sd">                         Pipeline instance for the task provided or is not a valid</span>
-<span class="sd">                         override to any arguments available in the Model, an</span>
-<span class="sd">                         Exception will be raised at runtime. It is very important</span>
-<span class="sd">                         to validate the entries in this dictionary to ensure</span>
-<span class="sd">                         that they are valid prior to saving or logging.</span>
-
-<span class="sd">            An example of providing overrides for a question generation model:</span>
-
-<span class="sd">            .. code-block:: python</span>
-
-<span class="sd">                from transformers import pipeline, AutoTokenizer</span>
-
-<span class="sd">                task = &quot;text-generation&quot;</span>
-<span class="sd">                architecture = &quot;gpt2&quot;</span>
-
-<span class="sd">                sentence_pipeline = pipeline(</span>
-<span class="sd">                    task=task,</span>
-<span class="sd">                    tokenizer=AutoTokenizer.from_pretrained(architecture),</span>
-<span class="sd">                    model=architecture,</span>
-<span class="sd">                )</span>
-
-<span class="sd">                # Validate that the overrides function</span>
-<span class="sd">                prompts = [&quot;Generative models are&quot;, &quot;I&#39;d like a coconut so that I can&quot;]</span>
-
-<span class="sd">                # validation of config prior to save or log</span>
-<span class="sd">                model_config = {</span>
-<span class="sd">                    &quot;top_k&quot;: 2,</span>
-<span class="sd">                    &quot;num_beams&quot;: 5,</span>
-<span class="sd">                    &quot;max_length&quot;: 30,</span>
-<span class="sd">                    &quot;temperature&quot;: 0.62,</span>
-<span class="sd">                    &quot;top_p&quot;: 0.85,</span>
-<span class="sd">                    &quot;repetition_penalty&quot;: 1.15,</span>
-<span class="sd">                }</span>
-
-<span class="sd">                # Verify that no exceptions are thrown</span>
-<span class="sd">                sentence_pipeline(prompts, **model_config)</span>
-
-<span class="sd">                with mlflow.start_run():</span>
-<span class="sd">                    mlflow.transformers.log_model(</span>
-<span class="sd">                        transformers_model=sentence_pipeline,</span>
-<span class="sd">                        artifact_path=&quot;my_sentence_generator&quot;,</span>
-<span class="sd">                        task=task,</span>
-<span class="sd">                        model_config=model_config,</span>
-<span class="sd">                    )</span>
 
 <span class="sd">        code_paths: {{ code_paths }}</span>
 <span class="sd">        registered_model_name: This argument may change or be removed in a</span>
@@ -1216,6 +1164,57 @@
 <span class="sd">        extra_pip_requirements: {{ extra_pip_requirements }}</span>
 <span class="sd">        conda_env: {{ conda_env }}</span>
 <span class="sd">        metadata: {{ metadata }}</span>
+<span class="sd">        model_config:</span>
+<span class="sd">            A dict of valid overrides that can be applied to a pipeline instance during inference.</span>
+<span class="sd">            These arguments are used exclusively for the case of loading the model as a ``pyfunc``</span>
+<span class="sd">            Model or for use in Spark. These values are not applied to a returned Pipeline from a</span>
+<span class="sd">            call to ``mlflow.transformers.load_model()``</span>
+
+<span class="sd">            .. Warning:: If the key provided is not compatible with either the</span>
+<span class="sd">                         Pipeline instance for the task provided or is not a valid</span>
+<span class="sd">                         override to any arguments available in the Model, an</span>
+<span class="sd">                         Exception will be raised at runtime. It is very important</span>
+<span class="sd">                         to validate the entries in this dictionary to ensure</span>
+<span class="sd">                         that they are valid prior to saving or logging.</span>
+
+<span class="sd">            An example of providing overrides for a question generation model:</span>
+
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                from transformers import pipeline, AutoTokenizer</span>
+
+<span class="sd">                task = &quot;text-generation&quot;</span>
+<span class="sd">                architecture = &quot;gpt2&quot;</span>
+
+<span class="sd">                sentence_pipeline = pipeline(</span>
+<span class="sd">                    task=task,</span>
+<span class="sd">                    tokenizer=AutoTokenizer.from_pretrained(architecture),</span>
+<span class="sd">                    model=architecture,</span>
+<span class="sd">                )</span>
+
+<span class="sd">                # Validate that the overrides function</span>
+<span class="sd">                prompts = [&quot;Generative models are&quot;, &quot;I&#39;d like a coconut so that I can&quot;]</span>
+
+<span class="sd">                # validation of config prior to save or log</span>
+<span class="sd">                model_config = {</span>
+<span class="sd">                    &quot;top_k&quot;: 2,</span>
+<span class="sd">                    &quot;num_beams&quot;: 5,</span>
+<span class="sd">                    &quot;max_length&quot;: 30,</span>
+<span class="sd">                    &quot;temperature&quot;: 0.62,</span>
+<span class="sd">                    &quot;top_p&quot;: 0.85,</span>
+<span class="sd">                    &quot;repetition_penalty&quot;: 1.15,</span>
+<span class="sd">                }</span>
+
+<span class="sd">                # Verify that no exceptions are thrown</span>
+<span class="sd">                sentence_pipeline(prompts, **model_config)</span>
+
+<span class="sd">                with mlflow.start_run():</span>
+<span class="sd">                    mlflow.transformers.log_model(</span>
+<span class="sd">                        transformers_model=sentence_pipeline,</span>
+<span class="sd">                        artifact_path=&quot;my_sentence_generator&quot;,</span>
+<span class="sd">                        task=task,</span>
+<span class="sd">                        model_config=model_config,</span>
+<span class="sd">                    )</span>
 <span class="sd">        example_no_conversion: {{ example_no_conversion }}</span>
 <span class="sd">        prompt_template: {{ prompt_template }}</span>
 <span class="sd">        save_pretrained: {{ save_pretrained }}</span>
@@ -1719,10 +1718,28 @@
 <span class="sd">    NB: The get_task() function only works for remote models available in the Hugging</span>
 <span class="sd">    Face hub, so the default task should be supplied when using a custom local model.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">transformers.pipelines</span> <span class="kn">import</span> <span class="n">get_task</span>
+    <span class="kn">from</span> <span class="nn">transformers.pipelines</span> <span class="kn">import</span> <span class="n">get_supported_tasks</span><span class="p">,</span> <span class="n">get_task</span>
 
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">get_task</span><span class="p">(</span><span class="n">model_name_or_path</span><span class="p">)</span>
+        <span class="n">model_task</span> <span class="o">=</span> <span class="n">get_task</span><span class="p">(</span><span class="n">model_name_or_path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">model_task</span> <span class="ow">in</span> <span class="n">get_supported_tasks</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">model_task</span>
+        <span class="k">elif</span> <span class="n">default_task</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;The task &#39;</span><span class="si">{</span><span class="n">model_task</span><span class="si">}</span><span class="s2">&#39; inferred from the model is not&quot;</span>
+                <span class="s2">&quot;supported by the transformers pipeline. MLflow will &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;construct the pipeline with the fallback task </span><span class="si">{</span><span class="n">default_task</span><span class="si">}</span><span class="s2"> &quot;</span>
+                <span class="s2">&quot;inferred from the specified &#39;llm/v1/xxx&#39; task.&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">default_task</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Cannot construct transformers pipeline because the task &#39;</span><span class="si">{</span><span class="n">model_task</span><span class="si">}</span><span class="s2">&#39; &quot;</span>
+                <span class="s2">&quot;inferred from the model is not supported by the transformers pipeline. &quot;</span>
+                <span class="s2">&quot;Please construct the pipeline instance manually and pass it to the &quot;</span>
+                <span class="s2">&quot;`log_model` or `save_model` function.&quot;</span>
+            <span class="p">)</span>
+
     <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">default_task</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">default_task</span>

@@ -307,6 +307,11 @@
                 <img src="../../_static/images/logos/openai-logo.png" alt="OpenAI Logo"/>
             </div>
         </a>
+        <a href="../openai/autologging.html#auto-tracing-for-openai-swarm">
+            <div class="logo-card">
+                <img src="../../_static/images/logos/openai-swarm-logo.png" alt="OpenAI Swarm Logo"/>
+            </div>
+        </a>
         <a href="#automatic-tracing">
             <div class="logo-card">
                 <img src="../../_static/images/logos/autogen-logo.svg" alt="AutoGen Logo"/>
@@ -351,7 +356,7 @@ LangChain, OpenAI, LlamaIndex, and AutoGen. For these libraries, you can instrum
 just a single command <code class="docutils literal notranslate"><span class="pre">mlflow.&lt;library&gt;.autolog()</span></code> and MLflow will automatically log traces
 for model/API invocations to the active MLflow Experiment.</p>
 <div class="sphinx-tabs docutils container">
-<div aria-label="Tabbed content" role="tablist"><button aria-controls="panel-0-0-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-0-0-0" name="0-0" role="tab" tabindex="0">LangChain / LangGraph</button><button aria-controls="panel-0-0-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-1" name="0-1" role="tab" tabindex="-1">OpenAI</button><button aria-controls="panel-0-0-2" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-2" name="0-2" role="tab" tabindex="-1">LlamaIndex</button><button aria-controls="panel-0-0-3" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-3" name="0-3" role="tab" tabindex="-1">AutoGen</button></div><div aria-labelledby="tab-0-0-0" class="sphinx-tabs-panel" id="panel-0-0-0" name="0-0" role="tabpanel" tabindex="0"><h3>LangChain Automatic Tracing</h3><div class="line-block">
+<div aria-label="Tabbed content" role="tablist"><button aria-controls="panel-0-0-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-0-0-0" name="0-0" role="tab" tabindex="0">LangChain / LangGraph</button><button aria-controls="panel-0-0-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-1" name="0-1" role="tab" tabindex="-1">OpenAI</button><button aria-controls="panel-0-0-2" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-2" name="0-2" role="tab" tabindex="-1">Swarm</button><button aria-controls="panel-0-0-3" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-3" name="0-3" role="tab" tabindex="-1">LlamaIndex</button><button aria-controls="panel-0-0-4" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-4" name="0-4" role="tab" tabindex="-1">AutoGen</button></div><div aria-labelledby="tab-0-0-0" class="sphinx-tabs-panel" id="panel-0-0-0" name="0-0" role="tabpanel" tabindex="0"><h3>LangChain Automatic Tracing</h3><div class="line-block">
 <div class="line"><br /></div>
 </div>
 <p>As part of the LangChain autologging integration, traces are logged to the active MLflow Experiment when calling invocation APIs on chains. You can enable tracing
@@ -474,7 +479,57 @@ To learn more about OpenAI autologging, you can <a class="reference external" hr
 <div class="figure align-center">
 <a class="reference internal image-reference" href="../../_images/openai-tracing.png"><img alt="OpenAI Tracing" src="../../_images/openai-tracing.png" style="width: 100%;" /></a>
 </div>
-</div><div aria-labelledby="tab-0-0-2" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-2" name="0-2" role="tabpanel" tabindex="0"><h3>LlamaIndex Automatic Tracing</h3><div class="line-block">
+</div><div aria-labelledby="tab-0-0-2" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-2" name="0-2" role="tabpanel" tabindex="0"><h3>OpenAI Swarm Automatic Tracing</h3><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>The MLflow OpenAI flavor supports automatic tracing for <a class="reference external" href="https://github.com/openai/swarm">Swarm</a>, a multi-agent orchestration
+framework from OpenAI. To enable tracing for <strong>Swarm</strong>, just call <a class="reference internal" href="../../python_api/openai/index.html#mlflow.openai.autolog" title="mlflow.openai.autolog"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.openai.autolog()</span></code></a>
+before running your multi-agent interactions. MLflow will trace all LLM interactions,
+tool calls, and agent operations automatically.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">openai</span><span class="o">.</span><span class="n">autolog</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>For example, the code below will run the simplest example of multi-agent interaction using OpenAI Swarm.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">from</span> <span class="nn">swarm</span> <span class="kn">import</span> <span class="n">Swarm</span><span class="p">,</span> <span class="n">Agent</span>
+
+<span class="c1"># Calling the autolog API will enable trace logging by default.</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">openai</span><span class="o">.</span><span class="n">autolog</span><span class="p">()</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s2">&quot;OpenAI Swarm&quot;</span><span class="p">)</span>
+
+<span class="n">client</span> <span class="o">=</span> <span class="n">Swarm</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">transfer_to_agent_b</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">agent_b</span>
+
+
+<span class="n">agent_a</span> <span class="o">=</span> <span class="n">Agent</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Agent A&quot;</span><span class="p">,</span>
+    <span class="n">instructions</span><span class="o">=</span><span class="s2">&quot;You are a helpful agent.&quot;</span><span class="p">,</span>
+    <span class="n">functions</span><span class="o">=</span><span class="p">[</span><span class="n">transfer_to_agent_b</span><span class="p">],</span>
+<span class="p">)</span>
+
+<span class="n">agent_b</span> <span class="o">=</span> <span class="n">Agent</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Agent B&quot;</span><span class="p">,</span>
+    <span class="n">instructions</span><span class="o">=</span><span class="s2">&quot;Only speak in Haikus.&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+    <span class="n">agent</span><span class="o">=</span><span class="n">agent_a</span><span class="p">,</span>
+    <span class="n">messages</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;I want to talk to agent B.&quot;</span><span class="p">}],</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The logged trace, associated with the <code class="docutils literal notranslate"><span class="pre">OpenAI</span> <span class="pre">Swarm</span></code> experiment, can be seen in the MLflow UI, as shown below:</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="../../_images/openai-swarm-tracing.png"><img alt="OpenAI Swarm Tracing" src="../../_images/openai-swarm-tracing.png" style="width: 100%;" /></a>
+</div>
+</div><div aria-labelledby="tab-0-0-3" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-3" name="0-3" role="tabpanel" tabindex="0"><h3>LlamaIndex Automatic Tracing</h3><div class="line-block">
 <div class="line"><br /></div>
 </div>
 <p>The MLflow LlamaIndex flavor’s autologging feature has a direct integration with MLflow tracing. When LlamaIndex autologging is enabled with <a class="reference internal" href="../../python_api/mlflow.llama_index.html#mlflow.llama_index.autolog" title="mlflow.llama_index.autolog"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.llama_index.autolog()</span></code></a>, invocation of components
@@ -488,7 +543,7 @@ such as LLMs, agents, and query/chat engines will automatically record generated
 <div class="figure align-center">
 <a class="reference internal image-reference" href="../../_images/llama-index-trace.png"><img alt="LlamaIndex Tracing" src="../../_images/llama-index-trace.png" style="width: 100%;" /></a>
 </div>
-</div><div aria-labelledby="tab-0-0-3" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-3" name="0-3" role="tabpanel" tabindex="0"><h3>AutoGen Automatic Tracing</h3><div class="line-block">
+</div><div aria-labelledby="tab-0-0-4" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-4" name="0-4" role="tabpanel" tabindex="0"><h3>AutoGen Automatic Tracing</h3><div class="line-block">
 <div class="line"><br /></div>
 </div>
 <p>MLflow Tracing ensures observability for your AutoGen application that involves complex multi-agent interactions. You can enable auto-tracing by calling <a class="reference internal" href="../../python_api/mlflow.autogen.html#mlflow.autogen.autolog" title="mlflow.autogen.autolog"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.autogen.autolog()</span></code></a>, then the internal steps of the agents chat session will be logged to the active MLflow Experiment.</p>

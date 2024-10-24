@@ -722,13 +722,13 @@ MLflow model.</p></li>
 <li><p><strong>registered_model_name</strong> – If given, create a model version under
 <code class="docutils literal notranslate"><span class="pre">registered_model_name</span></code>, also creating a registered model if
 one with the given name does not exist.</p></li>
-<li><p><strong>signature</strong> – {{ signature }}</p></li>
-<li><p><strong>input_example</strong> – {{ input_example }}</p></li>
 <li><p><strong>await_registration_for</strong> – Number of seconds to wait for the model version to finish
 being created and is in <code class="docutils literal notranslate"><span class="pre">READY</span></code> status. By default, the
 function waits for five minutes. Specify 0 or None to skip
 waiting.</p></li>
 <li><p><strong>metadata</strong> – {{ metadata }}</p></li>
+<li><p><strong>run_id</strong> – The run ID to associate with this model. If not provided,
+a new run will be started.</p></li>
 <li><p><strong>resources</strong> – {{ resources }}</p></li>
 <li><p><strong>kwargs</strong> – Extra args passed to the model flavor.</p></li>
 </ul>
@@ -943,7 +943,7 @@ representation is compact when embedded in an MLmodel yaml file.</p>
 
 <dl class="py class">
 <dt id="mlflow.models.Resource">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">mlflow.models.</span></code><code class="sig-name descname"><span class="pre">Resource</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">mlflow.models.resources.ResourceType</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_uri</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mlflow/models/resources.html#Resource"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.models.Resource" title="Permalink to this definition"> </a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">mlflow.models.</span></code><code class="sig-name descname"><span class="pre">Resource</span></code><a class="reference internal" href="../_modules/mlflow/models/resources.html#Resource"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.models.Resource" title="Permalink to this definition"> </a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
 <p>Base class for defining the resources needed to serve a model.</p>
 <dl class="field-list simple">
@@ -956,15 +956,16 @@ representation is compact when embedded in an MLmodel yaml file.</p>
 </dl>
 <dl class="py method">
 <dt id="mlflow.models.Resource.from_dict">
-<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_dict</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mlflow/models/resources.html#Resource.from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.models.Resource.from_dict" title="Permalink to this definition"> </a></dt>
+<em class="property"><span class="pre">abstract</span> <span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_dict</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mlflow/models/resources.html#Resource.from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.models.Resource.from_dict" title="Permalink to this definition"> </a></dt>
 <dd><p>Convert the dictionary to a Resource.
 Subclasses must implement this method.</p>
 </dd></dl>
 
-<dl class="py attribute">
+<dl class="py method">
 <dt id="mlflow.models.Resource.target_uri">
-<code class="sig-name descname"><span class="pre">target_uri</span></code><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><a class="headerlink" href="#mlflow.models.Resource.target_uri" title="Permalink to this definition"> </a></dt>
-<dd></dd></dl>
+<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">target_uri</span></code><a class="headerlink" href="#mlflow.models.Resource.target_uri" title="Permalink to this definition"> </a></dt>
+<dd><p>The target URI where the resource is hosted (must be defined by subclasses).</p>
+</dd></dl>
 
 <dl class="py method">
 <dt id="mlflow.models.Resource.to_dict">
@@ -973,10 +974,11 @@ Subclasses must implement this method.</p>
 Subclasses must implement this method.</p>
 </dd></dl>
 
-<dl class="py attribute">
+<dl class="py method">
 <dt id="mlflow.models.Resource.type">
-<code class="sig-name descname"><span class="pre">type</span></code><em class="property"><span class="pre">:</span> <span class="pre">mlflow.models.resources.ResourceType</span></em><a class="headerlink" href="#mlflow.models.Resource.type" title="Permalink to this definition"> </a></dt>
-<dd></dd></dl>
+<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">type</span></code><a class="headerlink" href="#mlflow.models.Resource.type" title="Permalink to this definition"> </a></dt>
+<dd><p>The resource type (must be defined by subclasses).</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -991,6 +993,11 @@ Subclasses must implement this method.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt id="mlflow.models.ResourceType.GENIE_SPACE">
+<code class="sig-name descname"><span class="pre">GENIE_SPACE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'genie_space'</span></em><a class="headerlink" href="#mlflow.models.ResourceType.GENIE_SPACE" title="Permalink to this definition"> </a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt id="mlflow.models.ResourceType.SERVING_ENDPOINT">
 <code class="sig-name descname"><span class="pre">SERVING_ENDPOINT</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'serving_endpoint'</span></em><a class="headerlink" href="#mlflow.models.ResourceType.SERVING_ENDPOINT" title="Permalink to this definition"> </a></dt>
 <dd></dd></dl>
@@ -998,6 +1005,11 @@ Subclasses must implement this method.</p>
 <dl class="py attribute">
 <dt id="mlflow.models.ResourceType.SQL_WAREHOUSE">
 <code class="sig-name descname"><span class="pre">SQL_WAREHOUSE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'sql_warehouse'</span></em><a class="headerlink" href="#mlflow.models.ResourceType.SQL_WAREHOUSE" title="Permalink to this definition"> </a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="mlflow.models.ResourceType.UC_CONNECTION">
+<code class="sig-name descname"><span class="pre">UC_CONNECTION</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'uc_connection'</span></em><a class="headerlink" href="#mlflow.models.ResourceType.UC_CONNECTION" title="Permalink to this definition"> </a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -1126,19 +1138,19 @@ you can disable it via the DISABLE_NGINX environment variable:</p>
 an ‘s3://’ URI). For more information about supported remote URIs for model artifacts,
 see https://mlflow.org/docs/latest/tracking.html#artifact-stores”</p></li>
 <li><p><strong>name</strong> – Name of the Docker image to build. Defaults to ‘mlflow-pyfunc’.</p></li>
-<li><p><strong>install_java</strong> – If specified, install Java in the image. Default is False in order to
-reduce both the image size and the build time. Model flavors requiring Java will enable
-this setting automatically, such as the Spark flavor. (This argument is only available
-in MLflow 2.10.1 and later. In earlier versions, Java is always installed to the image.)</p></li>
-<li><p><strong>enable_mlserver</strong> – If specified, the image will be built with the Seldon MLserver as backend.</p></li>
 <li><p><strong>env_manager</strong> – If specified, create an environment for MLmodel using the specified environment
 manager. The following values are supported: (1) virtualenv (default): use virtualenv
 and pyenv for Python version management (2) conda: use conda (3) local: use the local
 environment without creating a new one.</p></li>
+<li><p><strong>mlflow_home</strong> – Path to local clone of MLflow project. Use for development only.</p></li>
+<li><p><strong>install_java</strong> – If specified, install Java in the image. Default is False in order to
+reduce both the image size and the build time. Model flavors requiring Java will enable
+this setting automatically, such as the Spark flavor. (This argument is only available
+in MLflow 2.10.1 and later. In earlier versions, Java is always installed to the image.)</p></li>
 <li><p><strong>install_mlflow</strong> – If specified and there is a conda or virtualenv environment to be activated
 mlflow will be installed into the environment after it has been activated.
 The version of installed mlflow will be the same as the one used to invoke this command.</p></li>
-<li><p><strong>mlflow_home</strong> – Path to local clone of MLflow project. Use for development only.</p></li>
+<li><p><strong>enable_mlserver</strong> – If specified, the image will be built with the Seldon MLserver as backend.</p></li>
 <li><p><strong>base_image</strong> – Base image for the Docker image. If not specified, the default image is either
 UBUNTU_BASE_IMAGE = “ubuntu:20.04” or PYTHON_SLIM_BASE_IMAGE = “python:{version}-slim”
 Note: If custom image is used, there are no guarantees that the image will work. You
@@ -1421,6 +1433,25 @@ should be specified via the <code class="docutils literal notranslate"><span cla
 </li>
 </ul>
 </p></li>
+<li><p><strong>model_type</strong> – <p>(Optional) A string describing the model type. The default evaluator
+supports the following model types:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">'classifier'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'regressor'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'question-answering'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'text-summarization'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'text'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'retriever'</span></code></p></li>
+</ul>
+<p>If no <code class="docutils literal notranslate"><span class="pre">model_type</span></code> is specified, then you must provide a a list of
+metrics to compute via the <code class="docutils literal notranslate"><span class="pre">extra_metrics</span></code> param.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">'question-answering'</span></code>, <code class="docutils literal notranslate"><span class="pre">'text-summarization'</span></code>, <code class="docutils literal notranslate"><span class="pre">'text'</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">'retriever'</span></code> are experimental and may be changed or removed in a
+future release.</p>
+</div>
+</p></li>
 <li><p><strong>targets</strong> – If <code class="docutils literal notranslate"><span class="pre">data</span></code> is a numpy array or list, a numpy array or list of evaluation
 labels. If <code class="docutils literal notranslate"><span class="pre">data</span></code> is a DataFrame, the string name of a column from <code class="docutils literal notranslate"><span class="pre">data</span></code>
 that contains evaluation labels. Required for classifier and regressor models,
@@ -1464,28 +1495,6 @@ contains model outputs.</p></li>
 </div>
 </div>
 </p></li>
-<li><p><strong>model_type</strong> – <p>(Optional) A string describing the model type. The default evaluator
-supports the following model types:</p>
-<ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">'classifier'</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">'regressor'</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">'question-answering'</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">'text-summarization'</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">'text'</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">'retriever'</span></code></p></li>
-</ul>
-<p>If no <code class="docutils literal notranslate"><span class="pre">model_type</span></code> is specified, then you must provide a a list of
-metrics to compute via the <code class="docutils literal notranslate"><span class="pre">extra_metrics</span></code> param.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p><code class="docutils literal notranslate"><span class="pre">'question-answering'</span></code>, <code class="docutils literal notranslate"><span class="pre">'text-summarization'</span></code>, <code class="docutils literal notranslate"><span class="pre">'text'</span></code>, and
-<code class="docutils literal notranslate"><span class="pre">'retriever'</span></code> are experimental and may be changed or removed in a
-future release.</p>
-</div>
-</p></li>
-<li><p><strong>inference_params</strong> – (Optional) A dictionary of inference parameters to be passed to the model
-when making predictions, such as <code class="docutils literal notranslate"><span class="pre">{&quot;max_tokens&quot;:</span> <span class="pre">100}</span></code>. This is only used when
-the <code class="docutils literal notranslate"><span class="pre">model</span></code> is an MLflow Deployments endpoint URI e.g. <code class="docutils literal notranslate"><span class="pre">&quot;endpoints:/my-chat&quot;</span></code></p></li>
 <li><p><strong>dataset_path</strong> – (Optional) The path where the data is stored. Must not contain double
 quotes (<code class="docutils literal notranslate"><span class="pre">“</span></code>). If specified, the path is logged to the <code class="docutils literal notranslate"><span class="pre">mlflow.datasets</span></code>
 tag for lineage tracking purposes.</p></li>
@@ -1505,6 +1514,7 @@ evaluators, call <a class="reference internal" href="#mlflow.models.list_evaluat
 <li><p><strong>evaluator_config</strong> – A dictionary of additional configurations to supply to the evaluator.
 If multiple evaluators are specified, each configuration should be
 supplied as a nested dictionary whose key is the evaluator name.</p></li>
+<li><p><strong>custom_metrics</strong> – Deprecated. Use <code class="docutils literal notranslate"><span class="pre">extra_metrics</span></code> instead.</p></li>
 <li><p><strong>extra_metrics</strong> – <p>(Optional) A list of <a class="reference internal" href="#mlflow.models.EvaluationMetric" title="mlflow.models.EvaluationMetric"><code class="xref py py-class docutils literal notranslate"><span class="pre">EvaluationMetric</span></code></a>
 objects.  These metrics are computed in addition to the default metrics associated with
 pre-defined <cite>model_type</cite>, and setting <cite>model_type=None</cite> will only compute the metrics
@@ -1606,8 +1616,6 @@ its file path or define customizations through environment variables in
 API instead for running model validation against baseline.</p></li>
 <li><p><strong>baseline_model</strong> – DEPRECATED. Please use <a class="reference internal" href="mlflow.html#mlflow.validate_evaluation_results" title="mlflow.validate_evaluation_results"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.validate_evaluation_results()</span></code></a>
 API instead for running model validation against baseline.</p></li>
-<li><p><strong>baseline_config</strong> – DEPRECATED. Please use <a class="reference internal" href="mlflow.html#mlflow.validate_evaluation_results" title="mlflow.validate_evaluation_results"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.validate_evaluation_results()</span></code></a>
-API instead for running model validation against baseline.</p></li>
 <li><p><strong>env_manager</strong> – <p>Specify an environment manager to load the candidate <code class="docutils literal notranslate"><span class="pre">model</span></code> in
 isolated Python environments and restore their
 dependencies. Default value is <code class="docutils literal notranslate"><span class="pre">local</span></code>, and the following values are
@@ -1626,6 +1634,11 @@ errors or invalid predictions.</p></li>
 the model’s pyfunc flavor to know which keys are supported for your
 specific model. If not indicated, the default model configuration
 from the model is used (if any).</p></li>
+<li><p><strong>baseline_config</strong> – DEPRECATED. Please use <a class="reference internal" href="mlflow.html#mlflow.validate_evaluation_results" title="mlflow.validate_evaluation_results"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.validate_evaluation_results()</span></code></a>
+API instead for running model validation against baseline.</p></li>
+<li><p><strong>inference_params</strong> – (Optional) A dictionary of inference parameters to be passed to the model
+when making predictions, such as <code class="docutils literal notranslate"><span class="pre">{&quot;max_tokens&quot;:</span> <span class="pre">100}</span></code>. This is only used when
+the <code class="docutils literal notranslate"><span class="pre">model</span></code> is an MLflow Deployments endpoint URI e.g. <code class="docutils literal notranslate"><span class="pre">&quot;endpoints:/my-chat&quot;</span></code></p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>

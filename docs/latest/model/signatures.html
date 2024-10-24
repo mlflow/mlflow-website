@@ -886,6 +886,190 @@ for a simple transformers model:</p>
 </pre></div>
 </div>
 </div>
+<div class="section" id="model-signature-examples-for-genai-flavors">
+<h3>Model signature examples for GenAI flavors<a class="headerlink" href="#model-signature-examples-for-genai-flavors" title="Permalink to this headline"> </a></h3>
+<p>GenAI flavors such as langchain, OpenAI, and transformers normally require an object (dictionary) based model signature.
+Manually defining the structure is complex and error-prone. Instead, you should rely on the <cite>infer_signature</cite> method to automatically
+generate the model signature based on an input example.</p>
+<p>When logging a GenAI flavor model, you can pass the input example to the <cite>input_example</cite> parameter of the <cite>log_model</cite> method.
+MLflow will infer the model signature from the provided input and apply it to the logged model. Additionally, this input example
+helps validate that the model can run predictions successfully, making it <strong>strongly recommended to always include an input example when logging a GenAI model</strong>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>By default, fields in the input example are inferred as required. To mark a field as optional, you can provide a list of
+input examples where some examples contain None values for the optional fields. (e.g. <cite>[{“str”: “a”}, {“str”: None}]</cite>)</p>
+</div>
+<p>Taking a langchain model as an example, you can log a model with signature with 2 simple steps using the models from code feature:</p>
+<ol class="arabic simple">
+<li><p>Define the langchain model in a separate python file named <cite>langchain_model.py</cite>:</p></li>
+</ol>
+<p>To log a langchain model successfully, <strong>it is highly recommended to use</strong> <a class="reference external" href="../models.html#models-from-code">models from code</a> feature.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">itemgetter</span>
+
+<span class="kn">from</span> <span class="nn">langchain_core.output_parsers</span> <span class="kn">import</span> <span class="n">StrOutputParser</span>
+<span class="kn">from</span> <span class="nn">langchain_core.prompts</span> <span class="kn">import</span> <span class="n">PromptTemplate</span>
+<span class="kn">from</span> <span class="nn">langchain_core.runnables</span> <span class="kn">import</span> <span class="n">RunnableLambda</span>
+<span class="kn">from</span> <span class="nn">langchain_openai</span> <span class="kn">import</span> <span class="n">OpenAI</span>
+
+<span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s2">&quot;Homework Helper&quot;</span><span class="p">)</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">langchain</span><span class="o">.</span><span class="n">autolog</span><span class="p">()</span>
+
+<span class="n">prompt</span> <span class="o">=</span> <span class="n">PromptTemplate</span><span class="p">(</span>
+    <span class="n">template</span><span class="o">=</span><span class="s2">&quot;You are a helpful tutor that evaluates my homework assignments and provides suggestions on areas for me to study further.&quot;</span>
+    <span class="s2">&quot; Here is the question: </span><span class="si">{question}</span><span class="s2"> and my answer which I got wrong: </span><span class="si">{answer}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="n">input_variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;question&quot;</span><span class="p">,</span> <span class="s2">&quot;answer&quot;</span><span class="p">],</span>
+<span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">get_question</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+    <span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;What is your name?&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">input_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;content&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;question&quot;</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">default</span>
+
+
+<span class="k">def</span> <span class="nf">get_answer</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+    <span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;My name is Bobo&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">input_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;content&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;answer&quot;</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">default</span>
+
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">OpenAI</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="mf">0.95</span><span class="p">)</span>
+
+<span class="n">chain</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;question&quot;</span><span class="p">:</span> <span class="n">itemgetter</span><span class="p">(</span><span class="s2">&quot;messages&quot;</span><span class="p">)</span> <span class="o">|</span> <span class="n">RunnableLambda</span><span class="p">(</span><span class="n">get_question</span><span class="p">),</span>
+        <span class="s2">&quot;answer&quot;</span><span class="p">:</span> <span class="n">itemgetter</span><span class="p">(</span><span class="s2">&quot;messages&quot;</span><span class="p">)</span> <span class="o">|</span> <span class="n">RunnableLambda</span><span class="p">(</span><span class="n">get_answer</span><span class="p">),</span>
+    <span class="p">}</span>
+    <span class="o">|</span> <span class="n">prompt</span>
+    <span class="o">|</span> <span class="n">model</span>
+    <span class="c1"># Add this parser to convert the model output to a string</span>
+    <span class="c1"># so that MLflow can correctly infer the output schema</span>
+    <span class="o">|</span> <span class="n">StrOutputParser</span><span class="p">()</span>
+<span class="p">)</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">set_model</span><span class="p">(</span><span class="n">chain</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>MLflow can only infer model signature for <a class="reference internal" href="#supported-data-types-column"><span class="std std-ref">certain data types</span></a>, so for
+a langchain model, it is essential to add a parser such as <cite>StrOutputParser</cite> to parse the output to a format
+that MLflow accepts.</p>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>Log the langchain model with a valid input example:</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">input_example</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;question&quot;</span><span class="p">:</span> <span class="s2">&quot;What is the primary function of control rods in a nuclear reactor?&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;answer&quot;</span><span class="p">:</span> <span class="s2">&quot;To stir the primary coolant so that the neutrons are mixed well.&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">},</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+
+<span class="n">chain_path</span> <span class="o">=</span> <span class="s2">&quot;langchain_model.py&quot;</span>
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="n">model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">langchain</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+        <span class="n">lc_model</span><span class="o">=</span><span class="n">chain_path</span><span class="p">,</span> <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="n">input_example</span><span class="o">=</span><span class="n">input_example</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<p>At this stage, the input_example serves multiple purposes: it is used to infer the model signature,
+validate that the model functions correctly when reloaded using the PyFunc flavor, and to generate
+a corresponding serving_input_example. The generated signature is used to validate the model’s
+functionality prior to deployment as well as providing guidance to callers of the model when
+it is deployed if they are making requests with invalid data structures.
+For more information on the benefits and usage of the input example, refer to the <a class="reference internal" href="#input-example"><span class="std std-ref">Model Input Example</span></a> section.
+To learn how to validate the model locally before deployment, refer to the <a class="reference internal" href="#model-serving-payload-example"><span class="std std-ref">Model Serving Payload Example</span></a> section.</p>
+<p>If your model has an optional input field, you can use below input_example as a reference:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">infer_signature</span>
+
+<span class="n">input_example</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="c1"># specify name field in the first message</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;userA&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;question&quot;</span><span class="p">:</span> <span class="s2">&quot;What is the primary function of control rods in a nuclear reactor?&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;answer&quot;</span><span class="p">:</span> <span class="s2">&quot;To stir the primary coolant so that the neutrons are mixed well.&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="c1"># no name field in the second message, so `name` will be inferred as optional</span>
+            <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;question&quot;</span><span class="p">:</span> <span class="s2">&quot;What is MLflow?&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;answer&quot;</span><span class="p">:</span> <span class="s2">&quot;MLflow is an open-source platform&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">},</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">infer_signature</span><span class="p">(</span><span class="n">input_example</span><span class="p">))</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="3">
+<li><p>Load the model back and make predictions:</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">loaded_model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">loaded_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">input_example</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>A</strong> <a class="reference external" href="https://docs.python.org/3/library/dataclasses.html">Dataclass</a> <strong>object is also supported to define a signature. Passing a Dataclass
+instance to</strong> <cite>infer_signature</cite> <strong>will generate the corresponding model signature equivalent</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+<span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">infer_signature</span>
+
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Message</span><span class="p">:</span>
+    <span class="n">role</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">content</span><span class="p">:</span> <span class="nb">str</span>
+
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">ChatCompletionRequest</span><span class="p">:</span>
+    <span class="n">messages</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Message</span><span class="p">]</span>
+
+
+<span class="n">chat_request</span> <span class="o">=</span> <span class="n">ChatCompletionRequest</span><span class="p">(</span>
+    <span class="n">messages</span><span class="o">=</span><span class="p">[</span>
+        <span class="n">Message</span><span class="p">(</span>
+            <span class="n">role</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">,</span>
+            <span class="n">content</span><span class="o">=</span><span class="s2">&quot;What is the primary function of control rods in a nuclear reactor?&quot;</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">Message</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="s2">&quot;What is MLflow?&quot;</span><span class="p">),</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+
+<span class="n">model_signature</span> <span class="o">=</span> <span class="n">infer_signature</span><span class="p">(</span>
+    <span class="n">chat_request</span><span class="p">,</span>
+    <span class="s2">&quot;Sample output as a string&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">model_signature</span><span class="p">)</span>
+<span class="c1"># inputs:</span>
+<span class="c1"># [&#39;messages&#39;: Array({content: string (required), role: string (required)}) (required)]</span>
+<span class="c1"># outputs:</span>
+<span class="c1"># [string (required)]</span>
+<span class="c1"># params:</span>
+<span class="c1"># None</span>
+</pre></div>
+</div>
+</div>
 </div>
 <div class="section" id="how-to-set-signatures-on-models">
 <span id="id8"></span><h2>How To Set Signatures on Models<a class="headerlink" href="#how-to-set-signatures-on-models" title="Permalink to this headline"> </a></h2>
@@ -1151,7 +1335,7 @@ second element is a <code class="docutils literal notranslate"><span class="pre"
 </div>
 </div>
 <div class="section" id="model-serving-payload-example">
-<h2>Model Serving Payload Example<a class="headerlink" href="#model-serving-payload-example" title="Permalink to this headline"> </a></h2>
+<span id="id10"></span><h2>Model Serving Payload Example<a class="headerlink" href="#model-serving-payload-example" title="Permalink to this headline"> </a></h2>
 <p>Once an MLflow model is deployed to a REST endpoint for inference, the request payload will be
 JSON serialized and may have subtle difference from in-memory representation.
 To validate your model works for inference, you can use the <code class="docutils literal notranslate"><span class="pre">serving_input_example.json</span></code> file.

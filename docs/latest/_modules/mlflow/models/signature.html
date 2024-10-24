@@ -429,8 +429,22 @@
 <span class="sd">    Returns:</span>
 <span class="sd">      ModelSignature</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">inputs</span> <span class="o">=</span> <span class="n">_infer_schema</span><span class="p">(</span><span class="n">model_input</span><span class="p">)</span> <span class="k">if</span> <span class="n">model_input</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
-    <span class="n">outputs</span> <span class="o">=</span> <span class="n">_infer_schema</span><span class="p">(</span><span class="n">model_output</span><span class="p">)</span> <span class="k">if</span> <span class="n">model_output</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">model_input</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">inputs</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">convert_dataclass_to_schema</span><span class="p">(</span><span class="n">model_input</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">is_dataclass</span><span class="p">(</span><span class="n">model_input</span><span class="p">)</span>
+            <span class="k">else</span> <span class="n">_infer_schema</span><span class="p">(</span><span class="n">model_input</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">inputs</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">model_output</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">convert_dataclass_to_schema</span><span class="p">(</span><span class="n">model_output</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">is_dataclass</span><span class="p">(</span><span class="n">model_output</span><span class="p">)</span>
+            <span class="k">else</span> <span class="n">_infer_schema</span><span class="p">(</span><span class="n">model_output</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">params</span> <span class="o">=</span> <span class="n">_infer_param_schema</span><span class="p">(</span><span class="n">params</span><span class="p">)</span> <span class="k">if</span> <span class="n">params</span> <span class="k">else</span> <span class="kc">None</span>
     <span class="k">return</span> <span class="n">ModelSignature</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span></div>
 

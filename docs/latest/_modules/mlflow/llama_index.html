@@ -214,7 +214,7 @@
 <span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
 <span class="kn">from</span> <span class="nn">mlflow.llama_index.pyfunc_wrapper</span> <span class="kn">import</span> <span class="n">create_pyfunc_wrapper</span>
 <span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">Model</span><span class="p">,</span> <span class="n">ModelInputExample</span><span class="p">,</span> <span class="n">ModelSignature</span>
-<span class="kn">from</span> <span class="nn">mlflow.models.model</span> <span class="kn">import</span> <span class="n">MLMODEL_FILE_NAME</span><span class="p">,</span> <span class="n">MODEL_CODE_PATH</span>
+<span class="kn">from</span> <span class="nn">mlflow.models.model</span> <span class="kn">import</span> <span class="n">MLMODEL_FILE_NAME</span><span class="p">,</span> <span class="n">MODEL_CODE_PATH</span><span class="p">,</span> <span class="n">MODEL_CONFIG</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.signature</span> <span class="kn">import</span> <span class="n">_infer_signature_from_input_example</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.utils</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">_load_model_code_path</span><span class="p">,</span>
@@ -244,6 +244,7 @@
     <span class="n">_get_flavor_configuration</span><span class="p">,</span>
     <span class="n">_validate_and_copy_code_paths</span><span class="p">,</span>
     <span class="n">_validate_and_copy_file_to_directory</span><span class="p">,</span>
+    <span class="n">_validate_and_get_model_config_from_file</span><span class="p">,</span>
     <span class="n">_validate_and_prepare_target_save_path</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.requirements_utils</span> <span class="kn">import</span> <span class="n">_get_pinned_requirement</span>
@@ -323,7 +324,7 @@
     <span class="n">llama_index_model</span><span class="p">,</span>
     <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">engine_type</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">model_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">model_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">code_paths</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">mlflow_model</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Model</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">signature</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ModelSignature</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -363,10 +364,11 @@
 <span class="sd">            - ``&quot;retriever&quot;``: load the index as an instance of the LlamaIndex</span>
 <span class="sd">              `Retriever &lt;https://docs.llamaindex.ai/en/stable/module_guides/querying/retriever/&gt;`_.</span>
 
-<span class="sd">        model_config: Keyword arguments to be passed to the LlamaIndex engine at instantiation.</span>
-<span class="sd">            Note that not all llama index objects have supported serialization; when an object is</span>
-<span class="sd">            not supported, an info log message will be emitted and the unsupported object will be</span>
-<span class="sd">            dropped.</span>
+<span class="sd">        model_config: The model configuration to apply when loading the model back with</span>
+<span class="sd">            ``mlflow.pyfunc.load_model()``. It will be applied in a different way depending on the</span>
+<span class="sd">            model type and saving method. See the docstring of :func:`log_model` for more details</span>
+<span class="sd">            and usage examples.</span>
+
 <span class="sd">        code_paths: {{ code_paths }}</span>
 <span class="sd">        mlflow_model: An MLflow model object that specifies the flavor that this model is being</span>
 <span class="sd">            added to.</span>
@@ -393,6 +395,9 @@
 
         <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="n">_validate_and_prepare_target_save_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_config</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">model_config</span> <span class="o">=</span> <span class="n">_validate_and_get_model_config_from_file</span><span class="p">(</span><span class="n">model_config</span><span class="p">)</span>
 
         <span class="n">model_code_path</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_or_code_path</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -546,10 +551,58 @@
 <span class="sd">            - ``&quot;retriever&quot;``: load the index as an instance of the LlamaIndex</span>
 <span class="sd">              `Retriever &lt;https://docs.llamaindex.ai/en/stable/module_guides/querying/retriever/&gt;`_.</span>
 
-<span class="sd">        model_config: Keyword arguments to be passed to the LlamaIndex engine at instantiation.</span>
-<span class="sd">            Note that not all llama index objects have supported serialization; when an object is</span>
-<span class="sd">            not supported, an info log message will be emitted and the unsupported object will be</span>
-<span class="sd">            dropped.</span>
+<span class="sd">        model_config: The model configuration to apply when loading the model back with</span>
+<span class="sd">            ``mlflow.pyfunc.load_model()``. It will be applied in a different way depending on the</span>
+<span class="sd">            model type and saving method:</span>
+
+<span class="sd">            For in-memory Index objects saved directly, it will be passed as keyword arguments to</span>
+<span class="sd">            instantiate the LlamaIndex engine with the specified engine type at logging.</span>
+
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                with mlflow.start_run() as run:</span>
+<span class="sd">                    model_info = mlflow.llama_index.log_model(</span>
+<span class="sd">                        index,</span>
+<span class="sd">                        artifact_path=&quot;index&quot;,</span>
+<span class="sd">                        engine_type=&quot;chat&quot;,</span>
+<span class="sd">                        model_config={&quot;top_k&quot;: 10},</span>
+<span class="sd">                    )</span>
+
+<span class="sd">                # When loading back, MLflow will call ``index.as_chat_engine(top_k=10)``</span>
+<span class="sd">                engine = mlflow.pyfunc.load_model(model_info.model_uri)</span>
+
+<span class="sd">            For other model types saved with the `Model-from-Code &lt;https://www.mlflow.org/docs/latest/model/models-from-code.html&gt;`</span>
+<span class="sd">            method, the config will be accessed via the :py:class`~mlflow.models.ModelConfig`</span>
+<span class="sd">            object within your model code.</span>
+
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                with mlflow.start_run() as run:</span>
+<span class="sd">                    model_info = mlflow.llama_index.log_model(</span>
+<span class="sd">                        &quot;model.py&quot;,</span>
+<span class="sd">                        artifact_path=&quot;model&quot;,</span>
+<span class="sd">                        model_config={&quot;qdrant_host&quot;: &quot;localhost&quot;, &quot;qdrant_port&quot;: 6333},</span>
+<span class="sd">                    )</span>
+
+<span class="sd">            model.py:</span>
+
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                import mlflow</span>
+<span class="sd">                from llama_index.vector_stores.qdrant import QdrantVectorStore</span>
+<span class="sd">                import qdrant_client</span>
+
+
+<span class="sd">                # The model configuration is accessible via the ModelConfig singleton</span>
+<span class="sd">                model_config = mlflow.models.ModelConfig()</span>
+<span class="sd">                qdrant_host = model_config.get(&quot;top_k&quot;, 5)</span>
+<span class="sd">                qdrant_port = model_config.get(&quot;qdrant_port&quot;, 6333)</span>
+
+<span class="sd">                client = qdrant_client.Client(host=qdrant_host, port=qdrant_port)</span>
+<span class="sd">                vectorstore = QdrantVectorStore(client)</span>
+
+<span class="sd">                # the rest of the model definition...</span>
+
 <span class="sd">        code_paths: {{ code_paths }}</span>
 <span class="sd">        registered_model_name: This argument may change or be removed in a</span>
 <span class="sd">            future release without warning. If given, create a model</span>
@@ -621,11 +674,14 @@
     <span class="k">if</span> <span class="n">model_code_path</span> <span class="o">:=</span> <span class="n">pyfunc_flavor_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">MODEL_CODE_PATH</span><span class="p">):</span>
         <span class="c1"># TODO: The code path saved in the MLModel file is the local absolute path to the code</span>
         <span class="c1"># file when it is saved. We should update the relative path in artifact directory.</span>
-        <span class="n">model_code_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-            <span class="n">path</span><span class="p">,</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">model_code_path</span><span class="p">),</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="n">_load_model_code_path</span><span class="p">(</span><span class="n">model_code_path</span><span class="p">,</span> <span class="n">flavor_conf</span><span class="p">)</span>
+        <span class="n">model_code_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">model_code_path</span><span class="p">))</span>
+
+        <span class="n">model_config</span> <span class="o">=</span> <span class="n">pyfunc_flavor_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">MODEL_CONFIG</span><span class="p">)</span> <span class="ow">or</span> <span class="n">flavor_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">MODEL_CONFIG</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_config</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">config_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">model_config</span><span class="p">))</span>
+            <span class="n">model_config</span> <span class="o">=</span> <span class="n">_validate_and_get_model_config_from_file</span><span class="p">(</span><span class="n">config_path</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">_load_model_code_path</span><span class="p">(</span><span class="n">model_code_path</span><span class="p">,</span> <span class="n">model_config</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># Use default vector store when loading from the serialized index</span>
         <span class="n">index_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">_INDEX_PERSIST_FOLDER</span><span class="p">)</span>
