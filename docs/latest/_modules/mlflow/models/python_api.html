@@ -202,18 +202,20 @@
               <div itemprop="articleBody">
                 
   <h1>Source code for mlflow.models.python_api</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">logging</span>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
 <span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">StringIO</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">ForwardRef</span><span class="p">,</span> <span class="n">get_args</span><span class="p">,</span> <span class="n">get_origin</span>
 
 <span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.flavor_backend_registry</span> <span class="kn">import</span> <span class="n">get_flavor_backend</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils</span> <span class="kn">import</span> <span class="n">env_manager</span> <span class="k">as</span> <span class="n">_EnvManager</span>
+<span class="kn">from</span> <span class="nn">mlflow.utils.annotations</span> <span class="kn">import</span> <span class="n">experimental</span>
+<span class="kn">from</span> <span class="nn">mlflow.utils.databricks_utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">is_databricks_connect</span><span class="p">,</span>
+    <span class="n">is_in_databricks_runtime</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.file_utils</span> <span class="kn">import</span> <span class="n">TempDir</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.proto_json_utils</span> <span class="kn">import</span> <span class="n">dump_input_data</span>
 
 <span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -298,7 +300,8 @@
 <span class="n">_CONTENT_TYPE_JSON</span> <span class="o">=</span> <span class="s2">&quot;json&quot;</span>
 
 
-<div class="viewcode-block" id="predict"><a class="viewcode-back" href="../../../python_api/mlflow.models.html#mlflow.models.predict">[docs]</a><span class="k">def</span> <span class="nf">predict</span><span class="p">(</span>
+<div class="viewcode-block" id="predict"><a class="viewcode-back" href="../../../python_api/mlflow.models.html#mlflow.models.predict">[docs]</a><span class="nd">@experimental</span>
+<span class="k">def</span> <span class="nf">predict</span><span class="p">(</span>
     <span class="n">model_uri</span><span class="p">,</span>
     <span class="n">input_data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">input_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -317,6 +320,11 @@
 <span class="sd">        model_uri: URI to the model. A local path, a local or remote URI e.g. runs:/, s3://.</span>
 <span class="sd">        input_data: Input data for prediction. Must be valid input for the PyFunc model. Refer</span>
 <span class="sd">            to the :py:func:`mlflow.pyfunc.PyFuncModel.predict()` for the supported input types.</span>
+
+<span class="sd">            .. note::</span>
+<span class="sd">                If this API fails due to errors in input_data, use</span>
+<span class="sd">                `mlflow.models.convert_input_example_to_serving_input` to manually validate</span>
+<span class="sd">                your input data.</span>
 <span class="sd">        input_path: Path to a file containing input data. If provided, &#39;input_data&#39; must be None.</span>
 <span class="sd">        content_type: Content type of the input data. Can be one of {‘json’, ‘csv’}.</span>
 <span class="sd">        output_path: File to output results to as json. If not provided, output to stdout.</span>
@@ -332,6 +340,12 @@
 <span class="sd">        pip_requirements_override: If specified, install the specified python dependencies to the</span>
 <span class="sd">            model inference environment. This is particularly useful when you want to add extra</span>
 <span class="sd">            dependencies or try different versions of the dependencies defined in the logged model.</span>
+
+<span class="sd">            .. tip::</span>
+<span class="sd">                After validating the pip requirements override works as expected, you can update</span>
+<span class="sd">                the logged model&#39;s dependency using `mlflow.models.update_model_requirements` API</span>
+<span class="sd">                without re-logging it. Note that a registered model is immutable, so you need to</span>
+<span class="sd">                register a new model version with the updated model.</span>
 
 <span class="sd">    Code example:</span>
 
@@ -350,20 +364,48 @@
 <span class="sd">        # Run prediction with additional pip dependencies</span>
 <span class="sd">        mlflow.models.predict(</span>
 <span class="sd">            model_uri=f&quot;runs:/{run_id}/model&quot;,</span>
-<span class="sd">            input_data=&#39;{&quot;x&quot;: 1, &quot;y&quot;: 2}&#39;,</span>
+<span class="sd">            input_data={&quot;x&quot;: 1, &quot;y&quot;: 2},</span>
 <span class="sd">            content_type=&quot;json&quot;,</span>
 <span class="sd">            pip_requirements_override=[&quot;scikit-learn==0.23.2&quot;],</span>
 <span class="sd">        )</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># to avoid circular imports</span>
+    <span class="kn">from</span> <span class="nn">mlflow.pyfunc</span> <span class="kn">import</span> <span class="n">_PREBUILD_ENV_ROOT_LOCATION</span>
+
     <span class="k">if</span> <span class="n">content_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">_CONTENT_TYPE_JSON</span><span class="p">,</span> <span class="n">_CONTENT_TYPE_CSV</span><span class="p">]:</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;Content type must be one of </span><span class="si">{</span><span class="n">_CONTENT_TYPE_JSON</span><span class="si">}</span><span class="s2"> or </span><span class="si">{</span><span class="n">_CONTENT_TYPE_CSV</span><span class="si">}</span><span class="s2">.&quot;</span>
         <span class="p">)</span>
 
+    <span class="n">spark_session</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">is_in_databricks_runtime</span><span class="p">():</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">pyspark.sql</span> <span class="kn">import</span> <span class="n">SparkSession</span>
+
+            <span class="n">spark_session</span> <span class="o">=</span> <span class="n">SparkSession</span><span class="o">.</span><span class="n">getActiveSession</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+    <span class="n">is_dbconnect_mode</span> <span class="o">=</span> <span class="n">is_databricks_connect</span><span class="p">(</span><span class="n">spark_session</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">is_dbconnect_mode</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">env_manager</span> <span class="o">!=</span> <span class="n">_EnvManager</span><span class="o">.</span><span class="n">VIRTUALENV</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                <span class="s2">&quot;Databricks Connect only supports virtualenv as the environment manager. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="n">env_manager</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+        <span class="n">pyfunc_backend_env_root_config</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;create_env_root_dir&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s2">&quot;env_root_dir&quot;</span><span class="p">:</span> <span class="n">_PREBUILD_ENV_ROOT_LOCATION</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">pyfunc_backend_env_root_config</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;create_env_root_dir&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+
     <span class="k">def</span> <span class="nf">_predict</span><span class="p">(</span><span class="n">_input_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">get_flavor_backend</span><span class="p">(</span>
-            <span class="n">model_uri</span><span class="p">,</span> <span class="n">env_manager</span><span class="o">=</span><span class="n">env_manager</span><span class="p">,</span> <span class="n">install_mlflow</span><span class="o">=</span><span class="n">install_mlflow</span>
+            <span class="n">model_uri</span><span class="p">,</span>
+            <span class="n">env_manager</span><span class="o">=</span><span class="n">env_manager</span><span class="p">,</span>
+            <span class="n">install_mlflow</span><span class="o">=</span><span class="n">install_mlflow</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">pyfunc_backend_env_root_config</span><span class="p">,</span>
         <span class="p">)</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span>
             <span class="n">model_uri</span><span class="o">=</span><span class="n">model_uri</span><span class="p">,</span>
             <span class="n">input_path</span><span class="o">=</span><span class="n">_input_path</span><span class="p">,</span>
@@ -414,6 +456,10 @@
     <span class="c1"># so we shouldn&#39;t import pandas at the top level</span>
     <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
+    <span class="c1"># this introduces numpy as dependency, we shouldn&#39;t import it at the top level</span>
+    <span class="c1"># as it is not available in mlflow-skinny</span>
+    <span class="kn">from</span> <span class="nn">mlflow.models.utils</span> <span class="kn">import</span> <span class="n">convert_input_example_to_serving_input</span>
+
     <span class="n">valid_input_types</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">_CONTENT_TYPE_CSV</span><span class="p">:</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">),</span>
         <span class="n">_CONTENT_TYPE_JSON</span><span class="p">:</span> <span class="n">_get_pyfunc_supported_input_types</span><span class="p">(),</span>
@@ -425,65 +471,41 @@
             <span class="sa">f</span><span class="s2">&quot;but got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">input_data</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
         <span class="p">)</span>
 
-    <span class="c1"># If the input is already string, check if the input string can be deserialized correctly</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="n">_validate_string</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="n">content_type</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">input_data</span>
+    <span class="k">if</span> <span class="n">content_type</span> <span class="o">==</span> <span class="n">_CONTENT_TYPE_CSV</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">_validate_csv_string</span><span class="p">(</span><span class="n">input_data</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">input_data</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">input_data</span><span class="p">)</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
+                    <span class="s2">&quot;Failed to serialize input data to CSV format.&quot;</span>
+                <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
 
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">content_type</span> <span class="o">==</span> <span class="n">_CONTENT_TYPE_CSV</span><span class="p">:</span>
-            <span class="c1"># We should not set header=False here because the scoring server expects the</span>
-            <span class="c1"># first row to be the header</span>
-            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">input_data</span><span class="p">)</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">_serialize_to_json</span><span class="p">(</span><span class="n">input_data</span><span class="p">)</span>
+        <span class="c1"># rely on convert_input_example_to_serving_input to validate</span>
+        <span class="c1"># the input_data is valid type for the loaded pyfunc model</span>
+        <span class="k">return</span> <span class="n">convert_input_example_to_serving_input</span><span class="p">(</span><span class="n">input_data</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
-            <span class="n">message</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Input data could not be serialized to </span><span class="si">{</span><span class="n">content_type</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="s2">&quot;Invalid input data, please make sure the data is acceptable by the &quot;</span>
+            <span class="s2">&quot;loaded pyfunc model. Use `mlflow.models.convert_input_example_to_serving_input` &quot;</span>
+            <span class="s2">&quot;to manually validate your input data.&quot;</span>
         <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
 
 
-<span class="k">def</span> <span class="nf">_serialize_to_json</span><span class="p">(</span><span class="n">input_data</span><span class="p">):</span>
-    <span class="c1"># imported inside function to avoid circular import</span>
-    <span class="kn">from</span> <span class="nn">mlflow.pyfunc.scoring_server</span> <span class="kn">import</span> <span class="n">SUPPORTED_FORMATS</span>
-    <span class="kn">from</span> <span class="nn">mlflow.pyfunc.utils.serving_data_parser</span> <span class="kn">import</span> <span class="n">SUPPORTED_LLM_FORMATS</span>
-
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span>
-        <span class="n">key</span> <span class="ow">in</span> <span class="n">input_data</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">SUPPORTED_FORMATS</span> <span class="o">|</span> <span class="n">SUPPORTED_LLM_FORMATS</span>
-    <span class="p">):</span>
-        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">input_data</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">original_input_data</span> <span class="o">=</span> <span class="n">input_data</span>
-
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="p">(</span><span class="n">datetime</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">)):</span>
-            <span class="n">input_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">input_data</span><span class="p">]</span>
-
-        <span class="n">input_data</span> <span class="o">=</span> <span class="n">dump_input_data</span><span class="p">(</span><span class="n">input_data</span><span class="p">)</span>
-
-        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Your input data has been transformed to comply with the expected input format for &quot;</span>
-            <span class="s2">&quot;the MLflow scoring server. If you want to deploy the model to online serving, make &quot;</span>
-            <span class="s2">&quot;sure to apply the same preprocessing in your inference client. Please also refer to &quot;</span>
-            <span class="s2">&quot;https://www.mlflow.org/docs/latest/deployment/deploy-model-locally.html#json-input &quot;</span>
-            <span class="s2">&quot;for more details on the supported input format.&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Original input data:</span><span class="se">\n</span><span class="si">{</span><span class="n">original_input_data</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Transformed input data:</span><span class="se">\n</span><span class="si">{</span><span class="n">input_data</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="n">input_data</span>
-
-
-<span class="k">def</span> <span class="nf">_validate_string</span><span class="p">(</span><span class="n">input_data</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">content_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_validate_csv_string</span><span class="p">(</span><span class="n">input_data</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Validate the string must be the path to a CSV file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">content_type</span> <span class="o">==</span> <span class="n">_CONTENT_TYPE_CSV</span><span class="p">:</span>
-            <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+        <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
-            <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">StringIO</span><span class="p">(</span><span class="n">input_data</span><span class="p">))</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">input_data</span><span class="p">)</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">StringIO</span><span class="p">(</span><span class="n">input_data</span><span class="p">))</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="n">target</span> <span class="o">=</span> <span class="s2">&quot;JSON&quot;</span> <span class="k">if</span> <span class="n">content_type</span> <span class="o">==</span> <span class="n">_CONTENT_TYPE_JSON</span> <span class="k">else</span> <span class="s2">&quot;Pandas DataFrame&quot;</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
-            <span class="n">message</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Failed to deserialize input string data to </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Failed to deserialize input string data to Pandas DataFrame.&quot;</span>
         <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
 </pre></div>
 

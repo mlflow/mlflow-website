@@ -1312,7 +1312,11 @@
 <span class="sd">    `mlflow-spark JAR</span>
 <span class="sd">    &lt;https://www.mlflow.org/docs/latest/tracking.html#spark&gt;`_</span>
 <span class="sd">    attached. It should be called on the Spark driver, not on the executors (i.e. do not call</span>
-<span class="sd">    this method within a function parallelized by Spark). This API requires Spark 3.0 or above.</span>
+<span class="sd">    this method within a function parallelized by Spark).</span>
+<span class="sd">    The mlflow-spark JAR used must match the Scala version of Spark. Please see the</span>
+<span class="sd">    `Maven Repository</span>
+<span class="sd">    &lt;https://mvnrepository.com/artifact/org.mlflow/mlflow-spark&gt;`_</span>
+<span class="sd">    for available versions. This API requires Spark 3.0 or above.</span>
 
 <span class="sd">    Datasource information is cached in memory and logged to all subsequent MLflow runs,</span>
 <span class="sd">    including the active MLflow run (if one exists when the data is read). Note that autologging of</span>
@@ -1333,11 +1337,16 @@
 <span class="sd">        from pyspark.sql import SparkSession</span>
 
 <span class="sd">        # Create and persist some dummy data</span>
+<span class="sd">        # Note: the 2.12 in &#39;org.mlflow:mlflow-spark_2.12:2.16.2&#39; below indicates the Scala</span>
+<span class="sd">        # version, please match this with that of Spark. The 2.16.2 indicates the mlflow version.</span>
 <span class="sd">        # Note: On environments like Databricks with pre-created SparkSessions,</span>
-<span class="sd">        # ensure the org.mlflow:mlflow-spark:2.22.0 is attached as a library to</span>
+<span class="sd">        # ensure the org.mlflow:mlflow-spark_2.12:2.16.2 is attached as a library to</span>
 <span class="sd">        # your cluster</span>
 <span class="sd">        spark = (</span>
-<span class="sd">            SparkSession.builder.config(&quot;spark.jars.packages&quot;, &quot;org.mlflow:mlflow-spark:2.22.0&quot;)</span>
+<span class="sd">            SparkSession.builder.config(</span>
+<span class="sd">                &quot;spark.jars.packages&quot;,</span>
+<span class="sd">                &quot;org.mlflow:mlflow-spark_2.12:2.16.2&quot;,</span>
+<span class="sd">            )</span>
 <span class="sd">            .master(&quot;local[*]&quot;)</span>
 <span class="sd">            .getOrCreate()</span>
 <span class="sd">        )</span>

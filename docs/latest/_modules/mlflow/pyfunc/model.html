@@ -943,12 +943,20 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            The prediction result from the MLflow Deployments endpoint as a dictionary.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">mlflow.metrics.genai.model_utils</span> <span class="kn">import</span> <span class="n">_call_deployments_api</span>
+        <span class="kn">from</span> <span class="nn">mlflow.metrics.genai.model_utils</span> <span class="kn">import</span> <span class="n">call_deployments_api</span><span class="p">,</span> <span class="n">get_endpoint_type</span>
+
+        <span class="n">endpoint_type</span> <span class="o">=</span> <span class="n">get_endpoint_type</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;endpoints:/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">prediction</span> <span class="o">=</span> <span class="n">_call_deployments_api</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+            <span class="c1"># If the input payload is string, MLflow needs to construct the JSON</span>
+            <span class="c1"># payload based on the endpoint type. If the endpoint type is not</span>
+            <span class="c1"># set on the endpoint, we will default to chat format.</span>
+            <span class="n">endpoint_type</span> <span class="o">=</span> <span class="n">endpoint_type</span> <span class="ow">or</span> <span class="s2">&quot;llm/v1/chat&quot;</span>
+            <span class="n">prediction</span> <span class="o">=</span> <span class="n">call_deployments_api</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="n">endpoint_type</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="n">prediction</span> <span class="o">=</span> <span class="n">_call_deployments_api</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="n">wrap_payload</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="c1"># If the input is dictionary, we assume the input is already in the</span>
+            <span class="c1"># compatible format for the endpoint.</span>
+            <span class="n">prediction</span> <span class="o">=</span> <span class="n">call_deployments_api</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="n">endpoint_type</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Invalid input data type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s2">. The feature column of the evaluation &quot;</span>

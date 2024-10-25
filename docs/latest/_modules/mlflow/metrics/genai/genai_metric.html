@@ -305,12 +305,16 @@
 
 
 <span class="k">def</span> <span class="nf">_score_model_on_one_payload</span><span class="p">(</span>
-    <span class="n">payload</span><span class="p">,</span>
-    <span class="n">eval_model</span><span class="p">,</span>
-    <span class="n">parameters</span><span class="p">,</span>
+    <span class="n">payload</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">eval_model</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">parameters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
 <span class="p">):</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">raw_result</span> <span class="o">=</span> <span class="n">model_utils</span><span class="o">.</span><span class="n">score_model_on_payload</span><span class="p">(</span><span class="n">eval_model</span><span class="p">,</span> <span class="n">payload</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
+        <span class="c1"># If the endpoint does not specify type, default to chat format</span>
+        <span class="n">endpoint_type</span> <span class="o">=</span> <span class="n">model_utils</span><span class="o">.</span><span class="n">get_endpoint_type</span><span class="p">(</span><span class="n">eval_model</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;llm/v1/chat&quot;</span>
+        <span class="n">raw_result</span> <span class="o">=</span> <span class="n">model_utils</span><span class="o">.</span><span class="n">score_model_on_payload</span><span class="p">(</span>
+            <span class="n">eval_model</span><span class="p">,</span> <span class="n">payload</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">endpoint_type</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="n">_extract_score_and_justification</span><span class="p">(</span><span class="n">raw_result</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
         <span class="k">raise</span>

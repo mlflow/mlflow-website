@@ -557,8 +557,8 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">example_type</span> <span class="o">=</span> <span class="s2">&quot;sparse_matrix_csr&quot;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">example_type</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">serving_input</span> <span class="o">=</span> <span class="p">{</span><span class="n">INPUTS</span><span class="p">:</span> <span class="n">model_input</span><span class="o">.</span><span class="n">toarray</span><span class="p">()}</span>
             <span class="n">model_input</span> <span class="o">=</span> <span class="n">_handle_sparse_matrix</span><span class="p">(</span><span class="n">model_input</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">serving_input</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_input</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
             <span class="n">model_input</span> <span class="o">=</span> <span class="n">_convert_dataframe_to_split_dict</span><span class="p">(</span><span class="n">model_input</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">serving_input</span> <span class="o">=</span> <span class="p">{</span><span class="n">DF_SPLIT</span><span class="p">:</span> <span class="n">model_input</span><span class="p">}</span>
@@ -569,7 +569,7 @@
                     <span class="s2">&quot;pandas_orient&quot;</span><span class="p">:</span> <span class="n">orient</span><span class="p">,</span>
                 <span class="p">}</span>
             <span class="p">)</span>
-        <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">model_input</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">model_input</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_input</span><span class="p">,</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;json_object&quot;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">serving_input</span> <span class="o">=</span> <span class="p">{</span><span class="n">INPUTS</span><span class="p">:</span> <span class="n">model_input</span><span class="p">}</span>
         <span class="k">else</span><span class="p">:</span>
@@ -583,6 +583,7 @@
                 <span class="s2">&quot;- dict</span><span class="se">\n</span><span class="s2">&quot;</span>
                 <span class="s2">&quot;- list</span><span class="se">\n</span><span class="s2">&quot;</span>
                 <span class="s2">&quot;- scalars</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;- datetime.datetime</span><span class="se">\n</span><span class="s2">&quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;but got &#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">model_input</span><span class="p">)</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">,</span>
             <span class="p">)</span>
 
