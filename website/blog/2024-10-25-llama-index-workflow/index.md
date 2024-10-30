@@ -55,7 +55,7 @@ How do we bring this concept to life? Let’s dive in and build this hybrid RAG 
 
 ## 1. Set Up Repository
 
-The sample code, including the environment setup script, is available in the [GitHub repository](https://github.com/mlflow/examples/llama_index/workflow). It contains a complete workflow definition, a hands-on notebook, and a sample dataset for running experiments. To clone it to your working environment, use the following command:
+The sample code, including the environment setup script, is available in the [GitHub repository](https://github.com/mlflow/mlflow/tree/master/examples/llama_index/workflow). It contains a complete workflow definition, a hands-on notebook, and a sample dataset for running experiments. To clone it to your working environment, use the following command:
 
 ```shell
 git clone https://github.com/mlflow/mlflow.git
