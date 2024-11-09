@@ -12,9 +12,9 @@ thumbnail: /img/blog/bedrock-chatmodel.png
 In this blog post, we delve into the integration of AWS Bedrock Agent as a ChatModel within MLflow, focusing on how to
 leverage Bedrock's Action Groups and Knowledge Bases to build a conversational AI application. The blog will guide you
 through setting up the Bedrock Agent, configuring Action Groups to enable custom actions with Lambda, and utilizing knowledge bases
-for context-aware interactions. A special emphasis is placed on implementing tracing within MLflow to monitor
-your ChatModel effectively. By the end of this article, you'll have a good understanding
-of how to combine AWS Bedrock's advanced features with MLflow's tracking capabilities.
+for context-aware interactions. A special emphasis is placed on implementing tracing within MLflow.
+By the end of this article, you'll have a good understanding of how to combine AWS Bedrock's advanced features
+with MLflow's capabilities such as agent request tracing, model tracking and consistent signatures for input examples.
 
 ## What is AWS Bedrock?
 
