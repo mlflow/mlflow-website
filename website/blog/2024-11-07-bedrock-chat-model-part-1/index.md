@@ -84,7 +84,8 @@ You will need to setup following items (either via the AWS console or SDKs):
 In our case, we are going to deploy a following example action group, which calculates the specific period of time
 when it's most efficient(duration, energy efficiency etc) to launch a spacecraft from Earth to Mars.
 
-As described above, here is the OpenAPI Schema for our action group:
+### OpenAPI schema for Action Groups
+As described above, here is the OpenAPI Schema for our example action group:
 
 ```yaml
 openapi: 3.0.0
@@ -111,7 +112,9 @@ paths:
                     description: date of the next optimal launch window to Mars
 ```
 
-and here is the code deployment for action group's Lambda:
+### Action groups - Lamda function
+
+Here is the code deployment for action group's example Lambda:
 
 ```python
 from datetime import datetime, timedelta
@@ -1038,9 +1041,9 @@ Each group of events with the same _`traceId`_ will contain at least two events:
 one of type _`modelInvocationOutput`_. Groups that involve action group traces will also include events of type
 _`actionGroupInvocationInput`_ and _`actionGroupInvocationOutput`_. Similarly, groups that use knowledge bases will have
 additional events of type _`knowledgeBaseLookupInput`_ and _`knowledgeBaseLookupOutput`_.
-In the BedrockModel mentioned above, it implements an approach to parse these event groups into trace nodes.
+In the _`BedrockModel`_ mentioned above, it implements an approach to parse these event groups into trace nodes.
 This method allows the trace to display the reasoning behind selecting action groups/knowledge bases to answer queries and invoking
-the corresponding Lambda function calls, as defined in out example OpenAPI spec above.
+the corresponding Lambda function calls, as defined in our example OpenAPI spec above.
 This structure helps to clearly show the flow of information and decision-making process that bedrock agent follows.
 
 <details>
