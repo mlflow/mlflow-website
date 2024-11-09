@@ -669,7 +669,7 @@ response = loaded.predict(
 
 ```
 
-### Custom trace conversion
+### Mapping Bedrock Agent Trace Data to MLflow Span Objects
 
 In this step, we need to iterate over the data that is returned within the bedrock agent's response trace
 to provide relevant mappings to create the MLflow span object.
