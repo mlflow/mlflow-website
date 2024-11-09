@@ -27,6 +27,21 @@ export type Release = {
 // Sort by date descending
 export const BLOGS: Blog[] = [
   {
+    title: "Using Bedrock Agent as an MLflow ChatModel with Tracing",
+    path: "/blog/bedrock-chat-model-part-1",
+    tags: ["genai", "pyfunc", "bedrock", "tracing"],
+    authors: [
+      {
+        name: "Jas Bali",
+        title: "Lead Specialist Solutions Architect at Databricks",
+        url: "https://www.linkedin.com/in/jas-bali-195ba410a/",
+        image_url: "/img/authors/jas_bali.png",
+      },
+    ],
+    date: "2024-11-07",
+    thumbnail: "/img/blog/bedrock-chatmodel.png",
+  },
+  {
     title: "Building Advanced RAG with MLflow and LlamaIndex Workflow",
     path: "/blog/mlflow-llama-index-workflow",
     tags: ["genai", "mlops", "mlflow-evaluate"],
