@@ -623,7 +623,7 @@ output_example = {
         }
     ]
 }
-signature = infer_signature(example, output_example)
+signature = infer_signature(input_example, output_example)
 
 with mlflow.start_run():
 
