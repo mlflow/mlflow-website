@@ -34,7 +34,8 @@ for the agent to invoke and complete tasks.
 **Knowledge Bases**: Amazon Bedrock supports the creation of Knowledge Bases to implement
 Retrieval Augmented Generation workflows. It consists of data sources (on S3 or webpages) and a vector store.
 
-Bedrock agent's execution process (and the following trace is grouped as such) consists of:
+Bedrock agent's execution process and the corresponding tracing is grouped in such a manner:
+
 **Pre-processing**
 This step validated, contextualizes and categorizes user input.
 
@@ -42,7 +43,7 @@ This step validated, contextualizes and categorizes user input.
 This step handles interpreting of user inputs, deciding when/what tasks to perform, iteratively refines responses
 via observations, rationales and augmented prompts.
 
-**Pre-processing (Optional)**
+**Post-processing (Optional)**
 This step formats the final response before returning to the user.
 
 **Traces**
