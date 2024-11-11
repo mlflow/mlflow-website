@@ -607,7 +607,7 @@ input_example = [{
     "messages": [
         {
             "role": "user",
-            "content": "what is the next launch window for Mars?",
+            "content": "When is the next launch window for Mars?",
         }
     ]
 }]
@@ -648,7 +648,7 @@ with mlflow.start_run():
     # Input example for the model
     input_example = {
         "messages": [
-            {"role": "user", "content": "Hi there!"}
+            {"role": "user", "content": "When is the next launch window for Mars?"}
         ]
     }
 
@@ -668,12 +668,11 @@ response = loaded.predict(
         "messages": [
             {
                 "role": "user",
-                "content": "what is the next launch window for Mars?",
+                "content": "When is the next launch window for Mars?",
             }
         ]
     }
 )
-print(response)
 ```
 
 ```text
