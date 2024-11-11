@@ -451,43 +451,41 @@ class BedrockModel(ChatModel):
 
             _knowledge_base_trace(str(trace_group))
 
-        def _find_trace_group_type(_trace_id, trace_group):
+        def _find_trace_group_type(_trace_id, trace_group, _trace):
             trace_name = "observation"
             pre_processing_trace_id_suffix = "-pre"
             if pre_processing_trace_id_suffix in _trace_id:
                 trace_name = "agent-initial-context"
             else:
-                for _trace in trace_group:
-                    action_group_invocation_input = _trace.get("data", {}).get(
-                        "actionGroupInvocationInput"
+                action_group_invocation_input = _trace.get("data", {}).get(
+                    "actionGroupInvocationInput"
+                )
+                if action_group_invocation_input is not None:
+                    action_group_name = action_group_invocation_input.get(
+                        "actionGroupName"
                     )
-                    if action_group_invocation_input is not None:
-                        action_group_name = action_group_invocation_input.get(
-                            "actionGroupName"
-                        )
-                        trace_name = f"ACTION-GROUP-{action_group_name}"
-                        _extract_action_group_trace(
-                            _trace_id, trace_group, action_group_invocation_input
-                        )
-                        break
-                    knowledge_base_lookup_input = _trace.get("data", {}).get(
-                        "knowledgeBaseLookupInput"
+                    trace_name = f"ACTION-GROUP-{action_group_name}"
+                    _extract_action_group_trace(
+                        _trace_id, trace_group, action_group_invocation_input
                     )
-                    if knowledge_base_lookup_input is not None:
-                        knowledge_base_id = knowledge_base_lookup_input.get(
-                            "knowledgeBaseId"
-                        )
-                        trace_name = f"KNOWLEDGE_BASE_{knowledge_base_id}"
-                        _extract_knowledge_base_trace(
-                            _trace_id, trace_group, knowledge_base_lookup_input
-                        )
+                knowledge_base_lookup_input = _trace.get("data", {}).get(
+                    "knowledgeBaseLookupInput"
+                )
+                if knowledge_base_lookup_input is not None:
+                    knowledge_base_id = knowledge_base_lookup_input.get(
+                        "knowledgeBaseId"
+                    )
+                    trace_name = f"KNOWLEDGE_BASE_{knowledge_base_id}"
+                    _extract_knowledge_base_trace(
+                        _trace_id, trace_group, knowledge_base_lookup_input
+                    )
             return trace_name
 
         final_response = ""
         for _trace_id, _trace_group in trace_id_groups_copy.items():
             for _trace in _trace_group:
                 if model_invocation_input_key == _trace.get("type", ""):
-                    trace_name = _find_trace_group_type(_trace_id, _trace_group)
+                    trace_name = _find_trace_group_type(_trace_id, _trace_group, _trace)
                     _create_trace_by_type(trace_name, _trace_id, _trace)
                 final_response = (
                     _trace.get("data", {}).get("finalResponse", {}).get("text", "")
