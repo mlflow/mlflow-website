@@ -607,7 +607,7 @@ input_example = [{
     "messages": [
         {
             "role": "user",
-            "content": "When is the next launch window for Mars?",
+            "content": "what is the next launch window for Mars?",
         }
     ]
 }]
@@ -645,6 +645,14 @@ with mlflow.start_run():
         },
     }
 
+    # Input example for the model
+    input_example = {
+        "messages": [
+            {"role": "user", "content": "Hi there!"}
+        ]
+    }
+
+    # Log and load the model using MLflow
     logged_chain_info = mlflow.pyfunc.log_model(
         python_model=BedrockModel(),
         model_config=model_config,
@@ -654,16 +662,18 @@ with mlflow.start_run():
 
 loaded = mlflow.pyfunc.load_model(logged_chain_info.model_uri)
 
+# Predict using the loaded model
 response = loaded.predict(
     {
         "messages": [
             {
                 "role": "user",
-                "content": "when is the next launch window for Mars?",
+                "content": "what is the next launch window for Mars?",
             }
         ]
     }
 )
+print(response)
 ```
 
 ```text
