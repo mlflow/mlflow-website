@@ -9,20 +9,18 @@ thumbnail: /img/blog/bedrock-chatmodel.png
 
 ![Thumbnail](bedrock_chatmodel.png)
 
-In this blog post, we delve into the integration of AWS Bedrock Agent as a ChatModel within MLflow, focusing on how to
-leverage Bedrock's [Action Groups](https://docs.aws.amazon.com/bedrock/latest/userguide/agents-action-create.html) 
-and [Knowledge Bases](https://docs.aws.amazon.com/bedrock/latest/userguide/agents-kb-add.html)
-to build a conversational AI application. The blog will guide you
-through setting up the Bedrock Agent, configuring Action Groups to enable custom actions with Lambda, and utilizing knowledge bases
-for context-aware interactions. A special emphasis is placed on implementing tracing within MLflow.
-By the end of this article, you'll have a good understanding of how to combine AWS Bedrock's advanced features
-with MLflow's capabilities such as agent request tracing, model tracking and consistent signatures for input examples.
+**In this blog post, we delve into the integration of AWS Bedrock Agent as a ChatModel within MLflow, focusing on
+how to leverage Bedrock's [Action Groups](https://docs.aws.amazon.com/bedrock/latest/userguide/agents-action-create.html)
+and [Knowledge Bases](https://docs.aws.amazon.com/bedrock/latest/userguide/agents-kb-add.html) to build a
+conversational AI application. The blog will guide you through setting up the Bedrock Agent, configuring
+Action Groups to enable custom actions with Lambda, and utilizing knowledge bases for context-aware interactions.
+A special emphasis is placed on implementing tracing within MLflow.By the end of this article, you'll have a good
+understanding of how to combine AWS Bedrock's advanced features with MLflow's capabilities such as agent request
+tracing, model tracking and consistent signatures for input examples.**
 
 ## What is AWS Bedrock?
 
-Amazon Bedrock is a managed service by AWS that simplifies the development of generative AI applications.
-It provides access to a variety of foundation models (FMs) from leading AI providers through a single API,
-enabling developers to build and scale AI solutions securely and efficiently.
+Amazon Bedrock is a managed service by AWS that simplifies the development of generative AI applications. It provides access to a variety of foundation models (FMs) from leading AI providers through a single API, enabling developers to build and scale AI solutions securely and efficiently.
 
 Key Components Relevant to This Integration:
 
@@ -34,7 +32,7 @@ Action Groups consist of an OpenAPI Schema and the corresponding Lambda function
 The OpenAPI Schema is used to define APIs available for the agent to invoke and complete tasks.
 
 **Knowledge Bases**: Amazon Bedrock supports the creation of Knowledge Bases to implement
-Retrieval Augmented Generation workflows. It consists of data sources (on S3 or webpages) 
+Retrieval Augmented Generation workflows. It consists of data sources (on S3 or webpages)
 and a vector store that contains the embedded references to this data.
 
 Bedrock's Agent execution process and the corresponding tracing for Agent instrumentation is grouped as follows:
@@ -43,7 +41,7 @@ Bedrock's Agent execution process and the corresponding tracing for Agent instru
 This step validates, contextualizes and categorizes user input.
 
 **Orchestration**
-This step handles the interpretation of user inputs, deciding when to and which tasks to perform, 
+This step handles the interpretation of user inputs, deciding when to and which tasks to perform,
 and iteratively refines responses
 
 **Post-processing (Optional)**
@@ -57,7 +55,7 @@ We will look at these traces in detail below.
 
 ## What is a ChatModel in MLflow?
 
-The [ChatModel class](https://mlflow.org/docs/latest/llms/chat-model-guide/index.html) is specifically 
+The [ChatModel class](https://mlflow.org/docs/latest/llms/chat-model-guide/index.html) is specifically
 designed to make it easier to implement models that are compatible with
 popular large language model (LLM) chat APIs. It enables you to seamlessly bring in your own models or agents and
 leverage MLflow's functionality, even if those models aren't natively supported as a flavor in MLflow. Additionally,
@@ -86,10 +84,11 @@ You will need to setup following items (either via the AWS console or SDKs):
   - **Important**:Save the agent alias ID here as we will need this below.
 - Deploy Bedrock agent with an alias. [Example](https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/python/example_code/bedrock-agent/scenario_get_started_with_agents.py#L342)
 
-<b>In our case, we are going to deploy the following example action group, which calculates the next optimal departure 
+<b>In our case, we are going to deploy the following example action group, which calculates the next optimal departure
 date for a Hohmann transfer from Earth to Mars, based on the spacecraft's mass and specific impulse.</b>
 
 ### OpenAPI schema for Action Groups
+
 As described above, here is the OpenAPI Schema for our example action group:
 
 ```yaml
@@ -124,17 +123,16 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: The next optimal departure date for a Hohmann transfer from Earth to Mars, based on the spacecraft's mass and specific impulse.
           content:
-            'application/json':
+            "application/json":
               schema:
                 type: object
                 properties:
                   next_launch_window:
                     type: string
                     description: Next Mars Launch Window
-
 ```
 
 ### Action groups - Lamda function
@@ -1293,30 +1291,26 @@ This structure helps to clearly show the flow of information and decision-making
 ```
 </details>
 
-### A Step-by-Step Guide to the Tracing UI
-***
-1) <b>Initial Prompt Submitted to the Bedrock Agent.</b>
-![Thumbnail](bedrock_input_prompt.png)
-***
+### Visualizing Trace Breakdown in the MLflow UI
 
-2) <b>In this trace, we can observe how the Bedrock Agent evaluates and selects the most suitable Action Group for the task at hand.</b>
-![Thumbnail](action_group_decision.png)
-***
-3) <b>Once an Action Group is selected, its invocation is traced, displaying the input and output interactions with the underlying Lambda function as outlined by the OpenAPI Spec above.</b>
-![Thumbnail](invoking_action_group.png)
-***
-4) <b>Furthermore, Bedrock's supplementary trace is included under the Attributes section, 
-along with additional metadata as shown below</b>
-![Thumbnail](traces_attributes.png)
-***
-5) <b>Subsequently, the final response from the agent is traced, as depicted below.</b>
-![Thumbnail](retrieved_response.png)
-***
+1. <b>Initial Prompt Submitted to the Bedrock Agent.</b>
+   ![Thumbnail](bedrock_input_prompt.png)
 
-**Note**: We cannot break down the span's duration into individual trace durations 
+2. <b>In this trace, we can observe how the Bedrock Agent evaluates and selects the most suitable Action Group for the task at hand.</b>
+   ![Thumbnail](action_group_decision.png)
+
+3. <b>Once an Action Group is selected, its invocation is traced, displaying the input and output interactions with the underlying Lambda function as outlined by the OpenAPI Spec above.</b>
+   ![Thumbnail](invoking_action_group.png)
+
+4. <b>Furthermore, Bedrock's supplementary trace is included under the Attributes section,
+   along with additional metadata as shown below</b>
+   ![Thumbnail](traces_attributes.png)
+
+5. <b>Subsequently, the final response from the agent is traced, as depicted below.</b>
+   ![Thumbnail](retrieved_response.png)
+
+**Note**: We cannot break down the span's duration into individual trace durations
 because the Bedrock Agent's trace response does not include timestamps for each trace step.
-
-
 
 ## Conclusion
 
