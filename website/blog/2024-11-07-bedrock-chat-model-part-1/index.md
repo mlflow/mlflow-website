@@ -1294,23 +1294,24 @@ This structure helps to clearly show the flow of information and decision-making
 </details>
 
 ### A Step-by-Step Guide to the Tracing UI
-
+***
 1) <b>Initial Prompt Submitted to the Bedrock Agent.</b>
-***
 ![Thumbnail](bedrock_input_prompt.png)
+***
+
 2) <b>In this trace, we can observe how the Bedrock Agent evaluates and selects the most suitable Action Group for the task at hand.</b>
-***
 ![Thumbnail](action_group_decision.png)
-3) <b>Once an Action Group is selected, its invocation is traced, displaying the input and output interactions with the underlying Lambda function as outlined by the OpenAPI Spec above.</b>
 ***
+3) <b>Once an Action Group is selected, its invocation is traced, displaying the input and output interactions with the underlying Lambda function as outlined by the OpenAPI Spec above.</b>
 ![Thumbnail](invoking_action_group.png)
+***
 4) <b>Furthermore, Bedrock's supplementary trace is included under the Attributes section, 
 along with additional metadata as shown below</b>
-***
 ![Thumbnail](traces_attributes.png)
-5) <b>Subsequently, the final response from the agent is traced, as depicted below.</b> 
 ***
+5) <b>Subsequently, the final response from the agent is traced, as depicted below.</b>
 ![Thumbnail](retrieved_response.png)
+***
 
 **Note**: We cannot break down the span's duration into individual trace durations 
 because the Bedrock Agent's trace response does not include timestamps for each trace step.
