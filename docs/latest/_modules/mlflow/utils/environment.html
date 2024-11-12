@@ -55,7 +55,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="MLflow 2.17.1.dev0 documentation" href="../../../index.html"/>
+    <link rel="top" title="MLflow 2.17.3.dev0 documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
   
@@ -87,7 +87,7 @@
     <a href="../../../index.html" class="wy-nav-top-logo"
       ><img src="../../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.17.1.dev0</span>
+    <span class="version">2.17.3.dev0</span>
   </li>
 </ul>
   </nav>
@@ -202,7 +202,8 @@
               <div itemprop="articleBody">
                 
   <h1>Source code for mlflow.utils.environment</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">importlib.metadata</span>
+<span></span><span class="kn">import</span> <span class="nn">hashlib</span>
+<span class="kn">import</span> <span class="nn">importlib.metadata</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">pathlib</span>
@@ -210,7 +211,8 @@
 <span class="kn">import</span> <span class="nn">subprocess</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
 
 <span class="kn">import</span> <span class="nn">yaml</span>
 <span class="kn">from</span> <span class="nn">packaging.requirements</span> <span class="kn">import</span> <span class="n">InvalidRequirement</span><span class="p">,</span> <span class="n">Requirement</span>
@@ -223,7 +225,14 @@
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
 <span class="kn">from</span> <span class="nn">mlflow.protos.databricks_pb2</span> <span class="kn">import</span> <span class="n">INVALID_PARAMETER_VALUE</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils</span> <span class="kn">import</span> <span class="n">PYTHON_VERSION</span><span class="p">,</span> <span class="n">insecure_hash</span>
+<span class="kn">from</span> <span class="nn">mlflow.tracking</span> <span class="kn">import</span> <span class="n">get_tracking_uri</span>
+<span class="kn">from</span> <span class="nn">mlflow.utils</span> <span class="kn">import</span> <span class="n">PYTHON_VERSION</span>
+<span class="kn">from</span> <span class="nn">mlflow.utils.databricks_utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_get_databricks_serverless_env_vars</span><span class="p">,</span>
+    <span class="n">get_databricks_env_vars</span><span class="p">,</span>
+    <span class="n">is_databricks_connect</span><span class="p">,</span>
+    <span class="n">is_in_databricks_runtime</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.os</span> <span class="kn">import</span> <span class="n">is_windows</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.process</span> <span class="kn">import</span> <span class="n">_exec_cmd</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.requirements_utils</span> <span class="kn">import</span> <span class="p">(</span>
@@ -943,7 +952,7 @@
 <span class="sd">        (e.g. &quot;mlflow-da39a3ee5e6b4b0d3255bfef95601890afd80709&quot;)</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="s2">&quot;mlflow-&quot;</span> <span class="o">+</span> <span class="n">insecure_hash</span><span class="o">.</span><span class="n">sha1</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+    <span class="k">return</span> <span class="s2">&quot;mlflow-&quot;</span> <span class="o">+</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">),</span> <span class="n">usedforsecurity</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
 
 
 <span class="k">def</span> <span class="nf">_get_pip_install_mlflow</span><span class="p">():</span>
@@ -961,7 +970,7 @@
 
 <span class="k">def</span> <span class="nf">_get_requirements_from_file</span><span class="p">(</span>
     <span class="n">file_path</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Requirement</span><span class="p">]:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Requirement</span><span class="p">]:</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">file_path</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">file_path</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">_CONDA_ENV_FILE_NAME</span><span class="p">:</span>
         <span class="n">conda_env</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
@@ -973,7 +982,7 @@
 
 <span class="k">def</span> <span class="nf">_write_requirements_to_file</span><span class="p">(</span>
     <span class="n">file_path</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span>
-    <span class="n">new_reqs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">new_reqs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">file_path</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">_CONDA_ENV_FILE_NAME</span><span class="p">:</span>
         <span class="n">conda_env</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">file_path</span><span class="o">.</span><span class="n">read_text</span><span class="p">())</span>
@@ -985,9 +994,9 @@
 
 
 <span class="k">def</span> <span class="nf">_add_or_overwrite_requirements</span><span class="p">(</span>
-    <span class="n">new_reqs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Requirement</span><span class="p">],</span>
-    <span class="n">old_reqs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Requirement</span><span class="p">],</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="n">new_reqs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Requirement</span><span class="p">],</span>
+    <span class="n">old_reqs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Requirement</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
     <span class="n">deduped_new_reqs</span> <span class="o">=</span> <span class="n">_deduplicate_requirements</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">req</span><span class="p">)</span> <span class="k">for</span> <span class="n">req</span> <span class="ow">in</span> <span class="n">new_reqs</span><span class="p">])</span>
     <span class="n">deduped_new_reqs</span> <span class="o">=</span> <span class="p">[</span><span class="n">Requirement</span><span class="p">(</span><span class="n">req</span><span class="p">)</span> <span class="k">for</span> <span class="n">req</span> <span class="ow">in</span> <span class="n">deduped_new_reqs</span><span class="p">]</span>
 
@@ -998,9 +1007,9 @@
 
 
 <span class="k">def</span> <span class="nf">_remove_requirements</span><span class="p">(</span>
-    <span class="n">reqs_to_remove</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Requirement</span><span class="p">],</span>
-    <span class="n">old_reqs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Requirement</span><span class="p">],</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="n">reqs_to_remove</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Requirement</span><span class="p">],</span>
+    <span class="n">old_reqs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Requirement</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
     <span class="n">old_reqs_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">req</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">req</span><span class="p">)</span> <span class="k">for</span> <span class="n">req</span> <span class="ow">in</span> <span class="n">old_reqs</span><span class="p">}</span>
     <span class="k">for</span> <span class="n">req</span> <span class="ow">in</span> <span class="n">reqs_to_remove</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">req</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">old_reqs_dict</span><span class="p">:</span>
@@ -1030,9 +1039,12 @@
         <span class="n">stdin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">synchronous</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="k">if</span> <span class="n">command_env</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">command_env</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">command_env</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_extra_env</span><span class="p">,</span> <span class="o">**</span><span class="n">command_env</span><span class="p">}</span>
+        <span class="n">command_env</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">if</span> <span class="n">command_env</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">command_env</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">is_in_databricks_runtime</span><span class="p">():</span>
+            <span class="n">command_env</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">get_databricks_env_vars</span><span class="p">(</span><span class="n">get_tracking_uri</span><span class="p">()))</span>
+        <span class="k">if</span> <span class="n">is_databricks_connect</span><span class="p">():</span>
+            <span class="n">command_env</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">_get_databricks_serverless_env_vars</span><span class="p">())</span>
+        <span class="n">command_env</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_extra_env</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="n">command</span> <span class="o">=</span> <span class="p">[</span><span class="n">command</span><span class="p">]</span>
 
@@ -1082,7 +1094,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../../',
-      VERSION:'2.17.1.dev0',
+      VERSION:'2.17.3.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

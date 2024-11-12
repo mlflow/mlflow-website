@@ -55,7 +55,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="MLflow 2.17.1.dev0 documentation" href="index.html"/>
+    <link rel="top" title="MLflow 2.17.3.dev0 documentation" href="index.html"/>
         <link rel="next" title="Managing Dependencies in MLflow Models" href="/model/dependencies.html"/>
         <link rel="prev" title="MLflow Projects" href="/projects.html"/> 
 
@@ -87,7 +87,7 @@
     <a href="index.html" class="wy-nav-top-logo"
       ><img src="_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.17.1.dev0</span>
+    <span class="version">2.17.3.dev0</span>
   </li>
 </ul>
   </nav>
@@ -143,6 +143,7 @@
 <li class="toctree-l4"><a class="reference internal" href="model/dependencies.html">Managing Dependencies in MLflow Models</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="#environment-variables-file">Environment variables file</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#managing-model-dependencies">Managing Model Dependencies</a></li>
@@ -384,14 +385,18 @@ to Amazon SageMaker).</p>
 <div class="section" id="mlmodel-file">
 <h3>MLmodel file<a class="headerlink" href="#mlmodel-file" title="Permalink to this headline"> </a></h3>
 <p>All of the flavors that a particular model supports are defined in its <code class="docutils literal notranslate"><span class="pre">MLmodel</span></code> file in YAML
-format. For example, <a class="reference internal" href="python_api/mlflow.sklearn.html#module-mlflow.sklearn" title="mlflow.sklearn"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mlflow.sklearn</span></code></a> outputs models as follows:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span># Directory written by mlflow.sklearn.save_model(model, &quot;my_model&quot;)
-my_model/
+format. For example, running <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">examples/sklearn_logistic_regression/train.py</span></code> from <a class="reference external" href="https://github.com/mlflow/mlflow/blob/master/examples/sklearn_logistic_regression/train.py">MLflow repo</a>
+will create the following files under the <code class="docutils literal notranslate"><span class="pre">model</span></code> directory:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span># Directory written by mlflow.sklearn.save_model(model, &quot;model&quot;, input_example=...)
+model/
 ├── MLmodel
 ├── model.pkl
 ├── conda.yaml
 ├── python_env.yaml
-└── requirements.txt
+├── requirements.txt
+├── input_example.json (optional, only logged when input example is provided and valid during model logging)
+├── serving_input_example.json (optional, only logged when input example is provided and valid during model logging)
+└── environment_variables.txt (optional, only logged when environment variables are used during model inference)
 </pre></div>
 </div>
 <p>And its <code class="docutils literal notranslate"><span class="pre">MLmodel</span></code> file describes two flavors:</p>
@@ -421,6 +426,8 @@ the following fields:</p>
 <p>For environment recreation, we automatically log <code class="docutils literal notranslate"><span class="pre">conda.yaml</span></code>, <code class="docutils literal notranslate"><span class="pre">python_env.yaml</span></code>, and <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> files whenever a model is logged.
 These files can then be used to reinstall dependencies using <code class="docutils literal notranslate"><span class="pre">conda</span></code> or <code class="docutils literal notranslate"><span class="pre">virtualenv</span></code> with <code class="docutils literal notranslate"><span class="pre">pip</span></code>. Please see
 <a class="reference internal" href="model/dependencies.html#how-mlflow-records-dependencies"><span class="std std-ref">How MLflow Model Records Dependencies</span></a> for more details about these files.</p>
+<p>If a model input example is provided when logging the model, two additional files <code class="docutils literal notranslate"><span class="pre">input_example.json</span></code> and <code class="docutils literal notranslate"><span class="pre">serving_input_example.json</span></code> are logged.
+See <a class="reference external" href="model/signatures.html#input-example">Model Input Example</a> for more details.</p>
 <p>When logging a model, model metadata files (<code class="docutils literal notranslate"><span class="pre">MLmodel</span></code>, <code class="docutils literal notranslate"><span class="pre">conda.yaml</span></code>, <code class="docutils literal notranslate"><span class="pre">python_env.yaml</span></code>, <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code>) are copied to a subdirectory named <code class="docutils literal notranslate"><span class="pre">metadata</span></code>. For wheeled models, <code class="docutils literal notranslate"><span class="pre">original_requirements.txt</span></code> file is also copied.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -436,6 +443,71 @@ the model directory. This subdirectory contains the lightweight copy of aforemen
 metadata files for internal use.</p>
 </div>
 <div class="toctree-wrapper compound">
+</div>
+</div>
+<div class="section" id="environment-variables-file">
+<h3>Environment variables file<a class="headerlink" href="#environment-variables-file" title="Permalink to this headline"> </a></h3>
+<p>MLflow records the environment variables that are used during model inference in <code class="docutils literal notranslate"><span class="pre">environment_variables.txt</span></code> file when logging a model.</p>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<p><code class="docutils literal notranslate"><span class="pre">environment_variables.txt</span></code> file <strong>only contains names</strong> of the environment variables that are used during model inference,
+<strong>values are not stored</strong>.</p>
+</div>
+<p>Currently MLflow only logs the environment variables whose name contains any of the following keywords:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">RECORD_ENV_VAR_ALLOWLIST</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="c1"># api key related</span>
+    <span class="s2">&quot;API_KEY&quot;</span><span class="p">,</span>  <span class="c1"># e.g. OPENAI_API_KEY</span>
+    <span class="s2">&quot;API_TOKEN&quot;</span><span class="p">,</span>
+    <span class="c1"># databricks auth related</span>
+    <span class="s2">&quot;DATABRICKS_HOST&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;DATABRICKS_USERNAME&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;DATABRICKS_PASSWORD&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;DATABRICKS_TOKEN&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;DATABRICKS_INSECURE&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;DATABRICKS_CLIENT_ID&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;DATABRICKS_CLIENT_SECRET&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;_DATABRICKS_WORKSPACE_HOST&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;_DATABRICKS_WORKSPACE_ID&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Example of a pyfunc model that uses environment variables:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;TEST_API_KEY&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;test_api_key&quot;</span>
+
+
+<span class="k">class</span> <span class="nc">MyModel</span><span class="p">(</span><span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">PythonModel</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">model_input</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TEST_API_KEY&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">model_input</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;API key not found&quot;</span><span class="p">)</span>
+
+
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="n">model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+        <span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="n">python_model</span><span class="o">=</span><span class="n">MyModel</span><span class="p">(),</span> <span class="n">input_example</span><span class="o">=</span><span class="s2">&quot;data&quot;</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<p>Environment variable <cite>TEST_API_KEY</cite> is logged in the environment_variables.txt file like below</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># This file records environment variable names that are used during model inference.</span>
+<span class="c1"># They might need to be set when creating a serving endpoint from this model.</span>
+<span class="c1"># Note: it is not guaranteed that all environment variables listed here are required</span>
+<span class="n">TEST_API_KEY</span>
+</pre></div>
+</div>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<p>Before you deploy a model to a serving endpoint, <strong>review the environment_variables.txt file</strong> to ensure
+all necessary environment variables for model inference are set. Note that <strong>not all environment variables
+listed in the file are always required for model inference.</strong> For detailed instructions on setting
+environment variables on a databricks serving endpoint, refer to <a class="reference external" href="https://docs.databricks.com/en/machine-learning/model-serving/store-env-variable-model-serving.html#add-plain-text-environment-variables">this guidance</a>.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To disable this feature, set the environment variable <code class="docutils literal notranslate"><span class="pre">MLFLOW_RECORD_ENV_VARS_IN_MODEL_LOGGING</span></code> to <code class="docutils literal notranslate"><span class="pre">false</span></code>.</p>
 </div>
 </div>
 </div>
@@ -4676,7 +4748,7 @@ maintained by the MLflow community.</p>
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'./',
-      VERSION:'2.17.1.dev0',
+      VERSION:'2.17.3.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

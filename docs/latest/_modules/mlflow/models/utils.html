@@ -55,7 +55,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="MLflow 2.17.1.dev0 documentation" href="../../../index.html"/>
+    <link rel="top" title="MLflow 2.17.3.dev0 documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
   
@@ -87,7 +87,7 @@
     <a href="../../../index.html" class="wy-nav-top-logo"
       ><img src="../../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.17.1.dev0</span>
+    <span class="version">2.17.3.dev0</span>
   </li>
 </ul>
   </nav>
@@ -210,6 +210,7 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
 <span class="kn">import</span> <span class="nn">uuid</span>
@@ -235,6 +236,7 @@
     <span class="n">clean_tensor_type</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.annotations</span> <span class="kn">import</span> <span class="n">experimental</span>
+<span class="kn">from</span> <span class="nn">mlflow.utils.file_utils</span> <span class="kn">import</span> <span class="n">create_tmp_dir</span><span class="p">,</span> <span class="n">get_local_path_or_none</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.proto_json_utils</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">NumpyEncoder</span><span class="p">,</span>
     <span class="n">dataframe_from_parsed_json</span><span class="p">,</span>
@@ -287,7 +289,7 @@
 <span class="p">]</span>
 
 <span class="n">PyFuncLLMSingleInput</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span>
-    <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
     <span class="nb">bool</span><span class="p">,</span>
     <span class="nb">bytes</span><span class="p">,</span>
     <span class="nb">float</span><span class="p">,</span>
@@ -296,7 +298,7 @@
 <span class="p">]</span>
 
 <span class="n">PyFuncLLMOutputChunk</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span>
-    <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
     <span class="nb">str</span><span class="p">,</span>
 <span class="p">]</span>
 
@@ -306,8 +308,8 @@
     <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="s2">&quot;csc_matrix&quot;</span><span class="p">,</span>
     <span class="s2">&quot;csr_matrix&quot;</span><span class="p">,</span>
-    <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
-    <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>  <span class="c1"># noqa: UP006</span>
+    <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>  <span class="c1"># noqa: UP006</span>
     <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="p">,</span>
     <span class="nb">bool</span><span class="p">,</span>
     <span class="nb">bytes</span><span class="p">,</span>
@@ -746,7 +748,7 @@
         <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_load_serving_input_example</span><span class="p">(</span><span class="n">mlflow_model</span><span class="p">:</span> <span class="n">Model</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_load_serving_input_example</span><span class="p">(</span><span class="n">mlflow_model</span><span class="p">:</span> <span class="n">Model</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Load serving input exaple from a model directory. Returns None if there is no serving input</span>
 <span class="sd">    example.</span>
@@ -1482,7 +1484,7 @@
     <span class="k">return</span> <span class="n">_enforce_type</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">property</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_enforce_object</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Object</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_enforce_object</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Object</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">required</span> <span class="ow">and</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="n">HAS_PYSPARK</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">Row</span><span class="p">):</span>
@@ -1682,7 +1684,7 @@
     <span class="k">return</span> <span class="n">client</span><span class="o">.</span><span class="n">get_model_version</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_enforce_params_schema</span><span class="p">(</span><span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">schema</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ParamSchema</span><span class="p">]):</span>
+<span class="k">def</span> <span class="nf">_enforce_params_schema</span><span class="p">(</span><span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">schema</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ParamSchema</span><span class="p">]):</span>
     <span class="k">if</span> <span class="n">schema</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">params</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">{}]:</span>
             <span class="k">return</span> <span class="n">params</span>
@@ -1863,7 +1865,7 @@
     <span class="k">return</span> <span class="n">data</span>
 
 
-<span class="k">def</span> <span class="nf">_convert_llm_input_data</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]:</span>
+<span class="k">def</span> <span class="nf">_convert_llm_input_data</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convert input data to a format that can be passed to the model with GenAI flavors such as</span>
 <span class="sd">    LangChain and LLamaIndex.</span>
@@ -1888,8 +1890,8 @@
 
 <span class="k">def</span> <span class="nf">_validate_and_get_model_code_path</span><span class="p">(</span><span class="n">model_code_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">temp_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Validate model code path exists. Creates a temp file in temp_dir and validate its contents if</span>
-<span class="sd">    it&#39;s a notebook.</span>
+<span class="sd">    Validate model code path exists. When failing to open the model file on Databricks,</span>
+<span class="sd">    creates a temp file in temp_dir and validate its contents if it&#39;s a notebook.</span>
 
 <span class="sd">    Returns either `model_code_path` or a temp file path with the contents of the notebook.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -1898,10 +1900,12 @@
     <span class="n">model_code_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">model_code_path</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">model_code_path</span><span class="p">):</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">model_code_path</span><span class="p">)</span>
+        <span class="n">additional_message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Perhaps you meant &#39;</span><span class="si">{</span><span class="n">model_code_path</span><span class="si">}</span><span class="s2">.py&#39;?&quot;</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">ext</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;The provided model path &#39;</span><span class="si">{</span><span class="n">model_code_path</span><span class="si">}</span><span class="s2">&#39; is not a valid Python file path or a &quot;</span>
-            <span class="s2">&quot;Databricks Notebook file path containing the code for defining the chain instance. &quot;</span>
-            <span class="s2">&quot;Ensure the file path is valid and try again.&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;The provided model path &#39;</span><span class="si">{</span><span class="n">model_code_path</span><span class="si">}</span><span class="s2">&#39; does not exist. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Ensure the file path is valid and try again.</span><span class="si">{</span><span class="n">additional_message</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
 
     <span class="k">try</span><span class="p">:</span>
@@ -1930,7 +1934,7 @@
 
 
 <span class="nd">@contextmanager</span>
-<span class="k">def</span> <span class="nf">_config_context</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_config_context</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
     <span class="c1"># Check if config_path is None and set it to &quot;&quot; so when loading the model</span>
     <span class="c1"># the config_path is set to &quot;&quot; so the ModelConfig can correctly check if the</span>
     <span class="c1"># config is set or not</span>
@@ -1991,7 +1995,7 @@
 <span class="c1"># This function addresses this by dynamically importing the `code path` module under a unique,</span>
 <span class="c1"># dynamically generated module name. This bypasses the caching mechanism, as each import is</span>
 <span class="c1"># considered a separate module by the Python interpreter.</span>
-<span class="k">def</span> <span class="nf">_load_model_code_path</span><span class="p">(</span><span class="n">code_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">model_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]):</span>
+<span class="k">def</span> <span class="nf">_load_model_code_path</span><span class="p">(</span><span class="n">code_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">model_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]):</span>
     <span class="k">with</span> <span class="n">_config_context</span><span class="p">(</span><span class="n">model_config</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">new_module_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;code_model_</span><span class="si">{</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -2021,9 +2025,9 @@
 
 
 <span class="k">def</span> <span class="nf">_flatten_nested_params</span><span class="p">(</span>
-    <span class="n">d</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">parent_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">sep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-    <span class="n">items</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">d</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">parent_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">sep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+    <span class="n">items</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">new_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">parent_key</span><span class="si">}{</span><span class="n">sep</span><span class="si">}{</span><span class="n">k</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">parent_key</span> <span class="k">else</span> <span class="n">k</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
@@ -2036,7 +2040,7 @@
 <span class="c1"># NB: this function should always be kept in sync with the serving</span>
 <span class="c1"># process in scoring_server invocations.</span>
 <div class="viewcode-block" id="validate_serving_input"><a class="viewcode-back" href="../../../python_api/mlflow.models.html#mlflow.models.validate_serving_input">[docs]</a><span class="nd">@experimental</span>
-<span class="k">def</span> <span class="nf">validate_serving_input</span><span class="p">(</span><span class="n">model_uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">serving_input</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]):</span>
+<span class="k">def</span> <span class="nf">validate_serving_input</span><span class="p">(</span><span class="n">model_uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">serving_input</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Helper function to validate the model can be served and provided input is valid</span>
 <span class="sd">    prior to serving the model.</span>
@@ -2053,14 +2057,20 @@
     <span class="c1"># sklearn model might not have python_function flavor if it</span>
     <span class="c1"># doesn&#39;t define a predict function. In such case the model</span>
     <span class="c1"># can not be served anyways</span>
-    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">temp_output_dir</span><span class="p">:</span>
-        <span class="n">pyfunc_model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">dst_path</span><span class="o">=</span><span class="n">temp_output_dir</span><span class="p">)</span>
+
+    <span class="n">output_dir</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">get_local_path_or_none</span><span class="p">(</span><span class="n">model_uri</span><span class="p">)</span> <span class="k">else</span> <span class="n">create_tmp_dir</span><span class="p">()</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">pyfunc_model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">dst_path</span><span class="o">=</span><span class="n">output_dir</span><span class="p">)</span>
         <span class="n">parsed_input</span> <span class="o">=</span> <span class="n">_parse_json_data</span><span class="p">(</span>
             <span class="n">serving_input</span><span class="p">,</span>
             <span class="n">pyfunc_model</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span>
             <span class="n">pyfunc_model</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get_input_schema</span><span class="p">(),</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="n">pyfunc_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">parsed_input</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">parsed_input</span><span class="o">.</span><span class="n">params</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">pyfunc_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">parsed_input</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">parsed_input</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">output_dir</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">output_dir</span><span class="p">):</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span></div>
 </pre></div>
 
               </div>
@@ -2091,7 +2101,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../../',
-      VERSION:'2.17.1.dev0',
+      VERSION:'2.17.3.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

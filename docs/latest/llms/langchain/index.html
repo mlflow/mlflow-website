@@ -55,7 +55,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="MLflow 2.17.1.dev0 documentation" href="../../index.html"/>
+    <link rel="top" title="MLflow 2.17.3.dev0 documentation" href="../../index.html"/>
         <link rel="up" title="LLMs" href="../index.html"/>
         <link rel="next" title="MLflow Langchain Autologging" href="/autologging.html"/>
         <link rel="prev" title="Sentence Transformers within MLflow" href="/../sentence-transformers/guide/index.html"/> 
@@ -89,7 +89,7 @@
     <a href="../../index.html" class="wy-nav-top-logo"
       ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.17.1.dev0</span>
+    <span class="version">2.17.3.dev0</span>
   </li>
 </ul>
   </nav>
@@ -253,7 +253,11 @@ benefits that are associated with using LangChain within the broader MLflow ecos
 </div>
 <div class="section" id="dependency-management">
 <h3>Dependency Management<a class="headerlink" href="#dependency-management" title="Permalink to this headline"> </a></h3>
-<p>Deploy your LangChain application with confidence, leveraging MLflow’s ability to <a class="reference external" href="../../model/dependencies.html">manage and record all external dependencies</a> automatically. This ensures consistency between development and production environments, reducing deployment risks with less manual intervention.</p>
+<p>Deploy your LangChain application with confidence, leveraging MLflow’s ability to <a class="reference external" href="../../model/dependencies.html">manage and record code and environment dependencies</a> automatically.
+You can also explicitly declare external resource dependencies, like the LLM serving endpoint or vector search index queried by your LangChain application.
+These dependencies are tracked by MLflow as model metadata, so that downstream serving systems can ensure authentication from your
+deployed LangChain application to these dependent resources just works.</p>
+<p>These features ensure consistency between development and production environments, reducing deployment risks with less manual intervention.</p>
 </div>
 <div class="section" id="mlflow-evaluate">
 <h3>MLflow Evaluate<a class="headerlink" href="#mlflow-evaluate" title="Permalink to this headline"> </a></h3>
@@ -715,6 +719,43 @@ string response, which can be compared to the <cite>“ground_truth”</cite> co
 <p>For a complete example of a LangGraph model that works with this evaluation example, see the
 <a class="reference external" href="https://mlflow.org/blog/langgraph-model-from-code">MLflow LangGraph blog</a>.</p>
 </div>
+<div class="section" id="how-to-control-whether-my-input-is-converted-to-list-langchain-schema-basemessage-in-pyfunc-predict">
+<h3>How to control whether my input is converted to List[langchain.schema.BaseMessage] in PyFunc predict?<a class="headerlink" href="#how-to-control-whether-my-input-is-converted-to-list-langchain-schema-basemessage-in-pyfunc-predict" title="Permalink to this headline"> </a></h3>
+<p>By default, MLflow converts chat request format input <code class="docutils literal notranslate"><span class="pre">{&quot;messages&quot;:</span> <span class="pre">[{&quot;role&quot;:</span> <span class="pre">&quot;user&quot;,</span> <span class="pre">&quot;content&quot;:</span> <span class="pre">&quot;some_question&quot;}]}</span></code> to
+List[langchain.schema.BaseMessage] like <code class="docutils literal notranslate"><span class="pre">[HumanMessage(content=&quot;some_question&quot;)]</span></code> for certain model types.
+To force the conversion, set the environment variable <code class="docutils literal notranslate"><span class="pre">MLFLOW_CONVERT_MESSAGES_DICT_FOR_LANGCHAIN</span></code> to <code class="docutils literal notranslate"><span class="pre">True</span></code>.
+To disable this behavior, set the environment variable <code class="docutils literal notranslate"><span class="pre">MLFLOW_CONVERT_MESSAGES_DICT_FOR_LANGCHAIN</span></code> to <code class="docutils literal notranslate"><span class="pre">False</span></code> as demonstrated below:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">itemgetter</span>
+<span class="kn">from</span> <span class="nn">langchain.schema.runnable</span> <span class="kn">import</span> <span class="n">RunnablePassthrough</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">RunnablePassthrough</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span>
+    <span class="n">problem</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;messages&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;content&quot;</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">|</span> <span class="n">itemgetter</span><span class="p">(</span><span class="s2">&quot;problem&quot;</span><span class="p">)</span>
+
+<span class="n">input_example</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;Hello&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+<span class="c1"># this model accepts the input_example</span>
+<span class="k">assert</span> <span class="n">model</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="n">input_example</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;Hello&quot;</span>
+
+<span class="c1"># set this environment variable to avoid input conversion</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;MLFLOW_CONVERT_MESSAGES_DICT_FOR_LANGCHAIN&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;false&quot;</span>
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="n">model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">langchain</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="n">input_example</span><span class="o">=</span><span class="n">input_example</span><span class="p">)</span>
+
+<span class="n">pyfunc_model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">pyfunc_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">input_example</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span><span class="s2">&quot;Hello&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
 </div>
 </div>
 
@@ -756,7 +797,7 @@ string response, which can be compared to the <cite>“ground_truth”</cite> co
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../',
-      VERSION:'2.17.1.dev0',
+      VERSION:'2.17.3.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

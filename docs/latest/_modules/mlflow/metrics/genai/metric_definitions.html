@@ -55,7 +55,7 @@
         <link rel="index" title="Index"
               href="../../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../../search.html"/>
-    <link rel="top" title="MLflow 2.17.1.dev0 documentation" href="../../../../index.html"/>
+    <link rel="top" title="MLflow 2.17.3.dev0 documentation" href="../../../../index.html"/>
         <link rel="up" title="mlflow.metrics" href="../../metrics.html"/> 
 
   
@@ -87,7 +87,7 @@
     <a href="../../../../index.html" class="wy-nav-top-logo"
       ><img src="../../../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.17.1.dev0</span>
+    <span class="version">2.17.3.dev0</span>
   </li>
 </ul>
   </nav>
@@ -204,7 +204,7 @@
               <div itemprop="articleBody">
                 
   <h1>Source code for mlflow.metrics.genai.metric_definitions</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
 <span class="kn">from</span> <span class="nn">mlflow.metrics.genai.base</span> <span class="kn">import</span> <span class="n">EvaluationExample</span>
@@ -220,13 +220,18 @@
 <span class="k">def</span> <span class="nf">answer_similarity</span><span class="p">(</span>
     <span class="n">model</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">metric_version</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">examples</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">EvaluationExample</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">metric_metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">examples</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">EvaluationExample</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">metric_metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">parameters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">extra_headers</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">proxy_url</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluationMetric</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function will create a genai metric used to evaluate the answer similarity of an LLM</span>
 <span class="sd">    using the model provided. Answer similarity will be assessed by the semantic similarity of the</span>
-<span class="sd">    output to the ``ground_truth``, which should be specified in the ``targets`` column.</span>
+<span class="sd">    output to the ``ground_truth``, which should be specified in the ``targets`` column. High</span>
+<span class="sd">    scores mean that your model outputs contain similar information as the ground_truth, while</span>
+<span class="sd">    low scores mean that outputs may disagree with the ground_truth.</span>
 
 <span class="sd">    The ``targets`` eval_arg must be provided as part of the input dataset or output</span>
 <span class="sd">    predictions. This can be mapped to a column of a different name using ``col_mapping``</span>
@@ -235,10 +240,9 @@
 <span class="sd">    An MlflowException will be raised if the specified version for this metric does not exist.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        model: (Optional) Model uri of an openai or gateway judge model in the format of</span>
-<span class="sd">            &quot;openai:/gpt-4&quot; or &quot;gateway:/my-route&quot;. Defaults to</span>
-<span class="sd">            &quot;openai:/gpt-4&quot;. Your use of a third party LLM service (e.g., OpenAI) for</span>
-<span class="sd">            evaluation may be subject to and governed by the LLM service&#39;s terms of use.</span>
+<span class="sd">        model: (Optional) Model uri of the judge model that will be used to compute the metric,</span>
+<span class="sd">            e.g., ``openai:/gpt-4``. Refer to the `LLM-as-a-Judge Metrics &lt;https://mlflow.org/docs/latest/llms/llm-evaluate/index.html#selecting-the-llm-as-judge-model&gt;`_</span>
+<span class="sd">            documentation for the supported model types and their URI format.</span>
 <span class="sd">        metric_version: (Optional) The version of the answer similarity metric to use.</span>
 <span class="sd">            Defaults to the latest version.</span>
 <span class="sd">        examples: (Optional) Provide a list of examples to help the judge model evaluate the</span>
@@ -247,6 +251,14 @@
 <span class="sd">        metric_metadata: (Optional) Dictionary of metadata to be attached to the</span>
 <span class="sd">            EvaluationMetric object. Useful for model evaluators that require additional</span>
 <span class="sd">            information to determine how to evaluate this metric.</span>
+<span class="sd">        parameters: (Optional) Dictionary of parameters to be passed to the judge model,</span>
+<span class="sd">            e.g., {&quot;temperature&quot;: 0.5}. When specified, these parameters will override</span>
+<span class="sd">            the default parameters defined in the metric implementation.</span>
+<span class="sd">        extra_headers: (Optional) Dictionary of extra headers to be passed to the judge model.</span>
+<span class="sd">        proxy_url: (Optional) Proxy URL to be used for the judge model. This is useful when the</span>
+<span class="sd">            judge model is served via a proxy endpoint, not directly via LLM provider services.</span>
+<span class="sd">            If not specified, the default URL for the LLM provider will be used</span>
+<span class="sd">            (e.g., https://api.openai.com/v1/chat/completions for OpenAI chat models).</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A metric object</span>
@@ -282,10 +294,12 @@
         <span class="n">version</span><span class="o">=</span><span class="n">metric_version</span><span class="p">,</span>
         <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
         <span class="n">grading_context_columns</span><span class="o">=</span><span class="n">answer_similarity_class_module</span><span class="o">.</span><span class="n">grading_context_columns</span><span class="p">,</span>
-        <span class="n">parameters</span><span class="o">=</span><span class="n">answer_similarity_class_module</span><span class="o">.</span><span class="n">parameters</span><span class="p">,</span>
+        <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span> <span class="ow">or</span> <span class="n">answer_similarity_class_module</span><span class="o">.</span><span class="n">parameters</span><span class="p">,</span>
         <span class="n">aggregations</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;variance&quot;</span><span class="p">,</span> <span class="s2">&quot;p90&quot;</span><span class="p">],</span>
         <span class="n">greater_is_better</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">metric_metadata</span><span class="o">=</span><span class="n">metric_metadata</span><span class="p">,</span>
+        <span class="n">extra_headers</span><span class="o">=</span><span class="n">extra_headers</span><span class="p">,</span>
+        <span class="n">proxy_url</span><span class="o">=</span><span class="n">proxy_url</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 
@@ -293,13 +307,20 @@
 <span class="k">def</span> <span class="nf">answer_correctness</span><span class="p">(</span>
     <span class="n">model</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">metric_version</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">examples</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">EvaluationExample</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">metric_metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">examples</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">EvaluationExample</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">metric_metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">parameters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">extra_headers</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">proxy_url</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluationMetric</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function will create a genai metric used to evaluate the answer correctness of an LLM</span>
 <span class="sd">    using the model provided. Answer correctness will be assessed by the accuracy of the provided</span>
 <span class="sd">    output based on the ``ground_truth``, which should be specified in the ``targets`` column.</span>
+<span class="sd">    High scores mean that your model outputs contain similar information as the ground_truth and</span>
+<span class="sd">    that this information is correct, while low scores mean that outputs may disagree with the</span>
+<span class="sd">    ground_truth or that the information in the output is incorrect. Note that this builds onto</span>
+<span class="sd">    answer_similarity.</span>
 
 <span class="sd">    The ``targets`` eval_arg must be provided as part of the input dataset or output</span>
 <span class="sd">    predictions. This can be mapped to a column of a different name using ``col_mapping``</span>
@@ -308,10 +329,9 @@
 <span class="sd">    An MlflowException will be raised if the specified version for this metric does not exist.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        model: Model uri of an openai or gateway judge model in the format of</span>
-<span class="sd">            &quot;openai:/gpt-4&quot; or &quot;gateway:/my-route&quot;. Defaults to</span>
-<span class="sd">            &quot;openai:/gpt-4&quot;. Your use of a third party LLM service (e.g., OpenAI) for</span>
-<span class="sd">            evaluation may be subject to and governed by the LLM service&#39;s terms of use.</span>
+<span class="sd">        model: (Optional) Model uri of the judge model that will be used to compute the metric,</span>
+<span class="sd">            e.g., ``openai:/gpt-4``. Refer to the `LLM-as-a-Judge Metrics &lt;https://mlflow.org/docs/latest/llms/llm-evaluate/index.html#selecting-the-llm-as-judge-model&gt;`_</span>
+<span class="sd">            documentation for the supported model types and their URI format.</span>
 <span class="sd">        metric_version: The version of the answer correctness metric to use.</span>
 <span class="sd">            Defaults to the latest version.</span>
 <span class="sd">        examples: Provide a list of examples to help the judge model evaluate the</span>
@@ -320,6 +340,14 @@
 <span class="sd">        metric_metadata: (Optional) Dictionary of metadata to be attached to the</span>
 <span class="sd">            EvaluationMetric object. Useful for model evaluators that require additional</span>
 <span class="sd">            information to determine how to evaluate this metric.</span>
+<span class="sd">        parameters: (Optional) Dictionary of parameters to be passed to the judge model,</span>
+<span class="sd">            e.g., {&quot;temperature&quot;: 0.5}. When specified, these parameters will override</span>
+<span class="sd">            the default parameters defined in the metric implementation.</span>
+<span class="sd">        extra_headers: (Optional) Dictionary of extra headers to be passed to the judge model.</span>
+<span class="sd">        proxy_url: (Optional) Proxy URL to be used for the judge model. This is useful when the</span>
+<span class="sd">            judge model is served via a proxy endpoint, not directly via LLM provider services.</span>
+<span class="sd">            If not specified, the default URL for the LLM provider will be used</span>
+<span class="sd">            (e.g., https://api.openai.com/v1/chat/completions for OpenAI chat models).</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A metric object</span>
@@ -354,10 +382,12 @@
         <span class="n">version</span><span class="o">=</span><span class="n">metric_version</span><span class="p">,</span>
         <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
         <span class="n">grading_context_columns</span><span class="o">=</span><span class="n">answer_correctness_class_module</span><span class="o">.</span><span class="n">grading_context_columns</span><span class="p">,</span>
-        <span class="n">parameters</span><span class="o">=</span><span class="n">answer_correctness_class_module</span><span class="o">.</span><span class="n">parameters</span><span class="p">,</span>
+        <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span> <span class="ow">or</span> <span class="n">answer_correctness_class_module</span><span class="o">.</span><span class="n">parameters</span><span class="p">,</span>
         <span class="n">aggregations</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;variance&quot;</span><span class="p">,</span> <span class="s2">&quot;p90&quot;</span><span class="p">],</span>
         <span class="n">greater_is_better</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">metric_metadata</span><span class="o">=</span><span class="n">metric_metadata</span><span class="p">,</span>
+        <span class="n">extra_headers</span><span class="o">=</span><span class="n">extra_headers</span><span class="p">,</span>
+        <span class="n">proxy_url</span><span class="o">=</span><span class="n">proxy_url</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 
@@ -365,13 +395,18 @@
 <span class="k">def</span> <span class="nf">faithfulness</span><span class="p">(</span>
     <span class="n">model</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">metric_version</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">_get_latest_metric_version</span><span class="p">(),</span>
-    <span class="n">examples</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">EvaluationExample</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">metric_metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">examples</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">EvaluationExample</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">metric_metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">parameters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">extra_headers</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">proxy_url</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluationMetric</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function will create a genai metric used to evaluate the faithfullness of an LLM using the</span>
 <span class="sd">    model provided. Faithfulness will be assessed based on how factually consistent the output</span>
-<span class="sd">    is to the ``context``.</span>
+<span class="sd">    is to the ``context``. High scores mean that the outputs contain information that is in</span>
+<span class="sd">    line with the context, while low scores mean that outputs may disagree with the context</span>
+<span class="sd">    (input is ignored).</span>
 
 <span class="sd">    The ``context`` eval_arg must be provided as part of the input dataset or output</span>
 <span class="sd">    predictions. This can be mapped to a column of a different name using ``col_mapping``</span>
@@ -380,10 +415,9 @@
 <span class="sd">    An MlflowException will be raised if the specified version for this metric does not exist.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        model: Model uri of an openai or gateway judge model in the format of</span>
-<span class="sd">            &quot;openai:/gpt-4&quot; or &quot;gateway:/my-route&quot;. Defaults to</span>
-<span class="sd">            &quot;openai:/gpt-4&quot;. Your use of a third party LLM service (e.g., OpenAI) for</span>
-<span class="sd">            evaluation may be subject to and governed by the LLM service&#39;s terms of use.</span>
+<span class="sd">        model: (Optional) Model uri of the judge model that will be used to compute the metric,</span>
+<span class="sd">            e.g., ``openai:/gpt-4``. Refer to the `LLM-as-a-Judge Metrics &lt;https://mlflow.org/docs/latest/llms/llm-evaluate/index.html#selecting-the-llm-as-judge-model&gt;`_</span>
+<span class="sd">            documentation for the supported model types and their URI format.</span>
 <span class="sd">        metric_version: The version of the faithfulness metric to use.</span>
 <span class="sd">            Defaults to the latest version.</span>
 <span class="sd">        examples: Provide a list of examples to help the judge model evaluate the</span>
@@ -392,6 +426,14 @@
 <span class="sd">        metric_metadata: (Optional) Dictionary of metadata to be attached to the</span>
 <span class="sd">            EvaluationMetric object. Useful for model evaluators that require additional</span>
 <span class="sd">            information to determine how to evaluate this metric.</span>
+<span class="sd">        parameters: (Optional) Dictionary of parameters to be passed to the judge model,</span>
+<span class="sd">            e.g., {&quot;temperature&quot;: 0.5}. When specified, these parameters will override</span>
+<span class="sd">            the default parameters defined in the metric implementation.</span>
+<span class="sd">        extra_headers: (Optional) Dictionary of extra headers to be passed to the judge model.</span>
+<span class="sd">        proxy_url: (Optional) Proxy URL to be used for the judge model. This is useful when the</span>
+<span class="sd">            judge model is served via a proxy endpoint, not directly via LLM provider services.</span>
+<span class="sd">            If not specified, the default URL for the LLM provider will be used</span>
+<span class="sd">            (e.g., https://api.openai.com/v1/chat/completions for OpenAI chat models).</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A metric object</span>
@@ -424,11 +466,13 @@
         <span class="n">examples</span><span class="o">=</span><span class="n">examples</span><span class="p">,</span>
         <span class="n">version</span><span class="o">=</span><span class="n">metric_version</span><span class="p">,</span>
         <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
-        <span class="n">grading_context_columns</span><span class="o">=</span><span class="n">faithfulness_class_module</span><span class="o">.</span><span class="n">grading_context_columns</span><span class="p">,</span>
+        <span class="n">grading_context_columns</span><span class="o">=</span><span class="n">parameters</span> <span class="ow">or</span> <span class="n">faithfulness_class_module</span><span class="o">.</span><span class="n">grading_context_columns</span><span class="p">,</span>
         <span class="n">parameters</span><span class="o">=</span><span class="n">faithfulness_class_module</span><span class="o">.</span><span class="n">parameters</span><span class="p">,</span>
         <span class="n">aggregations</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;variance&quot;</span><span class="p">,</span> <span class="s2">&quot;p90&quot;</span><span class="p">],</span>
         <span class="n">greater_is_better</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">metric_metadata</span><span class="o">=</span><span class="n">metric_metadata</span><span class="p">,</span>
+        <span class="n">extra_headers</span><span class="o">=</span><span class="n">extra_headers</span><span class="p">,</span>
+        <span class="n">proxy_url</span><span class="o">=</span><span class="n">proxy_url</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 
@@ -436,21 +480,25 @@
 <span class="k">def</span> <span class="nf">answer_relevance</span><span class="p">(</span>
     <span class="n">model</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">metric_version</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">_get_latest_metric_version</span><span class="p">(),</span>
-    <span class="n">examples</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">EvaluationExample</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">metric_metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">examples</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">EvaluationExample</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">metric_metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">parameters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">extra_headers</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">proxy_url</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluationMetric</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function will create a genai metric used to evaluate the answer relevance of an LLM</span>
 <span class="sd">    using the model provided. Answer relevance will be assessed based on the appropriateness and</span>
-<span class="sd">    applicability of the output with respect to the input.</span>
+<span class="sd">    applicability of the output with respect to the input. High scores mean that your model</span>
+<span class="sd">    outputs are about the same subject as the input, while low scores mean that outputs may</span>
+<span class="sd">    be non-topical.</span>
 
 <span class="sd">    An MlflowException will be raised if the specified version for this metric does not exist.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        model: Model uri of an openai or gateway judge model in the format of</span>
-<span class="sd">            &quot;openai:/gpt-4&quot; or &quot;gateway:/my-route&quot;. Defaults to</span>
-<span class="sd">            &quot;openai:/gpt-4&quot;. Your use of a third party LLM service (e.g., OpenAI) for</span>
-<span class="sd">            evaluation may be subject to and governed by the LLM service&#39;s terms of use.</span>
+<span class="sd">        model: (Optional) Model uri of the judge model that will be used to compute the metric,</span>
+<span class="sd">            e.g., ``openai:/gpt-4``. Refer to the `LLM-as-a-Judge Metrics &lt;https://mlflow.org/docs/latest/llms/llm-evaluate/index.html#selecting-the-llm-as-judge-model&gt;`_</span>
+<span class="sd">            documentation for the supported model types and their URI format.</span>
 <span class="sd">        metric_version: The version of the answer relevance metric to use.</span>
 <span class="sd">            Defaults to the latest version.</span>
 <span class="sd">        examples: Provide a list of examples to help the judge model evaluate the</span>
@@ -459,6 +507,14 @@
 <span class="sd">        metric_metadata: (Optional) Dictionary of metadata to be attached to the</span>
 <span class="sd">            EvaluationMetric object. Useful for model evaluators that require additional</span>
 <span class="sd">            information to determine how to evaluate this metric.</span>
+<span class="sd">        parameters: (Optional) Dictionary of parameters to be passed to the judge model,</span>
+<span class="sd">            e.g., {&quot;temperature&quot;: 0.5}. When specified, these parameters will override</span>
+<span class="sd">            the default parameters defined in the metric implementation.</span>
+<span class="sd">        extra_headers: (Optional) Dictionary of extra headers to be passed to the judge model.</span>
+<span class="sd">        proxy_url: (Optional) Proxy URL to be used for the judge model. This is useful when the</span>
+<span class="sd">            judge model is served via a proxy endpoint, not directly via LLM provider services.</span>
+<span class="sd">            If not specified, the default URL for the LLM provider will be used</span>
+<span class="sd">            (e.g., https://api.openai.com/v1/chat/completions for OpenAI chat models).</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A metric object</span>
@@ -490,23 +546,31 @@
         <span class="n">examples</span><span class="o">=</span><span class="n">examples</span><span class="p">,</span>
         <span class="n">version</span><span class="o">=</span><span class="n">metric_version</span><span class="p">,</span>
         <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
-        <span class="n">parameters</span><span class="o">=</span><span class="n">answer_relevance_class_module</span><span class="o">.</span><span class="n">parameters</span><span class="p">,</span>
+        <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span> <span class="ow">or</span> <span class="n">answer_relevance_class_module</span><span class="o">.</span><span class="n">parameters</span><span class="p">,</span>
         <span class="n">aggregations</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;variance&quot;</span><span class="p">,</span> <span class="s2">&quot;p90&quot;</span><span class="p">],</span>
         <span class="n">greater_is_better</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">metric_metadata</span><span class="o">=</span><span class="n">metric_metadata</span><span class="p">,</span>
+        <span class="n">extra_headers</span><span class="o">=</span><span class="n">extra_headers</span><span class="p">,</span>
+        <span class="n">proxy_url</span><span class="o">=</span><span class="n">proxy_url</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="relevance"><a class="viewcode-back" href="../../../../python_api/mlflow.metrics.html#mlflow.metrics.genai.relevance">[docs]</a><span class="k">def</span> <span class="nf">relevance</span><span class="p">(</span>
     <span class="n">model</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">metric_version</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">examples</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">EvaluationExample</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">metric_metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">examples</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">EvaluationExample</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">metric_metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">parameters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">extra_headers</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">proxy_url</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluationMetric</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function will create a genai metric used to evaluate the evaluate the relevance of an</span>
 <span class="sd">    LLM using the model provided. Relevance will be assessed by the appropriateness, significance,</span>
-<span class="sd">    and applicability of the output with respect to the input and ``context``.</span>
+<span class="sd">    and applicability of the output with respect to the input and ``context``. High scores mean</span>
+<span class="sd">    that the model has understood the context and correct extracted relevant information from</span>
+<span class="sd">    the context, while low score mean that output has completely ignored the question and the</span>
+<span class="sd">    context and could be hallucinating.</span>
 
 <span class="sd">    The ``context`` eval_arg must be provided as part of the input dataset or output</span>
 <span class="sd">    predictions. This can be mapped to a column of a different name using ``col_mapping``</span>
@@ -515,10 +579,9 @@
 <span class="sd">    An MlflowException will be raised if the specified version for this metric does not exist.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        model: (Optional) Model uri of an openai or gateway judge model in the format of</span>
-<span class="sd">            &quot;openai:/gpt-4&quot; or &quot;gateway:/my-route&quot;. Defaults to</span>
-<span class="sd">            &quot;openai:/gpt-4&quot;. Your use of a third party LLM service (e.g., OpenAI) for</span>
-<span class="sd">            evaluation may be subject to and governed by the LLM service&#39;s terms of use.</span>
+<span class="sd">        model: (Optional) Model uri of the judge model that will be used to compute the metric,</span>
+<span class="sd">            e.g., ``openai:/gpt-4``. Refer to the `LLM-as-a-Judge Metrics &lt;https://mlflow.org/docs/latest/llms/llm-evaluate/index.html#selecting-the-llm-as-judge-model&gt;`_</span>
+<span class="sd">            documentation for the supported model types and their URI format.</span>
 <span class="sd">        metric_version: (Optional) The version of the relevance metric to use.</span>
 <span class="sd">            Defaults to the latest version.</span>
 <span class="sd">        examples: (Optional) Provide a list of examples to help the judge model evaluate the</span>
@@ -527,6 +590,14 @@
 <span class="sd">        metric_metadata: (Optional) Dictionary of metadata to be attached to the</span>
 <span class="sd">            EvaluationMetric object. Useful for model evaluators that require additional</span>
 <span class="sd">            information to determine how to evaluate this metric.</span>
+<span class="sd">        parameters: (Optional) Dictionary of parameters to be passed to the judge model,</span>
+<span class="sd">            e.g., {&quot;temperature&quot;: 0.5}. When specified, these parameters will override</span>
+<span class="sd">            the default parameters defined in the metric implementation.</span>
+<span class="sd">        extra_headers: (Optional) Dictionary of extra headers to be passed to the judge model.</span>
+<span class="sd">        proxy_url: (Optional) Proxy URL to be used for the judge model. This is useful when the</span>
+<span class="sd">            judge model is served via a proxy endpoint, not directly via LLM provider services.</span>
+<span class="sd">            If not specified, the default URL for the LLM provider will be used</span>
+<span class="sd">            (e.g., https://api.openai.com/v1/chat/completions for OpenAI chat models).</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A metric object</span>
@@ -561,10 +632,12 @@
         <span class="n">version</span><span class="o">=</span><span class="n">metric_version</span><span class="p">,</span>
         <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
         <span class="n">grading_context_columns</span><span class="o">=</span><span class="n">relevance_class_module</span><span class="o">.</span><span class="n">grading_context_columns</span><span class="p">,</span>
-        <span class="n">parameters</span><span class="o">=</span><span class="n">relevance_class_module</span><span class="o">.</span><span class="n">parameters</span><span class="p">,</span>
+        <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span> <span class="ow">or</span> <span class="n">relevance_class_module</span><span class="o">.</span><span class="n">parameters</span><span class="p">,</span>
         <span class="n">aggregations</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;variance&quot;</span><span class="p">,</span> <span class="s2">&quot;p90&quot;</span><span class="p">],</span>
         <span class="n">greater_is_better</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">metric_metadata</span><span class="o">=</span><span class="n">metric_metadata</span><span class="p">,</span>
+        <span class="n">extra_headers</span><span class="o">=</span><span class="n">extra_headers</span><span class="p">,</span>
+        <span class="n">proxy_url</span><span class="o">=</span><span class="n">proxy_url</span><span class="p">,</span>
     <span class="p">)</span></div>
 </pre></div>
 
@@ -596,7 +669,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../../../',
-      VERSION:'2.17.1.dev0',
+      VERSION:'2.17.3.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

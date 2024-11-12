@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkwebsite=self.webpackChunkwebsite||[]).push([[5419],{5208:e=>{e.exports=JSON.parse('{"label":"bedrock","permalink":"/mlflow-website/blog/tags/bedrock","allTagsPath":"/mlflow-website/blog/tags","count":1,"unlisted":false}')}}]);

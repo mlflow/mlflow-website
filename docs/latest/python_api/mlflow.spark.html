@@ -55,7 +55,7 @@
         <link rel="index" title="Index"
               href="../genindex.html"/>
         <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="MLflow 2.17.1.dev0 documentation" href="../index.html"/>
+    <link rel="top" title="MLflow 2.17.3.dev0 documentation" href="../index.html"/>
         <link rel="up" title="Python API" href="index.html"/>
         <link rel="next" title="mlflow.statsmodels" href="/mlflow.statsmodels.html"/>
         <link rel="prev" title="mlflow.spacy" href="/mlflow.spacy.html"/> 
@@ -88,7 +88,7 @@
     <a href="../index.html" class="wy-nav-top-logo"
       ><img src="../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.17.1.dev0</span>
+    <span class="version">2.17.3.dev0</span>
   </li>
 </ul>
   </nav>
@@ -302,6 +302,10 @@ best-effort, meaning that if Spark is under heavy load or MLflow logging fails f
 <p>For any unexpected issues with autologging, check Spark driver and executor logs in addition
 to stderr &amp; stdout generated from your MLflow code - datasource information is pulled from
 Spark, so logs relevant to debugging may show up amongst the Spark logs.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Spark datasource autologging only supports logging to MLflow runs in a single thread</p>
+</div>
 <div class="literal-block-wrapper docutils container" id="id3">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id3" title="Permalink to this code"> </a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow.spark</span>
@@ -442,9 +446,23 @@ MLlib persistence format and produces an MLflow Model with the Spark flavor.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>spark_model</strong> – Spark model to be saved - MLflow can only save descendants of
+<li><p><strong>spark_model</strong> – <p>Spark model to be saved - MLflow can only save descendants of
 pyspark.ml.Model or pyspark.ml.Transformer which implement
-MLReadable and MLWritable.</p></li>
+MLReadable and MLWritable.</p>
+<blockquote>
+<div><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The provided Spark model’s <cite>transform</cite> method must generate one column
+named with “prediction”, the column is used as MLflow pyfunc model output.
+Most Spark models generate the output column with “prediction” name that
+contains prediction labels by default.
+To set probability column as the output column for probabilistic
+classification models, you need to set “probabilityCol” param to “prediction”
+and set “predictionCol” param to “”.
+(e.g. <cite>model.setProbabilityCol(“prediction”).setPredictionCol(“”)</cite>)</p>
+</div>
+</div></blockquote>
+</p></li>
 <li><p><strong>artifact_path</strong> – Run relative artifact path.</p></li>
 <li><p><strong>conda_env</strong> – <p>Either a dictionary representation of a Conda environment or the path to a conda
 environment yaml file. If provided, this describes the environment this model should be run in.
@@ -771,7 +789,7 @@ section of the model’s conda environment (<code class="docutils literal notran
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../',
-      VERSION:'2.17.1.dev0',
+      VERSION:'2.17.3.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

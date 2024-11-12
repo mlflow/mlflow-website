@@ -56,10 +56,10 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="MLflow 2.17.1.dev0 documentation" href="../../index.html"/>
+    <link rel="top" title="MLflow 2.17.3.dev0 documentation" href="../../index.html"/>
         <link rel="up" title="LLMs" href="../index.html"/>
         <link rel="next" title="Tracing Concepts" href="/overview.html"/>
-        <link rel="prev" title="Tutorial: Custom GenAI Models using ChatModel" href="/../chat-model-guide/index.html"/> 
+        <link rel="prev" title="Build a tool-calling model with mlflow.pyfunc.ChatModel" href="/../notebooks/chat-model-tool-calling.html"/> 
 
   
   <script src="../../_static/js/modernizr.min.js"></script>
@@ -90,7 +90,7 @@
     <a href="../../index.html" class="wy-nav-top-logo"
       ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.17.1.dev0</span>
+    <span class="version">2.17.3.dev0</span>
   </li>
 </ul>
   </nav>
@@ -302,6 +302,11 @@
                 <img src="../../_static/images/logos/llamaindex-logo.svg" alt="LlamaIndex Logo"/>
             </div>
         </a>
+        <a href="#automatic-tracing">
+            <div class="logo-card">
+                <img src="../../_static/images/logos/dspy-logo.png" alt="DSPy Logo"/>
+            </div>
+        </a>
         <a href="../openai/autologging.html">
             <div class="logo-card">
                 <img src="../../_static/images/logos/openai-logo.png" alt="OpenAI Logo"/>
@@ -321,7 +326,7 @@
 Tracing provides a way to record the inputs, outputs, and metadata associated with each intermediate step of a request, enabling you to easily pinpoint the source of bugs and unexpected behaviors.</p>
 <p>MLflow offers a number of different options to enable tracing of your GenAI applications.</p>
 <ul class="simple">
-<li><p><strong>Automated tracing</strong>: MLflow provides a fully automated integration with integrated libraries such as LangChain, OpenAI, LlamaIndex, and AutoGen, that can activate by simply enabling <code class="docutils literal notranslate"><span class="pre">mlflow.&lt;library&gt;.autolog()</span></code>.</p></li>
+<li><p><strong>Automated tracing</strong>: MLflow provides fully automated integrations with various GenAI libraries such as LangChain, OpenAI, LlamaIndex, DSPy, AutoGen, and more that can be activated by simply enabling <code class="docutils literal notranslate"><span class="pre">mlflow.&lt;library&gt;.autolog()</span></code>.</p></li>
 <li><p><strong>Manual trace instrumentation with high-level fluent APIs</strong>: Decorators, function wrappers and context managers via the fluent API allow you to add tracing functionality with minor code modifications.</p></li>
 <li><p><strong>Low-level client APIs for tracing</strong>: The MLflow client API provides a thread-safe way to handle trace implementations, even in aysnchronous modes of operation.</p></li>
 </ul>
@@ -356,7 +361,7 @@ LangChain, OpenAI, LlamaIndex, and AutoGen. For these libraries, you can instrum
 just a single command <code class="docutils literal notranslate"><span class="pre">mlflow.&lt;library&gt;.autolog()</span></code> and MLflow will automatically log traces
 for model/API invocations to the active MLflow Experiment.</p>
 <div class="sphinx-tabs docutils container">
-<div aria-label="Tabbed content" role="tablist"><button aria-controls="panel-0-0-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-0-0-0" name="0-0" role="tab" tabindex="0">LangChain / LangGraph</button><button aria-controls="panel-0-0-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-1" name="0-1" role="tab" tabindex="-1">OpenAI</button><button aria-controls="panel-0-0-2" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-2" name="0-2" role="tab" tabindex="-1">Swarm</button><button aria-controls="panel-0-0-3" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-3" name="0-3" role="tab" tabindex="-1">LlamaIndex</button><button aria-controls="panel-0-0-4" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-4" name="0-4" role="tab" tabindex="-1">AutoGen</button></div><div aria-labelledby="tab-0-0-0" class="sphinx-tabs-panel" id="panel-0-0-0" name="0-0" role="tabpanel" tabindex="0"><h3>LangChain Automatic Tracing</h3><div class="line-block">
+<div aria-label="Tabbed content" role="tablist"><button aria-controls="panel-0-0-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-0-0-0" name="0-0" role="tab" tabindex="0">LangChain / LangGraph</button><button aria-controls="panel-0-0-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-1" name="0-1" role="tab" tabindex="-1">OpenAI</button><button aria-controls="panel-0-0-2" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-2" name="0-2" role="tab" tabindex="-1">Swarm</button><button aria-controls="panel-0-0-3" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-3" name="0-3" role="tab" tabindex="-1">LlamaIndex</button><button aria-controls="panel-0-0-4" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-4" name="0-4" role="tab" tabindex="-1">DSPy</button><button aria-controls="panel-0-0-5" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-5" name="0-5" role="tab" tabindex="-1">AutoGen</button></div><div aria-labelledby="tab-0-0-0" class="sphinx-tabs-panel" id="panel-0-0-0" name="0-0" role="tabpanel" tabindex="0"><h3>LangChain Automatic Tracing</h3><div class="line-block">
 <div class="line"><br /></div>
 </div>
 <p>As part of the LangChain autologging integration, traces are logged to the active MLflow Experiment when calling invocation APIs on chains. You can enable tracing
@@ -543,7 +548,56 @@ such as LLMs, agents, and query/chat engines will automatically record generated
 <div class="figure align-center">
 <a class="reference internal image-reference" href="../../_images/llama-index-trace.png"><img alt="LlamaIndex Tracing" src="../../_images/llama-index-trace.png" style="width: 100%;" /></a>
 </div>
-</div><div aria-labelledby="tab-0-0-4" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-4" name="0-4" role="tabpanel" tabindex="0"><h3>AutoGen Automatic Tracing</h3><div class="line-block">
+</div><div aria-labelledby="tab-0-0-4" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-4" name="0-4" role="tabpanel" tabindex="0"><h3>DSPy Automatic Tracing</h3><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>The MLflow DSPy flavor’s autologging feature has a direct integration with MLflow tracing. When DSPy autologging is enabled with <a class="reference internal" href="../../python_api/mlflow.dspy.html#mlflow.dspy.autolog" title="mlflow.dspy.autolog"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.dspy.autolog()</span></code></a>, invocation of components
+such as LMs, Adapters and Modules, will automatically record generated traces during interactive development.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">import</span> <span class="nn">dspy</span>
+
+<span class="c1"># Enable tracing for DSPy</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">dspy</span><span class="o">.</span><span class="n">autolog</span><span class="p">()</span>
+
+<span class="c1"># Set an experiment to log the traces to</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s2">&quot;DSPy Tracing&quot;</span><span class="p">)</span>
+
+<span class="c1"># Define a simple ChainOfThought model and run it</span>
+<span class="n">lm</span> <span class="o">=</span> <span class="n">dspy</span><span class="o">.</span><span class="n">LM</span><span class="p">(</span><span class="s2">&quot;openai/gpt-4o-mini&quot;</span><span class="p">)</span>
+<span class="n">dspy</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="n">lm</span><span class="o">=</span><span class="n">lm</span><span class="p">)</span>
+
+
+<span class="c1"># Define a simple summarizer model and run it</span>
+<span class="k">class</span> <span class="nc">SummarizeSignature</span><span class="p">(</span><span class="n">dspy</span><span class="o">.</span><span class="n">Signature</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Given a passage, generate a summary.&quot;&quot;&quot;</span>
+
+    <span class="n">passage</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">dspy</span><span class="o">.</span><span class="n">InputField</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">&quot;a passage to summarize&quot;</span><span class="p">)</span>
+    <span class="n">summary</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">dspy</span><span class="o">.</span><span class="n">OutputField</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">&quot;a one-line summary of the passage&quot;</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">Summarize</span><span class="p">(</span><span class="n">dspy</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">summarize</span> <span class="o">=</span> <span class="n">dspy</span><span class="o">.</span><span class="n">ChainOfThought</span><span class="p">(</span><span class="n">SummarizeSignature</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">passage</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">summarize</span><span class="p">(</span><span class="n">passage</span><span class="o">=</span><span class="n">passage</span><span class="p">)</span>
+
+
+<span class="n">summarizer</span> <span class="o">=</span> <span class="n">Summarize</span><span class="p">()</span>
+<span class="n">summarizer</span><span class="p">(</span>
+    <span class="n">passage</span><span class="o">=</span><span class="p">(</span>
+        <span class="s2">&quot;MLflow Tracing is a feature that enhances LLM observability in your Generative AI (GenAI) applications &quot;</span>
+        <span class="s2">&quot;by capturing detailed information about the execution of your application&#39;s services. Tracing provides &quot;</span>
+        <span class="s2">&quot;a way to record the inputs, outputs, and metadata associated with each intermediate step of a request, &quot;</span>
+        <span class="s2">&quot;enabling you to easily pinpoint the source of bugs and unexpected behaviors.&quot;</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="../../_images/dspy-tracing.png"><img alt="DSPy Tracing" src="../../_images/dspy-tracing.png" style="width: 100%;" /></a>
+</div>
+</div><div aria-labelledby="tab-0-0-5" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-5" name="0-5" role="tabpanel" tabindex="0"><h3>AutoGen Automatic Tracing</h3><div class="line-block">
 <div class="line"><br /></div>
 </div>
 <p>MLflow Tracing ensures observability for your AutoGen application that involves complex multi-agent interactions. You can enable auto-tracing by calling <a class="reference internal" href="../../python_api/mlflow.autogen.html#mlflow.autogen.autolog" title="mlflow.autogen.autolog"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.autogen.autolog()</span></code></a>, then the internal steps of the agents chat session will be logged to the active MLflow Experiment.</p>
@@ -1314,7 +1368,7 @@ be as follows:</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../chat-model-guide/index.html" class="btn btn-neutral" title="Tutorial: Custom GenAI Models using ChatModel" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+        <a href="../notebooks/chat-model-tool-calling.html" class="btn btn-neutral" title="Build a tool-calling model with mlflow.pyfunc.ChatModel" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
       
       
         <a href="overview.html" class="btn btn-neutral" title="Tracing Concepts" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
@@ -1345,7 +1399,7 @@ be as follows:</p>
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../',
-      VERSION:'2.17.1.dev0',
+      VERSION:'2.17.3.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

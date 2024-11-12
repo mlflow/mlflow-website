@@ -55,7 +55,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="MLflow 2.17.1.dev0 documentation" href="../../index.html"/>
+    <link rel="top" title="MLflow 2.17.3.dev0 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
@@ -87,7 +87,7 @@
     <a href="../../index.html" class="wy-nav-top-logo"
       ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.17.1.dev0</span>
+    <span class="version">2.17.3.dev0</span>
   </li>
 </ul>
   </nav>
@@ -228,7 +228,7 @@
 <span class="kn">import</span> <span class="nn">posixpath</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">import</span> <span class="nn">yaml</span>
 <span class="kn">from</span> <span class="nn">packaging.version</span> <span class="kn">import</span> <span class="n">Version</span>
@@ -371,6 +371,15 @@
 <span class="sd">        spark_model: Spark model to be saved - MLflow can only save descendants of</span>
 <span class="sd">            pyspark.ml.Model or pyspark.ml.Transformer which implement</span>
 <span class="sd">            MLReadable and MLWritable.</span>
+
+<span class="sd">                .. Note:: The provided Spark model&#39;s `transform` method must generate one column</span>
+<span class="sd">                    named with &quot;prediction&quot;, the column is used as MLflow pyfunc model output.</span>
+<span class="sd">                    Most Spark models generate the output column with &quot;prediction&quot; name that</span>
+<span class="sd">                    contains prediction labels by default.</span>
+<span class="sd">                    To set probability column as the output column for probabilistic</span>
+<span class="sd">                    classification models, you need to set &quot;probabilityCol&quot; param to &quot;prediction&quot;</span>
+<span class="sd">                    and set &quot;predictionCol&quot; param to &quot;&quot;.</span>
+<span class="sd">                    (e.g. `model.setProbabilityCol(&quot;prediction&quot;).setPredictionCol(&quot;&quot;)`)</span>
 <span class="sd">        artifact_path: Run relative artifact path.</span>
 <span class="sd">        conda_env: {{ conda_env }}</span>
 <span class="sd">        code_paths: {{ code_paths }}</span>
@@ -1232,7 +1241,7 @@
     <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">pandas_df</span><span class="p">,</span>
-        <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate predictions given input data in a pandas DataFrame.</span>
@@ -1327,6 +1336,8 @@
 <span class="sd">    For any unexpected issues with autologging, check Spark driver and executor logs in addition</span>
 <span class="sd">    to stderr &amp; stdout generated from your MLflow code - datasource information is pulled from</span>
 <span class="sd">    Spark, so logs relevant to debugging may show up amongst the Spark logs.</span>
+
+<span class="sd">    .. Note:: Spark datasource autologging only supports logging to MLflow runs in a single thread</span>
 
 <span class="sd">    .. code-block:: python</span>
 <span class="sd">        :caption: Example</span>
@@ -1454,7 +1465,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../',
-      VERSION:'2.17.1.dev0',
+      VERSION:'2.17.3.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

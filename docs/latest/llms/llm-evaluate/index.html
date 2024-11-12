@@ -56,7 +56,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="MLflow 2.17.1.dev0 documentation" href="../../index.html"/>
+    <link rel="top" title="MLflow 2.17.3.dev0 documentation" href="../../index.html"/>
         <link rel="up" title="LLMs" href="../index.html"/>
         <link rel="next" title="Prompt Engineering UI (Experimental)" href="/../prompt-engineering/index.html"/>
         <link rel="prev" title="Unity Catalog Integration" href="/../deployments/uc_integration.html"/> 
@@ -89,7 +89,7 @@
     <a href="../../index.html" class="wy-nav-top-logo"
       ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.17.1.dev0</span>
+    <span class="version">2.17.3.dev0</span>
   </li>
 </ul>
   </nav>
@@ -138,8 +138,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#full-notebook-guides-and-examples">Full Notebook Guides and Examples</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#quickstart">Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#llm-evaluation-metrics">LLM Evaluation Metrics</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#creating-custom-llm-evaluation-metrics">Creating Custom LLM-evaluation Metrics</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#prepare-your-llm-for-evaluating">Prepare Your LLM for Evaluating</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#prepare-your-target-models">Prepare Your Target Models</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#viewing-evaluation-results">Viewing Evaluation Results</a></li>
 </ul>
 </li>
@@ -311,34 +310,18 @@ requires OpenAI API key, if you don’t have an OpenAI key, you can set it up by
 <div class="section" id="llm-evaluation-metrics">
 <h2>LLM Evaluation Metrics<a class="headerlink" href="#llm-evaluation-metrics" title="Permalink to this headline"> </a></h2>
 <p>There are two types of LLM evaluation metrics in MLflow:</p>
-<ol class="arabic">
-<li><p>Metrics relying on SaaS model (e.g., OpenAI) for scoring, e.g., <a class="reference internal" href="../../python_api/mlflow.metrics.html#mlflow.metrics.genai.answer_relevance" title="mlflow.metrics.genai.answer_relevance"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.metrics.genai.answer_relevance()</span></code></a>. These
-metrics are created via <a class="reference internal" href="../../python_api/mlflow.metrics.html#mlflow.metrics.genai.make_genai_metric" title="mlflow.metrics.genai.make_genai_metric"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.metrics.genai.make_genai_metric()</span></code></a> method. For each data record, these metrics under the hood sends
-one prompt consisting of the following information to the SaaS model, and extract the score from model response:</p>
-<ul class="simple">
-<li><p>Metrics definition.</p></li>
-<li><p>Metrics grading criteria.</p></li>
-<li><p>Reference examples.</p></li>
-<li><p>Input data/context.</p></li>
-<li><p>Model output.</p></li>
-<li><p>[optional] Ground truth.</p></li>
-</ul>
-<p>More details of how these fields are set can be found in the section “Create your Custom LLM-evaluation Metrics”.</p>
-</li>
-<li><p>Function-based per-row metrics. These metrics calculate a score for each data record (row in terms of Pandas/Spark dataframe),
-based on certain functions, like Rouge (<a class="reference internal" href="../../python_api/mlflow.metrics.html#mlflow.metrics.rougeL" title="mlflow.metrics.rougeL"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.metrics.rougeL()</span></code></a>) or Flesch Kincaid (<a class="reference internal" href="../../python_api/mlflow.metrics.html#mlflow.metrics.flesch_kincaid_grade_level" title="mlflow.metrics.flesch_kincaid_grade_level"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.metrics.flesch_kincaid_grade_level()</span></code></a>).
-These metrics are similar to traditional metrics.</p></li>
+<ol class="arabic simple">
+<li><p><strong>Heuristic-based metrics</strong>: These metrics calculate a score for each data record (row in terms of Pandas/Spark dataframe), based on certain functions, such as: Rouge (<a class="reference internal" href="../../python_api/mlflow.metrics.html#mlflow.metrics.rougeL" title="mlflow.metrics.rougeL"><code class="xref py py-func docutils literal notranslate"><span class="pre">rougeL()</span></code></a>), Flesch Kincaid (<a class="reference internal" href="../../python_api/mlflow.metrics.html#mlflow.metrics.flesch_kincaid_grade_level" title="mlflow.metrics.flesch_kincaid_grade_level"><code class="xref py py-func docutils literal notranslate"><span class="pre">flesch_kincaid_grade_level()</span></code></a>) or Bilingual Evaluation Understudy (BLEU) (<a class="reference internal" href="../../python_api/mlflow.metrics.html#mlflow.metrics.bleu" title="mlflow.metrics.bleu"><code class="xref py py-func docutils literal notranslate"><span class="pre">bleu()</span></code></a>). These metrics are similar to traditional continuous value metrics. For the list of built-in heuristic metrics and how to define a custom metric with your own function definition, see the <a class="reference external" href="#heuristic-based-metrics">Heuristic-based Metrics</a> section.</p></li>
+<li><p><strong>LLM-as-a-Judge metrics</strong>: LLM-as-a-Judge is a new type of metric that uses LLMs to score the quality of model outputs. It overcomes the limitations of heuristic-based metrics, which often miss nuances like context and semantic accuracy. LLM-as-a-Judge metrics provides a more human-like evaluation for complex language tasks while being more scalable and cost-effective than human evaluation. MLflow provides various built-in LLM-as-a-Judge metrics and supports creating custom metrics with your own prompt, grading criteria, and reference examples. See the <a class="reference external" href="#llm-as-a-judge-metrics">LLM-as-a-Judge Metrics</a> section for more details.</p></li>
 </ol>
-<div class="section" id="select-metrics-to-evaluate">
-<h3>Select Metrics to Evaluate<a class="headerlink" href="#select-metrics-to-evaluate" title="Permalink to this headline"> </a></h3>
-<p>There are two ways to select metrics to evaluate your model:</p>
-<ul class="simple">
-<li><p>Use <strong>default</strong> metrics for pre-defined model types.</p></li>
-<li><p>Use a <strong>custom</strong> list of metrics.</p></li>
-</ul>
+<div class="section" id="id1">
+<h3>Heuristic-based Metrics<a class="headerlink" href="#id1" title="Permalink to this headline"> </a></h3>
+<div class="section" id="built-in-heuristic-metrics">
+<h4>Built-in Heuristic Metrics<a class="headerlink" href="#built-in-heuristic-metrics" title="Permalink to this headline"> </a></h4>
+<p>See <a class="reference external" href="https://mlflow.org/docs/latest/python_api/mlflow.metrics.html">this page</a> for the full list of the built-in heuristic metrics.</p>
 </div>
-<div class="section" id="use-default-metrics-for-pre-defined-model-types">
-<span id="llm-eval-default-metrics"></span><h3>Use Default Metrics for Pre-defined Model Types<a class="headerlink" href="#use-default-metrics-for-pre-defined-model-types" title="Permalink to this headline"> </a></h3>
+<div class="section" id="default-metrics-with-pre-defined-model-types">
+<span id="llm-eval-default-metrics"></span><h4>Default Metrics with Pre-defined Model Types<a class="headerlink" href="#default-metrics-with-pre-defined-model-types" title="Permalink to this headline"> </a></h4>
 <p>MLflow LLM evaluation includes default collections of metrics for pre-selected tasks, e.g, “question-answering”. Depending on the
 LLM use case that you are evaluating, these pre-defined collections can greatly simplify the process of running evaluations. To use
 defaults metrics for pre-selected tasks, specify the <code class="docutils literal notranslate"><span class="pre">model_type</span></code> argument in <a class="reference internal" href="../../python_api/mlflow.html#mlflow.evaluate" title="mlflow.evaluate"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code></a>, as shown by the example
@@ -400,7 +383,7 @@ below:</p>
 <p><sup>4</sup> All retriever metrics have a default <code class="docutils literal notranslate"><span class="pre">retriever_k</span></code> value of <code class="docutils literal notranslate"><span class="pre">3</span></code> that can be overridden by specifying <code class="docutils literal notranslate"><span class="pre">retriever_k</span></code> in the <code class="docutils literal notranslate"><span class="pre">evaluator_config</span></code> argument.</p>
 </div>
 <div class="section" id="use-a-custom-list-of-metrics">
-<span id="llm-eval-custom-metrics"></span><h3>Use a Custom List of Metrics<a class="headerlink" href="#use-a-custom-list-of-metrics" title="Permalink to this headline"> </a></h3>
+<span id="llm-eval-custom-metrics"></span><h4>Use a Custom List of Metrics<a class="headerlink" href="#use-a-custom-list-of-metrics" title="Permalink to this headline"> </a></h4>
 <p>Using the pre-defined metrics associated with a given model type is not the only way to generate scoring metrics
 for LLM evaluation in MLflow. You can specify a custom list of metrics in the <cite>extra_metrics</cite> argument in <cite>mlflow.evaluate</cite>:</p>
 <ul>
@@ -431,59 +414,173 @@ for LLM evaluation in MLflow. You can specify a custom list of metrics in the <c
 </ul>
 <p>The full reference for supported evaluation metrics can be found <a class="reference external" href="../../python_api/mlflow.html#mlflow.evaluate">here</a>.</p>
 </div>
-<div class="section" id="metrics-with-llm-as-the-judge">
-<h3>Metrics with LLM as the Judge<a class="headerlink" href="#metrics-with-llm-as-the-judge" title="Permalink to this headline"> </a></h3>
-<p>MLflow offers a few pre-canned metrics which uses LLM as the judge. Despite the difference under the hood, the usage
-is the same - put these metrics in the <code class="docutils literal notranslate"><span class="pre">extra_metrics</span></code> argument in <code class="docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code>. Here is the list of pre-canned
-metrics:</p>
+<div class="section" id="create-custom-heuristic-based-llm-evaluation-metrics">
+<h4>Create Custom heuristic-based LLM Evaluation Metrics<a class="headerlink" href="#create-custom-heuristic-based-llm-evaluation-metrics" title="Permalink to this headline"> </a></h4>
+<p>This is very similar to creating custom traditional metrics, with the exception of returning a <a class="reference internal" href="../../python_api/mlflow.metrics.html#mlflow.metrics.MetricValue" title="mlflow.metrics.MetricValue"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.metrics.MetricValue()</span></code></a> instance.
+Basically you need to:</p>
+<ol class="arabic simple">
+<li><p>Implement An <code class="docutils literal notranslate"><span class="pre">eval_fn</span></code> to define your scoring logic. This function must take in 2 args: <code class="docutils literal notranslate"><span class="pre">predictions</span></code> and <code class="docutils literal notranslate"><span class="pre">targets</span></code>.
+<code class="docutils literal notranslate"><span class="pre">eval_fn</span></code> must return a <a class="reference internal" href="../../python_api/mlflow.metrics.html#mlflow.metrics.MetricValue" title="mlflow.metrics.MetricValue"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.metrics.MetricValue()</span></code></a> instance.</p></li>
+<li><p>Pass <code class="docutils literal notranslate"><span class="pre">eval_fn</span></code> and other arguments to the <code class="docutils literal notranslate"><span class="pre">mlflow.metrics.make_metric</span></code> API to create the metric.</p></li>
+</ol>
+<p>The following code creates a dummy per-row metric called <code class="docutils literal notranslate"><span class="pre">&quot;over_10_chars&quot;</span></code>; if the model output is greater than 10,
+the score is “yes”, otherwise it is “no”.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">eval_fn</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">targets</span><span class="p">):</span>
+    <span class="n">scores</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;yes&quot;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pred</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">10</span> <span class="k">else</span> <span class="s2">&quot;no&quot;</span> <span class="k">for</span> <span class="n">pred</span> <span class="ow">in</span> <span class="n">predictions</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">MetricValue</span><span class="p">(</span>
+        <span class="n">scores</span><span class="o">=</span><span class="n">scores</span><span class="p">,</span>
+        <span class="n">aggregate_results</span><span class="o">=</span><span class="n">standard_aggregations</span><span class="p">(</span><span class="n">scores</span><span class="p">),</span>
+    <span class="p">)</span>
+
+
+<span class="c1"># Create an EvaluationMetric object.</span>
+<span class="n">passing_code_metric</span> <span class="o">=</span> <span class="n">make_metric</span><span class="p">(</span>
+    <span class="n">eval_fn</span><span class="o">=</span><span class="n">eval_fn</span><span class="p">,</span> <span class="n">greater_is_better</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;over_10_chars&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>To create a custom metric that is dependent on other metrics, include those other metrics’ names as an argument after <code class="docutils literal notranslate"><span class="pre">predictions</span></code> and <code class="docutils literal notranslate"><span class="pre">targets</span></code>. This can be the name of a builtin metric or another custom metric.
+Ensure that you do not accidentally have any circular dependencies in your metrics, or the evaluation will fail.</p>
+<p>The following code creates a dummy per-row metric called <code class="docutils literal notranslate"><span class="pre">&quot;toxic_or_over_10_chars&quot;</span></code>: if the model output is greater than 10 or the toxicity score is greater than 0.5, the score is “yes”, otherwise it is “no”.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">eval_fn</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">toxicity</span><span class="p">,</span> <span class="n">over_10_chars</span><span class="p">):</span>
+    <span class="n">scores</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;yes&quot;</span> <span class="k">if</span> <span class="n">toxicity</span><span class="o">.</span><span class="n">scores</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.5</span> <span class="ow">or</span> <span class="n">over_10_chars</span><span class="o">.</span><span class="n">scores</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">else</span> <span class="s2">&quot;no&quot;</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">len</span><span class="p">(</span><span class="n">toxicity</span><span class="o">.</span><span class="n">scores</span><span class="p">)</span>
+    <span class="p">]</span>
+    <span class="k">return</span> <span class="n">MetricValue</span><span class="p">(</span><span class="n">scores</span><span class="o">=</span><span class="n">scores</span><span class="p">)</span>
+
+
+<span class="c1"># Create an EvaluationMetric object.</span>
+<span class="n">toxic_and_over_10_chars_metric</span> <span class="o">=</span> <span class="n">make_metric</span><span class="p">(</span>
+    <span class="n">eval_fn</span><span class="o">=</span><span class="n">eval_fn</span><span class="p">,</span> <span class="n">greater_is_better</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;toxic_or_over_10_chars&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="id9">
+<h3>LLM-as-a-Judge Metrics<a class="headerlink" href="#id9" title="Permalink to this headline"> </a></h3>
+<p>LLM-as-a-Judge is a new type of metric that uses LLMs to score the quality of model outputs, providing a more human-like evaluation for complex language tasks while being more scalable and cost-effective than human evaluation.</p>
+<p>MLflow supports several builtin LLM-as-a-judge metrics, as well as allowing you to create your own LLM-as-a-judge metrics with custom configurations and prompts.</p>
+<div class="section" id="built-in-llm-as-a-judge-metrics">
+<h4>Built-in LLM-as-a-Judge metrics<a class="headerlink" href="#built-in-llm-as-a-judge-metrics" title="Permalink to this headline"> </a></h4>
+<p>To use built-in LLM-as-a-Judge metrics in MLflow, pass the list of metrics definitions to the <code class="docutils literal notranslate"><span class="pre">extra_metrics</span></code> argument in the <a class="reference internal" href="../../python_api/mlflow.html#mlflow.evaluate" title="mlflow.evaluate"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code></a> function.</p>
+<p>The following example uses the built-in answer correctness metric for evaluation, in addition to the latency metric (heuristic):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.metrics</span> <span class="kn">import</span> <span class="n">latency</span>
+<span class="kn">from</span> <span class="nn">mlflow.metrics.genai</span> <span class="kn">import</span> <span class="n">answer_correctness</span>
+
+<span class="n">results</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+    <span class="n">eval_data</span><span class="p">,</span>
+    <span class="n">targets</span><span class="o">=</span><span class="s2">&quot;ground_truth&quot;</span><span class="p">,</span>
+    <span class="n">extra_metrics</span><span class="o">=</span><span class="p">[</span>
+        <span class="n">answer_correctness</span><span class="p">(),</span>
+        <span class="n">latency</span><span class="p">(),</span>
+    <span class="p">],</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Here is the list of built-in LLM-as-a-Judge metrics. Click on the link to see the full documentation for each metric:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="../../python_api/mlflow.metrics.html#mlflow.metrics.genai.answer_similarity" title="mlflow.metrics.genai.answer_similarity"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.metrics.genai.answer_similarity()</span></code></a>: Use this metric when you want to evaluate how similar the model generated output is compared to the information in the ground_truth. High scores mean that your model outputs contain similar information as the ground_truth, while low scores mean that outputs may disagree with the ground_truth.</p></li>
-<li><p><a class="reference internal" href="../../python_api/mlflow.metrics.html#mlflow.metrics.genai.answer_correctness" title="mlflow.metrics.genai.answer_correctness"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.metrics.genai.answer_correctness()</span></code></a>: Use this metric when you want to evaluate how factually correct the model generated output is based on the information in the ground_truth. High scores mean that your model outputs contain similar information as the ground_truth and that this information is correct, while low scores mean that outputs may disagree with the ground_truth or that the information in the output is incorrect. Note that this builds onto answer_similarity.</p></li>
-<li><p><a class="reference internal" href="../../python_api/mlflow.metrics.html#mlflow.metrics.genai.answer_relevance" title="mlflow.metrics.genai.answer_relevance"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.metrics.genai.answer_relevance()</span></code></a>: Use this metric when you want to evaluate how relevant the model generated output is to the input (context is ignored). High scores mean that your model outputs are about the same subject as the input, while low scores mean that outputs may be non-topical.</p></li>
-<li><p><a class="reference internal" href="../../python_api/mlflow.metrics.html#mlflow.metrics.genai.relevance" title="mlflow.metrics.genai.relevance"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.metrics.genai.relevance()</span></code></a>: Use this metric when you want to evaluate how relevant the model generated output is with respect to both the input and the context. High scores mean that the model has understood the context and correct extracted relevant information from the context, while low score mean that output has completely ignored the question and the context and could be hallucinating.</p></li>
-<li><p><a class="reference internal" href="../../python_api/mlflow.metrics.html#mlflow.metrics.genai.faithfulness" title="mlflow.metrics.genai.faithfulness"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.metrics.genai.faithfulness()</span></code></a>: Use this metric when you want to evaluate how faithful the model generated output is based on the context provided. High scores mean that the outputs contain information that is in line with the context, while low scores mean that outputs may disagree with the context (input is ignored).</p></li>
+<li><p><a class="reference internal" href="../../python_api/mlflow.metrics.html#mlflow.metrics.genai.answer_similarity" title="mlflow.metrics.genai.answer_similarity"><code class="xref py py-func docutils literal notranslate"><span class="pre">answer_similarity()</span></code></a>: Evaluate how similar a model’s generated output is compared to the information in the ground truth data.</p></li>
+<li><p><a class="reference internal" href="../../python_api/mlflow.metrics.html#mlflow.metrics.genai.answer_correctness" title="mlflow.metrics.genai.answer_correctness"><code class="xref py py-func docutils literal notranslate"><span class="pre">answer_correctness()</span></code></a>: Evaluate how factually correct a model’s generated output is based on the information within the ground truth data.</p></li>
+<li><p><a class="reference internal" href="../../python_api/mlflow.metrics.html#mlflow.metrics.genai.answer_relevance" title="mlflow.metrics.genai.answer_relevance"><code class="xref py py-func docutils literal notranslate"><span class="pre">answer_relevance()</span></code></a>: Evaluate how relevant the model generated output is to the input (context is ignored).</p></li>
+<li><p><a class="reference internal" href="../../python_api/mlflow.metrics.html#mlflow.metrics.genai.relevance" title="mlflow.metrics.genai.relevance"><code class="xref py py-func docutils literal notranslate"><span class="pre">relevance()</span></code></a>: Evaluate how relevant the model generated output is with respect to both the input and the context.</p></li>
+<li><p><a class="reference internal" href="../../python_api/mlflow.metrics.html#mlflow.metrics.genai.faithfulness" title="mlflow.metrics.genai.faithfulness"><code class="xref py py-func docutils literal notranslate"><span class="pre">faithfulness()</span></code></a>: Evaluate how faithful the model generated output is based on the context provided.</p></li>
 </ul>
 </div>
-<div class="section" id="selecting-the-llm-as-judge-model">
-<h3>Selecting the LLM-as-judge Model<a class="headerlink" href="#selecting-the-llm-as-judge-model" title="Permalink to this headline"> </a></h3>
-<p>By default, llm-as-judge metrics use <code class="docutils literal notranslate"><span class="pre">openai:/gpt-4</span></code> as the judge. You can change the default judge model by passing an override to the <code class="docutils literal notranslate"><span class="pre">model</span></code> argument within the metric definition, as shown below. In addition to OpenAI models, you can also use any endpoint via MLflow Deployments. Use <a class="reference internal" href="../../python_api/mlflow.deployments.html#mlflow.deployments.set_deployments_target" title="mlflow.deployments.set_deployments_target"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.deployments.set_deployments_target()</span></code></a> to set the target deployment client.</p>
-<p>To use an endpoint hosted by a local MLflow AI Gateway, you can use the following code.</p>
+<div class="section" id="selecting-the-judge-model">
+<h4>Selecting the Judge Model<a class="headerlink" href="#selecting-the-judge-model" title="Permalink to this headline"> </a></h4>
+<p>By default, MLflow will use OpenAI’s GPT-4 model as the judge model that scores metrics. You can change the judge model by passing an override to the <code class="docutils literal notranslate"><span class="pre">model</span></code> argument within the metric definition.</p>
+<div class="section" id="saas-llm-providers">
+<h5>1. SaaS LLM Providers<a class="headerlink" href="#saas-llm-providers" title="Permalink to this headline"> </a></h5>
+<p>To use SaaS LLM providers, such as OpenAI or Anthropic, set the <code class="docutils literal notranslate"><span class="pre">model</span></code> parameter in the metrics definition, in the format of <code class="docutils literal notranslate"><span class="pre">&lt;provider&gt;:/&lt;model-name&gt;</span></code>. For example, to use Anthropic Claude 3.5 model as the judge model, set <code class="docutils literal notranslate"><span class="pre">anthropic</span></code> as the provider.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">my_answer_similarity</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">genai</span><span class="o">.</span><span class="n">answer_similarity</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;anthropic:/claude-3-5-sonnet-20241022&quot;</span><span class="p">,</span>
+    <span class="c1"># Override default judge parameters to meet Claude endpoint requirements.</span>
+    <span class="n">parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;max_tokens&quot;</span><span class="p">:</span> <span class="mi">256</span><span class="p">},</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Currently, MLflow supports <code class="docutils literal notranslate"><span class="pre">[&quot;openai&quot;,</span> <span class="pre">&quot;anthropic&quot;,</span> <span class="pre">&quot;bedrock&quot;,</span> <span class="pre">&quot;mistral&quot;,</span> <span class="pre">&quot;togetherai&quot;]</span></code> as viable LLM providers for any judge model. Azure OpenAI endpoints can be accessed via the <code class="docutils literal notranslate"><span class="pre">openai:/&lt;model-name&gt;</span></code> URI, by setting the environment variables, such as <code class="docutils literal notranslate"><span class="pre">OPENAI_API_BASE</span></code>, <code class="docutils literal notranslate"><span class="pre">OPENAI_API_TYPE</span></code>, etc.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To use SaaS LLM providers, make sure you have set the API key for the provider via
+the environment variable, e.g., <code class="docutils literal notranslate"><span class="pre">ANTHROPIC_API_KEY</span></code>. Your use of a third party LLM service (e.g., OpenAI) for evaluation may be subject to and governed by the LLM service’s terms of use.</p>
+</div>
+</div>
+<div class="section" id="self-hosted-proxy-endpoints">
+<h5>2. Self-hosted Proxy Endpoints<a class="headerlink" href="#self-hosted-proxy-endpoints" title="Permalink to this headline"> </a></h5>
+<p>If you are accessing SaaS LLM providers via a proxy endpoint (e.g., for security compliance), you can set the <code class="docutils literal notranslate"><span class="pre">proxy_url</span></code> parameter in the metrics definition. Additionally, use the <code class="docutils literal notranslate"><span class="pre">extra_headers</span></code> parameters  to pass extra headers for the endpoint for authentication.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">answer_similarity</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">genai</span><span class="o">.</span><span class="n">answer_similarity</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;openai:/gpt-4o&quot;</span><span class="p">,</span>
+    <span class="n">proxy_url</span><span class="o">=</span><span class="s2">&quot;https://my-proxy-endpoint/chat&quot;</span><span class="p">,</span>
+    <span class="n">extra_headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Group-ID&quot;</span><span class="p">:</span> <span class="s2">&quot;my-group-id&quot;</span><span class="p">},</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="mlflow-ai-gateway-endpoints">
+<h5>3. MLflow AI Gateway Endpoints<a class="headerlink" href="#mlflow-ai-gateway-endpoints" title="Permalink to this headline"> </a></h5>
+<p><a class="reference external" href="../deployments/index.html">MLflow AI Gateway</a> is a self-hosted solution that allows you to query various LLM providers in a unified interface. To use an endpoint hosted by MLflow AI Gateway:</p>
+<ol class="arabic simple">
+<li><p>Start the MLflow AI Gateway server with your LLM setting by following <a class="reference external" href="../deployments/index.html#quickstart">these steps</a>.</p></li>
+<li><p>Set the MLflow deployment client to target the server address by using <a class="reference internal" href="../../python_api/mlflow.deployments.html#mlflow.deployments.set_deployments_target" title="mlflow.deployments.set_deployments_target"><code class="xref py py-func docutils literal notranslate"><span class="pre">set_deployments_target()</span></code></a>.</p></li>
+<li><p>Set <code class="docutils literal notranslate"><span class="pre">endpoints:/&lt;endpoint-name&gt;</span></code> to the <code class="docutils literal notranslate"><span class="pre">model</span></code> parameter in the metrics definition.</p></li>
+</ol>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.deployments</span> <span class="kn">import</span> <span class="n">set_deployments_target</span>
 
+<span class="c1"># When the MLflow AI Gateway server is running at http://localhost:5000</span>
 <span class="n">set_deployments_target</span><span class="p">(</span><span class="s2">&quot;http://localhost:5000&quot;</span><span class="p">)</span>
 <span class="n">my_answer_similarity</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">genai</span><span class="o">.</span><span class="n">answer_similarity</span><span class="p">(</span>
     <span class="n">model</span><span class="o">=</span><span class="s2">&quot;endpoints:/my-endpoint&quot;</span>
 <span class="p">)</span>
 </pre></div>
 </div>
-<p>To use an endpoint hosted on Databricks, you can use the following code.</p>
+</div>
+<div class="section" id="databricks-model-serving">
+<h5>4. Databricks Model Serving<a class="headerlink" href="#databricks-model-serving" title="Permalink to this headline"> </a></h5>
+<p>If you have a model hosted on Databricks, you can use it as a judge model by setting <code class="docutils literal notranslate"><span class="pre">endpoints:/&lt;endpoint-name&gt;</span></code> to the <code class="docutils literal notranslate"><span class="pre">model</span></code> parameter in the metrics definition. The following code uses a Llama 3.1 405B model available via the <a class="reference external" href="https://docs.databricks.com/en/machine-learning/model-serving/index.html">Foundation Model API</a>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.deployments</span> <span class="kn">import</span> <span class="n">set_deployments_target</span>
 
 <span class="n">set_deployments_target</span><span class="p">(</span><span class="s2">&quot;databricks&quot;</span><span class="p">)</span>
-<span class="n">llama2_answer_similarity</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">genai</span><span class="o">.</span><span class="n">answer_similarity</span><span class="p">(</span>
-    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;endpoints:/databricks-llama-2-70b-chat&quot;</span>
+<span class="n">llama3_answer_similarity</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">genai</span><span class="o">.</span><span class="n">answer_similarity</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;endpoints:/databricks-llama-3-1-405b-instruct&quot;</span>
 <span class="p">)</span>
 </pre></div>
 </div>
-<p>For more information about how various models perform as judges, please refer to <a class="reference external" href="https://www.databricks.com/blog/LLM-auto-eval-best-practices-RAG">this blog</a>.</p>
 </div>
 </div>
-<div class="section" id="creating-custom-llm-evaluation-metrics">
-<h2>Creating Custom LLM-evaluation Metrics<a class="headerlink" href="#creating-custom-llm-evaluation-metrics" title="Permalink to this headline"> </a></h2>
-<div class="section" id="create-llm-as-judge-evaluation-metrics-category-1">
-<h3>Create LLM-as-judge Evaluation Metrics (Category 1)<a class="headerlink" href="#create-llm-as-judge-evaluation-metrics-category-1" title="Permalink to this headline"> </a></h3>
-<p>You can also create your own Saas LLM evaluation metrics with MLflow API <a class="reference internal" href="../../python_api/mlflow.metrics.html#mlflow.metrics.genai.make_genai_metric" title="mlflow.metrics.genai.make_genai_metric"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.metrics.genai.make_genai_metric()</span></code></a>, which
-needs the following information:</p>
+<div class="section" id="overriding-default-judge-parameters">
+<h4>Overriding Default Judge Parameters<a class="headerlink" href="#overriding-default-judge-parameters" title="Permalink to this headline"> </a></h4>
+<p>By default, MLflow queries the judge LLM model with the following parameters:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">temperature</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0</span>
+<span class="nt">max_tokens</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">200</span>
+<span class="nt">top_p</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span>
+</pre></div>
+</div>
+<p>However, this might not be suitable for all LLM providers. For example, accessing Anthropic’s Claude models on Amazon Bedrock requires an <code class="docutils literal notranslate"><span class="pre">anthropic_version</span></code> parameter to be specified in the request payload. You can override these default parameters by passing the <code class="docutils literal notranslate"><span class="pre">parameters</span></code> argument to the metrics definition.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">my_answer_similarity</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">genai</span><span class="o">.</span><span class="n">answer_similarity</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;bedrock:/anthropic.claude-3-5-sonnet-20241022-v2:0&quot;</span><span class="p">,</span>
+    <span class="n">parameters</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;max_tokens&quot;</span><span class="p">:</span> <span class="mi">256</span><span class="p">,</span>
+        <span class="s2">&quot;anthropic_version&quot;</span><span class="p">:</span> <span class="s2">&quot;bedrock-2023-05-31&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that the parameters dictionary you pass in the <code class="docutils literal notranslate"><span class="pre">parameters</span></code> argument will <strong>replace the default parameters</strong>, instead of being merged with them. For example, <code class="docutils literal notranslate"><span class="pre">top_p</span></code> will <strong>not</strong> be sent to the model in the above code example.</p>
+</div>
+<div class="section" id="creating-custom-llm-as-a-judge-metrics">
+<h4>Creating Custom LLM-as-a-Judge Metrics<a class="headerlink" href="#creating-custom-llm-as-a-judge-metrics" title="Permalink to this headline"> </a></h4>
+<p>You can also create your own LLM-as-a-Judge evaluation metrics with <a class="reference internal" href="../../python_api/mlflow.metrics.html#mlflow.metrics.genai.make_genai_metric" title="mlflow.metrics.genai.make_genai_metric"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.metrics.genai.make_genai_metric()</span></code></a> API, which needs the following information:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">name</span></code>: the name of your custom metric.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">definition</span></code>: describe what’s the metric doing.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">grading_prompt</span></code>: describe the scoring critieria.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">examples</span></code>: a few input/output examples with score, they are used as a reference for LLM judge.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">model</span></code>: the identifier of LLM judge, in the format of “openai:/gpt-4” or “endpoints:/databricks-llama-2-70b-chat”.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">parameters</span></code>: the extra parameters to send to LLM judge, e.g., <code class="docutils literal notranslate"><span class="pre">temperature</span></code> for <code class="docutils literal notranslate"><span class="pre">&quot;openai:/gpt-4o-mini&quot;</span></code>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">aggregations</span></code>: The list of options to aggregate the per-row scores using numpy functions.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">greater_is_better</span></code>: indicates if a higher score means your model is better.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">grading_prompt</span></code>: describe the scoring criteria.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">examples</span></code> (Optional): a few input/output examples with scores provided; used as a reference for the LLM judge.</p></li>
 </ul>
+<p>See the <a class="reference internal" href="../../python_api/mlflow.metrics.html#mlflow.metrics.genai.make_genai_metric" title="mlflow.metrics.genai.make_genai_metric"><code class="xref py py-func docutils literal notranslate"><span class="pre">API</span> <span class="pre">documentation</span></code></a> for the full list of the configurations.</p>
 <p>Under the hood, <code class="docutils literal notranslate"><span class="pre">definition</span></code>, <code class="docutils literal notranslate"><span class="pre">grading_prompt</span></code>, <code class="docutils literal notranslate"><span class="pre">examples</span></code> together with evaluation data and model output will be
 composed into a long prompt and sent to LLM. If you are familiar with the concept of prompt engineering,
 SaaS LLM evaluation metric is basically trying to compose a “right” prompt containing instructions, data and model
@@ -551,60 +648,11 @@ we will use <a class="reference internal" href="../../python_api/mlflow.metrics.
 </pre></div>
 </div>
 </div>
-<div class="section" id="create-heuristic-based-llm-evaluation-metrics-category-2">
-<h3>Create heuristic-based LLM Evaluation Metrics (Category 2)<a class="headerlink" href="#create-heuristic-based-llm-evaluation-metrics-category-2" title="Permalink to this headline"> </a></h3>
-<p>This is very similar to creating custom traditional metrics, with the exception of returning a <a class="reference internal" href="../../python_api/mlflow.metrics.html#mlflow.metrics.MetricValue" title="mlflow.metrics.MetricValue"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.metrics.MetricValue()</span></code></a> instance.
-Basically you need to:</p>
-<ol class="arabic simple">
-<li><p>Implement a <code class="docutils literal notranslate"><span class="pre">eval_fn</span></code> to define your scoring logic, it must take in 2 args <code class="docutils literal notranslate"><span class="pre">predictions</span></code> and <code class="docutils literal notranslate"><span class="pre">targets</span></code>.
-<code class="docutils literal notranslate"><span class="pre">eval_fn</span></code> must return a <a class="reference internal" href="../../python_api/mlflow.metrics.html#mlflow.metrics.MetricValue" title="mlflow.metrics.MetricValue"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.metrics.MetricValue()</span></code></a> instance.</p></li>
-<li><p>Pass <code class="docutils literal notranslate"><span class="pre">eval_fn</span></code> and other arguments to <code class="docutils literal notranslate"><span class="pre">mlflow.metrics.make_metric</span></code> API to create the metric.</p></li>
-</ol>
-<p>The following code creates a dummy per-row metric called <code class="docutils literal notranslate"><span class="pre">&quot;over_10_chars&quot;</span></code>: if the model output is greater than 10,
-the score is “yes” otherwise “no”.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">eval_fn</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">targets</span><span class="p">):</span>
-    <span class="n">scores</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">predictions</span><span class="p">)):</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">predictions</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">:</span>
-            <span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;yes&quot;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;no&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">MetricValue</span><span class="p">(</span>
-        <span class="n">scores</span><span class="o">=</span><span class="n">scores</span><span class="p">,</span>
-        <span class="n">aggregate_results</span><span class="o">=</span><span class="n">standard_aggregations</span><span class="p">(</span><span class="n">scores</span><span class="p">),</span>
-    <span class="p">)</span>
-
-
-<span class="c1"># Create an EvaluationMetric object.</span>
-<span class="n">passing_code_metric</span> <span class="o">=</span> <span class="n">make_metric</span><span class="p">(</span>
-    <span class="n">eval_fn</span><span class="o">=</span><span class="n">eval_fn</span><span class="p">,</span> <span class="n">greater_is_better</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;over_10_chars&quot;</span>
-<span class="p">)</span>
-</pre></div>
-</div>
-<p>To create a custom metric that is dependent on other metrics, include those other metrics’ names as an argument after <code class="docutils literal notranslate"><span class="pre">predictions</span></code> and <code class="docutils literal notranslate"><span class="pre">targets</span></code>. This can be the name of a builtin metric or another custom metric.
-Ensure that you do not accidentally have any circular dependencies in your metrics, or the evaluation will fail.</p>
-<p>The following code creates a dummy per-row metric called <code class="docutils literal notranslate"><span class="pre">&quot;toxic_or_over_10_chars&quot;</span></code>: if the model output is greater than 10 or the toxicity score is greater than 0.5, the score is “yes” otherwise “no”.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">eval_fn</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">toxicity</span><span class="p">,</span> <span class="n">over_10_chars</span><span class="p">):</span>
-    <span class="n">scores</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">predictions</span><span class="p">)):</span>
-        <span class="k">if</span> <span class="n">toxicity</span><span class="o">.</span><span class="n">scores</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.5</span> <span class="ow">or</span> <span class="n">over_10_chars</span><span class="o">.</span><span class="n">scores</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
-            <span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;yes&quot;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;no&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">MetricValue</span><span class="p">(</span><span class="n">scores</span><span class="o">=</span><span class="n">scores</span><span class="p">)</span>
-
-
-<span class="c1"># Create an EvaluationMetric object.</span>
-<span class="n">toxic_and_over_10_chars_metric</span> <span class="o">=</span> <span class="n">make_metric</span><span class="p">(</span>
-    <span class="n">eval_fn</span><span class="o">=</span><span class="n">eval_fn</span><span class="p">,</span> <span class="n">greater_is_better</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;toxic_or_over_10_chars&quot;</span>
-<span class="p">)</span>
-</pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="prepare-your-llm-for-evaluating">
-<h2>Prepare Your LLM for Evaluating<a class="headerlink" href="#prepare-your-llm-for-evaluating" title="Permalink to this headline"> </a></h2>
-<p>In order to evaluate your LLM with <code class="docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code>, your LLM has to be one of the following type:</p>
+<div class="section" id="prepare-your-target-models">
+<h2>Prepare Your Target Models<a class="headerlink" href="#prepare-your-target-models" title="Permalink to this headline"> </a></h2>
+<p>In order to evaluate your model with <code class="docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code>, your model has to be one of the following types:</p>
 <ol class="arabic simple">
 <li><p>A <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PyFuncModel" title="mlflow.pyfunc.PyFuncModel"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.pyfunc.PyFuncModel()</span></code></a> instance or a URI pointing to a logged <code class="docutils literal notranslate"><span class="pre">mlflow.pyfunc.PyFuncModel</span></code> model. In
 general we call that MLflow model. The</p></li>
@@ -624,7 +672,7 @@ general we call that MLflow model. The</p></li>
 <a class="reference external" href="https://mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#creating-custom-pyfunc-models">this doc</a>. But in short,
 to evaluate your model as an MLflow model, we recommend following the steps below:</p>
 <ol class="arabic">
-<li><p>Package your LLM as an MLflow model and log it to MLflow server by <code class="docutils literal notranslate"><span class="pre">log_model</span></code>. Each flavor (<code class="docutils literal notranslate"><span class="pre">opeanai</span></code>, <code class="docutils literal notranslate"><span class="pre">pytorch</span></code>, …)
+<li><p>Log your model to MLflow server by <code class="docutils literal notranslate"><span class="pre">log_model</span></code>. Each flavor (<code class="docutils literal notranslate"><span class="pre">opeanai</span></code>, <code class="docutils literal notranslate"><span class="pre">pytorch</span></code>, …)
 has its own <code class="docutils literal notranslate"><span class="pre">log_model</span></code> API, e.g., <a class="reference internal" href="../../python_api/openai/index.html#mlflow.openai.log_model" title="mlflow.openai.log_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.openai.log_model()</span></code></a>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
     <span class="n">system_prompt</span> <span class="o">=</span> <span class="s2">&quot;Answer the following question in two sentences&quot;</span>
@@ -706,8 +754,8 @@ up OpenAI authentication to run the code below.</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">metrics</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="literal-block-wrapper docutils container" id="id14">
-<div class="code-block-caption"><span class="caption-text">Output</span><a class="headerlink" href="#id14" title="Permalink to this code"> </a></div>
+<div class="literal-block-wrapper docutils container" id="id17">
+<div class="code-block-caption"><span class="caption-text">Output</span><a class="headerlink" href="#id17" title="Permalink to this code"> </a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;flesch_kincaid_grade_level/v1/mean&quot;</span><span class="p">:</span> <span class="mf">14.75</span><span class="p">,</span>
     <span class="s2">&quot;flesch_kincaid_grade_level/v1/variance&quot;</span><span class="p">:</span> <span class="mf">0.5625</span><span class="p">,</span>
@@ -1029,7 +1077,7 @@ MLflow UI. To view the evaluation results on MLflow UI, please follow the steps 
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../',
-      VERSION:'2.17.1.dev0',
+      VERSION:'2.17.3.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

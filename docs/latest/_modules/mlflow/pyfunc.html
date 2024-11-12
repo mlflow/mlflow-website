@@ -55,7 +55,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="MLflow 2.17.1.dev0 documentation" href="../../index.html"/>
+    <link rel="top" title="MLflow 2.17.3.dev0 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
@@ -87,7 +87,7 @@
     <a href="../../index.html" class="wy-nav-top-logo"
       ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.17.1.dev0</span>
+    <span class="version">2.17.3.dev0</span>
   </li>
 </ul>
   </nav>
@@ -602,6 +602,7 @@
 
 <span class="kn">import</span> <span class="nn">collections</span>
 <span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">hashlib</span>
 <span class="kn">import</span> <span class="nn">importlib</span>
 <span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">import</span> <span class="nn">json</span>
@@ -619,7 +620,7 @@
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">lru_cache</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 <span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urlparse</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -712,13 +713,12 @@
     <span class="n">databricks_utils</span><span class="p">,</span>
     <span class="n">find_free_port</span><span class="p">,</span>
     <span class="n">get_major_minor_py_version</span><span class="p">,</span>
-    <span class="n">insecure_hash</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils</span> <span class="kn">import</span> <span class="n">env_manager</span> <span class="k">as</span> <span class="n">_EnvManager</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils._spark_utils</span> <span class="kn">import</span> <span class="n">modified_environ</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.annotations</span> <span class="kn">import</span> <span class="n">deprecated</span><span class="p">,</span> <span class="n">developer_stable</span><span class="p">,</span> <span class="n">experimental</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.databricks_utils</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">get_dbconnect_client_cache</span><span class="p">,</span>
+    <span class="n">get_dbconnect_udf_sandbox_info</span><span class="p">,</span>
     <span class="n">is_databricks_connect</span><span class="p">,</span>
     <span class="n">is_in_databricks_runtime</span><span class="p">,</span>
     <span class="n">is_in_databricks_shared_cluster_runtime</span><span class="p">,</span>
@@ -970,12 +970,12 @@
         <span class="k">with</span> <span class="n">set_prediction_context</span><span class="p">(</span><span class="n">context</span><span class="p">):</span>
             <span class="k">yield</span> <span class="n">context</span>
 
-<div class="viewcode-block" id="PyFuncModel.predict"><a class="viewcode-back" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PyFuncModel.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">PyFuncInput</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PyFuncOutput</span><span class="p">:</span>
+<div class="viewcode-block" id="PyFuncModel.predict"><a class="viewcode-back" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PyFuncModel.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">PyFuncInput</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PyFuncOutput</span><span class="p">:</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_try_get_or_generate_prediction_context</span><span class="p">()</span> <span class="k">as</span> <span class="n">context</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_update_dependencies_schemas_in_prediction_context</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">PyFuncInput</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PyFuncOutput</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">PyFuncInput</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PyFuncOutput</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generates model predictions.</span>
 
@@ -1017,14 +1017,14 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_fn</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
 <div class="viewcode-block" id="PyFuncModel.predict_stream"><a class="viewcode-back" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PyFuncModel.predict_stream">[docs]</a>    <span class="k">def</span> <span class="nf">predict_stream</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">PyFuncLLMSingleInput</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">PyFuncLLMSingleInput</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">PyFuncLLMOutputChunk</span><span class="p">]:</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_try_get_or_generate_prediction_context</span><span class="p">()</span> <span class="k">as</span> <span class="n">context</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_update_dependencies_schemas_in_prediction_context</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_stream</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_predict_stream</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">PyFuncLLMSingleInput</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">PyFuncLLMSingleInput</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">PyFuncLLMOutputChunk</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generates streaming model predictions. Only LLM suports this method.</span>
@@ -1185,7 +1185,7 @@
     <span class="n">model_uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">suppress_warnings</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">dst_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">model_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">model_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PyFuncModel</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Load a model stored in Python function format.</span>
@@ -1347,7 +1347,7 @@
 
 
 <span class="k">def</span> <span class="nf">_load_model_or_server</span><span class="p">(</span>
-    <span class="n">model_uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">env_manager</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">model_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">model_uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">env_manager</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">model_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Load a model with env restoration. If a non-local ``env_manager`` is specified, prepare an</span>
@@ -1808,7 +1808,7 @@
 
 
 <span class="k">def</span> <span class="nf">_convert_struct_values</span><span class="p">(</span>
-    <span class="n">result</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
+    <span class="n">result</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
     <span class="n">result_type</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1890,10 +1890,10 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">python_env</span> <span class="o">=</span> <span class="n">_get_python_env</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">))</span>
     <span class="n">env_name</span> <span class="o">=</span> <span class="n">_get_virtualenv_name</span><span class="p">(</span><span class="n">python_env</span><span class="p">,</span> <span class="n">local_model_path</span><span class="p">)</span>
-    <span class="n">dbconnect_cache</span> <span class="o">=</span> <span class="n">get_dbconnect_client_cache</span><span class="p">(</span><span class="n">spark</span><span class="p">)</span>
+    <span class="n">dbconnect_udf_sandbox_info</span> <span class="o">=</span> <span class="n">get_dbconnect_udf_sandbox_info</span><span class="p">(</span><span class="n">spark</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">(</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">env_name</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">dbconnect_cache</span><span class="o">.</span><span class="n">udf_sandbox_image_version</span><span class="si">}</span><span class="s2">-&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dbconnect_cache</span><span class="o">.</span><span class="n">udf_sandbox_platform_machine</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">env_name</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">dbconnect_udf_sandbox_info</span><span class="o">.</span><span class="n">image_version</span><span class="si">}</span><span class="s2">-&quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dbconnect_udf_sandbox_info</span><span class="o">.</span><span class="n">platform_machine</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="p">)</span>
 
 
@@ -1906,9 +1906,9 @@
 
     <span class="n">python_env</span> <span class="o">=</span> <span class="n">_get_python_env</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">))</span>
     <span class="n">env_sha</span> <span class="o">=</span> <span class="n">_get_virtualenv_name</span><span class="p">(</span><span class="n">python_env</span><span class="p">,</span> <span class="n">local_model_path</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">dbconnect_cache</span> <span class="o">=</span> <span class="n">get_dbconnect_client_cache</span><span class="p">(</span><span class="n">spark</span><span class="p">)</span>
-    <span class="n">runtime_version</span> <span class="o">=</span> <span class="n">dbconnect_cache</span><span class="o">.</span><span class="n">udf_sandbox_image_version</span>
-    <span class="n">platform_machine</span> <span class="o">=</span> <span class="n">dbconnect_cache</span><span class="o">.</span><span class="n">udf_sandbox_platform_machine</span>
+    <span class="n">dbconnect_udf_sandbox_info</span> <span class="o">=</span> <span class="n">get_dbconnect_udf_sandbox_info</span><span class="p">(</span><span class="n">spark</span><span class="p">)</span>
+    <span class="n">runtime_version</span> <span class="o">=</span> <span class="n">dbconnect_udf_sandbox_info</span><span class="o">.</span><span class="n">image_version</span>
+    <span class="n">platform_machine</span> <span class="o">=</span> <span class="n">dbconnect_udf_sandbox_info</span><span class="o">.</span><span class="n">platform_machine</span>
 
     <span class="k">if</span> <span class="n">prebuilt_env_sha</span> <span class="o">!=</span> <span class="n">env_sha</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
@@ -1974,9 +1974,10 @@
 
             <span class="n">ws</span> <span class="o">=</span> <span class="n">WorkspaceClient</span><span class="p">()</span>
             <span class="c1"># Download model env file from UC volume.</span>
-            <span class="k">with</span> <span class="n">ws</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">model_env_uc_path</span><span class="p">)</span><span class="o">.</span><span class="n">contents</span> <span class="k">as</span> <span class="n">rf</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span>
-                <span class="n">local_model_env_path</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span>
-            <span class="p">)</span> <span class="k">as</span> <span class="n">wf</span><span class="p">:</span>
+            <span class="k">with</span> <span class="p">(</span>
+                <span class="n">ws</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">model_env_uc_path</span><span class="p">)</span><span class="o">.</span><span class="n">contents</span> <span class="k">as</span> <span class="n">rf</span><span class="p">,</span>
+                <span class="nb">open</span><span class="p">(</span><span class="n">local_model_env_path</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">wf</span><span class="p">,</span>
+            <span class="p">):</span>
                 <span class="k">while</span> <span class="n">chunk</span> <span class="o">:=</span> <span class="n">rf</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4096</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">):</span>
                     <span class="n">wf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">local_model_env_path</span>
@@ -2087,10 +2088,10 @@
     <span class="n">model_uri</span><span class="p">,</span>
     <span class="n">result_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">env_manager</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">extra_env</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">extra_env</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">prebuilt_env_uri</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">model_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">model_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A Spark UDF that can be used to invoke the Python function formatted model.</span>
@@ -2300,6 +2301,22 @@
     <span class="c1"># Note for Databricks Serverles runtime (notebook REPL), it runs on Servereless VM that</span>
     <span class="c1"># can&#39;t access NFS, so it needs to use `spark.addArtifact`.</span>
     <span class="n">use_dbconnect_artifact</span> <span class="o">=</span> <span class="n">is_dbconnect_mode</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_in_databricks_shared_cluster_runtime</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">use_dbconnect_artifact</span><span class="p">:</span>
+        <span class="n">udf_sandbox_info</span> <span class="o">=</span> <span class="n">get_dbconnect_udf_sandbox_info</span><span class="p">(</span><span class="n">spark</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">Version</span><span class="p">(</span><span class="n">udf_sandbox_info</span><span class="o">.</span><span class="n">mlflow_version</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">Version</span><span class="p">(</span><span class="s2">&quot;2.19.0&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                <span class="s2">&quot;Using &#39;mlflow.pyfunc.spark_udf&#39; in Databricks Serverless or in remote &quot;</span>
+                <span class="s2">&quot;Databricks Connect requires UDF sandbox image installed with MLflow &quot;</span>
+                <span class="s2">&quot;of version &gt;= 2.19.&quot;</span>
+            <span class="p">)</span>
+        <span class="c1"># `udf_sandbox_info.runtime_version` format is like &#39;&lt;major_version&gt;.&lt;minor_version&gt;&#39;.</span>
+        <span class="c1"># It&#39;s safe to apply `Version`.</span>
+        <span class="k">if</span> <span class="n">Version</span><span class="p">(</span><span class="n">udf_sandbox_info</span><span class="o">.</span><span class="n">runtime_version</span><span class="p">)</span><span class="o">.</span><span class="n">major</span> <span class="o">&lt;</span> <span class="mi">16</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                <span class="s2">&quot;Using &#39;mlflow.pyfunc.spark_udf&#39; in Databricks Serverless or in remote &quot;</span>
+                <span class="s2">&quot;Databricks Connect requires Databricks runtime version &gt;= 16.0.&quot;</span>
+            <span class="p">)</span>
 
     <span class="n">nfs_root_dir</span> <span class="o">=</span> <span class="n">get_nfs_cache_root_dir</span><span class="p">()</span>
     <span class="n">should_use_nfs</span> <span class="o">=</span> <span class="n">nfs_root_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
@@ -2564,7 +2581,7 @@
 
     <span class="nd">@pandas_udf</span><span class="p">(</span><span class="n">result_type</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">udf</span><span class="p">(</span>
-        <span class="n">iterator</span><span class="p">:</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span> <span class="o">...</span><span class="p">]],</span>
+        <span class="n">iterator</span><span class="p">:</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span> <span class="o">...</span><span class="p">]],</span>  <span class="c1"># noqa: UP006</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">result_type_hint</span><span class="p">]:</span>
         <span class="c1"># importing here to prevent circular import</span>
         <span class="kn">from</span> <span class="nn">mlflow.pyfunc.scoring_server.client</span> <span class="kn">import</span> <span class="p">(</span>
@@ -2702,7 +2719,7 @@
                     <span class="n">model_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
                         <span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">(),</span>
                         <span class="s2">&quot;mlflow&quot;</span><span class="p">,</span>
-                        <span class="n">insecure_hash</span><span class="o">.</span><span class="n">sha1</span><span class="p">(</span><span class="n">model_uri</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">(),</span>
+                        <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">(</span><span class="n">model_uri</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span> <span class="n">usedforsecurity</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">(),</span>
                         <span class="c1"># Use pid to avoid conflict when multiple spark UDF tasks</span>
                         <span class="nb">str</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">()),</span>
                     <span class="p">)</span>
@@ -2822,7 +2839,7 @@
     <span class="n">model_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">example_no_conversion</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">streamable</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">resources</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Resource</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">resources</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">Resource</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -3238,7 +3255,7 @@
     <span class="n">model_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">example_no_conversion</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">streamable</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">resources</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Resource</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">resources</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">Resource</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Log a Pyfunc model with custom inference logic and optional data dependencies as an MLflow</span>
@@ -3593,7 +3610,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../',
-      VERSION:'2.17.1.dev0',
+      VERSION:'2.17.3.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

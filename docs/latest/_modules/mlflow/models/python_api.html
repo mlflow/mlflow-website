@@ -55,7 +55,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="MLflow 2.17.1.dev0 documentation" href="../../../index.html"/>
+    <link rel="top" title="MLflow 2.17.3.dev0 documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
   
@@ -87,7 +87,7 @@
     <a href="../../../index.html" class="wy-nav-top-logo"
       ><img src="../../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.17.1.dev0</span>
+    <span class="version">2.17.3.dev0</span>
   </li>
 </ul>
   </nav>
@@ -213,7 +213,6 @@
 <span class="kn">from</span> <span class="nn">mlflow.utils.annotations</span> <span class="kn">import</span> <span class="n">experimental</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.databricks_utils</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">is_databricks_connect</span><span class="p">,</span>
-    <span class="n">is_in_databricks_runtime</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.file_utils</span> <span class="kn">import</span> <span class="n">TempDir</span>
 
@@ -310,6 +309,8 @@
     <span class="n">env_manager</span><span class="o">=</span><span class="n">_EnvManager</span><span class="o">.</span><span class="n">VIRTUALENV</span><span class="p">,</span>
     <span class="n">install_mlflow</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">pip_requirements_override</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">extra_envs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="c1"># TODO: add an option to force recreating the env</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate predictions in json format using a saved MLflow model. For information about the input</span>
@@ -346,6 +347,14 @@
 <span class="sd">                the logged model&#39;s dependency using `mlflow.models.update_model_requirements` API</span>
 <span class="sd">                without re-logging it. Note that a registered model is immutable, so you need to</span>
 <span class="sd">                register a new model version with the updated model.</span>
+<span class="sd">        extra_envs: If specified, a dictionary of extra environment variables will be passed to the</span>
+<span class="sd">            model inference environment. This is useful for testing what environment variables are</span>
+<span class="sd">            needed for the model to run correctly. By default, environment variables existing in the</span>
+<span class="sd">            current os.environ are passed, and this parameter can be used to override them.</span>
+
+<span class="sd">            .. note::</span>
+<span class="sd">                This parameter is only supported when `env_manager` is set to &quot;virtualenv&quot;</span>
+<span class="sd">                or &quot;conda&quot;.</span>
 
 <span class="sd">    Code example:</span>
 
@@ -367,6 +376,7 @@
 <span class="sd">            input_data={&quot;x&quot;: 1, &quot;y&quot;: 2},</span>
 <span class="sd">            content_type=&quot;json&quot;,</span>
 <span class="sd">            pip_requirements_override=[&quot;scikit-learn==0.23.2&quot;],</span>
+<span class="sd">            extra_envs={&quot;OPENAI_API_KEY&quot;: &quot;some_value&quot;},</span>
 <span class="sd">        )</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -377,16 +387,13 @@
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;Content type must be one of </span><span class="si">{</span><span class="n">_CONTENT_TYPE_JSON</span><span class="si">}</span><span class="s2"> or </span><span class="si">{</span><span class="n">_CONTENT_TYPE_CSV</span><span class="si">}</span><span class="s2">.&quot;</span>
         <span class="p">)</span>
+    <span class="k">if</span> <span class="n">extra_envs</span> <span class="ow">and</span> <span class="n">env_manager</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">_EnvManager</span><span class="o">.</span><span class="n">VIRTUALENV</span><span class="p">,</span> <span class="n">_EnvManager</span><span class="o">.</span><span class="n">CONDA</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
+            <span class="s2">&quot;Extra environment variables are only supported when env_manager is &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;set to &#39;</span><span class="si">{</span><span class="n">_EnvManager</span><span class="o">.</span><span class="n">VIRTUALENV</span><span class="si">}</span><span class="s2">&#39; or &#39;</span><span class="si">{</span><span class="n">_EnvManager</span><span class="o">.</span><span class="n">CONDA</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+        <span class="p">)</span>
 
-    <span class="n">spark_session</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="k">if</span> <span class="n">is_in_databricks_runtime</span><span class="p">():</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">pyspark.sql</span> <span class="kn">import</span> <span class="n">SparkSession</span>
-
-            <span class="n">spark_session</span> <span class="o">=</span> <span class="n">SparkSession</span><span class="o">.</span><span class="n">getActiveSession</span><span class="p">()</span>
-        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="k">pass</span>
-    <span class="n">is_dbconnect_mode</span> <span class="o">=</span> <span class="n">is_databricks_connect</span><span class="p">(</span><span class="n">spark_session</span><span class="p">)</span>
+    <span class="n">is_dbconnect_mode</span> <span class="o">=</span> <span class="n">is_databricks_connect</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">is_dbconnect_mode</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">env_manager</span> <span class="o">!=</span> <span class="n">_EnvManager</span><span class="o">.</span><span class="n">VIRTUALENV</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
@@ -412,6 +419,7 @@
             <span class="n">output_path</span><span class="o">=</span><span class="n">output_path</span><span class="p">,</span>
             <span class="n">content_type</span><span class="o">=</span><span class="n">content_type</span><span class="p">,</span>
             <span class="n">pip_requirements_override</span><span class="o">=</span><span class="n">pip_requirements_override</span><span class="p">,</span>
+            <span class="n">extra_envs</span><span class="o">=</span><span class="n">extra_envs</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">input_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">input_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -537,7 +545,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../../',
-      VERSION:'2.17.1.dev0',
+      VERSION:'2.17.3.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',
