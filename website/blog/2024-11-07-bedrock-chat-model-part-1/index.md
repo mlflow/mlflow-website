@@ -97,7 +97,7 @@ openapi: 3.0.0
 info:
   title: Time API
   version: 1.0.0
-  description: API to get the current date and time.
+  description: API to get the next optimal departure date for a Hohmann transfer from Earth to Mars.
 paths:
   /get-next-mars-launch-window:
     get:
