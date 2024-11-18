@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>How does it work?</title>
+  <title>DSPy Quickstart</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -220,7 +220,7 @@
         <li><a href="../index.html">MLflow DSPy Flavor</a> <span class="db-icon db-icon-chevron-right"></span></li>
     
     
-      <li>How does it work?</li>
+      <li>DSPy Quickstart</li>
     
     
     <!-- <li class="wy-breadcrumbs-aside">
@@ -480,9 +480,11 @@ div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
 </style>
+<div class="section" id="DSPy-Quickstart">
+<h1>DSPy Quickstart<a class="headerlink" href="#DSPy-Quickstart" title="Permalink to this headline"> </a></h1>
 <p><a class="reference external" href="https://dspy-docs.vercel.app/">DSPy</a> simplifies building language model (LM) pipelines by replacing manual prompt engineering with structured “text transformation graphs.” These graphs use flexible, learning modules that automate and optimize LM tasks like reasoning, retrieval, and answering complex questions.</p>
 <div class="section" id="How-does-it-work?">
-<h1>How does it work?<a class="headerlink" href="#How-does-it-work?" title="Permalink to this headline"> </a></h1>
+<h2>How does it work?<a class="headerlink" href="#How-does-it-work?" title="Permalink to this headline"> </a></h2>
 <p>At a high level, DSPy optimizes prompts, selects the best language model, and can even fine-tune the model using training data.</p>
 <p>The process follows these three steps, common to most DSPy <a class="reference external" href="https://dspy-docs.vercel.app/docs/building-blocks/optimizers">optimizers</a>:</p>
 <ol class="arabic simple">
@@ -491,19 +493,20 @@ div.rendered_html tbody tr:hover {
 </ol>
 </div>
 <div class="section" id="This-Demo">
-<h1>This Demo<a class="headerlink" href="#This-Demo" title="Permalink to this headline"> </a></h1>
+<h2>This Demo<a class="headerlink" href="#This-Demo" title="Permalink to this headline"> </a></h2>
 <p>Below we create a simple program that demonstrates the power of DSPy. We will build a text classifier leveraging OpenAI. By the end of this tutorial, we will…</p>
 <ol class="arabic simple">
 <li><p>Define a <a class="reference external" href="https://dspy-docs.vercel.app/docs/building-blocks/signatures">dspy.Signature</a> and <a class="reference external" href="https://dspy-docs.vercel.app/docs/building-blocks/modules">dspy.Module</a> to perform text classification.</p></li>
 <li><p>Leverage <a class="reference external" href="https://dspy-docs.vercel.app/api/optimizers/BootstrapFewShotWithRandomSearch">dspy.teleprompt.BootstrapFewShotWithRandomSearch</a> to compile our module so it’s better at classifying our text.</p></li>
+<li><p>Analyze internal steps with MLflow Tracing.</p></li>
 <li><p>Log the compiled model with MLflow.</p></li>
 <li><p>Load the logged model and perform inference.</p></li>
 </ol>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">pip</span> install -U openai dspy&gt;=2.5.1 mlflow&gt;=2.17.0
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">pip</span> install -U openai dspy&gt;=2.5.17 mlflow&gt;=2.18.0
 </pre></div>
 </div>
 </div>
@@ -516,11 +519,24 @@ zsh:1: 2.5.1 not found
 Note: you may need to restart the kernel to use updated packages.
 </pre></div></div>
 </div>
+</div>
 <div class="section" id="Setup">
 <h2>Setup<a class="headerlink" href="#Setup" title="Permalink to this headline"> </a></h2>
 <div class="section" id="Set-Up-LLM">
 <h3>Set Up LLM<a class="headerlink" href="#Set-Up-LLM" title="Permalink to this headline"> </a></h3>
 <p>After installing the relevant dependencies, let’s leverage a Databricks foundational model serving endpoint as our LLM of choice. Here, will leverage OpenAI’s <code class="docutils literal notranslate"><span class="pre">gpt-4o-mini</span></code> model.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set OpenAI API Key to the environment variable. You can also pass the token to dspy.LM()</span>
+<span class="kn">import</span> <span class="nn">getpass</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;OPENAI_API_KEY&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getpass</span><span class="p">(</span><span class="s2">&quot;Enter your OpenAI Key:&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
@@ -538,6 +554,33 @@ Note: you may need to restart the kernel to use updated packages.
     <span class="n">temperature</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">dspy</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="n">lm</span><span class="o">=</span><span class="n">lm</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Create-MLflow-Experiment">
+<h3>Create MLflow Experiment<a class="headerlink" href="#Create-MLflow-Experiment" title="Permalink to this headline"> </a></h3>
+<p>Create a new MLflow Experiment to track your DSPy models, metrics, parameters, and traces in one place. Although there is already a “default” experiment created in your workspace, it is highly recommended to create one for different tasks to organize experiment artifacts.</p>
+<p><strong>💡 Skip this step if you are running this tutorial on a Databricks Notebook. An MLflow experiment is automatically set up when you created any notebook.</strong></p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s2">&quot;DSPy Quickstart&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Turn-on-Auto-Tracing-with-MLflow">
+<h3>Turn on Auto Tracing with MLflow<a class="headerlink" href="#Turn-on-Auto-Tracing-with-MLflow" title="Permalink to this headline"> </a></h3>
+<p><a class="reference external" href="https://mlflow.org/docs/latest/llms/tracing/index.html">MLflow Tracing</a> is a powerful observability tool for monitoring and debugging what happens inside your DSPy modules, helping you identify potential bottlenecks or issues quickly. To enable DSPy tracing, you just need to call <code class="docutils literal notranslate"><span class="pre">mlflow.dspy.autolog</span></code> and that’s it!</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mlflow</span><span class="o">.</span><span class="n">dspy</span><span class="o">.</span><span class="n">autolog</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -706,6 +749,15 @@ Prediction(
 )
 </pre></div></div>
 </div>
+</div>
+<div class="section" id="Review-Traces">
+<h3>Review Traces<a class="headerlink" href="#Review-Traces" title="Permalink to this headline"> </a></h3>
+<ol class="arabic simple">
+<li><p>Open the MLflow UI and select the <code class="docutils literal notranslate"><span class="pre">&quot;DSPy</span> <span class="pre">Quickstart&quot;</span></code> experiment.</p></li>
+<li><p>Go to the <code class="docutils literal notranslate"><span class="pre">&quot;Traces&quot;</span></code> tab to view the generated traces.</p></li>
+</ol>
+<p>Now, you can observe how DSPy translates your query and interacts with the LLM. This feature is extremely valuable for debugging, iteratively refining components within your system, and monitoring models in production. While the module in this tutorial is relatively simple, the tracing feature becomes even more powerful as your model grows in complexity.</p>
+<p><img alt="MLflow DSPy Trace" src="../../../_images/dspy-trace.png" /></p>
 </div>
 </div>
 <div class="section" id="Compilation">
@@ -984,6 +1036,8 @@ Incorrect prediction:    crude
 <div class="output_area docutils container">
 <script type="application/vnd.jupyter.widget-view+json">{"model_id": "a94969489f0444d3a919ccf11f0bc4b6", "version_major": 2, "version_minor": 0}</script></div>
 </div>
+<p>Open the MLflow UI again and check the complied model is recorded to a new MLflow Run. Now you can load the model back for inference using <code class="docutils literal notranslate"><span class="pre">mlflow.dspy.load_model</span></code> or <code class="docutils literal notranslate"><span class="pre">mlflow.pyfunc.load_model</span></code>.</p>
+<p>💡 MLflow will remember the environment configuration stored in <code class="docutils literal notranslate"><span class="pre">dspy.settings</span></code>, such as the language model (LM) used during the experiment. This ensures excellent reproducibility for your experiment.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
 </pre></div>
@@ -1032,10 +1086,8 @@ interest
 <div class="section" id="Next-Steps">
 <h2>Next Steps<a class="headerlink" href="#Next-Steps" title="Permalink to this headline"> </a></h2>
 <p>This example demonstrates how DSPy works. Below are some potential extensions for improving this project, both with DSPy and MLflow.</p>
-</div>
-</div>
 <div class="section" id="DSPy">
-<h1>DSPy<a class="headerlink" href="#DSPy" title="Permalink to this headline"> </a></h1>
+<h3>DSPy<a class="headerlink" href="#DSPy" title="Permalink to this headline"> </a></h3>
 <ul class="simple">
 <li><p>Use real-world data for the classifier.</p></li>
 <li><p>Experiment with different optimizers.</p></li>
@@ -1043,12 +1095,14 @@ interest
 </ul>
 </div>
 <div class="section" id="MLflow">
-<h1>MLflow<a class="headerlink" href="#MLflow" title="Permalink to this headline"> </a></h1>
+<h3>MLflow<a class="headerlink" href="#MLflow" title="Permalink to this headline"> </a></h3>
 <ul class="simple">
 <li><p>Deploy the model using MLflow serving.</p></li>
 <li><p>Use MLflow to experiment with various optimization strategies.</p></li>
 </ul>
 <p>Happy coding!</p>
+</div>
+</div>
 </div>
 
 

@@ -224,6 +224,7 @@
     <span class="n">call_endpoint</span><span class="p">,</span>
     <span class="n">extract_api_info_for_service</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span> <span class="nn">mlflow.utils.string_utils</span> <span class="kn">import</span> <span class="n">_backtick_quote</span>
 
 <span class="n">DATABRICKS_HIVE_METASTORE_NAME</span> <span class="o">=</span> <span class="s2">&quot;hive_metastore&quot;</span>
 <span class="c1"># these two catalog names both points to the workspace local default HMS (hive metastore).</span>
@@ -284,7 +285,10 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">spark_read_op</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">spark_read_op</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_delta_table_name</span><span class="p">)</span></div>
+            <span class="n">backticked_delta_table_name</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="nb">map</span><span class="p">(</span><span class="n">_backtick_quote</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta_table_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">))</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">spark_read_op</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">backticked_delta_table_name</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>

@@ -230,9 +230,39 @@
                 
   <div class="section" id="tutorial-getting-started-with-chatmodel">
 <h1>Tutorial: Getting Started with ChatModel<a class="headerlink" href="#tutorial-getting-started-with-chatmodel" title="Permalink to this headline"> </a></h1>
-<p>MLflow’s <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.ChatModel" title="mlflow.pyfunc.ChatModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.pyfunc.ChatModel</span></code></a> class provides a standardized way to create production-ready conversational AI models. The resulting models are fully integrated with MLflow’s tracking, evaluation, and lifecycle management capabilities. They can be shared with others in the MLflow Model Registry, deployed as a REST API, or loaded in a notebook for interactive use. Furthermore, they are compatible with the widely-adopted OpenAI chat API spec, making them easy to integrate with other AI systems and tools.</p>
-<p>If you’re already familiar with <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PythonModel" title="mlflow.pyfunc.PythonModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.pyfunc.PythonModel</span></code></a>, you might be wondering why <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.ChatModel" title="mlflow.pyfunc.ChatModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.pyfunc.ChatModel</span></code></a> exists given that you can accomplish the same thing with a custom <code class="docutils literal notranslate"><span class="pre">PythonModel</span></code>. As GenAI applications become more prevalent and more complex, mapping the inputs, outputs, and parameters between your application and the custom <code class="docutils literal notranslate"><span class="pre">PythonModel</span></code> can become quite challenging. The <code class="docutils literal notranslate"><span class="pre">ChatModel</span></code> class offers a structured way to define custom conversational AI models that simplifies this process, with a focus on standardized, OpenAI-compatible inputs, outputs, and parameters.</p>
-<p>If you’re new to MLflow, or you have not used custom <code class="docutils literal notranslate"><span class="pre">PythonModel</span></code> s before, you can just think of <code class="docutils literal notranslate"><span class="pre">ChatModel</span></code> as a way to standardize how your AI Chat application talks to other systems, including deployment platforms, monitoring tools, and other AI services.</p>
+<p>MLflow’s <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.ChatModel" title="mlflow.pyfunc.ChatModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ChatModel</span></code></a> class provides a standardized way to create production-ready conversational AI models. The resulting models are fully integrated with MLflow’s tracking, evaluation, and lifecycle management capabilities. They can be shared with others in the MLflow Model Registry, deployed as a REST API, or loaded in a notebook for interactive use. Furthermore, they are compatible with the widely-adopted OpenAI chat API spec, making them easy to integrate with other AI systems and tools.</p>
+<p>If you’re already familiar with <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PythonModel" title="mlflow.pyfunc.PythonModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">PythonModel</span></code></a>, you might wonder why <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.ChatModel" title="mlflow.pyfunc.ChatModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ChatModel</span></code></a> is needed. As GenAI applications grow more complex, mapping inputs, outputs, and parameters with a custom <code class="docutils literal notranslate"><span class="pre">PythonModel</span></code> can be challenging. <code class="docutils literal notranslate"><span class="pre">ChatModel</span></code> simplifies this by offering a structured, OpenAI-compatible schema for conversational AI models.</p>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 40%" />
+<col style="width: 40%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"></th>
+<th class="head"><p>ChatModel</p></th>
+<th class="head"><p>PythonModel</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>When to use</p></td>
+<td><p>Use when you want to develop and deploy a conversational model with <strong>standard</strong> chat schema compatible with OpenAI spec.</p></td>
+<td><p>Use when you want <strong>full control</strong> over the model’s interface or customize every aspect of your model’s behavior.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Interface</p></td>
+<td><p><strong>Fixed</strong> to OpenAI’s chat schema.</p></td>
+<td><p><strong>Full control</strong> over the model’s input and output schema.</p></td>
+</tr>
+<tr class="row-even"><td><p>Setup</p></td>
+<td><p><strong>Quick</strong>. Works out of the box for conversational applications, with pre-defined model signature and input example.</p></td>
+<td><p><strong>Custom</strong>. You need to define model signature or input example yourself.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Complexity</p></td>
+<td><p><strong>Low</strong>. Standardized interface simplified model deployment and integration.</p></td>
+<td><p><strong>High</strong>. Deploying and integrating the custom PythonModel may not be straightforward. E.g., The model needs to handle Pandas DataFrames as MLflow converts input data to DataFrames before passing it to PythonModel.</p></td>
+</tr>
+</tbody>
+</table>
 <div class="section" id="what-you-ll-learn">
 <h2>What You’ll Learn<a class="headerlink" href="#what-you-ll-learn" title="Permalink to this headline"> </a></h2>
 <p>This guide will take you through the basics of using the ChatModel API to define custom conversational AI models. In particular, you will learn:</p>
@@ -240,7 +270,7 @@
 <li><p>How to map your application logic to the <code class="docutils literal notranslate"><span class="pre">ChatModel</span></code>’s input/output schema</p></li>
 <li><p>How to use the pre-defined inference parameters supported by ChatModels</p></li>
 <li><p>How to pass custom parameters to a ChatModel using <code class="docutils literal notranslate"><span class="pre">metadata</span></code></p></li>
-<li><p>How <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.ChatModel" title="mlflow.pyfunc.ChatModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.pyfunc.ChatModel</span></code></a> compares to <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PythonModel" title="mlflow.pyfunc.PythonModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.pyfunc.PythonModel</span></code></a> for defining custom chat models</p></li>
+<li><p>How <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.ChatModel" title="mlflow.pyfunc.ChatModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ChatModel</span></code></a> compares to <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PythonModel" title="mlflow.pyfunc.PythonModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">PythonModel</span></code></a> for defining custom chat models</p></li>
 </ol>
 <p>To illustrate these points, this guide will walk you through building a custom <code class="docutils literal notranslate"><span class="pre">ChatModel</span></code>, using a locally-hosted Ollama model as our example. There is no built-in Ollama model flavor, so creating a custom <code class="docutils literal notranslate"><span class="pre">ChatModel</span></code> provides a way to use MLflow’s extensive tracking, evaluation, and lifecycle management capabilities with Ollama models.</p>
 </div>
@@ -248,7 +278,7 @@
 <h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline"> </a></h2>
 <ul class="simple">
 <li><p>Familiarity with MLflow logging APIs and GenAI concepts.</p></li>
-<li><p>MLflow version 2.17.0 or higher installed for use of <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.ChatModel" title="mlflow.pyfunc.ChatModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.pyfunc.ChatModel</span></code></a>.</p></li>
+<li><p>MLflow version 2.17.0 or higher installed for use of <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.ChatModel" title="mlflow.pyfunc.ChatModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ChatModel</span></code></a>.</p></li>
 </ul>
 </div>
 <div class="section" id="understanding-chatmodel-input-output-mapping">
@@ -752,7 +782,7 @@ Hello! It&#39;s great to see you&#39;re starting the day with a cheerful greetin
     <span class="p">)</span>
 </pre></div>
 </div>
-<p>With a custom <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PythonModel" title="mlflow.pyfunc.PythonModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.pyfunc.PythonModel</span></code></a>, we need to manually define the model signature and input example. This is a significant difference from the ChatModel API, which automatically configured the signature to conform to the standardized OpenAI-compatible input/output/parameter schemas.</p>
+<p>With a custom <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PythonModel" title="mlflow.pyfunc.PythonModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">PythonModel</span></code></a>, we need to manually define the model signature and input example. This is a significant difference from the ChatModel API, which automatically configured the signature to conform to the standardized OpenAI-compatible input/output/parameter schemas.</p>
 <p>There is also one notable difference in how we call the loaded model’s <code class="docutils literal notranslate"><span class="pre">predict</span></code> method: parameters are passed as a dictionary via the <code class="docutils literal notranslate"><span class="pre">params</span></code> keyword argument, rather than in the dictionary containing the messages.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">loaded_model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
 
@@ -781,7 +811,7 @@ Hello! It&#39;s great to see you&#39;re starting the day with a cheerful greetin
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>In summary, <code class="docutils literal notranslate"><span class="pre">ChatModel</span></code> provides a more structured approach to defining custom chat models, with a focus on standardized, OpenAI-compatible inputs and outputs. While it requires a bit more setup work to map the input/output schemas between the <code class="docutils literal notranslate"><span class="pre">ChatModel</span></code> schema and the application it wraps, it can be easier to use than a fully custom <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PythonModel" title="mlflow.pyfunc.PythonModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.pyfunc.PythonModel</span></code></a> as it handles the often-challenging task of defining input/output/parameter schemas. The <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PythonModel" title="mlflow.pyfunc.PythonModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.pyfunc.PythonModel</span></code></a> approach, on the other hand, provides the most flexibility but requires the developer to manually handle all of the input/output/parameter mapping logic.</p>
+<p>In summary, <code class="docutils literal notranslate"><span class="pre">ChatModel</span></code> provides a more structured approach to defining custom chat models, with a focus on standardized, OpenAI-compatible inputs and outputs. While it requires a bit more setup work to map the input/output schemas between the <code class="docutils literal notranslate"><span class="pre">ChatModel</span></code> schema and the application it wraps, it can be easier to use than a fully custom <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PythonModel" title="mlflow.pyfunc.PythonModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">PythonModel</span></code></a> as it handles the often-challenging task of defining input/output/parameter schemas. The <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PythonModel" title="mlflow.pyfunc.PythonModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">PythonModel</span></code></a> approach, on the other hand, provides the most flexibility but requires the developer to manually handle all of the input/output/parameter mapping logic.</p>
 </div>
 <div class="section" id="conclusion">
 <h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline"> </a></h2>
@@ -790,7 +820,7 @@ Hello! It&#39;s great to see you&#39;re starting the day with a cheerful greetin
 <li><p>How to map the input/output schemas between the ChatModel API and your application</p></li>
 <li><p>How to configure commonly-used chat model inference parameters with the ChatModel API</p></li>
 <li><p>How to pass custom parameters to a <code class="docutils literal notranslate"><span class="pre">ChatModel</span></code> using the <code class="docutils literal notranslate"><span class="pre">metadata</span></code> key</p></li>
-<li><p>How <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.ChatModel" title="mlflow.pyfunc.ChatModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.pyfunc.ChatModel</span></code></a> compares to the <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PythonModel" title="mlflow.pyfunc.PythonModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.pyfunc.PythonModel</span></code></a> for defining custom chat models</p></li>
+<li><p>How <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.ChatModel" title="mlflow.pyfunc.ChatModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ChatModel</span></code></a> compares to the <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PythonModel" title="mlflow.pyfunc.PythonModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">PythonModel</span></code></a> for defining custom chat models</p></li>
 </ul>
 <p>You should now have a good sense of what the ChatModel API is and how it can be used to define custom chat models.</p>
 <p><code class="docutils literal notranslate"><span class="pre">ChatModel</span></code> includes some additional functionality that was not covered in this introductory guide, including:</p>

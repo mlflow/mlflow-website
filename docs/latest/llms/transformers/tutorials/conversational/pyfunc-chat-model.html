@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Building and Serving an OpenAI-compatible Chatbot</title>
+  <title>Deploying a Transformer model as an OpenAI-compatible Chatbot</title>
   
    
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -221,7 +221,7 @@
         <li><a href="../../index.html">MLflow Transformers Flavor</a> <span class="db-icon db-icon-chevron-right"></span></li>
     
     
-      <li>Building and Serving an OpenAI-compatible Chatbot</li>
+      <li>Deploying a Transformer model as an OpenAI-compatible Chatbot</li>
     
     
     <!-- <li class="wy-breadcrumbs-aside">
@@ -481,17 +481,19 @@ div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
 </style>
-<div class="section" id="Building-and-Serving-an-OpenAI-compatible-Chatbot">
-<h1>Building and Serving an OpenAI-compatible Chatbot<a class="headerlink" href="#Building-and-Serving-an-OpenAI-compatible-Chatbot" title="Permalink to this headline"> </a></h1>
-<p>Welcome to our tutorial on using Transformers and MLflow to create an OpenAI-compatible chat model. In MLflow 2.11 and up, the <a class="reference external" href="https://mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#mlflow.pyfunc.ChatModel">ChatModel</a> class has been added, allowing for convenient creation of served models that conform to the OpenAI API spec. This enables you to seamlessly swap out your chat app’s backing LLM, or to easily evaluate different models without having to edit your client-side code.</p>
+<div class="section" id="Deploying-a-Transformer-model-as-an-OpenAI-compatible-Chatbot">
+<h1>Deploying a Transformer model as an OpenAI-compatible Chatbot<a class="headerlink" href="#Deploying-a-Transformer-model-as-an-OpenAI-compatible-Chatbot" title="Permalink to this headline"> </a></h1>
+<p>Welcome to our tutorial on using Transformers and MLflow to create an OpenAI-compatible chat model. In MLflow 2.11 and up, MLflow’s Transformers flavors support special task type <code class="docutils literal notranslate"><span class="pre">llm/v1/chat</span></code>, which turns thousands of <a class="reference external" href="https://huggingface.co/models?pipeline_tag=text-generation">text-generation</a> models on Hugging Face into conversational chat bots that are interoperable with OpenAI models. This enables you to seamlessly swap out your chat app’s backing LLM or to easily evaluate different
+models without having to edit your client-side code.</p>
 <p>If you haven’t already seen it, you may find it helpful to go through our <a class="reference external" href="https://mlflow.org/docs/latest/llms/transformers/tutorials/conversational/conversational-model.html">introductory notebook on chat and Transformers</a> before proceeding with this one, as this notebook is slightly higher-level and does not delve too deeply into the inner workings of Transformers or MLflow Tracking.</p>
+<p><strong>Note</strong>: This page covers how to deploy a <strong>Transformers</strong> models as a chatbot. If you are using a different framework or a custom python model, use <a class="reference external" href="https://mlflow.org/docs/latest/llms/chat-model-intro/index.html">ChatModel</a> instead to build an OpenAI-compatible chat bot.</p>
 <div class="section" id="Learning-objectives">
 <h2>Learning objectives<a class="headerlink" href="#Learning-objectives" title="Permalink to this headline"> </a></h2>
 <p>In this tutorial, you will:</p>
 <ul class="simple">
 <li><p>Create an OpenAI-compatible chat model using TinyLLama-1.1B-Chat</p></li>
+<li><p>Log the model to MLflow and load it back for local inference.</p></li>
 <li><p>Serve the model with MLflow Model Serving</p></li>
-<li><p>Learn how to use MLflow’s <code class="docutils literal notranslate"><span class="pre">pyfunc</span></code> API to add arbitrary customization to your model</p></li>
 </ul>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
@@ -811,192 +813,14 @@ curl<span class="w"> </span>http://127.0.0.1:5000/invocations<span class="w"> </
 </ul>
 <p>Note: <code class="docutils literal notranslate"><span class="pre">n</span></code> does not have an equivalent Transformers pipeline param, and is not supported in queries. However, you can implement a model that consumes the <code class="docutils literal notranslate"><span class="pre">n</span></code> param using Custom Pyfunc (details below).</p>
 </div>
-<div class="section" id="Customizing-the-model">
-<h2>Customizing the model<a class="headerlink" href="#Customizing-the-model" title="Permalink to this headline"> </a></h2>
-<p>As always, custom functionality can be achieved with MLflow’s <code class="docutils literal notranslate"><span class="pre">pyfunc</span></code> API. In the cell below, we create a custom Chat-flavored <code class="docutils literal notranslate"><span class="pre">pyfunc</span></code> model by subclassing <code class="docutils literal notranslate"><span class="pre">mlflow.pyfunc.ChatModel</span></code>.</p>
-<p>In this example, we’ll use our previously-saved TinyLlama pipeline as the backing model by loading it with <code class="docutils literal notranslate"><span class="pre">mlflow.transformers.load_model()</span></code>, and then build our own customizations on top of it. However, <code class="docutils literal notranslate"><span class="pre">ChatModel</span></code> is agnostic to how you generate the outputs. You could use another transformer, Langchain, native OpenAI integrations, or even no LLM at all! As long the result of <code class="docutils literal notranslate"><span class="pre">predict</span></code> is of type <code class="docutils literal notranslate"><span class="pre">mlflow.types.llm.ChatResponse</span></code>, you’ll be able to take advantage of the automatic
-signature generation and input/output parsing.</p>
-<p>The possibilities for customization are endless here, but as a quick example, the code below simply edits the ID of the response, rather than having it be a random UUID. Of course, you could also insert any side-effects you wanted here, such as asynchronously logging some metadata for analytics.</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">random</span>
-
-<span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">from</span> <span class="nn">mlflow.types.llm</span> <span class="kn">import</span> <span class="n">ChatResponse</span>
-
-
-<span class="k">class</span> <span class="nc">MyChatModel</span><span class="p">(</span><span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">ChatModel</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">load_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
-        <span class="c1"># load our previously-saved Transformers pipeline from context.artifacts</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">transformers</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">artifacts</span><span class="p">[</span><span class="s2">&quot;chat_model_path&quot;</span><span class="p">])</span>
-
-    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">messages</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-        <span class="n">tokenizer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">tokenizer</span>
-        <span class="n">prompt</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">apply_chat_template</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="n">tokenize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">add_generation_prompt</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-        <span class="c1"># perform inference using the loaded pipeline</span>
-        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">return_full_text</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">generation_kwargs</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
-        <span class="n">text</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;generated_text&quot;</span><span class="p">]</span>
-        <span class="nb">id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;some_meaningful_id_</span><span class="si">{</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-
-        <span class="c1"># construct token usage information</span>
-        <span class="n">prompt_tokens</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">prompt</span><span class="p">))</span>
-        <span class="n">completion_tokens</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>
-        <span class="n">usage</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;prompt_tokens&quot;</span><span class="p">:</span> <span class="n">prompt_tokens</span><span class="p">,</span>
-            <span class="s2">&quot;completion_tokens&quot;</span><span class="p">:</span> <span class="n">completion_tokens</span><span class="p">,</span>
-            <span class="s2">&quot;total_tokens&quot;</span><span class="p">:</span> <span class="n">prompt_tokens</span> <span class="o">+</span> <span class="n">completion_tokens</span><span class="p">,</span>
-        <span class="p">}</span>
-
-        <span class="c1"># here, we can do any post-processing or side-effects required.</span>
-        <span class="c1"># for example, we could log the generated text to a database for</span>
-        <span class="c1"># analytics, or check the output for any banned words or phrases</span>
-        <span class="c1"># and return a different response if any are found.</span>
-
-        <span class="c1"># in this example, we just return the generated text as the response</span>
-
-        <span class="n">response</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="nb">id</span><span class="p">,</span>
-            <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="s2">&quot;MyChatModel&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;choices&quot;</span><span class="p">:</span> <span class="p">[</span>
-                <span class="p">{</span>
-                    <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-                    <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;assistant&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">text</span><span class="p">},</span>
-                    <span class="s2">&quot;finish_reason&quot;</span><span class="p">:</span> <span class="s2">&quot;stop&quot;</span><span class="p">,</span>
-                <span class="p">}</span>
-            <span class="p">],</span>
-            <span class="s2">&quot;usage&quot;</span><span class="p">:</span> <span class="n">usage</span><span class="p">,</span>
-        <span class="p">}</span>
-
-        <span class="k">return</span> <span class="n">ChatResponse</span><span class="p">(</span><span class="o">**</span><span class="n">response</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<p>Similar to what happens above, upon saving an instance of <code class="docutils literal notranslate"><span class="pre">MyChatModel</span></code>, MLflow will automatically recognize the <code class="docutils literal notranslate"><span class="pre">mlflow.pyfunc.ChatModel</span></code> subclass, and set chat signatures and handle input and output parsing automatically. Note that enforcement is performed on the output–MLflow will run inference on an example input, and assert that the output is of type <code class="docutils literal notranslate"><span class="pre">ChatResponse</span></code>.</p>
-<p>Full documentation for the <code class="docutils literal notranslate"><span class="pre">ChatResponse</span></code> type can be found in the <a class="reference external" href="https://mlflow.org/docs/latest/python_api/mlflow.types.html#mlflow.types.llm.ChatResponse">API reference</a>.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">save_model</span><span class="p">(</span>
-    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;my-model&quot;</span><span class="p">,</span>
-    <span class="n">python_model</span><span class="o">=</span><span class="n">MyChatModel</span><span class="p">(),</span>
-    <span class="c1"># provide the path to the pipeline we saved earlier</span>
-    <span class="n">artifacts</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;chat_model_path&quot;</span><span class="p">:</span> <span class="s2">&quot;tinyllama-chat&quot;</span><span class="p">},</span>
-<span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-2024/02/26 21:12:47 INFO mlflow.pyfunc: Predicting on input example to validate output
-/var/folders/qd/9rwd0_gd0qs65g4sdqlm51hr0000gp/T/ipykernel_55429/2958668123.py:10: FutureWarning: The &#39;transformers&#39; MLflow Models integration is known to be compatible with the following package version ranges: ``4.25.1`` -  ``4.37.1``. MLflow Models integrations with transformers may not succeed when used with package versions outside of this range.
-  self.pipeline = mlflow.transformers.load_model(context.artifacts[&#34;chat_model_path&#34;])
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"model_id": "cd12a6afe29847bcb79bdb01fc4892bd", "version_major": 2, "version_minor": 0}</script></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-2024/02/26 21:12:47 WARNING mlflow.transformers: Could not specify device parameter for this pipeline type
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"model_id": "8986e18350c44293944a8dc63d5e8324", "version_major": 2, "version_minor": 0}</script></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"model_id": "ab96f52af76949b790de16a3567619f3", "version_major": 2, "version_minor": 0}</script></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-2024/02/26 21:13:19 INFO mlflow.store.artifact.artifact_repo: The progress bar can be disabled by setting the environment variable MLFLOW_ENABLE_ARTIFACTS_PROGRESS_BAR to false
-</pre></div></div>
-</div>
-<p>As before, we can now serve the model by running the following in a terminal shell:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ mlflow models serve -m my-model
-</pre></div>
-</div>
-<p>And we should now be able to query it via HTTP request:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
-</pre></div>
-</div>
-<div class="input_area highlight-sh notranslate"><div class="highlight"><pre><span></span>%%sh
-curl<span class="w"> </span>http://127.0.0.1:5000/invocations<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>-d<span class="w"> </span><span class="s1">&#39;{ &quot;messages&quot;: [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Write me a hello world program in python&quot;}] }&#39;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">    </span><span class="p">|</span><span class="w"> </span>jq
-</pre></div>
-</div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-100   666  100   577  100    89     23      3  0:00:29  0:00:24  0:00:05   141
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-{
-  &#34;id&#34;: &#34;some_meaningful_id_33&#34;,
-  &#34;model&#34;: &#34;MyChatModel&#34;,
-  &#34;choices&#34;: [
-    {
-      &#34;index&#34;: 0,
-      &#34;message&#34;: {
-        &#34;role&#34;: &#34;assistant&#34;,
-        &#34;content&#34;: &#34;Here&#39;s a simple hello world program in Python:\n\n```python\nprint(\&#34;Hello, world!\&#34;)\n```\n\nThis program prints the string \&#34;Hello, world!\&#34; to the console. You can run this program by typing it into the Python interpreter or by running the command `python hello_world.py` in your terminal.&#34;
-      },
-      &#34;finish_reason&#34;: &#34;stop&#34;
-    }
-  ],
-  &#34;usage&#34;: {
-    &#34;prompt_tokens&#34;: 25,
-    &#34;completion_tokens&#34;: 71,
-    &#34;total_tokens&#34;: 96
-  },
-  &#34;object&#34;: &#34;chat.completion&#34;,
-  &#34;created&#34;: 1708949708
-}
-</pre></div></div>
-</div>
-</div>
 </div>
 <div class="section" id="Conclusion">
 <h1>Conclusion<a class="headerlink" href="#Conclusion" title="Permalink to this headline"> </a></h1>
-<p>In this tutorial, you learned how to create an OpenAI-compatible chat model by specifying “llm/v1/chat” as the task when saving Transformers pipelines. You also learned how to leverage Custom Pyfunc to add customizations that fit your specific use-case.</p>
+<p>In this tutorial, you learned how to create an OpenAI-compatible chat model by specifying “llm/v1/chat” as the task when saving Transformers pipelines.</p>
 <div class="section" id="What’s-next?">
 <h2>What’s next?<a class="headerlink" href="#What’s-next?" title="Permalink to this headline"> </a></h2>
 <ul class="simple">
-<li><p><a class="reference external" href="https://mlflow.org/docs/latest/traditional-ml/creating-custom-pyfunc/index.html">In-depth Pyfunc Walkthrough</a>. We briefly touched on custom <code class="docutils literal notranslate"><span class="pre">pyfunc</span></code> in this tutorial, but if you’re looking for more detail on the anatomy of a <code class="docutils literal notranslate"><span class="pre">pyfunc</span></code> model, the linked page provides an in-depth overview of all the components.</p></li>
+<li><p><a class="reference external" href="hhttps://mlflow.org/docs/latest/llms/chat-model-intro/index.html">Learn about custom ChatModel</a>. If you’re looking for futrher customization or models outside Transformers, the linked page provides a hand-on guidance for how to build a chat bot with MLflow’s <code class="docutils literal notranslate"><span class="pre">ChatModel</span></code> class.</p></li>
 <li><p><a class="reference external" href="https://mlflow.org/docs/latest/deployment/index.html">More on MLflow AI Gateway</a>. In this tutorial, we saw how to deploy a model using a local server, but MLflow provides many other ways to deploy your models to production. Check out this page to learn more about the different options.</p></li>
 <li><p><a class="reference external" href="https://mlflow.org/docs/latest/llms/transformers/index.html">More on MLflow’s Transformers Integration</a>. This page provides a comprehensive overview on MLflow’s Transformers integrations, along with lots of hands-on guides and notebooks. Learn how to fine-tune models, use prompt templates, and more!</p></li>
 <li><p><a class="reference external" href="https://mlflow.org/docs/latest/llms/index.html">Other LLM Integrations</a>. Aside from Transformers, MLflow has integrations with many other popular LLM libraries, such as Langchain and OpenAI.</p></li>

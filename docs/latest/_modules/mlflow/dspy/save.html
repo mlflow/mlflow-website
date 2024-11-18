@@ -221,11 +221,13 @@
     <span class="n">ModelSignature</span><span class="p">,</span>
     <span class="n">infer_pip_requirements</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span> <span class="nn">mlflow.models.dependencies_schemas</span> <span class="kn">import</span> <span class="n">_get_dependencies_schemas</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.model</span> <span class="kn">import</span> <span class="n">MLMODEL_FILE_NAME</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.rag_signatures</span> <span class="kn">import</span> <span class="n">SIGNATURE_FOR_LLM_INFERENCE_TASK</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.resources</span> <span class="kn">import</span> <span class="n">Resource</span><span class="p">,</span> <span class="n">_ResourceBuilder</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.signature</span> <span class="kn">import</span> <span class="n">_infer_signature_from_input_example</span>
 <span class="kn">from</span> <span class="nn">mlflow.models.utils</span> <span class="kn">import</span> <span class="n">_save_example</span>
+<span class="kn">from</span> <span class="nn">mlflow.tracing.provider</span> <span class="kn">import</span> <span class="n">trace_disabled</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracking._model_registry</span> <span class="kn">import</span> <span class="n">DEFAULT_AWAIT_MAX_SLEEP_SECONDS</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.annotations</span> <span class="kn">import</span> <span class="n">experimental</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.docstring_utils</span> <span class="kn">import</span> <span class="n">LOG_MODEL_PARAM_DOCS</span><span class="p">,</span> <span class="n">format_docstring</span>
@@ -273,6 +275,7 @@
 
 <div class="viewcode-block" id="save_model"><a class="viewcode-back" href="../../../python_api/mlflow.dspy.html#mlflow.dspy.save_model">[docs]</a><span class="nd">@experimental</span>
 <span class="nd">@format_docstring</span><span class="p">(</span><span class="n">LOG_MODEL_PARAM_DOCS</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">package_name</span><span class="o">=</span><span class="n">FLAVOR_NAME</span><span class="p">))</span>
+<span class="nd">@trace_disabled</span>  <span class="c1"># Suppress traces for internal predict calls while logging model</span>
 <span class="k">def</span> <span class="nf">save_model</span><span class="p">(</span>
     <span class="n">model</span><span class="p">,</span>
     <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -346,6 +349,13 @@
         <span class="n">saved_example</span> <span class="o">=</span> <span class="n">_save_example</span><span class="p">(</span><span class="n">mlflow_model</span><span class="p">,</span> <span class="n">input_example</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">metadata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">mlflow_model</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">metadata</span>
+
+    <span class="k">with</span> <span class="n">_get_dependencies_schemas</span><span class="p">()</span> <span class="k">as</span> <span class="n">dependencies_schemas</span><span class="p">:</span>
+        <span class="n">schema</span> <span class="o">=</span> <span class="n">dependencies_schemas</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">schema</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">mlflow_model</span><span class="o">.</span><span class="n">metadata</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">mlflow_model</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">mlflow_model</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span>
 
     <span class="n">model_data_subpath</span> <span class="o">=</span> <span class="n">_MODEL_DATA_PATH</span>
     <span class="c1"># Construct new data folder in existing path.</span>
@@ -447,6 +457,7 @@
 
 <div class="viewcode-block" id="log_model"><a class="viewcode-back" href="../../../python_api/mlflow.dspy.html#mlflow.dspy.log_model">[docs]</a><span class="nd">@experimental</span>
 <span class="nd">@format_docstring</span><span class="p">(</span><span class="n">LOG_MODEL_PARAM_DOCS</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">package_name</span><span class="o">=</span><span class="n">FLAVOR_NAME</span><span class="p">))</span>
+<span class="nd">@trace_disabled</span>  <span class="c1"># Suppress traces for internal predict calls while logging model</span>
 <span class="k">def</span> <span class="nf">log_model</span><span class="p">(</span>
     <span class="n">dspy_model</span><span class="p">,</span>
     <span class="n">artifact_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>

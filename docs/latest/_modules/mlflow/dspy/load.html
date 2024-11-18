@@ -206,6 +206,9 @@
 
 <span class="kn">import</span> <span class="nn">cloudpickle</span>
 
+<span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">Model</span>
+<span class="kn">from</span> <span class="nn">mlflow.models.dependencies_schemas</span> <span class="kn">import</span> <span class="n">_get_dependencies_schema_from_model</span>
+<span class="kn">from</span> <span class="nn">mlflow.tracing.provider</span> <span class="kn">import</span> <span class="n">trace_disabled</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracking.artifact_utils</span> <span class="kn">import</span> <span class="n">_download_artifact_from_uri</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.annotations</span> <span class="kn">import</span> <span class="n">experimental</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.model_utils</span> <span class="kn">import</span> <span class="p">(</span>
@@ -214,6 +217,25 @@
 <span class="p">)</span>
 
 <span class="n">_DEFAULT_MODEL_PATH</span> <span class="o">=</span> <span class="s2">&quot;data/model.pkl&quot;</span>
+
+
+<span class="k">def</span> <span class="nf">_set_tracer_context</span><span class="p">(</span><span class="n">model_path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Set dependency schemas from the saved model metadata to the tracer&#39;s prediction context.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">dspy</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dspy</span><span class="o">.</span><span class="n">settings</span><span class="p">,</span> <span class="s2">&quot;callbacks&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">dspy</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">callbacks</span><span class="p">:</span>
+        <span class="k">return</span>
+
+    <span class="kn">from</span> <span class="nn">mlflow.dspy.callback</span> <span class="kn">import</span> <span class="n">MlflowCallback</span>
+
+    <span class="n">tracer</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">cb</span> <span class="k">for</span> <span class="n">cb</span> <span class="ow">in</span> <span class="n">dspy</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">callbacks</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cb</span><span class="p">,</span> <span class="n">MlflowCallback</span><span class="p">)),</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">context</span> <span class="o">=</span> <span class="n">tracer</span><span class="o">.</span><span class="n">_prediction_context</span>
+
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">model_path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">schema</span> <span class="o">:=</span> <span class="n">_get_dependencies_schema_from_model</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+        <span class="n">context</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">schema</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_load_model</span><span class="p">(</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">dst_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -228,10 +250,13 @@
         <span class="n">loaded_wrapper</span> <span class="o">=</span> <span class="n">cloudpickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
     <span class="c1"># Set the global dspy settings and return the dspy wrapper.</span>
     <span class="n">dspy</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="o">**</span><span class="n">loaded_wrapper</span><span class="o">.</span><span class="n">dspy_settings</span><span class="p">)</span>
+
+    <span class="n">_set_tracer_context</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">loaded_wrapper</span>
 
 
 <div class="viewcode-block" id="load_model"><a class="viewcode-back" href="../../../python_api/mlflow.dspy.html#mlflow.dspy.load_model">[docs]</a><span class="nd">@experimental</span>
+<span class="nd">@trace_disabled</span>  <span class="c1"># Suppress traces for internal calls while loading model</span>
 <span class="k">def</span> <span class="nf">load_model</span><span class="p">(</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">dst_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Load a Dspy model from a run.</span>
