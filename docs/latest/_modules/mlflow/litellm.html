@@ -236,6 +236,7 @@
     <span class="kn">import</span> <span class="nn">litellm</span>
 
     <span class="c1"># This needs to be called before doing any safe-patching (otherwise safe-patch will be no-op).</span>
+    <span class="c1"># TODO: since this implementation is inconsistent, explore a universal way to solve the issue.</span>
     <span class="n">_autolog</span><span class="p">(</span><span class="n">log_traces</span><span class="o">=</span><span class="n">log_traces</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="n">disable</span><span class="p">,</span> <span class="n">silent</span><span class="o">=</span><span class="n">silent</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">log_traces</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">disable</span><span class="p">:</span>
@@ -260,11 +261,11 @@
                 <span class="s2">&quot;transcription&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;speech&quot;</span><span class="p">,</span>
             <span class="p">]:</span>
-                <span class="n">_patch_theading_in_function</span><span class="p">(</span><span class="n">litellm</span><span class="p">,</span> <span class="n">func</span><span class="p">)</span>
+                <span class="n">_patch_threading_in_function</span><span class="p">(</span><span class="n">litellm</span><span class="p">,</span> <span class="n">func</span><span class="p">)</span>
 
             <span class="c1"># For streaming case, we need to patch the iterator because traces are generated</span>
             <span class="c1"># when consuming the generator, not when calling the main APIs.</span>
-            <span class="n">_patch_theading_in_function</span><span class="p">(</span><span class="n">litellm</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">CustomStreamWrapper</span><span class="p">,</span> <span class="s2">&quot;__next__&quot;</span><span class="p">)</span>
+            <span class="n">_patch_threading_in_function</span><span class="p">(</span><span class="n">litellm</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">CustomStreamWrapper</span><span class="p">,</span> <span class="s2">&quot;__next__&quot;</span><span class="p">)</span>
 
             <span class="c1"># NB: We don&#39;t need to patch async function because Databricks notebook waits</span>
             <span class="c1"># for the async task to finish before finishing the cell.</span>
@@ -274,6 +275,10 @@
         <span class="c1"># Callback also needs to be removed from &#39;callbacks&#39; as litellm adds</span>
         <span class="c1"># success/failure callbacks to there as well.</span>
         <span class="n">litellm</span><span class="o">.</span><span class="n">callbacks</span> <span class="o">=</span> <span class="n">_remove_mlflow_callbacks</span><span class="p">(</span><span class="n">litellm</span><span class="o">.</span><span class="n">callbacks</span><span class="p">)</span></div>
+
+
+<span class="c1"># This is required by mlflow.autolog()</span>
+<span class="n">autolog</span><span class="o">.</span><span class="n">integration_name</span> <span class="o">=</span> <span class="n">FLAVOR_NAME</span>
 
 
 <span class="c1"># NB: The @autologging_integration annotation must be applied here, and the callback injection</span>
@@ -289,7 +294,7 @@
     <span class="k">pass</span>
 
 
-<span class="k">def</span> <span class="nf">_patch_theading_in_function</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">function_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_patch_threading_in_function</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">function_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Apply the threading patch to a synchronous function.</span>
 
@@ -336,16 +341,19 @@
         <span class="n">Thread</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="n">original</span>
 
 
-<span class="k">def</span> <span class="nf">_append_mlflow_callbacks</span><span class="p">(</span><span class="n">original_callbacks</span><span class="p">):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">cb</span> <span class="o">==</span> <span class="s2">&quot;mlflow&quot;</span> <span class="k">for</span> <span class="n">cb</span> <span class="ow">in</span> <span class="n">original_callbacks</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">original_callbacks</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;mlflow&quot;</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">original_callbacks</span>
+<span class="k">def</span> <span class="nf">_append_mlflow_callbacks</span><span class="p">(</span><span class="n">callbacks</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">cb</span> <span class="o">==</span> <span class="s2">&quot;mlflow&quot;</span> <span class="k">for</span> <span class="n">cb</span> <span class="ow">in</span> <span class="n">callbacks</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">callbacks</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;mlflow&quot;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">callbacks</span>
 
 
-<span class="k">def</span> <span class="nf">_remove_mlflow_callbacks</span><span class="p">(</span><span class="n">original_callbacks</span><span class="p">):</span>
-    <span class="kn">from</span> <span class="nn">litellm.integrations.mlflow</span> <span class="kn">import</span> <span class="n">MlflowLogger</span>
+<span class="k">def</span> <span class="nf">_remove_mlflow_callbacks</span><span class="p">(</span><span class="n">callbacks</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">litellm.integrations.mlflow</span> <span class="kn">import</span> <span class="n">MlflowLogger</span>
 
-    <span class="k">return</span> <span class="p">[</span><span class="n">cb</span> <span class="k">for</span> <span class="n">cb</span> <span class="ow">in</span> <span class="n">original_callbacks</span> <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">cb</span> <span class="o">==</span> <span class="s2">&quot;mlflow&quot;</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cb</span><span class="p">,</span> <span class="n">MlflowLogger</span><span class="p">))]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">cb</span> <span class="k">for</span> <span class="n">cb</span> <span class="ow">in</span> <span class="n">callbacks</span> <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">cb</span> <span class="o">==</span> <span class="s2">&quot;mlflow&quot;</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cb</span><span class="p">,</span> <span class="n">MlflowLogger</span><span class="p">))]</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">callbacks</span>
 </pre></div>
 
               </div>

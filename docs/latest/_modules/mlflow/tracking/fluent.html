@@ -423,8 +423,10 @@
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
-        <span class="n">status</span> <span class="o">=</span> <span class="n">RunStatus</span><span class="o">.</span><span class="n">FINISHED</span> <span class="k">if</span> <span class="n">exc_type</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">RunStatus</span><span class="o">.</span><span class="n">FAILED</span>
-        <span class="n">end_run</span><span class="p">(</span><span class="n">RunStatus</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">status</span><span class="p">))</span>
+        <span class="n">active_run_stack</span> <span class="o">=</span> <span class="n">_active_run_stack</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span> <span class="ow">in</span> <span class="n">active_run_stack</span><span class="p">:</span>  <span class="c1"># Is this run still active?</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="n">RunStatus</span><span class="o">.</span><span class="n">FINISHED</span> <span class="k">if</span> <span class="n">exc_type</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">RunStatus</span><span class="o">.</span><span class="n">FAILED</span>
+            <span class="n">end_run</span><span class="p">(</span><span class="n">RunStatus</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">status</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">exc_type</span> <span class="ow">is</span> <span class="kc">None</span></div>
 
 
@@ -2424,11 +2426,13 @@
     <span class="n">log_model_signatures</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">log_models</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">log_datasets</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">log_traces</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">disable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">exclusive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">disable_for_unsupported_versions</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">silent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">extra_tags</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">exclude_flavors</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Enables (or disables) and configures autologging for all supported integrations.</span>
@@ -2487,6 +2491,8 @@
 <span class="sd">            are also omitted when ``log_models`` is ``False``.</span>
 <span class="sd">        log_datasets: If ``True``, dataset information is logged to MLflow Tracking.</span>
 <span class="sd">            If ``False``, dataset information is not logged.</span>
+<span class="sd">        log_traces: If ``True``, traces are collected for integrations.</span>
+<span class="sd">            If ``False``, no trace is collected.</span>
 <span class="sd">        disable: If ``True``, disables all supported autologging integrations. If ``False``,</span>
 <span class="sd">            enables all supported autologging integrations.</span>
 <span class="sd">        exclusive: If ``True``, autologged content is not logged to user-created fluent runs.</span>
@@ -2499,6 +2505,8 @@
 <span class="sd">            setup and training execution. If ``False``, show all events and warnings during</span>
 <span class="sd">            autologging setup and training execution.</span>
 <span class="sd">        extra_tags: A dictionary of extra tags to set on each managed run created by autologging.</span>
+<span class="sd">        exclude_flavors: A list of flavor names that are excluded from the auto-logging.</span>
+<span class="sd">            e.g. tensorflow, pyspark.ml</span>
 
 <span class="sd">    .. code-block:: python</span>
 <span class="sd">        :test:</span>
@@ -2576,6 +2584,32 @@
         <span class="c1"># do not enable langchain autologging by default</span>
     <span class="p">}</span>
 
+    <span class="n">GENAI_LIBRARY_TO_AUTOLOG_MODULE</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;anthropic&quot;</span><span class="p">:</span> <span class="s2">&quot;mlflow.anthropic&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;autogen&quot;</span><span class="p">:</span> <span class="s2">&quot;mlflow.autogen&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;openai&quot;</span><span class="p">:</span> <span class="s2">&quot;mlflow.openai&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;google.generativeai&quot;</span><span class="p">:</span> <span class="s2">&quot;mlflow.gemini&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;litellm&quot;</span><span class="p">:</span> <span class="s2">&quot;mlflow.litellm&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;llama_index.core&quot;</span><span class="p">:</span> <span class="s2">&quot;mlflow.llama_index&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;langchain&quot;</span><span class="p">:</span> <span class="s2">&quot;mlflow.langchain&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;dspy&quot;</span><span class="p">:</span> <span class="s2">&quot;mlflow.dspy&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="c1"># Currently, GenAI libraries are not enabled by `mlflow.autolog` in Databricks,</span>
+    <span class="c1"># particularly when disable=False. This is because the function is automatically invoked</span>
+    <span class="c1"># by system and we don&#39;t want to take the risk of enabling GenAI libraries all at once.</span>
+    <span class="c1"># TODO: Remove this logic once a feature flag is implemented in Databricks Runtime init logic.</span>
+    <span class="k">if</span> <span class="n">is_in_databricks_runtime</span><span class="p">()</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">disable</span><span class="p">):</span>
+        <span class="n">target_library_and_module</span> <span class="o">=</span> <span class="n">LIBRARY_TO_AUTOLOG_MODULE</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">target_library_and_module</span> <span class="o">=</span> <span class="n">LIBRARY_TO_AUTOLOG_MODULE</span> <span class="o">|</span> <span class="n">GENAI_LIBRARY_TO_AUTOLOG_MODULE</span>
+
+    <span class="k">if</span> <span class="n">exclude_flavors</span><span class="p">:</span>
+        <span class="n">excluded_modules</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;mlflow.</span><span class="si">{</span><span class="n">flavor</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">flavor</span> <span class="ow">in</span> <span class="n">exclude_flavors</span><span class="p">]</span>
+        <span class="n">target_library_and_module</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">target_library_and_module</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">excluded_modules</span>
+        <span class="p">}</span>
+
     <span class="k">def</span> <span class="nf">get_autologging_params</span><span class="p">(</span><span class="n">autolog_fn</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">needed_params</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">autolog_fn</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
@@ -2591,7 +2625,7 @@
     <span class="k">def</span> <span class="nf">setup_autologging</span><span class="p">(</span><span class="n">module</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">autologging_params</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="n">autolog_module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">LIBRARY_TO_AUTOLOG_MODULE</span><span class="p">[</span><span class="n">module</span><span class="o">.</span><span class="vm">__name__</span><span class="p">])</span>
+            <span class="n">autolog_module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">target_library_and_module</span><span class="p">[</span><span class="n">module</span><span class="o">.</span><span class="vm">__name__</span><span class="p">])</span>
             <span class="n">autolog_fn</span> <span class="o">=</span> <span class="n">autolog_module</span><span class="o">.</span><span class="n">autolog</span>
             <span class="c1"># Only call integration&#39;s autolog function with `mlflow.autolog` configs</span>
             <span class="c1"># if the integration&#39;s autolog function has not already been called by the user.</span>
@@ -2634,8 +2668,8 @@
     <span class="c1"># for each autolog library (except pyspark), register a post-import hook.</span>
     <span class="c1"># this way, we do not send any errors to the user until we know they are using the library.</span>
     <span class="c1"># the post-import hook also retroactively activates for previously-imported libraries.</span>
-    <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">LIBRARY_TO_AUTOLOG_MODULE</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">-</span> <span class="p">{</span><span class="s2">&quot;pyspark&quot;</span><span class="p">,</span> <span class="s2">&quot;pyspark.ml&quot;</span><span class="p">}):</span>
-        <span class="n">register_post_import_hook</span><span class="p">(</span><span class="n">setup_autologging</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">library</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">target_library_and_module</span><span class="p">)</span> <span class="o">-</span> <span class="p">{</span><span class="s2">&quot;pyspark&quot;</span><span class="p">,</span> <span class="s2">&quot;pyspark.ml&quot;</span><span class="p">}):</span>
+        <span class="n">register_post_import_hook</span><span class="p">(</span><span class="n">setup_autologging</span><span class="p">,</span> <span class="n">library</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">is_in_databricks_runtime</span><span class="p">():</span>
         <span class="c1"># for pyspark, we activate autologging immediately, without waiting for a module import.</span>
@@ -2647,8 +2681,10 @@
         <span class="n">setup_autologging</span><span class="p">(</span><span class="n">pyspark_module</span><span class="p">)</span>
         <span class="n">setup_autologging</span><span class="p">(</span><span class="n">pyspark_ml_module</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">register_post_import_hook</span><span class="p">(</span><span class="n">setup_autologging</span><span class="p">,</span> <span class="s2">&quot;pyspark&quot;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">register_post_import_hook</span><span class="p">(</span><span class="n">setup_autologging</span><span class="p">,</span> <span class="s2">&quot;pyspark.ml&quot;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="s2">&quot;pyspark&quot;</span> <span class="ow">in</span> <span class="n">target_library_and_module</span><span class="p">:</span>
+            <span class="n">register_post_import_hook</span><span class="p">(</span><span class="n">setup_autologging</span><span class="p">,</span> <span class="s2">&quot;pyspark&quot;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;pyspark.ml&quot;</span> <span class="ow">in</span> <span class="n">target_library_and_module</span><span class="p">:</span>
+            <span class="n">register_post_import_hook</span><span class="p">(</span><span class="n">setup_autologging</span><span class="p">,</span> <span class="s2">&quot;pyspark.ml&quot;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 </pre></div>
 
               </div>

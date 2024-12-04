@@ -269,7 +269,7 @@
 <ol class="arabic simple">
 <li><p>How to map your application logic to the <code class="docutils literal notranslate"><span class="pre">ChatModel</span></code>’s input/output schema</p></li>
 <li><p>How to use the pre-defined inference parameters supported by ChatModels</p></li>
-<li><p>How to pass custom parameters to a ChatModel using <code class="docutils literal notranslate"><span class="pre">metadata</span></code></p></li>
+<li><p>How to pass custom parameters to a ChatModel using <code class="docutils literal notranslate"><span class="pre">custom_inputs</span></code></p></li>
 <li><p>How <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.ChatModel" title="mlflow.pyfunc.ChatModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ChatModel</span></code></a> compares to <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PythonModel" title="mlflow.pyfunc.PythonModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">PythonModel</span></code></a> for defining custom chat models</p></li>
 </ol>
 <p>To illustrate these points, this guide will walk you through building a custom <code class="docutils literal notranslate"><span class="pre">ChatModel</span></code>, using a locally-hosted Ollama model as our example. There is no built-in Ollama model flavor, so creating a custom <code class="docutils literal notranslate"><span class="pre">ChatModel</span></code> provides a way to use MLflow’s extensive tracking, evaluation, and lifecycle management capabilities with Ollama models.</p>
@@ -293,7 +293,7 @@
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>with a <code class="docutils literal notranslate"><span class="pre">messages</span></code> key containing a list of messages, and optional inference parameters such as <code class="docutils literal notranslate"><span class="pre">max_tokens</span></code>, <code class="docutils literal notranslate"><span class="pre">temperature</span></code>, <code class="docutils literal notranslate"><span class="pre">top_p</span></code>, and <code class="docutils literal notranslate"><span class="pre">stop</span></code>. You can find details of the full chat request object <a class="reference external" href="https://mlflow.org/docs/latest/python_api/mlflow.types.html#mlflow.types.llm.ChatRequest">here</a>.</p>
+<p>with a <code class="docutils literal notranslate"><span class="pre">messages</span></code> key containing a list of messages, and optional inference parameters such as <code class="docutils literal notranslate"><span class="pre">max_tokens</span></code>, <code class="docutils literal notranslate"><span class="pre">temperature</span></code>, <code class="docutils literal notranslate"><span class="pre">top_p</span></code>, and <code class="docutils literal notranslate"><span class="pre">stop</span></code>. You can find details of the full chat request object <a class="reference external" href="https://mlflow.org/docs/latest/python_api/mlflow.types.html#mlflow.types.llm.ChatCompletionRequest">here</a>.</p>
 <p>The output is also returned in a standardized format that looks like this:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;choices&quot;</span><span class="p">:</span> <span class="p">[</span>
@@ -312,7 +312,7 @@
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>You can find details of the full chat response object <a class="reference external" href="https://mlflow.org/docs/latest/python_api/mlflow.types.html#mlflow.types.llm.ChatResponse">here</a>.</p>
+<p>You can find details of the full chat response object <a class="reference external" href="https://mlflow.org/docs/latest/python_api/mlflow.types.html#mlflow.types.llm.ChatCompletionResponse">here</a>.</p>
 <p>These input/output schemas are compatible with the widely-adopted OpenAI spec, making <code class="docutils literal notranslate"><span class="pre">ChatModel</span></code> s easy to use in a wide variety of contexts.</p>
 <p>To demonstrate this mapping process, we will show how to use the <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.ChatModel" title="mlflow.pyfunc.ChatModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.pyfunc.ChatModel</span></code></a> class to log Meta’s Llama 3.2 1B model via the Ollama llm client, which does not have a native MLflow flavor.</p>
 </div>
@@ -390,12 +390,12 @@ Hello! It&#39;s great to see you&#39;re starting the day with a cheerful greetin
 <li><p><code class="docutils literal notranslate"><span class="pre">messages</span></code>: a list of <code class="docutils literal notranslate"><span class="pre">ChatMessage</span></code> objects</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">params</span></code>: a <code class="docutils literal notranslate"><span class="pre">ChatParams</span></code> object, which contains the inference parameters</p></li>
 </ul>
-<p>And we need to return a <code class="docutils literal notranslate"><span class="pre">ChatResponse</span></code> object, which is a dataclass made up of a list of <code class="docutils literal notranslate"><span class="pre">ChatChoice</span></code> objects, along with (optional) usage data and other metadata.</p>
+<p>And we need to return a <code class="docutils literal notranslate"><span class="pre">ChatCompletionResponse</span></code> object, which is a dataclass made up of a list of <code class="docutils literal notranslate"><span class="pre">ChatChoice</span></code> objects, along with (optional) usage data and other metadata.</p>
 <p>These are what we must map to the Ollama inputs and outputs. Here’s a simplified version that, for now, only handles the input/output messages:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># if you are using a jupyter notebook</span>
 <span class="c1"># %%writefile ollama_model.py</span>
 <span class="kn">from</span> <span class="nn">mlflow.pyfunc</span> <span class="kn">import</span> <span class="n">ChatModel</span>
-<span class="kn">from</span> <span class="nn">mlflow.types.llm</span> <span class="kn">import</span> <span class="n">ChatMessage</span><span class="p">,</span> <span class="n">ChatResponse</span><span class="p">,</span> <span class="n">ChatChoice</span>
+<span class="kn">from</span> <span class="nn">mlflow.types.llm</span> <span class="kn">import</span> <span class="n">ChatMessage</span><span class="p">,</span> <span class="n">ChatCompletionResponse</span><span class="p">,</span> <span class="n">ChatChoice</span>
 <span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">set_model</span>
 <span class="kn">import</span> <span class="nn">ollama</span>
 
@@ -415,8 +415,8 @@ Hello! It&#39;s great to see you&#39;re starting the day with a cheerful greetin
         <span class="c1"># Call Ollama</span>
         <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">chat</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model_name</span><span class="p">,</span> <span class="n">messages</span><span class="o">=</span><span class="n">ollama_messages</span><span class="p">)</span>
 
-        <span class="c1"># Prepare and return the ChatResponse</span>
-        <span class="k">return</span> <span class="n">ChatResponse</span><span class="p">(</span>
+        <span class="c1"># Prepare and return the ChatCompletionResponse</span>
+        <span class="k">return</span> <span class="n">ChatCompletionResponse</span><span class="p">(</span>
             <span class="n">choices</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;message&quot;</span><span class="p">]}],</span>
             <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model_name</span><span class="p">,</span>
         <span class="p">)</span>
@@ -428,7 +428,7 @@ Hello! It&#39;s great to see you&#39;re starting the day with a cheerful greetin
 <p>In the above code, we mapped the <code class="docutils literal notranslate"><span class="pre">ChatModel</span></code> inputs to the Ollama inputs, and the Ollama output back to the <code class="docutils literal notranslate"><span class="pre">ChatModel</span></code> output schema. More specifically:</p>
 <ul class="simple">
 <li><p>The <code class="docutils literal notranslate"><span class="pre">messages</span></code> key in the <code class="docutils literal notranslate"><span class="pre">ChatModel</span></code> input schema is a list of <code class="docutils literal notranslate"><span class="pre">ChatMessage</span></code> objects. We converted this to a list of dictionaries with <code class="docutils literal notranslate"><span class="pre">role</span></code> and <code class="docutils literal notranslate"><span class="pre">content</span></code> keys, which is the expected input format for Ollama.</p></li>
-<li><p>The <code class="docutils literal notranslate"><span class="pre">ChatResponse</span></code> that the <code class="docutils literal notranslate"><span class="pre">predict</span></code> method returns must be created using the <code class="docutils literal notranslate"><span class="pre">ChatResponse</span></code> dataclass, but the nested message and choice data can be provided as dictionaries that match the expected schema. MLflow will automatically convert these dictionaries to the appropriate dataclass objects. In our case, we created a <code class="docutils literal notranslate"><span class="pre">ChatResponse</span></code> but provided the choices and messages as dictionaries.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">ChatCompletionResponse</span></code> that the <code class="docutils literal notranslate"><span class="pre">predict</span></code> method returns must be created using the <code class="docutils literal notranslate"><span class="pre">ChatCompletionResponse</span></code> dataclass, but the nested message and choice data can be provided as dictionaries that match the expected schema. MLflow will automatically convert these dictionaries to the appropriate dataclass objects. In our case, we created a <code class="docutils literal notranslate"><span class="pre">ChatCompletionResponse</span></code> but provided the choices and messages as dictionaries.</p></li>
 </ul>
 <p>In a notebook environment, we can save the model to a file called <code class="docutils literal notranslate"><span class="pre">ollama_model.py</span></code> with the <code class="docutils literal notranslate"><span class="pre">%%writefile</span></code> magic command and call <code class="docutils literal notranslate"><span class="pre">set_model(SimpleOllamaModel())</span></code>. This is the “models from code” approach to model logging, which you can read more about <a class="reference internal" href="../../model/models-from-code.html"><span class="doc">here</span></a>.</p>
 <p>Now we can log this model to MLflow as follows, passing the path to the file containing the model definition we just created:</p>
@@ -493,7 +493,7 @@ Hello! It&#39;s great to see you&#39;re starting the day with a cheerful greetin
 <span class="p">)</span>
 </pre></div>
 </div>
-<p>You can find the full list of supported parameters <a class="reference external" href="https://mlflow.org/docs/latest/python_api/mlflow.types.html#mlflow.types.llm.ChatParams">here</a>. Furthermore, you can pass arbitrary additional parameters to a ChatModel via the <code class="docutils literal notranslate"><span class="pre">metadata</span></code> key in the input, which we will cover in more detail in the next section.</p>
+<p>You can find the full list of supported parameters <a class="reference external" href="https://mlflow.org/docs/latest/python_api/mlflow.types.html#mlflow.types.llm.ChatParams">here</a>. Furthermore, you can pass arbitrary additional parameters to a ChatModel via the <code class="docutils literal notranslate"><span class="pre">custom_inputs</span></code> key in the input, which we will cover in more detail in the next section.</p>
 <p><strong>Comparison to Parameter Handling in Custom PyFunc Models</strong></p>
 <p>If you’re familiar with configuring inference parameters for <a class="reference external" href="https://mlflow.org/blog/custom-pyfunc#parameterizing-the-custom-model">PyFunc models</a>, you will notice some key differneces in how ChatModel handles parameters:</p>
 <table class="docutils align-default">
@@ -527,7 +527,7 @@ Hello! It&#39;s great to see you&#39;re starting the day with a cheerful greetin
 
 <span class="kn">import</span> <span class="nn">mlflow</span>
 <span class="kn">from</span> <span class="nn">mlflow.pyfunc</span> <span class="kn">import</span> <span class="n">ChatModel</span>
-<span class="kn">from</span> <span class="nn">mlflow.types.llm</span> <span class="kn">import</span> <span class="n">ChatMessage</span><span class="p">,</span> <span class="n">ChatResponse</span><span class="p">,</span> <span class="n">ChatChoice</span>
+<span class="kn">from</span> <span class="nn">mlflow.types.llm</span> <span class="kn">import</span> <span class="n">ChatMessage</span><span class="p">,</span> <span class="n">ChatCompletionResponse</span><span class="p">,</span> <span class="n">ChatChoice</span>
 <span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">set_model</span>
 <span class="kn">import</span> <span class="nn">ollama</span>
 <span class="kn">from</span> <span class="nn">ollama</span> <span class="kn">import</span> <span class="n">Options</span>
@@ -555,8 +555,8 @@ Hello! It&#39;s great to see you&#39;re starting the day with a cheerful greetin
             <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">stop</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">options</span><span class="p">[</span><span class="s2">&quot;stop&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">stop</span>
 
-            <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">metadata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">options</span><span class="p">[</span><span class="s2">&quot;seed&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;seed&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">custom_inputs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">options</span><span class="p">[</span><span class="s2">&quot;seed&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">custom_inputs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;seed&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">Options</span><span class="p">(</span><span class="n">options</span><span class="p">)</span>
 
@@ -571,8 +571,8 @@ Hello! It&#39;s great to see you&#39;re starting the day with a cheerful greetin
             <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model_name</span><span class="p">,</span> <span class="n">messages</span><span class="o">=</span><span class="n">ollama_messages</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">options</span>
         <span class="p">)</span>
 
-        <span class="c1"># Prepare the ChatResponse</span>
-        <span class="k">return</span> <span class="n">ChatResponse</span><span class="p">(</span>
+        <span class="c1"># Prepare the ChatCompletionResponse</span>
+        <span class="k">return</span> <span class="n">ChatCompletionResponse</span><span class="p">(</span>
             <span class="n">choices</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;message&quot;</span><span class="p">]}],</span>
             <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model_name</span><span class="p">,</span>
         <span class="p">)</span>
@@ -585,7 +585,7 @@ Hello! It&#39;s great to see you&#39;re starting the day with a cheerful greetin
 <ul class="simple">
 <li><p>We mapped <code class="docutils literal notranslate"><span class="pre">max_tokens</span></code>, <code class="docutils literal notranslate"><span class="pre">temperature</span></code>, <code class="docutils literal notranslate"><span class="pre">top_p</span></code>, and <code class="docutils literal notranslate"><span class="pre">stop</span></code> from the <code class="docutils literal notranslate"><span class="pre">params</span></code> dictionary to <code class="docutils literal notranslate"><span class="pre">num_predict</span></code>, <code class="docutils literal notranslate"><span class="pre">temperature</span></code>, <code class="docutils literal notranslate"><span class="pre">top_p</span></code>, and <code class="docutils literal notranslate"><span class="pre">stop</span></code> in the Ollama client’s <code class="docutils literal notranslate"><span class="pre">options</span></code> dictionary (note the different parameter name for <code class="docutils literal notranslate"><span class="pre">max_tokens</span></code> expected by Ollama)</p></li>
 <li><p>We passed the <code class="docutils literal notranslate"><span class="pre">options</span></code> dictionary to the Ollama client’s <code class="docutils literal notranslate"><span class="pre">chat</span></code> method. Note that we created a new private method, <code class="docutils literal notranslate"><span class="pre">_prepare_options</span></code>, to handle the mapping from <code class="docutils literal notranslate"><span class="pre">params</span></code> to <code class="docutils literal notranslate"><span class="pre">options</span></code>. Additional methods can be added to a custom <code class="docutils literal notranslate"><span class="pre">ChatModel</span></code> to keep code clean and organized while handling custom logic.</p></li>
-<li><p>We checked the <code class="docutils literal notranslate"><span class="pre">metadata</span></code> key in the <code class="docutils literal notranslate"><span class="pre">params</span></code> dictionary for a <code class="docutils literal notranslate"><span class="pre">seed</span></code> value—we’ll cover this in more detail in the next section.</p></li>
+<li><p>We checked the <code class="docutils literal notranslate"><span class="pre">custom_inputs</span></code> key in the <code class="docutils literal notranslate"><span class="pre">params</span></code> dictionary for a <code class="docutils literal notranslate"><span class="pre">seed</span></code> value—we’ll cover this in more detail in the next section.</p></li>
 </ul>
 <p>Now we can log this model to MLflow, load it, and try it out in the same way as before:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">code_path</span> <span class="o">=</span> <span class="s2">&quot;ollama_model.py&quot;</span>
@@ -630,17 +630,17 @@ Hello! It&#39;s great to see you&#39;re starting the day with a cheerful greetin
 </div>
 <p>Now that we have appropriately mapped <code class="docutils literal notranslate"><span class="pre">max_tokens</span></code> from the ChatModel input schema to the Ollama client’s <code class="docutils literal notranslate"><span class="pre">num_predict</span></code> parameter, we receive a response with the expected number of tokens.</p>
 <p><strong>Passing Custom Parameters</strong></p>
-<p>What if we want to pass a custom paramerter that is not included in the list of built-in inference parameters? The ChatModel API provides a way to do this via the <code class="docutils literal notranslate"><span class="pre">metadata</span></code> key, which accepts a dictionary of key-value pairs that are passed through to the model as-is. Both the keys and values must be strings, so it might be necessary to handle type conversions in the <code class="docutils literal notranslate"><span class="pre">predict</span></code> method. In the above example, we configured the Ollama model to use a custom <code class="docutils literal notranslate"><span class="pre">seed</span></code> value by adding a <code class="docutils literal notranslate"><span class="pre">seed</span></code> key to the <code class="docutils literal notranslate"><span class="pre">metadata</span></code> dictionary:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">metadata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="n">options</span><span class="p">[</span><span class="s2">&quot;seed&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;seed&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<p>What if we want to pass a custom parameter that is not included in the list of built-in inference parameters? The ChatModel API provides a way to do this via the <code class="docutils literal notranslate"><span class="pre">custom_inputs</span></code> key, which accepts a dictionary of key-value pairs that are passed through to the model as-is. Both the keys and values must be strings, so it might be necessary to handle type conversions in the <code class="docutils literal notranslate"><span class="pre">predict</span></code> method. In the above example, we configured the Ollama model to use a custom <code class="docutils literal notranslate"><span class="pre">seed</span></code> value by adding a <code class="docutils literal notranslate"><span class="pre">seed</span></code> key to the <code class="docutils literal notranslate"><span class="pre">custom_inputs</span></code> dictionary:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">custom_inputs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">options</span><span class="p">[</span><span class="s2">&quot;seed&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">custom_inputs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;seed&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
 </pre></div>
 </div>
-<p>Because we included this, we can now pass a <code class="docutils literal notranslate"><span class="pre">seed</span></code> value via the <code class="docutils literal notranslate"><span class="pre">metadata</span></code> key in the <code class="docutils literal notranslate"><span class="pre">predict</span></code> method. If you call <code class="docutils literal notranslate"><span class="pre">predict</span></code> multiple times with the same seed value, you will always receive the same response.</p>
+<p>Because we included this, we can now pass a <code class="docutils literal notranslate"><span class="pre">seed</span></code> value via the <code class="docutils literal notranslate"><span class="pre">custom_inputs</span></code> key in the <code class="docutils literal notranslate"><span class="pre">predict</span></code> method. If you call <code class="docutils literal notranslate"><span class="pre">predict</span></code> multiple times with the same seed value, you will always receive the same response.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">loaded_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="p">{</span>
         <span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;What is MLflow?&quot;</span><span class="p">}],</span>
         <span class="s2">&quot;max_tokens&quot;</span><span class="p">:</span> <span class="mi">25</span><span class="p">,</span>
-        <span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;seed&quot;</span><span class="p">:</span> <span class="s2">&quot;321&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;custom_inputs&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;seed&quot;</span><span class="p">:</span> <span class="s2">&quot;321&quot;</span><span class="p">},</span>
     <span class="p">}</span>
 <span class="p">)</span>
 
@@ -685,7 +685,12 @@ Hello! It&#39;s great to see you&#39;re starting the day with a cheerful greetin
 
 <span class="kn">import</span> <span class="nn">mlflow</span>
 <span class="kn">from</span> <span class="nn">mlflow.pyfunc</span> <span class="kn">import</span> <span class="n">PythonModel</span>
-<span class="kn">from</span> <span class="nn">mlflow.types.llm</span> <span class="kn">import</span> <span class="n">ChatRequest</span><span class="p">,</span> <span class="n">ChatResponse</span><span class="p">,</span> <span class="n">ChatMessage</span><span class="p">,</span> <span class="n">ChatChoice</span>
+<span class="kn">from</span> <span class="nn">mlflow.types.llm</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ChatCompletionRequest</span><span class="p">,</span>
+    <span class="n">ChatCompletionResponse</span><span class="p">,</span>
+    <span class="n">ChatMessage</span><span class="p">,</span>
+    <span class="n">ChatChoice</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">set_model</span>
 <span class="kn">import</span> <span class="nn">ollama</span>
 <span class="kn">from</span> <span class="nn">ollama</span> <span class="kn">import</span> <span class="n">Options</span>
@@ -733,7 +738,7 @@ Hello! It&#39;s great to see you&#39;re starting the day with a cheerful greetin
             <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model_name</span><span class="p">,</span> <span class="n">messages</span><span class="o">=</span><span class="n">ollama_messages</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">options</span>
         <span class="p">)</span>
 
-        <span class="n">chat_response</span> <span class="o">=</span> <span class="n">ChatResponse</span><span class="p">(</span>
+        <span class="n">chat_response</span> <span class="o">=</span> <span class="n">ChatCompletionResponse</span><span class="p">(</span>
             <span class="n">choices</span><span class="o">=</span><span class="p">[</span>
                 <span class="n">ChatChoice</span><span class="p">(</span>
                     <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
@@ -755,12 +760,10 @@ Hello! It&#39;s great to see you&#39;re starting the day with a cheerful greetin
 <ul class="simple">
 <li><p>We had to handle the input data as a pandas DataFrame, even though the input is ultimately just a list of messages.</p></li>
 <li><p>Instead of receiving the inference parameters as a pre-configured <code class="docutils literal notranslate"><span class="pre">ChatParams</span></code> object, receive a <code class="docutils literal notranslate"><span class="pre">params</span></code> dictionary. One consequence of this is that we did not have to treat <code class="docutils literal notranslate"><span class="pre">seed</span></code> any differently from the other inference parameters: they’re <em>all</em> custom parameters in the <code class="docutils literal notranslate"><span class="pre">PythonModel</span></code> API.</p></li>
-<li><p>We had to call <code class="docutils literal notranslate"><span class="pre">chat_response.to_dict()</span></code> to convert the <code class="docutils literal notranslate"><span class="pre">ChatResponse</span></code> object to a dictionary rather than a <code class="docutils literal notranslate"><span class="pre">ChatResponse</span></code> object. This is handled automatically by <code class="docutils literal notranslate"><span class="pre">ChatModel</span></code>.</p></li>
+<li><p>We had to call <code class="docutils literal notranslate"><span class="pre">chat_response.to_dict()</span></code> to convert the <code class="docutils literal notranslate"><span class="pre">ChatCompletionResponse</span></code> object to a dictionary rather than a <code class="docutils literal notranslate"><span class="pre">ChatCompletionResponse</span></code> object. This is handled automatically by <code class="docutils literal notranslate"><span class="pre">ChatModel</span></code>.</p></li>
 </ul>
 <p>Some of the biggest differences come up when it’s time to log the model:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">infer_signature</span>
-
-<span class="n">code_path</span> <span class="o">=</span> <span class="s2">&quot;ollama_pyfunc_model.py&quot;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">code_path</span> <span class="o">=</span> <span class="s2">&quot;ollama_pyfunc_model.py&quot;</span>
 
 <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;max_tokens&quot;</span><span class="p">:</span> <span class="mi">25</span><span class="p">,</span>
@@ -771,18 +774,16 @@ Hello! It&#39;s great to see you&#39;re starting the day with a cheerful greetin
 <span class="p">}</span>
 <span class="n">request</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;What is MLflow?&quot;</span><span class="p">}]}</span>
 
-<span class="n">signature</span> <span class="o">=</span> <span class="n">infer_signature</span><span class="p">(</span><span class="n">model_input</span><span class="o">=</span><span class="n">request</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
-
 <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
     <span class="n">model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
         <span class="s2">&quot;ollama_pyfunc_model&quot;</span><span class="p">,</span>
         <span class="n">python_model</span><span class="o">=</span><span class="n">code_path</span><span class="p">,</span>
-        <span class="n">signature</span><span class="o">=</span><span class="n">signature</span><span class="p">,</span>
         <span class="n">input_example</span><span class="o">=</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">params</span><span class="p">),</span>
     <span class="p">)</span>
 </pre></div>
 </div>
-<p>With a custom <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PythonModel" title="mlflow.pyfunc.PythonModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">PythonModel</span></code></a>, we need to manually define the model signature and input example. This is a significant difference from the ChatModel API, which automatically configured the signature to conform to the standardized OpenAI-compatible input/output/parameter schemas.</p>
+<p>With a custom <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PythonModel" title="mlflow.pyfunc.PythonModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">PythonModel</span></code></a>, we need to manually define the input example so that a model signature can be inferred using the example. This is a significant difference from the ChatModel API, which automatically configures a signature that conforms to the standard OpenAI-compatible input/output/parameter schemas.
+To learn more about auto inference of model signature based on an input example, see the <a class="reference internal" href="../../model/signatures.html#genai-model-signature-example"><span class="std std-ref">GenAI model signature example</span></a> section for details.</p>
 <p>There is also one notable difference in how we call the loaded model’s <code class="docutils literal notranslate"><span class="pre">predict</span></code> method: parameters are passed as a dictionary via the <code class="docutils literal notranslate"><span class="pre">params</span></code> keyword argument, rather than in the dictionary containing the messages.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">loaded_model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
 
@@ -819,7 +820,7 @@ Hello! It&#39;s great to see you&#39;re starting the day with a cheerful greetin
 <ul class="simple">
 <li><p>How to map the input/output schemas between the ChatModel API and your application</p></li>
 <li><p>How to configure commonly-used chat model inference parameters with the ChatModel API</p></li>
-<li><p>How to pass custom parameters to a <code class="docutils literal notranslate"><span class="pre">ChatModel</span></code> using the <code class="docutils literal notranslate"><span class="pre">metadata</span></code> key</p></li>
+<li><p>How to pass custom parameters to a <code class="docutils literal notranslate"><span class="pre">ChatModel</span></code> using the <code class="docutils literal notranslate"><span class="pre">custom_inputs</span></code> key</p></li>
 <li><p>How <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.ChatModel" title="mlflow.pyfunc.ChatModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ChatModel</span></code></a> compares to the <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PythonModel" title="mlflow.pyfunc.PythonModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">PythonModel</span></code></a> for defining custom chat models</p></li>
 </ul>
 <p>You should now have a good sense of what the ChatModel API is and how it can be used to define custom chat models.</p>

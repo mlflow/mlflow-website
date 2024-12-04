@@ -553,7 +553,7 @@
 
 
 <span class="k">def</span> <span class="nf">_validate</span><span class="p">(</span>
-    <span class="n">validation_thresholds</span><span class="p">:</span> <span class="n">MetricThreshold</span><span class="p">,</span>
+    <span class="n">validation_thresholds</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">MetricThreshold</span><span class="p">],</span>
     <span class="n">candidate_metrics</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
     <span class="n">baseline_metrics</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
 <span class="p">):</span>
@@ -580,8 +580,7 @@
         <span class="k">for</span> <span class="p">(</span><span class="n">metric_name</span><span class="p">,</span> <span class="n">threshold</span><span class="p">)</span> <span class="ow">in</span> <span class="n">validation_thresholds</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
     <span class="p">}</span>
 
-    <span class="k">for</span> <span class="n">metric_name</span> <span class="ow">in</span> <span class="n">validation_thresholds</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-        <span class="n">metric_threshold</span> <span class="o">=</span> <span class="n">validation_thresholds</span><span class="p">[</span><span class="n">metric_name</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">metric_name</span><span class="p">,</span> <span class="n">metric_threshold</span> <span class="ow">in</span> <span class="n">validation_thresholds</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">validation_result</span> <span class="o">=</span> <span class="n">validation_results</span><span class="p">[</span><span class="n">metric_name</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">metric_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">candidate_metrics</span><span class="p">:</span>
@@ -592,7 +591,7 @@
         <span class="n">baseline_metric_value</span> <span class="o">=</span> <span class="n">baseline_metrics</span><span class="p">[</span><span class="n">metric_name</span><span class="p">]</span> <span class="k">if</span> <span class="n">baseline_metrics</span> <span class="k">else</span> <span class="kc">None</span>
 
         <span class="c1"># If metric is higher is better, &gt;= is used, otherwise &lt;= is used</span>
-        <span class="c1"># for thresholding metric value and model comparsion</span>
+        <span class="c1"># for thresholding metric value and model comparison</span>
         <span class="n">comparator_fn</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="fm">__ge__</span> <span class="k">if</span> <span class="n">metric_threshold</span><span class="o">.</span><span class="n">greater_is_better</span> <span class="k">else</span> <span class="n">operator</span><span class="o">.</span><span class="fm">__le__</span>
         <span class="n">operator_fn</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">add</span> <span class="k">if</span> <span class="n">metric_threshold</span><span class="o">.</span><span class="n">greater_is_better</span> <span class="k">else</span> <span class="n">operator</span><span class="o">.</span><span class="n">sub</span>
 
@@ -611,7 +610,7 @@
             <span class="k">continue</span>
 
         <span class="k">if</span> <span class="n">metric_threshold</span><span class="o">.</span><span class="n">min_absolute_change</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="c1"># metric comparsion aboslute change fails</span>
+            <span class="c1"># metric comparison absolute change fails</span>
             <span class="c1"># - if not (metric_value &gt;= baseline + min_absolute_change) for higher is better</span>
             <span class="c1"># - if not (metric_value &lt;= baseline - min_absolute_change) for lower is better</span>
             <span class="n">validation_result</span><span class="o">.</span><span class="n">min_absolute_change_failed</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">comparator_fn</span><span class="p">(</span>
@@ -632,7 +631,7 @@
                     <span class="n">Decimal</span><span class="p">(</span><span class="n">operator_fn</span><span class="p">(</span><span class="n">baseline_metric_value</span><span class="p">,</span> <span class="mf">1e-10</span><span class="p">)),</span>
                 <span class="p">)</span>
                 <span class="k">continue</span>
-            <span class="c1"># metric comparsion relative change fails</span>
+            <span class="c1"># metric comparison relative change fails</span>
             <span class="c1"># - if (metric_value - baseline) / baseline &lt; min_relative_change for higher is better</span>
             <span class="c1"># - if (baseline - metric_value) / baseline &lt; min_relative_change for lower is better</span>
             <span class="k">if</span> <span class="n">metric_threshold</span><span class="o">.</span><span class="n">greater_is_better</span><span class="p">:</span>

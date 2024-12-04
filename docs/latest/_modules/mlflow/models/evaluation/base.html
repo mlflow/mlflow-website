@@ -228,6 +228,7 @@
 <span class="kn">from</span> <span class="nn">mlflow.entities.dataset_input</span> <span class="kn">import</span> <span class="n">DatasetInput</span>
 <span class="kn">from</span> <span class="nn">mlflow.entities.input_tag</span> <span class="kn">import</span> <span class="n">InputTag</span>
 <span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
+<span class="kn">from</span> <span class="nn">mlflow.models.evaluation.utils.trace</span> <span class="kn">import</span> <span class="n">configure_autologging_for_evaluation</span>
 <span class="kn">from</span> <span class="nn">mlflow.protos.databricks_pb2</span> <span class="kn">import</span> <span class="n">INVALID_PARAMETER_VALUE</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracking.artifact_utils</span> <span class="kn">import</span> <span class="n">_download_artifact_from_uri</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracking.client</span> <span class="kn">import</span> <span class="n">MlflowClient</span>
@@ -254,6 +255,9 @@
     <span class="n">TEXT_SUMMARIZATION</span> <span class="o">=</span> <span class="s2">&quot;text-summarization&quot;</span>
     <span class="n">TEXT</span> <span class="o">=</span> <span class="s2">&quot;text&quot;</span>
     <span class="n">RETRIEVER</span> <span class="o">=</span> <span class="s2">&quot;retriever&quot;</span>
+    <span class="c1"># This model type is used for Mosaic AI Agent evaluation and only available in Databricks</span>
+    <span class="c1"># https://docs.databricks.com/en/generative-ai/agent-evaluation/index.html</span>
+    <span class="n">DATABRICKS_AGENT</span> <span class="o">=</span> <span class="s2">&quot;databricks-agent&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;This class is not meant to be instantiated.&quot;</span><span class="p">)</span>
@@ -908,7 +912,6 @@
 <span class="sd">            True if the evaluator can evaluate the specified model on the</span>
 <span class="sd">            specified dataset. False otherwise.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span>
@@ -951,7 +954,6 @@
 <span class="sd">            A :py:class:`mlflow.models.EvaluationResult` instance containing</span>
 <span class="sd">            evaluation metrics and artifacts for the model.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
 
 <div class="viewcode-block" id="list_evaluators"><a class="viewcode-back" href="../../../../python_api/mlflow.models.html#mlflow.list_evaluators">[docs]</a><span class="k">def</span> <span class="nf">list_evaluators</span><span class="p">():</span>
@@ -1046,6 +1048,21 @@
 <span class="sd">        A list of EvaluatorBundle that contains name, evaluator, config for each evaluator.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">mlflow.models.evaluation.evaluator_registry</span> <span class="kn">import</span> <span class="n">_model_evaluation_registry</span> <span class="k">as</span> <span class="n">rg</span>
+
+    <span class="c1"># NB: The `databricks-agents` package must be installed to use the &#39;databricks-agent&#39; model</span>
+    <span class="c1"># type. Ideally this check should be done in the &#39;databricks-agent&#39; evaluator implementation,</span>
+    <span class="c1"># but we need to do it here because the code won&#39;t reach the evaluator implementation if the</span>
+    <span class="c1"># package is not installed.</span>
+    <span class="k">if</span> <span class="n">model_type</span> <span class="o">==</span> <span class="n">_ModelType</span><span class="o">.</span><span class="n">DATABRICKS_AGENT</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">databricks.agents</span>  <span class="c1"># noqa: F401</span>
+        <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Databricks Agents SDK must be installed to use the &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">_ModelType</span><span class="o">.</span><span class="n">DATABRICKS_AGENT</span><span class="si">}</span><span class="s2">` model type. Run `pip install databricks-agents` &quot;</span>
+                <span class="s2">&quot;to install the package and try again.&quot;</span><span class="p">,</span>
+                <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
+            <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
 
     <span class="k">def</span> <span class="nf">check_nesting_config_dict</span><span class="p">(</span><span class="n">_evaluator_name_list</span><span class="p">,</span> <span class="n">_evaluator_name_to_conf_map</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_evaluator_name_to_conf_map</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span>
@@ -1147,7 +1164,7 @@
 <span class="k">def</span> <span class="nf">_model_validation_contains_model_comparison</span><span class="p">(</span><span class="n">validation_thresholds</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Helper function for determining if validation_thresholds contains</span>
-<span class="sd">    thresholds for model comparsion: either min_relative_change or min_absolute_change</span>
+<span class="sd">    thresholds for model comparison: either min_relative_change or min_absolute_change</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">validation_thresholds</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">False</span>
@@ -1203,21 +1220,24 @@
         <span class="n">dataset</span><span class="o">.</span><span class="n">_log_dataset_tag</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">run_id</span><span class="p">,</span> <span class="n">model_uuid</span><span class="p">)</span>
 
     <span class="n">eval_results</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">should_enable_tracing</span> <span class="o">=</span> <span class="n">model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>  <span class="c1"># Do not enable tracing if static dataset is provided</span>
     <span class="k">for</span> <span class="n">eval_</span> <span class="ow">in</span> <span class="n">evaluators</span><span class="p">:</span>
         <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Evaluating the model with the </span><span class="si">{</span><span class="n">eval_</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> evaluator.&quot;</span><span class="p">)</span>
         <span class="n">_last_failed_evaluator</span> <span class="o">=</span> <span class="n">eval_</span><span class="o">.</span><span class="n">name</span>
         <span class="k">if</span> <span class="n">eval_</span><span class="o">.</span><span class="n">evaluator</span><span class="o">.</span><span class="n">can_evaluate</span><span class="p">(</span><span class="n">model_type</span><span class="o">=</span><span class="n">model_type</span><span class="p">,</span> <span class="n">evaluator_config</span><span class="o">=</span><span class="n">eval_</span><span class="o">.</span><span class="n">config</span><span class="p">):</span>
-            <span class="n">eval_result</span> <span class="o">=</span> <span class="n">eval_</span><span class="o">.</span><span class="n">evaluator</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
-                <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
-                <span class="n">model_type</span><span class="o">=</span><span class="n">model_type</span><span class="p">,</span>
-                <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span>
-                <span class="n">run_id</span><span class="o">=</span><span class="n">run_id</span><span class="p">,</span>
-                <span class="n">evaluator_config</span><span class="o">=</span><span class="n">eval_</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
-                <span class="n">custom_metrics</span><span class="o">=</span><span class="n">custom_metrics</span><span class="p">,</span>
-                <span class="n">extra_metrics</span><span class="o">=</span><span class="n">extra_metrics</span><span class="p">,</span>
-                <span class="n">custom_artifacts</span><span class="o">=</span><span class="n">custom_artifacts</span><span class="p">,</span>
-                <span class="n">predictions</span><span class="o">=</span><span class="n">predictions</span><span class="p">,</span>
-            <span class="p">)</span>
+            <span class="k">with</span> <span class="n">configure_autologging_for_evaluation</span><span class="p">(</span><span class="n">enable_tracing</span><span class="o">=</span><span class="n">should_enable_tracing</span><span class="p">):</span>
+                <span class="n">eval_result</span> <span class="o">=</span> <span class="n">eval_</span><span class="o">.</span><span class="n">evaluator</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+                    <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+                    <span class="n">model_type</span><span class="o">=</span><span class="n">model_type</span><span class="p">,</span>
+                    <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span>
+                    <span class="n">run_id</span><span class="o">=</span><span class="n">run_id</span><span class="p">,</span>
+                    <span class="n">evaluator_config</span><span class="o">=</span><span class="n">eval_</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
+                    <span class="n">custom_metrics</span><span class="o">=</span><span class="n">custom_metrics</span><span class="p">,</span>
+                    <span class="n">extra_metrics</span><span class="o">=</span><span class="n">extra_metrics</span><span class="p">,</span>
+                    <span class="n">custom_artifacts</span><span class="o">=</span><span class="n">custom_artifacts</span><span class="p">,</span>
+                    <span class="n">predictions</span><span class="o">=</span><span class="n">predictions</span><span class="p">,</span>
+                <span class="p">)</span>
+
             <span class="k">if</span> <span class="n">eval_result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">eval_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">eval_result</span><span class="p">)</span>
 
@@ -1455,7 +1475,7 @@
 <span class="sd">          Explainer based on the model.</span>
 <span class="sd">        - **explainability_nsamples**: The number of sample rows to use for computing model</span>
 <span class="sd">          explainability insights. Default value is 2000.</span>
-<span class="sd">        - **explainability_kernel_link**: The kernel link function used by shap kernal explainer.</span>
+<span class="sd">        - **explainability_kernel_link**: The kernel link function used by shap kernel explainer.</span>
 <span class="sd">          Available values are &quot;identity&quot; and &quot;logit&quot;. Default value is &quot;identity&quot;.</span>
 <span class="sd">        - **max_classes_for_multiclass_roc_pr**:</span>
 <span class="sd">          For multiclass classification tasks, the maximum number of classes for which to log</span>

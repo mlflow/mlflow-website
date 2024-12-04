@@ -211,11 +211,13 @@
 <span class="sd">use OpenTelemetry e.g. PromptFlow, Snowpark.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
+<span class="kn">import</span> <span class="nn">contextvars</span>
 <span class="kn">import</span> <span class="nn">functools</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Optional</span>
 
+<span class="kn">from</span> <span class="nn">opentelemetry</span> <span class="kn">import</span> <span class="n">context</span> <span class="k">as</span> <span class="n">context_api</span>
 <span class="kn">from</span> <span class="nn">opentelemetry</span> <span class="kn">import</span> <span class="n">trace</span>
 <span class="kn">from</span> <span class="nn">opentelemetry.sdk.trace</span> <span class="kn">import</span> <span class="n">TracerProvider</span>
 
@@ -228,6 +230,9 @@
     <span class="n">is_in_databricks_model_serving_environment</span><span class="p">,</span>
     <span class="n">is_mlflow_tracing_enabled_in_model_serving</span><span class="p">,</span>
 <span class="p">)</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">mlflow.entities</span> <span class="kn">import</span> <span class="n">Span</span>
 
 <span class="c1"># Global tracer provider instance. We manage the tracer provider by ourselves instead of using</span>
 <span class="c1"># the global tracer provider provided by OpenTelemetry.</span>
@@ -288,6 +293,31 @@
     <span class="k">if</span> <span class="n">experiment_id</span><span class="p">:</span>
         <span class="n">attributes</span><span class="p">[</span><span class="n">SpanAttributeKey</span><span class="o">.</span><span class="n">EXPERIMENT_ID</span><span class="p">]</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">experiment_id</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">tracer</span><span class="o">.</span><span class="n">start_span</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="n">attributes</span><span class="p">,</span> <span class="n">start_time</span><span class="o">=</span><span class="n">start_time_ns</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">set_span_in_context</span><span class="p">(</span><span class="n">span</span><span class="p">:</span> <span class="s2">&quot;Span&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">contextvars</span><span class="o">.</span><span class="n">Token</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Set the given OpenTelemetry span as the active span in the current context.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        span: An MLflow span object to set as the active span.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A token object that will be required when detaching the span from the context.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">context</span> <span class="o">=</span> <span class="n">trace</span><span class="o">.</span><span class="n">set_span_in_context</span><span class="p">(</span><span class="n">span</span><span class="o">.</span><span class="n">_span</span><span class="p">)</span>
+    <span class="n">token</span> <span class="o">=</span> <span class="n">context_api</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">token</span>  <span class="c1"># noqa: RET504</span>
+
+
+<span class="k">def</span> <span class="nf">detach_span_from_context</span><span class="p">(</span><span class="n">token</span><span class="p">:</span> <span class="n">contextvars</span><span class="o">.</span><span class="n">Token</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Remove the active span from the current context.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        token: The token returned by `_set_span_to_active` function.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">context_api</span><span class="o">.</span><span class="n">detach</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_get_tracer</span><span class="p">(</span><span class="n">module_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
@@ -357,6 +387,17 @@
     <span class="n">tracer_provider</span> <span class="o">=</span> <span class="n">TracerProvider</span><span class="p">()</span>
     <span class="n">tracer_provider</span><span class="o">.</span><span class="n">add_span_processor</span><span class="p">(</span><span class="n">processor</span><span class="p">)</span>
     <span class="n">_MLFLOW_TRACER_PROVIDER</span> <span class="o">=</span> <span class="n">tracer_provider</span>
+
+    <span class="kn">from</span> <span class="nn">mlflow.tracing.utils.token</span> <span class="kn">import</span> <span class="n">suppress_token_detach_warning_to_debug_level</span>
+
+    <span class="c1"># Demote the &quot;Failed to detach context&quot; log raised by the OpenTelemetry logger to DEBUG</span>
+    <span class="c1"># level so that it does not show up in the user&#39;s console. This warning may indicate</span>
+    <span class="c1"># some incorrect context handling, but in many cases just false positive that does not</span>
+    <span class="c1"># cause any issue in the generated trace.</span>
+    <span class="c1"># Note that we need to apply it permanently rather than just the scope of prediction call,</span>
+    <span class="c1"># because the exception can happen for streaming case, where the error log might be</span>
+    <span class="c1"># generated when the iterator is consumed and we don&#39;t know when it will happen.</span>
+    <span class="n">suppress_token_detach_warning_to_debug_level</span><span class="p">()</span>
 
 
 <div class="viewcode-block" id="disable"><a class="viewcode-back" href="../../../python_api/mlflow.tracing.html#mlflow.tracing.disable">[docs]</a><span class="nd">@raise_as_trace_exception</span>

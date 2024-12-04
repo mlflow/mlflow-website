@@ -378,12 +378,22 @@ define integer columns with missing values as doubles (float64).</p>
 <li><p>Array (list, numpy arrays)</p></li>
 <li><p>Spark ML vector (it inherits <code class="docutils literal notranslate"><span class="pre">Array[double]</span></code> type)</p></li>
 <li><p>Object (dictionary)</p></li>
+<li><p>AnyType</p></li>
 </ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>AnyType is a special type that can be used to represent any data type, including None values. If this type is used, input data is not validated at all during schema enforcement process in pyfunc predict.
+<cite>mlflow.models.infer_signature</cite> function infers a field as AnyType only if the field is always None (e.g. <code class="docutils literal notranslate"><span class="pre">{&quot;a&quot;:</span> <span class="pre">None}</span> <span class="pre">--&gt;</span> <span class="pre">['a':</span> <span class="pre">Any</span> <span class="pre">(optional)]</span></code>); if the field has other valid types, the field is inferred
+as optional instead (e.g. <code class="docutils literal notranslate"><span class="pre">[{&quot;a&quot;:</span> <span class="pre">None},</span> <span class="pre">{&quot;a&quot;:</span> <span class="pre">&quot;abc&quot;}]</span> <span class="pre">--&gt;</span> <span class="pre">['a':</span> <span class="pre">string</span> <span class="pre">(optional)]</span></code>).
+If one field explicitly accepts multiple valid types (e.g. <code class="docutils literal notranslate"><span class="pre">[{&quot;a&quot;:</span> <span class="pre">&quot;string&quot;},</span> <span class="pre">{&quot;a&quot;:</span> <span class="pre">123}]</span></code>), <cite>infer_signature</cite> function would fail and you need to manually construct the signature using <cite>ModelSignature</cite> object
+with <cite>AnyType</cite> type for the field. (e.g. <code class="docutils literal notranslate"><span class="pre">ModelSignature(Schema([ColSpec(AnyType(),</span> <span class="pre">&quot;a&quot;,</span> <span class="pre">required=False)]))</span></code>)</p>
+</div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <ul class="simple">
 <li><p>Support for Array and Object types was introduced in MLflow version <strong>2.10.0</strong>. These types will not be recognized in previous versions of MLflow.  If you are saving a model that uses these signature types, you should ensure that any other environment that attempts to load these models  has a version of MLflow installed that is at least 2.10.0.</p></li>
 <li><p>Support for Spark ML vector type was introduced in MLflow version <strong>2.15.0</strong>, These type will not be recognized in previous versions of MLflow.</p></li>
+<li><p>Support for AnyType was introduced in MLflow version <strong>2.19.0</strong>. This type will not be recognized in previous versions of MLflow.</p></li>
 </ul>
 </div>
 <p>Additional examples for composite data types can be seen by viewing the <a class="reference external" href="notebooks/signature_examples.html">signature examples notebook</a>.</p>
@@ -887,7 +897,7 @@ for a simple transformers model:</p>
 </div>
 </div>
 <div class="section" id="model-signature-examples-for-genai-flavors">
-<h3>Model signature examples for GenAI flavors<a class="headerlink" href="#model-signature-examples-for-genai-flavors" title="Permalink to this headline"> </a></h3>
+<span id="genai-model-signature-example"></span><h3>Model signature examples for GenAI flavors<a class="headerlink" href="#model-signature-examples-for-genai-flavors" title="Permalink to this headline"> </a></h3>
 <p>GenAI flavors such as langchain, OpenAI, and transformers normally require an object (dictionary) based model signature.
 Manually defining the structure is complex and error-prone. Instead, you should rely on the <cite>infer_signature</cite> method to automatically
 generate the model signature based on an input example.</p>
@@ -1017,6 +1027,60 @@ To learn how to validate the model locally before deployment, refer to the <a cl
 <span class="p">}</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">infer_signature</span><span class="p">(</span><span class="n">input_example</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>If your model’s output contains None values, these fields will be inferred as AnyType (since MLflow 2.19.0), for example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">infer_signature</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s2">&quot;object&quot;</span><span class="p">:</span> <span class="s2">&quot;chat.completion&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;created&quot;</span><span class="p">:</span> <span class="mi">1731491873</span><span class="p">,</span>
+        <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s2">&quot;choices&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;assistant&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;MLflow&quot;</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;finish_reason&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">],</span>
+        <span class="s2">&quot;usage&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;prompt_tokens&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">&quot;completion_tokens&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">&quot;total_tokens&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">infer_signature</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+<span class="c1"># inputs:</span>
+<span class="c1"># [</span>
+<span class="c1">#     &#39;id&#39;: Any (optional),</span>
+<span class="c1">#     &#39;object&#39;: string (required),</span>
+<span class="c1">#     &#39;created&#39;: long (required),</span>
+<span class="c1">#     &#39;model&#39;: Any (optional),</span>
+<span class="c1">#     &#39;choices&#39;: Array({</span>
+<span class="c1">#         &#39;finish_reason&#39;: Any (optional),</span>
+<span class="c1">#         &#39;index&#39;: long (required),</span>
+<span class="c1">#         &#39;message&#39;: {</span>
+<span class="c1">#             &#39;content&#39;: string (required),</span>
+<span class="c1">#             &#39;role&#39;: string (required)</span>
+<span class="c1">#         } (required)</span>
+<span class="c1">#     }) (required),</span>
+<span class="c1">#     &#39;usage&#39;: {</span>
+<span class="c1">#         &#39;completion_tokens&#39;: Any (optional),</span>
+<span class="c1">#         &#39;prompt_tokens&#39;: Any (optional),</span>
+<span class="c1">#         &#39;total_tokens&#39;: Any (optional)</span>
+<span class="c1">#     } (required)</span>
+<span class="c1"># ]</span>
+<span class="c1"># outputs:</span>
+<span class="c1"># None</span>
+<span class="c1"># params:</span>
+<span class="c1"># None</span>
 </pre></div>
 </div>
 <ol class="arabic simple" start="3">

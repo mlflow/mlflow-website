@@ -229,10 +229,11 @@
 <span class="kn">from</span> <span class="nn">mlflow.store.artifact.utils.models</span> <span class="kn">import</span> <span class="n">get_model_name_and_version</span>
 <span class="kn">from</span> <span class="nn">mlflow.tracking.artifact_utils</span> <span class="kn">import</span> <span class="n">_download_artifact_from_uri</span>
 <span class="kn">from</span> <span class="nn">mlflow.types</span> <span class="kn">import</span> <span class="n">DataType</span><span class="p">,</span> <span class="n">ParamSchema</span><span class="p">,</span> <span class="n">ParamSpec</span><span class="p">,</span> <span class="n">Schema</span><span class="p">,</span> <span class="n">TensorSpec</span>
-<span class="kn">from</span> <span class="nn">mlflow.types.schema</span> <span class="kn">import</span> <span class="n">Array</span><span class="p">,</span> <span class="n">Map</span><span class="p">,</span> <span class="n">Object</span><span class="p">,</span> <span class="n">Property</span>
+<span class="kn">from</span> <span class="nn">mlflow.types.schema</span> <span class="kn">import</span> <span class="n">AnyType</span><span class="p">,</span> <span class="n">Array</span><span class="p">,</span> <span class="n">Map</span><span class="p">,</span> <span class="n">Object</span><span class="p">,</span> <span class="n">Property</span>
 <span class="kn">from</span> <span class="nn">mlflow.types.utils</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">TensorsNotSupportedException</span><span class="p">,</span>
     <span class="n">_infer_param_schema</span><span class="p">,</span>
+    <span class="n">_is_none_or_nan</span><span class="p">,</span>
     <span class="n">clean_tensor_type</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.annotations</span> <span class="kn">import</span> <span class="n">experimental</span>
@@ -750,7 +751,7 @@
 
 <span class="k">def</span> <span class="nf">_load_serving_input_example</span><span class="p">(</span><span class="n">mlflow_model</span><span class="p">:</span> <span class="n">Model</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Load serving input exaple from a model directory. Returns None if there is no serving input</span>
+<span class="sd">    Load serving input example from a model directory. Returns None if there is no serving input</span>
 <span class="sd">    example.</span>
 
 <span class="sd">    Args:</span>
@@ -1367,6 +1368,11 @@
             <span class="k">if</span> <span class="n">extra_cols</span><span class="p">:</span>
                 <span class="n">message</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; Note that there were extra inputs: </span><span class="si">{</span><span class="n">extra_cols</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">extra_cols</span><span class="p">:</span>
+            <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;Found extra inputs in the model input that are not defined in the model &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;signature: `</span><span class="si">{</span><span class="n">extra_cols</span><span class="si">}</span><span class="s2">`. These inputs will be ignored.&quot;</span>
+            <span class="p">)</span>
     <span class="k">elif</span> <span class="ow">not</span> <span class="n">input_schema</span><span class="o">.</span><span class="n">is_tensor_spec</span><span class="p">():</span>
         <span class="c1"># The model signature does not specify column names =&gt; we can only verify column count.</span>
         <span class="n">num_actual_columns</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pf_input</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
@@ -1430,7 +1436,7 @@
     <span class="n">columns_not_dropped_for_feature_store_model</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="n">new_pf_input</span><span class="o">.</span><span class="n">dtypes</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">input_names</span><span class="p">:</span>
-            <span class="c1"># to support backwards compatability with feature store models</span>
+            <span class="c1"># to support backwards compatibility with feature store models</span>
             <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">x</span> <span class="ow">in</span> <span class="n">dtype</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;array&quot;</span><span class="p">,</span> <span class="s2">&quot;map&quot;</span><span class="p">,</span> <span class="s2">&quot;struct&quot;</span><span class="p">]):</span>
                 <span class="k">if</span> <span class="n">flavor</span> <span class="o">==</span> <span class="n">_FEATURE_STORE_FLAVOR</span><span class="p">:</span>
                     <span class="n">columns_not_dropped_for_feature_store_model</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
@@ -1446,7 +1452,7 @@
 
 
 <span class="k">def</span> <span class="nf">_enforce_datatype</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DataType</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">required</span> <span class="ow">and</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">required</span> <span class="ow">and</span> <span class="n">_is_none_or_nan</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">None</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">DataType</span><span class="p">):</span>
@@ -1465,13 +1471,19 @@
 
 
 <span class="k">def</span> <span class="nf">_enforce_array</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">arr</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">required</span> <span class="ow">and</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Enforce data against an Array type.</span>
+<span class="sd">    If the field is required, then the data must be provided.</span>
+<span class="sd">    If Array&#39;s internal dtype is AnyType, then None and empty lists are also accepted.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">required</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">AnyType</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">))</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">data</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected data to be list or numpy array, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="n">data_enforced</span> <span class="o">=</span> <span class="p">[</span><span class="n">_enforce_type</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
+    <span class="n">data_enforced</span> <span class="o">=</span> <span class="p">[</span><span class="n">_enforce_type</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="n">required</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
 
     <span class="c1"># Keep input data type</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
@@ -1481,14 +1493,14 @@
 
 
 <span class="k">def</span> <span class="nf">_enforce_property</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="nb">property</span><span class="p">:</span> <span class="n">Property</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">_enforce_type</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">property</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_enforce_type</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">property</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="nb">property</span><span class="o">.</span><span class="n">required</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_enforce_object</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Object</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">required</span> <span class="ow">and</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="n">HAS_PYSPARK</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">Row</span><span class="p">):</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">asDict</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">data</span><span class="o">.</span><span class="n">asDict</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">required</span> <span class="ow">and</span> <span class="p">(</span><span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">data</span> <span class="o">==</span> <span class="p">{}):</span>
+        <span class="k">return</span> <span class="n">data</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;Failed to enforce schema of &#39;</span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">&#39; with type &#39;</span><span class="si">{</span><span class="n">obj</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
@@ -1521,8 +1533,8 @@
 
 
 <span class="k">def</span> <span class="nf">_enforce_map</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">map_type</span><span class="p">:</span> <span class="n">Map</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">required</span> <span class="ow">and</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">required</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">map_type</span><span class="o">.</span><span class="n">value_type</span><span class="p">,</span> <span class="n">AnyType</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">data</span> <span class="o">==</span> <span class="p">{}):</span>
+        <span class="k">return</span> <span class="n">data</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected data to be a dict, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -1530,7 +1542,7 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">data</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="s2">&quot;Expected all keys in the map type data are string type.&quot;</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_enforce_type</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">map_type</span><span class="o">.</span><span class="n">value_type</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_enforce_type</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">map_type</span><span class="o">.</span><span class="n">value_type</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="n">required</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 
 
 <span class="k">def</span> <span class="nf">_enforce_type</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">data_type</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">DataType</span><span class="p">,</span> <span class="n">Array</span><span class="p">,</span> <span class="n">Object</span><span class="p">,</span> <span class="n">Map</span><span class="p">],</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
@@ -1542,6 +1554,8 @@
         <span class="k">return</span> <span class="n">_enforce_object</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">data_type</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="n">required</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_type</span><span class="p">,</span> <span class="n">Map</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">_enforce_map</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">data_type</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="n">required</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_type</span><span class="p">,</span> <span class="n">AnyType</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">data</span>
     <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid data type: </span><span class="si">{</span><span class="n">data_type</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 

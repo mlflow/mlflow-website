@@ -204,22 +204,17 @@
               <div itemprop="articleBody">
                 
   <h1>Source code for mlflow.deployments.openai</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
 
+<span class="kn">from</span> <span class="nn">mlflow.deployments</span> <span class="kn">import</span> <span class="n">BaseDeploymentClient</span>
 <span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
 <span class="kn">from</span> <span class="nn">mlflow.protos.databricks_pb2</span> <span class="kn">import</span> <span class="n">INVALID_PARAMETER_VALUE</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.openai_utils</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">REQUEST_URL_CHAT</span><span class="p">,</span>
     <span class="n">_OAITokenHolder</span><span class="p">,</span>
     <span class="n">_OpenAIApiConfig</span><span class="p">,</span>
     <span class="n">_OpenAIEnvVar</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.rest_utils</span> <span class="kn">import</span> <span class="n">augmented_raise_for_status</span>
-
-<span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
-
-<span class="kn">from</span> <span class="nn">mlflow.deployments</span> <span class="kn">import</span> <span class="n">BaseDeploymentClient</span>
 
 
 <div class="viewcode-block" id="OpenAIDeploymentClient"><a class="viewcode-back" href="../../../python_api/mlflow.deployments.html#mlflow.deployments.OpenAIDeploymentClient">[docs]</a><span class="k">class</span> <span class="nc">OpenAIDeploymentClient</span><span class="p">(</span><span class="n">BaseDeploymentClient</span><span class="p">):</span>
@@ -311,56 +306,34 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">_check_openai_key</span><span class="p">()</span>
 
-        <span class="kn">from</span> <span class="nn">mlflow.openai.api_request_parallel_processor</span> <span class="kn">import</span> <span class="n">process_api_requests</span>
-
         <span class="n">api_config</span> <span class="o">=</span> <span class="n">_get_api_config_without_openai_dep</span><span class="p">()</span>
         <span class="n">api_token</span> <span class="o">=</span> <span class="n">_OAITokenHolder</span><span class="p">(</span><span class="n">api_config</span><span class="o">.</span><span class="n">api_type</span><span class="p">)</span>
+        <span class="n">api_token</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">api_config</span><span class="o">.</span><span class="n">api_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;azure&quot;</span><span class="p">,</span> <span class="s2">&quot;azure_ad&quot;</span><span class="p">,</span> <span class="s2">&quot;azuread&quot;</span><span class="p">):</span>
-            <span class="n">api_base</span> <span class="o">=</span> <span class="n">api_config</span><span class="o">.</span><span class="n">api_base</span>
-            <span class="n">api_version</span> <span class="o">=</span> <span class="n">api_config</span><span class="o">.</span><span class="n">api_version</span>
-            <span class="n">engine</span> <span class="o">=</span> <span class="n">api_config</span><span class="o">.</span><span class="n">engine</span>
-            <span class="n">deployment_id</span> <span class="o">=</span> <span class="n">api_config</span><span class="o">.</span><span class="n">deployment_id</span>
+            <span class="kn">from</span> <span class="nn">openai</span> <span class="kn">import</span> <span class="n">AzureOpenAI</span>
 
-            <span class="k">if</span> <span class="n">engine</span><span class="p">:</span>
-                <span class="c1"># Avoid using both parameters as they serve the same purpose</span>
-                <span class="c1"># Invalid inputs:</span>
-                <span class="c1">#   - Wrong engine + correct/wrong deployment_id</span>
-                <span class="c1">#   - No engine + wrong deployment_id</span>
-                <span class="c1"># Valid inputs:</span>
-                <span class="c1">#   - Correct engine + correct/wrong deployment_id</span>
-                <span class="c1">#   - No engine + correct deployment_id</span>
-                <span class="k">if</span> <span class="n">deployment_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                        <span class="s2">&quot;Both engine and deployment_id are set. &quot;</span>
-                        <span class="s2">&quot;Using engine as it takes precedence.&quot;</span>
-                    <span class="p">)</span>
-                <span class="n">inputs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;engine&quot;</span><span class="p">:</span> <span class="n">engine</span><span class="p">,</span> <span class="o">**</span><span class="n">inputs</span><span class="p">}</span>
-            <span class="k">elif</span> <span class="n">deployment_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
-                    <span class="s2">&quot;Either engine or deployment_id must be set for Azure OpenAI API&quot;</span><span class="p">,</span>
-                <span class="p">)</span>
-
-            <span class="n">request_url</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">api_base</span><span class="si">}</span><span class="s2">/openai/deployments/</span><span class="si">{</span><span class="n">deployment_id</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;/chat/completions?api-version=</span><span class="si">{</span><span class="n">api_version</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">client</span> <span class="o">=</span> <span class="n">AzureOpenAI</span><span class="p">(</span>
+                <span class="n">api_key</span><span class="o">=</span><span class="n">api_token</span><span class="o">.</span><span class="n">token</span><span class="p">,</span>
+                <span class="n">azure_endpoint</span><span class="o">=</span><span class="n">api_config</span><span class="o">.</span><span class="n">api_base</span><span class="p">,</span>
+                <span class="n">api_version</span><span class="o">=</span><span class="n">api_config</span><span class="o">.</span><span class="n">api_version</span><span class="p">,</span>
+                <span class="n">azure_deployment</span><span class="o">=</span><span class="n">api_config</span><span class="o">.</span><span class="n">deployment_id</span><span class="p">,</span>
+                <span class="n">max_retries</span><span class="o">=</span><span class="n">api_config</span><span class="o">.</span><span class="n">max_retries</span><span class="p">,</span>
+                <span class="n">timeout</span><span class="o">=</span><span class="n">api_config</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">inputs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="n">endpoint</span><span class="p">,</span> <span class="o">**</span><span class="n">inputs</span><span class="p">}</span>
-            <span class="n">request_url</span> <span class="o">=</span> <span class="n">REQUEST_URL_CHAT</span>
+            <span class="kn">from</span> <span class="nn">openai</span> <span class="kn">import</span> <span class="n">OpenAI</span>
 
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">process_api_requests</span><span class="p">(</span>
-                <span class="p">[</span><span class="n">inputs</span><span class="p">],</span>
-                <span class="n">request_url</span><span class="p">,</span>
-                <span class="n">api_token</span><span class="o">=</span><span class="n">api_token</span><span class="p">,</span>
-                <span class="n">throw_original_error</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="n">max_workers</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-            <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">except</span> <span class="n">MlflowException</span><span class="p">:</span>
-            <span class="k">raise</span>
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error response from OpenAI:</span><span class="se">\n</span><span class="s2"> </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+            <span class="n">client</span> <span class="o">=</span> <span class="n">OpenAI</span><span class="p">(</span>
+                <span class="n">api_key</span><span class="o">=</span><span class="n">api_token</span><span class="o">.</span><span class="n">token</span><span class="p">,</span>
+                <span class="n">base_url</span><span class="o">=</span><span class="n">api_config</span><span class="o">.</span><span class="n">api_base</span><span class="p">,</span>
+                <span class="n">max_retries</span><span class="o">=</span><span class="n">api_config</span><span class="o">.</span><span class="n">max_retries</span><span class="p">,</span>
+                <span class="n">timeout</span><span class="o">=</span><span class="n">api_config</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">client</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">completions</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">messages</span><span class="o">=</span><span class="n">inputs</span><span class="p">[</span><span class="s2">&quot;messages&quot;</span><span class="p">],</span> <span class="n">model</span><span class="o">=</span><span class="n">endpoint</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">model_dump</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="OpenAIDeploymentClient.create_endpoint"><a class="viewcode-back" href="../../../python_api/mlflow.deployments.html#mlflow.deployments.OpenAIDeploymentClient.create_endpoint">[docs]</a>    <span class="k">def</span> <span class="nf">create_endpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -456,7 +429,6 @@
     <span class="n">api_type</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">_OpenAIEnvVar</span><span class="o">.</span><span class="n">OPENAI_API_TYPE</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
     <span class="n">api_version</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">_OpenAIEnvVar</span><span class="o">.</span><span class="n">OPENAI_API_VERSION</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
     <span class="n">api_base</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">_OpenAIEnvVar</span><span class="o">.</span><span class="n">OPENAI_API_BASE</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-    <span class="n">engine</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">_OpenAIEnvVar</span><span class="o">.</span><span class="n">OPENAI_ENGINE</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="n">deployment_id</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">_OpenAIEnvVar</span><span class="o">.</span><span class="n">OPENAI_DEPLOYMENT_NAME</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">api_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;azure&quot;</span><span class="p">,</span> <span class="s2">&quot;azure_ad&quot;</span><span class="p">,</span> <span class="s2">&quot;azuread&quot;</span><span class="p">):</span>
         <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">16</span>
@@ -474,7 +446,6 @@
         <span class="n">max_tokens_per_minute</span><span class="o">=</span><span class="n">max_tokens_per_minute</span><span class="p">,</span>
         <span class="n">api_base</span><span class="o">=</span><span class="n">api_base</span><span class="p">,</span>
         <span class="n">api_version</span><span class="o">=</span><span class="n">api_version</span><span class="p">,</span>
-        <span class="n">engine</span><span class="o">=</span><span class="n">engine</span><span class="p">,</span>
         <span class="n">deployment_id</span><span class="o">=</span><span class="n">deployment_id</span><span class="p">,</span>
     <span class="p">)</span>
 

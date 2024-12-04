@@ -299,15 +299,6 @@ an example of interfacing with an external service. You can easily swap the
 provider example to use any managed LLM hosting service with ease (<a class="reference external" href="https://docs.aws.amazon.com/bedrock/latest/userguide/what-is-bedrock.html">Amazon Bedrock</a>,
 <a class="reference external" href="https://learn.microsoft.com/en-us/azure/ai-studio/concepts/deployments-overview">Azure AI Studio</a>,
 <a class="reference external" href="https://platform.openai.com/docs/libraries/python-library">OpenAI</a>, <a class="reference external" href="https://docs.anthropic.com/en/api/client-sdks#python">Anthropic</a>, and many others).</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>In an upcoming MLflow release, we will be making the following changes to <a class="reference internal" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.ChatModel" title="mlflow.pyfunc.ChatModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.pyfunc.ChatModel</span></code></a>:</p>
-<ul class="simple">
-<li><p><a class="reference internal" href="../../python_api/mlflow.types.html#mlflow.types.llm.ChatRequest" title="mlflow.types.llm.ChatRequest"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.types.llm.ChatRequest</span></code></a> will be renamed to <code class="docutils literal notranslate"><span class="pre">ChatCompletionRequest</span></code></p></li>
-<li><p><a class="reference internal" href="../../python_api/mlflow.types.html#mlflow.types.llm.ChatResponse" title="mlflow.types.llm.ChatResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.types.llm.ChatResponse</span></code></a> will be renamed to <code class="docutils literal notranslate"><span class="pre">ChatCompletionResponse</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">predict_stream</span></code> will be returning a true streaming interface that returns a generator of <code class="docutils literal notranslate"><span class="pre">ChatCompletionChunks</span></code> instead of the current behavior of yielding the entire prediction as a single <code class="docutils literal notranslate"><span class="pre">ChatResponse</span></code> generator entry.</p></li>
-</ul>
-</div>
 </div>
 <div class="section" id="core-concepts">
 <h2>Core Concepts<a class="headerlink" href="#core-concepts" title="Permalink to this headline"> </a></h2>
@@ -469,7 +460,7 @@ It is provided for us.</p>
 standard structure of <a class="reference internal" href="../../python_api/mlflow.types.html#mlflow.types.llm.ChatMessage" title="mlflow.types.llm.ChatMessage"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.types.llm.ChatMessage</span></code></a> and <a class="reference internal" href="../../python_api/mlflow.types.html#mlflow.types.llm.ChatParams" title="mlflow.types.llm.ChatParams"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.types.llm.ChatParams</span></code></a> and ensure that it conforms to what
 your service is expecting.</p></li>
 <li><p>The returned response from <code class="docutils literal notranslate"><span class="pre">predict</span></code> should adhere to the output structure defined within the <code class="docutils literal notranslate"><span class="pre">ChatModel</span></code> output signature:
-<a class="reference internal" href="../../python_api/mlflow.types.html#mlflow.types.llm.ChatResponse" title="mlflow.types.llm.ChatResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.types.llm.ChatResponse</span></code></a>.</p></li>
+<a class="reference internal" href="../../python_api/mlflow.types.html#mlflow.types.llm.ChatCompletionResponse" title="mlflow.types.llm.ChatCompletionResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.types.llm.ChatCompletionResponse</span></code></a>.</p></li>
 </ul>
 </div><div aria-labelledby="tab-0-0-3" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-3" name="0-3" role="tabpanel" tabindex="0"><h3>Common GenAI pitfalls in MLflow</h3><div class="line-block">
 <div class="line"><br /></div>
@@ -615,7 +606,7 @@ values in the class constructor to ensure proper loading of our model.</p></li>
 <li><p>We implement a multi-step agent interaction pattern using methods like <cite>_get_system_message</cite>, <cite>_get_agent_response</cite>, and <cite>_call_agent</cite>. These
 methods manage the flow of communication between multiple agents, such as an “oracle” and a “judge” role, each configured with specific instructions
 and parameters.</p></li>
-<li><p><strong>Static Input/Output Structures</strong>: By adhering to the <code class="docutils literal notranslate"><span class="pre">ChatModel</span></code>’s required input (<cite>List[ChatMessage]</cite>) and output (<cite>ChatResponse</cite>) formats,
+<li><p><strong>Static Input/Output Structures</strong>: By adhering to the <code class="docutils literal notranslate"><span class="pre">ChatModel</span></code>’s required input (<cite>List[ChatMessage]</cite>) and output (<cite>ChatCompletionResponse</cite>) formats,
 we eliminate the complexities associated with converting JSON or tabular data, which is common in more general models like <code class="docutils literal notranslate"><span class="pre">PythonModel</span></code>.</p></li>
 </ul>
 </div></blockquote>
@@ -630,7 +621,7 @@ structural issues early, reducing debugging time during deployment.</p></li>
 </li>
 </ul>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">from</span> <span class="nn">mlflow.types.llm</span> <span class="kn">import</span> <span class="n">ChatResponse</span><span class="p">,</span> <span class="n">ChatMessage</span><span class="p">,</span> <span class="n">ChatParams</span><span class="p">,</span> <span class="n">ChatChoice</span>
+<span class="kn">from</span> <span class="nn">mlflow.types.llm</span> <span class="kn">import</span> <span class="n">ChatCompletionResponse</span><span class="p">,</span> <span class="n">ChatMessage</span><span class="p">,</span> <span class="n">ChatParams</span><span class="p">,</span> <span class="n">ChatChoice</span>
 <span class="kn">from</span> <span class="nn">mlflow.pyfunc</span> <span class="kn">import</span> <span class="n">ChatModel</span>
 <span class="kn">from</span> <span class="nn">mlflow</span> <span class="kn">import</span> <span class="n">deployments</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Dict</span>
@@ -741,7 +732,7 @@ structural issues early, reducing debugging time during deployment.</p></li>
 
     <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">messages</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ChatMessage</span><span class="p">],</span> <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ChatParams</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ChatResponse</span><span class="p">:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ChatCompletionResponse</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Predict method to handle agent conversation.</span>
 
@@ -751,7 +742,7 @@ structural issues early, reducing debugging time during deployment.</p></li>
 <span class="sd">            params (Optional[ChatParams]): Additional parameters for the conversation.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            ChatResponse: The structured response object.</span>
+<span class="sd">            ChatCompletionResponse: The structured response object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Use the fluent API context handler to have added control over what is included in the span</span>
         <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_span</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Audit Agent&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">root_span</span><span class="p">:</span>
@@ -775,7 +766,7 @@ structural issues early, reducing debugging time during deployment.</p></li>
             <span class="c1"># Reset the conversation history and return the final response</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">conversation_history</span> <span class="o">=</span> <span class="p">[]</span>
 
-            <span class="n">output</span> <span class="o">=</span> <span class="n">ChatResponse</span><span class="p">(</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">ChatCompletionResponse</span><span class="p">(</span>
                 <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="n">ChatChoice</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">ChatMessage</span><span class="p">(</span><span class="o">**</span><span class="n">judge_response</span><span class="p">))],</span>
                 <span class="n">usage</span><span class="o">=</span><span class="p">{},</span>
                 <span class="n">model</span><span class="o">=</span><span class="n">judge_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;endpoint&quot;</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">),</span>

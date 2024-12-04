@@ -68,6 +68,7 @@
 <script type="text/javascript" src="../../_static/jquery.js"></script>
 <script type="text/javascript" src="../../_static/underscore.js"></script>
 <script type="text/javascript" src="../../_static/doctools.js"></script>
+<script type="text/javascript" src="../../_static/tabs.js"></script>
 <script type="text/javascript" src="../../_static/languagesections.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
@@ -493,19 +494,124 @@ Ensure that you do not accidentally have any circular dependencies in your metri
 <p>By default, MLflow will use OpenAI’s GPT-4 model as the judge model that scores metrics. You can change the judge model by passing an override to the <code class="docutils literal notranslate"><span class="pre">model</span></code> argument within the metric definition.</p>
 <div class="section" id="saas-llm-providers">
 <h5>1. SaaS LLM Providers<a class="headerlink" href="#saas-llm-providers" title="Permalink to this headline"> </a></h5>
-<p>To use SaaS LLM providers, such as OpenAI or Anthropic, set the <code class="docutils literal notranslate"><span class="pre">model</span></code> parameter in the metrics definition, in the format of <code class="docutils literal notranslate"><span class="pre">&lt;provider&gt;:/&lt;model-name&gt;</span></code>. For example, to use Anthropic Claude 3.5 model as the judge model, set <code class="docutils literal notranslate"><span class="pre">anthropic</span></code> as the provider.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">my_answer_similarity</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">genai</span><span class="o">.</span><span class="n">answer_similarity</span><span class="p">(</span>
+<p>To use SaaS LLM providers, such as OpenAI or Anthropic, set the <code class="docutils literal notranslate"><span class="pre">model</span></code> parameter in the metrics definition, in the format of <code class="docutils literal notranslate"><span class="pre">&lt;provider&gt;:/&lt;model-name&gt;</span></code>. Currently, MLflow supports <code class="docutils literal notranslate"><span class="pre">[&quot;openai&quot;,</span> <span class="pre">&quot;anthropic&quot;,</span> <span class="pre">&quot;bedrock&quot;,</span> <span class="pre">&quot;mistral&quot;,</span> <span class="pre">&quot;togetherai&quot;]</span></code> as viable LLM providers for any judge model.</p>
+<div class="sphinx-tabs docutils container">
+<div aria-label="Tabbed content" role="tablist"><button aria-controls="panel-0-0-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-0-0-0" name="0-0" role="tab" tabindex="0">OpenAI / Azure OpenAI</button><button aria-controls="panel-0-0-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-1" name="0-1" role="tab" tabindex="-1">Anthropic</button><button aria-controls="panel-0-0-2" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-2" name="0-2" role="tab" tabindex="-1">Bedrock</button><button aria-controls="panel-0-0-3" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-3" name="0-3" role="tab" tabindex="-1">Mistral</button><button aria-controls="panel-0-0-4" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-4" name="0-4" role="tab" tabindex="-1">TogetherAI</button></div><div aria-labelledby="tab-0-0-0" class="sphinx-tabs-panel" id="panel-0-0-0" name="0-0" role="tabpanel" tabindex="0"><p>OpenAI models can be accessed via the <code class="docutils literal notranslate"><span class="pre">openai:/&lt;model-name&gt;</span></code> URI.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;OPENAI_API_KEY&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&lt;your-openai-api-key&gt;&quot;</span>
+
+<span class="n">answer_correctness</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">genai</span><span class="o">.</span><span class="n">answer_correctness</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="s2">&quot;openai:/gpt-4o&quot;</span><span class="p">)</span>
+
+<span class="c1"># Test the metric definition</span>
+<span class="n">answer_correctness</span><span class="p">(</span>
+    <span class="n">inputs</span><span class="o">=</span><span class="s2">&quot;What is MLflow?&quot;</span><span class="p">,</span>
+    <span class="n">predictions</span><span class="o">=</span><span class="s2">&quot;MLflow is an innovative full self-driving airship.&quot;</span><span class="p">,</span>
+    <span class="n">targets</span><span class="o">=</span><span class="s2">&quot;MLflow is an open-source platform for managing the end-to-end ML lifecycle.&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Azure OpenAI endpoints can be accessed via the same <code class="docutils literal notranslate"><span class="pre">openai:/&lt;model-name&gt;</span></code> URI, by setting the environment variables, such as <code class="docutils literal notranslate"><span class="pre">OPENAI_API_BASE</span></code>, <code class="docutils literal notranslate"><span class="pre">OPENAI_API_TYPE</span></code>, etc.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;OPENAI_API_TYPE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;azure&quot;</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;OPENAI_API_BASE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;https:/my-azure-openai-endpoint.azure.com/&quot;</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;OPENAI_DEPLOYMENT_NAME&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;gpt-4o-mini&quot;</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;OPENAI_API_VERSION&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;2024-08-01-preview&quot;</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;OPENAI_API_KEY&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&lt;your-api-key-for-azure-openai-endpoint&gt;&quot;</span>
+</pre></div>
+</div>
+</div><div aria-labelledby="tab-0-0-1" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-1" name="0-1" role="tabpanel" tabindex="0"><p>Anthropic models can be accessed via the <code class="docutils literal notranslate"><span class="pre">anthropic:/&lt;model-name&gt;</span></code> URI. Note that the <cite>default judge parameters &lt;#overriding-default-judge-parameters&gt;</cite> need to be overridden by passing the <code class="docutils literal notranslate"><span class="pre">parameters</span></code> argument to the metrics definition, since the default parameters violates the Anthropic endpoint requirement (<code class="docutils literal notranslate"><span class="pre">temperature</span></code> and <code class="docutils literal notranslate"><span class="pre">top_p</span></code> cannot be specified together).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;ANTHROPIC_API_KEY&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&lt;your-anthropic-api-key&gt;&quot;</span>
+
+<span class="n">answer_correctness</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">genai</span><span class="o">.</span><span class="n">answer_correctness</span><span class="p">(</span>
     <span class="n">model</span><span class="o">=</span><span class="s2">&quot;anthropic:/claude-3-5-sonnet-20241022&quot;</span><span class="p">,</span>
     <span class="c1"># Override default judge parameters to meet Claude endpoint requirements.</span>
     <span class="n">parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;max_tokens&quot;</span><span class="p">:</span> <span class="mi">256</span><span class="p">},</span>
 <span class="p">)</span>
+
+<span class="c1"># Test the metric definition</span>
+<span class="n">answer_correctness</span><span class="p">(</span>
+    <span class="n">inputs</span><span class="o">=</span><span class="s2">&quot;What is MLflow?&quot;</span><span class="p">,</span>
+    <span class="n">predictions</span><span class="o">=</span><span class="s2">&quot;MLflow is an innovative full self-driving airship.&quot;</span><span class="p">,</span>
+    <span class="n">targets</span><span class="o">=</span><span class="s2">&quot;MLflow is an open-source platform for managing the end-to-end ML lifecycle.&quot;</span><span class="p">,</span>
+<span class="p">)</span>
 </pre></div>
 </div>
-<p>Currently, MLflow supports <code class="docutils literal notranslate"><span class="pre">[&quot;openai&quot;,</span> <span class="pre">&quot;anthropic&quot;,</span> <span class="pre">&quot;bedrock&quot;,</span> <span class="pre">&quot;mistral&quot;,</span> <span class="pre">&quot;togetherai&quot;]</span></code> as viable LLM providers for any judge model. Azure OpenAI endpoints can be accessed via the <code class="docutils literal notranslate"><span class="pre">openai:/&lt;model-name&gt;</span></code> URI, by setting the environment variables, such as <code class="docutils literal notranslate"><span class="pre">OPENAI_API_BASE</span></code>, <code class="docutils literal notranslate"><span class="pre">OPENAI_API_TYPE</span></code>, etc.</p>
+</div><div aria-labelledby="tab-0-0-2" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-2" name="0-2" role="tabpanel" tabindex="0"><p>Bedrock models can be accessed via the <code class="docutils literal notranslate"><span class="pre">bedrock:/&lt;model-name&gt;</span></code> URI. Make sure you have set the authentication information via the environment variables. You can use both role-based or API key-based authentication for accessing Bedrock models.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;AWS_REGION&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&lt;your-aws-region&gt;&quot;</span>
+
+<span class="c1"># Option 1. Role-based authentication</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;AWS_ROLE_ARN&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&lt;your-aws-role-arn&gt;&quot;</span>
+
+<span class="c1"># Option 2. API key-based authentication</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;AWS_ACCESS_KEY_ID&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&lt;your-aws-access-key-id&gt;&quot;</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;AWS_SECRET_ACCESS_KEY&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&lt;your-aws-secret-access-key&gt;&quot;</span>
+<span class="c1"># You can also use session token for temporary credentials.</span>
+<span class="c1"># os.environ[&quot;AWS_SESSION_TOKEN&quot;] = &quot;&lt;your-aws-session-token&gt;&quot;</span>
+
+<span class="n">answer_correctness</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">genai</span><span class="o">.</span><span class="n">answer_correctness</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;bedrock:/anthropic.claude-3-5-sonnet-20241022-v2:0&quot;</span><span class="p">,</span>
+    <span class="n">parameters</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;max_tokens&quot;</span><span class="p">:</span> <span class="mi">256</span><span class="p">,</span>
+        <span class="s2">&quot;anthropic_version&quot;</span><span class="p">:</span> <span class="s2">&quot;bedrock-2023-05-31&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+
+<span class="c1"># Test the metric definition</span>
+<span class="n">answer_correctness</span><span class="p">(</span>
+    <span class="n">inputs</span><span class="o">=</span><span class="s2">&quot;What is MLflow?&quot;</span><span class="p">,</span>
+    <span class="n">predictions</span><span class="o">=</span><span class="s2">&quot;MLflow is an innovative full self-driving airship.&quot;</span><span class="p">,</span>
+    <span class="n">targets</span><span class="o">=</span><span class="s2">&quot;MLflow is an open-source platform for managing the end-to-end ML lifecycle.&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div><div aria-labelledby="tab-0-0-3" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-3" name="0-3" role="tabpanel" tabindex="0"><p>Mistral models can be accessed via the <code class="docutils literal notranslate"><span class="pre">mistral:/&lt;model-name&gt;</span></code> URI.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;MISTRAL_API_KEY&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&lt;your-mistral-api-key&gt;&quot;</span>
+
+<span class="n">answer_correctness</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">genai</span><span class="o">.</span><span class="n">answer_correctness</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;mistral:/mistral-small-latest&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Test the metric definition</span>
+<span class="n">answer_correctness</span><span class="p">(</span>
+    <span class="n">inputs</span><span class="o">=</span><span class="s2">&quot;What is MLflow?&quot;</span><span class="p">,</span>
+    <span class="n">predictions</span><span class="o">=</span><span class="s2">&quot;MLflow is an innovative full self-driving airship.&quot;</span><span class="p">,</span>
+    <span class="n">targets</span><span class="o">=</span><span class="s2">&quot;MLflow is an open-source platform for managing the end-to-end ML lifecycle.&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div><div aria-labelledby="tab-0-0-4" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-4" name="0-4" role="tabpanel" tabindex="0"><p>TogetherAI models can be accessed via the <code class="docutils literal notranslate"><span class="pre">togetherai:/&lt;model-name&gt;</span></code> URI.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;TOGETHERAI_API_KEY&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&lt;your-togetherai-api-key&gt;&quot;</span>
+
+<span class="n">answer_correctness</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">genai</span><span class="o">.</span><span class="n">answer_correctness</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;togetherai:/togetherai-small-latest&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Test the metric definition</span>
+<span class="n">answer_correctness</span><span class="p">(</span>
+    <span class="n">inputs</span><span class="o">=</span><span class="s2">&quot;What is MLflow?&quot;</span><span class="p">,</span>
+    <span class="n">predictions</span><span class="o">=</span><span class="s2">&quot;MLflow is an innovative full self-driving airship.&quot;</span><span class="p">,</span>
+    <span class="n">targets</span><span class="o">=</span><span class="s2">&quot;MLflow is an open-source platform for managing the end-to-end ML lifecycle.&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div></div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>To use SaaS LLM providers, make sure you have set the API key for the provider via
-the environment variable, e.g., <code class="docutils literal notranslate"><span class="pre">ANTHROPIC_API_KEY</span></code>. Your use of a third party LLM service (e.g., OpenAI) for evaluation may be subject to and governed by the LLM service’s terms of use.</p>
+<p>Your use of a third party LLM service (e.g., OpenAI) for evaluation may be subject to and governed by the LLM service’s terms of use.</p>
 </div>
 </div>
 <div class="section" id="self-hosted-proxy-endpoints">

@@ -241,6 +241,7 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
 <span class="kn">from</span> <span class="nn">string</span> <span class="kn">import</span> <span class="n">Formatter</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
 
@@ -290,9 +291,6 @@
     <span class="n">_validate_and_prepare_target_save_path</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.utils.openai_utils</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">REQUEST_URL_CHAT</span><span class="p">,</span>
-    <span class="n">REQUEST_URL_COMPLETIONS</span><span class="p">,</span>
-    <span class="n">REQUEST_URL_EMBEDDINGS</span><span class="p">,</span>
     <span class="n">_OAITokenHolder</span><span class="p">,</span>
     <span class="n">_OpenAIApiConfig</span><span class="p">,</span>
     <span class="n">_OpenAIEnvVar</span><span class="p">,</span>
@@ -389,8 +387,8 @@
     <span class="n">api_base</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">_OpenAIEnvVar</span><span class="o">.</span><span class="n">OPENAI_API_BASE</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span>
         <span class="n">_OpenAIEnvVar</span><span class="o">.</span><span class="n">OPENAI_BASE_URL</span><span class="o">.</span><span class="n">value</span>
     <span class="p">)</span>
-    <span class="n">engine</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">_OpenAIEnvVar</span><span class="o">.</span><span class="n">OPENAI_ENGINE</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="n">deployment_id</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">_OpenAIEnvVar</span><span class="o">.</span><span class="n">OPENAI_DEPLOYMENT_NAME</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">organization</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">_OpenAIEnvVar</span><span class="o">.</span><span class="n">OPENAI_ORGANIZATION</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">api_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;azure&quot;</span><span class="p">,</span> <span class="s2">&quot;azure_ad&quot;</span><span class="p">,</span> <span class="s2">&quot;azuread&quot;</span><span class="p">):</span>
         <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">16</span>
         <span class="n">max_tokens_per_minute</span> <span class="o">=</span> <span class="mi">60_000</span>
@@ -407,8 +405,8 @@
         <span class="n">max_tokens_per_minute</span><span class="o">=</span><span class="n">max_tokens_per_minute</span><span class="p">,</span>
         <span class="n">api_base</span><span class="o">=</span><span class="n">api_base</span><span class="p">,</span>
         <span class="n">api_version</span><span class="o">=</span><span class="n">api_version</span><span class="p">,</span>
-        <span class="n">engine</span><span class="o">=</span><span class="n">engine</span><span class="p">,</span>
         <span class="n">deployment_id</span><span class="o">=</span><span class="n">deployment_id</span><span class="p">,</span>
+        <span class="n">organization</span><span class="o">=</span><span class="n">organization</span><span class="p">,</span>
     <span class="p">)</span>
 
 
@@ -843,34 +841,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="o">=</span> <span class="n">task</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">api_config</span> <span class="o">=</span> <span class="n">_get_api_config</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">api_token</span> <span class="o">=</span> <span class="n">_OAITokenHolder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api_config</span><span class="o">.</span><span class="n">api_type</span><span class="p">)</span>
-        <span class="c1"># If the same parameter exists in self.model &amp; self.api_config,</span>
-        <span class="c1"># we use the parameter from self.model</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">request_configs</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;api_base&quot;</span><span class="p">,</span> <span class="s2">&quot;api_version&quot;</span><span class="p">,</span> <span class="s2">&quot;api_type&quot;</span><span class="p">,</span> <span class="s2">&quot;engine&quot;</span><span class="p">,</span> <span class="s2">&quot;deployment_id&quot;</span><span class="p">]:</span>
-            <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">request_configs</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">value</span> <span class="o">:=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api_config</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">request_configs</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">request_configs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;api_type&quot;</span><span class="p">)</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;azure&quot;</span><span class="p">,</span> <span class="s2">&quot;azure_ad&quot;</span><span class="p">,</span> <span class="s2">&quot;azuread&quot;</span><span class="p">):</span>
-            <span class="n">deployment_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request_configs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;deployment_id&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">request_configs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;engine&quot;</span><span class="p">):</span>
-                <span class="c1"># Avoid using both parameters as they serve the same purpose</span>
-                <span class="c1"># Invalid inputs:</span>
-                <span class="c1">#   - Wrong engine + correct/wrong deployment_id</span>
-                <span class="c1">#   - No engine + wrong deployment_id</span>
-                <span class="c1"># Valid inputs:</span>
-                <span class="c1">#   - Correct engine + correct/wrong deployment_id</span>
-                <span class="c1">#   - No engine + correct deployment_id</span>
-                <span class="k">if</span> <span class="n">deployment_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                        <span class="s2">&quot;Both engine and deployment_id are set. &quot;</span>
-                        <span class="s2">&quot;Using engine as it takes precedence.&quot;</span>
-                    <span class="p">)</span>
-            <span class="k">elif</span> <span class="n">deployment_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
-                    <span class="s2">&quot;Either engine or deployment_id must be set for Azure OpenAI API&quot;</span><span class="p">,</span>
-                <span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="o">!=</span> <span class="s2">&quot;embeddings&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_setup_completions</span><span class="p">()</span>
@@ -886,107 +856,122 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">template</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;messages&quot;</span><span class="p">,</span> <span class="p">[])</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">template</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;prompt&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">formater</span> <span class="o">=</span> <span class="n">_ContentFormatter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">template</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">formatter</span> <span class="o">=</span> <span class="n">_ContentFormatter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">template</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">format_completions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params_list</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">formater</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">params</span><span class="p">)</span> <span class="k">for</span> <span class="n">params</span> <span class="ow">in</span> <span class="n">params_list</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">formatter</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">params</span><span class="p">)</span> <span class="k">for</span> <span class="n">params</span> <span class="ow">in</span> <span class="n">params_list</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">get_params_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">formater</span><span class="o">.</span><span class="n">variables</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">variable</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">formater</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">formatter</span><span class="o">.</span><span class="n">variables</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">variable</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">formatter</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">data</span><span class="p">[[</span><span class="n">variable</span><span class="p">]]</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="n">orient</span><span class="o">=</span><span class="s2">&quot;records&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">first_string_column</span> <span class="o">=</span> <span class="n">_first_string_column</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
                 <span class="k">return</span> <span class="p">[{</span><span class="n">variable</span><span class="p">:</span> <span class="n">s</span><span class="p">}</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="n">first_string_column</span><span class="p">]]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">formater</span><span class="o">.</span><span class="n">variables</span><span class="p">]</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="n">orient</span><span class="o">=</span><span class="s2">&quot;records&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">formatter</span><span class="o">.</span><span class="n">variables</span><span class="p">]</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="n">orient</span><span class="o">=</span><span class="s2">&quot;records&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_construct_request_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_url</span><span class="p">,</span> <span class="n">default_url</span><span class="p">):</span>
-        <span class="n">api_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request_configs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;api_type&quot;</span><span class="p">)</span>
-        <span class="n">api_base</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">base</span> <span class="o">:=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request_configs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;api_base&quot;</span><span class="p">))</span> <span class="k">else</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="n">api_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;azure&quot;</span><span class="p">,</span> <span class="s2">&quot;azure_ad&quot;</span><span class="p">,</span> <span class="s2">&quot;azuread&quot;</span><span class="p">):</span>
-            <span class="n">api_version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request_configs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;api_version&quot;</span><span class="p">)</span>
-            <span class="n">deployment_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request_configs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;deployment_id&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_client</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_retries</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="c1"># with_option method should not be used before v1.3.8: https://github.com/openai/openai-python/issues/865</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_config</span><span class="o">.</span><span class="n">api_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;azure&quot;</span><span class="p">,</span> <span class="s2">&quot;azure_ad&quot;</span><span class="p">,</span> <span class="s2">&quot;azuread&quot;</span><span class="p">):</span>
+            <span class="kn">from</span> <span class="nn">openai</span> <span class="kn">import</span> <span class="n">AzureOpenAI</span>
 
-            <span class="k">return</span> <span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">api_base</span><span class="si">}</span><span class="s2">/openai/deployments/</span><span class="si">{</span><span class="n">deployment_id</span><span class="si">}</span><span class="s2">/&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">task_url</span><span class="si">}</span><span class="s2">?api-version=</span><span class="si">{</span><span class="n">api_version</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">return</span> <span class="n">AzureOpenAI</span><span class="p">(</span>
+                <span class="n">api_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_token</span><span class="o">.</span><span class="n">token</span><span class="p">,</span>
+                <span class="n">azure_endpoint</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_config</span><span class="o">.</span><span class="n">api_base</span><span class="p">,</span>
+                <span class="n">api_version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_config</span><span class="o">.</span><span class="n">api_version</span><span class="p">,</span>
+                <span class="n">azure_deployment</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_config</span><span class="o">.</span><span class="n">deployment_id</span><span class="p">,</span>
+                <span class="n">max_retries</span><span class="o">=</span><span class="n">max_retries</span><span class="p">,</span>
+                <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
             <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">openai</span> <span class="kn">import</span> <span class="n">OpenAI</span>
 
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">api_base</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">task_url</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">api_base</span> <span class="k">else</span> <span class="n">default_url</span>
+            <span class="k">return</span> <span class="n">OpenAI</span><span class="p">(</span>
+                <span class="n">api_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_token</span><span class="o">.</span><span class="n">token</span><span class="p">,</span>
+                <span class="n">base_url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_config</span><span class="o">.</span><span class="n">api_base</span><span class="p">,</span>
+                <span class="n">max_retries</span><span class="o">=</span><span class="n">max_retries</span><span class="p">,</span>
+                <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
+            <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_predict_chat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
         <span class="kn">from</span> <span class="nn">mlflow.openai.api_request_parallel_processor</span> <span class="kn">import</span> <span class="n">process_api_requests</span>
 
         <span class="n">_validate_model_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
-        <span class="n">messages_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_completions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_params_list</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
-        <span class="n">requests</span> <span class="o">=</span> <span class="p">[{</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">,</span> <span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="n">messages</span><span class="p">}</span> <span class="k">for</span> <span class="n">messages</span> <span class="ow">in</span> <span class="n">messages_list</span><span class="p">]</span>
-        <span class="n">request_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_construct_request_url</span><span class="p">(</span><span class="s2">&quot;chat/completions&quot;</span><span class="p">,</span> <span class="n">REQUEST_URL_CHAT</span><span class="p">)</span>
+        <span class="n">max_retries</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;max_retries&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_config</span><span class="o">.</span><span class="n">max_retries</span><span class="p">)</span>
+        <span class="n">timeout</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;timeout&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_config</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
 
-        <span class="n">results</span> <span class="o">=</span> <span class="n">process_api_requests</span><span class="p">(</span>
-            <span class="n">requests</span><span class="p">,</span>
-            <span class="n">request_url</span><span class="p">,</span>
-            <span class="n">api_token</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_token</span><span class="p">,</span>
-            <span class="n">max_requests_per_minute</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_config</span><span class="o">.</span><span class="n">max_requests_per_minute</span><span class="p">,</span>
-            <span class="n">max_tokens_per_minute</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_config</span><span class="o">.</span><span class="n">max_tokens_per_minute</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="s2">&quot;choices&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;message&quot;</span><span class="p">][</span><span class="s2">&quot;content&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span><span class="p">]</span>
+        <span class="n">messages_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_completions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_params_list</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+        <span class="n">client</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_client</span><span class="p">(</span><span class="n">max_retries</span><span class="o">=</span><span class="n">max_retries</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+
+        <span class="n">requests</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">partial</span><span class="p">(</span>
+                <span class="n">client</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">completions</span><span class="o">.</span><span class="n">create</span><span class="p">,</span>
+                <span class="n">messages</span><span class="o">=</span><span class="n">messages</span><span class="p">,</span>
+                <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">[</span><span class="s2">&quot;model&quot;</span><span class="p">],</span>
+                <span class="o">**</span><span class="n">params</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">messages</span> <span class="ow">in</span> <span class="n">messages_list</span>
+        <span class="p">]</span>
+
+        <span class="n">results</span> <span class="o">=</span> <span class="n">process_api_requests</span><span class="p">(</span><span class="n">request_tasks</span><span class="o">=</span><span class="n">requests</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="n">r</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">content</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">_predict_completions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
         <span class="kn">from</span> <span class="nn">mlflow.openai.api_request_parallel_processor</span> <span class="kn">import</span> <span class="n">process_api_requests</span>
 
         <span class="n">_validate_model_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
         <span class="n">prompts_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_completions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_params_list</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
-
+        <span class="n">max_retries</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;max_retries&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_config</span><span class="o">.</span><span class="n">max_retries</span><span class="p">)</span>
+        <span class="n">timeout</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;timeout&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_config</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
         <span class="n">batch_size</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;batch_size&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_config</span><span class="o">.</span><span class="n">batch_size</span><span class="p">)</span>
         <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Requests are being batched by </span><span class="si">{</span><span class="n">batch_size</span><span class="si">}</span><span class="s2"> samples.&quot;</span><span class="p">)</span>
+
+        <span class="n">client</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_client</span><span class="p">(</span><span class="n">max_retries</span><span class="o">=</span><span class="n">max_retries</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+
         <span class="n">requests</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="p">{</span>
-                <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
+            <span class="n">partial</span><span class="p">(</span>
+                <span class="n">client</span><span class="o">.</span><span class="n">completions</span><span class="o">.</span><span class="n">create</span><span class="p">,</span>
+                <span class="n">prompt</span><span class="o">=</span><span class="n">prompts_list</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">batch_size</span><span class="p">],</span>
+                <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">[</span><span class="s2">&quot;model&quot;</span><span class="p">],</span>
                 <span class="o">**</span><span class="n">params</span><span class="p">,</span>
-                <span class="s2">&quot;prompt&quot;</span><span class="p">:</span> <span class="n">prompts_list</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">batch_size</span><span class="p">],</span>
-            <span class="p">}</span>
+            <span class="p">)</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">prompts_list</span><span class="p">),</span> <span class="n">batch_size</span><span class="p">)</span>
         <span class="p">]</span>
-        <span class="n">request_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_construct_request_url</span><span class="p">(</span><span class="s2">&quot;completions&quot;</span><span class="p">,</span> <span class="n">REQUEST_URL_COMPLETIONS</span><span class="p">)</span>
 
-        <span class="n">results</span> <span class="o">=</span> <span class="n">process_api_requests</span><span class="p">(</span>
-            <span class="n">requests</span><span class="p">,</span>
-            <span class="n">request_url</span><span class="p">,</span>
-            <span class="n">api_token</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_token</span><span class="p">,</span>
-            <span class="n">max_requests_per_minute</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_config</span><span class="o">.</span><span class="n">max_requests_per_minute</span><span class="p">,</span>
-            <span class="n">max_tokens_per_minute</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_config</span><span class="o">.</span><span class="n">max_tokens_per_minute</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">results</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;choices&quot;</span><span class="p">]]</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">process_api_requests</span><span class="p">(</span><span class="n">request_tasks</span><span class="o">=</span><span class="n">requests</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="n">row</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">results</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">batch</span><span class="o">.</span><span class="n">choices</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">_predict_embeddings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
         <span class="kn">from</span> <span class="nn">mlflow.openai.api_request_parallel_processor</span> <span class="kn">import</span> <span class="n">process_api_requests</span>
 
         <span class="n">_validate_model_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+        <span class="n">max_retries</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;max_retries&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_config</span><span class="o">.</span><span class="n">max_retries</span><span class="p">)</span>
+        <span class="n">timeout</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;timeout&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_config</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
         <span class="n">batch_size</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;batch_size&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_config</span><span class="o">.</span><span class="n">batch_size</span><span class="p">)</span>
         <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Requests are being batched by </span><span class="si">{</span><span class="n">batch_size</span><span class="si">}</span><span class="s2"> samples.&quot;</span><span class="p">)</span>
 
         <span class="n">first_string_column</span> <span class="o">=</span> <span class="n">_first_string_column</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="n">texts</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">first_string_column</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+        <span class="n">client</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_client</span><span class="p">(</span><span class="n">max_retries</span><span class="o">=</span><span class="n">max_retries</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+
         <span class="n">requests</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="p">{</span>
-                <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
+            <span class="n">partial</span><span class="p">(</span>
+                <span class="n">client</span><span class="o">.</span><span class="n">embeddings</span><span class="o">.</span><span class="n">create</span><span class="p">,</span>
+                <span class="nb">input</span><span class="o">=</span><span class="n">texts</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">batch_size</span><span class="p">],</span>
+                <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">[</span><span class="s2">&quot;model&quot;</span><span class="p">],</span>
                 <span class="o">**</span><span class="n">params</span><span class="p">,</span>
-                <span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="n">texts</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">batch_size</span><span class="p">],</span>
-            <span class="p">}</span>
+            <span class="p">)</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">texts</span><span class="p">),</span> <span class="n">batch_size</span><span class="p">)</span>
         <span class="p">]</span>
-        <span class="n">request_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_construct_request_url</span><span class="p">(</span><span class="s2">&quot;embeddings&quot;</span><span class="p">,</span> <span class="n">REQUEST_URL_EMBEDDINGS</span><span class="p">)</span>
 
-        <span class="n">results</span> <span class="o">=</span> <span class="n">process_api_requests</span><span class="p">(</span>
-            <span class="n">requests</span><span class="p">,</span>
-            <span class="n">request_url</span><span class="p">,</span>
-            <span class="n">api_token</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_token</span><span class="p">,</span>
-            <span class="n">max_requests_per_minute</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_config</span><span class="o">.</span><span class="n">max_requests_per_minute</span><span class="p">,</span>
-            <span class="n">max_tokens_per_minute</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_config</span><span class="o">.</span><span class="n">max_tokens_per_minute</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;embedding&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">results</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]]</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">process_api_requests</span><span class="p">(</span><span class="n">request_tasks</span><span class="o">=</span><span class="n">requests</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="n">row</span><span class="o">.</span><span class="n">embedding</span> <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">results</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">batch</span><span class="o">.</span><span class="n">data</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -997,7 +982,6 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            Model predictions.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">api_token</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="o">==</span> <span class="s2">&quot;chat.completions&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_chat</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">params</span> <span class="ow">or</span> <span class="p">{})</span>

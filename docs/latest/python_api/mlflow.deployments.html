@@ -148,11 +148,13 @@
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Python API</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="mlflow.html">mlflow</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.html#mlflow-tracing-apis">MLflow Tracing APIs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mlflow.anthropic.html">mlflow.anthropic</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.artifacts.html">mlflow.artifacts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.autogen.html">mlflow.autogen</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.catboost.html">mlflow.catboost</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.client.html">mlflow.client</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.config.html">mlflow.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mlflow.crewai.html">mlflow.crewai</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.data.html">mlflow.data</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">mlflow.deployments</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.diviner.html">mlflow.diviner</a></li>
@@ -622,7 +624,7 @@ endpoint</p></li>
 
 <dl class="py method">
 <dt id="mlflow.deployments.DatabricksDeploymentClient.create_endpoint">
-<code class="sig-name descname"><span class="pre">create_endpoint</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">route_optimized</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mlflow/deployments/databricks.html#DatabricksDeploymentClient.create_endpoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.deployments.DatabricksDeploymentClient.create_endpoint" title="Permalink to this definition"> </a></dt>
+<code class="sig-name descname"><span class="pre">create_endpoint</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">route_optimized</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mlflow/deployments/databricks.html#DatabricksDeploymentClient.create_endpoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.deployments.DatabricksDeploymentClient.create_endpoint" title="Permalink to this definition"> </a></dt>
 <dd><div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Experimental: This function may change or be removed in a future release without warning.</p>
@@ -633,11 +635,21 @@ schema.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> – The name of the serving endpoint to create.</p></li>
-<li><p><strong>config</strong> – A dictionary containing the configuration of the serving endpoint to create.</p></li>
-<li><p><strong>route_optimized</strong> – A boolean which defines whether databricks serving endpoint
-in optimized for routing traffic. Refer to the following doc for more details.
-<a class="reference external" href="https://docs.databricks.com/en/machine-learning/model-serving/route-optimization.html#enable-route-optimization-on-a-feature-serving-endpoint">https://docs.databricks.com/en/machine-learning/model-serving/route-optimization.html#enable-route-optimization-on-a-feature-serving-endpoint</a></p></li>
+<li><p><strong>name</strong> – <p>The name of the serving endpoint to create.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Deprecated. Include <cite>name</cite> in <cite>config</cite> instead.</p>
+</div>
+</p></li>
+<li><p><strong>config</strong> – A dictionary containing either the full API request payload
+or the configuration of the serving endpoint to create.</p></li>
+<li><p><strong>route_optimized</strong> – <p>A boolean which defines whether databricks serving endpoint
+is optimized for routing traffic. Only used in the deprecated approach.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Deprecated. Include <cite>route_optimized</cite> in <cite>config</cite> instead.</p>
+</div>
+</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -649,26 +661,27 @@ in optimized for routing traffic. Refer to the following doc for more details.
 
 <span class="n">client</span> <span class="o">=</span> <span class="n">get_deploy_client</span><span class="p">(</span><span class="s2">&quot;databricks&quot;</span><span class="p">)</span>
 <span class="n">endpoint</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">create_endpoint</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;chat&quot;</span><span class="p">,</span>
     <span class="n">config</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">&quot;served_entities&quot;</span><span class="p">:</span> <span class="p">[</span>
-            <span class="p">{</span>
-                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;external_model&quot;</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;gpt-4&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;provider&quot;</span><span class="p">:</span> <span class="s2">&quot;openai&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;task&quot;</span><span class="p">:</span> <span class="s2">&quot;llm/v1/chat&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;openai_config&quot;</span><span class="p">:</span> <span class="p">{</span>
-                        <span class="s2">&quot;openai_api_key&quot;</span><span class="p">:</span> <span class="s2">&quot;{{secrets/scope/key}}&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;config&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;served_entities&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;external_model&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;gpt-4&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;provider&quot;</span><span class="p">:</span> <span class="s2">&quot;openai&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;task&quot;</span><span class="p">:</span> <span class="s2">&quot;llm/v1/chat&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;openai_config&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="s2">&quot;openai_api_key&quot;</span><span class="p">:</span> <span class="s2">&quot;{{secrets/scope/key}}&quot;</span><span class="p">,</span>
+                        <span class="p">},</span>
                     <span class="p">},</span>
-                <span class="p">},</span>
-            <span class="p">}</span>
-        <span class="p">],</span>
+                <span class="p">}</span>
+            <span class="p">],</span>
+            <span class="s2">&quot;route_optimized&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="p">},</span>
     <span class="p">},</span>
-    <span class="n">route_optimized</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="k">assert</span> <span class="n">endpoint</span> <span class="o">==</span> <span class="p">{</span>
-    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;chat&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span>
     <span class="s2">&quot;creator&quot;</span><span class="p">:</span> <span class="s2">&quot;alice@company.com&quot;</span><span class="p">,</span>
     <span class="s2">&quot;creation_timestamp&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
     <span class="s2">&quot;last_updated_timestamp&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
@@ -676,6 +689,12 @@ in optimized for routing traffic. Refer to the following doc for more details.
     <span class="s2">&quot;config&quot;</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span>
     <span class="s2">&quot;tags&quot;</span><span class="p">:</span> <span class="p">[</span><span class="o">...</span><span class="p">],</span>
     <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;88fd3f75a0d24b0380ddc40484d7a31b&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;permission_level&quot;</span><span class="p">:</span> <span class="s2">&quot;CAN_MANAGE&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;route_optimized&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s2">&quot;task&quot;</span><span class="p">:</span> <span class="s2">&quot;llm/v1/chat&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;endpoint_type&quot;</span><span class="p">:</span> <span class="s2">&quot;EXTERNAL_MODEL&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;creator_display_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Alice&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;creator_kind&quot;</span><span class="p">:</span> <span class="s2">&quot;User&quot;</span><span class="p">,</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -932,9 +951,9 @@ schema.</p>
 <dl class="py method">
 <dt id="mlflow.deployments.DatabricksDeploymentClient.update_endpoint">
 <code class="sig-name descname"><span class="pre">update_endpoint</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">endpoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mlflow/deployments/databricks.html#DatabricksDeploymentClient.update_endpoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.deployments.DatabricksDeploymentClient.update_endpoint" title="Permalink to this definition"> </a></dt>
-<dd><div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Experimental: This function may change or be removed in a future release without warning.</p>
+<dd><div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><code class="docutils literal notranslate"><span class="pre">mlflow.deployments.databricks.DatabricksDeploymentClient.update_endpoint</span></code> is deprecated. This method will be removed in a future release. Use <code class="docutils literal notranslate"><span class="pre">update_endpoint_config,</span> <span class="pre">update_endpoint_tags,</span> <span class="pre">update_endpoint_rate_limits,</span> <span class="pre">or</span> <span class="pre">update_endpoint_ai_gateway</span></code> instead.</p>
 </div>
 <p>Update a specified serving endpoint with the provided configuration.
 See <a class="reference external" href="https://docs.databricks.com/api/workspace/servingendpoints/updateconfig">https://docs.databricks.com/api/workspace/servingendpoints/updateconfig</a> for
@@ -1004,6 +1023,193 @@ request/response schema.</p>
         <span class="p">}</span>
     <span class="p">],</span>
 <span class="p">}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mlflow.deployments.DatabricksDeploymentClient.update_endpoint_ai_gateway">
+<code class="sig-name descname"><span class="pre">update_endpoint_ai_gateway</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">endpoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mlflow/deployments/databricks.html#DatabricksDeploymentClient.update_endpoint_ai_gateway"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.deployments.DatabricksDeploymentClient.update_endpoint_ai_gateway" title="Permalink to this definition"> </a></dt>
+<dd><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Experimental: This function may change or be removed in a future release without warning.</p>
+</div>
+<p>Update the AI Gateway configuration of a specified serving endpoint.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>endpoint</strong> (<em>str</em>) – The name of the serving endpoint to update.</p></li>
+<li><p><strong>config</strong> (<em>dict</em>) – A dictionary containing the AI Gateway configuration to update.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dictionary containing the updated AI Gateway configuration.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+<p>Example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.deployments</span> <span class="kn">import</span> <span class="n">get_deploy_client</span>
+
+<span class="n">client</span> <span class="o">=</span> <span class="n">get_deploy_client</span><span class="p">(</span><span class="s2">&quot;databricks&quot;</span><span class="p">)</span>
+<span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;test&quot;</span>
+
+<span class="n">gateway_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;usage_tracking_config&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+    <span class="s2">&quot;inference_table_config&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">&quot;catalog_name&quot;</span><span class="p">:</span> <span class="s2">&quot;my_catalog&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;schema_name&quot;</span><span class="p">:</span> <span class="s2">&quot;my_schema&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+
+<span class="n">updated_gateway</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">update_endpoint_ai_gateway</span><span class="p">(</span>
+    <span class="n">endpoint</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">gateway_config</span>
+<span class="p">)</span>
+<span class="k">assert</span> <span class="n">updated_gateway</span> <span class="o">==</span> <span class="p">{</span>
+    <span class="s2">&quot;usage_tracking_config&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+    <span class="s2">&quot;inference_table_config&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;catalog_name&quot;</span><span class="p">:</span> <span class="s2">&quot;my_catalog&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;schema_name&quot;</span><span class="p">:</span> <span class="s2">&quot;my_schema&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;table_name_prefix&quot;</span><span class="p">:</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mlflow.deployments.DatabricksDeploymentClient.update_endpoint_config">
+<code class="sig-name descname"><span class="pre">update_endpoint_config</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">endpoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mlflow/deployments/databricks.html#DatabricksDeploymentClient.update_endpoint_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.deployments.DatabricksDeploymentClient.update_endpoint_config" title="Permalink to this definition"> </a></dt>
+<dd><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Experimental: This function may change or be removed in a future release without warning.</p>
+</div>
+<p>Update the configuration of a specified serving endpoint. See
+<a class="reference external" href="https://docs.databricks.com/api/workspace/servingendpoints/updateconfig">https://docs.databricks.com/api/workspace/servingendpoints/updateconfig</a> for request/response
+request/response schema.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>endpoint</strong> – The name of the serving endpoint to update.</p></li>
+<li><p><strong>config</strong> – A dictionary containing the configuration of the serving endpoint to update.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A <a class="reference internal" href="#mlflow.deployments.DatabricksEndpoint" title="mlflow.deployments.DatabricksEndpoint"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatabricksEndpoint</span></code></a> object containing the request response.</p>
+</dd>
+</dl>
+<p>Example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.deployments</span> <span class="kn">import</span> <span class="n">get_deploy_client</span>
+
+<span class="n">client</span> <span class="o">=</span> <span class="n">get_deploy_client</span><span class="p">(</span><span class="s2">&quot;databricks&quot;</span><span class="p">)</span>
+<span class="n">updated_endpoint</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">update_endpoint_config</span><span class="p">(</span>
+    <span class="n">endpoint</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">,</span>
+    <span class="n">config</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;served_entities&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;gpt-4o-mini&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;external_model&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;gpt-4o-mini&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;provider&quot;</span><span class="p">:</span> <span class="s2">&quot;openai&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;task&quot;</span><span class="p">:</span> <span class="s2">&quot;llm/v1/chat&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;openai_config&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;openai_api_key&quot;</span><span class="p">:</span> <span class="s2">&quot;{{secrets/scope/key}}&quot;</span><span class="p">,</span>
+                    <span class="p">},</span>
+                <span class="p">},</span>
+            <span class="p">}</span>
+        <span class="p">]</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+<span class="k">assert</span> <span class="n">updated_endpoint</span> <span class="o">==</span> <span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;creator&quot;</span><span class="p">:</span> <span class="s2">&quot;alice@company.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;creation_timestamp&quot;</span><span class="p">:</span> <span class="mi">1729527763000</span><span class="p">,</span>
+    <span class="s2">&quot;last_updated_timestamp&quot;</span><span class="p">:</span> <span class="mi">1729530896000</span><span class="p">,</span>
+    <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;ready&quot;</span><span class="p">:</span> <span class="s2">&quot;READY&quot;</span><span class="p">,</span> <span class="s2">&quot;config_update&quot;</span><span class="p">:</span> <span class="s2">&quot;NOT_UPDATING&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;config&quot;</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span>
+    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;44b258fb39804564b37603d8d14b853e&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;permission_level&quot;</span><span class="p">:</span> <span class="s2">&quot;CAN_MANAGE&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;route_optimized&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s2">&quot;task&quot;</span><span class="p">:</span> <span class="s2">&quot;llm/v1/chat&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;endpoint_type&quot;</span><span class="p">:</span> <span class="s2">&quot;EXTERNAL_MODEL&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;creator_display_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Alice&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;creator_kind&quot;</span><span class="p">:</span> <span class="s2">&quot;User&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mlflow.deployments.DatabricksDeploymentClient.update_endpoint_rate_limits">
+<code class="sig-name descname"><span class="pre">update_endpoint_rate_limits</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">endpoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mlflow/deployments/databricks.html#DatabricksDeploymentClient.update_endpoint_rate_limits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.deployments.DatabricksDeploymentClient.update_endpoint_rate_limits" title="Permalink to this definition"> </a></dt>
+<dd><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Experimental: This function may change or be removed in a future release without warning.</p>
+</div>
+<p>Update the rate limits of a specified serving endpoint.
+See <a class="reference external" href="https://docs.databricks.com/api/workspace/servingendpoints/put">https://docs.databricks.com/api/workspace/servingendpoints/put</a> for request/response
+schema.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>endpoint</strong> – The name of the serving endpoint to update.</p></li>
+<li><p><strong>config</strong> – A dictionary containing the updated rate limit configuration.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A <a class="reference internal" href="#mlflow.deployments.DatabricksEndpoint" title="mlflow.deployments.DatabricksEndpoint"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatabricksEndpoint</span></code></a> object containing the updated rate limits.</p>
+</dd>
+</dl>
+<p>Example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.deployments</span> <span class="kn">import</span> <span class="n">get_deploy_client</span>
+
+<span class="n">client</span> <span class="o">=</span> <span class="n">get_deploy_client</span><span class="p">(</span><span class="s2">&quot;databricks&quot;</span><span class="p">)</span>
+<span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;databricks-dbrx-instruct&quot;</span>
+<span class="n">rate_limits</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;rate_limits&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;calls&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="s2">&quot;endpoint&quot;</span><span class="p">,</span> <span class="s2">&quot;renewal_period&quot;</span><span class="p">:</span> <span class="s2">&quot;minute&quot;</span><span class="p">}]</span>
+<span class="p">}</span>
+<span class="n">updated_rate_limits</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">update_endpoint_rate_limits</span><span class="p">(</span>
+    <span class="n">endpoint</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">rate_limits</span>
+<span class="p">)</span>
+<span class="k">assert</span> <span class="n">updated_rate_limits</span> <span class="o">==</span> <span class="p">{</span>
+    <span class="s2">&quot;rate_limits&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;calls&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="s2">&quot;endpoint&quot;</span><span class="p">,</span> <span class="s2">&quot;renewal_period&quot;</span><span class="p">:</span> <span class="s2">&quot;minute&quot;</span><span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mlflow.deployments.DatabricksDeploymentClient.update_endpoint_tags">
+<code class="sig-name descname"><span class="pre">update_endpoint_tags</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">endpoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mlflow/deployments/databricks.html#DatabricksDeploymentClient.update_endpoint_tags"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.deployments.DatabricksDeploymentClient.update_endpoint_tags" title="Permalink to this definition"> </a></dt>
+<dd><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Experimental: This function may change or be removed in a future release without warning.</p>
+</div>
+<p>Update the tags of a specified serving endpoint. See
+<a class="reference external" href="https://docs.databricks.com/api/workspace/servingendpoints/patch">https://docs.databricks.com/api/workspace/servingendpoints/patch</a> for request/response
+schema.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>endpoint</strong> – The name of the serving endpoint to update.</p></li>
+<li><p><strong>config</strong> – A dictionary containing tags to add and/or remove.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A <a class="reference internal" href="#mlflow.deployments.DatabricksEndpoint" title="mlflow.deployments.DatabricksEndpoint"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatabricksEndpoint</span></code></a> object containing the request response.</p>
+</dd>
+</dl>
+<p>Example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.deployments</span> <span class="kn">import</span> <span class="n">get_deploy_client</span>
+
+<span class="n">client</span> <span class="o">=</span> <span class="n">get_deploy_client</span><span class="p">(</span><span class="s2">&quot;databricks&quot;</span><span class="p">)</span>
+<span class="n">updated_tags</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">update_endpoint_tags</span><span class="p">(</span>
+    <span class="n">endpoint</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;add_tags&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="s2">&quot;project&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;test&quot;</span><span class="p">}]}</span>
+<span class="p">)</span>
+<span class="k">assert</span> <span class="n">updated_tags</span> <span class="o">==</span> <span class="p">{</span><span class="s2">&quot;tags&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="s2">&quot;project&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;test&quot;</span><span class="p">}]}</span>
 </pre></div>
 </div>
 </dd></dl>
