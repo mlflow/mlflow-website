@@ -55,7 +55,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="MLflow 2.18.1.dev0 documentation" href="../../index.html"/>
+    <link rel="top" title="MLflow 2.19.1.dev0 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
@@ -87,7 +87,7 @@
     <a href="../../index.html" class="wy-nav-top-logo"
       ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.18.1.dev0</span>
+    <span class="version">2.19.1.dev0</span>
   </li>
 </ul>
   </nav>
@@ -773,6 +773,10 @@
 <span class="n">ENV</span> <span class="o">=</span> <span class="s2">&quot;env&quot;</span>
 
 <span class="n">_MODEL_DATA_SUBPATH</span> <span class="o">=</span> <span class="s2">&quot;data&quot;</span>
+<span class="n">_CHAT_PARAMS_WARNING_MESSAGE</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;Default values for temperature, n and stream in ChatParams will be removed in the &quot;</span>
+    <span class="s2">&quot;next release. Specify them in the input example explicitly if needed.&quot;</span>
+<span class="p">)</span>
 
 
 <div class="viewcode-block" id="EnvType"><a class="viewcode-back" href="../../python_api/mlflow.pyfunc.html#mlflow.pyfunc.EnvType">[docs]</a><span class="k">class</span> <span class="nc">EnvType</span><span class="p">:</span>
@@ -3137,6 +3141,8 @@
                         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">input_example</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
                         <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="s2">&quot;messages&quot;</span> <span class="ow">and</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ChatParams</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
                     <span class="p">}</span>
+                <span class="k">if</span> <span class="n">valid_params</span> <span class="ow">or</span> <span class="n">input_params</span><span class="p">:</span>
+                    <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">_CHAT_PARAMS_WARNING_MESSAGE</span><span class="p">)</span>
                 <span class="n">input_example</span> <span class="o">=</span> <span class="p">{</span>
                     <span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">messages</span><span class="p">],</span>
                     <span class="o">**</span><span class="n">valid_params</span><span class="p">,</span>
@@ -3144,6 +3150,7 @@
                 <span class="p">}</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">input_example</span> <span class="o">=</span> <span class="n">CHAT_MODEL_INPUT_EXAMPLE</span>
+                <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">_CHAT_PARAMS_WARNING_MESSAGE</span><span class="p">)</span>
                 <span class="n">messages</span> <span class="o">=</span> <span class="p">[</span><span class="n">ChatMessage</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">input_example</span><span class="p">[</span><span class="s2">&quot;messages&quot;</span><span class="p">]]</span>
             <span class="c1"># extra params introduced by ChatParams will not be included in the</span>
             <span class="c1"># logged input example file to avoid confusion</span>
@@ -3612,7 +3619,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../',
-      VERSION:'2.18.1.dev0',
+      VERSION:'2.19.1.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

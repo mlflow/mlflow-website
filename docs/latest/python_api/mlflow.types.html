@@ -55,7 +55,7 @@
         <link rel="index" title="Index"
               href="../genindex.html"/>
         <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="MLflow 2.18.1.dev0 documentation" href="../index.html"/>
+    <link rel="top" title="MLflow 2.19.1.dev0 documentation" href="../index.html"/>
         <link rel="up" title="Python API" href="index.html"/>
         <link rel="next" title="mlflow.utils" href="/mlflow.utils.html"/>
         <link rel="prev" title="mlflow.transformers" href="/mlflow.transformers.html"/> 
@@ -88,7 +88,7 @@
     <a href="../index.html" class="wy-nav-top-logo"
       ><img src="../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.18.1.dev0</span>
+    <span class="version">2.19.1.dev0</span>
   </li>
 </ul>
   </nav>
@@ -164,7 +164,6 @@
 <li class="toctree-l2"><a class="reference internal" href="mlflow.fastai.html">mlflow.fastai</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.gateway.html">mlflow.gateway</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.gemini.html">mlflow.gemini</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mlflow.gluon.html">mlflow.gluon</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.h2o.html">mlflow.h2o</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.johnsnowlabs.html">mlflow.johnsnowlabs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.keras.html">mlflow.keras</a></li>
@@ -707,7 +706,7 @@ ref: <a class="reference external" href="https://platform.openai.com/docs/api-re
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>index</strong> (<em>int</em>) – The index of the response in the list of responses.
 defaults to <code class="docutils literal notranslate"><span class="pre">0</span></code></p></li>
-<li><p><strong>message</strong> (<a class="reference internal" href="#mlflow.types.llm.ChatChoiceDelta" title="mlflow.types.llm.ChatChoiceDelta"><code class="xref py py-class docutils literal notranslate"><span class="pre">ChatChoiceDelta</span></code></a>) – The streaming chunk message that was generated.</p></li>
+<li><p><strong>delta</strong> (<a class="reference internal" href="#mlflow.types.llm.ChatChoiceDelta" title="mlflow.types.llm.ChatChoiceDelta"><code class="xref py py-class docutils literal notranslate"><span class="pre">ChatChoiceDelta</span></code></a>) – The streaming chunk message that was generated.</p></li>
 <li><p><strong>finish_reason</strong> (<em>str</em>) – The reason why generation stopped.
 <strong>Optional</strong>, defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
 <li><p><strong>logprobs</strong> (<a class="reference internal" href="#mlflow.types.llm.ChatChoiceLogProbs" title="mlflow.types.llm.ChatChoiceLogProbs"><code class="xref py py-class docutils literal notranslate"><span class="pre">ChatChoiceLogProbs</span></code></a>) – Log probability information for the choice.
@@ -734,7 +733,8 @@ containing the generated chunk of a streaming response</p></li>
 <li><p><strong>object</strong> (<em>str</em>) – The object type. Defaults to ‘chat.completion.chunk’</p></li>
 <li><p><strong>created</strong> (<em>int</em>) – The time the response was created.
 <strong>Optional</strong>, defaults to the current time.</p></li>
-<li><p><strong>custom_outputs</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>str</em><em>]</em>) – An field that can contain arbitrary additional context.
+<li><p><strong>custom_outputs</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) – An field that can contain arbitrary additional context.
+The dictionary values must be JSON-serializable.
 <strong>Optional</strong>, defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
 </ul>
 </dd>
@@ -772,14 +772,18 @@ the same line verbatim.</p></li>
 <li><p><strong>presence_penalty</strong> – (float): An optional param of positive or negative value,
 positive values penalize new tokens based on whether they appear in the text so far,
 increasing the model’s likelihood to talk about new topics.</p></li>
-<li><p><strong>custom_inputs</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>str</em><em>]</em>) – An optional param to provide arbitrary additional context
-to the model. Both the keys and the values must be strings (i.e. nested dictionaries
-are not supported).</p></li>
+<li><p><strong>custom_inputs</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) – An optional param to provide arbitrary additional context
+to the model. The dictionary values must be JSON-serializable.</p></li>
 <li><p><strong>tools</strong> (List[<a class="reference internal" href="#mlflow.types.llm.ToolDefinition" title="mlflow.types.llm.ToolDefinition"><code class="xref py py-class docutils literal notranslate"><span class="pre">ToolDefinition</span></code></a>]) – An optional list of tools that can be called by
 the model.</p></li>
 </ul>
 </dd>
 </dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>In an upcoming MLflow release, default values for <cite>temperature</cite>, <cite>n</cite> and <cite>stream</cite> will be
+removed. Please provide these values explicitly in your code if needed.</p>
+</div>
 </dd></dl>
 
 <dl class="py class">
@@ -799,6 +803,7 @@ containing the generated responses</p></li>
 <li><p><strong>created</strong> (<em>int</em>) – The time the response was created.
 <strong>Optional</strong>, defaults to the current time.</p></li>
 <li><p><strong>custom_outputs</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) – An field that can contain arbitrary additional context.
+The dictionary values must be JSON-serializable.
 <strong>Optional</strong>, defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
 </ul>
 </dd>
@@ -858,13 +863,17 @@ the same line verbatim.</p></li>
 positive values penalize new tokens based on whether they appear in the text so far,
 increasing the model’s likelihood to talk about new topics.</p></li>
 <li><p><strong>custom_inputs</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) – An optional param to provide arbitrary additional context
-to the model. Both the keys and the values must be strings (i.e. nested dictionaries
-are not supported).</p></li>
+to the model. The dictionary values must be JSON-serializable.</p></li>
 <li><p><strong>tools</strong> (List[<a class="reference internal" href="#mlflow.types.llm.ToolDefinition" title="mlflow.types.llm.ToolDefinition"><code class="xref py py-class docutils literal notranslate"><span class="pre">ToolDefinition</span></code></a>]) – An optional list of tools that can be called by
 the model.</p></li>
 </ul>
 </dd>
 </dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>In an upcoming MLflow release, default values for <cite>temperature</cite>, <cite>n</cite> and <cite>stream</cite> will be
+removed. Please provide these values explicitly in your code if needed.</p>
+</div>
 <dl class="py method">
 <dt id="mlflow.types.llm.ChatParams.keys">
 <em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">keys</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">set</span><a class="reference internal" href="../_modules/mlflow/types/llm.html#ChatParams.keys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.types.llm.ChatParams.keys" title="Permalink to this definition"> </a></dt>
@@ -1223,7 +1232,7 @@ Example: {“property_name”: {“type”: “string”, “required”: True}}
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../',
-      VERSION:'2.18.1.dev0',
+      VERSION:'2.19.1.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

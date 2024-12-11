@@ -55,7 +55,7 @@
         <link rel="index" title="Index"
               href="../genindex.html"/>
         <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="MLflow 2.18.1.dev0 documentation" href="../index.html"/>
+    <link rel="top" title="MLflow 2.19.1.dev0 documentation" href="../index.html"/>
         <link rel="up" title="Python API" href="index.html"/>
         <link rel="next" title="mlflow.environment_variables" href="/mlflow.environment_variables.html"/>
         <link rel="prev" title="mlflow.dspy" href="/mlflow.dspy.html"/> 
@@ -88,7 +88,7 @@
     <a href="../index.html" class="wy-nav-top-logo"
       ><img src="../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.18.1.dev0</span>
+    <span class="version">2.19.1.dev0</span>
   </li>
 </ul>
   </nav>
@@ -164,7 +164,6 @@
 <li class="toctree-l2"><a class="reference internal" href="mlflow.fastai.html">mlflow.fastai</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.gateway.html">mlflow.gateway</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.gemini.html">mlflow.gemini</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mlflow.gluon.html">mlflow.gluon</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.h2o.html">mlflow.h2o</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.johnsnowlabs.html">mlflow.johnsnowlabs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.keras.html">mlflow.keras</a></li>
@@ -1482,6 +1481,78 @@ is ERROR, otherwise it will be ignored.</p></li>
 <dd></dd></dl>
 
 <dl class="py method">
+<dt id="mlflow.entities.Trace.search_spans">
+<code class="sig-name descname"><span class="pre">search_spans</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">span_type</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#mlflow.entities.SpanType" title="mlflow.entities.SpanType"><span class="pre">SpanType</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">re.Pattern</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">list</span><a class="reference internal" href="../_modules/mlflow/entities/trace.html#Trace.search_spans"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.entities.Trace.search_spans" title="Permalink to this definition"> </a></dt>
+<dd><p>Search for spans that match the given criteria within the trace.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>span_type</strong> – The type of the span to search for.</p></li>
+<li><p><strong>name</strong> – The name of the span to search for. This can be a string or a regular expression.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A list of spans that match the given criteria.
+If there is no match, an empty list is returned.</p>
+</dd>
+</dl>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">mlflow.entities</span> <span class="kn">import</span> <span class="n">SpanType</span>
+
+
+<span class="nd">@mlflow</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">span_type</span><span class="o">=</span><span class="n">SpanType</span><span class="o">.</span><span class="n">CHAIN</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">add_one</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">add_two</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">multiply_by_two</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span>
+
+
+<span class="nd">@mlflow</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">span_type</span><span class="o">=</span><span class="n">SpanType</span><span class="o">.</span><span class="n">TOOL</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">add_one</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">1</span>
+
+
+<span class="nd">@mlflow</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">span_type</span><span class="o">=</span><span class="n">SpanType</span><span class="o">.</span><span class="n">TOOL</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">add_two</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">2</span>
+
+
+<span class="nd">@mlflow</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">span_type</span><span class="o">=</span><span class="n">SpanType</span><span class="o">.</span><span class="n">TOOL</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">multiply_by_two</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="mi">2</span>
+
+
+<span class="c1"># Run the function and get the trace</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">run</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">trace</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">get_last_active_trace</span><span class="p">()</span>
+
+<span class="c1"># 1. Search spans by name (exact match)</span>
+<span class="n">spans</span> <span class="o">=</span> <span class="n">trace</span><span class="o">.</span><span class="n">search_spans</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;add_one&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">spans</span><span class="p">)</span>
+<span class="c1"># Output: [Span(name=&#39;add_one&#39;, ...)]</span>
+
+<span class="c1"># 2. Search spans by name (regular expression)</span>
+<span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;add.*&quot;</span><span class="p">)</span>
+<span class="n">spans</span> <span class="o">=</span> <span class="n">trace</span><span class="o">.</span><span class="n">search_spans</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">pattern</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">spans</span><span class="p">)</span>
+<span class="c1"># Output: [Span(name=&#39;add_one&#39;, ...), Span(name=&#39;add_two&#39;, ...)]</span>
+
+<span class="c1"># 3. Search spans by type</span>
+<span class="n">spans</span> <span class="o">=</span> <span class="n">trace</span><span class="o">.</span><span class="n">search_spans</span><span class="p">(</span><span class="n">span_type</span><span class="o">=</span><span class="n">SpanType</span><span class="o">.</span><span class="n">LLM</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">spans</span><span class="p">)</span>
+<span class="c1"># Output: [Span(name=&#39;run&#39;, ...)]</span>
+
+<span class="c1"># 4. Search spans by name and type</span>
+<span class="n">spans</span> <span class="o">=</span> <span class="n">trace</span><span class="o">.</span><span class="n">search_spans</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;add_one&quot;</span><span class="p">,</span> <span class="n">span_type</span><span class="o">=</span><span class="n">SpanType</span><span class="o">.</span><span class="n">TOOL</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">spans</span><span class="p">)</span>
+<span class="c1"># Output: [Span(name=&#39;add_one&#39;, ...)]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
 <dt id="mlflow.entities.Trace.to_dict">
 <code class="sig-name descname"><span class="pre">to_dict</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">dict</span><a class="reference internal" href="../_modules/mlflow/entities/trace.html#Trace.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.entities.Trace.to_dict" title="Permalink to this definition"> </a></dt>
 <dd></dd></dl>
@@ -1991,7 +2062,7 @@ elements, if any are available</p>
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../',
-      VERSION:'2.18.1.dev0',
+      VERSION:'2.19.1.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

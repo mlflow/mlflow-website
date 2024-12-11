@@ -55,7 +55,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="MLflow 2.18.1.dev0 documentation" href="../../../index.html"/>
+    <link rel="top" title="MLflow 2.19.1.dev0 documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
   
@@ -87,7 +87,7 @@
     <a href="../../../index.html" class="wy-nav-top-logo"
       ><img src="../../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.18.1.dev0</span>
+    <span class="version">2.19.1.dev0</span>
   </li>
 </ul>
   </nav>
@@ -204,6 +204,7 @@
   <h1>Source code for mlflow.models.python_api</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">StringIO</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">ForwardRef</span><span class="p">,</span> <span class="n">get_args</span><span class="p">,</span> <span class="n">get_origin</span>
 
@@ -217,6 +218,10 @@
 <span class="kn">from</span> <span class="nn">mlflow.utils.file_utils</span> <span class="kn">import</span> <span class="n">TempDir</span>
 
 <span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">UV_INSTALLATION_INSTRUCTIONS</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;Run `pip install uv` to install uv. See &quot;</span>
+    <span class="s2">&quot;https://docs.astral.sh/uv/getting-started/installation for other installation methods.&quot;</span>
+<span class="p">)</span>
 
 
 <div class="viewcode-block" id="build_docker"><a class="viewcode-back" href="../../../python_api/mlflow.models.html#mlflow.models.build_docker">[docs]</a><span class="k">def</span> <span class="nf">build_docker</span><span class="p">(</span>
@@ -332,6 +337,7 @@
 <span class="sd">        env_manager: Specify a way to create an environment for MLmodel inference:</span>
 
 <span class="sd">            - &quot;virtualenv&quot; (default): use virtualenv (and pyenv for Python version management)</span>
+<span class="sd">            - &quot;uv&quot;: use uv</span>
 <span class="sd">            - &quot;local&quot;: use the local environment</span>
 <span class="sd">            - &quot;conda&quot;: use conda</span>
 
@@ -353,8 +359,8 @@
 <span class="sd">            current os.environ are passed, and this parameter can be used to override them.</span>
 
 <span class="sd">            .. note::</span>
-<span class="sd">                This parameter is only supported when `env_manager` is set to &quot;virtualenv&quot;</span>
-<span class="sd">                or &quot;conda&quot;.</span>
+<span class="sd">                This parameter is only supported when `env_manager` is set to &quot;virtualenv&quot;,</span>
+<span class="sd">                &quot;conda&quot; or &quot;uv&quot;.</span>
 
 <span class="sd">    Code example:</span>
 
@@ -370,7 +376,14 @@
 <span class="sd">            content_type=&quot;json&quot;,</span>
 <span class="sd">        )</span>
 
-<span class="sd">        # Run prediction with additional pip dependencies</span>
+<span class="sd">        # Run prediction with &quot;uv&quot; as the environment manager</span>
+<span class="sd">        mlflow.models.predict(</span>
+<span class="sd">            model_uri=f&quot;runs:/{run_id}/model&quot;,</span>
+<span class="sd">            input_data={&quot;x&quot;: 1, &quot;y&quot;: 2},</span>
+<span class="sd">            env_manager=&quot;uv&quot;,</span>
+<span class="sd">        )</span>
+
+<span class="sd">        # Run prediction with additional pip dependencies and extra environment variables</span>
 <span class="sd">        mlflow.models.predict(</span>
 <span class="sd">            model_uri=f&quot;runs:/{run_id}/model&quot;,</span>
 <span class="sd">            input_data={&quot;x&quot;: 1, &quot;y&quot;: 2},</span>
@@ -387,18 +400,36 @@
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;Content type must be one of </span><span class="si">{</span><span class="n">_CONTENT_TYPE_JSON</span><span class="si">}</span><span class="s2"> or </span><span class="si">{</span><span class="n">_CONTENT_TYPE_CSV</span><span class="si">}</span><span class="s2">.&quot;</span>
         <span class="p">)</span>
-    <span class="k">if</span> <span class="n">extra_envs</span> <span class="ow">and</span> <span class="n">env_manager</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">_EnvManager</span><span class="o">.</span><span class="n">VIRTUALENV</span><span class="p">,</span> <span class="n">_EnvManager</span><span class="o">.</span><span class="n">CONDA</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">extra_envs</span> <span class="ow">and</span> <span class="n">env_manager</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span>
+        <span class="n">_EnvManager</span><span class="o">.</span><span class="n">VIRTUALENV</span><span class="p">,</span>
+        <span class="n">_EnvManager</span><span class="o">.</span><span class="n">CONDA</span><span class="p">,</span>
+        <span class="n">_EnvManager</span><span class="o">.</span><span class="n">UV</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
             <span class="s2">&quot;Extra environment variables are only supported when env_manager is &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;set to &#39;</span><span class="si">{</span><span class="n">_EnvManager</span><span class="o">.</span><span class="n">VIRTUALENV</span><span class="si">}</span><span class="s2">&#39; or &#39;</span><span class="si">{</span><span class="n">_EnvManager</span><span class="o">.</span><span class="n">CONDA</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;set to &#39;</span><span class="si">{</span><span class="n">_EnvManager</span><span class="o">.</span><span class="n">VIRTUALENV</span><span class="si">}</span><span class="s2">&#39;, &#39;</span><span class="si">{</span><span class="n">_EnvManager</span><span class="o">.</span><span class="n">CONDA</span><span class="si">}</span><span class="s2">&#39; or &#39;</span><span class="si">{</span><span class="n">_EnvManager</span><span class="o">.</span><span class="n">UV</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">env_manager</span> <span class="o">==</span> <span class="n">_EnvManager</span><span class="o">.</span><span class="n">UV</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="s2">&quot;uv&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Found &#39;</span><span class="si">{</span><span class="n">env_manager</span><span class="si">}</span><span class="s2">&#39; as env_manager, but the &#39;uv&#39; command is not found in the &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;PATH. </span><span class="si">{</span><span class="n">UV_INSTALLATION_INSTRUCTIONS</span><span class="si">}</span><span class="s2"> Alternatively, you can use &#39;virtualenv&#39; or &quot;</span>
+                <span class="s2">&quot;&#39;conda&#39; as the environment manager, but note their performances are not &quot;</span>
+                <span class="s2">&quot;as good as &#39;uv&#39;.&quot;</span>
+            <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;It is highly recommended to use `</span><span class="si">{</span><span class="n">_EnvManager</span><span class="o">.</span><span class="n">UV</span><span class="si">}</span><span class="s2">` as the environment manager for &quot;</span>
+            <span class="s2">&quot;predicting with MLflow models as its performance is significantly better than other &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;environment managers. </span><span class="si">{</span><span class="n">UV_INSTALLATION_INSTRUCTIONS</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
 
     <span class="n">is_dbconnect_mode</span> <span class="o">=</span> <span class="n">is_databricks_connect</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">is_dbconnect_mode</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">env_manager</span> <span class="o">!=</span> <span class="n">_EnvManager</span><span class="o">.</span><span class="n">VIRTUALENV</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">env_manager</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">_EnvManager</span><span class="o">.</span><span class="n">VIRTUALENV</span><span class="p">,</span> <span class="n">_EnvManager</span><span class="o">.</span><span class="n">UV</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
-                <span class="s2">&quot;Databricks Connect only supports virtualenv as the environment manager. &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="n">env_manager</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Databricks Connect only supports &#39;</span><span class="si">{</span><span class="n">_EnvManager</span><span class="o">.</span><span class="n">VIRTUALENV</span><span class="si">}</span><span class="s2">&#39; or &#39;</span><span class="si">{</span><span class="n">_EnvManager</span><span class="o">.</span><span class="n">UV</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; as the environment manager. Got </span><span class="si">{</span><span class="n">env_manager</span><span class="si">}</span><span class="s2">.&quot;</span>
             <span class="p">)</span>
         <span class="n">pyfunc_backend_env_root_config</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;create_env_root_dir&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
@@ -545,7 +576,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../../',
-      VERSION:'2.18.1.dev0',
+      VERSION:'2.19.1.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

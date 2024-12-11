@@ -55,7 +55,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="MLflow 2.18.1.dev0 documentation" href="../../index.html"/>
+    <link rel="top" title="MLflow 2.19.1.dev0 documentation" href="../../index.html"/>
         <link rel="up" title="LLMs" href="../index.html"/>
         <link rel="next" title="MLflow AI Gateway (Experimental)" href="/../deployments/index.html"/>
         <link rel="prev" title="MLflow Tracing Schema" href="/tracing-schema.html"/> 
@@ -88,7 +88,7 @@
     <a href="../../index.html" class="wy-nav-top-logo"
       ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.18.1.dev0</span>
+    <span class="version">2.19.1.dev0</span>
   </li>
 </ul>
   </nav>
@@ -284,7 +284,7 @@
 <p>From a tracing perspective, GenAI libraries can be categorized into two types:</p>
 <p><strong>🧠 LLM Providers or Wrappers</strong></p>
 <p>Libraries like <strong>OpenAI</strong>, <strong>Anthropic</strong>, <strong>Ollama</strong>, and <strong>LiteLLM</strong> focus on providing access to LLMs. These libraries often have simple client SDKs, therefore, we often simply use ad-hoc patching to trace those APIs.</p>
-<p>For this type of library, start with listing up the core APIs to instrument. For example, in OpenAI auto-tracing, we patch the <code class="docutils literal notranslate"><span class="pre">create()</span></code> method of the <code class="docutils literal notranslate"><span class="pre">ChatCompletion</span></code>, <code class="docutils literal notranslate"><span class="pre">Completion</span></code>, and <code class="docutils literal notranslate"><span class="pre">Embedding</span></code> classes. Refer to the <a class="reference external" href="https://github.com/mlflow/mlflow/blob/master/mlflow/openai/_openai_autolog.py#L123-L178">OpenAI auto-tracing implementation</a> as an example.</p>
+<p>For this type of library, start with listing up the core APIs to instrument. For example, in Anthropic auto-tracing, we patch the <code class="docutils literal notranslate"><span class="pre">create()</span></code> method of the <code class="docutils literal notranslate"><span class="pre">Messages</span></code> class. If the library has multiple APIs (e.g., embeddings, transcription) and you’re not sure which ones to support, consult with the maintainers. Refer to the <a class="reference external" href="https://github.com/mlflow/mlflow/blob/master/mlflow/anthropic/autolog.py">Anthropic auto-tracing implementation</a> as an example.</p>
 <p><strong>⚙️ Orchestration Frameworks</strong></p>
 <p>Libraries such as <strong>LangChain</strong>, <strong>LlamaIndex</strong>, and <strong>DSPy</strong> offer higher-level workflows, integrating LLMs, embeddings, retrievers, and tools into complex applications. Since these libraries require trace data from multiple components, we do not want to rely on ad-hoc patching. Therefore, auto-tracing for these libraries often leverage available callbacks (e.g., <a class="reference external" href="https://python.langchain.com/docs/how_to/#callbacks">LangChain Callbacks</a>) for more reliable integration.</p>
 <p>For this type of library, first check if the library provides any callback mechanism you can make use of. If there isn’t, consider filing a feature request to the library to have this functionality added by the project maintainers, providing comprehensive justification for the request. Having a callback mechanism also benefits the other users of the library, by providing flexibility and allowing integration with many other tools. If there is a certain reason the library cannot provide callbacks, consult with the  MLflow maintainers. We will not likely proceed with a design that relies on ad-hoc patching, but we can discuss alternative approaches if there are any to be had.</p>
@@ -304,7 +304,7 @@
 <p>With the design approved, start implementation:</p>
 <ol class="arabic simple">
 <li><p><strong>Create a New Module</strong>: If the library isn’t already integrated with MLflow, create a new directory under <code class="docutils literal notranslate"><span class="pre">mlflow/</span></code> (e.g., <code class="docutils literal notranslate"><span class="pre">mlflow/llama_index</span></code>). Add an <code class="docutils literal notranslate"><span class="pre">__init__.py</span></code> file to initialize the module.</p></li>
-<li><p><strong>Develop the Tracing Hook</strong>: Implement your chosen method (patch, callback, or decorator) for tracing. If you go with patching approach, use the <code class="docutils literal notranslate"><span class="pre">safe_patch</span></code> function to ensure stable patching (see <a class="reference external" href="https://github.com/mlflow/mlflow/blob/master/mlflow/openai/__init__.py#L905">example</a>).</p></li>
+<li><p><strong>Develop the Tracing Hook</strong>: Implement your chosen method (patch, callback, or decorator) for tracing. If you go with patching approach, use the <code class="docutils literal notranslate"><span class="pre">safe_patch</span></code> function to ensure stable patching (see <a class="reference external" href="https://github.com/mlflow/mlflow/blob/master/mlflow/anthropic/__init__.py">example</a>).</p></li>
 <li><p><strong>Define `mlflow.xxx.autolog() function`</strong>: This function will be the main entry point for the integration, which enables tracing when called (e.g., <a class="reference internal" href="../../python_api/mlflow.llama_index.html#mlflow.llama_index.autolog" title="mlflow.llama_index.autolog"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.llama_index.autolog()</span></code></a>).</p></li>
 <li><p><strong>Write Tests</strong>: Cover edge cases like asynchronous calls, custom data types, and streaming outputs if the library supports them.</p></li>
 </ol>
@@ -388,7 +388,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../',
-      VERSION:'2.18.1.dev0',
+      VERSION:'2.19.1.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',
