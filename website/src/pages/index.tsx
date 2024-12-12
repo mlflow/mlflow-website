@@ -24,6 +24,7 @@ import Anchor from "../components/Anchor";
 import Flow from "../components/Flow";
 import ConceptCard from "../components/ConceptCard";
 import CenterGrid from "../components/CenterGrid";
+import ExpandableGrid from "../components/ExpandableGrid";
 
 const IMAGE =
   // "https://images.unsplash.com/photo-1506624183912-c602f4a21ca7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60";
@@ -525,78 +526,26 @@ export default function Home(): JSX.Element {
           </h2>
         </div>
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-            gap: "24px",
-          }}
-        >
-          {[
-            {
-              title: "PyTorch",
-              src: "img/pytorch.svg",
-              href: "docs/latest/python_api/mlflow.pytorch.html",
-            },
-            {
-              title: "HuggingFace",
-              src: "img/huggingface.svg",
-              href: "docs/latest/python_api/mlflow.transformers.html",
-            },
-            {
-              title: "OpenAI",
-              src: "img/openai.svg",
-              href: "docs/latest/python_api/openai/index.html",
-            },
-            {
-              title: "LangChain",
-              src: "img/langchain.svg",
-              href: "docs/latest/python_api/mlflow.langchain.html",
-            },
-            {
-              title: "Spark",
-              src: "img/spark.svg",
-              href: "docs/latest/python_api/mlflow.spark.html",
-            },
-            {
-              title: "Keras",
-              src: "img/keras.svg",
-              href: "docs/latest/python_api/mlflow.keras_core.html",
-            },
-            {
-              title: "TensorFlow",
-              src: "img/tensorflow.svg",
-              href: "docs/latest/python_api/mlflow.tensorflow.html",
-            },
-            {
-              title: "Prophet",
-              src: "img/prophet.svg",
-              href: "docs/latest/python_api/mlflow.prophet.html",
-            },
-            {
-              title: "scikit-learn",
-              src: "img/scikit-learn.svg",
-              href: "docs/latest/python_api/mlflow.sklearn.html",
-            },
-            {
-              title: "XGBoost",
-              src: "img/xgboost.svg",
-              href: "docs/latest/python_api/mlflow.xgboost.html",
-            },
-            {
-              title: "LightGBM",
-              src: "img/lightgbm.svg",
-              href: "docs/latest/python_api/mlflow.lightgbm.html",
-            },
-            {
-              title: "CatBoost",
-              src: "img/catboost.svg",
-              href: "docs/latest/python_api/mlflow.catboost.html",
-            },
-          ].map(({ title, src, href }, index) => (
-            <MiniLogoCard title={title} src={src} href={href} key={index} />
-          ))}
-        </div>
+        <ExpandableGrid
+           items={[
+            { title: "PyTorch", src: "img/pytorch.svg", href: "docs/latest/python_api/mlflow.pytorch.html" },
+            { title: "HuggingFace", src: "img/huggingface.svg", href: "docs/latest/python_api/mlflow.transformers.html" },
+            { title: "OpenAI", src: "img/openai.svg", href: "docs/latest/python_api/openai/index.html" },
+            { title: "LangChain", src: "img/langchain.svg", href: "docs/latest/python_api/mlflow.langchain.html" },
+            { title: "Spark", src: "img/spark.svg", href: "docs/latest/python_api/mlflow.spark.html" },
+            { title: "Keras", src: "img/keras.svg", href: "docs/latest/python_api/mlflow.keras_core.html" },
+            { title: "TensorFlow", src: "img/tensorflow.svg", href: "docs/latest/python_api/mlflow.tensorflow.html" },
+            { title: "Prophet", src: "img/prophet.svg", href: "docs/latest/python_api/mlflow.prophet.html" },
+            { title: "scikit-learn", src: "img/scikit-learn.svg", href: "docs/latest/python_api/mlflow.sklearn.html" },
+            { title: "XGBoost", src: "img/xgboost.svg", href: "docs/latest/python_api/mlflow.xgboost.html" },
+            { title: "LightGBM", src: "img/lightgbm.svg", href: "docs/latest/python_api/mlflow.lightgbm.html" },
+            { title: "CatBoost", src: "img/catboost.svg", href: "docs/latest/python_api/mlflow.catboost.html" },
+          ]}
+          defaultVisibleCount={8}
+          renderItem={({ title, src, href }) => (
+            <MiniLogoCard title={title} src={src} href={href} />
+          )}
+        />
 
         <Spacer height={200} />
         <Anchor
