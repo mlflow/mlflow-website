@@ -6,7 +6,6 @@ import ArrowText from "../ArrowText";
 import styles from "./styles.module.css";
 import { MOBILE_LAYOUT_BREAKPOINT } from "../../constants";
 
-
 const MLflowLogo = ({ displaySideDots }: { displaySideDots: boolean }) => {
   return (
     <svg

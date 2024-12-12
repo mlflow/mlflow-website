@@ -8,7 +8,9 @@ const ExpandableGrid = ({ items, defaultVisibleCount, renderItem }) => {
 
   return (
     <div>
-      <div className={`${styles.grid} ${!isExpanded ? styles.fadeOverlay : ""}`}>
+      <div
+        className={`${styles.grid} ${!isExpanded ? styles.fadeOverlay : ""}`}
+      >
         {visibleItems.map((item, index) => (
           <div key={index} className={styles.gridItem}>
             {renderItem(item, index)}
