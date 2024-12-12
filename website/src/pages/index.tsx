@@ -25,6 +25,7 @@ import Flow from "../components/Flow";
 import ConceptCard from "../components/ConceptCard";
 import CenterGrid from "../components/CenterGrid";
 import ExpandableGrid from "../components/ExpandableGrid";
+import { MOBILE_LAYOUT_BREAKPOINT } from "../constants";
 
 const IMAGE =
   // "https://images.unsplash.com/photo-1506624183912-c602f4a21ca7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60";
@@ -550,13 +551,12 @@ export default function Home(): JSX.Element {
             { title: "Spacy", src: "img/spacy.svg", href: "docs/latest/models.html#spacy-spacy" },
             { title: "FastAI", src: "img/fastai.png", href: "docs/latest/models.html#fastai-fastai" },
             { title: "StatsModels", src: "img/statsmodels.svg", href: "docs/latest/models.html#statsmodels-statsmodels" },
-            { title: "Prompt flow", src: "img/fastai.png", href: "docs/latest/models.html#promptflow-promptflow-experimental" },
+            { title: "Prompt flow", src: "img/promptflow.svg", href: "docs/latest/models.html#promptflow-promptflow-experimental" },
             { title: "JohnSnowLabs", src: "img/johnsnowlab.svg", href: "docs/latest/models.html#john-snow-labs-johnsnowlabs-experimental" },
             { title: "H2O", src: "img/h2o.svg", href: "docs/latest/models.html#h2o-h2o" },
             { title: "Prophet", src: "img/prophet.svg", href: "docs/latest/python_api/mlflow.prophet.html" },
-
           ]}
-          defaultVisibleCount={16}
+          defaultVisibleCount={window.innerWidth > MOBILE_LAYOUT_BREAKPOINT ? 16 : 8}
           renderItem={({ title, src, href }) => (
             <MiniLogoCard title={title} src={src} href={href} />
           )}
