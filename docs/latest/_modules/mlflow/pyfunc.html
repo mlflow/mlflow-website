@@ -686,6 +686,7 @@
     <span class="n">extract_archive_to_dir</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">mlflow.pyfunc.model</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_DEFAULT_CHAT_MODEL_METADATA_TASK</span><span class="p">,</span>
     <span class="n">ChatModel</span><span class="p">,</span>
     <span class="n">PythonModel</span><span class="p">,</span>
     <span class="n">PythonModelContext</span><span class="p">,</span>
@@ -771,6 +772,7 @@
 <span class="n">CODE</span> <span class="o">=</span> <span class="s2">&quot;code&quot;</span>
 <span class="n">DATA</span> <span class="o">=</span> <span class="s2">&quot;data&quot;</span>
 <span class="n">ENV</span> <span class="o">=</span> <span class="s2">&quot;env&quot;</span>
+<span class="n">TASK</span> <span class="o">=</span> <span class="s2">&quot;task&quot;</span>
 
 <span class="n">_MODEL_DATA_SUBPATH</span> <span class="o">=</span> <span class="s2">&quot;data&quot;</span>
 <span class="n">_CHAT_PARAMS_WARNING_MESSAGE</span> <span class="o">=</span> <span class="p">(</span>
@@ -1058,7 +1060,7 @@
                 <span class="p">)</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_predict_stream_fn</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;params&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s2">&quot;params&quot;</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_predict_stream_fn</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_stream_fn</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
 
         <span class="n">_log_warning_if_params_not_in_predict_signature</span><span class="p">(</span><span class="n">_logger</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
@@ -1318,7 +1320,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            Model predictions.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">invoke</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;params&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s2">&quot;params&quot;</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">invoke</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="p">:</span>
             <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span><span class="o">.</span><span class="n">get_predictions</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">_log_warning_if_params_not_in_predict_signature</span><span class="p">(</span><span class="n">_logger</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
@@ -2703,7 +2705,7 @@
                     <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="n">err_msg</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
 
                 <span class="k">def</span> <span class="nf">batch_predict_fn</span><span class="p">(</span><span class="n">pdf</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">client</span><span class="o">.</span><span class="n">invoke</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;params&quot;</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="s2">&quot;params&quot;</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">client</span><span class="o">.</span><span class="n">invoke</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="p">:</span>
                         <span class="k">return</span> <span class="n">client</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="n">pdf</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span><span class="o">.</span><span class="n">get_predictions</span><span class="p">()</span>
                     <span class="n">_log_warning_if_params_not_in_predict_signature</span><span class="p">(</span><span class="n">_logger</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
                     <span class="k">return</span> <span class="n">client</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="n">pdf</span><span class="p">)</span><span class="o">.</span><span class="n">get_predictions</span><span class="p">()</span>
@@ -2736,7 +2738,7 @@
                     <span class="p">)</span>
 
                 <span class="k">def</span> <span class="nf">batch_predict_fn</span><span class="p">(</span><span class="n">pdf</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">loaded_model</span><span class="o">.</span><span class="n">predict</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;params&quot;</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="s2">&quot;params&quot;</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">loaded_model</span><span class="o">.</span><span class="n">predict</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="p">:</span>
                         <span class="k">return</span> <span class="n">loaded_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">pdf</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
                     <span class="n">_log_warning_if_params_not_in_predict_signature</span><span class="p">(</span><span class="n">_logger</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
                     <span class="k">return</span> <span class="n">loaded_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">pdf</span><span class="p">)</span>
@@ -3120,6 +3122,10 @@
                 <span class="n">CHAT_MODEL_INPUT_SCHEMA</span><span class="p">,</span>
                 <span class="n">CHAT_MODEL_OUTPUT_SCHEMA</span><span class="p">,</span>
             <span class="p">)</span>
+            <span class="c1"># For ChatModel we set default metadata to indicate its task</span>
+            <span class="n">default_metadata</span> <span class="o">=</span> <span class="p">{</span><span class="n">TASK</span><span class="p">:</span> <span class="n">_DEFAULT_CHAT_MODEL_METADATA_TASK</span><span class="p">}</span>
+            <span class="n">mlflow_model</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">default_metadata</span><span class="p">,</span> <span class="o">**</span><span class="p">(</span><span class="n">mlflow_model</span><span class="o">.</span><span class="n">metadata</span> <span class="ow">or</span> <span class="p">{})}</span>
+
             <span class="k">if</span> <span class="n">input_example</span><span class="p">:</span>
                 <span class="n">input_example</span><span class="p">,</span> <span class="n">input_params</span> <span class="o">=</span> <span class="n">_split_input_data_and_params</span><span class="p">(</span><span class="n">input_example</span><span class="p">)</span>
                 <span class="n">valid_params</span> <span class="o">=</span> <span class="p">{}</span>
@@ -3161,7 +3167,10 @@
             <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Predicting on input example to validate output&quot;</span><span class="p">)</span>
             <span class="n">context</span> <span class="o">=</span> <span class="n">PythonModelContext</span><span class="p">(</span><span class="n">artifacts</span><span class="p">,</span> <span class="n">model_config</span><span class="p">)</span>
             <span class="n">python_model</span><span class="o">.</span><span class="n">load_context</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
-            <span class="n">output</span> <span class="o">=</span> <span class="n">python_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">messages</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;context&quot;</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">python_model</span><span class="o">.</span><span class="n">predict</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="p">:</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="n">python_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">messages</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="n">python_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">ChatCompletionResponse</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
                     <span class="s2">&quot;Failed to save ChatModel. Please ensure that the model&#39;s predict() method &quot;</span>

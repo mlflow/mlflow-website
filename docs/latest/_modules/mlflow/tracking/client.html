@@ -898,6 +898,45 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">end_span</span><span class="p">(</span><span class="n">request_id</span><span class="p">,</span> <span class="n">root_span_id</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">attributes</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span> <span class="n">end_time_ns</span><span class="p">)</span></div>
 
+    <span class="nd">@experimental</span>
+    <span class="k">def</span> <span class="nf">_log_trace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace</span><span class="p">:</span> <span class="n">Trace</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Log the complete Trace object to the backend store.</span>
+
+<span class="sd">        # NB: Since the backend API is used directly here, customization of request ID&#39;s</span>
+<span class="sd">        # are not possible with this internal API. A backend-generated ID will be generated</span>
+<span class="sd">        # directly with this invocation, instead of the one from the given trace object.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            trace: The trace object to log.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The request ID of the logged trace.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Create trace info entry in the backend</span>
+        <span class="c1"># Note that the backend generates a new request ID for the trace. Currently there is</span>
+        <span class="c1"># no way to insert the trace with a specific request ID given by the user.</span>
+        <span class="n">new_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tracking_client</span><span class="o">.</span><span class="n">start_trace</span><span class="p">(</span>
+            <span class="n">experiment_id</span><span class="o">=</span><span class="n">trace</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">experiment_id</span><span class="p">,</span>
+            <span class="n">timestamp_ms</span><span class="o">=</span><span class="n">trace</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">timestamp_ms</span><span class="p">,</span>
+            <span class="n">request_metadata</span><span class="o">=</span><span class="p">{},</span>
+            <span class="n">tags</span><span class="o">=</span><span class="p">{},</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tracking_client</span><span class="o">.</span><span class="n">end_trace</span><span class="p">(</span>
+            <span class="n">request_id</span><span class="o">=</span><span class="n">new_info</span><span class="o">.</span><span class="n">request_id</span><span class="p">,</span>
+            <span class="c1"># Compute the end time of the original trace</span>
+            <span class="n">timestamp_ms</span><span class="o">=</span><span class="n">trace</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">timestamp_ms</span> <span class="o">+</span> <span class="n">trace</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">execution_time_ms</span><span class="p">,</span>
+            <span class="n">status</span><span class="o">=</span><span class="n">trace</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">status</span><span class="p">,</span>
+            <span class="n">request_metadata</span><span class="o">=</span><span class="n">trace</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">request_metadata</span><span class="p">,</span>
+            <span class="n">tags</span><span class="o">=</span><span class="n">trace</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">tags</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Upload trace data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_upload_trace_spans_as_tag</span><span class="p">(</span><span class="n">new_info</span><span class="p">,</span> <span class="n">trace</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_upload_trace_data</span><span class="p">(</span><span class="n">new_info</span><span class="p">,</span> <span class="n">trace</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">new_info</span><span class="o">.</span><span class="n">request_id</span>
+
     <span class="k">def</span> <span class="nf">_upload_trace_spans_as_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace_info</span><span class="p">:</span> <span class="n">TraceInfo</span><span class="p">,</span> <span class="n">trace_data</span><span class="p">:</span> <span class="n">TraceData</span><span class="p">):</span>
         <span class="c1"># When a trace is logged, we set a mlflow.traceSpans tag via SetTraceTag API</span>
         <span class="c1"># https://databricks.atlassian.net/browse/ML-40306</span>
