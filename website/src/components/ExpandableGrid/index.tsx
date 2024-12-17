@@ -7,7 +7,7 @@ const ExpandableGrid = ({ items, defaultVisibleCount, renderItem }) => {
   const visibleItems = isExpanded ? items : items.slice(0, defaultVisibleCount);
 
   return (
-    <div>
+    <>
       <div
         className={`${styles.grid} ${!isExpanded ? styles.fadeOverlay : ""}`}
       >
@@ -27,7 +27,7 @@ const ExpandableGrid = ({ items, defaultVisibleCount, renderItem }) => {
           </button>
         </div>
       )}
-    </div>
+    </>
   );
 };
 
