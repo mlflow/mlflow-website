@@ -219,13 +219,13 @@ const config: Config = {
       darkTheme: prismThemes.vsDark,
     },
     announcementBar: {
-      id: 'survey_bar',
-      content: 
-      'Help us improve MLflow by taking our <a target="_blank" rel="noopener noreferrer" href="https://surveys.training.databricks.com/jfe/form/SV_cA2jrfBjs6vi6SG">survey</a>!',
-      backgroundColor: '#72A1ED',
-      textColor: '#091E42',
+      id: "survey_bar",
+      content:
+        'Help us improve MLflow by taking our <a target="_blank" rel="noopener noreferrer" href="https://surveys.training.databricks.com/jfe/form/SV_cA2jrfBjs6vi6SG">survey</a>!',
+      backgroundColor: "#72A1ED",
+      textColor: "#091E42",
       isCloseable: false,
-    }
+    },
   } satisfies Preset.ThemeConfig,
 };
 
