@@ -286,12 +286,20 @@
 <span class="sd">        which contains a JSON representation of the Trace object. This object is deserialized</span>
 <span class="sd">        in Databricks notebooks to display the Trace object in a nicer UI.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">mlflow.tracing.display</span> <span class="kn">import</span> <span class="n">get_display_handler</span>
+        <span class="kn">from</span> <span class="nn">mlflow.tracing.display</span> <span class="kn">import</span> <span class="p">(</span>
+            <span class="n">get_display_handler</span><span class="p">,</span>
+            <span class="n">get_notebook_iframe_html</span><span class="p">,</span>
+            <span class="n">is_using_tracking_server</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="kn">from</span> <span class="nn">mlflow.utils.databricks_utils</span> <span class="kn">import</span> <span class="n">is_in_databricks_runtime</span>
 
         <span class="n">bundle</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;text/plain&quot;</span><span class="p">:</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="p">)}</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">get_display_handler</span><span class="p">()</span><span class="o">.</span><span class="n">disabled</span><span class="p">:</span>
-            <span class="n">bundle</span><span class="p">[</span><span class="s2">&quot;application/databricks.mlflow.trace&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_serialize_for_mimebundle</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">is_in_databricks_runtime</span><span class="p">():</span>
+                <span class="n">bundle</span><span class="p">[</span><span class="s2">&quot;application/databricks.mlflow.trace&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_serialize_for_mimebundle</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">is_using_tracking_server</span><span class="p">():</span>
+                <span class="n">bundle</span><span class="p">[</span><span class="s2">&quot;text/html&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_notebook_iframe_html</span><span class="p">([</span><span class="bp">self</span><span class="p">])</span>
 
         <span class="k">return</span> <span class="n">bundle</span>
 

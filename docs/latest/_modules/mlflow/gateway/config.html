@@ -212,7 +212,6 @@
 
 <span class="kn">import</span> <span class="nn">pydantic</span>
 <span class="kn">import</span> <span class="nn">yaml</span>
-<span class="kn">from</span> <span class="nn">packaging</span> <span class="kn">import</span> <span class="n">version</span>
 <span class="kn">from</span> <span class="nn">packaging.version</span> <span class="kn">import</span> <span class="n">Version</span>
 <span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">ConfigDict</span><span class="p">,</span> <span class="n">Field</span><span class="p">,</span> <span class="n">ValidationError</span><span class="p">,</span> <span class="n">root_validator</span><span class="p">,</span> <span class="n">validator</span>
 <span class="kn">from</span> <span class="nn">pydantic.json</span> <span class="kn">import</span> <span class="n">pydantic_encoder</span>
@@ -231,12 +230,11 @@
     <span class="n">is_valid_endpoint_name</span><span class="p">,</span>
     <span class="n">is_valid_mosiacml_chat_model</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span> <span class="nn">mlflow.utils</span> <span class="kn">import</span> <span class="n">IS_PYDANTIC_V2_OR_NEWER</span>
 
 <span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
-<span class="n">IS_PYDANTIC_V2</span> <span class="o">=</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">pydantic</span><span class="o">.</span><span class="n">version</span><span class="o">.</span><span class="n">VERSION</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s2">&quot;2.0&quot;</span><span class="p">)</span>
-
-<span class="k">if</span> <span class="n">IS_PYDANTIC_V2</span><span class="p">:</span>
+<span class="k">if</span> <span class="n">IS_PYDANTIC_V2_OR_NEWER</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">SerializeAsAny</span>
 
 
@@ -364,7 +362,7 @@
 
         <span class="k">return</span> <span class="n">info</span>
 
-    <span class="k">if</span> <span class="n">IS_PYDANTIC_V2</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">IS_PYDANTIC_V2_OR_NEWER</span><span class="p">:</span>
         <span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">model_validator</span> <span class="k">as</span> <span class="n">_model_validator</span>
 
         <span class="nd">@_model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;before&quot;</span><span class="p">)</span>
@@ -480,7 +478,7 @@
 <div class="viewcode-block" id="Model"><a class="viewcode-back" href="../../../python_api/mlflow.gateway.html#mlflow.gateway.config.Model">[docs]</a><span class="k">class</span> <span class="nc">Model</span><span class="p">(</span><span class="n">ConfigModel</span><span class="p">):</span>
     <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">provider</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Provider</span><span class="p">]</span>
-    <span class="k">if</span> <span class="n">IS_PYDANTIC_V2</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">IS_PYDANTIC_V2_OR_NEWER</span><span class="p">:</span>
         <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SerializeAsAny</span><span class="p">[</span><span class="n">ConfigModel</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ConfigModel</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
@@ -510,7 +508,7 @@
             <span class="s2">&quot;A provider must be provided for each gateway route.&quot;</span>
         <span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">IS_PYDANTIC_V2</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">IS_PYDANTIC_V2_OR_NEWER</span><span class="p">:</span>
 
         <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;config&quot;</span><span class="p">,</span> <span class="n">pre</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">validate_config</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
@@ -659,7 +657,7 @@
     <span class="n">limit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Limit</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="Route.Config"><a class="viewcode-back" href="../../../python_api/mlflow.gateway.html#mlflow.gateway.config.Route.Config">[docs]</a>    <span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">IS_PYDANTIC_V2</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">IS_PYDANTIC_V2_OR_NEWER</span><span class="p">:</span>
             <span class="n">json_schema_extra</span> <span class="o">=</span> <span class="n">_ROUTE_EXTRA_SCHEMA</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">schema_extra</span> <span class="o">=</span> <span class="n">_ROUTE_EXTRA_SCHEMA</span></div>

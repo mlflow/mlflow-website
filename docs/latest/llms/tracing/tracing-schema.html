@@ -547,6 +547,117 @@ such as evaluation will function as expected.</p></td>
 <p>* For example, both <code class="docutils literal notranslate"><span class="pre">[Document(page_content=&quot;Hello</span> <span class="pre">world&quot;,</span> <span class="pre">metadata={&quot;doc_uri&quot;:</span> <span class="pre">&quot;https://example.com&quot;})]</span></code> and
 <code class="docutils literal notranslate"><span class="pre">[{&quot;page_content&quot;:</span> <span class="pre">&quot;Hello</span> <span class="pre">world&quot;,</span> <span class="pre">&quot;metadata&quot;:</span> <span class="pre">{&quot;doc_uri&quot;:</span> <span class="pre">&quot;https://example.com&quot;}}]</span></code> are valid outputs for a <code class="docutils literal notranslate"><span class="pre">RETRIEVER</span></code> span.</p>
 </div>
+<div class="section" id="chat-completion-spans">
+<h3>Chat Completion Spans<a class="headerlink" href="#chat-completion-spans" title="Permalink to this headline"> </a></h3>
+<p>Spans of type <code class="docutils literal notranslate"><span class="pre">CHAT_MODEL</span></code> or <code class="docutils literal notranslate"><span class="pre">LLM</span></code> are used to represent interactions with a chat completions API
+(for example, OpenAI’s <a class="reference external" href="https://platform.openai.com/docs/api-reference/chat/create">chat completions</a>,
+or Anthropic’s <a class="reference external" href="https://docs.anthropic.com/en/api/messages">messages</a> API). As providers can have
+different schemas for their API, there are no restrictions on the format of the span’s inputs and
+outputs.</p>
+<p>However, it is still important to have a common schema in order to enable certain UI features (e.g. rich
+conversation display), and to make authoring evaluation functions easier. To support this, we specify some
+custom attributes for standardized chat messages and tool defintions:</p>
+<table class="colwidths-given wrap-table docutils align-default">
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 40%" />
+<col style="width: 40%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>Attribute Name</strong></p></th>
+<th class="head"><p><strong>Description</strong></p></th>
+<th class="head"><p><strong>Note</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>mlflow.chat.messages</strong></p></td>
+<td><p>This attribute represents the system/user/assistant messages involved in the
+conversation with the chat model. It enables rich conversation rendering in the UI,
+and will also be used in MLflow evaluation in the future.</p>
+<p>The type must be <code class="docutils literal notranslate"><span class="pre">List[</span></code> <a class="reference internal" href="../../python_api/mlflow.types.html#mlflow.types.chat.RequestMessage" title="mlflow.types.chat.RequestMessage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RequestMessage</span></code></a> <code class="docutils literal notranslate"><span class="pre">]</span></code></p>
+</td>
+<td><p>This attribute can be conveniently set using the <a class="reference internal" href="../../python_api/mlflow.tracing.html#mlflow.tracing.set_span_chat_messages" title="mlflow.tracing.set_span_chat_messages"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.tracing.set_span_chat_messages()</span></code></a> function. This function
+will throw a validation error if the data does not conform to the spec.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>mlflow.chat.tools</strong></p></td>
+<td><p>This attribute represents the tools that were available for the chat model to call. In the OpenAI
+context, this would be equivalent to the <a class="reference external" href="https://platform.openai.com/docs/api-reference/chat/create#chat-create-tools">tools</a>
+param in the Chat Completions API.</p>
+<p>The type must be <code class="docutils literal notranslate"><span class="pre">List[</span></code> <a class="reference internal" href="../../python_api/mlflow.types.html#mlflow.types.chat.ChatTool" title="mlflow.types.chat.ChatTool"><code class="xref py py-class docutils literal notranslate"><span class="pre">RequestMessage</span></code></a> <code class="docutils literal notranslate"><span class="pre">]</span></code></p>
+</td>
+<td><p>This attribute can be conveniently set using the <a class="reference internal" href="../../python_api/mlflow.tracing.html#mlflow.tracing.set_span_chat_tools" title="mlflow.tracing.set_span_chat_tools"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.tracing.set_span_chat_tools()</span></code></a> function. This function
+will throw a validation error if the data does not conform to the spec.</p></td>
+</tr>
+</tbody>
+</table>
+<p>Please refer to the example below for a quick demonstration of how to use the utility functions described above, as well as
+how to retrieve them using the <a class="reference internal" href="../../python_api/mlflow.entities.html#mlflow.entities.Span.get_attribute" title="mlflow.entities.Span.get_attribute"><code class="xref py py-class docutils literal notranslate"><span class="pre">span.get_attribute()</span></code></a> function:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">from</span> <span class="nn">mlflow.entities.span</span> <span class="kn">import</span> <span class="n">SpanType</span>
+<span class="kn">from</span> <span class="nn">mlflow.tracing.constant</span> <span class="kn">import</span> <span class="n">SpanAttributeKey</span>
+<span class="kn">from</span> <span class="nn">mlflow.tracing</span> <span class="kn">import</span> <span class="n">set_span_chat_messages</span><span class="p">,</span> <span class="n">set_span_chat_tools</span>
+
+<span class="c1"># example messages and tools</span>
+<span class="n">messages</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;please use the provided tool to answer the user&#39;s questions&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;what is 1 + 1?&quot;</span><span class="p">},</span>
+<span class="p">]</span>
+
+<span class="n">tools</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;function&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;function&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;add&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Add two numbers&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;number&quot;</span><span class="p">},</span>
+                    <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;number&quot;</span><span class="p">},</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">],</span>
+            <span class="p">},</span>
+        <span class="p">},</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+
+
+<span class="nd">@mlflow</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">span_type</span><span class="o">=</span><span class="n">SpanType</span><span class="o">.</span><span class="n">CHAT_MODEL</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">call_chat_model</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="n">tools</span><span class="p">):</span>
+    <span class="c1"># mocking a response</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;assistant&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;tool_calls&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;123&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;function&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;arguments&quot;</span><span class="p">:</span> <span class="s1">&#39;{&quot;a&quot;: 1,&quot;b&quot;: 2}&#39;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;add&quot;</span><span class="p">},</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;function&quot;</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">],</span>
+    <span class="p">}</span>
+
+    <span class="n">combined_messages</span> <span class="o">=</span> <span class="n">messages</span> <span class="o">+</span> <span class="p">[</span><span class="n">response</span><span class="p">]</span>
+
+    <span class="n">span</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">get_current_active_span</span><span class="p">()</span>
+    <span class="n">set_span_chat_messages</span><span class="p">(</span><span class="n">span</span><span class="p">,</span> <span class="n">combined_messages</span><span class="p">)</span>
+    <span class="n">set_span_chat_tools</span><span class="p">(</span><span class="n">span</span><span class="p">,</span> <span class="n">tools</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">response</span>
+
+
+<span class="n">call_chat_model</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="n">tools</span><span class="p">)</span>
+
+<span class="n">trace</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">get_last_active_trace</span><span class="p">()</span>
+<span class="n">span</span> <span class="o">=</span> <span class="n">trace</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">spans</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Messages: &quot;</span><span class="p">,</span> <span class="n">span</span><span class="o">.</span><span class="n">get_attribute</span><span class="p">(</span><span class="n">SpanAttributeKey</span><span class="o">.</span><span class="n">CHAT_MESSAGES</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Tools: &quot;</span><span class="p">,</span> <span class="n">span</span><span class="o">.</span><span class="n">get_attribute</span><span class="p">(</span><span class="n">SpanAttributeKey</span><span class="o">.</span><span class="n">CHAT_TOOLS</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
 </div>
 </div>
 
