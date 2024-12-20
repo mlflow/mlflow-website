@@ -222,8 +222,8 @@ const config: Config = {
       id: "survey_bar",
       content:
         'Help us improve MLflow by taking our <a target="_blank" rel="noopener noreferrer" href="https://surveys.training.databricks.com/jfe/form/SV_cA2jrfBjs6vi6SG">survey</a>!',
-      backgroundColor: "#72A1ED",
-      textColor: "#091E42",
+      backgroundColor: "#0194e2",
+      textColor: "#ffffff",
       isCloseable: false,
     },
   } satisfies Preset.ThemeConfig,
