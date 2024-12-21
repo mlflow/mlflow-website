@@ -27,6 +27,21 @@ export type Release = {
 // Sort by date descending
 export const BLOGS: Blog[] = [
   {
+    title: "MLflow Tracing in Jupyter Notebooks",
+    path: "/blog/mlflow-tracing-in-jupyter",
+    tags: ["genai", "mlops", "tracing"],
+    authors: [
+      {
+        name: "Daniel Lok",
+        title: "Software Engineer at Databricks",
+        url: "https://www.linkedin.com/in/daniel-yk-lok/",
+        image_url: "/img/authors/daniel_lok.png",
+      },
+    ],
+    date: "2024-12-20",
+    thumbnail: "/img/blog/mlflow-tracing-in-jupyter.png",
+  },
+  {
     title: "Using Bedrock Agent as an MLflow ChatModel with Tracing",
     path: "/blog/bedrock-chat-model-part-1",
     tags: ["genai", "pyfunc", "bedrock", "tracing"],
