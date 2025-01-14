@@ -207,19 +207,19 @@
 <span class="sd">MLflow run. This module is exposed to users at the top-level :py:mod:`mlflow` module.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">atexit</span>
-<span class="kn">import</span> <span class="nn">contextlib</span>
-<span class="kn">import</span> <span class="nn">importlib</span>
-<span class="kn">import</span> <span class="nn">inspect</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">threading</span>
-<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">atexit</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">contextlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">importlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">from</span> <span class="nn">mlflow.data.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
-<span class="kn">from</span> <span class="nn">mlflow.entities</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.data.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.entities</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DatasetInput</span><span class="p">,</span>
     <span class="n">Experiment</span><span class="p">,</span>
     <span class="n">InputTag</span><span class="p">,</span>
@@ -230,29 +230,29 @@
     <span class="n">RunTag</span><span class="p">,</span>
     <span class="n">ViewType</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.entities.lifecycle_stage</span> <span class="kn">import</span> <span class="n">LifecycleStage</span>
-<span class="kn">from</span> <span class="nn">mlflow.environment_variables</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.entities.lifecycle_stage</span><span class="w"> </span><span class="kn">import</span> <span class="n">LifecycleStage</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.environment_variables</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">MLFLOW_ENABLE_ASYNC_LOGGING</span><span class="p">,</span>
     <span class="n">MLFLOW_ENABLE_SYSTEM_METRICS_LOGGING</span><span class="p">,</span>
     <span class="n">MLFLOW_EXPERIMENT_ID</span><span class="p">,</span>
     <span class="n">MLFLOW_EXPERIMENT_NAME</span><span class="p">,</span>
     <span class="n">MLFLOW_RUN_ID</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
-<span class="kn">from</span> <span class="nn">mlflow.protos.databricks_pb2</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">MlflowException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.protos.databricks_pb2</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
     <span class="n">RESOURCE_DOES_NOT_EXIST</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.store.tracking</span> <span class="kn">import</span> <span class="n">SEARCH_MAX_RESULTS_DEFAULT</span>
-<span class="kn">from</span> <span class="nn">mlflow.tracing.provider</span> <span class="kn">import</span> <span class="n">_get_trace_exporter</span>
-<span class="kn">from</span> <span class="nn">mlflow.tracking</span> <span class="kn">import</span> <span class="n">_get_artifact_repo</span><span class="p">,</span> <span class="n">_get_store</span><span class="p">,</span> <span class="n">artifact_utils</span>
-<span class="kn">from</span> <span class="nn">mlflow.tracking.client</span> <span class="kn">import</span> <span class="n">MlflowClient</span>
-<span class="kn">from</span> <span class="nn">mlflow.tracking.context</span> <span class="kn">import</span> <span class="n">registry</span> <span class="k">as</span> <span class="n">context_registry</span>
-<span class="kn">from</span> <span class="nn">mlflow.tracking.default_experiment</span> <span class="kn">import</span> <span class="n">registry</span> <span class="k">as</span> <span class="n">default_experiment_registry</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils</span> <span class="kn">import</span> <span class="n">get_results_from_paginated_fn</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.annotations</span> <span class="kn">import</span> <span class="n">experimental</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.async_logging.run_operations</span> <span class="kn">import</span> <span class="n">RunOperations</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.autologging_utils</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.store.tracking</span><span class="w"> </span><span class="kn">import</span> <span class="n">SEARCH_MAX_RESULTS_DEFAULT</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.tracing.provider</span><span class="w"> </span><span class="kn">import</span> <span class="n">_get_trace_exporter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.tracking</span><span class="w"> </span><span class="kn">import</span> <span class="n">_get_artifact_repo</span><span class="p">,</span> <span class="n">_get_store</span><span class="p">,</span> <span class="n">artifact_utils</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.tracking.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">MlflowClient</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.tracking.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">registry</span> <span class="k">as</span> <span class="n">context_registry</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.tracking.default_experiment</span><span class="w"> </span><span class="kn">import</span> <span class="n">registry</span> <span class="k">as</span> <span class="n">default_experiment_registry</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_results_from_paginated_fn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">experimental</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.async_logging.run_operations</span><span class="w"> </span><span class="kn">import</span> <span class="n">RunOperations</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.autologging_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AUTOLOGGING_CONF_KEY_IS_GLOBALLY_CONFIGURED</span><span class="p">,</span>
     <span class="n">AUTOLOGGING_INTEGRATIONS</span><span class="p">,</span>
     <span class="n">autologging_conf_lock</span><span class="p">,</span>
@@ -260,9 +260,9 @@
     <span class="n">autologging_is_disabled</span><span class="p">,</span>
     <span class="n">is_testing</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.databricks_utils</span> <span class="kn">import</span> <span class="n">is_in_databricks_runtime</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.import_hooks</span> <span class="kn">import</span> <span class="n">register_post_import_hook</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.mlflow_tags</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.databricks_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_in_databricks_runtime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.import_hooks</span><span class="w"> </span><span class="kn">import</span> <span class="n">register_post_import_hook</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.mlflow_tags</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">MLFLOW_DATASET_CONTEXT</span><span class="p">,</span>
     <span class="n">MLFLOW_EXPERIMENT_PRIMARY_METRIC_GREATER_IS_BETTER</span><span class="p">,</span>
     <span class="n">MLFLOW_EXPERIMENT_PRIMARY_METRIC_NAME</span><span class="p">,</span>
@@ -270,17 +270,17 @@
     <span class="n">MLFLOW_RUN_NAME</span><span class="p">,</span>
     <span class="n">MLFLOW_RUN_NOTE</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.thread_utils</span> <span class="kn">import</span> <span class="n">ThreadLocalVariable</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.time</span> <span class="kn">import</span> <span class="n">get_current_time_millis</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.validation</span> <span class="kn">import</span> <span class="n">_validate_experiment_id_type</span><span class="p">,</span> <span class="n">_validate_run_id</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.thread_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">ThreadLocalVariable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.time</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_current_time_millis</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">_validate_experiment_id_type</span><span class="p">,</span> <span class="n">_validate_run_id</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">matplotlib</span>
-    <span class="kn">import</span> <span class="nn">matplotlib.figure</span>
-    <span class="kn">import</span> <span class="nn">numpy</span>
-    <span class="kn">import</span> <span class="nn">pandas</span>
-    <span class="kn">import</span> <span class="nn">PIL</span>
-    <span class="kn">import</span> <span class="nn">plotly</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.figure</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">PIL</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">plotly</span>
 
 
 <span class="n">_active_experiment_id</span> <span class="o">=</span> <span class="kc">None</span>
@@ -301,7 +301,7 @@
 <span class="n">_experiment_lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
 
 
-<div class="viewcode-block" id="set_experiment"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.set_experiment">[docs]</a><span class="k">def</span> <span class="nf">set_experiment</span><span class="p">(</span>
+<div class="viewcode-block" id="set_experiment"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.set_experiment">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">set_experiment</span><span class="p">(</span>
     <span class="n">experiment_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">experiment_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Experiment</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -403,7 +403,7 @@
     <span class="k">return</span> <span class="n">experiment</span></div>
 
 
-<span class="k">def</span> <span class="nf">_set_experiment_primary_metric</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_set_experiment_primary_metric</span><span class="p">(</span>
     <span class="n">experiment_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">primary_metric</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">greater_is_better</span><span class="p">:</span> <span class="nb">bool</span>
 <span class="p">):</span>
     <span class="n">client</span> <span class="o">=</span> <span class="n">MlflowClient</span><span class="p">()</span>
@@ -413,16 +413,16 @@
     <span class="p">)</span>
 
 
-<div class="viewcode-block" id="ActiveRun"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.ActiveRun">[docs]</a><span class="k">class</span> <span class="nc">ActiveRun</span><span class="p">(</span><span class="n">Run</span><span class="p">):</span>
+<div class="viewcode-block" id="ActiveRun"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.ActiveRun">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">ActiveRun</span><span class="p">(</span><span class="n">Run</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Wrapper around :py:class:`mlflow.entities.Run` to enable using Python ``with`` syntax.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run</span><span class="p">):</span>
         <span class="n">Run</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run</span><span class="o">.</span><span class="n">info</span><span class="p">,</span> <span class="n">run</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
         <span class="n">active_run_stack</span> <span class="o">=</span> <span class="n">_active_run_stack</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
 
         <span class="c1"># Check if the run is still active. We check based on ID instead of</span>
@@ -435,7 +435,7 @@
         <span class="k">return</span> <span class="n">exc_type</span> <span class="ow">is</span> <span class="kc">None</span></div>
 
 
-<div class="viewcode-block" id="start_run"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.start_run">[docs]</a><span class="k">def</span> <span class="nf">start_run</span><span class="p">(</span>
+<div class="viewcode-block" id="start_run"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.start_run">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">start_run</span><span class="p">(</span>
     <span class="n">run_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">experiment_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">run_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -666,7 +666,7 @@
                 <span class="s2">&quot;`mlflow.start_run()` or calling `mlflow.disable_system_metrics_logging`.&quot;</span>
             <span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">mlflow.system_metrics.system_metrics_monitor</span> <span class="kn">import</span> <span class="n">SystemMetricsMonitor</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.system_metrics.system_metrics_monitor</span><span class="w"> </span><span class="kn">import</span> <span class="n">SystemMetricsMonitor</span>
 
             <span class="n">system_monitor</span> <span class="o">=</span> <span class="n">SystemMetricsMonitor</span><span class="p">(</span>
                 <span class="n">active_run_obj</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">run_id</span><span class="p">,</span>
@@ -681,7 +681,7 @@
     <span class="k">return</span> <span class="n">active_run_stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="end_run"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.end_run">[docs]</a><span class="k">def</span> <span class="nf">end_run</span><span class="p">(</span><span class="n">status</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">RunStatus</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">RunStatus</span><span class="o">.</span><span class="n">FINISHED</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="end_run"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.end_run">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">end_run</span><span class="p">(</span><span class="n">status</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">RunStatus</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">RunStatus</span><span class="o">.</span><span class="n">FINISHED</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    End an active MLflow run (if there is one).</span>
 
@@ -726,7 +726,7 @@
             <span class="n">system_metrics_monitor</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span></div>
 
 
-<span class="k">def</span> <span class="nf">_safe_end_run</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_safe_end_run</span><span class="p">():</span>
     <span class="k">with</span> <span class="n">contextlib</span><span class="o">.</span><span class="n">suppress</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
         <span class="n">end_run</span><span class="p">()</span>
 
@@ -734,7 +734,7 @@
 <span class="n">atexit</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">_safe_end_run</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="active_run"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.active_run">[docs]</a><span class="k">def</span> <span class="nf">active_run</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ActiveRun</span><span class="p">]:</span>
+<div class="viewcode-block" id="active_run"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.active_run">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">active_run</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ActiveRun</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the currently active ``Run``, or None if no such run exists.</span>
 
@@ -767,7 +767,7 @@
     <span class="k">return</span> <span class="n">active_run_stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">active_run_stack</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span></div>
 
 
-<div class="viewcode-block" id="last_active_run"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.last_active_run">[docs]</a><span class="k">def</span> <span class="nf">last_active_run</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Run</span><span class="p">]:</span>
+<div class="viewcode-block" id="last_active_run"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.last_active_run">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">last_active_run</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Run</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets the most recent active run.</span>
 
 <span class="sd">    Examples:</span>
@@ -830,7 +830,7 @@
     <span class="k">return</span> <span class="n">get_run</span><span class="p">(</span><span class="n">last_active_run_id</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">_get_latest_active_run</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_latest_active_run</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get active run from global context by checking all threads. The `mlflow.active_run` API</span>
 <span class="sd">    only returns active run from current thread. This API is useful for the case where one</span>
@@ -844,7 +844,7 @@
     <span class="k">return</span> <span class="kc">None</span>
 
 
-<div class="viewcode-block" id="get_run"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.get_run">[docs]</a><span class="k">def</span> <span class="nf">get_run</span><span class="p">(</span><span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Run</span><span class="p">:</span>
+<div class="viewcode-block" id="get_run"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.get_run">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">get_run</span><span class="p">(</span><span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Run</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Fetch the run from backend store. The resulting Run contains a collection of run metadata --</span>
 <span class="sd">    RunInfo as well as a collection of run parameters, tags, and metrics -- RunData. It also</span>
@@ -879,7 +879,7 @@
     <span class="k">return</span> <span class="n">MlflowClient</span><span class="p">()</span><span class="o">.</span><span class="n">get_run</span><span class="p">(</span><span class="n">run_id</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="get_parent_run"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.get_parent_run">[docs]</a><span class="k">def</span> <span class="nf">get_parent_run</span><span class="p">(</span><span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Run</span><span class="p">]:</span>
+<div class="viewcode-block" id="get_parent_run"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.get_parent_run">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">get_parent_run</span><span class="p">(</span><span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Run</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets the parent run for the given run id if one exists.</span>
 
 <span class="sd">    Args:</span>
@@ -914,7 +914,7 @@
     <span class="k">return</span> <span class="n">MlflowClient</span><span class="p">()</span><span class="o">.</span><span class="n">get_parent_run</span><span class="p">(</span><span class="n">run_id</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="log_param"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.log_param">[docs]</a><span class="k">def</span> <span class="nf">log_param</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">synchronous</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<div class="viewcode-block" id="log_param"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.log_param">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">log_param</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">synchronous</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Log a parameter (e.g. model hyperparameter) under the current run. If no run is active,</span>
 <span class="sd">    this method will create a new active run.</span>
@@ -951,17 +951,17 @@
     <span class="k">return</span> <span class="n">MlflowClient</span><span class="p">()</span><span class="o">.</span><span class="n">log_param</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">synchronous</span><span class="o">=</span><span class="n">synchronous</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="flush_async_logging"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.flush_async_logging">[docs]</a><span class="k">def</span> <span class="nf">flush_async_logging</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="flush_async_logging"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.flush_async_logging">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">flush_async_logging</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Flush all pending async logging.&quot;&quot;&quot;</span>
     <span class="n">_get_store</span><span class="p">()</span><span class="o">.</span><span class="n">flush_async_logging</span><span class="p">()</span></div>
 
 
-<span class="k">def</span> <span class="nf">_shut_down_async_logging</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_shut_down_async_logging</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Shutdown the async logging and flush all pending data.&quot;&quot;&quot;</span>
     <span class="n">_get_store</span><span class="p">()</span><span class="o">.</span><span class="n">shut_down_async_logging</span><span class="p">()</span>
 
 
-<div class="viewcode-block" id="flush_artifact_async_logging"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.flush_artifact_async_logging">[docs]</a><span class="k">def</span> <span class="nf">flush_artifact_async_logging</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="flush_artifact_async_logging"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.flush_artifact_async_logging">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">flush_artifact_async_logging</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Flush all pending artifact async logging.&quot;&quot;&quot;</span>
     <span class="n">run_id</span> <span class="o">=</span> <span class="n">_get_or_start_run</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">run_id</span>
     <span class="n">_artifact_repo</span> <span class="o">=</span> <span class="n">_get_artifact_repo</span><span class="p">(</span><span class="n">run_id</span><span class="p">)</span>
@@ -969,7 +969,7 @@
         <span class="n">_artifact_repo</span><span class="o">.</span><span class="n">flush_async_logging</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="flush_trace_async_logging"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.flush_trace_async_logging">[docs]</a><span class="k">def</span> <span class="nf">flush_trace_async_logging</span><span class="p">(</span><span class="n">terminate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="flush_trace_async_logging"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.flush_trace_async_logging">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">flush_trace_async_logging</span><span class="p">(</span><span class="n">terminate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Flush all pending trace async logging.</span>
 
@@ -982,7 +982,7 @@
         <span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to flush trace async logging: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="set_experiment_tag"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.set_experiment_tag">[docs]</a><span class="k">def</span> <span class="nf">set_experiment_tag</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="set_experiment_tag"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.set_experiment_tag">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">set_experiment_tag</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Set a tag on the current experiment. Value is converted to a string.</span>
 
@@ -1006,7 +1006,7 @@
     <span class="n">MlflowClient</span><span class="p">()</span><span class="o">.</span><span class="n">set_experiment_tag</span><span class="p">(</span><span class="n">experiment_id</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="set_tag"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.set_tag">[docs]</a><span class="k">def</span> <span class="nf">set_tag</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">synchronous</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RunOperations</span><span class="p">]:</span>
+<div class="viewcode-block" id="set_tag"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.set_tag">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">set_tag</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">synchronous</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RunOperations</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Set a tag under the current run. If no run is active, this method will create a new active</span>
 <span class="sd">    run.</span>
@@ -1046,7 +1046,7 @@
     <span class="k">return</span> <span class="n">MlflowClient</span><span class="p">()</span><span class="o">.</span><span class="n">set_tag</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">synchronous</span><span class="o">=</span><span class="n">synchronous</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="delete_tag"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.delete_tag">[docs]</a><span class="k">def</span> <span class="nf">delete_tag</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="delete_tag"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.delete_tag">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">delete_tag</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Delete a tag from a run. This is irreversible. If no run is active, this method</span>
 <span class="sd">    will create a new active run.</span>
@@ -1072,7 +1072,7 @@
     <span class="n">MlflowClient</span><span class="p">()</span><span class="o">.</span><span class="n">delete_tag</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="log_metric"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.log_metric">[docs]</a><span class="k">def</span> <span class="nf">log_metric</span><span class="p">(</span>
+<div class="viewcode-block" id="log_metric"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.log_metric">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">log_metric</span><span class="p">(</span>
     <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">step</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1134,7 +1134,7 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="log_metrics"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.log_metrics">[docs]</a><span class="k">def</span> <span class="nf">log_metrics</span><span class="p">(</span>
+<div class="viewcode-block" id="log_metrics"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.log_metrics">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">log_metrics</span><span class="p">(</span>
     <span class="n">metrics</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
     <span class="n">step</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">synchronous</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1190,7 +1190,7 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="log_params"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.log_params">[docs]</a><span class="k">def</span> <span class="nf">log_params</span><span class="p">(</span>
+<div class="viewcode-block" id="log_params"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.log_params">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">log_params</span><span class="p">(</span>
     <span class="n">params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">synchronous</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RunOperations</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1236,7 +1236,7 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="log_input"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.log_input">[docs]</a><span class="k">def</span> <span class="nf">log_input</span><span class="p">(</span>
+<div class="viewcode-block" id="log_input"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.log_input">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">log_input</span><span class="p">(</span>
     <span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">tags</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1274,7 +1274,7 @@
     <span class="n">MlflowClient</span><span class="p">()</span><span class="o">.</span><span class="n">log_inputs</span><span class="p">(</span><span class="n">run_id</span><span class="o">=</span><span class="n">run_id</span><span class="p">,</span> <span class="n">datasets</span><span class="o">=</span><span class="p">[</span><span class="n">dataset_input</span><span class="p">])</span></div>
 
 
-<div class="viewcode-block" id="set_experiment_tags"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.set_experiment_tags">[docs]</a><span class="k">def</span> <span class="nf">set_experiment_tags</span><span class="p">(</span><span class="n">tags</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="set_experiment_tags"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.set_experiment_tags">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">set_experiment_tags</span><span class="p">(</span><span class="n">tags</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Set tags for the current active experiment.</span>
 
@@ -1301,7 +1301,7 @@
         <span class="n">set_experiment_tag</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="set_tags"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.set_tags">[docs]</a><span class="k">def</span> <span class="nf">set_tags</span><span class="p">(</span><span class="n">tags</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">synchronous</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RunOperations</span><span class="p">]:</span>
+<div class="viewcode-block" id="set_tags"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.set_tags">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">set_tags</span><span class="p">(</span><span class="n">tags</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">synchronous</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RunOperations</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Log a batch of tags for the current run. If no run is active, this method will create a</span>
 <span class="sd">    new active run.</span>
@@ -1347,7 +1347,7 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="log_artifact"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.log_artifact">[docs]</a><span class="k">def</span> <span class="nf">log_artifact</span><span class="p">(</span>
+<div class="viewcode-block" id="log_artifact"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.log_artifact">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">log_artifact</span><span class="p">(</span>
     <span class="n">local_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">artifact_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1383,7 +1383,7 @@
     <span class="n">MlflowClient</span><span class="p">()</span><span class="o">.</span><span class="n">log_artifact</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">local_path</span><span class="p">,</span> <span class="n">artifact_path</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="log_artifacts"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.log_artifacts">[docs]</a><span class="k">def</span> <span class="nf">log_artifacts</span><span class="p">(</span>
+<div class="viewcode-block" id="log_artifacts"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.log_artifacts">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">log_artifacts</span><span class="p">(</span>
     <span class="n">local_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">artifact_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1423,7 +1423,7 @@
     <span class="n">MlflowClient</span><span class="p">()</span><span class="o">.</span><span class="n">log_artifacts</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">local_dir</span><span class="p">,</span> <span class="n">artifact_path</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="log_text"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.log_text">[docs]</a><span class="k">def</span> <span class="nf">log_text</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">artifact_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="log_text"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.log_text">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">log_text</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">artifact_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Log text as an artifact.</span>
 
@@ -1455,7 +1455,7 @@
     <span class="n">MlflowClient</span><span class="p">()</span><span class="o">.</span><span class="n">log_text</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">artifact_file</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="log_dict"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.log_dict">[docs]</a><span class="k">def</span> <span class="nf">log_dict</span><span class="p">(</span><span class="n">dictionary</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">artifact_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="log_dict"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.log_dict">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">log_dict</span><span class="p">(</span><span class="n">dictionary</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">artifact_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Log a JSON/YAML-serializable object (e.g. `dict`) as an artifact. The serialization</span>
 <span class="sd">    format (JSON or YAML) is automatically inferred from the extension of `artifact_file`.</span>
@@ -1494,7 +1494,7 @@
     <span class="n">MlflowClient</span><span class="p">()</span><span class="o">.</span><span class="n">log_dict</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">dictionary</span><span class="p">,</span> <span class="n">artifact_file</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="log_figure"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.log_figure">[docs]</a><span class="k">def</span> <span class="nf">log_figure</span><span class="p">(</span>
+<div class="viewcode-block" id="log_figure"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.log_figure">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">log_figure</span><span class="p">(</span>
     <span class="n">figure</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;matplotlib.figure.Figure&quot;</span><span class="p">,</span> <span class="s2">&quot;plotly.graph_objects.Figure&quot;</span><span class="p">],</span>
     <span class="n">artifact_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
@@ -1547,7 +1547,7 @@
     <span class="n">MlflowClient</span><span class="p">()</span><span class="o">.</span><span class="n">log_figure</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">figure</span><span class="p">,</span> <span class="n">artifact_file</span><span class="p">,</span> <span class="n">save_kwargs</span><span class="o">=</span><span class="n">save_kwargs</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="log_image"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.log_image">[docs]</a><span class="k">def</span> <span class="nf">log_image</span><span class="p">(</span>
+<div class="viewcode-block" id="log_image"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.log_image">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">log_image</span><span class="p">(</span>
     <span class="n">image</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;numpy.ndarray&quot;</span><span class="p">,</span> <span class="s2">&quot;PIL.Image.Image&quot;</span><span class="p">,</span> <span class="s2">&quot;mlflow.Image&quot;</span><span class="p">],</span>
     <span class="n">artifact_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1678,7 +1678,7 @@
 
 
 <div class="viewcode-block" id="log_table"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.log_table">[docs]</a><span class="nd">@experimental</span>
-<span class="k">def</span> <span class="nf">log_table</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">log_table</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="s2">&quot;pandas.DataFrame&quot;</span><span class="p">],</span>
     <span class="n">artifact_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">run_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1731,7 +1731,7 @@
 
 
 <div class="viewcode-block" id="load_table"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.load_table">[docs]</a><span class="nd">@experimental</span>
-<span class="k">def</span> <span class="nf">load_table</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_table</span><span class="p">(</span>
     <span class="n">artifact_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">run_ids</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">extra_columns</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1806,12 +1806,12 @@
     <span class="k">return</span> <span class="n">MlflowClient</span><span class="p">()</span><span class="o">.</span><span class="n">load_table</span><span class="p">(</span><span class="n">experiment_id</span><span class="p">,</span> <span class="n">artifact_file</span><span class="p">,</span> <span class="n">run_ids</span><span class="p">,</span> <span class="n">extra_columns</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">_record_logged_model</span><span class="p">(</span><span class="n">mlflow_model</span><span class="p">,</span> <span class="n">run_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_record_logged_model</span><span class="p">(</span><span class="n">mlflow_model</span><span class="p">,</span> <span class="n">run_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">run_id</span> <span class="o">=</span> <span class="n">run_id</span> <span class="ow">or</span> <span class="n">_get_or_start_run</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">run_id</span>
     <span class="n">MlflowClient</span><span class="p">()</span><span class="o">.</span><span class="n">_record_logged_model</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">mlflow_model</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="get_experiment"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.get_experiment">[docs]</a><span class="k">def</span> <span class="nf">get_experiment</span><span class="p">(</span><span class="n">experiment_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Experiment</span><span class="p">:</span>
+<div class="viewcode-block" id="get_experiment"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.get_experiment">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">get_experiment</span><span class="p">(</span><span class="n">experiment_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Experiment</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Retrieve an experiment by experiment_id from the backend store</span>
 
 <span class="sd">    Args:</span>
@@ -1845,7 +1845,7 @@
     <span class="k">return</span> <span class="n">MlflowClient</span><span class="p">()</span><span class="o">.</span><span class="n">get_experiment</span><span class="p">(</span><span class="n">experiment_id</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="get_experiment_by_name"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.get_experiment_by_name">[docs]</a><span class="k">def</span> <span class="nf">get_experiment_by_name</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Experiment</span><span class="p">]:</span>
+<div class="viewcode-block" id="get_experiment_by_name"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.get_experiment_by_name">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">get_experiment_by_name</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Experiment</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Retrieve an experiment by experiment name from the backend store</span>
 
@@ -1882,7 +1882,7 @@
     <span class="k">return</span> <span class="n">MlflowClient</span><span class="p">()</span><span class="o">.</span><span class="n">get_experiment_by_name</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="search_experiments"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.search_experiments">[docs]</a><span class="k">def</span> <span class="nf">search_experiments</span><span class="p">(</span>
+<div class="viewcode-block" id="search_experiments"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.search_experiments">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">search_experiments</span><span class="p">(</span>
     <span class="n">view_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">ViewType</span><span class="o">.</span><span class="n">ACTIVE_ONLY</span><span class="p">,</span>
     <span class="n">max_results</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">filter_string</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1980,7 +1980,7 @@
 <span class="sd">        assert_experiment_names_equal(experiments, [&quot;bb&quot;, &quot;ab&quot;, &quot;b&quot;, &quot;a&quot;])</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">pagination_wrapper_func</span><span class="p">(</span><span class="n">number_to_get</span><span class="p">,</span> <span class="n">next_page_token</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pagination_wrapper_func</span><span class="p">(</span><span class="n">number_to_get</span><span class="p">,</span> <span class="n">next_page_token</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">MlflowClient</span><span class="p">()</span><span class="o">.</span><span class="n">search_experiments</span><span class="p">(</span>
             <span class="n">view_type</span><span class="o">=</span><span class="n">view_type</span><span class="p">,</span>
             <span class="n">max_results</span><span class="o">=</span><span class="n">number_to_get</span><span class="p">,</span>
@@ -1996,7 +1996,7 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="create_experiment"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.create_experiment">[docs]</a><span class="k">def</span> <span class="nf">create_experiment</span><span class="p">(</span>
+<div class="viewcode-block" id="create_experiment"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.create_experiment">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">create_experiment</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">artifact_location</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">tags</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2047,7 +2047,7 @@
     <span class="k">return</span> <span class="n">MlflowClient</span><span class="p">()</span><span class="o">.</span><span class="n">create_experiment</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">artifact_location</span><span class="p">,</span> <span class="n">tags</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="delete_experiment"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.delete_experiment">[docs]</a><span class="k">def</span> <span class="nf">delete_experiment</span><span class="p">(</span><span class="n">experiment_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="delete_experiment"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.delete_experiment">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">delete_experiment</span><span class="p">(</span><span class="n">experiment_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Delete an experiment from the backend store.</span>
 
@@ -2082,7 +2082,7 @@
     <span class="n">MlflowClient</span><span class="p">()</span><span class="o">.</span><span class="n">delete_experiment</span><span class="p">(</span><span class="n">experiment_id</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="delete_run"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.delete_run">[docs]</a><span class="k">def</span> <span class="nf">delete_run</span><span class="p">(</span><span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="delete_run"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.delete_run">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">delete_run</span><span class="p">(</span><span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Deletes a run with the given ID.</span>
 
@@ -2113,7 +2113,7 @@
     <span class="n">MlflowClient</span><span class="p">()</span><span class="o">.</span><span class="n">delete_run</span><span class="p">(</span><span class="n">run_id</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="get_artifact_uri"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.get_artifact_uri">[docs]</a><span class="k">def</span> <span class="nf">get_artifact_uri</span><span class="p">(</span><span class="n">artifact_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<div class="viewcode-block" id="get_artifact_uri"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.get_artifact_uri">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">get_artifact_uri</span><span class="p">(</span><span class="n">artifact_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the absolute URI of the specified artifact in the currently active run.</span>
 
@@ -2169,7 +2169,7 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="search_runs"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.search_runs">[docs]</a><span class="k">def</span> <span class="nf">search_runs</span><span class="p">(</span>
+<div class="viewcode-block" id="search_runs"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.search_runs">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">search_runs</span><span class="p">(</span>
     <span class="n">experiment_ids</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">filter_string</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="n">run_view_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">ViewType</span><span class="o">.</span><span class="n">ACTIVE_ONLY</span><span class="p">,</span>
@@ -2289,7 +2289,7 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># Using an internal function as the linter doesn&#39;t like assigning a lambda, and inlining the</span>
         <span class="c1"># full thing is a mess</span>
-        <span class="k">def</span> <span class="nf">pagination_wrapper_func</span><span class="p">(</span><span class="n">number_to_get</span><span class="p">,</span> <span class="n">next_page_token</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">pagination_wrapper_func</span><span class="p">(</span><span class="n">number_to_get</span><span class="p">,</span> <span class="n">next_page_token</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">MlflowClient</span><span class="p">()</span><span class="o">.</span><span class="n">search_runs</span><span class="p">(</span>
                 <span class="n">experiment_ids</span><span class="p">,</span>
                 <span class="n">filter_string</span><span class="p">,</span>
@@ -2308,8 +2308,8 @@
     <span class="k">if</span> <span class="n">output_format</span> <span class="o">==</span> <span class="s2">&quot;list&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">runs</span>  <span class="c1"># List[mlflow.entities.run.Run]</span>
     <span class="k">elif</span> <span class="n">output_format</span> <span class="o">==</span> <span class="s2">&quot;pandas&quot;</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-        <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
         <span class="n">info</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;run_id&quot;</span><span class="p">:</span> <span class="p">[],</span>
@@ -2381,14 +2381,14 @@
         <span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">_get_or_start_run</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_or_start_run</span><span class="p">():</span>
     <span class="n">active_run_stack</span> <span class="o">=</span> <span class="n">_active_run_stack</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">active_run_stack</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">active_run_stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">start_run</span><span class="p">()</span>
 
 
-<span class="k">def</span> <span class="nf">_get_experiment_id_from_env</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_experiment_id_from_env</span><span class="p">():</span>
     <span class="n">experiment_name</span> <span class="o">=</span> <span class="n">MLFLOW_EXPERIMENT_NAME</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
     <span class="n">experiment_id</span> <span class="o">=</span> <span class="n">MLFLOW_EXPERIMENT_ID</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">experiment_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -2415,10 +2415,10 @@
                 <span class="sa">f</span><span class="s2">&quot;value `</span><span class="si">{</span><span class="n">experiment_id</span><span class="si">}</span><span class="s2">` does not exist in the tracking server. Provide a valid &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;experiment_id.&quot;</span><span class="p">,</span>
                 <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
-            <span class="p">)</span> <span class="kn">from</span> <span class="nn">exc</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
 
 
-<span class="k">def</span> <span class="nf">_get_experiment_id</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_experiment_id</span><span class="p">():</span>
     <span class="k">if</span> <span class="n">_active_experiment_id</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">_active_experiment_id</span>
     <span class="k">else</span><span class="p">:</span>
@@ -2426,7 +2426,7 @@
 
 
 <div class="viewcode-block" id="autolog"><a class="viewcode-back" href="../../../python_api/mlflow.html#mlflow.autolog">[docs]</a><span class="nd">@autologging_integration</span><span class="p">(</span><span class="s2">&quot;mlflow&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">autolog</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">autolog</span><span class="p">(</span>
     <span class="n">log_input_examples</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">log_model_signatures</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">log_models</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -2597,6 +2597,7 @@
         <span class="s2">&quot;langchain&quot;</span><span class="p">:</span> <span class="s2">&quot;mlflow.langchain&quot;</span><span class="p">,</span>
         <span class="s2">&quot;dspy&quot;</span><span class="p">:</span> <span class="s2">&quot;mlflow.dspy&quot;</span><span class="p">,</span>
         <span class="s2">&quot;crewai&quot;</span><span class="p">:</span> <span class="s2">&quot;mlflow.crewai&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;groq&quot;</span><span class="p">:</span> <span class="s2">&quot;mlflow.groq&quot;</span><span class="p">,</span>
         <span class="s2">&quot;boto3&quot;</span><span class="p">:</span> <span class="s2">&quot;mlflow.bedrock&quot;</span><span class="p">,</span>
     <span class="p">}</span>
 
@@ -2615,7 +2616,7 @@
             <span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">target_library_and_module</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">excluded_modules</span>
         <span class="p">}</span>
 
-    <span class="k">def</span> <span class="nf">get_autologging_params</span><span class="p">(</span><span class="n">autolog_fn</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_autologging_params</span><span class="p">(</span><span class="n">autolog_fn</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">needed_params</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">autolog_fn</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
             <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">locals_copy</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">needed_params</span><span class="p">}</span>
@@ -2627,7 +2628,7 @@
     <span class="c1"># and be executed asynchronously, so that it is out of current active</span>
     <span class="c1"># `autologging_conf_lock` scope.</span>
     <span class="nd">@autologging_conf_lock</span>
-    <span class="k">def</span> <span class="nf">setup_autologging</span><span class="p">(</span><span class="n">module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup_autologging</span><span class="p">(</span><span class="n">module</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">autologging_params</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="n">autolog_module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">target_library_and_module</span><span class="p">[</span><span class="n">module</span><span class="o">.</span><span class="vm">__name__</span><span class="p">])</span>
@@ -2680,8 +2681,8 @@
         <span class="c1"># for pyspark, we activate autologging immediately, without waiting for a module import.</span>
         <span class="c1"># this is because on Databricks a SparkSession already exists and the user can directly</span>
         <span class="c1">#   interact with it, and this activity should be logged.</span>
-        <span class="kn">import</span> <span class="nn">pyspark</span> <span class="k">as</span> <span class="nn">pyspark_module</span>
-        <span class="kn">import</span> <span class="nn">pyspark.ml</span> <span class="k">as</span> <span class="nn">pyspark_ml_module</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">pyspark</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pyspark_module</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">pyspark.ml</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pyspark_ml_module</span>
 
         <span class="n">setup_autologging</span><span class="p">(</span><span class="n">pyspark_module</span><span class="p">)</span>
         <span class="n">setup_autologging</span><span class="p">(</span><span class="n">pyspark_ml_module</span><span class="p">)</span>

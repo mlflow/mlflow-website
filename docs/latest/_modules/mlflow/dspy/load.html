@@ -202,17 +202,17 @@
               <div itemprop="articleBody">
                 
   <h1>Source code for mlflow.dspy.load</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
-<span class="kn">import</span> <span class="nn">cloudpickle</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">cloudpickle</span>
 
-<span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">Model</span>
-<span class="kn">from</span> <span class="nn">mlflow.models.dependencies_schemas</span> <span class="kn">import</span> <span class="n">_get_dependencies_schema_from_model</span>
-<span class="kn">from</span> <span class="nn">mlflow.tracing.provider</span> <span class="kn">import</span> <span class="n">trace_disabled</span>
-<span class="kn">from</span> <span class="nn">mlflow.tracking.artifact_utils</span> <span class="kn">import</span> <span class="n">_download_artifact_from_uri</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.annotations</span> <span class="kn">import</span> <span class="n">experimental</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.model_utils</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Model</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models.dependencies_schemas</span><span class="w"> </span><span class="kn">import</span> <span class="n">_get_dependencies_schema_from_model</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.tracing.provider</span><span class="w"> </span><span class="kn">import</span> <span class="n">trace_disabled</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.tracking.artifact_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_download_artifact_from_uri</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">experimental</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.model_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_add_code_from_conf_to_system_path</span><span class="p">,</span>
     <span class="n">_get_flavor_configuration</span><span class="p">,</span>
 <span class="p">)</span>
@@ -222,11 +222,11 @@
 <span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_set_tracer_context</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="n">callbacks</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_set_tracer_context</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="n">callbacks</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Set dependency schemas from the saved model metadata to the tracer&#39;s prediction context.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">mlflow.dspy.callback</span> <span class="kn">import</span> <span class="n">MlflowCallback</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.dspy.callback</span><span class="w"> </span><span class="kn">import</span> <span class="n">MlflowCallback</span>
 
     <span class="n">tracer</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">cb</span> <span class="k">for</span> <span class="n">cb</span> <span class="ow">in</span> <span class="n">callbacks</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cb</span><span class="p">,</span> <span class="n">MlflowCallback</span><span class="p">)),</span> <span class="kc">None</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">tracer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -238,8 +238,8 @@
         <span class="n">context</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">schema</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_load_model</span><span class="p">(</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">dst_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="kn">import</span> <span class="nn">dspy</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_load_model</span><span class="p">(</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">dst_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">dspy</span>
 
     <span class="n">local_model_path</span> <span class="o">=</span> <span class="n">_download_artifact_from_uri</span><span class="p">(</span><span class="n">artifact_uri</span><span class="o">=</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">output_path</span><span class="o">=</span><span class="n">dst_path</span><span class="p">)</span>
     <span class="n">flavor_conf</span> <span class="o">=</span> <span class="n">_get_flavor_configuration</span><span class="p">(</span><span class="n">model_path</span><span class="o">=</span><span class="n">local_model_path</span><span class="p">,</span> <span class="n">flavor_name</span><span class="o">=</span><span class="s2">&quot;dspy&quot;</span><span class="p">)</span>
@@ -257,7 +257,7 @@
 
 <div class="viewcode-block" id="load_model"><a class="viewcode-back" href="../../../python_api/mlflow.dspy.html#mlflow.dspy.load_model">[docs]</a><span class="nd">@experimental</span>
 <span class="nd">@trace_disabled</span>  <span class="c1"># Suppress traces for internal calls while loading model</span>
-<span class="k">def</span> <span class="nf">load_model</span><span class="p">(</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">dst_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_model</span><span class="p">(</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">dst_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Load a Dspy model from a run.</span>
 
@@ -285,7 +285,7 @@
     <span class="k">return</span> <span class="n">_load_model</span><span class="p">(</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">dst_path</span><span class="p">)</span><span class="o">.</span><span class="n">model</span></div>
 
 
-<span class="k">def</span> <span class="nf">_load_pyfunc</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_load_pyfunc</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">_load_model</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 </pre></div>
 

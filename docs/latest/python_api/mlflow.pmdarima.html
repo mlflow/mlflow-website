@@ -164,6 +164,7 @@
 <li class="toctree-l2"><a class="reference internal" href="mlflow.fastai.html">mlflow.fastai</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.gateway.html">mlflow.gateway</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.gemini.html">mlflow.gemini</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mlflow.groq.html">mlflow.groq</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.h2o.html">mlflow.h2o</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.johnsnowlabs.html">mlflow.johnsnowlabs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.keras.html">mlflow.keras</a></li>
@@ -272,19 +273,19 @@ of historical forecasts.</p>
 </div></blockquote>
 <div class="literal-block-wrapper docutils container" id="id3">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id3" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">import</span> <span class="nn">mlflow.pyfunc</span>
-<span class="kn">import</span> <span class="nn">pmdarima</span>
-<span class="kn">from</span> <span class="nn">pmdarima</span> <span class="kn">import</span> <span class="n">auto_arima</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mlflow.pyfunc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pmdarima</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pmdarima</span><span class="w"> </span><span class="kn">import</span> <span class="n">auto_arima</span>
 
 
 <span class="c1"># Define a custom model class</span>
-<span class="k">class</span> <span class="nc">PmdarimaWrapper</span><span class="p">(</span><span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">PythonModel</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">load_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PmdarimaWrapper</span><span class="p">(</span><span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">PythonModel</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">artifacts</span><span class="p">[</span><span class="s2">&quot;model&quot;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">model_input</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">model_input</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">n_periods</span><span class="o">=</span><span class="n">model_input</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
 
@@ -368,11 +369,11 @@ path will be created.</p></li>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id4">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id4" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">infer_signature</span>
-<span class="kn">import</span> <span class="nn">pmdarima</span>
-<span class="kn">from</span> <span class="nn">pmdarima.metrics</span> <span class="kn">import</span> <span class="n">smape</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">infer_signature</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pmdarima</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pmdarima.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">smape</span>
 
 <span class="c1"># Specify locations of source data and the model artifact</span>
 <span class="n">SOURCE_DATA</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/facebook/prophet/master/examples/example_retail_sales.csv&quot;</span>
@@ -485,7 +486,7 @@ To manually infer a model signature, call
 with valid model inputs, such as a training dataset with the target column
 omitted, and valid model outputs, like model predictions made on the training
 dataset, for example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">infer_signature</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">infer_signature</span>
 
 <span class="n">model</span> <span class="o">=</span> <span class="n">pmdarima</span><span class="o">.</span><span class="n">auto_arima</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 <span class="n">predictions</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">n_periods</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">return_conf_int</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -552,11 +553,11 @@ metadata of the logged model.</p>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id6">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id6" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">infer_signature</span>
-<span class="kn">import</span> <span class="nn">pmdarima</span>
-<span class="kn">from</span> <span class="nn">pmdarima.metrics</span> <span class="kn">import</span> <span class="n">smape</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">infer_signature</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pmdarima</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pmdarima.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">smape</span>
 
 <span class="c1"># Specify locations of source data and the model artifact</span>
 <span class="n">SOURCE_DATA</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/facebook/prophet/master/examples/example_retail_sales.csv&quot;</span>
@@ -644,7 +645,7 @@ To manually infer a model signature, call
 with valid model inputs, such as a training dataset with the target column
 omitted, and valid model outputs, like model predictions made on the training
 dataset, for example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">infer_signature</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">infer_signature</span>
 
 <span class="n">model</span> <span class="o">=</span> <span class="n">pmdarima</span><span class="o">.</span><span class="n">auto_arima</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 <span class="n">predictions</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">n_periods</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">return_conf_int</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -702,9 +703,9 @@ section of the model’s conda environment (<code class="docutils literal notran
 </dl>
 <div class="literal-block-wrapper docutils container" id="id7">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id7" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">import</span> <span class="nn">pmdarima</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pmdarima</span>
 
 <span class="c1"># Specify locations of source data and the model artifact</span>
 <span class="n">SOURCE_DATA</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/facebook/prophet/master/examples/example_retail_sales.csv&quot;</span>

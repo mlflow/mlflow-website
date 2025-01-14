@@ -202,28 +202,28 @@
               <div itemprop="articleBody">
                 
   <h1>Source code for mlflow.tracking._model_registry.utils</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
 
-<span class="kn">from</span> <span class="nn">mlflow.environment_variables</span> <span class="kn">import</span> <span class="n">MLFLOW_REGISTRY_URI</span>
-<span class="kn">from</span> <span class="nn">mlflow.store.db.db_types</span> <span class="kn">import</span> <span class="n">DATABASE_ENGINES</span>
-<span class="kn">from</span> <span class="nn">mlflow.store.model_registry.databricks_workspace_model_registry_rest_store</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.environment_variables</span><span class="w"> </span><span class="kn">import</span> <span class="n">MLFLOW_REGISTRY_URI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.store.db.db_types</span><span class="w"> </span><span class="kn">import</span> <span class="n">DATABASE_ENGINES</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.store.model_registry.databricks_workspace_model_registry_rest_store</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DatabricksWorkspaceModelRegistryRestStore</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.store.model_registry.file_store</span> <span class="kn">import</span> <span class="n">FileStore</span>
-<span class="kn">from</span> <span class="nn">mlflow.store.model_registry.rest_store</span> <span class="kn">import</span> <span class="n">RestStore</span>
-<span class="kn">from</span> <span class="nn">mlflow.tracking._model_registry.registry</span> <span class="kn">import</span> <span class="n">ModelRegistryStoreRegistry</span>
-<span class="kn">from</span> <span class="nn">mlflow.tracking._tracking_service.utils</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.store.model_registry.file_store</span><span class="w"> </span><span class="kn">import</span> <span class="n">FileStore</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.store.model_registry.rest_store</span><span class="w"> </span><span class="kn">import</span> <span class="n">RestStore</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.tracking._model_registry.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModelRegistryStoreRegistry</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.tracking._tracking_service.utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_resolve_tracking_uri</span><span class="p">,</span>
     <span class="n">get_tracking_uri</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils._spark_utils</span> <span class="kn">import</span> <span class="n">_get_active_spark_session</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.credentials</span> <span class="kn">import</span> <span class="n">get_default_host_creds</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.databricks_utils</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils._spark_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_get_active_spark_session</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.credentials</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_default_host_creds</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.databricks_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">get_databricks_host_creds</span><span class="p">,</span>
     <span class="n">is_in_databricks_serverless_runtime</span><span class="p">,</span>
     <span class="n">warn_on_deprecated_cross_workspace_registry_uri</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.uri</span> <span class="kn">import</span> <span class="n">_DATABRICKS_UNITY_CATALOG_SCHEME</span><span class="p">,</span> <span class="n">_OSS_UNITY_CATALOG_SCHEME</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.uri</span><span class="w"> </span><span class="kn">import</span> <span class="n">_DATABRICKS_UNITY_CATALOG_SCHEME</span><span class="p">,</span> <span class="n">_OSS_UNITY_CATALOG_SCHEME</span>
 
 <span class="c1"># NOTE: in contrast to tracking, we do not support the following ways to specify</span>
 <span class="c1"># the model registry URI:</span>
@@ -243,7 +243,7 @@
 <span class="n">_registry_uri</span> <span class="o">=</span> <span class="kc">None</span>
 
 
-<div class="viewcode-block" id="set_registry_uri"><a class="viewcode-back" href="../../../../python_api/mlflow.config.html#mlflow.set_registry_uri">[docs]</a><span class="k">def</span> <span class="nf">set_registry_uri</span><span class="p">(</span><span class="n">uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="set_registry_uri"><a class="viewcode-back" href="../../../../python_api/mlflow.config.html#mlflow.set_registry_uri">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">set_registry_uri</span><span class="p">(</span><span class="n">uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the registry server URI. This method is especially useful if you have a registry server</span>
 <span class="sd">    that&#39;s different from the tracking server.</span>
 
@@ -286,7 +286,7 @@
         <span class="n">MLFLOW_REGISTRY_URI</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">_registry_uri</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">_get_registry_uri_from_spark_session</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_registry_uri_from_spark_session</span><span class="p">():</span>
     <span class="n">session</span> <span class="o">=</span> <span class="n">_get_active_spark_session</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">session</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
@@ -298,7 +298,7 @@
     <span class="k">return</span> <span class="n">session</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;spark.mlflow.modelRegistryUri&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_get_registry_uri_from_context</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_registry_uri_from_context</span><span class="p">():</span>
     <span class="k">if</span> <span class="n">_registry_uri</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">_registry_uri</span>
     <span class="k">elif</span> <span class="p">(</span><span class="n">uri</span> <span class="o">:=</span> <span class="n">MLFLOW_REGISTRY_URI</span><span class="o">.</span><span class="n">get</span><span class="p">())</span> <span class="ow">or</span> <span class="p">(</span><span class="n">uri</span> <span class="o">:=</span> <span class="n">_get_registry_uri_from_spark_session</span><span class="p">()):</span>
@@ -306,7 +306,7 @@
     <span class="k">return</span> <span class="n">_registry_uri</span>
 
 
-<div class="viewcode-block" id="get_registry_uri"><a class="viewcode-back" href="../../../../python_api/mlflow.config.html#mlflow.get_registry_uri">[docs]</a><span class="k">def</span> <span class="nf">get_registry_uri</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<div class="viewcode-block" id="get_registry_uri"><a class="viewcode-back" href="../../../../python_api/mlflow.config.html#mlflow.get_registry_uri">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">get_registry_uri</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the current registry URI. If none has been specified, defaults to the tracking URI.</span>
 
 <span class="sd">    Returns:</span>
@@ -334,21 +334,21 @@
     <span class="k">return</span> <span class="n">_get_registry_uri_from_context</span><span class="p">()</span> <span class="ow">or</span> <span class="n">get_tracking_uri</span><span class="p">()</span></div>
 
 
-<span class="k">def</span> <span class="nf">_resolve_registry_uri</span><span class="p">(</span><span class="n">registry_uri</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tracking_uri</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_resolve_registry_uri</span><span class="p">(</span><span class="n">registry_uri</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tracking_uri</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">registry_uri</span> <span class="ow">or</span> <span class="n">_get_registry_uri_from_context</span><span class="p">()</span> <span class="ow">or</span> <span class="n">_resolve_tracking_uri</span><span class="p">(</span><span class="n">tracking_uri</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_get_sqlalchemy_store</span><span class="p">(</span><span class="n">store_uri</span><span class="p">):</span>
-    <span class="kn">from</span> <span class="nn">mlflow.store.model_registry.sqlalchemy_store</span> <span class="kn">import</span> <span class="n">SqlAlchemyStore</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_sqlalchemy_store</span><span class="p">(</span><span class="n">store_uri</span><span class="p">):</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.store.model_registry.sqlalchemy_store</span><span class="w"> </span><span class="kn">import</span> <span class="n">SqlAlchemyStore</span>
 
     <span class="k">return</span> <span class="n">SqlAlchemyStore</span><span class="p">(</span><span class="n">store_uri</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_get_rest_store</span><span class="p">(</span><span class="n">store_uri</span><span class="p">,</span> <span class="o">**</span><span class="n">_</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_rest_store</span><span class="p">(</span><span class="n">store_uri</span><span class="p">,</span> <span class="o">**</span><span class="n">_</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">RestStore</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">get_default_host_creds</span><span class="p">,</span> <span class="n">store_uri</span><span class="p">))</span>
 
 
-<span class="k">def</span> <span class="nf">_get_databricks_rest_store</span><span class="p">(</span><span class="n">store_uri</span><span class="p">,</span> <span class="o">**</span><span class="n">_</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_databricks_rest_store</span><span class="p">(</span><span class="n">store_uri</span><span class="p">,</span> <span class="o">**</span><span class="n">_</span><span class="p">):</span>
     <span class="n">warn_on_deprecated_cross_workspace_registry_uri</span><span class="p">(</span><span class="n">registry_uri</span><span class="o">=</span><span class="n">store_uri</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">DatabricksWorkspaceModelRegistryRestStore</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">get_databricks_host_creds</span><span class="p">,</span> <span class="n">store_uri</span><span class="p">))</span>
 
@@ -358,14 +358,14 @@
 <span class="n">_model_registry_store_registry</span> <span class="o">=</span> <span class="kc">None</span>
 
 
-<span class="k">def</span> <span class="nf">_get_file_store</span><span class="p">(</span><span class="n">store_uri</span><span class="p">,</span> <span class="o">**</span><span class="n">_</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_file_store</span><span class="p">(</span><span class="n">store_uri</span><span class="p">,</span> <span class="o">**</span><span class="n">_</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">FileStore</span><span class="p">(</span><span class="n">store_uri</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_get_store_registry</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_store_registry</span><span class="p">():</span>
     <span class="k">global</span> <span class="n">_model_registry_store_registry</span>
-    <span class="kn">from</span> <span class="nn">mlflow.store._unity_catalog.registry.rest_store</span> <span class="kn">import</span> <span class="n">UcModelRegistryStore</span>
-    <span class="kn">from</span> <span class="nn">mlflow.store._unity_catalog.registry.uc_oss_rest_store</span> <span class="kn">import</span> <span class="n">UnityCatalogOssStore</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.store._unity_catalog.registry.rest_store</span><span class="w"> </span><span class="kn">import</span> <span class="n">UcModelRegistryStore</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.store._unity_catalog.registry.uc_oss_rest_store</span><span class="w"> </span><span class="kn">import</span> <span class="n">UnityCatalogOssStore</span>
 
     <span class="k">if</span> <span class="n">_model_registry_store_registry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">_model_registry_store_registry</span>
@@ -390,7 +390,7 @@
     <span class="k">return</span> <span class="n">_model_registry_store_registry</span>
 
 
-<span class="k">def</span> <span class="nf">_get_store</span><span class="p">(</span><span class="n">store_uri</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tracking_uri</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_store</span><span class="p">(</span><span class="n">store_uri</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tracking_uri</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">_get_store_registry</span><span class="p">()</span><span class="o">.</span><span class="n">get_store</span><span class="p">(</span><span class="n">store_uri</span><span class="p">,</span> <span class="n">tracking_uri</span><span class="p">)</span>
 </pre></div>
 

@@ -229,7 +229,7 @@
 <p><a class="reference external" href="autolog.html">Auto logging</a> is a powerful feature that allows you to log metrics, parameters, and models without the need for explicit log statements
 but just a single <code class="docutils literal notranslate"><span class="pre">mlflow.autolog()</span></code> call at the top of your ML code. See <a class="reference internal" href="autolog.html#automatic-logging"><span class="std std-ref">auto logging documentation</span></a> for supported libraries and how to use autolog APIs with each of them.</p>
 <blockquote>
-<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="n">mlflow</span><span class="o">.</span><span class="n">autolog</span><span class="p">()</span>
 
@@ -412,11 +412,11 @@ statement exits, even if it exits due to an exception.</p>
 <span id="id5"></span><h4>Parallel Runs<a class="headerlink" href="#parallel-runs" title="Permalink to this headline"> </a></h4>
 <p>MLflow also supports running multiple runs in parallel using <a class="reference external" href="https://docs.python.org/2/library/multiprocessing.html">multiprocessing</a> or multi threading.</p>
 <p><strong>Multi-processing</strong> is straightforward: just call <a class="reference internal" href="../python_api/mlflow.html#mlflow.start_run" title="mlflow.start_run"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.start_run()</span></code></a> in a separate process and it creates a new run for each. For example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">import</span> <span class="nn">multiprocessing</span> <span class="k">as</span> <span class="nn">mp</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">multiprocessing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mp</span>
 
 
-<span class="k">def</span> <span class="nf">train_model</span><span class="p">(</span><span class="n">param</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_model</span><span class="p">(</span><span class="n">param</span><span class="p">):</span>
     <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
         <span class="n">mlflow</span><span class="o">.</span><span class="n">log_param</span><span class="p">(</span><span class="s2">&quot;p&quot;</span><span class="p">,</span> <span class="n">param</span><span class="p">)</span>
         <span class="o">...</span>
@@ -436,11 +436,11 @@ the <code class="docutils literal notranslate"><span class="pre">spawn</span></c
 the active experiment and tracking URI, resulting in the child processes not being able to log to the same experiment. To
 overcome this limitation, you can set the active experiment and tracking URI explicitly in each child process as shown below.
 The <code class="docutils literal notranslate"><span class="pre">fork</span></code> is the default method on POSIX systems except MacOS, but otherwise <code class="docutils literal notranslate"><span class="pre">spawn</span></code> method will be used by default.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">import</span> <span class="nn">multiprocessing</span> <span class="k">as</span> <span class="nn">mp</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">multiprocessing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mp</span>
 
 
-<span class="k">def</span> <span class="nf">train_model</span><span class="p">(</span><span class="n">params</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_model</span><span class="p">(</span><span class="n">params</span><span class="p">):</span>
     <span class="c1"># Set the experiment and tracking URI in each child process</span>
     <span class="n">mlflow</span><span class="o">.</span><span class="n">set_tracking_uri</span><span class="p">(</span><span class="s2">&quot;http://localhost:5000&quot;</span><span class="p">)</span>
     <span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s2">&quot;multi-process&quot;</span><span class="p">)</span>
@@ -458,11 +458,11 @@ The <code class="docutils literal notranslate"><span class="pre">fork</span></co
 <p><strong>Multi-threading</strong> is a bit more complicated because MLflow uses a global state to keep track of the currently active run i.e. having multiple active
 runs in the same process may cause data corruption. However, you can avoid this issue and use multi threading by using <a class="reference internal" href="#child-runs"><span class="std std-ref">Child Runs</span></a>.
 You can start child runs in each thread by passing <code class="docutils literal notranslate"><span class="pre">nested=True</span></code> to <a class="reference internal" href="../python_api/mlflow.html#mlflow.start_run" title="mlflow.start_run"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.start_run()</span></code></a> as described in the previous section. For example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">import</span> <span class="nn">threading</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
 
 
-<span class="k">def</span> <span class="nf">train_model</span><span class="p">(</span><span class="n">param</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_model</span><span class="p">(</span><span class="n">param</span><span class="p">):</span>
     <span class="c1"># Create a child run by passing nested=True</span>
     <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">(</span><span class="n">nested</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="n">mlflow</span><span class="o">.</span><span class="n">log_param</span><span class="p">(</span><span class="s2">&quot;p&quot;</span><span class="p">,</span> <span class="n">param</span><span class="p">)</span>
@@ -561,11 +561,11 @@ The following tags are set automatically by MLflow, when appropriate:</p>
 <h3>Get MLflow Run instance from autologged results<a class="headerlink" href="#get-mlflow-run-instance-from-autologged-results" title="Permalink to this headline"> </a></h3>
 <p>In some cases, you may want to access the MLflow Run instance associated with the autologged results, similarly to you can get the run context with <cite>mlflow.start_run()</cite>
 You can access the most recent autolog run through the <a class="reference internal" href="../python_api/mlflow.html#mlflow.last_active_run" title="mlflow.last_active_run"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.last_active_run()</span></code></a> function. Here’s a short sklearn autolog example that makes use of this function:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
-<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
-<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_diabetes</span>
-<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestRegressor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_diabetes</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.ensemble</span><span class="w"> </span><span class="kn">import</span> <span class="n">RandomForestRegressor</span>
 
 <span class="n">mlflow</span><span class="o">.</span><span class="n">autolog</span><span class="p">()</span>
 

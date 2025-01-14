@@ -204,31 +204,31 @@
   <h1>Source code for mlflow.keras.save</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Functions for saving Keras models to MLflow.&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">importlib</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">shutil</span>
-<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">importlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 
-<span class="kn">import</span> <span class="nn">keras</span>
-<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">keras</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
 
-<span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">from</span> <span class="nn">mlflow</span> <span class="kn">import</span> <span class="n">pyfunc</span>
-<span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span> <span class="n">MlflowException</span>
-<span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyfunc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span> <span class="n">MlflowException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Model</span><span class="p">,</span>
     <span class="n">ModelInputExample</span><span class="p">,</span>
     <span class="n">ModelSignature</span><span class="p">,</span>
     <span class="n">infer_pip_requirements</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.models.model</span> <span class="kn">import</span> <span class="n">MLMODEL_FILE_NAME</span>
-<span class="kn">from</span> <span class="nn">mlflow.models.utils</span> <span class="kn">import</span> <span class="n">_save_example</span>
-<span class="kn">from</span> <span class="nn">mlflow.tracking._model_registry</span> <span class="kn">import</span> <span class="n">DEFAULT_AWAIT_MAX_SLEEP_SECONDS</span>
-<span class="kn">from</span> <span class="nn">mlflow.types.schema</span> <span class="kn">import</span> <span class="n">TensorSpec</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.annotations</span> <span class="kn">import</span> <span class="n">experimental</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.docstring_utils</span> <span class="kn">import</span> <span class="n">LOG_MODEL_PARAM_DOCS</span><span class="p">,</span> <span class="n">format_docstring</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.environment</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">MLMODEL_FILE_NAME</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_save_example</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.tracking._model_registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_AWAIT_MAX_SLEEP_SECONDS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.types.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">TensorSpec</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">experimental</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.docstring_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOG_MODEL_PARAM_DOCS</span><span class="p">,</span> <span class="n">format_docstring</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.environment</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_CONDA_ENV_FILE_NAME</span><span class="p">,</span>
     <span class="n">_CONSTRAINTS_FILE_NAME</span><span class="p">,</span>
     <span class="n">_PYTHON_ENV_FILE_NAME</span><span class="p">,</span>
@@ -238,8 +238,8 @@
     <span class="n">_process_pip_requirements</span><span class="p">,</span>
     <span class="n">_PythonEnv</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.file_utils</span> <span class="kn">import</span> <span class="n">get_total_file_size</span><span class="p">,</span> <span class="n">write_to</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.requirements_utils</span> <span class="kn">import</span> <span class="n">_get_pinned_requirement</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.file_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_total_file_size</span><span class="p">,</span> <span class="n">write_to</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.requirements_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_get_pinned_requirement</span>
 
 <span class="n">FLAVOR_NAME</span> <span class="o">=</span> <span class="s2">&quot;keras&quot;</span>
 
@@ -252,7 +252,7 @@
 <span class="n">_MODEL_DATA_PATH</span> <span class="o">=</span> <span class="s2">&quot;data&quot;</span>
 
 
-<div class="viewcode-block" id="get_default_pip_requirements"><a class="viewcode-back" href="../../../python_api/mlflow.keras.html#mlflow.keras.save.get_default_pip_requirements">[docs]</a><span class="k">def</span> <span class="nf">get_default_pip_requirements</span><span class="p">():</span>
+<div class="viewcode-block" id="get_default_pip_requirements"><a class="viewcode-back" href="../../../python_api/mlflow.keras.html#mlflow.keras.save.get_default_pip_requirements">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">get_default_pip_requirements</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns:</span>
 <span class="sd">        A list of default pip requirements for MLflow Models produced by Keras flavor. Calls to</span>
@@ -262,7 +262,7 @@
     <span class="k">return</span> <span class="p">[</span><span class="n">_get_pinned_requirement</span><span class="p">(</span><span class="s2">&quot;keras&quot;</span><span class="p">)]</span></div>
 
 
-<div class="viewcode-block" id="get_default_conda_env"><a class="viewcode-back" href="../../../python_api/mlflow.keras.html#mlflow.keras.save.get_default_conda_env">[docs]</a><span class="k">def</span> <span class="nf">get_default_conda_env</span><span class="p">():</span>
+<div class="viewcode-block" id="get_default_conda_env"><a class="viewcode-back" href="../../../python_api/mlflow.keras.html#mlflow.keras.save.get_default_conda_env">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">get_default_conda_env</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns:</span>
 <span class="sd">        The default Conda environment for MLflow Models produced by calls to `save_model()` and</span>
@@ -271,14 +271,14 @@
     <span class="k">return</span> <span class="n">_mlflow_conda_env</span><span class="p">(</span><span class="n">additional_pip_deps</span><span class="o">=</span><span class="n">get_default_pip_requirements</span><span class="p">())</span></div>
 
 
-<span class="k">def</span> <span class="nf">_export_keras_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">signature</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_export_keras_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">signature</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">signature</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
             <span class="s2">&quot;`signature` cannot be None when `save_exported_model=True` for &quot;</span>
             <span class="s2">&quot;`mlflow.keras.save_model()` method.&quot;</span>
         <span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">tensorflow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tf</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
             <span class="s2">&quot;`tensorflow` must be installed if you want to export a Keras 3 model, please &quot;</span>
@@ -305,7 +305,7 @@
 
 <div class="viewcode-block" id="save_model"><a class="viewcode-back" href="../../../python_api/mlflow.keras.html#mlflow.keras.save.save_model">[docs]</a><span class="nd">@experimental</span>
 <span class="nd">@format_docstring</span><span class="p">(</span><span class="n">LOG_MODEL_PARAM_DOCS</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">package_name</span><span class="o">=</span><span class="n">FLAVOR_NAME</span><span class="p">))</span>
-<span class="k">def</span> <span class="nf">save_model</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">save_model</span><span class="p">(</span>
     <span class="n">model</span><span class="p">,</span>
     <span class="n">path</span><span class="p">,</span>
     <span class="n">save_exported_model</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -359,7 +359,7 @@
 <span class="sd">            mlflow.keras.save_model(model, &quot;./model&quot;)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="kn">import</span> <span class="nn">keras</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">keras</span>
 
     <span class="k">if</span> <span class="n">signature</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;You are saving a Keras model without specifying model signature.&quot;</span><span class="p">)</span>
@@ -480,7 +480,7 @@
 
 <div class="viewcode-block" id="log_model"><a class="viewcode-back" href="../../../python_api/mlflow.keras.html#mlflow.keras.save.log_model">[docs]</a><span class="nd">@experimental</span>
 <span class="nd">@format_docstring</span><span class="p">(</span><span class="n">LOG_MODEL_PARAM_DOCS</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">package_name</span><span class="o">=</span><span class="n">FLAVOR_NAME</span><span class="p">))</span>
-<span class="k">def</span> <span class="nf">log_model</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">log_model</span><span class="p">(</span>
     <span class="n">model</span><span class="p">,</span>
     <span class="n">artifact_path</span><span class="p">,</span>
     <span class="n">save_exported_model</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>

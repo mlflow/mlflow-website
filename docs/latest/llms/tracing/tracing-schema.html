@@ -574,7 +574,7 @@ custom attributes for standardized chat messages and tool defintions:</p>
 <td><p>This attribute represents the system/user/assistant messages involved in the
 conversation with the chat model. It enables rich conversation rendering in the UI,
 and will also be used in MLflow evaluation in the future.</p>
-<p>The type must be <code class="docutils literal notranslate"><span class="pre">List[</span></code> <a class="reference internal" href="../../python_api/mlflow.types.html#mlflow.types.chat.RequestMessage" title="mlflow.types.chat.RequestMessage"><code class="xref py py-class docutils literal notranslate"><span class="pre">RequestMessage</span></code></a> <code class="docutils literal notranslate"><span class="pre">]</span></code></p>
+<p>The type must be <code class="docutils literal notranslate"><span class="pre">List[</span></code> <a class="reference internal" href="../../python_api/mlflow.types.html#mlflow.types.chat.ChatMessage" title="mlflow.types.chat.ChatMessage"><code class="xref py py-class docutils literal notranslate"><span class="pre">ChatMessage</span></code></a> <code class="docutils literal notranslate"><span class="pre">]</span></code></p>
 </td>
 <td><p>This attribute can be conveniently set using the <a class="reference internal" href="../../python_api/mlflow.tracing.html#mlflow.tracing.set_span_chat_messages" title="mlflow.tracing.set_span_chat_messages"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.tracing.set_span_chat_messages()</span></code></a> function. This function
 will throw a validation error if the data does not conform to the spec.</p></td>
@@ -583,7 +583,7 @@ will throw a validation error if the data does not conform to the spec.</p></td>
 <td><p>This attribute represents the tools that were available for the chat model to call. In the OpenAI
 context, this would be equivalent to the <a class="reference external" href="https://platform.openai.com/docs/api-reference/chat/create#chat-create-tools">tools</a>
 param in the Chat Completions API.</p>
-<p>The type must be <code class="docutils literal notranslate"><span class="pre">List[</span></code> <a class="reference internal" href="../../python_api/mlflow.types.html#mlflow.types.chat.ChatTool" title="mlflow.types.chat.ChatTool"><code class="xref py py-class docutils literal notranslate"><span class="pre">RequestMessage</span></code></a> <code class="docutils literal notranslate"><span class="pre">]</span></code></p>
+<p>The type must be <code class="docutils literal notranslate"><span class="pre">List[</span></code> <a class="reference internal" href="../../python_api/mlflow.types.html#mlflow.types.chat.ChatTool" title="mlflow.types.chat.ChatTool"><code class="xref py py-class docutils literal notranslate"><span class="pre">ChatTool</span></code></a> <code class="docutils literal notranslate"><span class="pre">]</span></code></p>
 </td>
 <td><p>This attribute can be conveniently set using the <a class="reference internal" href="../../python_api/mlflow.tracing.html#mlflow.tracing.set_span_chat_tools" title="mlflow.tracing.set_span_chat_tools"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.tracing.set_span_chat_tools()</span></code></a> function. This function
 will throw a validation error if the data does not conform to the spec.</p></td>
@@ -592,10 +592,10 @@ will throw a validation error if the data does not conform to the spec.</p></td>
 </table>
 <p>Please refer to the example below for a quick demonstration of how to use the utility functions described above, as well as
 how to retrieve them using the <a class="reference internal" href="../../python_api/mlflow.entities.html#mlflow.entities.Span.get_attribute" title="mlflow.entities.Span.get_attribute"><code class="xref py py-class docutils literal notranslate"><span class="pre">span.get_attribute()</span></code></a> function:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">from</span> <span class="nn">mlflow.entities.span</span> <span class="kn">import</span> <span class="n">SpanType</span>
-<span class="kn">from</span> <span class="nn">mlflow.tracing.constant</span> <span class="kn">import</span> <span class="n">SpanAttributeKey</span>
-<span class="kn">from</span> <span class="nn">mlflow.tracing</span> <span class="kn">import</span> <span class="n">set_span_chat_messages</span><span class="p">,</span> <span class="n">set_span_chat_tools</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.entities.span</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpanType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.tracing.constant</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpanAttributeKey</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.tracing</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_span_chat_messages</span><span class="p">,</span> <span class="n">set_span_chat_tools</span>
 
 <span class="c1"># example messages and tools</span>
 <span class="n">messages</span> <span class="o">=</span> <span class="p">[</span>
@@ -626,7 +626,7 @@ how to retrieve them using the <a class="reference internal" href="../../python_
 
 
 <span class="nd">@mlflow</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">span_type</span><span class="o">=</span><span class="n">SpanType</span><span class="o">.</span><span class="n">CHAT_MODEL</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">call_chat_model</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="n">tools</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">call_chat_model</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="n">tools</span><span class="p">):</span>
     <span class="c1"># mocking a response</span>
     <span class="n">response</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;assistant&quot;</span><span class="p">,</span>

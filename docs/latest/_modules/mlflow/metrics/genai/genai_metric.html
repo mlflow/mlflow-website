@@ -204,36 +204,36 @@
               <div itemprop="articleBody">
                 
   <h1>Source code for mlflow.metrics.genai.genai_metric</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">concurrent.futures</span> <span class="kn">import</span> <span class="n">ThreadPoolExecutor</span><span class="p">,</span> <span class="n">as_completed</span>
-<span class="kn">from</span> <span class="nn">inspect</span> <span class="kn">import</span> <span class="n">Parameter</span><span class="p">,</span> <span class="n">Signature</span>
-<span class="kn">from</span> <span class="nn">tempfile</span> <span class="kn">import</span> <span class="n">TemporaryDirectory</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">concurrent.futures</span><span class="w"> </span><span class="kn">import</span> <span class="n">ThreadPoolExecutor</span><span class="p">,</span> <span class="n">as_completed</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">inspect</span><span class="w"> </span><span class="kn">import</span> <span class="n">Parameter</span><span class="p">,</span> <span class="n">Signature</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tempfile</span><span class="w"> </span><span class="kn">import</span> <span class="n">TemporaryDirectory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
-<span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
-<span class="kn">from</span> <span class="nn">mlflow.metrics.base</span> <span class="kn">import</span> <span class="n">MetricValue</span>
-<span class="kn">from</span> <span class="nn">mlflow.metrics.genai</span> <span class="kn">import</span> <span class="n">model_utils</span>
-<span class="kn">from</span> <span class="nn">mlflow.metrics.genai.base</span> <span class="kn">import</span> <span class="n">EvaluationExample</span>
-<span class="kn">from</span> <span class="nn">mlflow.metrics.genai.prompt_template</span> <span class="kn">import</span> <span class="n">PromptTemplate</span>
-<span class="kn">from</span> <span class="nn">mlflow.metrics.genai.utils</span> <span class="kn">import</span> <span class="n">_get_default_model</span><span class="p">,</span> <span class="n">_get_latest_metric_version</span>
-<span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">EvaluationMetric</span><span class="p">,</span> <span class="n">make_metric</span>
-<span class="kn">from</span> <span class="nn">mlflow.models.evaluation.base</span> <span class="kn">import</span> <span class="n">_make_metric</span>
-<span class="kn">from</span> <span class="nn">mlflow.protos.databricks_pb2</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">MlflowException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.metrics.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">MetricValue</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.metrics.genai</span><span class="w"> </span><span class="kn">import</span> <span class="n">model_utils</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.metrics.genai.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">EvaluationExample</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.metrics.genai.prompt_template</span><span class="w"> </span><span class="kn">import</span> <span class="n">PromptTemplate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.metrics.genai.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_get_default_model</span><span class="p">,</span> <span class="n">_get_latest_metric_version</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">EvaluationMetric</span><span class="p">,</span> <span class="n">make_metric</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models.evaluation.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">_make_metric</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.protos.databricks_pb2</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">BAD_REQUEST</span><span class="p">,</span>
     <span class="n">INTERNAL_ERROR</span><span class="p">,</span>
     <span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
     <span class="n">UNAUTHENTICATED</span><span class="p">,</span>
     <span class="n">ErrorCode</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.annotations</span> <span class="kn">import</span> <span class="n">experimental</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.class_utils</span> <span class="kn">import</span> <span class="n">_get_class_from_string</span>
-<span class="kn">from</span> <span class="nn">mlflow.version</span> <span class="kn">import</span> <span class="n">VERSION</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">experimental</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.class_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_get_class_from_string</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.version</span><span class="w"> </span><span class="kn">import</span> <span class="n">VERSION</span>
 
 <span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -247,8 +247,8 @@
 <span class="s2">Do not add additional new lines. Do not add any other fields.&quot;&quot;&quot;</span>
 
 
-<span class="k">def</span> <span class="nf">_format_args_string</span><span class="p">(</span><span class="n">grading_context_columns</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span> <span class="n">eval_values</span><span class="p">,</span> <span class="n">indx</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_format_args_string</span><span class="p">(</span><span class="n">grading_context_columns</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span> <span class="n">eval_values</span><span class="p">,</span> <span class="n">indx</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
     <span class="n">args_dict</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">grading_context_columns</span><span class="p">:</span>
@@ -276,7 +276,7 @@
 
 
 <span class="c1"># Function to extract Score and Justification</span>
-<span class="k">def</span> <span class="nf">_extract_score_and_justification</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_extract_score_and_justification</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">text</span><span class="p">:</span>
         <span class="n">text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;score&quot;</span><span class="p">,</span> <span class="s2">&quot;score&quot;</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
         <span class="n">text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;justification&quot;</span><span class="p">,</span> <span class="s2">&quot;justification&quot;</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
@@ -304,7 +304,7 @@
     <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
 
 
-<span class="k">def</span> <span class="nf">_score_model_on_one_payload</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_score_model_on_one_payload</span><span class="p">(</span>
     <span class="n">payload</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">eval_model</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">parameters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
@@ -333,7 +333,7 @@
         <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Failed to score model on payload. Error: </span><span class="si">{</span><span class="n">e</span><span class="si">!s}</span><span class="s2">&quot;</span>
 
 
-<span class="k">def</span> <span class="nf">_score_model_on_payloads</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_score_model_on_payloads</span><span class="p">(</span>
     <span class="n">grading_payloads</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">proxy_url</span><span class="p">,</span> <span class="n">max_workers</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
     <span class="n">scores</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">grading_payloads</span><span class="p">)</span>
@@ -353,7 +353,7 @@
 
         <span class="n">as_comp</span> <span class="o">=</span> <span class="n">as_completed</span><span class="p">(</span><span class="n">futures</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">tqdm.auto</span> <span class="kn">import</span> <span class="n">tqdm</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">tqdm.auto</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
 
             <span class="n">as_comp</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">as_comp</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">futures</span><span class="p">))</span>
         <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
@@ -368,10 +368,10 @@
     <span class="k">return</span> <span class="n">scores</span><span class="p">,</span> <span class="n">justifications</span>
 
 
-<span class="k">def</span> <span class="nf">_get_aggregate_results</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">aggregations</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_aggregate_results</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">aggregations</span><span class="p">):</span>
     <span class="c1"># loop over the aggregations and compute the aggregate results on the scores</span>
-    <span class="k">def</span> <span class="nf">aggregate_function</span><span class="p">(</span><span class="n">aggregate_option</span><span class="p">,</span> <span class="n">scores</span><span class="p">):</span>
-        <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">aggregate_function</span><span class="p">(</span><span class="n">aggregate_option</span><span class="p">,</span> <span class="n">scores</span><span class="p">):</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
         <span class="n">options</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;min&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">,</span>
@@ -400,7 +400,7 @@
 
 
 <div class="viewcode-block" id="make_genai_metric_from_prompt"><a class="viewcode-back" href="../../../../python_api/mlflow.metrics.html#mlflow.metrics.genai.make_genai_metric_from_prompt">[docs]</a><span class="nd">@experimental</span>
-<span class="k">def</span> <span class="nf">make_genai_metric_from_prompt</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_genai_metric_from_prompt</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">judge_prompt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">model</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">_get_default_model</span><span class="p">(),</span>
@@ -469,7 +469,7 @@
 <span class="sd">        )</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
     <span class="n">prompt_template</span> <span class="o">=</span> <span class="n">PromptTemplate</span><span class="p">([</span><span class="n">judge_prompt</span><span class="p">,</span> <span class="n">_PROMPT_FORMATTING_WRAPPER</span><span class="p">])</span>
     <span class="n">allowed_variables</span> <span class="o">=</span> <span class="n">prompt_template</span><span class="o">.</span><span class="n">variables</span>
@@ -493,7 +493,7 @@
 
     <span class="n">aggregations</span> <span class="o">=</span> <span class="n">aggregations</span> <span class="ow">or</span> <span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;variance&quot;</span><span class="p">,</span> <span class="s2">&quot;p90&quot;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">eval_fn</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_fn</span><span class="p">(</span>
         <span class="o">*</span><span class="n">args</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MetricValue</span><span class="p">:</span>
@@ -533,7 +533,7 @@
 
 
 <div class="viewcode-block" id="make_genai_metric"><a class="viewcode-back" href="../../../../python_api/mlflow.metrics.html#mlflow.metrics.genai.make_genai_metric">[docs]</a><span class="nd">@experimental</span>
-<span class="k">def</span> <span class="nf">make_genai_metric</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_genai_metric</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">definition</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">grading_prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -681,7 +681,7 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">grading_context_columns</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
         <span class="n">grading_context_columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">grading_context_columns</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">process_example</span><span class="p">(</span><span class="n">example</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">process_example</span><span class="p">(</span><span class="n">example</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">example</span><span class="o">.</span><span class="n">grading_context</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">grading_context_columns</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">grading_context</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">example</span><span class="o">.</span><span class="n">grading_context</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
@@ -720,12 +720,12 @@
             <span class="sa">f</span><span class="s2">&quot;Failed to find evaluation model for version </span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">.&quot;</span>
             <span class="sa">f</span><span class="s2">&quot; Please check the correctness of the version&quot;</span><span class="p">,</span>
             <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
-        <span class="p">)</span> <span class="kn">from</span> <span class="kc">None</span>
+        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;Failed to construct evaluation model </span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">. Error: </span><span class="si">{</span><span class="n">e</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">,</span>
             <span class="n">error_code</span><span class="o">=</span><span class="n">INTERNAL_ERROR</span><span class="p">,</span>
-        <span class="p">)</span> <span class="kn">from</span> <span class="kc">None</span>
+        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
 
     <span class="n">evaluation_context</span> <span class="o">=</span> <span class="n">evaluation_model_class_module</span><span class="p">(</span>
         <span class="n">name</span><span class="p">,</span>
@@ -736,7 +736,7 @@
         <span class="o">*</span><span class="p">(</span><span class="n">parameters</span><span class="p">,)</span> <span class="k">if</span> <span class="n">parameters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">(),</span>
     <span class="p">)</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">eval_fn</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_fn</span><span class="p">(</span>
         <span class="n">predictions</span><span class="p">:</span> <span class="s2">&quot;pd.Series&quot;</span><span class="p">,</span>
         <span class="n">metrics</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">MetricValue</span><span class="p">],</span>
         <span class="n">inputs</span><span class="p">:</span> <span class="s2">&quot;pd.Series&quot;</span><span class="p">,</span>
@@ -806,7 +806,7 @@
 
             <span class="n">as_comp</span> <span class="o">=</span> <span class="n">as_completed</span><span class="p">(</span><span class="n">futures</span><span class="p">)</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="kn">from</span> <span class="nn">tqdm.auto</span> <span class="kn">import</span> <span class="n">tqdm</span>
+                <span class="kn">from</span><span class="w"> </span><span class="nn">tqdm.auto</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
 
                 <span class="n">as_comp</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">as_comp</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">futures</span><span class="p">))</span>
             <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
@@ -847,11 +847,11 @@
     <span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">_filter_by_field</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">field_name</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_filter_by_field</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">field_name</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">field_name</span><span class="p">]</span> <span class="o">==</span> <span class="n">value</span><span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">_deserialize_genai_metric_args</span><span class="p">(</span><span class="n">args_dict</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_deserialize_genai_metric_args</span><span class="p">(</span><span class="n">args_dict</span><span class="p">):</span>
     <span class="n">mlflow_version_at_ser</span> <span class="o">=</span> <span class="n">args_dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;mlflow_version&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="n">fn_name</span> <span class="o">=</span> <span class="n">args_dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;fn_name&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">fn_name</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">mlflow_version_at_ser</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -882,7 +882,7 @@
     <span class="k">return</span> <span class="n">make_genai_metric</span><span class="p">(</span><span class="o">**</span><span class="n">args_dict</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="retrieve_custom_metrics"><a class="viewcode-back" href="../../../../python_api/mlflow.metrics.html#mlflow.metrics.genai.retrieve_custom_metrics">[docs]</a><span class="k">def</span> <span class="nf">retrieve_custom_metrics</span><span class="p">(</span>
+<div class="viewcode-block" id="retrieve_custom_metrics"><a class="viewcode-back" href="../../../../python_api/mlflow.metrics.html#mlflow.metrics.genai.retrieve_custom_metrics">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">retrieve_custom_metrics</span><span class="p">(</span>
     <span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>

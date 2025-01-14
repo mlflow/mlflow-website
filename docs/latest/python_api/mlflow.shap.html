@@ -164,6 +164,7 @@
 <li class="toctree-l2"><a class="reference internal" href="mlflow.fastai.html">mlflow.fastai</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.gateway.html">mlflow.gateway</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.gemini.html">mlflow.gemini</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mlflow.groq.html">mlflow.groq</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.h2o.html">mlflow.h2o</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.johnsnowlabs.html">mlflow.johnsnowlabs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.keras.html">mlflow.keras</a></li>
@@ -369,7 +370,7 @@ and output <a class="reference internal" href="mlflow.types.html#mlflow.types.Sc
 <a class="reference internal" href="mlflow.models.html#mlflow.models.infer_signature" title="mlflow.models.infer_signature"><code class="xref py py-func docutils literal notranslate"><span class="pre">inferred</span></code></a> from datasets with valid model input
 (e.g. the training dataset with target column omitted) and valid model output
 (e.g. model predictions generated on the training dataset), for example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">infer_signature</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">infer_signature</span>
 
 <span class="n">train</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop_column</span><span class="p">(</span><span class="s2">&quot;target_label&quot;</span><span class="p">)</span>
 <span class="n">predictions</span> <span class="o">=</span> <span class="o">...</span>  <span class="c1"># compute model predictions</span>
@@ -441,7 +442,7 @@ exPlanations).</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>predict_function</strong> – <p>A function to compute the output of a model (e.g. <code class="docutils literal notranslate"><span class="pre">predict_proba</span></code> method of
 scikit-learn classifiers). Must have the following signature:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">predict_function</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pred</span><span class="p">:</span> <span class="o">...</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">predict_function</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pred</span><span class="p">:</span> <span class="o">...</span>
 </pre></div>
 </div>
 <ul>
@@ -480,15 +481,15 @@ If unspecified, defaults to “model_explanations_shap”.</p></li>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id3">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id3" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_diabetes</span>
-<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_diabetes</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.linear_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinearRegression</span>
 
-<span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">from</span> <span class="nn">mlflow</span> <span class="kn">import</span> <span class="n">MlflowClient</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">MlflowClient</span>
 
 <span class="c1"># prepare training data</span>
 <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">dataset</span> <span class="o">=</span> <span class="n">load_diabetes</span><span class="p">(</span><span class="n">return_X_y</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">as_frame</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -604,7 +605,7 @@ and output <a class="reference internal" href="mlflow.types.html#mlflow.types.Sc
 <a class="reference internal" href="mlflow.models.html#mlflow.models.infer_signature" title="mlflow.models.infer_signature"><code class="xref py py-func docutils literal notranslate"><span class="pre">inferred</span></code></a> from datasets with valid model input
 (e.g. the training dataset with target column omitted) and valid model output (e.g.
 model predictions generated on the training dataset), for example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">infer_signature</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">infer_signature</span>
 
 <span class="n">train</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop_column</span><span class="p">(</span><span class="s2">&quot;target_label&quot;</span><span class="p">)</span>
 <span class="n">predictions</span> <span class="o">=</span> <span class="o">...</span>  <span class="c1"># compute model predictions</span>

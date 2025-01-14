@@ -145,6 +145,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../chat-model-guide/index.html">Tutorial: Custom GenAI Models using ChatModel</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../notebooks/chat-model-tool-calling.html">Build a tool-calling model with <code class="docutils literal notranslate"><span class="pre">mlflow.pyfunc.ChatModel</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tracing/notebooks/jupyter-trace-demo.html">MLflow Trace UI in Jupyter Notebook Demo</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../index.html#id1">MLflow Tracing</a></li>
@@ -335,9 +336,9 @@ Hello! It&#39;s great to see you&#39;re starting the day with a cheerful greetin
 <p>We will use the <code class="docutils literal notranslate"><span class="pre">ollama-python</span></code> library to interface with the Ollama model. Install it to your Python environment with <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">ollama</span></code>. Also, install <code class="docutils literal notranslate"><span class="pre">mlflow</span></code> with <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">mlflow</span></code>.</p>
 <p><strong>Using the Ollama Python library</strong></p>
 <p>In order to map the Ollama input/output schema to the ChatModel input/output schema, we first need to understand what kinds of inputs and outputs the Ollama model expects and returns. Here’s how to query the model with a simple prompt:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ollama</span>
-<span class="kn">from</span> <span class="nn">ollama</span> <span class="kn">import</span> <span class="n">Options</span>
-<span class="kn">from</span> <span class="nn">rich</span> <span class="kn">import</span> <span class="nb">print</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ollama</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ollama</span><span class="w"> </span><span class="kn">import</span> <span class="n">Options</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rich</span><span class="w"> </span><span class="kn">import</span> <span class="nb">print</span>
 
 <span class="n">response</span> <span class="o">=</span> <span class="n">ollama</span><span class="o">.</span><span class="n">chat</span><span class="p">(</span>
     <span class="n">model</span><span class="o">=</span><span class="s2">&quot;llama3.2:1b&quot;</span><span class="p">,</span>
@@ -394,21 +395,21 @@ Hello! It&#39;s great to see you&#39;re starting the day with a cheerful greetin
 <p>These are what we must map to the Ollama inputs and outputs. Here’s a simplified version that, for now, only handles the input/output messages:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># if you are using a jupyter notebook</span>
 <span class="c1"># %%writefile ollama_model.py</span>
-<span class="kn">from</span> <span class="nn">mlflow.pyfunc</span> <span class="kn">import</span> <span class="n">ChatModel</span>
-<span class="kn">from</span> <span class="nn">mlflow.types.llm</span> <span class="kn">import</span> <span class="n">ChatMessage</span><span class="p">,</span> <span class="n">ChatCompletionResponse</span><span class="p">,</span> <span class="n">ChatChoice</span>
-<span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">set_model</span>
-<span class="kn">import</span> <span class="nn">ollama</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.pyfunc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChatModel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.types.llm</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChatMessage</span><span class="p">,</span> <span class="n">ChatCompletionResponse</span><span class="p">,</span> <span class="n">ChatChoice</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_model</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ollama</span>
 
 
-<span class="k">class</span> <span class="nc">SimpleOllamaModel</span><span class="p">(</span><span class="n">ChatModel</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SimpleOllamaModel</span><span class="p">(</span><span class="n">ChatModel</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_name</span> <span class="o">=</span> <span class="s2">&quot;llama3.2:1b&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">load_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">ollama</span><span class="o">.</span><span class="n">Client</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">messages</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">messages</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="c1"># Prepare the messages for Ollama</span>
         <span class="n">ollama_messages</span> <span class="o">=</span> <span class="p">[</span><span class="n">msg</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">messages</span><span class="p">]</span>
 
@@ -432,7 +433,7 @@ Hello! It&#39;s great to see you&#39;re starting the day with a cheerful greetin
 </ul>
 <p>In a notebook environment, we can save the model to a file called <code class="docutils literal notranslate"><span class="pre">ollama_model.py</span></code> with the <code class="docutils literal notranslate"><span class="pre">%%writefile</span></code> magic command and call <code class="docutils literal notranslate"><span class="pre">set_model(SimpleOllamaModel())</span></code>. This is the “models from code” approach to model logging, which you can read more about <a class="reference internal" href="../../model/models-from-code.html"><span class="doc">here</span></a>.</p>
 <p>Now we can log this model to MLflow as follows, passing the path to the file containing the model definition we just created:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s2">&quot;chatmodel-quickstart&quot;</span><span class="p">)</span>
 <span class="n">code_path</span> <span class="o">=</span> <span class="s2">&quot;ollama_model.py&quot;</span>
@@ -525,24 +526,24 @@ Hello! It&#39;s great to see you&#39;re starting the day with a cheerful greetin
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># if you are using a jupyter notebook</span>
 <span class="c1"># %%writefile ollama_model.py</span>
 
-<span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">from</span> <span class="nn">mlflow.pyfunc</span> <span class="kn">import</span> <span class="n">ChatModel</span>
-<span class="kn">from</span> <span class="nn">mlflow.types.llm</span> <span class="kn">import</span> <span class="n">ChatMessage</span><span class="p">,</span> <span class="n">ChatCompletionResponse</span><span class="p">,</span> <span class="n">ChatChoice</span>
-<span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">set_model</span>
-<span class="kn">import</span> <span class="nn">ollama</span>
-<span class="kn">from</span> <span class="nn">ollama</span> <span class="kn">import</span> <span class="n">Options</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.pyfunc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChatModel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.types.llm</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChatMessage</span><span class="p">,</span> <span class="n">ChatCompletionResponse</span><span class="p">,</span> <span class="n">ChatChoice</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_model</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ollama</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ollama</span><span class="w"> </span><span class="kn">import</span> <span class="n">Options</span>
 
 
-<span class="k">class</span> <span class="nc">OllamaModelWithMetadata</span><span class="p">(</span><span class="n">ChatModel</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">OllamaModelWithMetadata</span><span class="p">(</span><span class="n">ChatModel</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_name</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">load_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_name</span> <span class="o">=</span> <span class="s2">&quot;llama3.2:1b&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">ollama</span><span class="o">.</span><span class="n">Client</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_prepare_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_prepare_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
         <span class="c1"># Prepare options from params</span>
         <span class="n">options</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="n">params</span><span class="p">:</span>
@@ -560,7 +561,7 @@ Hello! It&#39;s great to see you&#39;re starting the day with a cheerful greetin
 
         <span class="k">return</span> <span class="n">Options</span><span class="p">(</span><span class="n">options</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">messages</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">messages</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">ollama_messages</span> <span class="o">=</span> <span class="p">[</span>
             <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="n">msg</span><span class="o">.</span><span class="n">role</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">msg</span><span class="o">.</span><span class="n">content</span><span class="p">}</span> <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">messages</span>
         <span class="p">]</span>
@@ -683,31 +684,31 @@ Hello! It&#39;s great to see you&#39;re starting the day with a cheerful greetin
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># if you are using a jupyter notebook</span>
 <span class="c1"># %%writefile ollama_pyfunc_model.py</span>
 
-<span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">from</span> <span class="nn">mlflow.pyfunc</span> <span class="kn">import</span> <span class="n">PythonModel</span>
-<span class="kn">from</span> <span class="nn">mlflow.types.llm</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.pyfunc</span><span class="w"> </span><span class="kn">import</span> <span class="n">PythonModel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.types.llm</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ChatCompletionRequest</span><span class="p">,</span>
     <span class="n">ChatCompletionResponse</span><span class="p">,</span>
     <span class="n">ChatMessage</span><span class="p">,</span>
     <span class="n">ChatChoice</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">set_model</span>
-<span class="kn">import</span> <span class="nn">ollama</span>
-<span class="kn">from</span> <span class="nn">ollama</span> <span class="kn">import</span> <span class="n">Options</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_model</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ollama</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ollama</span><span class="w"> </span><span class="kn">import</span> <span class="n">Options</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span>
 
 
-<span class="k">class</span> <span class="nc">OllamaPyfunc</span><span class="p">(</span><span class="n">PythonModel</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">OllamaPyfunc</span><span class="p">(</span><span class="n">PythonModel</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_name</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">load_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_name</span> <span class="o">=</span> <span class="s2">&quot;llama3.2:1b&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">ollama</span><span class="o">.</span><span class="n">Client</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_prepare_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_prepare_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
         <span class="n">options</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="n">params</span><span class="p">:</span>
             <span class="k">if</span> <span class="s2">&quot;max_tokens&quot;</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
@@ -723,7 +724,7 @@ Hello! It&#39;s great to see you&#39;re starting the day with a cheerful greetin
 
         <span class="k">return</span> <span class="n">Options</span><span class="p">(</span><span class="n">options</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">model_input</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">model_input</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_input</span><span class="p">,</span> <span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)):</span>
             <span class="n">messages</span> <span class="o">=</span> <span class="n">model_input</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="n">orient</span><span class="o">=</span><span class="s2">&quot;records&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;messages&quot;</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>

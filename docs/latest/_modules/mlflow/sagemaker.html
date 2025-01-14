@@ -206,40 +206,40 @@
 <span class="sd">The ``mlflow.sagemaker`` module provides an API for deploying MLflow models to Amazon SageMaker.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">platform</span>
-<span class="kn">import</span> <span class="nn">signal</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">tarfile</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">import</span> <span class="nn">urllib.parse</span>
-<span class="kn">import</span> <span class="nn">uuid</span>
-<span class="kn">from</span> <span class="nn">subprocess</span> <span class="kn">import</span> <span class="n">Popen</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">platform</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">signal</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tarfile</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">urllib.parse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">subprocess</span><span class="w"> </span><span class="kn">import</span> <span class="n">Popen</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">import</span> <span class="nn">mlflow.version</span>
-<span class="kn">from</span> <span class="nn">mlflow</span> <span class="kn">import</span> <span class="n">mleap</span><span class="p">,</span> <span class="n">pyfunc</span>
-<span class="kn">from</span> <span class="nn">mlflow.deployments</span> <span class="kn">import</span> <span class="n">BaseDeploymentClient</span><span class="p">,</span> <span class="n">PredictionsResponse</span>
-<span class="kn">from</span> <span class="nn">mlflow.environment_variables</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mlflow.version</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">mleap</span><span class="p">,</span> <span class="n">pyfunc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.deployments</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseDeploymentClient</span><span class="p">,</span> <span class="n">PredictionsResponse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.environment_variables</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">MLFLOW_DEPLOYMENT_FLAVOR_NAME</span><span class="p">,</span>
     <span class="n">MLFLOW_SAGEMAKER_DEPLOY_IMG_URL</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
-<span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">Model</span>
-<span class="kn">from</span> <span class="nn">mlflow.models.container</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">MlflowException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Model</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models.container</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">SERVING_ENVIRONMENT</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.models.container</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models.container</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">SUPPORTED_FLAVORS</span> <span class="k">as</span> <span class="n">SUPPORTED_DEPLOYMENT_FLAVORS</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.models.model</span> <span class="kn">import</span> <span class="n">MLMODEL_FILE_NAME</span>
-<span class="kn">from</span> <span class="nn">mlflow.protos.databricks_pb2</span> <span class="kn">import</span> <span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span> <span class="n">RESOURCE_DOES_NOT_EXIST</span>
-<span class="kn">from</span> <span class="nn">mlflow.tracking.artifact_utils</span> <span class="kn">import</span> <span class="n">_download_artifact_from_uri</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.file_utils</span> <span class="kn">import</span> <span class="n">TempDir</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.proto_json_utils</span> <span class="kn">import</span> <span class="n">dump_input_data</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">MLMODEL_FILE_NAME</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.protos.databricks_pb2</span><span class="w"> </span><span class="kn">import</span> <span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span> <span class="n">RESOURCE_DOES_NOT_EXIST</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.tracking.artifact_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_download_artifact_from_uri</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.file_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">TempDir</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.proto_json_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">dump_input_data</span>
 
 <span class="n">DEFAULT_IMAGE_NAME</span> <span class="o">=</span> <span class="s2">&quot;mlflow-pyfunc&quot;</span>
 <span class="n">DEPLOYMENT_MODE_ADD</span> <span class="o">=</span> <span class="s2">&quot;add&quot;</span>
@@ -262,7 +262,7 @@
 <span class="n">_full_template</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{account}</span><span class="s2">.dkr.ecr.</span><span class="si">{region}</span><span class="s2">.amazonaws.com/</span><span class="si">{image}</span><span class="s2">:</span><span class="si">{version}</span><span class="s2">&quot;</span>
 
 
-<span class="k">def</span> <span class="nf">_get_preferred_deployment_flavor</span><span class="p">(</span><span class="n">model_config</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_preferred_deployment_flavor</span><span class="p">(</span><span class="n">model_config</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Obtains the flavor that MLflow would prefer to use when deploying the model.</span>
 <span class="sd">    If the model does not contain any supported flavors for deployment, an exception</span>
@@ -292,7 +292,7 @@
         <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_validate_deployment_flavor</span><span class="p">(</span><span class="n">model_config</span><span class="p">,</span> <span class="n">flavor</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_validate_deployment_flavor</span><span class="p">(</span><span class="n">model_config</span><span class="p">,</span> <span class="n">flavor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Checks that the specified flavor is a supported deployment flavor</span>
 <span class="sd">    and is contained in the specified model. If one of these conditions</span>
@@ -321,7 +321,7 @@
         <span class="p">)</span>
 
 
-<div class="viewcode-block" id="push_image_to_ecr"><a class="viewcode-back" href="../../python_api/mlflow.sagemaker.html#mlflow.sagemaker.push_image_to_ecr">[docs]</a><span class="k">def</span> <span class="nf">push_image_to_ecr</span><span class="p">(</span><span class="n">image</span><span class="o">=</span><span class="n">DEFAULT_IMAGE_NAME</span><span class="p">):</span>
+<div class="viewcode-block" id="push_image_to_ecr"><a class="viewcode-back" href="../../python_api/mlflow.sagemaker.html#mlflow.sagemaker.push_image_to_ecr">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">push_image_to_ecr</span><span class="p">(</span><span class="n">image</span><span class="o">=</span><span class="n">DEFAULT_IMAGE_NAME</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Push local Docker image to AWS ECR.</span>
 
@@ -330,7 +330,7 @@
 <span class="sd">    Args:</span>
 <span class="sd">        image: Docker image name.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">boto3</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">boto3</span>
 
     <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Pushing image to ECR&quot;</span><span class="p">)</span>
     <span class="n">client</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span><span class="s2">&quot;sts&quot;</span><span class="p">)</span>
@@ -373,7 +373,7 @@
     <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">_deploy</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_deploy</span><span class="p">(</span>
     <span class="n">app_name</span><span class="p">,</span>
     <span class="n">model_uri</span><span class="p">,</span>
     <span class="n">execution_role_arn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -560,7 +560,7 @@
 <span class="sd">        env: An optional dictionary of environment variables to set for the model.</span>
 <span class="sd">        tags: An optional dictionary of tags to apply to the endpoint.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">boto3</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">boto3</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">archive</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">synchronous</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
@@ -695,7 +695,7 @@
     <span class="k">return</span> <span class="n">app_name</span><span class="p">,</span> <span class="n">flavor</span>
 
 
-<span class="k">def</span> <span class="nf">_delete</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_delete</span><span class="p">(</span>
     <span class="n">app_name</span><span class="p">,</span>
     <span class="n">region_name</span><span class="o">=</span><span class="s2">&quot;us-west-2&quot;</span><span class="p">,</span>
     <span class="n">assume_role_arn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -730,7 +730,7 @@
 <span class="sd">            APIs or the AWS console. If `synchronous` is False, this parameter</span>
 <span class="sd">            is ignored.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">boto3</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">boto3</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">archive</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">synchronous</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
@@ -752,7 +752,7 @@
     <span class="n">sage_client</span><span class="o">.</span><span class="n">delete_endpoint</span><span class="p">(</span><span class="n">EndpointName</span><span class="o">=</span><span class="n">app_name</span><span class="p">)</span>
     <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Deleted endpoint with arn: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">endpoint_arn</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">status_check_fn</span><span class="p">():</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">status_check_fn</span><span class="p">():</span>
         <span class="n">endpoint_info</span> <span class="o">=</span> <span class="n">_find_endpoint</span><span class="p">(</span><span class="n">endpoint_name</span><span class="o">=</span><span class="n">app_name</span><span class="p">,</span> <span class="n">sage_client</span><span class="o">=</span><span class="n">sage_client</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">endpoint_info</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">_SageMakerOperationStatus</span><span class="o">.</span><span class="n">in_progress</span><span class="p">(</span>
@@ -765,7 +765,7 @@
                 <span class="s2">&quot;The SageMaker endpoint was deleted successfully.&quot;</span>
             <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">cleanup_fn</span><span class="p">():</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cleanup_fn</span><span class="p">():</span>
         <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Cleaning up unused resources...&quot;</span><span class="p">)</span>
         <span class="n">config_name</span> <span class="o">=</span> <span class="n">endpoint_info</span><span class="p">[</span><span class="s2">&quot;EndpointConfigName&quot;</span><span class="p">]</span>
         <span class="n">config_info</span> <span class="o">=</span> <span class="n">sage_client</span><span class="o">.</span><span class="n">describe_endpoint_config</span><span class="p">(</span><span class="n">EndpointConfigName</span><span class="o">=</span><span class="n">config_name</span><span class="p">)</span>
@@ -796,7 +796,7 @@
             <span class="n">delete_operation</span><span class="o">.</span><span class="n">clean_up</span><span class="p">()</span>
 
 
-<div class="viewcode-block" id="deploy_transform_job"><a class="viewcode-back" href="../../python_api/mlflow.sagemaker.html#mlflow.sagemaker.deploy_transform_job">[docs]</a><span class="k">def</span> <span class="nf">deploy_transform_job</span><span class="p">(</span>
+<div class="viewcode-block" id="deploy_transform_job"><a class="viewcode-back" href="../../python_api/mlflow.sagemaker.html#mlflow.sagemaker.deploy_transform_job">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">deploy_transform_job</span><span class="p">(</span>
     <span class="n">job_name</span><span class="p">,</span>
     <span class="n">model_uri</span><span class="p">,</span>
     <span class="n">s3_input_data_type</span><span class="p">,</span>
@@ -927,7 +927,7 @@
 <span class="sd">            deployment using native SageMaker APIs or the AWS console. If</span>
 <span class="sd">            ``synchronous`` is ``False``, this parameter is ignored.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">boto3</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">boto3</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">archive</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">synchronous</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
@@ -1035,7 +1035,7 @@
             <span class="n">deployment_operation</span><span class="o">.</span><span class="n">clean_up</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="terminate_transform_job"><a class="viewcode-back" href="../../python_api/mlflow.sagemaker.html#mlflow.sagemaker.terminate_transform_job">[docs]</a><span class="k">def</span> <span class="nf">terminate_transform_job</span><span class="p">(</span>
+<div class="viewcode-block" id="terminate_transform_job"><a class="viewcode-back" href="../../python_api/mlflow.sagemaker.html#mlflow.sagemaker.terminate_transform_job">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">terminate_transform_job</span><span class="p">(</span>
     <span class="n">job_name</span><span class="p">,</span>
     <span class="n">region_name</span><span class="o">=</span><span class="s2">&quot;us-west-2&quot;</span><span class="p">,</span>
     <span class="n">assume_role_arn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1070,7 +1070,7 @@
 <span class="sd">            SageMaker APIs or the AWS console. If `synchronous` is False, this</span>
 <span class="sd">            parameter is ignored.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">boto3</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">boto3</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">archive</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">synchronous</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
@@ -1093,7 +1093,7 @@
     <span class="n">sage_client</span><span class="o">.</span><span class="n">stop_transform_job</span><span class="p">(</span><span class="n">TransformJobName</span><span class="o">=</span><span class="n">job_name</span><span class="p">)</span>
     <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Terminated batch transform job with arn: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">transform_job_arn</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">status_check_fn</span><span class="p">():</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">status_check_fn</span><span class="p">():</span>
         <span class="n">transform_job_info</span> <span class="o">=</span> <span class="n">_find_transform_job</span><span class="p">(</span><span class="n">job_name</span><span class="o">=</span><span class="n">job_name</span><span class="p">,</span> <span class="n">sage_client</span><span class="o">=</span><span class="n">sage_client</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">transform_job_info</span><span class="p">[</span><span class="s2">&quot;TransformJobStatus&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Stopping&quot;</span><span class="p">:</span>
@@ -1108,7 +1108,7 @@
                 <span class="s2">&quot;The SageMaker batch transform job was terminated successfully.&quot;</span>
             <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">cleanup_fn</span><span class="p">():</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cleanup_fn</span><span class="p">():</span>
         <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Cleaning up unused resources...&quot;</span><span class="p">)</span>
         <span class="n">model_name</span> <span class="o">=</span> <span class="n">transform_job_info</span><span class="p">[</span><span class="s2">&quot;ModelName&quot;</span><span class="p">]</span>
         <span class="n">model_arn</span> <span class="o">=</span> <span class="n">_delete_sagemaker_model</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">sage_client</span><span class="p">,</span> <span class="n">s3_client</span><span class="p">)</span>
@@ -1133,7 +1133,7 @@
             <span class="n">stop_operation</span><span class="o">.</span><span class="n">clean_up</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="push_model_to_sagemaker"><a class="viewcode-back" href="../../python_api/mlflow.sagemaker.html#mlflow.sagemaker.push_model_to_sagemaker">[docs]</a><span class="k">def</span> <span class="nf">push_model_to_sagemaker</span><span class="p">(</span>
+<div class="viewcode-block" id="push_model_to_sagemaker"><a class="viewcode-back" href="../../python_api/mlflow.sagemaker.html#mlflow.sagemaker.push_model_to_sagemaker">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">push_model_to_sagemaker</span><span class="p">(</span>
     <span class="n">model_name</span><span class="p">,</span>
     <span class="n">model_uri</span><span class="p">,</span>
     <span class="n">execution_role_arn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1213,7 +1213,7 @@
 <span class="sd">            specified flavor is not present or not supported for deployment, an exception</span>
 <span class="sd">            will be thrown.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">boto3</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">boto3</span>
 
     <span class="n">model_path</span> <span class="o">=</span> <span class="n">_download_artifact_from_uri</span><span class="p">(</span><span class="n">model_uri</span><span class="p">)</span>
     <span class="n">model_config_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="n">MLMODEL_FILE_NAME</span><span class="p">)</span>
@@ -1280,7 +1280,7 @@
     <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Created Sagemaker model with arn: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">model_response</span><span class="p">[</span><span class="s2">&quot;ModelArn&quot;</span><span class="p">])</span></div>
 
 
-<div class="viewcode-block" id="run_local"><a class="viewcode-back" href="../../python_api/mlflow.sagemaker.html#mlflow.sagemaker.run_local">[docs]</a><span class="k">def</span> <span class="nf">run_local</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">model_uri</span><span class="p">,</span> <span class="n">flavor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="run_local"><a class="viewcode-back" href="../../python_api/mlflow.sagemaker.html#mlflow.sagemaker.run_local">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">run_local</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">model_uri</span><span class="p">,</span> <span class="n">flavor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Serve the model locally in a SageMaker compatible Docker container.</span>
 
@@ -1367,7 +1367,7 @@
     <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;executing: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmd</span><span class="p">))</span>
     <span class="n">proc</span> <span class="o">=</span> <span class="n">Popen</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_sigterm_handler</span><span class="p">(</span><span class="o">*</span><span class="n">_</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_sigterm_handler</span><span class="p">(</span><span class="o">*</span><span class="n">_</span><span class="p">):</span>
         <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;received termination signal =&gt; killing docker process&quot;</span><span class="p">)</span>
         <span class="n">proc</span><span class="o">.</span><span class="n">send_signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGINT</span><span class="p">)</span>
 
@@ -1375,7 +1375,7 @@
     <span class="n">proc</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="target_help"><a class="viewcode-back" href="../../python_api/mlflow.sagemaker.html#mlflow.sagemaker.target_help">[docs]</a><span class="k">def</span> <span class="nf">target_help</span><span class="p">():</span>
+<div class="viewcode-block" id="target_help"><a class="viewcode-back" href="../../python_api/mlflow.sagemaker.html#mlflow.sagemaker.target_help">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">target_help</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Provide help information for the SageMaker deployment client.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -1400,8 +1400,8 @@
 <span class="s2">    &quot;&quot;&quot;</span></div>
 
 
-<span class="k">def</span> <span class="nf">_get_default_image_url</span><span class="p">(</span><span class="n">region_name</span><span class="p">):</span>
-    <span class="kn">import</span> <span class="nn">boto3</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_default_image_url</span><span class="p">(</span><span class="n">region_name</span><span class="p">):</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">boto3</span>
 
     <span class="k">if</span> <span class="n">env_img</span> <span class="o">:=</span> <span class="n">MLFLOW_SAGEMAKER_DEPLOY_IMG_URL</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
         <span class="k">return</span> <span class="n">env_img</span>
@@ -1413,8 +1413,8 @@
     <span class="k">return</span> <span class="p">(</span><span class="n">repository_conf</span><span class="p">[</span><span class="s2">&quot;repositoryUri&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;:</span><span class="si">{version}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">version</span><span class="o">=</span><span class="n">mlflow</span><span class="o">.</span><span class="n">version</span><span class="o">.</span><span class="n">VERSION</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_get_account_id</span><span class="p">(</span><span class="o">**</span><span class="n">assume_role_credentials</span><span class="p">):</span>
-    <span class="kn">import</span> <span class="nn">boto3</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_account_id</span><span class="p">(</span><span class="o">**</span><span class="n">assume_role_credentials</span><span class="p">):</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">boto3</span>
 
     <span class="n">sess</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span>
     <span class="n">sts_client</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">client</span><span class="p">(</span><span class="s2">&quot;sts&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">assume_role_credentials</span><span class="p">)</span>
@@ -1422,12 +1422,12 @@
     <span class="k">return</span> <span class="n">identity_info</span><span class="p">[</span><span class="s2">&quot;Account&quot;</span><span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">_get_assumed_role_arn</span><span class="p">(</span><span class="o">**</span><span class="n">assume_role_credentials</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_assumed_role_arn</span><span class="p">(</span><span class="o">**</span><span class="n">assume_role_credentials</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns:</span>
 <span class="sd">        ARN of the user&#39;s current IAM role.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">boto3</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">boto3</span>
 
     <span class="n">sess</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span>
     <span class="n">sts_client</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">client</span><span class="p">(</span><span class="s2">&quot;sts&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">assume_role_credentials</span><span class="p">)</span>
@@ -1439,7 +1439,7 @@
     <span class="k">return</span> <span class="n">role_response</span><span class="p">[</span><span class="s2">&quot;Role&quot;</span><span class="p">][</span><span class="s2">&quot;Arn&quot;</span><span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">_assume_role_and_get_credentials</span><span class="p">(</span><span class="n">assume_role_arn</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_assume_role_and_get_credentials</span><span class="p">(</span><span class="n">assume_role_arn</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Assume a new role in AWS and return the credentials for that role.</span>
 <span class="sd">    When ``assume_role_arn`` is ``None`` or an empty string,</span>
@@ -1451,7 +1451,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        Dict with credentials of the assumed role</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">boto3</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">boto3</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">assume_role_arn</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">{}</span>
@@ -1470,8 +1470,8 @@
     <span class="p">}</span>
 
 
-<span class="k">def</span> <span class="nf">_get_default_s3_bucket</span><span class="p">(</span><span class="n">region_name</span><span class="p">,</span> <span class="o">**</span><span class="n">assume_role_credentials</span><span class="p">):</span>
-    <span class="kn">import</span> <span class="nn">boto3</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_default_s3_bucket</span><span class="p">(</span><span class="n">region_name</span><span class="p">,</span> <span class="o">**</span><span class="n">assume_role_credentials</span><span class="p">):</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">boto3</span>
 
     <span class="c1"># create bucket if it does not exist</span>
     <span class="n">sess</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span>
@@ -1502,7 +1502,7 @@
     <span class="k">return</span> <span class="n">bucket_name</span>
 
 
-<span class="k">def</span> <span class="nf">_make_tarfile</span><span class="p">(</span><span class="n">output_filename</span><span class="p">,</span> <span class="n">source_dir</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_make_tarfile</span><span class="p">(</span><span class="n">output_filename</span><span class="p">,</span> <span class="n">source_dir</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    create a tar.gz from a directory.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -1511,7 +1511,7 @@
             <span class="n">tar</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">source_dir</span><span class="p">,</span> <span class="n">f</span><span class="p">),</span> <span class="n">arcname</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_upload_s3</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">,</span> <span class="n">bucket</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">region_name</span><span class="p">,</span> <span class="n">s3_client</span><span class="p">,</span> <span class="o">**</span><span class="n">assume_role_credentials</span><span class="p">):</span>  <span class="c1"># noqa: D417</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_upload_s3</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">,</span> <span class="n">bucket</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">region_name</span><span class="p">,</span> <span class="n">s3_client</span><span class="p">,</span> <span class="o">**</span><span class="n">assume_role_credentials</span><span class="p">):</span>  <span class="c1"># noqa: D417</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Upload dir to S3 as .tar.gz.</span>
 
@@ -1525,7 +1525,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        S3 path of the uploaded artifact.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">boto3</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">boto3</span>
 
     <span class="n">sess</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">Session</span><span class="p">(</span><span class="n">region_name</span><span class="o">=</span><span class="n">region_name</span><span class="p">,</span> <span class="o">**</span><span class="n">assume_role_credentials</span><span class="p">)</span>
     <span class="k">with</span> <span class="n">TempDir</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmp</span><span class="p">:</span>
@@ -1542,7 +1542,7 @@
             <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;s3://</span><span class="si">{</span><span class="n">bucket</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span>
 
 
-<span class="k">def</span> <span class="nf">_get_deployment_config</span><span class="p">(</span><span class="n">flavor_name</span><span class="p">,</span> <span class="n">env_override</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_deployment_config</span><span class="p">(</span><span class="n">flavor_name</span><span class="p">,</span> <span class="n">env_override</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns:</span>
 <span class="sd">        The deployment configuration as a dictionary</span>
@@ -1566,7 +1566,7 @@
     <span class="k">return</span> <span class="n">deployment_config</span>
 
 
-<span class="k">def</span> <span class="nf">_truncate_name</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">max_length</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_truncate_name</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">max_length</span><span class="p">):</span>
     <span class="c1"># NB: Sagemaker prevents the registration of models and configurations whose names</span>
     <span class="c1"># exceed 63 characters in length. For reference:</span>
     <span class="c1"># https://docs.aws.amazon.com/sagemaker/latest/APIReference/API_Model.html</span>
@@ -1586,30 +1586,30 @@
     <span class="k">return</span> <span class="n">truncated_name</span>
 
 
-<span class="k">def</span> <span class="nf">_get_unique_name</span><span class="p">(</span><span class="n">base_name</span><span class="p">,</span> <span class="n">unique_suffix</span><span class="p">,</span> <span class="n">unique_id_length</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_unique_name</span><span class="p">(</span><span class="n">base_name</span><span class="p">,</span> <span class="n">unique_suffix</span><span class="p">,</span> <span class="n">unique_id_length</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
     <span class="n">unique_id</span> <span class="o">=</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">[:</span><span class="n">unique_id_length</span><span class="p">]</span>
     <span class="n">unique_resource_string</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">unique_suffix</span><span class="si">}{</span><span class="n">unique_id</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="n">max_length</span> <span class="o">=</span> <span class="mi">63</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_resource_string</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">_truncate_name</span><span class="p">(</span><span class="n">base_name</span><span class="p">,</span> <span class="n">max_length</span><span class="p">)</span> <span class="o">+</span> <span class="n">unique_resource_string</span>
 
 
-<span class="k">def</span> <span class="nf">_get_sagemaker_model_name</span><span class="p">(</span><span class="n">endpoint_name</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_sagemaker_model_name</span><span class="p">(</span><span class="n">endpoint_name</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">_get_unique_name</span><span class="p">(</span><span class="n">endpoint_name</span><span class="p">,</span> <span class="s2">&quot;-model-&quot;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_get_sagemaker_transform_model_name</span><span class="p">(</span><span class="n">job_name</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_sagemaker_transform_model_name</span><span class="p">(</span><span class="n">job_name</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">_get_unique_name</span><span class="p">(</span><span class="n">job_name</span><span class="p">,</span> <span class="s2">&quot;-model-&quot;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_get_sagemaker_config_name</span><span class="p">(</span><span class="n">endpoint_name</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_sagemaker_config_name</span><span class="p">(</span><span class="n">endpoint_name</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">_get_unique_name</span><span class="p">(</span><span class="n">endpoint_name</span><span class="p">,</span> <span class="s2">&quot;-config-&quot;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_get_sagemaker_config_tags</span><span class="p">(</span><span class="n">endpoint_name</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_sagemaker_config_tags</span><span class="p">(</span><span class="n">endpoint_name</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">[{</span><span class="s2">&quot;Key&quot;</span><span class="p">:</span> <span class="n">SAGEMAKER_APP_NAME_TAG_KEY</span><span class="p">,</span> <span class="s2">&quot;Value&quot;</span><span class="p">:</span> <span class="n">endpoint_name</span><span class="p">}]</span>
 
 
-<span class="k">def</span> <span class="nf">_prepare_sagemaker_tags</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_prepare_sagemaker_tags</span><span class="p">(</span>
     <span class="n">config_tags</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]],</span>
     <span class="n">sagemaker_tags</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
@@ -1625,7 +1625,7 @@
     <span class="k">return</span> <span class="n">config_tags</span> <span class="o">+</span> <span class="n">parsed</span>
 
 
-<span class="k">def</span> <span class="nf">_create_sagemaker_transform_job</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_create_sagemaker_transform_job</span><span class="p">(</span>
     <span class="n">job_name</span><span class="p">,</span>
     <span class="n">model_name</span><span class="p">,</span>
     <span class="n">model_s3_path</span><span class="p">,</span>
@@ -1732,7 +1732,7 @@
         <span class="s2">&quot;Created batch transform job with arn: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">transform_job_response</span><span class="p">[</span><span class="s2">&quot;TransformJobArn&quot;</span><span class="p">]</span>
     <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">status_check_fn</span><span class="p">():</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">status_check_fn</span><span class="p">():</span>
         <span class="n">transform_job_info</span> <span class="o">=</span> <span class="n">sage_client</span><span class="o">.</span><span class="n">describe_transform_job</span><span class="p">(</span><span class="n">TransformJobName</span><span class="o">=</span><span class="n">job_name</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">transform_job_info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1758,7 +1758,7 @@
             <span class="p">)</span>
             <span class="k">return</span> <span class="n">_SageMakerOperationStatus</span><span class="o">.</span><span class="n">failed</span><span class="p">(</span><span class="n">failure_reason</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">cleanup_fn</span><span class="p">():</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cleanup_fn</span><span class="p">():</span>
         <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Cleaning up Sagemaker model and S3 model artifacts...&quot;</span><span class="p">)</span>
         <span class="n">transform_job_info</span> <span class="o">=</span> <span class="n">sage_client</span><span class="o">.</span><span class="n">describe_transform_job</span><span class="p">(</span><span class="n">TransformJobName</span><span class="o">=</span><span class="n">job_name</span><span class="p">)</span>
         <span class="n">model_name</span> <span class="o">=</span> <span class="n">transform_job_info</span><span class="p">[</span><span class="s2">&quot;ModelName&quot;</span><span class="p">]</span>
@@ -1768,7 +1768,7 @@
     <span class="k">return</span> <span class="n">_SageMakerOperation</span><span class="p">(</span><span class="n">status_check_fn</span><span class="o">=</span><span class="n">status_check_fn</span><span class="p">,</span> <span class="n">cleanup_fn</span><span class="o">=</span><span class="n">cleanup_fn</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_create_sagemaker_endpoint</span><span class="p">(</span>  <span class="c1"># noqa: D417</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_create_sagemaker_endpoint</span><span class="p">(</span>  <span class="c1"># noqa: D417</span>
     <span class="n">endpoint_name</span><span class="p">,</span>
     <span class="n">model_name</span><span class="p">,</span>
     <span class="n">model_s3_path</span><span class="p">,</span>
@@ -1863,7 +1863,7 @@
     <span class="p">)</span>
     <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Created endpoint with arn: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">endpoint_response</span><span class="p">[</span><span class="s2">&quot;EndpointArn&quot;</span><span class="p">])</span>
 
-    <span class="k">def</span> <span class="nf">status_check_fn</span><span class="p">():</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">status_check_fn</span><span class="p">():</span>
         <span class="n">endpoint_info</span> <span class="o">=</span> <span class="n">_find_endpoint</span><span class="p">(</span><span class="n">endpoint_name</span><span class="o">=</span><span class="n">endpoint_name</span><span class="p">,</span> <span class="n">sage_client</span><span class="o">=</span><span class="n">sage_client</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">endpoint_info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1887,13 +1887,13 @@
             <span class="p">)</span>
             <span class="k">return</span> <span class="n">_SageMakerOperationStatus</span><span class="o">.</span><span class="n">failed</span><span class="p">(</span><span class="n">failure_reason</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">cleanup_fn</span><span class="p">():</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cleanup_fn</span><span class="p">():</span>
         <span class="k">pass</span>
 
     <span class="k">return</span> <span class="n">_SageMakerOperation</span><span class="p">(</span><span class="n">status_check_fn</span><span class="o">=</span><span class="n">status_check_fn</span><span class="p">,</span> <span class="n">cleanup_fn</span><span class="o">=</span><span class="n">cleanup_fn</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_update_sagemaker_endpoint</span><span class="p">(</span>  <span class="c1"># noqa: D417</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_update_sagemaker_endpoint</span><span class="p">(</span>  <span class="c1"># noqa: D417</span>
     <span class="n">endpoint_name</span><span class="p">,</span>
     <span class="n">model_name</span><span class="p">,</span>
     <span class="n">model_uri</span><span class="p">,</span>
@@ -2019,7 +2019,7 @@
 
     <span class="n">operation_start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">status_check_fn</span><span class="p">():</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">status_check_fn</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">operation_start_time</span> <span class="o">&lt;</span> <span class="mi">20</span><span class="p">:</span>
             <span class="c1"># Wait at least 20 seconds before checking the status of the update; this ensures</span>
             <span class="c1"># that we don&#39;t consider the operation to have failed if small delays occur at</span>
@@ -2049,7 +2049,7 @@
                 <span class="s1">&#39; &quot;</span><span class="si">{endpoint_status}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">endpoint_status</span><span class="o">=</span><span class="n">endpoint_info</span><span class="p">[</span><span class="s2">&quot;EndpointStatus&quot;</span><span class="p">])</span>
             <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">cleanup_fn</span><span class="p">():</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cleanup_fn</span><span class="p">():</span>
         <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Cleaning up unused resources...&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="n">DEPLOYMENT_MODE_REPLACE</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">pv</span> <span class="ow">in</span> <span class="n">deployed_production_variants</span><span class="p">:</span>
@@ -2064,7 +2064,7 @@
     <span class="k">return</span> <span class="n">_SageMakerOperation</span><span class="p">(</span><span class="n">status_check_fn</span><span class="o">=</span><span class="n">status_check_fn</span><span class="p">,</span> <span class="n">cleanup_fn</span><span class="o">=</span><span class="n">cleanup_fn</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_create_sagemaker_model</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_create_sagemaker_model</span><span class="p">(</span>
     <span class="n">model_name</span><span class="p">,</span>
     <span class="n">model_s3_path</span><span class="p">,</span>
     <span class="n">model_uri</span><span class="p">,</span>
@@ -2111,7 +2111,7 @@
     <span class="k">return</span> <span class="n">sage_client</span><span class="o">.</span><span class="n">create_model</span><span class="p">(</span><span class="o">**</span><span class="n">create_model_args</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_delete_sagemaker_model</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">sage_client</span><span class="p">,</span> <span class="n">s3_client</span><span class="p">):</span>  <span class="c1"># noqa: D417</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_delete_sagemaker_model</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">sage_client</span><span class="p">,</span> <span class="n">s3_client</span><span class="p">):</span>  <span class="c1"># noqa: D417</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Args:</span>
 <span class="sd">        sage_client: A boto3 client for SageMaker.</span>
@@ -2137,7 +2137,7 @@
     <span class="k">return</span> <span class="n">model_arn</span>
 
 
-<span class="k">def</span> <span class="nf">_delete_sagemaker_endpoint_configuration</span><span class="p">(</span><span class="n">endpoint_config_name</span><span class="p">,</span> <span class="n">sage_client</span><span class="p">):</span>  <span class="c1"># noqa: D417</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_delete_sagemaker_endpoint_configuration</span><span class="p">(</span><span class="n">endpoint_config_name</span><span class="p">,</span> <span class="n">sage_client</span><span class="p">):</span>  <span class="c1"># noqa: D417</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Args:</span>
 <span class="sd">        sage_client: A boto3 client for SageMaker.</span>
@@ -2152,7 +2152,7 @@
     <span class="k">return</span> <span class="n">endpoint_config_info</span><span class="p">[</span><span class="s2">&quot;EndpointConfigArn&quot;</span><span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">_find_endpoint</span><span class="p">(</span><span class="n">endpoint_name</span><span class="p">,</span> <span class="n">sage_client</span><span class="p">):</span>  <span class="c1"># noqa: D417</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_find_endpoint</span><span class="p">(</span><span class="n">endpoint_name</span><span class="p">,</span> <span class="n">sage_client</span><span class="p">):</span>  <span class="c1"># noqa: D417</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Finds a SageMaker endpoint with the specified name in the caller&#39;s AWS account, returning a</span>
 <span class="sd">    NoneType if the endpoint is not found.</span>
@@ -2179,7 +2179,7 @@
             <span class="k">return</span> <span class="kc">None</span>
 
 
-<span class="k">def</span> <span class="nf">_find_transform_job</span><span class="p">(</span><span class="n">job_name</span><span class="p">,</span> <span class="n">sage_client</span><span class="p">):</span>  <span class="c1"># noqa: D417</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_find_transform_job</span><span class="p">(</span><span class="n">job_name</span><span class="p">,</span> <span class="n">sage_client</span><span class="p">):</span>  <span class="c1"># noqa: D417</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Finds a SageMaker batch transform job with the specified name in the caller&#39;s AWS account,</span>
 <span class="sd">    returning a NoneType if the transform job is not found.</span>
@@ -2208,7 +2208,7 @@
             <span class="k">return</span> <span class="kc">None</span>
 
 
-<span class="k">def</span> <span class="nf">_does_model_exist</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">sage_client</span><span class="p">):</span>  <span class="c1"># noqa: D417</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_does_model_exist</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">sage_client</span><span class="p">):</span>  <span class="c1"># noqa: D417</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Determines whether a SageMaker model exists with the specified name in the caller&#39;s AWS account,</span>
 <span class="sd">    returning True if the model exists, returning False if the model does not exist.</span>
@@ -2229,7 +2229,7 @@
         <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="SageMakerDeploymentClient"><a class="viewcode-back" href="../../python_api/mlflow.sagemaker.html#mlflow.sagemaker.SageMakerDeploymentClient">[docs]</a><span class="k">class</span> <span class="nc">SageMakerDeploymentClient</span><span class="p">(</span><span class="n">BaseDeploymentClient</span><span class="p">):</span>
+<div class="viewcode-block" id="SageMakerDeploymentClient"><a class="viewcode-back" href="../../python_api/mlflow.sagemaker.html#mlflow.sagemaker.SageMakerDeploymentClient">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">SageMakerDeploymentClient</span><span class="p">(</span><span class="n">BaseDeploymentClient</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Initialize a deployment client for SageMaker. The default region and assumed role ARN will</span>
 <span class="sd">    be set according to the value of the `target_uri`.</span>
@@ -2255,7 +2255,7 @@
 <span class="sd">            an MlflowException will be raised.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_uri</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_uri</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">target_uri</span><span class="o">=</span><span class="n">target_uri</span><span class="p">)</span>
 
         <span class="c1"># Default region_name and assumed_role_arn when</span>
@@ -2264,7 +2264,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">assumed_role_arn</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_get_values_from_target_uri</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_get_values_from_target_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_values_from_target_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">parsed</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">urlparse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_uri</span><span class="p">)</span>
         <span class="n">values_str</span> <span class="o">=</span> <span class="n">parsed</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
 
@@ -2297,7 +2297,7 @@
                 <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
             <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_default_deployment_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">create_mode</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_default_deployment_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">create_mode</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="n">config</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;assume_role_arn&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">assumed_role_arn</span><span class="p">,</span>
             <span class="s2">&quot;execution_role_arn&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
@@ -2325,7 +2325,7 @@
 
         <span class="k">return</span> <span class="n">config</span>
 
-    <span class="k">def</span> <span class="nf">_apply_custom_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">custom_config</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_apply_custom_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">custom_config</span><span class="p">):</span>
         <span class="n">int_fields</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;instance_count&quot;</span><span class="p">,</span> <span class="s2">&quot;timeout_seconds&quot;</span><span class="p">}</span>
         <span class="n">bool_fields</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;synchronous&quot;</span><span class="p">,</span> <span class="s2">&quot;archive&quot;</span><span class="p">}</span>
         <span class="n">dict_fields</span> <span class="o">=</span> <span class="p">{</span>
@@ -2349,7 +2349,7 @@
 
             <span class="n">config</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
-<div class="viewcode-block" id="SageMakerDeploymentClient.create_deployment"><a class="viewcode-back" href="../../python_api/mlflow.sagemaker.html#mlflow.sagemaker.SageMakerDeploymentClient.create_deployment">[docs]</a>    <span class="k">def</span> <span class="nf">create_deployment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">model_uri</span><span class="p">,</span> <span class="n">flavor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="SageMakerDeploymentClient.create_deployment"><a class="viewcode-back" href="../../python_api/mlflow.sagemaker.html#mlflow.sagemaker.SageMakerDeploymentClient.create_deployment">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">create_deployment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">model_uri</span><span class="p">,</span> <span class="n">flavor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Deploy an MLflow model on AWS SageMaker.</span>
 <span class="sd">        The currently active AWS account must have correct permissions set up.</span>
@@ -2566,7 +2566,7 @@
 
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">app_name</span><span class="p">,</span> <span class="s2">&quot;flavor&quot;</span><span class="p">:</span> <span class="n">flavor</span><span class="p">}</span></div>
 
-<div class="viewcode-block" id="SageMakerDeploymentClient.update_deployment"><a class="viewcode-back" href="../../python_api/mlflow.sagemaker.html#mlflow.sagemaker.SageMakerDeploymentClient.update_deployment">[docs]</a>    <span class="k">def</span> <span class="nf">update_deployment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">model_uri</span><span class="p">,</span> <span class="n">flavor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="SageMakerDeploymentClient.update_deployment"><a class="viewcode-back" href="../../python_api/mlflow.sagemaker.html#mlflow.sagemaker.SageMakerDeploymentClient.update_deployment">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_deployment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">model_uri</span><span class="p">,</span> <span class="n">flavor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Update a deployment on AWS SageMaker. This function can replace or add a new model to</span>
 <span class="sd">        an existing SageMaker endpoint. By default, this function replaces the existing model</span>
@@ -2824,7 +2824,7 @@
 
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">app_name</span><span class="p">,</span> <span class="s2">&quot;flavor&quot;</span><span class="p">:</span> <span class="n">flavor</span><span class="p">}</span></div>
 
-<div class="viewcode-block" id="SageMakerDeploymentClient.delete_deployment"><a class="viewcode-back" href="../../python_api/mlflow.sagemaker.html#mlflow.sagemaker.SageMakerDeploymentClient.delete_deployment">[docs]</a>    <span class="k">def</span> <span class="nf">delete_deployment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="SageMakerDeploymentClient.delete_deployment"><a class="viewcode-back" href="../../python_api/mlflow.sagemaker.html#mlflow.sagemaker.SageMakerDeploymentClient.delete_deployment">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">delete_deployment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Delete a SageMaker application.</span>
 
@@ -2906,7 +2906,7 @@
             <span class="n">timeout_seconds</span><span class="o">=</span><span class="n">final_config</span><span class="p">[</span><span class="s2">&quot;timeout_seconds&quot;</span><span class="p">],</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="SageMakerDeploymentClient.list_deployments"><a class="viewcode-back" href="../../python_api/mlflow.sagemaker.html#mlflow.sagemaker.SageMakerDeploymentClient.list_deployments">[docs]</a>    <span class="k">def</span> <span class="nf">list_deployments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="SageMakerDeploymentClient.list_deployments"><a class="viewcode-back" href="../../python_api/mlflow.sagemaker.html#mlflow.sagemaker.SageMakerDeploymentClient.list_deployments">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">list_deployments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        List deployments. This method returns a list of dictionaries that describes each deployment.</span>
 
@@ -2936,7 +2936,7 @@
 
 <span class="sd">            mlflow deployments list --target sagemaker:/us-east-1/arn:aws:1234:role/assumed_role</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">import</span> <span class="nn">boto3</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">boto3</span>
 
         <span class="n">assume_role_credentials</span> <span class="o">=</span> <span class="n">_assume_role_and_get_credentials</span><span class="p">(</span>
             <span class="n">assume_role_arn</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">assumed_role_arn</span>
@@ -2947,7 +2947,7 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">sage_client</span><span class="o">.</span><span class="n">list_endpoints</span><span class="p">()[</span><span class="s2">&quot;Endpoints&quot;</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="SageMakerDeploymentClient.get_deployment"><a class="viewcode-back" href="../../python_api/mlflow.sagemaker.html#mlflow.sagemaker.SageMakerDeploymentClient.get_deployment">[docs]</a>    <span class="k">def</span> <span class="nf">get_deployment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="SageMakerDeploymentClient.get_deployment"><a class="viewcode-back" href="../../python_api/mlflow.sagemaker.html#mlflow.sagemaker.SageMakerDeploymentClient.get_deployment">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_deployment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a dictionary describing the specified deployment.</span>
 
@@ -2982,7 +2982,7 @@
 <span class="sd">            mlflow deployments get --target sagemaker:/us-east-1/arn:aws:1234:role/assumed_role \\</span>
 <span class="sd">                --name my-deployment</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">import</span> <span class="nn">boto3</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">boto3</span>
 
         <span class="n">assume_role_credentials</span> <span class="o">=</span> <span class="n">_assume_role_and_get_credentials</span><span class="p">(</span>
             <span class="n">assume_role_arn</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">assumed_role_arn</span>
@@ -2998,7 +2998,7 @@
                 <span class="n">message</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;There was an error while retrieving the deployment: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
             <span class="p">)</span></div>
 
-<div class="viewcode-block" id="SageMakerDeploymentClient.predict"><a class="viewcode-back" href="../../python_api/mlflow.sagemaker.html#mlflow.sagemaker.SageMakerDeploymentClient.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span>
+<div class="viewcode-block" id="SageMakerDeploymentClient.predict"><a class="viewcode-back" href="../../python_api/mlflow.sagemaker.html#mlflow.sagemaker.SageMakerDeploymentClient.predict">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">deployment_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -3052,7 +3052,7 @@
 <span class="sd">                --name my-deployment \\</span>
 <span class="sd">                --input-path ./input.json</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">import</span> <span class="nn">boto3</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">boto3</span>
 
         <span class="n">assume_role_credentials</span> <span class="o">=</span> <span class="n">_assume_role_and_get_credentials</span><span class="p">(</span>
             <span class="n">assume_role_arn</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">assumed_role_arn</span>
@@ -3074,13 +3074,13 @@
                 <span class="n">message</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;There was an error while getting model prediction: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
             <span class="p">)</span></div>
 
-<div class="viewcode-block" id="SageMakerDeploymentClient.explain"><a class="viewcode-back" href="../../python_api/mlflow.sagemaker.html#mlflow.sagemaker.SageMakerDeploymentClient.explain">[docs]</a>    <span class="k">def</span> <span class="nf">explain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deployment_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="SageMakerDeploymentClient.explain"><a class="viewcode-back" href="../../python_api/mlflow.sagemaker.html#mlflow.sagemaker.SageMakerDeploymentClient.explain">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">explain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deployment_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        *This function has not been implemented and will be coming in the future.*</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;This function is not implemented yet.&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SageMakerDeploymentClient.create_endpoint"><a class="viewcode-back" href="../../python_api/mlflow.sagemaker.html#mlflow.sagemaker.SageMakerDeploymentClient.create_endpoint">[docs]</a>    <span class="k">def</span> <span class="nf">create_endpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="SageMakerDeploymentClient.create_endpoint"><a class="viewcode-back" href="../../python_api/mlflow.sagemaker.html#mlflow.sagemaker.SageMakerDeploymentClient.create_endpoint">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">create_endpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create an endpoint with the specified target. By default, this method should block until</span>
 <span class="sd">        creation completes (i.e. until it&#39;s possible to create a deployment within the endpoint).</span>
@@ -3099,7 +3099,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;This function is not implemented yet.&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SageMakerDeploymentClient.update_endpoint"><a class="viewcode-back" href="../../python_api/mlflow.sagemaker.html#mlflow.sagemaker.SageMakerDeploymentClient.update_endpoint">[docs]</a>    <span class="k">def</span> <span class="nf">update_endpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="SageMakerDeploymentClient.update_endpoint"><a class="viewcode-back" href="../../python_api/mlflow.sagemaker.html#mlflow.sagemaker.SageMakerDeploymentClient.update_endpoint">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_endpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Update the endpoint with the specified name. You can update any target-specific attributes</span>
 <span class="sd">        of the endpoint (via `config`). By default, this method should block until the update</span>
@@ -3113,7 +3113,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;This function is not implemented yet.&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SageMakerDeploymentClient.delete_endpoint"><a class="viewcode-back" href="../../python_api/mlflow.sagemaker.html#mlflow.sagemaker.SageMakerDeploymentClient.delete_endpoint">[docs]</a>    <span class="k">def</span> <span class="nf">delete_endpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">):</span>
+<div class="viewcode-block" id="SageMakerDeploymentClient.delete_endpoint"><a class="viewcode-back" href="../../python_api/mlflow.sagemaker.html#mlflow.sagemaker.SageMakerDeploymentClient.delete_endpoint">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">delete_endpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Delete the endpoint from the specified target. Deletion should be idempotent (i.e. deletion</span>
 <span class="sd">        should not fail if retried on a non-existent deployment).</span>
@@ -3123,7 +3123,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;This function is not implemented yet.&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SageMakerDeploymentClient.list_endpoints"><a class="viewcode-back" href="../../python_api/mlflow.sagemaker.html#mlflow.sagemaker.SageMakerDeploymentClient.list_endpoints">[docs]</a>    <span class="k">def</span> <span class="nf">list_endpoints</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SageMakerDeploymentClient.list_endpoints"><a class="viewcode-back" href="../../python_api/mlflow.sagemaker.html#mlflow.sagemaker.SageMakerDeploymentClient.list_endpoints">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">list_endpoints</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        List endpoints in the specified target. This method is expected to return an</span>
 <span class="sd">        unpaginated list of all endpoints (an alternative would be to return a dict with</span>
@@ -3139,7 +3139,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;This function is not implemented yet.&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SageMakerDeploymentClient.get_endpoint"><a class="viewcode-back" href="../../python_api/mlflow.sagemaker.html#mlflow.sagemaker.SageMakerDeploymentClient.get_endpoint">[docs]</a>    <span class="k">def</span> <span class="nf">get_endpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">):</span>
+<div class="viewcode-block" id="SageMakerDeploymentClient.get_endpoint"><a class="viewcode-back" href="../../python_api/mlflow.sagemaker.html#mlflow.sagemaker.SageMakerDeploymentClient.get_endpoint">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_endpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a dictionary describing the specified endpoint, throwing a</span>
 <span class="sd">        py:class:`mlflow.exception.MlflowException` if no endpoint exists with the provided</span>
@@ -3153,15 +3153,15 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;This function is not implemented yet.&quot;</span><span class="p">)</span></div></div>
 
 
-<span class="k">class</span> <span class="nc">_SageMakerOperation</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status_check_fn</span><span class="p">,</span> <span class="n">cleanup_fn</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_SageMakerOperation</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status_check_fn</span><span class="p">,</span> <span class="n">cleanup_fn</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">status_check_fn</span> <span class="o">=</span> <span class="n">status_check_fn</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_fn</span> <span class="o">=</span> <span class="n">cleanup_fn</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">_SageMakerOperationStatus</span><span class="p">(</span><span class="n">_SageMakerOperationStatus</span><span class="o">.</span><span class="n">STATE_IN_PROGRESS</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_up</span> <span class="o">=</span> <span class="kc">False</span>
 
-    <span class="k">def</span> <span class="nf">await_completion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout_seconds</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">await_completion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout_seconds</span><span class="p">):</span>
         <span class="n">iteration</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">begin</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="k">while</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">begin</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">timeout_seconds</span><span class="p">:</span>
@@ -3181,7 +3181,7 @@
         <span class="n">duration_seconds</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">begin</span>
         <span class="k">return</span> <span class="n">_SageMakerOperationStatus</span><span class="o">.</span><span class="n">timed_out</span><span class="p">(</span><span class="n">duration_seconds</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">clean_up</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clean_up</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">state</span> <span class="o">!=</span> <span class="n">_SageMakerOperationStatus</span><span class="o">.</span><span class="n">STATE_SUCCEEDED</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;Cannot clean up an operation that has not succeeded! Current operation state:&quot;</span>
@@ -3196,24 +3196,24 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_fn</span><span class="p">()</span>
 
 
-<span class="k">class</span> <span class="nc">_SageMakerOperationStatus</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_SageMakerOperationStatus</span><span class="p">:</span>
     <span class="n">STATE_SUCCEEDED</span> <span class="o">=</span> <span class="s2">&quot;succeeded&quot;</span>
     <span class="n">STATE_FAILED</span> <span class="o">=</span> <span class="s2">&quot;failed&quot;</span>
     <span class="n">STATE_IN_PROGRESS</span> <span class="o">=</span> <span class="s2">&quot;in progress&quot;</span>
     <span class="n">STATE_TIMED_OUT</span> <span class="o">=</span> <span class="s2">&quot;timed_out&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">state</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">in_progress</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">in_progress</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">message</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;The operation is still in progress.&quot;</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">_SageMakerOperationStatus</span><span class="o">.</span><span class="n">STATE_IN_PROGRESS</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">timed_out</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">duration_seconds</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">timed_out</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">duration_seconds</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
             <span class="n">_SageMakerOperationStatus</span><span class="o">.</span><span class="n">STATE_TIMED_OUT</span><span class="p">,</span>
             <span class="sa">f</span><span class="s2">&quot;Timed out after waiting </span><span class="si">{</span><span class="n">duration_seconds</span><span class="si">}</span><span class="s2"> seconds for the operation to&quot;</span>
@@ -3222,11 +3222,11 @@
         <span class="p">)</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">failed</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">failed</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">_SageMakerOperationStatus</span><span class="o">.</span><span class="n">STATE_FAILED</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">succeeded</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">succeeded</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">_SageMakerOperationStatus</span><span class="o">.</span><span class="n">STATE_SUCCEEDED</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
 </pre></div>
 

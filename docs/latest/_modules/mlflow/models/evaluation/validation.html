@@ -202,21 +202,21 @@
               <div itemprop="articleBody">
                 
   <h1>Source code for mlflow.models.evaluation.validation</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">operator</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">decimal</span> <span class="kn">import</span> <span class="n">Decimal</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">operator</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">decimal</span><span class="w"> </span><span class="kn">import</span> <span class="n">Decimal</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
 
-<span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
-<span class="kn">from</span> <span class="nn">mlflow.models.evaluation</span> <span class="kn">import</span> <span class="n">EvaluationResult</span>
-<span class="kn">from</span> <span class="nn">mlflow.protos.databricks_pb2</span> <span class="kn">import</span> <span class="n">BAD_REQUEST</span><span class="p">,</span> <span class="n">INVALID_PARAMETER_VALUE</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.annotations</span> <span class="kn">import</span> <span class="n">deprecated</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">MlflowException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models.evaluation</span><span class="w"> </span><span class="kn">import</span> <span class="n">EvaluationResult</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.protos.databricks_pb2</span><span class="w"> </span><span class="kn">import</span> <span class="n">BAD_REQUEST</span><span class="p">,</span> <span class="n">INVALID_PARAMETER_VALUE</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">deprecated</span>
 
 <span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="MetricThreshold"><a class="viewcode-back" href="../../../../python_api/mlflow.models.html#mlflow.MetricThreshold">[docs]</a><span class="k">class</span> <span class="nc">MetricThreshold</span><span class="p">:</span>
+<div class="viewcode-block" id="MetricThreshold"><a class="viewcode-back" href="../../../../python_api/mlflow.models.html#mlflow.MetricThreshold">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">MetricThreshold</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class allows you to define metric thresholds for model validation.</span>
 <span class="sd">    Allowed thresholds are: threshold, min_absolute_change, min_relative_change.</span>
@@ -263,7 +263,7 @@
 <span class="sd">            A required boolean representing whether higher value is better for the metric.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">threshold</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">min_absolute_change</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -306,21 +306,21 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_greater_is_better</span> <span class="o">=</span> <span class="n">greater_is_better</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">threshold</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">threshold</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Value of the threshold.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_threshold</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">min_absolute_change</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">min_absolute_change</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Value of the minimum absolute change required to pass model comparison with baseline model.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_min_absolute_change</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">min_relative_change</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">min_relative_change</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Float value of the minimum relative change required to pass model comparison with</span>
 <span class="sd">        baseline model.</span>
@@ -329,20 +329,20 @@
 
     <span class="nd">@property</span>
     <span class="nd">@deprecated</span><span class="p">(</span><span class="s2">&quot;The attribute `higher_is_better` is deprecated. Use `greater_is_better` instead.&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">higher_is_better</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">higher_is_better</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Boolean value representing whether higher value is better for the metric.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_greater_is_better</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">greater_is_better</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">greater_is_better</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Boolean value representing whether higher value is better for the metric.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_greater_is_better</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a human-readable string consisting of all specified thresholds.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -361,13 +361,13 @@
         <span class="k">return</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">threshold_strs</span><span class="p">)</span></div>
 
 
-<span class="k">class</span> <span class="nc">MetricThresholdClassException</span><span class="p">(</span><span class="n">MlflowException</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_message</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MetricThresholdClassException</span><span class="p">(</span><span class="n">MlflowException</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_message</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Could not instantiate MetricThreshold class: &quot;</span> <span class="o">+</span> <span class="n">_message</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">_MetricValidationResult</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_MetricValidationResult</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Internal class for representing validation result per metric.</span>
 <span class="sd">    Not user facing, used for organizing metric failures and generating failure message</span>
@@ -387,7 +387,7 @@
     <span class="n">min_absolute_change_failed</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">min_relative_change_failed</span> <span class="o">=</span> <span class="kc">False</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">metric_name</span><span class="p">,</span>
         <span class="n">candidate_metric_value</span><span class="p">,</span>
@@ -399,7 +399,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">baseline_metric_value</span> <span class="o">=</span> <span class="n">baseline_metric_value</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">metric_threshold</span> <span class="o">=</span> <span class="n">metric_threshold</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a human-readable string representing the validation result for the metric.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -443,7 +443,7 @@
                 <span class="p">)</span>
         <span class="k">return</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">result_strs</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">is_success</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_success</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">missing_candidate</span>
             <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">missing_baseline</span>
@@ -453,12 +453,12 @@
         <span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">ModelValidationFailedException</span><span class="p">(</span><span class="n">MlflowException</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ModelValidationFailedException</span><span class="p">(</span><span class="n">MlflowException</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">error_code</span><span class="o">=</span><span class="n">BAD_REQUEST</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="validate_evaluation_results"><a class="viewcode-back" href="../../../../python_api/mlflow.html#mlflow.validate_evaluation_results">[docs]</a><span class="k">def</span> <span class="nf">validate_evaluation_results</span><span class="p">(</span>
+<div class="viewcode-block" id="validate_evaluation_results"><a class="viewcode-back" href="../../../../python_api/mlflow.html#mlflow.validate_evaluation_results">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">validate_evaluation_results</span><span class="p">(</span>
     <span class="n">validation_thresholds</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">MetricThreshold</span><span class="p">],</span>
     <span class="n">candidate_result</span><span class="p">:</span> <span class="n">EvaluationResult</span><span class="p">,</span>
     <span class="n">baseline_result</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EvaluationResult</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -552,7 +552,7 @@
     <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Model validation passed!&quot;</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">_validate</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_validate</span><span class="p">(</span>
     <span class="n">validation_thresholds</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">MetricThreshold</span><span class="p">],</span>
     <span class="n">candidate_metrics</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
     <span class="n">baseline_metrics</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>

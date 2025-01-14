@@ -202,15 +202,15 @@
               <div itemprop="articleBody">
                 
   <h1>Source code for mlflow.gateway.client</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">import</span> <span class="nn">requests.exceptions</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">requests.exceptions</span>
 
-<span class="kn">from</span> <span class="nn">mlflow</span> <span class="kn">import</span> <span class="n">MlflowException</span>
-<span class="kn">from</span> <span class="nn">mlflow.gateway.config</span> <span class="kn">import</span> <span class="n">LimitsConfig</span><span class="p">,</span> <span class="n">Route</span>
-<span class="kn">from</span> <span class="nn">mlflow.gateway.constants</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">MlflowException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.gateway.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">LimitsConfig</span><span class="p">,</span> <span class="n">Route</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.gateway.constants</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">MLFLOW_GATEWAY_CLIENT_QUERY_RETRY_CODES</span><span class="p">,</span>
     <span class="n">MLFLOW_GATEWAY_CLIENT_QUERY_TIMEOUT_SECONDS</span><span class="p">,</span>
     <span class="n">MLFLOW_GATEWAY_CRUD_ROUTE_BASE</span><span class="p">,</span>
@@ -218,24 +218,24 @@
     <span class="n">MLFLOW_GATEWAY_ROUTE_BASE</span><span class="p">,</span>
     <span class="n">MLFLOW_QUERY_SUFFIX</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.gateway.utils</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.gateway.utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">assemble_uri_path</span><span class="p">,</span>
     <span class="n">gateway_deprecated</span><span class="p">,</span>
     <span class="n">get_gateway_uri</span><span class="p">,</span>
     <span class="n">resolve_route_url</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.protos.databricks_pb2</span> <span class="kn">import</span> <span class="n">BAD_REQUEST</span>
-<span class="kn">from</span> <span class="nn">mlflow.store.entities.paged_list</span> <span class="kn">import</span> <span class="n">PagedList</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.credentials</span> <span class="kn">import</span> <span class="n">get_default_host_creds</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.databricks_utils</span> <span class="kn">import</span> <span class="n">get_databricks_host_creds</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.rest_utils</span> <span class="kn">import</span> <span class="n">augmented_raise_for_status</span><span class="p">,</span> <span class="n">http_request</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.uri</span> <span class="kn">import</span> <span class="n">get_uri_scheme</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.protos.databricks_pb2</span><span class="w"> </span><span class="kn">import</span> <span class="n">BAD_REQUEST</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.store.entities.paged_list</span><span class="w"> </span><span class="kn">import</span> <span class="n">PagedList</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.credentials</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_default_host_creds</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.databricks_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_databricks_host_creds</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.rest_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">augmented_raise_for_status</span><span class="p">,</span> <span class="n">http_request</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.uri</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_uri_scheme</span>
 
 <span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="MlflowGatewayClient"><a class="viewcode-back" href="../../../python_api/mlflow.gateway.html#mlflow.gateway.MlflowGatewayClient">[docs]</a><span class="nd">@gateway_deprecated</span>
-<span class="k">class</span> <span class="nc">MlflowGatewayClient</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MlflowGatewayClient</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Client for interacting with the MLflow Gateway API.</span>
 
@@ -245,16 +245,16 @@
 <span class="sd">            `MLFLOW_GATEWAY_URI`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gateway_uri</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gateway_uri</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_gateway_uri</span> <span class="o">=</span> <span class="n">gateway_uri</span> <span class="ow">or</span> <span class="n">get_gateway_uri</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_is_databricks_host</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_is_databricks_host</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_gateway_uri</span> <span class="o">==</span> <span class="s2">&quot;databricks&quot;</span> <span class="ow">or</span> <span class="n">get_uri_scheme</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_gateway_uri</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;databricks&quot;</span>
         <span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">_host_creds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_host_creds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        NB: When `MlflowGatewayClient` is used as an instance variable in a custom pyfunc model, it</span>
 <span class="sd">        is pickled in the environment where the custom pyfunc model is defined (e.g. a notebook).</span>
@@ -268,7 +268,7 @@
             <span class="k">return</span> <span class="n">get_default_host_creds</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_gateway_uri</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">gateway_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">gateway_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the current value for the URI of the MLflow Gateway.</span>
 
@@ -277,7 +277,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gateway_uri</span>
 
-    <span class="k">def</span> <span class="nf">_call_endpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">route</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">json_body</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_call_endpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">route</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">json_body</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Call a specific endpoint on the Gateway API.</span>
 
@@ -312,7 +312,7 @@
         <span class="k">return</span> <span class="n">response</span>
 
 <div class="viewcode-block" id="MlflowGatewayClient.get_route"><a class="viewcode-back" href="../../../python_api/mlflow.gateway.html#mlflow.gateway.MlflowGatewayClient.get_route">[docs]</a>    <span class="nd">@gateway_deprecated</span>
-    <span class="k">def</span> <span class="nf">get_route</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_route</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get a specific query route from the gateway. The routes that are available to retrieve</span>
 <span class="sd">        are only those that have been configured through the MLflow Gateway Server configuration</span>
@@ -334,7 +334,7 @@
         <span class="k">return</span> <span class="n">Route</span><span class="p">(</span><span class="o">**</span><span class="n">response</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MlflowGatewayClient.search_routes"><a class="viewcode-back" href="../../../python_api/mlflow.gateway.html#mlflow.gateway.MlflowGatewayClient.search_routes">[docs]</a>    <span class="nd">@gateway_deprecated</span>
-    <span class="k">def</span> <span class="nf">search_routes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page_token</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PagedList</span><span class="p">[</span><span class="n">Route</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">search_routes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page_token</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PagedList</span><span class="p">[</span><span class="n">Route</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Search for routes in the Gateway.</span>
 
@@ -368,7 +368,7 @@
         <span class="k">return</span> <span class="n">PagedList</span><span class="p">(</span><span class="n">routes</span><span class="p">,</span> <span class="n">next_page_token</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MlflowGatewayClient.create_route"><a class="viewcode-back" href="../../../python_api/mlflow.gateway.html#mlflow.gateway.MlflowGatewayClient.create_route">[docs]</a>    <span class="nd">@gateway_deprecated</span>
-    <span class="k">def</span> <span class="nf">create_route</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_route</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">route_type</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Route</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -446,7 +446,7 @@
         <span class="k">return</span> <span class="n">Route</span><span class="p">(</span><span class="o">**</span><span class="n">response</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MlflowGatewayClient.delete_route"><a class="viewcode-back" href="../../../python_api/mlflow.gateway.html#mlflow.gateway.MlflowGatewayClient.delete_route">[docs]</a>    <span class="nd">@gateway_deprecated</span>
-    <span class="k">def</span> <span class="nf">delete_route</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delete_route</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Delete an existing route in the Gateway.</span>
 
@@ -483,7 +483,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_call_endpoint</span><span class="p">(</span><span class="s2">&quot;DELETE&quot;</span><span class="p">,</span> <span class="n">route</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MlflowGatewayClient.query"><a class="viewcode-back" href="../../../python_api/mlflow.gateway.html#mlflow.gateway.MlflowGatewayClient.query">[docs]</a>    <span class="nd">@gateway_deprecated</span>
-    <span class="k">def</span> <span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">route</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">route</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Submit a query to a configured provider route.</span>
 
@@ -579,7 +579,7 @@
                 <span class="k">raise</span> <span class="n">e</span></div>
 
 <div class="viewcode-block" id="MlflowGatewayClient.set_limits"><a class="viewcode-back" href="../../../python_api/mlflow.gateway.html#mlflow.gateway.MlflowGatewayClient.set_limits">[docs]</a>    <span class="nd">@gateway_deprecated</span>
-    <span class="k">def</span> <span class="nf">set_limits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">route</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">limits</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">LimitsConfig</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_limits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">route</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">limits</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">LimitsConfig</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set limits on an existing route in the Gateway.</span>
 
@@ -628,7 +628,7 @@
         <span class="k">return</span> <span class="n">LimitsConfig</span><span class="p">(</span><span class="o">**</span><span class="n">response</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MlflowGatewayClient.get_limits"><a class="viewcode-back" href="../../../python_api/mlflow.gateway.html#mlflow.gateway.MlflowGatewayClient.get_limits">[docs]</a>    <span class="nd">@gateway_deprecated</span>
-    <span class="k">def</span> <span class="nf">get_limits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">route</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LimitsConfig</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_limits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">route</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LimitsConfig</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get limits of an existing route in the Gateway.</span>
 

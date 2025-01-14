@@ -204,19 +204,19 @@
               <div itemprop="articleBody">
                 
   <h1>Source code for mlflow.data.http_dataset_source</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
-<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urlparse</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">urllib.parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">urlparse</span>
 
-<span class="kn">from</span> <span class="nn">mlflow.data.dataset_source</span> <span class="kn">import</span> <span class="n">DatasetSource</span>
-<span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
-<span class="kn">from</span> <span class="nn">mlflow.protos.databricks_pb2</span> <span class="kn">import</span> <span class="n">INVALID_PARAMETER_VALUE</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.file_utils</span> <span class="kn">import</span> <span class="n">create_tmp_dir</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.rest_utils</span> <span class="kn">import</span> <span class="n">augmented_raise_for_status</span><span class="p">,</span> <span class="n">cloud_storage_http_request</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.data.dataset_source</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatasetSource</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">MlflowException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.protos.databricks_pb2</span><span class="w"> </span><span class="kn">import</span> <span class="n">INVALID_PARAMETER_VALUE</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.file_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_tmp_dir</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.rest_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">augmented_raise_for_status</span><span class="p">,</span> <span class="n">cloud_storage_http_request</span>
 
 
-<span class="k">def</span> <span class="nf">_is_path</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_is_path</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return True if `filename` is a path, False otherwise. For example,</span>
 <span class="sd">    &quot;foo/bar&quot; is a path, but &quot;bar&quot; is not.</span>
@@ -224,17 +224,17 @@
     <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="o">!=</span> <span class="n">filename</span>
 
 
-<div class="viewcode-block" id="HTTPDatasetSource"><a class="viewcode-back" href="../../../python_api/mlflow.data.html#mlflow.data.http_dataset_source.HTTPDatasetSource">[docs]</a><span class="k">class</span> <span class="nc">HTTPDatasetSource</span><span class="p">(</span><span class="n">DatasetSource</span><span class="p">):</span>
+<div class="viewcode-block" id="HTTPDatasetSource"><a class="viewcode-back" href="../../../python_api/mlflow.data.html#mlflow.data.http_dataset_source.HTTPDatasetSource">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">HTTPDatasetSource</span><span class="p">(</span><span class="n">DatasetSource</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Represents the source of a dataset stored at a web location and referred to</span>
 <span class="sd">    by an HTTP or HTTPS URL.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_url</span> <span class="o">=</span> <span class="n">url</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The HTTP/S URL referring to the dataset source location.</span>
 
 <span class="sd">        Returns:</span>
@@ -244,10 +244,10 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_url</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_get_source_type</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_source_type</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="s2">&quot;http&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_extract_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_extract_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extracts a filename from the Content-Disposition header or the URL&#39;s path.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -264,7 +264,7 @@
         <span class="c1"># Extract basename from URL if no valid filename in Content-Disposition</span>
         <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">urlparse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
 
-<div class="viewcode-block" id="HTTPDatasetSource.load"><a class="viewcode-back" href="../../../python_api/mlflow.data.html#mlflow.data.http_dataset_source.HTTPDatasetSource.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dst_path</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<div class="viewcode-block" id="HTTPDatasetSource.load"><a class="viewcode-back" href="../../../python_api/mlflow.data.html#mlflow.data.http_dataset_source.HTTPDatasetSource.load">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dst_path</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Downloads the dataset source to the local filesystem.</span>
 
 <span class="sd">        Args:</span>
@@ -301,7 +301,7 @@
         <span class="k">return</span> <span class="n">dst_path</span></div>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_can_resolve</span><span class="p">(</span><span class="n">raw_source</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_can_resolve</span><span class="p">(</span><span class="n">raw_source</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            raw_source: The raw source, e.g. a string like &quot;http://mysite/mydata.tar.gz&quot;.</span>
@@ -319,14 +319,14 @@
             <span class="k">return</span> <span class="kc">False</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_resolve</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">raw_source</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;HTTPDatasetSource&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_resolve</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">raw_source</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;HTTPDatasetSource&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            raw_source: The raw source, e.g. a string like &quot;http://mysite/mydata.tar.gz&quot;.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">HTTPDatasetSource</span><span class="p">(</span><span class="n">raw_source</span><span class="p">)</span>
 
-<div class="viewcode-block" id="HTTPDatasetSource.to_dict"><a class="viewcode-back" href="../../../python_api/mlflow.data.html#mlflow.data.http_dataset_source.HTTPDatasetSource.to_dict">[docs]</a>    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<div class="viewcode-block" id="HTTPDatasetSource.to_dict"><a class="viewcode-back" href="../../../python_api/mlflow.data.html#mlflow.data.http_dataset_source.HTTPDatasetSource.to_dict">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns:</span>
 <span class="sd">            A JSON-compatible dictionary representation of the HTTPDatasetSource.</span>
@@ -336,7 +336,7 @@
         <span class="p">}</span></div>
 
 <div class="viewcode-block" id="HTTPDatasetSource.from_dict"><a class="viewcode-back" href="../../../python_api/mlflow.data.html#mlflow.data.http_dataset_source.HTTPDatasetSource.from_dict">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">source_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;HTTPDatasetSource&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">source_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;HTTPDatasetSource&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            source_dict: A dictionary representation of the HTTPDatasetSource.</span>

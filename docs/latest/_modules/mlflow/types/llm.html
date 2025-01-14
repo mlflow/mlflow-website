@@ -202,12 +202,12 @@
               <div itemprop="articleBody">
                 
   <h1>Source code for mlflow.types.llm</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">import</span> <span class="nn">uuid</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">asdict</span><span class="p">,</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">fields</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Optional</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">asdict</span><span class="p">,</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">fields</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">from</span> <span class="nn">mlflow.types.schema</span> <span class="kn">import</span> <span class="n">AnyType</span><span class="p">,</span> <span class="n">Array</span><span class="p">,</span> <span class="n">ColSpec</span><span class="p">,</span> <span class="n">DataType</span><span class="p">,</span> <span class="n">Map</span><span class="p">,</span> <span class="n">Object</span><span class="p">,</span> <span class="n">Property</span><span class="p">,</span> <span class="n">Schema</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.types.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnyType</span><span class="p">,</span> <span class="n">Array</span><span class="p">,</span> <span class="n">ColSpec</span><span class="p">,</span> <span class="n">DataType</span><span class="p">,</span> <span class="n">Map</span><span class="p">,</span> <span class="n">Object</span><span class="p">,</span> <span class="n">Property</span><span class="p">,</span> <span class="n">Schema</span>
 
 <span class="c1"># TODO: Switch to pydantic in a future version of MLflow.</span>
 <span class="c1">#       For now, to prevent adding pydantic as a core dependency,</span>
@@ -221,8 +221,8 @@
 <span class="n">JSON_SCHEMA_TYPES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;number&quot;</span><span class="p">,</span> <span class="s2">&quot;integer&quot;</span><span class="p">,</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span> <span class="s2">&quot;array&quot;</span><span class="p">,</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span> <span class="s2">&quot;null&quot;</span><span class="p">]</span>
 
 
-<span class="k">class</span> <span class="nc">_BaseDataclass</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">_validate_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">val_type</span><span class="p">,</span> <span class="n">required</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_BaseDataclass</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">val_type</span><span class="p">,</span> <span class="n">required</span><span class="p">):</span>
         <span class="n">value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">required</span> <span class="ow">and</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">` is required&quot;</span><span class="p">)</span>
@@ -231,14 +231,14 @@
                 <span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">` must be of type </span><span class="si">{</span><span class="n">val_type</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_validate_literal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">allowed_values</span><span class="p">,</span> <span class="n">required</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_literal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">allowed_values</span><span class="p">,</span> <span class="n">required</span><span class="p">):</span>
         <span class="n">value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">required</span> <span class="ow">and</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">` is required&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">allowed_values</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">` must be one of </span><span class="si">{</span><span class="n">allowed_values</span><span class="si">}</span><span class="s2">, got </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_validate_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">val_type</span><span class="p">,</span> <span class="n">required</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">val_type</span><span class="p">,</span> <span class="n">required</span><span class="p">):</span>
         <span class="n">values</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">required</span> <span class="ow">and</span> <span class="n">values</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">` is required&quot;</span><span class="p">)</span>
@@ -249,7 +249,7 @@
             <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">` must be a list, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">values</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_convert_dataclass</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="bp">cls</span><span class="p">:</span> <span class="s2">&quot;_BaseDataclass&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_convert_dataclass</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="bp">cls</span><span class="p">:</span> <span class="s2">&quot;_BaseDataclass&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="n">value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">required</span><span class="p">:</span>
@@ -270,7 +270,7 @@
         <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error when coercing </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_convert_dataclass_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="bp">cls</span><span class="p">:</span> <span class="s2">&quot;_BaseDataclass&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_convert_dataclass_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="bp">cls</span><span class="p">:</span> <span class="s2">&quot;_BaseDataclass&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="n">values</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">values</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">required</span><span class="p">:</span>
@@ -291,7 +291,7 @@
                     <span class="sa">f</span><span class="s2">&quot;Items in `</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">` must all have the same type: </span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> or dict&quot;</span>
                 <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_convert_dataclass_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_convert_dataclass_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="n">mapping</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">mapping</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">required</span><span class="p">:</span>
@@ -318,11 +318,11 @@
                 <span class="p">)</span>
         <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">new_mapping</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">asdict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dict_factory</span><span class="o">=</span><span class="k">lambda</span> <span class="n">obj</span><span class="p">:</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">obj</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">})</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create an instance of the class from a dict, ignoring any undefined fields.</span>
 <span class="sd">        This is useful when the dict contains extra fields, causing cls(**data) to fail.</span>
@@ -333,7 +333,7 @@
 
 
 <div class="viewcode-block" id="FunctionToolCallArguments"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.llm.FunctionToolCallArguments">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">FunctionToolCallArguments</span><span class="p">(</span><span class="n">_BaseDataclass</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FunctionToolCallArguments</span><span class="p">(</span><span class="n">_BaseDataclass</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The arguments of a function tool call made by the model.</span>
 
@@ -345,18 +345,18 @@
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">arguments</span><span class="p">:</span> <span class="nb">str</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;arguments&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">to_tool_call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_tool_call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="nb">id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
         <span class="k">return</span> <span class="n">ToolCall</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">,</span> <span class="n">function</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ToolCall"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.llm.ToolCall">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">ToolCall</span><span class="p">(</span><span class="n">_BaseDataclass</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ToolCall</span><span class="p">(</span><span class="n">_BaseDataclass</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A tool call made by the model.</span>
 
@@ -370,14 +370,14 @@
     <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()))</span>
     <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;function&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_convert_dataclass</span><span class="p">(</span><span class="s2">&quot;function&quot;</span><span class="p">,</span> <span class="n">FunctionToolCallArguments</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ChatMessage"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.llm.ChatMessage">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">ChatMessage</span><span class="p">(</span><span class="n">_BaseDataclass</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ChatMessage</span><span class="p">(</span><span class="n">_BaseDataclass</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A message in a chat request or response.</span>
 
@@ -402,7 +402,7 @@
     <span class="n">tool_calls</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">ToolCall</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">tool_call_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;role&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">refusal</span><span class="p">:</span>
@@ -420,7 +420,7 @@
 
 
 <div class="viewcode-block" id="ChatChoiceDelta"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.llm.ChatChoiceDelta">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">ChatChoiceDelta</span><span class="p">(</span><span class="n">_BaseDataclass</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ChatChoiceDelta</span><span class="p">(</span><span class="n">_BaseDataclass</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A streaming message delta in a chat response.</span>
 
@@ -446,7 +446,7 @@
     <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">tool_calls</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">ToolCall</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;role&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">refusal</span><span class="p">:</span>
@@ -459,15 +459,15 @@
 
 
 <div class="viewcode-block" id="ParamType"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.llm.ParamType">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">ParamType</span><span class="p">(</span><span class="n">_BaseDataclass</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ParamType</span><span class="p">(</span><span class="n">_BaseDataclass</span><span class="p">):</span>
     <span class="nb">type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;number&quot;</span><span class="p">,</span> <span class="s2">&quot;integer&quot;</span><span class="p">,</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span> <span class="s2">&quot;array&quot;</span><span class="p">,</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span> <span class="s2">&quot;null&quot;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_literal</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="n">JSON_SCHEMA_TYPES</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ParamProperty"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.llm.ParamProperty">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">ParamProperty</span><span class="p">(</span><span class="n">ParamType</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ParamProperty</span><span class="p">(</span><span class="n">ParamType</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A single parameter within a function definition.</span>
 
@@ -486,7 +486,7 @@
     <span class="n">enum</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">items</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ParamType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_list</span><span class="p">(</span><span class="s2">&quot;enum&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_convert_dataclass</span><span class="p">(</span><span class="s2">&quot;items&quot;</span><span class="p">,</span> <span class="n">ParamType</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
@@ -494,7 +494,7 @@
 
 
 <div class="viewcode-block" id="ToolParamsSchema"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.llm.ToolParamsSchema">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">ToolParamsSchema</span><span class="p">(</span><span class="n">_BaseDataclass</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ToolParamsSchema</span><span class="p">(</span><span class="n">_BaseDataclass</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A tool parameter definition.</span>
 
@@ -512,7 +512,7 @@
     <span class="n">required</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">additionalProperties</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_convert_dataclass_map</span><span class="p">(</span><span class="s2">&quot;properties&quot;</span><span class="p">,</span> <span class="n">ParamProperty</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_literal</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;object&quot;</span><span class="p">],</span> <span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_list</span><span class="p">(</span><span class="s2">&quot;required&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
@@ -520,7 +520,7 @@
 
 
 <div class="viewcode-block" id="FunctionToolDefinition"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.llm.FunctionToolDefinition">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">FunctionToolDefinition</span><span class="p">(</span><span class="n">_BaseDataclass</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FunctionToolDefinition</span><span class="p">(</span><span class="n">_BaseDataclass</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Definition for function tools (currently the only supported type of tool).</span>
 
@@ -540,13 +540,13 @@
     <span class="n">parameters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ToolParamsSchema</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">strict</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_convert_dataclass</span><span class="p">(</span><span class="s2">&quot;parameters&quot;</span><span class="p">,</span> <span class="n">ToolParamsSchema</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;strict&quot;</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
 
-<div class="viewcode-block" id="FunctionToolDefinition.to_tool_definition"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.llm.FunctionToolDefinition.to_tool_definition">[docs]</a>    <span class="k">def</span> <span class="nf">to_tool_definition</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="FunctionToolDefinition.to_tool_definition"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.llm.FunctionToolDefinition.to_tool_definition">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">to_tool_definition</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convenience function for wrapping this in a ToolDefinition</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -554,7 +554,7 @@
 
 
 <div class="viewcode-block" id="ToolDefinition"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.llm.ToolDefinition">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">ToolDefinition</span><span class="p">(</span><span class="n">_BaseDataclass</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ToolDefinition</span><span class="p">(</span><span class="n">_BaseDataclass</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Definition for tools that can be called by the model.</span>
 
@@ -566,13 +566,13 @@
     <span class="n">function</span><span class="p">:</span> <span class="n">FunctionToolDefinition</span>
     <span class="nb">type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;function&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;function&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_literal</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;function&quot;</span><span class="p">],</span> <span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_convert_dataclass</span><span class="p">(</span><span class="s2">&quot;function&quot;</span><span class="p">,</span> <span class="n">FunctionToolDefinition</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ChatParams"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.llm.ChatParams">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">ChatParams</span><span class="p">(</span><span class="n">_BaseDataclass</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ChatParams</span><span class="p">(</span><span class="n">_BaseDataclass</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Common parameters used for chat inference</span>
 
@@ -624,7 +624,7 @@
     <span class="n">custom_inputs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">tools</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">ToolDefinition</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;temperature&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;max_tokens&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_list</span><span class="p">(</span><span class="s2">&quot;stop&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
@@ -652,7 +652,7 @@
                     <span class="p">)</span>
 
 <div class="viewcode-block" id="ChatParams.keys"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.llm.ChatParams.keys">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">keys</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">keys</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return the keys of the dataclass</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -660,7 +660,7 @@
 
 
 <div class="viewcode-block" id="ChatCompletionRequest"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.llm.ChatCompletionRequest">[docs]</a><span class="nd">@dataclass</span><span class="p">()</span>
-<span class="k">class</span> <span class="nc">ChatCompletionRequest</span><span class="p">(</span><span class="n">ChatParams</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ChatCompletionRequest</span><span class="p">(</span><span class="n">ChatParams</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Format of the request object expected by the chat endpoint.</span>
 
@@ -702,13 +702,13 @@
 
     <span class="n">messages</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ChatMessage</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_convert_dataclass_list</span><span class="p">(</span><span class="s2">&quot;messages&quot;</span><span class="p">,</span> <span class="n">ChatMessage</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__post_init__</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="TopTokenLogProb"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.llm.TopTokenLogProb">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">TopTokenLogProb</span><span class="p">(</span><span class="n">_BaseDataclass</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TopTokenLogProb</span><span class="p">(</span><span class="n">_BaseDataclass</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Token and its log probability.</span>
 
@@ -728,14 +728,14 @@
     <span class="n">logprob</span><span class="p">:</span> <span class="nb">float</span>
     <span class="nb">bytes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;token&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;logprob&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_list</span><span class="p">(</span><span class="s2">&quot;bytes&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="TokenLogProb"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.llm.TokenLogProb">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">TokenLogProb</span><span class="p">(</span><span class="n">_BaseDataclass</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TokenLogProb</span><span class="p">(</span><span class="n">_BaseDataclass</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Message content token with log probability information.</span>
 
@@ -759,7 +759,7 @@
     <span class="n">top_logprobs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">TopTokenLogProb</span><span class="p">]</span>
     <span class="nb">bytes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;token&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;logprob&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_convert_dataclass_list</span><span class="p">(</span><span class="s2">&quot;top_logprobs&quot;</span><span class="p">,</span> <span class="n">TopTokenLogProb</span><span class="p">)</span>
@@ -767,7 +767,7 @@
 
 
 <div class="viewcode-block" id="ChatChoiceLogProbs"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.llm.ChatChoiceLogProbs">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">ChatChoiceLogProbs</span><span class="p">(</span><span class="n">_BaseDataclass</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ChatChoiceLogProbs</span><span class="p">(</span><span class="n">_BaseDataclass</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Log probability information for the choice.</span>
 
@@ -777,12 +777,12 @@
 
     <span class="n">content</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">TokenLogProb</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_convert_dataclass_list</span><span class="p">(</span><span class="s2">&quot;content&quot;</span><span class="p">,</span> <span class="n">TokenLogProb</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ChatChoice"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.llm.ChatChoice">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">ChatChoice</span><span class="p">(</span><span class="n">_BaseDataclass</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ChatChoice</span><span class="p">(</span><span class="n">_BaseDataclass</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A single chat response generated by the model.</span>
 <span class="sd">    ref: https://platform.openai.com/docs/api-reference/chat/object</span>
@@ -802,7 +802,7 @@
     <span class="n">finish_reason</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;stop&quot;</span>
     <span class="n">logprobs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ChatChoiceLogProbs</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;finish_reason&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_convert_dataclass</span><span class="p">(</span><span class="s2">&quot;message&quot;</span><span class="p">,</span> <span class="n">ChatMessage</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
@@ -810,7 +810,7 @@
 
 
 <div class="viewcode-block" id="ChatChunkChoice"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.llm.ChatChunkChoice">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">ChatChunkChoice</span><span class="p">(</span><span class="n">_BaseDataclass</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ChatChunkChoice</span><span class="p">(</span><span class="n">_BaseDataclass</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A single chat response chunk generated by the model.</span>
 <span class="sd">    ref: https://platform.openai.com/docs/api-reference/chat/streaming</span>
@@ -830,7 +830,7 @@
     <span class="n">finish_reason</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">logprobs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ChatChoiceLogProbs</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;finish_reason&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_convert_dataclass</span><span class="p">(</span><span class="s2">&quot;delta&quot;</span><span class="p">,</span> <span class="n">ChatChoiceDelta</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
@@ -838,7 +838,7 @@
 
 
 <div class="viewcode-block" id="TokenUsageStats"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.llm.TokenUsageStats">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">TokenUsageStats</span><span class="p">(</span><span class="n">_BaseDataclass</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TokenUsageStats</span><span class="p">(</span><span class="n">_BaseDataclass</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Stats about the number of tokens used during inference.</span>
 
@@ -855,14 +855,14 @@
     <span class="n">completion_tokens</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">total_tokens</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;prompt_tokens&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;completion_tokens&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;total_tokens&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ChatCompletionResponse"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.llm.ChatCompletionResponse">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">ChatCompletionResponse</span><span class="p">(</span><span class="n">_BaseDataclass</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ChatCompletionResponse</span><span class="p">(</span><span class="n">_BaseDataclass</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The full response object returned by the chat endpoint.</span>
 
@@ -889,7 +889,7 @@
     <span class="n">created</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()))</span>
     <span class="n">custom_outputs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;object&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;created&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
@@ -899,7 +899,7 @@
 
 
 <div class="viewcode-block" id="ChatCompletionChunk"><a class="viewcode-back" href="../../../python_api/mlflow.types.html#mlflow.types.llm.ChatCompletionChunk">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">ChatCompletionChunk</span><span class="p">(</span><span class="n">_BaseDataclass</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ChatCompletionChunk</span><span class="p">(</span><span class="n">_BaseDataclass</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The streaming chunk returned by the chat endpoint.</span>
 <span class="sd">    ref: https://platform.openai.com/docs/api-reference/chat/streaming</span>
@@ -927,7 +927,7 @@
     <span class="n">created</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()))</span>
     <span class="n">custom_outputs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;object&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_field</span><span class="p">(</span><span class="s2">&quot;created&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
@@ -938,6 +938,21 @@
 
 <span class="c1"># turn off formatting for the model signatures to preserve readability</span>
 <span class="c1"># fmt: off</span>
+
+<span class="n">_token_usage_stats_col_spec</span> <span class="o">=</span> <span class="n">ColSpec</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;usage&quot;</span><span class="p">,</span>
+    <span class="nb">type</span><span class="o">=</span><span class="n">Object</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="n">Property</span><span class="p">(</span><span class="s2">&quot;prompt_tokens&quot;</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">long</span><span class="p">),</span>
+            <span class="n">Property</span><span class="p">(</span><span class="s2">&quot;completion_tokens&quot;</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">long</span><span class="p">),</span>
+            <span class="n">Property</span><span class="p">(</span><span class="s2">&quot;total_tokens&quot;</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">long</span><span class="p">),</span>
+        <span class="p">]</span>
+    <span class="p">),</span>
+    <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">_custom_inputs_col_spec</span> <span class="o">=</span> <span class="n">ColSpec</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;custom_inputs&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Map</span><span class="p">(</span><span class="n">AnyType</span><span class="p">()),</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">_custom_outputs_col_spec</span> <span class="o">=</span> <span class="n">ColSpec</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;custom_outputs&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Map</span><span class="p">(</span><span class="n">AnyType</span><span class="p">()),</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
 <span class="n">CHAT_MODEL_INPUT_SCHEMA</span> <span class="o">=</span> <span class="n">Schema</span><span class="p">(</span>
     <span class="p">[</span>
         <span class="n">ColSpec</span><span class="p">(</span>
@@ -996,7 +1011,7 @@
             <span class="p">),</span>
             <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="p">),</span>
-        <span class="n">ColSpec</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;custom_inputs&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Map</span><span class="p">(</span><span class="n">AnyType</span><span class="p">()),</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="n">_custom_inputs_col_spec</span><span class="p">,</span>
     <span class="p">]</span>
 <span class="p">)</span>
 
@@ -1028,18 +1043,8 @@
                 <span class="n">Property</span><span class="p">(</span><span class="s2">&quot;finish_reason&quot;</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">string</span><span class="p">),</span>
             <span class="p">])),</span>
         <span class="p">),</span>
-        <span class="n">ColSpec</span><span class="p">(</span>
-            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;usage&quot;</span><span class="p">,</span>
-            <span class="nb">type</span><span class="o">=</span><span class="n">Object</span><span class="p">(</span>
-                <span class="p">[</span>
-                    <span class="n">Property</span><span class="p">(</span><span class="s2">&quot;prompt_tokens&quot;</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">long</span><span class="p">),</span>
-                    <span class="n">Property</span><span class="p">(</span><span class="s2">&quot;completion_tokens&quot;</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">long</span><span class="p">),</span>
-                    <span class="n">Property</span><span class="p">(</span><span class="s2">&quot;total_tokens&quot;</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">long</span><span class="p">),</span>
-                <span class="p">]</span>
-            <span class="p">),</span>
-            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="p">),</span>
-        <span class="n">ColSpec</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;custom_outputs&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Map</span><span class="p">(</span><span class="n">AnyType</span><span class="p">()),</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="n">_token_usage_stats_col_spec</span><span class="p">,</span>
+        <span class="n">_custom_outputs_col_spec</span>
     <span class="p">]</span>
 <span class="p">)</span>
 

@@ -204,27 +204,27 @@
               <div itemprop="articleBody">
                 
   <h1>Source code for mlflow.data.delta_dataset_source</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">from</span> <span class="nn">mlflow.data.dataset_source</span> <span class="kn">import</span> <span class="n">DatasetSource</span>
-<span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
-<span class="kn">from</span> <span class="nn">mlflow.protos.databricks_managed_catalog_messages_pb2</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.data.dataset_source</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatasetSource</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">MlflowException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.protos.databricks_managed_catalog_messages_pb2</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">GetTable</span><span class="p">,</span>
     <span class="n">GetTableResponse</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.protos.databricks_managed_catalog_service_pb2</span> <span class="kn">import</span> <span class="n">DatabricksUnityCatalogService</span>
-<span class="kn">from</span> <span class="nn">mlflow.protos.databricks_pb2</span> <span class="kn">import</span> <span class="n">INVALID_PARAMETER_VALUE</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils._spark_utils</span> <span class="kn">import</span> <span class="n">_get_active_spark_session</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils._unity_catalog_utils</span> <span class="kn">import</span> <span class="n">get_full_name_from_sc</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.databricks_utils</span> <span class="kn">import</span> <span class="n">get_databricks_host_creds</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.proto_json_utils</span> <span class="kn">import</span> <span class="n">message_to_json</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.rest_utils</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.protos.databricks_managed_catalog_service_pb2</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatabricksUnityCatalogService</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.protos.databricks_pb2</span><span class="w"> </span><span class="kn">import</span> <span class="n">INVALID_PARAMETER_VALUE</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils._spark_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_get_active_spark_session</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils._unity_catalog_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_full_name_from_sc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.databricks_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_databricks_host_creds</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.proto_json_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">message_to_json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.rest_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_REST_API_PATH_PREFIX</span><span class="p">,</span>
     <span class="n">call_endpoint</span><span class="p">,</span>
     <span class="n">extract_api_info_for_service</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.string_utils</span> <span class="kn">import</span> <span class="n">_backtick_quote</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.string_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_backtick_quote</span>
 
 <span class="n">DATABRICKS_HIVE_METASTORE_NAME</span> <span class="o">=</span> <span class="s2">&quot;hive_metastore&quot;</span>
 <span class="c1"># these two catalog names both points to the workspace local default HMS (hive metastore).</span>
@@ -236,12 +236,12 @@
 <span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="DeltaDatasetSource"><a class="viewcode-back" href="../../../python_api/mlflow.data.html#mlflow.data.delta_dataset_source.DeltaDatasetSource">[docs]</a><span class="k">class</span> <span class="nc">DeltaDatasetSource</span><span class="p">(</span><span class="n">DatasetSource</span><span class="p">):</span>
+<div class="viewcode-block" id="DeltaDatasetSource"><a class="viewcode-back" href="../../../python_api/mlflow.data.html#mlflow.data.delta_dataset_source.DeltaDatasetSource">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">DeltaDatasetSource</span><span class="p">(</span><span class="n">DatasetSource</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Represents the source of a dataset stored at in a delta table.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">delta_table_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -264,17 +264,17 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_delta_table_id</span> <span class="o">=</span> <span class="n">delta_table_id</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_get_source_type</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_source_type</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="s2">&quot;delta_table&quot;</span>
 
-<div class="viewcode-block" id="DeltaDatasetSource.load"><a class="viewcode-back" href="../../../python_api/mlflow.data.html#mlflow.data.delta_dataset_source.DeltaDatasetSource.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="DeltaDatasetSource.load"><a class="viewcode-back" href="../../../python_api/mlflow.data.html#mlflow.data.delta_dataset_source.DeltaDatasetSource.load">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Loads the dataset source as a Delta Dataset Source.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            An instance of ``pyspark.sql.DataFrame``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">pyspark.sql</span> <span class="kn">import</span> <span class="n">SparkSession</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pyspark.sql</span><span class="w"> </span><span class="kn">import</span> <span class="n">SparkSession</span>
 
         <span class="n">spark</span> <span class="o">=</span> <span class="n">SparkSession</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">getOrCreate</span><span class="p">()</span>
 
@@ -291,31 +291,31 @@
             <span class="k">return</span> <span class="n">spark_read_op</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">backticked_delta_table_name</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">delta_table_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delta_table_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta_table_name</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">delta_table_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delta_table_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta_table_id</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">delta_table_version</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delta_table_version</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta_table_version</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_can_resolve</span><span class="p">(</span><span class="n">raw_source</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_can_resolve</span><span class="p">(</span><span class="n">raw_source</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">False</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_resolve</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">raw_source</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;DeltaDatasetSource&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_resolve</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">raw_source</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;DeltaDatasetSource&quot;</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
     <span class="c1"># check if table is in the Databricks Unity Catalog</span>
-    <span class="k">def</span> <span class="nf">_is_databricks_uc_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_is_databricks_uc_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta_table_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">catalog_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta_table_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">return</span> <span class="p">(</span>
@@ -325,7 +325,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
 
-    <span class="k">def</span> <span class="nf">_lookup_table_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_name</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_lookup_table_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_name</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">req_body</span> <span class="o">=</span> <span class="n">message_to_json</span><span class="p">(</span><span class="n">GetTable</span><span class="p">(</span><span class="n">full_name_arg</span><span class="o">=</span><span class="n">table_name</span><span class="p">))</span>
             <span class="n">_METHOD_TO_INFO</span> <span class="o">=</span> <span class="n">extract_api_info_for_service</span><span class="p">(</span>
@@ -347,7 +347,7 @@
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="DeltaDatasetSource.to_dict"><a class="viewcode-back" href="../../../python_api/mlflow.data.html#mlflow.data.delta_dataset_source.DeltaDatasetSource.to_dict">[docs]</a>    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<div class="viewcode-block" id="DeltaDatasetSource.to_dict"><a class="viewcode-back" href="../../../python_api/mlflow.data.html#mlflow.data.delta_dataset_source.DeltaDatasetSource.to_dict">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="n">info</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">:</span>
             <span class="n">info</span><span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span>
@@ -364,7 +364,7 @@
         <span class="k">return</span> <span class="n">info</span></div>
 
 <div class="viewcode-block" id="DeltaDatasetSource.from_dict"><a class="viewcode-back" href="../../../python_api/mlflow.data.html#mlflow.data.delta_dataset_source.DeltaDatasetSource.from_dict">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">source_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;DeltaDatasetSource&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">source_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;DeltaDatasetSource&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
             <span class="n">path</span><span class="o">=</span><span class="n">source_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;path&quot;</span><span class="p">),</span>
             <span class="n">delta_table_name</span><span class="o">=</span><span class="n">source_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;delta_table_name&quot;</span><span class="p">),</span>

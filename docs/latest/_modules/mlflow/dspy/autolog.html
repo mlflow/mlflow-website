@@ -202,14 +202,14 @@
               <div itemprop="articleBody">
                 
   <h1>Source code for mlflow.dspy.autolog</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">mlflow.dspy.save</span> <span class="kn">import</span> <span class="n">FLAVOR_NAME</span>
-<span class="kn">from</span> <span class="nn">mlflow.tracing.provider</span> <span class="kn">import</span> <span class="n">trace_disabled</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.annotations</span> <span class="kn">import</span> <span class="n">experimental</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.autologging_utils</span> <span class="kn">import</span> <span class="n">autologging_integration</span><span class="p">,</span> <span class="n">safe_patch</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.dspy.save</span><span class="w"> </span><span class="kn">import</span> <span class="n">FLAVOR_NAME</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.tracing.provider</span><span class="w"> </span><span class="kn">import</span> <span class="n">trace_disabled</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">experimental</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.autologging_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">autologging_integration</span><span class="p">,</span> <span class="n">safe_patch</span>
 
 
 <div class="viewcode-block" id="autolog"><a class="viewcode-back" href="../../../python_api/mlflow.dspy.html#mlflow.dspy.autolog">[docs]</a><span class="nd">@experimental</span>
-<span class="k">def</span> <span class="nf">autolog</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">autolog</span><span class="p">(</span>
     <span class="n">log_traces</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">disable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">silent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -234,9 +234,9 @@
     <span class="c1"># TODO: since this implementation is inconsistent, explore a universal way to solve the issue.</span>
     <span class="n">_autolog</span><span class="p">(</span><span class="n">log_traces</span><span class="o">=</span><span class="n">log_traces</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="n">disable</span><span class="p">,</span> <span class="n">silent</span><span class="o">=</span><span class="n">silent</span><span class="p">)</span>
 
-    <span class="kn">import</span> <span class="nn">dspy</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">dspy</span>
 
-    <span class="kn">from</span> <span class="nn">mlflow.dspy.callback</span> <span class="kn">import</span> <span class="n">MlflowCallback</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.dspy.callback</span><span class="w"> </span><span class="kn">import</span> <span class="n">MlflowCallback</span>
 
     <span class="c1"># Enable tracing by setting the MlflowCallback</span>
     <span class="k">if</span> <span class="n">log_traces</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">disable</span><span class="p">:</span>
@@ -248,15 +248,15 @@
         <span class="p">)</span>
 
     <span class="c1"># Patch teleprompter and evaluate not to generate traces</span>
-    <span class="k">def</span> <span class="nf">trace_disabled_fn</span><span class="p">(</span><span class="n">original</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">trace_disabled_fn</span><span class="p">(</span><span class="n">original</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nd">@trace_disabled</span>
-        <span class="k">def</span> <span class="nf">_fn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_fn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">original</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">_fn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-    <span class="kn">from</span> <span class="nn">dspy.evaluate</span> <span class="kn">import</span> <span class="n">Evaluate</span>
-    <span class="kn">from</span> <span class="nn">dspy.teleprompt</span> <span class="kn">import</span> <span class="n">Teleprompter</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">dspy.evaluate</span><span class="w"> </span><span class="kn">import</span> <span class="n">Evaluate</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">dspy.teleprompt</span><span class="w"> </span><span class="kn">import</span> <span class="n">Teleprompter</span>
 
     <span class="n">compile_patch</span> <span class="o">=</span> <span class="s2">&quot;compile&quot;</span>
     <span class="k">for</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="n">Teleprompter</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">():</span>
@@ -286,7 +286,7 @@
 
 
 <span class="nd">@autologging_integration</span><span class="p">(</span><span class="n">FLAVOR_NAME</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">_autolog</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_autolog</span><span class="p">(</span>
     <span class="n">log_traces</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
     <span class="n">disable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">silent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>

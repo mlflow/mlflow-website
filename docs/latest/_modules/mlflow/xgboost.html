@@ -221,37 +221,37 @@
 <span class="sd">    https://xgboost.readthedocs.io/en/latest/python/python_api.html#module-xgboost.sklearn</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">functools</span>
-<span class="kn">import</span> <span class="nn">inspect</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">tempfile</span>
-<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">import</span> <span class="nn">yaml</span>
-<span class="kn">from</span> <span class="nn">packaging.version</span> <span class="kn">import</span> <span class="n">Version</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">packaging.version</span><span class="w"> </span><span class="kn">import</span> <span class="n">Version</span>
 
-<span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">from</span> <span class="nn">mlflow</span> <span class="kn">import</span> <span class="n">pyfunc</span>
-<span class="kn">from</span> <span class="nn">mlflow.data.code_dataset_source</span> <span class="kn">import</span> <span class="n">CodeDatasetSource</span>
-<span class="kn">from</span> <span class="nn">mlflow.data.numpy_dataset</span> <span class="kn">import</span> <span class="n">from_numpy</span>
-<span class="kn">from</span> <span class="nn">mlflow.data.pandas_dataset</span> <span class="kn">import</span> <span class="n">from_pandas</span>
-<span class="kn">from</span> <span class="nn">mlflow.entities.dataset_input</span> <span class="kn">import</span> <span class="n">DatasetInput</span>
-<span class="kn">from</span> <span class="nn">mlflow.entities.input_tag</span> <span class="kn">import</span> <span class="n">InputTag</span>
-<span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">Model</span><span class="p">,</span> <span class="n">ModelInputExample</span><span class="p">,</span> <span class="n">ModelSignature</span><span class="p">,</span> <span class="n">infer_signature</span>
-<span class="kn">from</span> <span class="nn">mlflow.models.model</span> <span class="kn">import</span> <span class="n">MLMODEL_FILE_NAME</span>
-<span class="kn">from</span> <span class="nn">mlflow.models.signature</span> <span class="kn">import</span> <span class="n">_infer_signature_from_input_example</span>
-<span class="kn">from</span> <span class="nn">mlflow.models.utils</span> <span class="kn">import</span> <span class="n">_save_example</span>
-<span class="kn">from</span> <span class="nn">mlflow.sklearn</span> <span class="kn">import</span> <span class="n">_SklearnTrainingSession</span>
-<span class="kn">from</span> <span class="nn">mlflow.tracking._model_registry</span> <span class="kn">import</span> <span class="n">DEFAULT_AWAIT_MAX_SLEEP_SECONDS</span>
-<span class="kn">from</span> <span class="nn">mlflow.tracking.artifact_utils</span> <span class="kn">import</span> <span class="n">_download_artifact_from_uri</span>
-<span class="kn">from</span> <span class="nn">mlflow.tracking.context</span> <span class="kn">import</span> <span class="n">registry</span> <span class="k">as</span> <span class="n">context_registry</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils</span> <span class="kn">import</span> <span class="n">_get_fully_qualified_class_name</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.arguments_utils</span> <span class="kn">import</span> <span class="n">_get_arg_names</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.autologging_utils</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyfunc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.data.code_dataset_source</span><span class="w"> </span><span class="kn">import</span> <span class="n">CodeDatasetSource</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.data.numpy_dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">from_numpy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.data.pandas_dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">from_pandas</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.entities.dataset_input</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatasetInput</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.entities.input_tag</span><span class="w"> </span><span class="kn">import</span> <span class="n">InputTag</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Model</span><span class="p">,</span> <span class="n">ModelInputExample</span><span class="p">,</span> <span class="n">ModelSignature</span><span class="p">,</span> <span class="n">infer_signature</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">MLMODEL_FILE_NAME</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models.signature</span><span class="w"> </span><span class="kn">import</span> <span class="n">_infer_signature_from_input_example</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_save_example</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.sklearn</span><span class="w"> </span><span class="kn">import</span> <span class="n">_SklearnTrainingSession</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.tracking._model_registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_AWAIT_MAX_SLEEP_SECONDS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.tracking.artifact_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_download_artifact_from_uri</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.tracking.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">registry</span> <span class="k">as</span> <span class="n">context_registry</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_get_fully_qualified_class_name</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.arguments_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_get_arg_names</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.autologging_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ENSURE_AUTOLOGGING_ENABLED_TEXT</span><span class="p">,</span>
     <span class="n">INPUT_EXAMPLE_SAMPLE_ROWS</span><span class="p">,</span>
     <span class="n">InputExampleInfo</span><span class="p">,</span>
@@ -264,9 +264,9 @@
     <span class="n">resolve_input_example_and_signature</span><span class="p">,</span>
     <span class="n">safe_patch</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.class_utils</span> <span class="kn">import</span> <span class="n">_get_class_from_string</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.docstring_utils</span> <span class="kn">import</span> <span class="n">LOG_MODEL_PARAM_DOCS</span><span class="p">,</span> <span class="n">format_docstring</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.environment</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.class_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_get_class_from_string</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.docstring_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOG_MODEL_PARAM_DOCS</span><span class="p">,</span> <span class="n">format_docstring</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.environment</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_CONDA_ENV_FILE_NAME</span><span class="p">,</span>
     <span class="n">_CONSTRAINTS_FILE_NAME</span><span class="p">,</span>
     <span class="n">_PYTHON_ENV_FILE_NAME</span><span class="p">,</span>
@@ -277,24 +277,24 @@
     <span class="n">_PythonEnv</span><span class="p">,</span>
     <span class="n">_validate_env_arguments</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.file_utils</span> <span class="kn">import</span> <span class="n">get_total_file_size</span><span class="p">,</span> <span class="n">write_to</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.mlflow_tags</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.file_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_total_file_size</span><span class="p">,</span> <span class="n">write_to</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.mlflow_tags</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">MLFLOW_DATASET_CONTEXT</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.model_utils</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.model_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_add_code_from_conf_to_system_path</span><span class="p">,</span>
     <span class="n">_get_flavor_configuration</span><span class="p">,</span>
     <span class="n">_validate_and_copy_code_paths</span><span class="p">,</span>
     <span class="n">_validate_and_prepare_target_save_path</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.requirements_utils</span> <span class="kn">import</span> <span class="n">_get_pinned_requirement</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.requirements_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_get_pinned_requirement</span>
 
 <span class="n">FLAVOR_NAME</span> <span class="o">=</span> <span class="s2">&quot;xgboost&quot;</span>
 
 <span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="get_default_pip_requirements"><a class="viewcode-back" href="../../python_api/mlflow.xgboost.html#mlflow.xgboost.get_default_pip_requirements">[docs]</a><span class="k">def</span> <span class="nf">get_default_pip_requirements</span><span class="p">():</span>
+<div class="viewcode-block" id="get_default_pip_requirements"><a class="viewcode-back" href="../../python_api/mlflow.xgboost.html#mlflow.xgboost.get_default_pip_requirements">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">get_default_pip_requirements</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns:</span>
 <span class="sd">        A list of default pip requirements for MLflow Models produced by this flavor. Calls to</span>
@@ -304,7 +304,7 @@
     <span class="k">return</span> <span class="p">[</span><span class="n">_get_pinned_requirement</span><span class="p">(</span><span class="s2">&quot;xgboost&quot;</span><span class="p">)]</span></div>
 
 
-<div class="viewcode-block" id="get_default_conda_env"><a class="viewcode-back" href="../../python_api/mlflow.xgboost.html#mlflow.xgboost.get_default_conda_env">[docs]</a><span class="k">def</span> <span class="nf">get_default_conda_env</span><span class="p">():</span>
+<div class="viewcode-block" id="get_default_conda_env"><a class="viewcode-back" href="../../python_api/mlflow.xgboost.html#mlflow.xgboost.get_default_conda_env">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">get_default_conda_env</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns:</span>
 <span class="sd">        The default Conda environment for MLflow Models produced by calls to</span>
@@ -314,7 +314,7 @@
 
 
 <div class="viewcode-block" id="save_model"><a class="viewcode-back" href="../../python_api/mlflow.xgboost.html#mlflow.xgboost.save_model">[docs]</a><span class="nd">@format_docstring</span><span class="p">(</span><span class="n">LOG_MODEL_PARAM_DOCS</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">package_name</span><span class="o">=</span><span class="n">FLAVOR_NAME</span><span class="p">))</span>
-<span class="k">def</span> <span class="nf">save_model</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">save_model</span><span class="p">(</span>
     <span class="n">xgb_model</span><span class="p">,</span>
     <span class="n">path</span><span class="p">,</span>
     <span class="n">conda_env</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -343,7 +343,7 @@
 <span class="sd">        model_format: File format in which the model is to be saved.</span>
 <span class="sd">        metadata: {{ metadata }}</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">xgboost</span> <span class="k">as</span> <span class="nn">xgb</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">xgboost</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xgb</span>
 
     <span class="n">_validate_env_arguments</span><span class="p">(</span><span class="n">conda_env</span><span class="p">,</span> <span class="n">pip_requirements</span><span class="p">,</span> <span class="n">extra_pip_requirements</span><span class="p">)</span>
 
@@ -426,7 +426,7 @@
 
 
 <div class="viewcode-block" id="log_model"><a class="viewcode-back" href="../../python_api/mlflow.xgboost.html#mlflow.xgboost.log_model">[docs]</a><span class="nd">@format_docstring</span><span class="p">(</span><span class="n">LOG_MODEL_PARAM_DOCS</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">package_name</span><span class="o">=</span><span class="n">FLAVOR_NAME</span><span class="p">))</span>
-<span class="k">def</span> <span class="nf">log_model</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">log_model</span><span class="p">(</span>
     <span class="n">xgb_model</span><span class="p">,</span>
     <span class="n">artifact_path</span><span class="p">,</span>
     <span class="n">conda_env</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -485,7 +485,7 @@
     <span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">_load_model</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_load_model</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Load Model Implementation.</span>
 
 <span class="sd">    Args:</span>
@@ -507,7 +507,7 @@
     <span class="k">return</span> <span class="n">model</span>
 
 
-<span class="k">def</span> <span class="nf">_load_pyfunc</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_load_pyfunc</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Load PyFunc implementation. Called by ``pyfunc.load_model``.</span>
 
 <span class="sd">    Args:</span>
@@ -516,7 +516,7 @@
     <span class="k">return</span> <span class="n">_XGBModelWrapper</span><span class="p">(</span><span class="n">_load_model</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
 
 
-<div class="viewcode-block" id="load_model"><a class="viewcode-back" href="../../python_api/mlflow.xgboost.html#mlflow.xgboost.load_model">[docs]</a><span class="k">def</span> <span class="nf">load_model</span><span class="p">(</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">dst_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="load_model"><a class="viewcode-back" href="../../python_api/mlflow.xgboost.html#mlflow.xgboost.load_model">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">load_model</span><span class="p">(</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">dst_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Load an XGBoost model from a local file or a run.</span>
 
 <span class="sd">    Args:</span>
@@ -544,17 +544,17 @@
     <span class="k">return</span> <span class="n">_load_model</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">local_model_path</span><span class="p">)</span></div>
 
 
-<span class="k">class</span> <span class="nc">_XGBModelWrapper</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xgb_model</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_XGBModelWrapper</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xgb_model</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">xgb_model</span> <span class="o">=</span> <span class="n">xgb_model</span>
 
-    <span class="k">def</span> <span class="nf">get_raw_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_raw_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the underlying XGBoost model.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">xgb_model</span>
 
-    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">dataframe</span><span class="p">,</span>
         <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -567,7 +567,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            Model predictions.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">import</span> <span class="nn">xgboost</span> <span class="k">as</span> <span class="nn">xgb</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">xgboost</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xgb</span>
 
         <span class="n">predict_fn</span> <span class="o">=</span> <span class="n">_wrapped_xgboost_model_predict_fn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xgb_model</span><span class="p">)</span>
         <span class="n">params</span> <span class="o">=</span> <span class="n">params</span> <span class="ow">or</span> <span class="p">{}</span>
@@ -580,7 +580,7 @@
         <span class="k">return</span> <span class="n">predict_fn</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_exclude_unrecognized_kwargs</span><span class="p">(</span><span class="n">predict_fn</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_exclude_unrecognized_kwargs</span><span class="p">(</span><span class="n">predict_fn</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
     <span class="n">filtered_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">allowed_params</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">predict_fn</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span>
     <span class="c1"># avoid excluding kwargs when predict function uses args or kwargs</span>
@@ -600,15 +600,15 @@
     <span class="k">return</span> <span class="n">filtered_kwargs</span>
 
 
-<span class="k">def</span> <span class="nf">_wrapped_xgboost_model_predict_fn</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">validate_features</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_wrapped_xgboost_model_predict_fn</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">validate_features</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Wraps the predict method of the raw model to accept a DataFrame as input.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">xgboost</span> <span class="k">as</span> <span class="nn">xgb</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">xgboost</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xgb</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">xgb</span><span class="o">.</span><span class="n">Booster</span><span class="p">):</span>
         <span class="c1"># we need to wrap the predict function to accept data in pandas format</span>
-        <span class="k">def</span> <span class="nf">wrapped_predict_fn</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">wrapped_predict_fn</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="n">filtered_kwargs</span> <span class="o">=</span> <span class="n">_exclude_unrecognized_kwargs</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span>
                 <span class="n">xgb</span><span class="o">.</span><span class="n">DMatrix</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">validate_features</span><span class="o">=</span><span class="n">validate_features</span><span class="p">,</span> <span class="o">**</span><span class="n">filtered_kwargs</span>
@@ -621,8 +621,8 @@
         <span class="k">return</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span>
 
 
-<span class="k">def</span> <span class="nf">_wrapped_xgboost_model_predict_proba_fn</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">validate_features</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="kn">import</span> <span class="nn">xgboost</span> <span class="k">as</span> <span class="nn">xgb</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_wrapped_xgboost_model_predict_proba_fn</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">validate_features</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">xgboost</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xgb</span>
 
     <span class="n">predict_proba_fn</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;predict_proba&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">xgb</span><span class="o">.</span><span class="n">XGBModel</span><span class="p">)</span> <span class="ow">and</span> <span class="n">predict_proba_fn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -631,7 +631,7 @@
 
 
 <div class="viewcode-block" id="autolog"><a class="viewcode-back" href="../../python_api/mlflow.xgboost.html#mlflow.xgboost.autolog">[docs]</a><span class="nd">@autologging_integration</span><span class="p">(</span><span class="n">FLAVOR_NAME</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">autolog</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">autolog</span><span class="p">(</span>
     <span class="n">importance_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">log_input_examples</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">log_model_signatures</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -694,8 +694,8 @@
 <span class="sd">        model_format: File format in which the model is to be saved.</span>
 <span class="sd">        extra_tags: A dictionary of extra tags to set on each managed run created by autologging.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-    <span class="kn">import</span> <span class="nn">xgboost</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">xgboost</span>
 
     <span class="k">if</span> <span class="n">importance_types</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">importance_types</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span>
@@ -704,7 +704,7 @@
     <span class="c1">#   to use as an input example and for inferring the model signature.</span>
     <span class="c1">#   (there is no way to get the data back from a DMatrix object)</span>
     <span class="c1"># We store it on the DMatrix object so the train function is able to read it.</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="n">original</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="n">original</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -724,24 +724,24 @@
 
         <span class="n">original</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">train_impl</span><span class="p">(</span><span class="n">_log_models</span><span class="p">,</span> <span class="n">_log_datasets</span><span class="p">,</span> <span class="n">original</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">def</span> <span class="nf">record_eval_results</span><span class="p">(</span><span class="n">eval_results</span><span class="p">,</span> <span class="n">metrics_logger</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">train_impl</span><span class="p">(</span><span class="n">_log_models</span><span class="p">,</span> <span class="n">_log_datasets</span><span class="p">,</span> <span class="n">original</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">record_eval_results</span><span class="p">(</span><span class="n">eval_results</span><span class="p">,</span> <span class="n">metrics_logger</span><span class="p">):</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Create a callback function that records evaluation results.</span>
 <span class="sd">            &quot;&quot;&quot;</span>
             <span class="c1"># TODO: Remove `replace(&quot;SNAPSHOT&quot;, &quot;dev&quot;)` once the following issue is addressed:</span>
             <span class="c1">#       https://github.com/dmlc/xgboost/issues/6984</span>
-            <span class="kn">from</span> <span class="nn">mlflow.xgboost._autolog</span> <span class="kn">import</span> <span class="n">IS_TRAINING_CALLBACK_SUPPORTED</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.xgboost._autolog</span><span class="w"> </span><span class="kn">import</span> <span class="n">IS_TRAINING_CALLBACK_SUPPORTED</span>
 
             <span class="k">if</span> <span class="n">IS_TRAINING_CALLBACK_SUPPORTED</span><span class="p">:</span>
-                <span class="kn">from</span> <span class="nn">mlflow.xgboost._autolog</span> <span class="kn">import</span> <span class="n">AutologCallback</span>
+                <span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.xgboost._autolog</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutologCallback</span>
 
                 <span class="c1"># In xgboost &gt;= 1.3.0, user-defined callbacks should inherit</span>
                 <span class="c1"># `xgboost.callback.TrainingCallback`:</span>
                 <span class="c1"># https://xgboost.readthedocs.io/en/latest/python/callbacks.html#defining-your-own-callback</span>
                 <span class="k">return</span> <span class="n">AutologCallback</span><span class="p">(</span><span class="n">metrics_logger</span><span class="p">,</span> <span class="n">eval_results</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="kn">from</span> <span class="nn">mlflow.xgboost._autolog</span> <span class="kn">import</span> <span class="n">autolog_callback</span>
+                <span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.xgboost._autolog</span><span class="w"> </span><span class="kn">import</span> <span class="n">autolog_callback</span>
 
                 <span class="k">return</span> <span class="n">picklable_exception_safe_function</span><span class="p">(</span>
                     <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span>
@@ -749,12 +749,12 @@
                     <span class="p">)</span>
                 <span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">log_feature_importance_plot</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">importance</span><span class="p">,</span> <span class="n">importance_type</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">log_feature_importance_plot</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">importance</span><span class="p">,</span> <span class="n">importance_type</span><span class="p">):</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Log feature importance plot.</span>
 <span class="sd">            &quot;&quot;&quot;</span>
-            <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-            <span class="kn">from</span> <span class="nn">cycler</span> <span class="kn">import</span> <span class="n">cycler</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">cycler</span><span class="w"> </span><span class="kn">import</span> <span class="n">cycler</span>
 
             <span class="n">features</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
 
@@ -958,14 +958,14 @@
         <span class="c1">#   constructor was applied, so we cannot assume the input_example_info exists</span>
         <span class="n">input_example_info</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">dtrain</span><span class="p">,</span> <span class="s2">&quot;input_example_info&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">get_input_example</span><span class="p">():</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">get_input_example</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">input_example_info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">ENSURE_AUTOLOGGING_ENABLED_TEXT</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">input_example_info</span><span class="o">.</span><span class="n">error_msg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">input_example_info</span><span class="o">.</span><span class="n">error_msg</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">input_example_info</span><span class="o">.</span><span class="n">input_example</span>
 
-        <span class="k">def</span> <span class="nf">infer_model_signature</span><span class="p">(</span><span class="n">input_example</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">infer_model_signature</span><span class="p">(</span><span class="n">input_example</span><span class="p">):</span>
             <span class="n">model_output</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">xgboost</span><span class="o">.</span><span class="n">DMatrix</span><span class="p">(</span><span class="n">input_example</span><span class="p">))</span>
             <span class="k">return</span> <span class="n">infer_signature</span><span class="p">(</span><span class="n">input_example</span><span class="p">,</span> <span class="n">model_output</span><span class="p">)</span>
 
@@ -998,7 +998,7 @@
 
         <span class="k">return</span> <span class="n">model</span>
 
-    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="n">_log_models</span><span class="p">,</span> <span class="n">_log_datasets</span><span class="p">,</span> <span class="n">original</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">train</span><span class="p">(</span><span class="n">_log_models</span><span class="p">,</span> <span class="n">_log_datasets</span><span class="p">,</span> <span class="n">original</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">current_sklearn_session</span> <span class="o">=</span> <span class="n">_SklearnTrainingSession</span><span class="o">.</span><span class="n">get_current_session</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">current_sklearn_session</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">current_sklearn_session</span><span class="o">.</span><span class="n">should_log</span><span class="p">():</span>
             <span class="k">return</span> <span class="n">train_impl</span><span class="p">(</span><span class="n">_log_models</span><span class="p">,</span> <span class="n">_log_datasets</span><span class="p">,</span> <span class="n">original</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -1029,7 +1029,7 @@
     <span class="n">safe_patch</span><span class="p">(</span><span class="n">FLAVOR_NAME</span><span class="p">,</span> <span class="n">xgboost</span><span class="o">.</span><span class="n">DMatrix</span><span class="p">,</span> <span class="s2">&quot;__init__&quot;</span><span class="p">,</span> <span class="fm">__init__</span><span class="p">)</span>
 
     <span class="c1"># enable xgboost scikit-learn estimators autologging</span>
-    <span class="kn">import</span> <span class="nn">mlflow.sklearn</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">mlflow.sklearn</span>
 
     <span class="n">mlflow</span><span class="o">.</span><span class="n">sklearn</span><span class="o">.</span><span class="n">_autolog</span><span class="p">(</span>
         <span class="n">flavor_name</span><span class="o">=</span><span class="n">FLAVOR_NAME</span><span class="p">,</span>
@@ -1047,11 +1047,11 @@
     <span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">_log_xgboost_dataset</span><span class="p">(</span><span class="n">xgb_dataset</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">autologging_client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-    <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-    <span class="kn">import</span> <span class="nn">xgboost</span> <span class="k">as</span> <span class="nn">xgb</span>
-    <span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">issparse</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_log_xgboost_dataset</span><span class="p">(</span><span class="n">xgb_dataset</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">autologging_client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">xgboost</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xgb</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">issparse</span>
 
     <span class="c1"># dmatrix has a get_data method added in 1.7. skip for earlier versions.</span>
     <span class="k">if</span> <span class="n">Version</span><span class="p">(</span><span class="n">xgb</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">Version</span><span class="p">(</span><span class="s2">&quot;1.7.0&quot;</span><span class="p">):</span>

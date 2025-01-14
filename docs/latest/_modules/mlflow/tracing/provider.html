@@ -211,28 +211,28 @@
 <span class="sd">use OpenTelemetry e.g. PromptFlow, Snowpark.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">contextvars</span>
-<span class="kn">import</span> <span class="nn">functools</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">contextvars</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">from</span> <span class="nn">opentelemetry</span> <span class="kn">import</span> <span class="n">context</span> <span class="k">as</span> <span class="n">context_api</span>
-<span class="kn">from</span> <span class="nn">opentelemetry</span> <span class="kn">import</span> <span class="n">trace</span>
-<span class="kn">from</span> <span class="nn">opentelemetry.sdk.trace</span> <span class="kn">import</span> <span class="n">TracerProvider</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opentelemetry</span><span class="w"> </span><span class="kn">import</span> <span class="n">context</span> <span class="k">as</span> <span class="n">context_api</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opentelemetry</span><span class="w"> </span><span class="kn">import</span> <span class="n">trace</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opentelemetry.sdk.trace</span><span class="w"> </span><span class="kn">import</span> <span class="n">TracerProvider</span>
 
-<span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowTracingException</span>
-<span class="kn">from</span> <span class="nn">mlflow.tracing.constant</span> <span class="kn">import</span> <span class="n">SpanAttributeKey</span>
-<span class="kn">from</span> <span class="nn">mlflow.tracing.utils.exception</span> <span class="kn">import</span> <span class="n">raise_as_trace_exception</span>
-<span class="kn">from</span> <span class="nn">mlflow.tracing.utils.once</span> <span class="kn">import</span> <span class="n">Once</span>
-<span class="kn">from</span> <span class="nn">mlflow.tracing.utils.otlp</span> <span class="kn">import</span> <span class="n">get_otlp_exporter</span><span class="p">,</span> <span class="n">should_use_otlp_exporter</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.databricks_utils</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">MlflowTracingException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.tracing.constant</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpanAttributeKey</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.tracing.utils.exception</span><span class="w"> </span><span class="kn">import</span> <span class="n">raise_as_trace_exception</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.tracing.utils.once</span><span class="w"> </span><span class="kn">import</span> <span class="n">Once</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.tracing.utils.otlp</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_otlp_exporter</span><span class="p">,</span> <span class="n">should_use_otlp_exporter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.databricks_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">is_in_databricks_model_serving_environment</span><span class="p">,</span>
     <span class="n">is_mlflow_tracing_enabled_in_model_serving</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">mlflow.entities</span> <span class="kn">import</span> <span class="n">Span</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.entities</span><span class="w"> </span><span class="kn">import</span> <span class="n">Span</span>
 
 <span class="c1"># Global tracer provider instance. We manage the tracer provider by ourselves instead of using</span>
 <span class="c1"># the global tracer provider provided by OpenTelemetry.</span>
@@ -245,7 +245,7 @@
 <span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">start_span_in_context</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">trace</span><span class="o">.</span><span class="n">Span</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">start_span_in_context</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">trace</span><span class="o">.</span><span class="n">Span</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Start a new OpenTelemetry span in the current context.</span>
 
@@ -261,7 +261,7 @@
     <span class="k">return</span> <span class="n">_get_tracer</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">start_span</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">start_detached_span</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">start_detached_span</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">parent</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">trace</span><span class="o">.</span><span class="n">Span</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">experiment_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -295,7 +295,7 @@
     <span class="k">return</span> <span class="n">tracer</span><span class="o">.</span><span class="n">start_span</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="n">attributes</span><span class="p">,</span> <span class="n">start_time</span><span class="o">=</span><span class="n">start_time_ns</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">set_span_in_context</span><span class="p">(</span><span class="n">span</span><span class="p">:</span> <span class="s2">&quot;Span&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">contextvars</span><span class="o">.</span><span class="n">Token</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">set_span_in_context</span><span class="p">(</span><span class="n">span</span><span class="p">:</span> <span class="s2">&quot;Span&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">contextvars</span><span class="o">.</span><span class="n">Token</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Set the given OpenTelemetry span as the active span in the current context.</span>
 
@@ -310,7 +310,7 @@
     <span class="k">return</span> <span class="n">token</span>  <span class="c1"># noqa: RET504</span>
 
 
-<span class="k">def</span> <span class="nf">detach_span_from_context</span><span class="p">(</span><span class="n">token</span><span class="p">:</span> <span class="n">contextvars</span><span class="o">.</span><span class="n">Token</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">detach_span_from_context</span><span class="p">(</span><span class="n">token</span><span class="p">:</span> <span class="n">contextvars</span><span class="o">.</span><span class="n">Token</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Remove the active span from the current context.</span>
 
@@ -320,7 +320,7 @@
     <span class="n">context_api</span><span class="o">.</span><span class="n">detach</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_get_tracer</span><span class="p">(</span><span class="n">module_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_tracer</span><span class="p">(</span><span class="n">module_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get a tracer instance for the given module name.</span>
 
@@ -332,7 +332,7 @@
     <span class="k">return</span> <span class="n">_MLFLOW_TRACER_PROVIDER</span><span class="o">.</span><span class="n">get_tracer</span><span class="p">(</span><span class="n">module_name</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_get_trace_exporter</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_trace_exporter</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the exporter instance that is used by the current tracer provider.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -343,7 +343,7 @@
         <span class="k">return</span> <span class="n">processor</span><span class="o">.</span><span class="n">span_exporter</span>
 
 
-<span class="k">def</span> <span class="nf">_setup_tracer_provider</span><span class="p">(</span><span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_setup_tracer_provider</span><span class="p">(</span><span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Instantiate a tracer provider and set it as the global tracer provider.</span>
 
@@ -359,7 +359,7 @@
 
     <span class="k">if</span> <span class="n">should_use_otlp_exporter</span><span class="p">():</span>
         <span class="c1"># Export to OpenTelemetry Collector when configured</span>
-        <span class="kn">from</span> <span class="nn">mlflow.tracing.processor.otel</span> <span class="kn">import</span> <span class="n">OtelSpanProcessor</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.tracing.processor.otel</span><span class="w"> </span><span class="kn">import</span> <span class="n">OtelSpanProcessor</span>
 
         <span class="n">exporter</span> <span class="o">=</span> <span class="n">get_otlp_exporter</span><span class="p">()</span>
         <span class="n">processor</span> <span class="o">=</span> <span class="n">OtelSpanProcessor</span><span class="p">(</span><span class="n">exporter</span><span class="p">)</span>
@@ -370,16 +370,16 @@
             <span class="n">_MLFLOW_TRACER_PROVIDER</span> <span class="o">=</span> <span class="n">trace</span><span class="o">.</span><span class="n">NoOpTracerProvider</span><span class="p">()</span>
             <span class="k">return</span>
 
-        <span class="kn">from</span> <span class="nn">mlflow.tracing.export.inference_table</span> <span class="kn">import</span> <span class="n">InferenceTableSpanExporter</span>
-        <span class="kn">from</span> <span class="nn">mlflow.tracing.processor.inference_table</span> <span class="kn">import</span> <span class="n">InferenceTableSpanProcessor</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.tracing.export.inference_table</span><span class="w"> </span><span class="kn">import</span> <span class="n">InferenceTableSpanExporter</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.tracing.processor.inference_table</span><span class="w"> </span><span class="kn">import</span> <span class="n">InferenceTableSpanProcessor</span>
 
         <span class="n">exporter</span> <span class="o">=</span> <span class="n">InferenceTableSpanExporter</span><span class="p">()</span>
         <span class="n">processor</span> <span class="o">=</span> <span class="n">InferenceTableSpanProcessor</span><span class="p">(</span><span class="n">exporter</span><span class="p">)</span>
 
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># Default to MLflow Tracking Server</span>
-        <span class="kn">from</span> <span class="nn">mlflow.tracing.export.mlflow</span> <span class="kn">import</span> <span class="n">MlflowSpanExporter</span>
-        <span class="kn">from</span> <span class="nn">mlflow.tracing.processor.mlflow</span> <span class="kn">import</span> <span class="n">MlflowSpanProcessor</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.tracing.export.mlflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">MlflowSpanExporter</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.tracing.processor.mlflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">MlflowSpanProcessor</span>
 
         <span class="n">exporter</span> <span class="o">=</span> <span class="n">MlflowSpanExporter</span><span class="p">()</span>
         <span class="n">processor</span> <span class="o">=</span> <span class="n">MlflowSpanProcessor</span><span class="p">(</span><span class="n">exporter</span><span class="p">)</span>
@@ -388,7 +388,7 @@
     <span class="n">tracer_provider</span><span class="o">.</span><span class="n">add_span_processor</span><span class="p">(</span><span class="n">processor</span><span class="p">)</span>
     <span class="n">_MLFLOW_TRACER_PROVIDER</span> <span class="o">=</span> <span class="n">tracer_provider</span>
 
-    <span class="kn">from</span> <span class="nn">mlflow.tracing.utils.token</span> <span class="kn">import</span> <span class="n">suppress_token_detach_warning_to_debug_level</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.tracing.utils.token</span><span class="w"> </span><span class="kn">import</span> <span class="n">suppress_token_detach_warning_to_debug_level</span>
 
     <span class="c1"># Demote the &quot;Failed to detach context&quot; log raised by the OpenTelemetry logger to DEBUG</span>
     <span class="c1"># level so that it does not show up in the user&#39;s console. This warning may indicate</span>
@@ -401,7 +401,7 @@
 
 
 <div class="viewcode-block" id="disable"><a class="viewcode-back" href="../../../python_api/mlflow.tracing.html#mlflow.tracing.disable">[docs]</a><span class="nd">@raise_as_trace_exception</span>
-<span class="k">def</span> <span class="nf">disable</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">disable</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Disable tracing.</span>
 
@@ -442,7 +442,7 @@
 
 
 <div class="viewcode-block" id="enable"><a class="viewcode-back" href="../../../python_api/mlflow.tracing.html#mlflow.tracing.enable">[docs]</a><span class="nd">@raise_as_trace_exception</span>
-<span class="k">def</span> <span class="nf">enable</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">enable</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Enable tracing.</span>
 
@@ -482,7 +482,7 @@
     <span class="n">_MLFLOW_TRACER_PROVIDER_INITIALIZED</span><span class="o">.</span><span class="n">done</span> <span class="o">=</span> <span class="kc">True</span></div>
 
 
-<span class="k">def</span> <span class="nf">trace_disabled</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">trace_disabled</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A decorator that temporarily disables tracing for the duration of the decorated function.</span>
 
@@ -503,7 +503,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">is_func_called</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">result</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">try</span><span class="p">:</span>
@@ -535,7 +535,7 @@
     <span class="k">return</span> <span class="n">wrapper</span>
 
 
-<span class="k">def</span> <span class="nf">reset_tracer_setup</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">reset_tracer_setup</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Reset the flags that indicates whether the MLflow tracer provider has been initialized.</span>
 <span class="sd">    This ensures that the tracer provider is re-initialized when next tracing</span>
@@ -549,7 +549,7 @@
 
 
 <span class="nd">@raise_as_trace_exception</span>
-<span class="k">def</span> <span class="nf">is_tracing_enabled</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_tracing_enabled</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Check if tracing is enabled based on whether the global tracer</span>
 <span class="sd">    is instantiated or not.</span>

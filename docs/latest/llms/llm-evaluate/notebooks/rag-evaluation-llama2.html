@@ -148,6 +148,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../chat-model-intro/index.html">Tutorial: Getting Started with ChatModel</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../chat-model-guide/index.html">Tutorial: Custom GenAI Models using ChatModel</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../notebooks/chat-model-tool-calling.html">Build a tool-calling model with <code class="docutils literal notranslate"><span class="pre">mlflow.pyfunc.ChatModel</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tracing/notebooks/jupyter-trace-demo.html">MLflow Trace UI in Jupyter Notebook Demo</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../index.html#id1">MLflow Tracing</a></li>
@@ -536,16 +537,16 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">langchain.chains</span> <span class="kn">import</span> <span class="n">RetrievalQA</span>
-<span class="kn">from</span> <span class="nn">langchain.document_loaders</span> <span class="kn">import</span> <span class="n">WebBaseLoader</span>
-<span class="kn">from</span> <span class="nn">langchain.text_splitter</span> <span class="kn">import</span> <span class="n">CharacterTextSplitter</span>
-<span class="kn">from</span> <span class="nn">langchain.vectorstores</span> <span class="kn">import</span> <span class="n">Chroma</span>
-<span class="kn">from</span> <span class="nn">langchain_openai</span> <span class="kn">import</span> <span class="n">OpenAI</span><span class="p">,</span> <span class="n">OpenAIEmbeddings</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain.chains</span><span class="w"> </span><span class="kn">import</span> <span class="n">RetrievalQA</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain.document_loaders</span><span class="w"> </span><span class="kn">import</span> <span class="n">WebBaseLoader</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain.text_splitter</span><span class="w"> </span><span class="kn">import</span> <span class="n">CharacterTextSplitter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain.vectorstores</span><span class="w"> </span><span class="kn">import</span> <span class="n">Chroma</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_openai</span><span class="w"> </span><span class="kn">import</span> <span class="n">OpenAI</span><span class="p">,</span> <span class="n">OpenAIEmbeddings</span>
 
-<span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">from</span> <span class="nn">mlflow.deployments</span> <span class="kn">import</span> <span class="n">set_deployments_target</span>
-<span class="kn">from</span> <span class="nn">mlflow.metrics.genai</span> <span class="kn">import</span> <span class="n">EvaluationExample</span><span class="p">,</span> <span class="n">faithfulness</span><span class="p">,</span> <span class="n">relevance</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.deployments</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_deployments_target</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.metrics.genai</span><span class="w"> </span><span class="kn">import</span> <span class="n">EvaluationExample</span><span class="p">,</span> <span class="n">faithfulness</span><span class="p">,</span> <span class="n">relevance</span>
 </pre></div>
 </div>
 </div>
@@ -593,7 +594,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="n">input_df</span><span class="p">):</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">model</span><span class="p">(</span><span class="n">input_df</span><span class="p">):</span>
     <span class="n">answer</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">input_df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
         <span class="n">answer</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">qa</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;questions&quot;</span><span class="p">]))</span>

@@ -164,6 +164,7 @@
 <li class="toctree-l2"><a class="reference internal" href="mlflow.fastai.html">mlflow.fastai</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.gateway.html">mlflow.gateway</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.gemini.html">mlflow.gemini</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mlflow.groq.html">mlflow.groq</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.h2o.html">mlflow.h2o</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.johnsnowlabs.html">mlflow.johnsnowlabs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.keras.html">mlflow.keras</a></li>
@@ -263,7 +264,7 @@
 <span id="mlflow"></span><h1>mlflow<a class="headerlink" href="#module-mlflow" title="Permalink to this headline"> </a></h1>
 <p>The <code class="docutils literal notranslate"><span class="pre">mlflow</span></code> module provides a high-level “fluent” API for starting and managing MLflow runs.
 For example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">()</span>
 <span class="n">mlflow</span><span class="o">.</span><span class="n">log_param</span><span class="p">(</span><span class="s2">&quot;my&quot;</span><span class="p">,</span> <span class="s2">&quot;param&quot;</span><span class="p">)</span>
@@ -302,9 +303,9 @@ stored as a PIL image and can be logged to MLflow using <cite>mlflow.log_image</
 </dl>
 <div class="literal-block-wrapper docutils container" id="id17">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id17" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
 
 <span class="c1"># Create an image as a numpy array</span>
 <span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
@@ -426,7 +427,7 @@ this API will not retrieve that run.</p>
 to access such attributes, use the <a class="reference internal" href="mlflow.client.html#mlflow.client.MlflowClient" title="mlflow.client.MlflowClient"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.client.MlflowClient</span></code></a> as follows:</p>
 <div class="literal-block-wrapper docutils container" id="id18">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id18" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">()</span>
 <span class="n">run</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">active_run</span><span class="p">()</span>
@@ -458,7 +459,7 @@ trace including what happens inside the remote service call.</p>
 <p>The following example demonstrates how to use this function to merge a trace from a remote
 service to the current active trace in the function.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@mlflow</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;predict&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
     <span class="c1"># Call a remote service that returns a trace in the response</span>
     <span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://your-service-endpoint&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
 
@@ -471,7 +472,7 @@ service to the current active trace in the function.</p>
 </pre></div>
 </div>
 <p>If you have a specific target span to merge the trace under, you can pass the target span</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
     <span class="c1"># Create a local span</span>
     <span class="n">span</span> <span class="o">=</span> <span class="n">MlflowClient</span><span class="p">()</span><span class="o">.</span><span class="n">start_span</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;predict&quot;</span><span class="p">)</span>
 
@@ -511,19 +512,19 @@ will be created and the trace will be merged under it.</p></li>
 integrations.</p>
 <p>Note that framework-specific configurations set at any point will take precedence over
 any configurations set by this function. For example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="n">mlflow</span><span class="o">.</span><span class="n">autolog</span><span class="p">(</span><span class="n">log_models</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">exclusive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="kn">import</span> <span class="nn">sklearn</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sklearn</span>
 </pre></div>
 </div>
 <p>would enable autologging for <cite>sklearn</cite> with <cite>log_models=False</cite> and <cite>exclusive=True</cite>,
 but</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="n">mlflow</span><span class="o">.</span><span class="n">autolog</span><span class="p">(</span><span class="n">log_models</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">exclusive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<span class="kn">import</span> <span class="nn">sklearn</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sklearn</span>
 
 <span class="n">mlflow</span><span class="o">.</span><span class="n">sklearn</span><span class="o">.</span><span class="n">autolog</span><span class="p">(</span><span class="n">log_models</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
@@ -574,13 +575,13 @@ e.g. tensorflow, pyspark.ml</p></li>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id20">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id20" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">mlflow.sklearn</span>
-<span class="kn">from</span> <span class="nn">mlflow</span> <span class="kn">import</span> <span class="n">MlflowClient</span>
-<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mlflow.sklearn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">MlflowClient</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.linear_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinearRegression</span>
 
 
-<span class="k">def</span> <span class="nf">print_auto_logged_info</span><span class="p">(</span><span class="n">r</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">print_auto_logged_info</span><span class="p">(</span><span class="n">r</span><span class="p">):</span>
     <span class="n">tags</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;mlflow.&quot;</span><span class="p">)}</span>
     <span class="n">artifacts</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">path</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">MlflowClient</span><span class="p">()</span><span class="o">.</span><span class="n">list_artifacts</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">run_id</span><span class="p">,</span> <span class="s2">&quot;model&quot;</span><span class="p">)]</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;run_id: </span><span class="si">{</span><span class="n">r</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">run_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -642,8 +643,8 @@ an appropriate default.</p></li>
 <dd class="field-even"><p><p>String ID of the created experiment.</p>
 <div class="literal-block-wrapper docutils container" id="id22">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id22" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="c1"># Create an experiment name, which must be unique and case sensitive</span>
 <span class="n">experiment_id</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">create_experiment</span><span class="p">(</span>
@@ -688,7 +689,7 @@ Creation timestamp: 1662004217511
 </dl>
 <div class="literal-block-wrapper docutils container" id="id24">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id24" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="n">experiment_id</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">create_experiment</span><span class="p">(</span><span class="s2">&quot;New Experiment&quot;</span><span class="p">)</span>
 <span class="n">mlflow</span><span class="o">.</span><span class="n">delete_experiment</span><span class="p">(</span><span class="n">experiment_id</span><span class="p">)</span>
@@ -724,7 +725,7 @@ Last Updated timestamp: 1662004217511
 </dl>
 <div class="literal-block-wrapper docutils container" id="id26">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id26" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">()</span> <span class="k">as</span> <span class="n">run</span><span class="p">:</span>
     <span class="n">mlflow</span><span class="o">.</span><span class="n">log_param</span><span class="p">(</span><span class="s2">&quot;p&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
@@ -757,7 +758,7 @@ will create a new active run.</p>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id28">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id28" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="n">tags</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;engineering&quot;</span><span class="p">:</span> <span class="s2">&quot;ML Platform&quot;</span><span class="p">,</span> <span class="s2">&quot;engineering_remote&quot;</span><span class="p">:</span> <span class="s2">&quot;ML Platform&quot;</span><span class="p">}</span>
 
@@ -805,7 +806,7 @@ information.</p>
 </div>
 <div class="literal-block-wrapper docutils container" id="id29">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id29" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
     <span class="n">mlflow</span><span class="o">.</span><span class="n">doctor</span><span class="p">()</span>
@@ -875,7 +876,7 @@ system metrics logging for individual runs by <cite>mlflow.start_run(log_system_
 <dd><p>End an active MLflow run (if there is one).</p>
 <div class="literal-block-wrapper docutils container" id="id31">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id31" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="c1"># Start run and get status</span>
 <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">()</span>
@@ -1115,7 +1116,7 @@ of a valid function:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_uri</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">fn</span><span class="p">(</span><span class="n">model_input</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">fn</span><span class="p">(</span><span class="n">model_input</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">model_input</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1195,7 +1196,7 @@ contains model outputs.</p></li>
 <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;question&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;foo&quot;</span><span class="p">]})</span>
 
 
-<span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;answer&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;bar&quot;</span><span class="p">],</span> <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;baz&quot;</span><span class="p">]})</span>
 
 
@@ -1244,11 +1245,11 @@ specified in <cite>extra_metrics</cite>. See the <cite>mlflow.metrics</cite> mod
 the builtin metrics and how to define extra metrics.</p>
 <div class="literal-block-wrapper docutils container" id="id34">
 <div class="code-block-caption"><span class="caption-text">Example usage of extra metrics</span><a class="headerlink" href="#id34" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 
-<span class="k">def</span> <span class="nf">root_mean_squared_error</span><span class="p">(</span><span class="n">eval_df</span><span class="p">,</span> <span class="n">_builtin_metrics</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">root_mean_squared_error</span><span class="p">(</span><span class="n">eval_df</span><span class="p">,</span> <span class="n">_builtin_metrics</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">eval_df</span><span class="p">[</span><span class="s2">&quot;prediction&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">eval_df</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
 
 
@@ -1262,7 +1263,7 @@ the builtin metrics and how to define extra metrics.</p>
 </div>
 </p></li>
 <li><p><strong>custom_artifacts</strong> – <p>(Optional) A list of custom artifact functions with the following signature:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">custom_artifact</span><span class="p">(</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">custom_artifact</span><span class="p">(</span>
     <span class="n">eval_df</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pandas</span><span class="o">.</span><span class="n">Dataframe</span><span class="p">,</span> <span class="n">pyspark</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span>
     <span class="n">builtin_metrics</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
     <span class="n">artifacts_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -1311,11 +1312,11 @@ its file path or define customizations through environment variables in
 </div></blockquote>
 <div class="literal-block-wrapper docutils container" id="id35">
 <div class="code-block-caption"><span class="caption-text">Example usage of custom artifacts</span><a class="headerlink" href="#id35" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
 
-<span class="k">def</span> <span class="nf">scatter_plot</span><span class="p">(</span><span class="n">eval_df</span><span class="p">,</span> <span class="n">builtin_metrics</span><span class="p">,</span> <span class="n">artifacts_dir</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">scatter_plot</span><span class="p">(</span><span class="n">eval_df</span><span class="p">,</span> <span class="n">builtin_metrics</span><span class="p">,</span> <span class="n">artifacts_dir</span><span class="p">):</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">eval_df</span><span class="p">[</span><span class="s2">&quot;prediction&quot;</span><span class="p">],</span> <span class="n">eval_df</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">])</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Targets&quot;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Predictions&quot;</span><span class="p">)</span>
@@ -1325,7 +1326,7 @@ its file path or define customizations through environment variables in
     <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;pred_target_scatter&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">artifacts_dir</span><span class="p">,</span> <span class="s2">&quot;example.png&quot;</span><span class="p">)}</span>
 
 
-<span class="k">def</span> <span class="nf">pred_sample</span><span class="p">(</span><span class="n">eval_df</span><span class="p">,</span> <span class="n">_builtin_metrics</span><span class="p">,</span> <span class="n">_artifacts_dir</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">pred_sample</span><span class="p">(</span><span class="n">eval_df</span><span class="p">,</span> <span class="n">_builtin_metrics</span><span class="p">,</span> <span class="n">_artifacts_dir</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;pred_sample&quot;</span><span class="p">:</span> <span class="n">pred_sample</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">)}</span>
 
 
@@ -1418,7 +1419,7 @@ URI of the form <code class="docutils literal notranslate"><span class="pre">s3:
 </dl>
 <div class="literal-block-wrapper docutils container" id="id36">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id36" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="n">features</span> <span class="o">=</span> <span class="s2">&quot;rooms, zipcode, median_price, school_rating, transport&quot;</span>
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;features.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -1461,7 +1462,7 @@ Artifact uri: file:///.../0/a46a80f1c9644bd8f4e5dd5553fffce/artifacts/features/f
 </dl>
 <div class="literal-block-wrapper docutils container" id="id38">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id38" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="n">experiment</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">get_experiment</span><span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Name: </span><span class="si">{</span><span class="n">experiment</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -1499,7 +1500,7 @@ if an experiment with the specified name exists, otherwise None.</p>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id40">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id40" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="c1"># Case sensitive name</span>
 <span class="n">experiment</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">get_experiment_by_name</span><span class="p">(</span><span class="s2">&quot;Default&quot;</span><span class="p">)</span>
@@ -1538,7 +1539,7 @@ returns None.</p>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id42">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id42" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="c1"># Create nested runs</span>
 <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
@@ -1606,7 +1607,7 @@ run, the RunData contains the most recently logged value at the largest step for
 </dl>
 <div class="literal-block-wrapper docutils container" id="id44">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id44" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">()</span> <span class="k">as</span> <span class="n">run</span><span class="p">:</span>
     <span class="n">mlflow</span><span class="o">.</span><span class="n">log_param</span><span class="p">(</span><span class="s2">&quot;p&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
@@ -1635,7 +1636,7 @@ the currently active run, since the tracking URI can be updated via <code class=
 <dd class="field-odd"><p>The tracking URI.</p>
 </dd>
 </dl>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="c1"># Get the current tracking uri</span>
 <span class="n">tracking_uri</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">get_tracking_uri</span><span class="p">()</span>
@@ -1660,11 +1661,11 @@ the currently active run, since the tracking URI can be updated via <code class=
 <p>Examples:</p>
 <div class="literal-block-wrapper docutils container" id="id46">
 <div class="code-block-caption"><span class="caption-text">To retrieve the most recent autologged run:</span><a class="headerlink" href="#id46" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
-<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
-<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_diabetes</span>
-<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestRegressor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_diabetes</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.ensemble</span><span class="w"> </span><span class="kn">import</span> <span class="n">RandomForestRegressor</span>
 
 <span class="n">mlflow</span><span class="o">.</span><span class="n">autolog</span><span class="p">()</span>
 
@@ -1683,7 +1684,7 @@ the currently active run, since the tracking URI can be updated via <code class=
 </div>
 <div class="literal-block-wrapper docutils container" id="id47">
 <div class="code-block-caption"><span class="caption-text">To get the most recently active run that ended:</span><a class="headerlink" href="#id47" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">()</span>
 <span class="n">mlflow</span><span class="o">.</span><span class="n">end_run</span><span class="p">()</span>
@@ -1693,7 +1694,7 @@ the currently active run, since the tracking URI can be updated via <code class=
 </div>
 <div class="literal-block-wrapper docutils container" id="id48">
 <div class="code-block-caption"><span class="caption-text">To retrieve the currently active run:</span><a class="headerlink" href="#id48" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">()</span>
 <span class="n">run</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">last_active_run</span><span class="p">()</span>
@@ -1739,7 +1740,7 @@ or else throw a MlflowException.</p>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id49">
 <div class="code-block-caption"><span class="caption-text">Example with passing run_ids</span><a class="headerlink" href="#id49" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="n">table_dict</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;inputs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;What is MLflow?&quot;</span><span class="p">,</span> <span class="s2">&quot;What is Databricks?&quot;</span><span class="p">],</span>
@@ -1765,7 +1766,7 @@ or else throw a MlflowException.</p>
 <div class="code-block-caption"><span class="caption-text">Example with passing no run_ids</span><a class="headerlink" href="#id50" title="Permalink to this code"> </a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Loads the table with the specified name for all runs in the given</span>
 <span class="c1"># experiment and joins them together</span>
-<span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="n">table_dict</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;inputs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;What is MLflow?&quot;</span><span class="p">,</span> <span class="s2">&quot;What is Databricks?&quot;</span><span class="p">],</span>
@@ -1804,10 +1805,10 @@ artifact to the currently active run.</p></li>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id51">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id51" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tempfile</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="c1"># Create a features.txt artifact file</span>
 <span class="n">features</span> <span class="o">=</span> <span class="s2">&quot;rooms, zipcode, median_price, school_rating, transport&quot;</span>
@@ -1840,11 +1841,11 @@ artifacts to the currently active run.</p></li>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id52">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id52" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">tempfile</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="c1"># Create some files to preserve as artifacts</span>
 <span class="n">features</span> <span class="o">=</span> <span class="s2">&quot;rooms, zipcode, median_price, school_rating, transport&quot;</span>
@@ -1883,7 +1884,7 @@ dictionary to the currently active run.</p></li>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id53">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id53" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="n">dictionary</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;k&quot;</span><span class="p">:</span> <span class="s2">&quot;v&quot;</span><span class="p">}</span>
 
@@ -1923,8 +1924,8 @@ the figure is saved (e.g. “dir/file.png”).</p></li>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id54">
 <div class="code-block-caption"><span class="caption-text">Matplotlib Example</span><a class="headerlink" href="#id54" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
@@ -1936,8 +1937,8 @@ the figure is saved (e.g. “dir/file.png”).</p></li>
 </div>
 <div class="literal-block-wrapper docutils container" id="id55">
 <div class="code-block-caption"><span class="caption-text">Plotly Example</span><a class="headerlink" href="#id55" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">from</span> <span class="nn">plotly</span> <span class="kn">import</span> <span class="n">graph_objects</span> <span class="k">as</span> <span class="n">go</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">plotly</span><span class="w"> </span><span class="kn">import</span> <span class="n">graph_objects</span> <span class="k">as</span> <span class="n">go</span>
 
 <span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">(</span><span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]))</span>
 
@@ -2032,8 +2033,8 @@ Defaults to 0.</p></li>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id56">
 <div class="code-block-caption"><span class="caption-text">Time-stepped image logging numpy example</span><a class="headerlink" href="#id56" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">256</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
 
@@ -2044,8 +2045,8 @@ Defaults to 0.</p></li>
 </div>
 <div class="literal-block-wrapper docutils container" id="id57">
 <div class="code-block-caption"><span class="caption-text">Time-stepped image logging pillow example</span><a class="headerlink" href="#id57" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
 
 <span class="n">image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">,</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
 
@@ -2056,8 +2057,8 @@ Defaults to 0.</p></li>
 </div>
 <div class="literal-block-wrapper docutils container" id="id58">
 <div class="code-block-caption"><span class="caption-text">Time-stepped image logging with mlflow.Image example</span><a class="headerlink" href="#id58" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
 
 <span class="c1"># If you have a preexisting saved image</span>
 <span class="n">Image</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">,</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;image.png&quot;</span><span class="p">)</span>
@@ -2070,8 +2071,8 @@ Defaults to 0.</p></li>
 </div>
 <div class="literal-block-wrapper docutils container" id="id59">
 <div class="code-block-caption"><span class="caption-text">Legacy artifact file image logging numpy example</span><a class="headerlink" href="#id59" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">256</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
 
@@ -2082,8 +2083,8 @@ Defaults to 0.</p></li>
 </div>
 <div class="literal-block-wrapper docutils container" id="id60">
 <div class="code-block-caption"><span class="caption-text">Legacy artifact file image logging pillow example</span><a class="headerlink" href="#id60" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
 
 <span class="n">image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">,</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
 
@@ -2110,8 +2111,8 @@ This will be set as an input tag with key <cite>mlflow.data.context</cite>.</p><
 </dl>
 <div class="literal-block-wrapper docutils container" id="id61">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id61" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="n">array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span> <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">]])</span>
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="s2">&quot;data.csv&quot;</span><span class="p">)</span>
@@ -2159,7 +2160,7 @@ logging operation.</p>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id62">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id62" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="c1"># Log a metric</span>
 <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
@@ -2204,7 +2205,7 @@ represents future for logging operation.</p>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id63">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id63" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="n">metrics</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;mse&quot;</span><span class="p">:</span> <span class="mf">2500.00</span><span class="p">,</span> <span class="s2">&quot;rmse&quot;</span><span class="p">:</span> <span class="mf">50.00</span><span class="p">}</span>
 
@@ -2247,7 +2248,7 @@ future for logging operation.</p>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id64">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id64" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
     <span class="n">value</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">log_param</span><span class="p">(</span><span class="s2">&quot;learning_rate&quot;</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
@@ -2284,7 +2285,7 @@ represents future for logging operation.</p>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id65">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id65" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;learning_rate&quot;</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span> <span class="s2">&quot;n_estimators&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">}</span>
 
@@ -2322,7 +2323,7 @@ table to the currently active run.</p></li>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id66">
 <div class="code-block-caption"><span class="caption-text">Dictionary Example</span><a class="headerlink" href="#id66" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="n">table_dict</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;inputs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;What is MLflow?&quot;</span><span class="p">,</span> <span class="s2">&quot;What is Databricks?&quot;</span><span class="p">],</span>
@@ -2337,8 +2338,8 @@ table to the currently active run.</p></li>
 </div>
 <div class="literal-block-wrapper docutils container" id="id67">
 <div class="code-block-caption"><span class="caption-text">Pandas DF Example</span><a class="headerlink" href="#id67" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
 <span class="n">table_dict</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;inputs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;What is MLflow?&quot;</span><span class="p">,</span> <span class="s2">&quot;What is Databricks?&quot;</span><span class="p">],</span>
@@ -2371,7 +2372,7 @@ artifact to the currently active run.</p></li>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id68">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id68" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
     <span class="c1"># Log text to a file under the run&#39;s root artifact directory</span>
@@ -2407,7 +2408,7 @@ raised if no credentials are found.</p></li>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id69">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id69" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="n">mlflow</span><span class="o">.</span><span class="n">login</span><span class="p">()</span>
 <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
@@ -2448,10 +2449,10 @@ backend.</p>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id70">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id70" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow.sklearn</span>
-<span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">infer_signature</span>
-<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">make_regression</span>
-<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestRegressor</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow.sklearn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">infer_signature</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_regression</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.ensemble</span><span class="w"> </span><span class="kn">import</span> <span class="n">RandomForestRegressor</span>
 
 <span class="n">mlflow</span><span class="o">.</span><span class="n">set_tracking_uri</span><span class="p">(</span><span class="s2">&quot;sqlite:////tmp/mlruns.db&quot;</span><span class="p">)</span>
 <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;n_estimators&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;random_state&quot;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}</span>
@@ -2557,7 +2558,7 @@ about the launched run.</p>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id72">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id72" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="n">project_uri</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/mlflow/mlflow-example&quot;</span>
 <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;alpha&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s2">&quot;l1_ratio&quot;</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">}</span>
@@ -2649,10 +2650,10 @@ The following fields are supported:</p>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id74">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id74" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 
-<span class="k">def</span> <span class="nf">assert_experiment_names_equal</span><span class="p">(</span><span class="n">experiments</span><span class="p">,</span> <span class="n">expected_names</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">assert_experiment_names_equal</span><span class="p">(</span><span class="n">experiments</span><span class="p">,</span> <span class="n">expected_names</span><span class="p">):</span>
     <span class="n">actual_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">experiments</span> <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;Default&quot;</span><span class="p">]</span>
     <span class="k">assert</span> <span class="n">actual_names</span> <span class="o">==</span> <span class="n">expected_names</span><span class="p">,</span> <span class="p">(</span><span class="n">actual_names</span><span class="p">,</span> <span class="n">expected_names</span><span class="p">)</span>
 
@@ -2740,8 +2741,8 @@ matching search results.</p></li>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id75">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id75" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LogisticRegression</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.linear_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogisticRegression</span>
 
 <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
     <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
@@ -2822,8 +2823,8 @@ that satisfy the search expressions.</p>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id77">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id77" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LogisticRegression</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.linear_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogisticRegression</span>
 
 <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
     <span class="n">mlflow</span><span class="o">.</span><span class="n">sklearn</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
@@ -2921,7 +2922,7 @@ respectively.</p>
 <dd class="field-odd"><p><p>If output_format is <code class="docutils literal notranslate"><span class="pre">list</span></code></p>
 <div class="literal-block-wrapper docutils container" id="id79">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id79" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="c1"># Create an experiment and log two runs under it</span>
 <span class="n">experiment_name</span> <span class="o">=</span> <span class="s2">&quot;Social NLP Experiments&quot;</span>
@@ -2996,7 +2997,7 @@ experiment.</p>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id81">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id81" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="c1"># Set an experiment name, which must be unique and case-sensitive.</span>
 <span class="n">experiment</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s2">&quot;Social NLP Experiments&quot;</span><span class="p">)</span>
@@ -3036,7 +3037,7 @@ up to length 5000, but some may support larger values.</p></li>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id83">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id83" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
     <span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment_tag</span><span class="p">(</span><span class="s2">&quot;release.version&quot;</span><span class="p">,</span> <span class="s2">&quot;2.2.0&quot;</span><span class="p">)</span>
@@ -3056,7 +3057,7 @@ up to length 5000, but some may support larger values.</p></li>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id84">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id84" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="n">tags</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;engineering&quot;</span><span class="p">:</span> <span class="s2">&quot;ML Platform&quot;</span><span class="p">,</span>
@@ -3089,7 +3090,7 @@ workspace, provided as the string “databricks” or, to use a Databricks CLI
 </dl>
 <div class="literal-block-wrapper docutils container" id="id85">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id85" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mflow</span>
 
 <span class="c1"># Set model registry uri, fetch the set uri, and compare</span>
 <span class="c1"># it with the tracking uri. They should be different</span>
@@ -3181,7 +3182,7 @@ represents future for logging operation.</p>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id87">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id87" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="c1"># Set a tag.</span>
 <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
@@ -3219,7 +3220,7 @@ represents future for logging operation.</p>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id88">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id88" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="n">tags</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;engineering&quot;</span><span class="p">:</span> <span class="s2">&quot;ML Platform&quot;</span><span class="p">,</span>
@@ -3260,7 +3261,7 @@ CLI <a class="reference external" href="https://github.com/databricks/databricks
 </dl>
 <div class="literal-block-wrapper docutils container" id="id89">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id89" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="n">mlflow</span><span class="o">.</span><span class="n">set_tracking_uri</span><span class="p">(</span><span class="s2">&quot;file:///tmp/my_tracking&quot;</span><span class="p">)</span>
 <span class="n">tracking_uri</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">get_tracking_uri</span><span class="p">()</span>
@@ -3325,7 +3326,7 @@ run’s state.</p>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id91">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id91" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="c1"># Create nested runs</span>
 <span class="n">experiment_id</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">create_experiment</span><span class="p">(</span><span class="s2">&quot;experiment1&quot;</span><span class="p">)</span>
@@ -3386,17 +3387,13 @@ child runs:
 <dl class="py function">
 <dt id="mlflow.update_current_trace">
 <code class="sig-prename descclassname"><span class="pre">mlflow.</span></code><code class="sig-name descname"><span class="pre">update_current_trace</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mlflow/tracing/fluent.html#update_current_trace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.update_current_trace" title="Permalink to this definition"> </a></dt>
-<dd><div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Experimental: This function may change or be removed in a future release without warning.</p>
-</div>
-<p>Update the current active trace with the given tags.</p>
+<dd><p>Update the current active trace with the given tags.</p>
 <p>You can use this function either within a function decorated with <cite>&#64;mlflow.trace</cite> or within the
 scope of the <cite>with mlflow.start_span</cite> context manager. If there is no active trace found, this
 function will raise an exception.</p>
 <p>Using within a function decorated with <cite>&#64;mlflow.trace</cite>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@mlflow</span><span class="o">.</span><span class="n">trace</span>
-<span class="k">def</span> <span class="nf">my_func</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">my_func</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="n">mlflow</span><span class="o">.</span><span class="n">update_current_trace</span><span class="p">(</span><span class="n">tags</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;fruit&quot;</span><span class="p">:</span> <span class="s2">&quot;apple&quot;</span><span class="p">})</span>
     <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">1</span>
 </pre></div>
@@ -3439,8 +3436,8 @@ compared against the threshold values directly.</p></li>
 <blockquote>
 <div><div class="literal-block-wrapper docutils container" id="id93">
 <div class="code-block-caption"><span class="caption-text">Example of Model Validation</span><a class="headerlink" href="#id93" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">MetricThreshold</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">MetricThreshold</span>
 
 <span class="n">thresholds</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;accuracy_score&quot;</span><span class="p">:</span> <span class="n">MetricThreshold</span><span class="p">(</span>
@@ -3503,20 +3500,20 @@ status to <code class="docutils literal notranslate"><span class="pre">ERROR</sp
 will be recorded to the <code class="docutils literal notranslate"><span class="pre">attributes</span></code> field of the span.</p>
 <p>For example, the following code will yield a span with the name <code class="docutils literal notranslate"><span class="pre">&quot;my_function&quot;</span></code>,
 capturing the input arguments <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code>, and the output of the function.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 
 <span class="nd">@mlflow</span><span class="o">.</span><span class="n">trace</span>
-<span class="k">def</span> <span class="nf">my_function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">my_function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
 </pre></div>
 </div>
 <p>This is equivalent to doing the following using the <a class="reference internal" href="#mlflow.start_span" title="mlflow.start_span"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.start_span()</span></code></a> context
 manager, but requires less boilerplate code.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 
-<span class="k">def</span> <span class="nf">my_function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">my_function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
 
 
@@ -3535,9 +3532,9 @@ yourself. However, you may also want to trace a function in external libraries. 
 such case, you can use this <code class="docutils literal notranslate"><span class="pre">mlflow.trace()</span></code> function to directly wrap the function,
 instead of using as the decorator. This will create the exact same span as the
 one created by the decorator i.e. captures information from the function call.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
 
-<span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="n">mlflow</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">factorial</span><span class="p">)(</span><span class="mi">5</span><span class="p">)</span>
 </pre></div>
@@ -3566,7 +3563,7 @@ context manager will set the span status to <code class="docutils literal notran
 exception message and stacktrace will be recorded to the <code class="docutils literal notranslate"><span class="pre">attributes</span></code> field of the span.
 New spans can be created within the context manager, then they will be assigned as child
 spans.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_span</span><span class="p">(</span><span class="s2">&quot;my_span&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">span</span><span class="p">:</span>
     <span class="n">x</span> <span class="o">=</span> <span class="mi">1</span>
@@ -3632,7 +3629,7 @@ it returns None.</p>
 <dd class="field-odd"><p><strong>request_id</strong> – The request ID of the trace.</p>
 </dd>
 </dl>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 
 <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_span</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;span&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">span</span><span class="p">:</span>
@@ -3652,11 +3649,7 @@ it returns None.</p>
 <dl class="py function">
 <dt id="mlflow.search_traces">
 <code class="sig-prename descclassname"><span class="pre">mlflow.</span></code><code class="sig-name descname"><span class="pre">search_traces</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">experiment_ids</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_string</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_results</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order_by</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extract_fields</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">pandas.DataFrame</span><a class="reference internal" href="../_modules/mlflow/tracing/fluent.html#search_traces"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.search_traces" title="Permalink to this definition"> </a></dt>
-<dd><div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Experimental: This function may change or be removed in a future release without warning.</p>
-</div>
-<p>Return traces that match the given list of search expressions within the experiments.</p>
+<dd><p>Return traces that match the given list of search expressions within the experiments.</p>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
 <p>This API returns a <strong>Pandas DataFrame</strong> that contains the traces as rows. To retrieve
@@ -3704,7 +3697,7 @@ trace. See the example below for how to filter traces by run id.</p></li>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id94">
 <div class="code-block-caption"><span class="caption-text">Search traces with extract_fields</span><a class="headerlink" href="#id94" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_span</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;span1&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">span</span><span class="p">:</span>
     <span class="n">span</span><span class="o">.</span><span class="n">set_inputs</span><span class="p">({</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">})</span>
@@ -3718,7 +3711,7 @@ trace. See the example below for how to filter traces by run id.</p></li>
 </div>
 <div class="literal-block-wrapper docutils container" id="id95">
 <div class="code-block-caption"><span class="caption-text">Search traces with extract_fields and non-dictionary span inputs and outputs</span><a class="headerlink" href="#id95" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_span</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;non_dict_span&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">span</span><span class="p">:</span>
     <span class="n">span</span><span class="o">.</span><span class="n">set_inputs</span><span class="p">([</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">])</span>
@@ -3732,11 +3725,11 @@ trace. See the example below for how to filter traces by run id.</p></li>
 </div>
 <div class="literal-block-wrapper docutils container" id="id96">
 <div class="code-block-caption"><span class="caption-text">Search traces by run ID</span><a class="headerlink" href="#id96" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 
 <span class="nd">@mlflow</span><span class="o">.</span><span class="n">trace</span>
-<span class="k">def</span> <span class="nf">traced_func</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">traced_func</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">1</span>
 
 
@@ -3759,11 +3752,11 @@ trace. See the example below for how to filter traces by run id.</p></li>
 <cite>with mlflow.start_span</cite>. If a span is created with MlflowClient APIs, it won’t be
 attached to the global context so this function will not return it.</p>
 </div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 
 <span class="nd">@mlflow</span><span class="o">.</span><span class="n">trace</span>
-<span class="k">def</span> <span class="nf">f</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">():</span>
     <span class="n">span</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">get_current_active_span</span><span class="p">()</span>
     <span class="n">span</span><span class="o">.</span><span class="n">set_attribute</span><span class="p">(</span><span class="s2">&quot;key&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="mi">0</span>
@@ -3802,11 +3795,11 @@ immutable after the trace is ended, you can still edit some fields such as <cite
 please use the respective MlflowClient APIs with the request ID of the trace, as
 shown in the example below.</p>
 </div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 
 <span class="nd">@mlflow</span><span class="o">.</span><span class="n">trace</span>
-<span class="k">def</span> <span class="nf">f</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">():</span>
     <span class="k">pass</span>
 
 
@@ -3837,11 +3830,11 @@ shown in the example below.</p>
 and effectively disables all tracing operations.</p>
 </div>
 <p>Example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 
 <span class="nd">@mlflow</span><span class="o">.</span><span class="n">trace</span>
-<span class="k">def</span> <span class="nf">f</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">():</span>
     <span class="k">return</span> <span class="mi">0</span>
 
 
@@ -3869,11 +3862,11 @@ Call <a class="reference internal" href="mlflow.tracing.html#mlflow.tracing.enab
 <code class="sig-prename descclassname"><span class="pre">mlflow.tracing.</span></code><code class="sig-name descname"><span class="pre">enable</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mlflow/tracing/provider.html#enable"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Enable tracing.</p>
 <p>Example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 
 <span class="nd">@mlflow</span><span class="o">.</span><span class="n">trace</span>
-<span class="k">def</span> <span class="nf">f</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">():</span>
     <span class="k">return</span> <span class="mi">0</span>
 
 
@@ -3911,7 +3904,7 @@ or <a class="reference internal" href="mlflow.client.html#mlflow.client.MlflowCl
 
 <dl class="py function">
 <dt>
-<code class="sig-prename descclassname"><span class="pre">mlflow.tracing.</span></code><code class="sig-name descname"><span class="pre">set_span_chat_messages</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">span</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">LiveSpan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">messages</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">RequestMessage</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mlflow/tracing/utils.html#set_span_chat_messages"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<code class="sig-prename descclassname"><span class="pre">mlflow.tracing.</span></code><code class="sig-name descname"><span class="pre">set_span_chat_messages</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">span</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">LiveSpan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">messages</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">,</span> </span><span class="pre">ChatMessage</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">append</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mlflow/tracing/utils.html#set_span_chat_messages"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Set the <cite>mlflow.chat.messages</cite> attribute on the specified span. This
 attribute is used in the UI, and also by downstream applications that
 consume trace data, such as MLflow evaluate.</p>
@@ -3922,16 +3915,20 @@ consume trace data, such as MLflow evaluate.</p>
 <li><p><strong>messages</strong> – A list of standardized chat messages (refer to the
 <a class="reference external" href="../llms/tracing/tracing-schema.html#chat-completion-spans">spec</a>
 for details)</p></li>
+<li><p><strong>append</strong> – If True, the messages will be appended to the existing messages. Otherwise,
+the attribute will be overwritten entirely. Default is False.
+This is useful when you want to record messages incrementally, e.g., log
+input messages first, and then log output messages later.</p></li>
 </ul>
 </dd>
 </dl>
 <p>Example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">from</span> <span class="nn">mlflow.tracing</span> <span class="kn">import</span> <span class="n">set_span_chat_messages</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.tracing</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_span_chat_messages</span>
 
 
 <span class="nd">@mlflow</span><span class="o">.</span><span class="n">trace</span>
-<span class="k">def</span> <span class="nf">f</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">():</span>
     <span class="n">messages</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;hello&quot;</span><span class="p">}]</span>
     <span class="n">span</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">get_current_active_span</span><span class="p">()</span>
     <span class="n">set_span_chat_messages</span><span class="p">(</span><span class="n">span</span><span class="p">,</span> <span class="n">messages</span><span class="p">)</span>
@@ -3961,8 +3958,8 @@ for details)</p>
 </dd>
 </dl>
 <p>Example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">from</span> <span class="nn">mlflow.tracing</span> <span class="kn">import</span> <span class="n">set_span_chat_tools</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.tracing</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_span_chat_tools</span>
 
 <span class="n">tools</span> <span class="o">=</span> <span class="p">[</span>
     <span class="p">{</span>
@@ -3984,7 +3981,7 @@ for details)</p>
 
 
 <span class="nd">@mlflow</span><span class="o">.</span><span class="n">trace</span>
-<span class="k">def</span> <span class="nf">f</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">():</span>
     <span class="n">span</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">get_current_active_span</span><span class="p">()</span>
     <span class="n">set_span_chat_tools</span><span class="p">(</span><span class="n">span</span><span class="p">,</span> <span class="n">tools</span><span class="p">)</span>
     <span class="k">return</span> <span class="mi">0</span>

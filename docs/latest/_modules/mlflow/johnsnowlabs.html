@@ -249,40 +249,40 @@
 <span class="sd">    os.environ[&quot;JOHNSNOWLABS_LICENSE_JSON&quot;] = json.dumps(creds)</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">posixpath</span>
-<span class="kn">import</span> <span class="nn">shutil</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">posixpath</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
 
-<span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">from</span> <span class="nn">mlflow</span> <span class="kn">import</span> <span class="n">mleap</span><span class="p">,</span> <span class="n">pyfunc</span>
-<span class="kn">from</span> <span class="nn">mlflow.environment_variables</span> <span class="kn">import</span> <span class="n">MLFLOW_DFS_TMP</span>
-<span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">Model</span>
-<span class="kn">from</span> <span class="nn">mlflow.models.model</span> <span class="kn">import</span> <span class="n">MLMODEL_FILE_NAME</span>
-<span class="kn">from</span> <span class="nn">mlflow.models.signature</span> <span class="kn">import</span> <span class="n">ModelSignature</span>
-<span class="kn">from</span> <span class="nn">mlflow.models.utils</span> <span class="kn">import</span> <span class="n">ModelInputExample</span><span class="p">,</span> <span class="n">_save_example</span>
-<span class="kn">from</span> <span class="nn">mlflow.spark</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">mleap</span><span class="p">,</span> <span class="n">pyfunc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.environment_variables</span><span class="w"> </span><span class="kn">import</span> <span class="n">MLFLOW_DFS_TMP</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Model</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">MLMODEL_FILE_NAME</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models.signature</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModelSignature</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModelInputExample</span><span class="p">,</span> <span class="n">_save_example</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.spark</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_HadoopFileSystem</span><span class="p">,</span>
     <span class="n">_maybe_save_model</span><span class="p">,</span>
     <span class="n">_mlflowdbfs_path</span><span class="p">,</span>
     <span class="n">_should_use_mlflowdbfs</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.store.artifact.databricks_artifact_repo</span> <span class="kn">import</span> <span class="n">DatabricksArtifactRepository</span>
-<span class="kn">from</span> <span class="nn">mlflow.tracking._model_registry</span> <span class="kn">import</span> <span class="n">DEFAULT_AWAIT_MAX_SLEEP_SECONDS</span>
-<span class="kn">from</span> <span class="nn">mlflow.tracking.artifact_utils</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.store.artifact.databricks_artifact_repo</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatabricksArtifactRepository</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.tracking._model_registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_AWAIT_MAX_SLEEP_SECONDS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.tracking.artifact_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_download_artifact_from_uri</span><span class="p">,</span>
     <span class="n">_get_root_uri_and_artifact_path</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils</span> <span class="kn">import</span> <span class="n">databricks_utils</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.annotations</span> <span class="kn">import</span> <span class="n">experimental</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.docstring_utils</span> <span class="kn">import</span> <span class="n">LOG_MODEL_PARAM_DOCS</span><span class="p">,</span> <span class="n">format_docstring</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.environment</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">databricks_utils</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">experimental</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.docstring_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOG_MODEL_PARAM_DOCS</span><span class="p">,</span> <span class="n">format_docstring</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.environment</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_CONDA_ENV_FILE_NAME</span><span class="p">,</span>
     <span class="n">_CONSTRAINTS_FILE_NAME</span><span class="p">,</span>
     <span class="n">_PYTHON_ENV_FILE_NAME</span><span class="p">,</span>
@@ -292,19 +292,19 @@
     <span class="n">_process_pip_requirements</span><span class="p">,</span>
     <span class="n">_PythonEnv</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.file_utils</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.file_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">TempDir</span><span class="p">,</span>
     <span class="n">get_total_file_size</span><span class="p">,</span>
     <span class="n">shutil_copytree_without_file_permissions</span><span class="p">,</span>
     <span class="n">write_to</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.model_utils</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.model_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_add_code_from_conf_to_system_path</span><span class="p">,</span>
     <span class="n">_get_flavor_configuration_from_uri</span><span class="p">,</span>
     <span class="n">_validate_and_copy_code_paths</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.requirements_utils</span> <span class="kn">import</span> <span class="n">_get_pinned_requirement</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.uri</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.requirements_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_get_pinned_requirement</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.uri</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">append_to_uri_path</span><span class="p">,</span>
     <span class="n">dbfs_hdfs_uri_to_fuse_path</span><span class="p">,</span>
     <span class="n">generate_tmp_dfs_path</span><span class="p">,</span>
@@ -321,7 +321,7 @@
 <span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_validate_env_vars</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_validate_env_vars</span><span class="p">():</span>
     <span class="k">if</span> <span class="n">_JOHNSNOWLABS_ENV_JSON_LICENSE_KEY</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;Please set the </span><span class="si">{</span><span class="n">_JOHNSNOWLABS_ENV_JSON_LICENSE_KEY</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -330,21 +330,21 @@
     <span class="n">_set_env_vars</span><span class="p">()</span>
 
 
-<span class="k">def</span> <span class="nf">_set_env_vars</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_set_env_vars</span><span class="p">():</span>
     <span class="c1"># if json license is detected, we parse it and set the env vars</span>
     <span class="n">loaded_license</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">_JOHNSNOWLABS_ENV_JSON_LICENSE_KEY</span><span class="p">])</span>
     <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">loaded_license</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">})</span>
 
 
 <div class="viewcode-block" id="get_default_pip_requirements"><a class="viewcode-back" href="../../python_api/mlflow.johnsnowlabs.html#mlflow.johnsnowlabs.get_default_pip_requirements">[docs]</a><span class="nd">@experimental</span>
-<span class="k">def</span> <span class="nf">get_default_pip_requirements</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_default_pip_requirements</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns:</span>
 <span class="sd">        A list of default pip requirements for MLflow Models produced by this flavor.</span>
 <span class="sd">        Calls to :func:`save_model()` and :func:`log_model()` produce a pip environment</span>
 <span class="sd">        that, at minimum, contains these requirements.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">johnsnowlabs</span> <span class="kn">import</span> <span class="n">settings</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">johnsnowlabs</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
 
     <span class="k">if</span> <span class="p">(</span>
         <span class="n">_JOHNSNOWLABS_ENV_HEALTHCARE_SECRET</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span>
@@ -387,7 +387,7 @@
 
 
 <div class="viewcode-block" id="get_default_conda_env"><a class="viewcode-back" href="../../python_api/mlflow.johnsnowlabs.html#mlflow.johnsnowlabs.get_default_conda_env">[docs]</a><span class="nd">@experimental</span>
-<span class="k">def</span> <span class="nf">get_default_conda_env</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_default_conda_env</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns:</span>
 <span class="sd">        The default Conda environment for MLflow Models produced by calls to</span>
@@ -398,7 +398,7 @@
 
 <div class="viewcode-block" id="log_model"><a class="viewcode-back" href="../../python_api/mlflow.johnsnowlabs.html#mlflow.johnsnowlabs.log_model">[docs]</a><span class="nd">@experimental</span>
 <span class="nd">@format_docstring</span><span class="p">(</span><span class="n">LOG_MODEL_PARAM_DOCS</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">package_name</span><span class="o">=</span><span class="s2">&quot;johnsnowlabs&quot;</span><span class="p">))</span>
-<span class="k">def</span> <span class="nf">log_model</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">log_model</span><span class="p">(</span>
     <span class="n">spark_model</span><span class="p">,</span>
     <span class="n">artifact_path</span><span class="p">,</span>
     <span class="n">conda_env</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -582,7 +582,7 @@
         <span class="k">return</span> <span class="n">mlflow_model</span><span class="o">.</span><span class="n">get_model_info</span><span class="p">()</span></div>
 
 
-<span class="k">def</span> <span class="nf">_save_model_metadata</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_save_model_metadata</span><span class="p">(</span>
     <span class="n">dst_dir</span><span class="p">,</span>
     <span class="n">spark_model</span><span class="p">,</span>
     <span class="n">mlflow_model</span><span class="p">,</span>
@@ -619,7 +619,7 @@
     <span class="n">code_dir_subpath</span> <span class="o">=</span> <span class="n">_validate_and_copy_code_paths</span><span class="p">(</span><span class="n">code_paths</span><span class="p">,</span> <span class="n">dst_dir</span><span class="p">)</span>
 
     <span class="c1"># add the johnsnowlabs flavor</span>
-    <span class="kn">import</span> <span class="nn">pyspark</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pyspark</span>
 
     <span class="n">mlflow_model</span><span class="o">.</span><span class="n">add_flavor</span><span class="p">(</span>
         <span class="n">FLAVOR_NAME</span><span class="p">,</span>
@@ -664,9 +664,9 @@
     <span class="n">_save_jars_and_lic</span><span class="p">(</span><span class="n">dst_dir</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_save_jars_and_lic</span><span class="p">(</span><span class="n">dst_dir</span><span class="p">,</span> <span class="n">store_license</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="kn">from</span> <span class="nn">johnsnowlabs.auto_install.jsl_home</span> <span class="kn">import</span> <span class="n">get_install_suite_from_jsl_home</span>
-    <span class="kn">from</span> <span class="nn">johnsnowlabs.py_models.jsl_secrets</span> <span class="kn">import</span> <span class="n">JslSecrets</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_save_jars_and_lic</span><span class="p">(</span><span class="n">dst_dir</span><span class="p">,</span> <span class="n">store_license</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">johnsnowlabs.auto_install.jsl_home</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_install_suite_from_jsl_home</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">johnsnowlabs.py_models.jsl_secrets</span><span class="w"> </span><span class="kn">import</span> <span class="n">JslSecrets</span>
 
     <span class="n">deps_data_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">dst_dir</span><span class="p">)</span> <span class="o">/</span> <span class="n">_JOHNSNOWLABS_MODEL_PATH_SUB</span> <span class="o">/</span> <span class="s2">&quot;jars.jsl&quot;</span>
     <span class="n">deps_data_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -691,7 +691,7 @@
 
 <div class="viewcode-block" id="save_model"><a class="viewcode-back" href="../../python_api/mlflow.johnsnowlabs.html#mlflow.johnsnowlabs.save_model">[docs]</a><span class="nd">@experimental</span>
 <span class="nd">@format_docstring</span><span class="p">(</span><span class="n">LOG_MODEL_PARAM_DOCS</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">package_name</span><span class="o">=</span><span class="s2">&quot;johnsnowlabs&quot;</span><span class="p">))</span>
-<span class="k">def</span> <span class="nf">save_model</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">save_model</span><span class="p">(</span>
     <span class="n">spark_model</span><span class="p">,</span>
     <span class="n">path</span><span class="p">,</span>
     <span class="n">mlflow_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -836,8 +836,8 @@
     <span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">_load_model_databricks</span><span class="p">(</span><span class="n">dfs_tmpdir</span><span class="p">,</span> <span class="n">local_model_path</span><span class="p">):</span>
-    <span class="kn">from</span> <span class="nn">johnsnowlabs</span> <span class="kn">import</span> <span class="n">nlp</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_load_model_databricks</span><span class="p">(</span><span class="n">dfs_tmpdir</span><span class="p">,</span> <span class="n">local_model_path</span><span class="p">):</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">johnsnowlabs</span><span class="w"> </span><span class="kn">import</span> <span class="n">nlp</span>
 
     <span class="c1"># Spark ML expects the model to be stored on DFS</span>
     <span class="c1"># Copy the model to a temp DFS location first. We cannot delete this file, as</span>
@@ -850,8 +850,8 @@
     <span class="k">return</span> <span class="n">nlp</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">dfs_tmpdir</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_load_model</span><span class="p">(</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">dfs_tmpdir_base</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">local_model_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="kn">from</span> <span class="nn">johnsnowlabs</span> <span class="kn">import</span> <span class="n">nlp</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_load_model</span><span class="p">(</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">dfs_tmpdir_base</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">local_model_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">johnsnowlabs</span><span class="w"> </span><span class="kn">import</span> <span class="n">nlp</span>
 
     <span class="n">dfs_tmpdir</span> <span class="o">=</span> <span class="n">generate_tmp_dfs_path</span><span class="p">(</span><span class="n">dfs_tmpdir_base</span> <span class="ow">or</span> <span class="n">MLFLOW_DFS_TMP</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
     <span class="k">if</span> <span class="n">databricks_utils</span><span class="o">.</span><span class="n">is_in_cluster</span><span class="p">()</span> <span class="ow">and</span> <span class="n">databricks_utils</span><span class="o">.</span><span class="n">is_dbfs_fuse_available</span><span class="p">():</span>
@@ -869,7 +869,7 @@
     <span class="k">return</span> <span class="n">nlp</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">local_model_path</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="load_model"><a class="viewcode-back" href="../../python_api/mlflow.johnsnowlabs.html#mlflow.johnsnowlabs.load_model">[docs]</a><span class="k">def</span> <span class="nf">load_model</span><span class="p">(</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">dfs_tmpdir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dst_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="load_model"><a class="viewcode-back" href="../../python_api/mlflow.johnsnowlabs.html#mlflow.johnsnowlabs.load_model">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">load_model</span><span class="p">(</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">dfs_tmpdir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dst_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Load the Johnsnowlabs MLflow model from the path.</span>
 
@@ -934,7 +934,7 @@
     <span class="n">_add_code_from_conf_to_system_path</span><span class="p">(</span><span class="n">local_mlflow_model_path</span><span class="p">,</span> <span class="n">flavor_conf</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">_should_use_mlflowdbfs</span><span class="p">(</span><span class="n">model_uri</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">pyspark.ml.pipeline</span> <span class="kn">import</span> <span class="n">PipelineModel</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pyspark.ml.pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">PipelineModel</span>
 
         <span class="n">mlflowdbfs_path</span> <span class="o">=</span> <span class="n">_mlflowdbfs_path</span><span class="p">(</span>
             <span class="n">DatabricksArtifactRepository</span><span class="o">.</span><span class="n">_extract_run_id</span><span class="p">(</span><span class="n">model_uri</span><span class="p">),</span> <span class="n">artifact_path</span>
@@ -953,7 +953,7 @@
     <span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">_load_pyfunc</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">spark</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_load_pyfunc</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">spark</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Load PyFunc implementation. Called by ``pyfunc.load_model``.</span>
 
 <span class="sd">    Args:</span>
@@ -971,7 +971,7 @@
     <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_get_or_create_sparksession</span><span class="p">(</span><span class="n">model_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>  <span class="c1"># noqa: D417</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_or_create_sparksession</span><span class="p">(</span><span class="n">model_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>  <span class="c1"># noqa: D417</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if SparkSession running and get it.</span>
 
 <span class="sd">    If none exists, create a new one using jars in model_path. If model_path not defined, rely on</span>
@@ -985,9 +985,9 @@
 <span class="sd">    Returns:</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">johnsnowlabs</span> <span class="kn">import</span> <span class="n">nlp</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">johnsnowlabs</span><span class="w"> </span><span class="kn">import</span> <span class="n">nlp</span>
 
-    <span class="kn">from</span> <span class="nn">mlflow.utils._spark_utils</span> <span class="kn">import</span> <span class="n">_get_active_spark_session</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils._spark_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_get_active_spark_session</span>
 
     <span class="n">_validate_env_vars</span><span class="p">()</span>
 
@@ -1021,7 +1021,7 @@
     <span class="k">return</span> <span class="n">spark</span>
 
 
-<span class="k">def</span> <span class="nf">_fetch_deps_from_path</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_fetch_deps_from_path</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">_JOHNSNOWLABS_MODEL_PATH_SUB</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">local_model_path</span><span class="p">:</span>
         <span class="n">local_model_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">)</span> <span class="o">/</span> <span class="n">_JOHNSNOWLABS_MODEL_PATH_SUB</span> <span class="o">/</span> <span class="s2">&quot;jars.jsl&quot;</span>
     <span class="k">else</span><span class="p">:</span>
@@ -1040,8 +1040,8 @@
     <span class="k">return</span> <span class="n">jar_paths</span><span class="p">,</span> <span class="n">license_path</span>
 
 
-<span class="k">def</span> <span class="nf">_unpack_and_save_model</span><span class="p">(</span><span class="n">spark_model</span><span class="p">,</span> <span class="n">dst</span><span class="p">):</span>
-    <span class="kn">from</span> <span class="nn">pyspark.ml</span> <span class="kn">import</span> <span class="n">PipelineModel</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_unpack_and_save_model</span><span class="p">(</span><span class="n">spark_model</span><span class="p">,</span> <span class="n">dst</span><span class="p">):</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pyspark.ml</span><span class="w"> </span><span class="kn">import</span> <span class="n">PipelineModel</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spark_model</span><span class="p">,</span> <span class="n">_PyFuncModelWrapper</span><span class="p">):</span>
         <span class="n">spark_model</span> <span class="o">=</span> <span class="n">spark_model</span><span class="o">.</span><span class="n">spark_model</span>
@@ -1059,12 +1059,12 @@
             <span class="n">spark_model</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">dst</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">_PyFuncModelWrapper</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_PyFuncModelWrapper</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Wrapper around NLUPipeline providing interface for scoring pandas DataFrame.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">spark_model</span><span class="p">,</span>
         <span class="n">spark</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1073,13 +1073,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">spark</span> <span class="o">=</span> <span class="n">spark</span> <span class="ow">or</span> <span class="n">_get_or_create_sparksession</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">spark_model</span> <span class="o">=</span> <span class="n">spark_model</span>
 
-    <span class="k">def</span> <span class="nf">get_raw_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_raw_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the underlying model.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">spark_model</span>
 
-    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate predictions given input data in a pandas DataFrame.</span>
 
 <span class="sd">        Args:</span>

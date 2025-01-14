@@ -204,40 +204,40 @@
   <h1>Source code for mlflow.keras.load</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Functions for loading Keras models saved with MLflow.&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
-<span class="kn">import</span> <span class="nn">keras</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">keras</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
-<span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span> <span class="n">MlflowException</span>
-<span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">Model</span>
-<span class="kn">from</span> <span class="nn">mlflow.models.model</span> <span class="kn">import</span> <span class="n">MLMODEL_FILE_NAME</span>
-<span class="kn">from</span> <span class="nn">mlflow.tracking.artifact_utils</span> <span class="kn">import</span> <span class="n">_download_artifact_from_uri</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.annotations</span> <span class="kn">import</span> <span class="n">experimental</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span> <span class="n">MlflowException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Model</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">MLMODEL_FILE_NAME</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.tracking.artifact_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_download_artifact_from_uri</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">experimental</span>
 
 <span class="n">_MODEL_SAVE_PATH</span> <span class="o">=</span> <span class="s2">&quot;model&quot;</span>
 
 
-<div class="viewcode-block" id="KerasModelWrapper"><a class="viewcode-back" href="../../../python_api/mlflow.keras.html#mlflow.keras.load.KerasModelWrapper">[docs]</a><span class="k">class</span> <span class="nc">KerasModelWrapper</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">signature</span><span class="p">,</span> <span class="n">save_exported_model</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="KerasModelWrapper"><a class="viewcode-back" href="../../../python_api/mlflow.keras.html#mlflow.keras.load.KerasModelWrapper">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">KerasModelWrapper</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">signature</span><span class="p">,</span> <span class="n">save_exported_model</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">signature</span> <span class="o">=</span> <span class="n">signature</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">save_exported_model</span> <span class="o">=</span> <span class="n">save_exported_model</span>
 
-<div class="viewcode-block" id="KerasModelWrapper.get_raw_model"><a class="viewcode-back" href="../../../python_api/mlflow.keras.html#mlflow.keras.load.KerasModelWrapper.get_raw_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_raw_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="KerasModelWrapper.get_raw_model"><a class="viewcode-back" href="../../../python_api/mlflow.keras.html#mlflow.keras.load.KerasModelWrapper.get_raw_model">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_raw_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the underlying model.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span></div>
 
-<div class="viewcode-block" id="KerasModelWrapper.get_model_call_method"><a class="viewcode-back" href="../../../python_api/mlflow.keras.html#mlflow.keras.load.KerasModelWrapper.get_model_call_method">[docs]</a>    <span class="k">def</span> <span class="nf">get_model_call_method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="KerasModelWrapper.get_model_call_method"><a class="viewcode-back" href="../../../python_api/mlflow.keras.html#mlflow.keras.load.KerasModelWrapper.get_model_call_method">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_model_call_method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_exported_model</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">serve</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span></div>
 
-<div class="viewcode-block" id="KerasModelWrapper.predict"><a class="viewcode-back" href="../../../python_api/mlflow.keras.html#mlflow.keras.load.KerasModelWrapper.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="KerasModelWrapper.predict"><a class="viewcode-back" href="../../../python_api/mlflow.keras.html#mlflow.keras.load.KerasModelWrapper.predict">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">model_call</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_model_call_method</span><span class="p">()</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">model_call</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
@@ -253,14 +253,14 @@
         <span class="k">return</span> <span class="n">keras</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">convert_to_numpy</span><span class="p">(</span><span class="n">model_call</span><span class="p">(</span><span class="n">data</span><span class="p">))</span></div></div>
 
 
-<span class="k">def</span> <span class="nf">_load_keras_model</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">model_conf</span><span class="p">,</span> <span class="n">custom_objects</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">load_model_kwargs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_load_keras_model</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">model_conf</span><span class="p">,</span> <span class="n">custom_objects</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">load_model_kwargs</span><span class="p">):</span>
     <span class="n">save_exported_model</span> <span class="o">=</span> <span class="n">model_conf</span><span class="o">.</span><span class="n">flavors</span><span class="p">[</span><span class="s2">&quot;keras&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;save_exported_model&quot;</span><span class="p">)</span>
     <span class="n">model_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">model_conf</span><span class="o">.</span><span class="n">flavors</span><span class="p">[</span><span class="s2">&quot;keras&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">_MODEL_SAVE_PATH</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">model_path</span><span class="p">):</span>
         <span class="n">model_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="n">_MODEL_SAVE_PATH</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">save_exported_model</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">tensorflow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tf</span>
         <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
                 <span class="s2">&quot;`tensorflow` must be installed if you want to load an exported Keras 3 model, &quot;</span>
@@ -277,7 +277,7 @@
 
 
 <div class="viewcode-block" id="load_model"><a class="viewcode-back" href="../../../python_api/mlflow.keras.html#mlflow.keras.load.load_model">[docs]</a><span class="nd">@experimental</span>
-<span class="k">def</span> <span class="nf">load_model</span><span class="p">(</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">dst_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">custom_objects</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">load_model_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_model</span><span class="p">(</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">dst_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">custom_objects</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">load_model_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Load Keras model from MLflow.</span>
 
@@ -340,7 +340,7 @@
     <span class="k">return</span> <span class="n">_load_keras_model</span><span class="p">(</span><span class="n">local_model_path</span><span class="p">,</span> <span class="n">model_conf</span><span class="p">,</span> <span class="n">custom_objects</span><span class="p">,</span> <span class="o">**</span><span class="n">load_model_kwargs</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">_load_pyfunc</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_load_pyfunc</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Logics of loading a saved Keras model as a PyFunc model.</span>
 
 <span class="sd">    This function is called by `mlflow.pyfunc.load_model`.</span>

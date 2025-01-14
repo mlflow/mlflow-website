@@ -202,21 +202,21 @@
               <div itemprop="articleBody">
                 
   <h1>Source code for mlflow.litellm</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
-<span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Thread</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">contextmanager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">threading</span><span class="w"> </span><span class="kn">import</span> <span class="n">Thread</span>
 
-<span class="kn">from</span> <span class="nn">mlflow.utils.annotations</span> <span class="kn">import</span> <span class="n">experimental</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.autologging_utils</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">experimental</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.autologging_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">autologging_integration</span><span class="p">,</span>
     <span class="n">safe_patch</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.databricks_utils</span> <span class="kn">import</span> <span class="n">is_in_databricks_runtime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.databricks_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_in_databricks_runtime</span>
 
 <span class="n">FLAVOR_NAME</span> <span class="o">=</span> <span class="s2">&quot;litellm&quot;</span>
 
 
 <div class="viewcode-block" id="autolog"><a class="viewcode-back" href="../../python_api/mlflow.litellm.html#mlflow.litellm.autolog">[docs]</a><span class="nd">@experimental</span>
-<span class="k">def</span> <span class="nf">autolog</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">autolog</span><span class="p">(</span>
     <span class="n">log_traces</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">disable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">silent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -233,7 +233,7 @@
 <span class="sd">        silent: If ``True``, suppress all event logs and warnings from MLflow during LiteLLM</span>
 <span class="sd">            autologging. If ``False``, show all events and warnings.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">litellm</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">litellm</span>
 
     <span class="c1"># This needs to be called before doing any safe-patching (otherwise safe-patch will be no-op).</span>
     <span class="c1"># TODO: since this implementation is inconsistent, explore a universal way to solve the issue.</span>
@@ -286,7 +286,7 @@
 <span class="c1"># executed when disable=True is passed. This prevents us from removing our callback and patching</span>
 <span class="c1"># when autologging is turned off.</span>
 <span class="nd">@autologging_integration</span><span class="p">(</span><span class="n">FLAVOR_NAME</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">_autolog</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_autolog</span><span class="p">(</span>
     <span class="n">log_traces</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
     <span class="n">disable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">silent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -294,7 +294,7 @@
     <span class="k">pass</span>
 
 
-<span class="k">def</span> <span class="nf">_patch_threading_in_function</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">function_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_patch_threading_in_function</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">function_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Apply the threading patch to a synchronous function.</span>
 
@@ -302,7 +302,7 @@
 <span class="sd">    then join them to ensure they are finished before the notebook cell finishes executing.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_patch_fn</span><span class="p">(</span><span class="n">original</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_patch_fn</span><span class="p">(</span><span class="n">original</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">with</span> <span class="n">_patch_thread_start</span><span class="p">()</span> <span class="k">as</span> <span class="n">logging_threads</span><span class="p">:</span>
             <span class="n">result</span> <span class="o">=</span> <span class="n">original</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">thread</span> <span class="ow">in</span> <span class="n">logging_threads</span><span class="p">:</span>
@@ -313,7 +313,7 @@
 
 
 <span class="nd">@contextmanager</span>
-<span class="k">def</span> <span class="nf">_patch_thread_start</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_patch_thread_start</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A context manager to collect threads started for logging handlers.</span>
 <span class="sd">    This is done by monkey-patching the start() method of threading.Thread.</span>
@@ -322,7 +322,7 @@
     <span class="n">original</span> <span class="o">=</span> <span class="n">Thread</span><span class="o">.</span><span class="n">start</span>
     <span class="n">logging_threads</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="k">def</span> <span class="nf">patched_thread</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">patched_thread</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">target</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_target&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="c1"># success_handler is for normal request, and run_success_... is for streaming</span>
         <span class="c1"># - https://github.com/BerriAI/litellm/blob/4f8a3fd4cfc20cf43b38379928b41c2691c85d36/litellm/utils.py#L946</span>
@@ -341,15 +341,15 @@
         <span class="n">Thread</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="n">original</span>
 
 
-<span class="k">def</span> <span class="nf">_append_mlflow_callbacks</span><span class="p">(</span><span class="n">callbacks</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_append_mlflow_callbacks</span><span class="p">(</span><span class="n">callbacks</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">cb</span> <span class="o">==</span> <span class="s2">&quot;mlflow&quot;</span> <span class="k">for</span> <span class="n">cb</span> <span class="ow">in</span> <span class="n">callbacks</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">callbacks</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;mlflow&quot;</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">callbacks</span>
 
 
-<span class="k">def</span> <span class="nf">_remove_mlflow_callbacks</span><span class="p">(</span><span class="n">callbacks</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_remove_mlflow_callbacks</span><span class="p">(</span><span class="n">callbacks</span><span class="p">):</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">from</span> <span class="nn">litellm.integrations.mlflow</span> <span class="kn">import</span> <span class="n">MlflowLogger</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">litellm.integrations.mlflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">MlflowLogger</span>
 
         <span class="k">return</span> <span class="p">[</span><span class="n">cb</span> <span class="k">for</span> <span class="n">cb</span> <span class="ow">in</span> <span class="n">callbacks</span> <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">cb</span> <span class="o">==</span> <span class="s2">&quot;mlflow&quot;</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cb</span><span class="p">,</span> <span class="n">MlflowLogger</span><span class="p">))]</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>

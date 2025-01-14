@@ -164,6 +164,7 @@
 <li class="toctree-l2"><a class="reference internal" href="mlflow.fastai.html">mlflow.fastai</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.gateway.html">mlflow.gateway</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.gemini.html">mlflow.gemini</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mlflow.groq.html">mlflow.groq</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.h2o.html">mlflow.h2o</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.johnsnowlabs.html">mlflow.johnsnowlabs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.keras.html">mlflow.keras</a></li>
@@ -319,7 +320,7 @@
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>eval_fn</strong> – <p>A function that computes the metric with the following signature:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">eval_fn</span><span class="p">(</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">eval_fn</span><span class="p">(</span>
     <span class="n">predictions</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
     <span class="n">targets</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
     <span class="n">metrics</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">MetricValue</span><span class="p">],</span>
@@ -672,7 +673,7 @@ the MLmodel YAML file representation.</p>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id18">
 <div class="code-block-caption"><span class="caption-text">example</span><a class="headerlink" href="#id18" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">Model</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Model</span>
 
 <span class="c1"># Load the Model object from a local MLmodel file</span>
 <span class="n">model1</span> <span class="o">=</span> <span class="n">Model</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;~/path/to/my/MLmodel&quot;</span><span class="p">)</span>
@@ -686,13 +687,15 @@ the MLmodel YAML file representation.</p>
 
 <dl class="py method">
 <dt id="mlflow.models.Model.load_input_example">
-<code class="sig-name descname"><span class="pre">load_input_example</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/mlflow/models/model.html#Model.load_input_example"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.models.Model.load_input_example" title="Permalink to this definition"> </a></dt>
+<code class="sig-name descname"><span class="pre">load_input_example</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/mlflow/models/model.html#Model.load_input_example"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.models.Model.load_input_example" title="Permalink to this definition"> </a></dt>
 <dd><p>Load the input example saved along a model. Returns None if there is no example metadata
 (i.e. the model was saved without example). Raises FileNotFoundError if there is model
 metadata but the example file is missing.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>path</strong> – Path to the model directory.</p>
+<dd class="field-odd"><p><strong>path</strong> – Model or run URI, or path to the <cite>model</cite> directory.
+e.g. models://&lt;model_name&gt;/&lt;model_version&gt;, runs:/&lt;run_id&gt;/&lt;artifact_path&gt;
+or /path/to/model</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Input example (NumPy ndarray, SciPy csc_matrix, SciPy csr_matrix,
@@ -770,10 +773,10 @@ metadata of the logged model.</p>
 <div class="literal-block-wrapper docutils container" id="id19">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id19" title="Permalink to this code"> </a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create and log a model with metadata to the Model Registry</span>
-<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">datasets</span>
-<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span>
-<span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">infer_signature</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn</span><span class="w"> </span><span class="kn">import</span> <span class="n">datasets</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.ensemble</span><span class="w"> </span><span class="kn">import</span> <span class="n">RandomForestClassifier</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">infer_signature</span>
 
 <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
     <span class="n">iris</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">load_iris</span><span class="p">()</span>
@@ -907,7 +910,7 @@ configuration. If the configuration is not provided, an error is raised</p>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id20">
 <div class="code-block-caption"><span class="caption-text">Example usage in model code</span><a class="headerlink" href="#id20" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">ModelConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModelConfig</span>
 
 <span class="c1"># Load the configuration from a dictionary</span>
 <span class="n">config</span> <span class="o">=</span> <span class="n">ModelConfig</span><span class="p">(</span><span class="n">development_config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;key1&quot;</span><span class="p">:</span> <span class="s2">&quot;value1&quot;</span><span class="p">})</span>
@@ -926,7 +929,7 @@ configuration. If the configuration is not provided, an error is raised</p>
 </div>
 <div class="literal-block-wrapper docutils container" id="id22">
 <div class="code-block-caption"><span class="caption-text">Example yaml usage in model code</span><a class="headerlink" href="#id22" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">ModelConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModelConfig</span>
 
 <span class="c1"># Load the configuration from a file</span>
 <span class="n">config</span> <span class="o">=</span> <span class="n">ModelConfig</span><span class="p">(</span><span class="n">development_config</span><span class="o">=</span><span class="s2">&quot;config.yaml&quot;</span><span class="p">)</span>
@@ -938,14 +941,14 @@ configuration. If the configuration is not provided, an error is raised</p>
 which would be used as configuration for the model.</p>
 <div class="literal-block-wrapper docutils container" id="id23">
 <div class="code-block-caption"><span class="caption-text">Example to use ModelConfig when logging model as code: agent.py</span><a class="headerlink" href="#id23" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">ModelConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModelConfig</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="n">ModelConfig</span><span class="p">(</span><span class="n">development_config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;key1&quot;</span><span class="p">:</span> <span class="s2">&quot;value1&quot;</span><span class="p">})</span>
 
 
-<span class="k">class</span> <span class="nc">TestModel</span><span class="p">(</span><span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">PythonModel</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">model_input</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestModel</span><span class="p">(</span><span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">PythonModel</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">model_input</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;key1&quot;</span><span class="p">)</span>
 
 
@@ -1153,12 +1156,12 @@ libraries are not supported.</p>
 <div class="literal-block-wrapper docutils container" id="id25">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id25" title="Permalink to this code"> </a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create and log a model to the Model Registry</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">datasets</span>
-<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span>
-<span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">import</span> <span class="nn">mlflow.sklearn</span>
-<span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">infer_signature</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn</span><span class="w"> </span><span class="kn">import</span> <span class="n">datasets</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.ensemble</span><span class="w"> </span><span class="kn">import</span> <span class="n">RandomForestClassifier</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mlflow.sklearn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">infer_signature</span>
 
 <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
     <span class="n">iris</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">load_iris</span><span class="p">()</span>
@@ -1174,7 +1177,7 @@ libraries are not supported.</p>
 <span class="n">model_uri</span> <span class="o">=</span> <span class="s2">&quot;models:/model-with-libs/1&quot;</span>
 
 <span class="c1"># Import utility</span>
-<span class="kn">from</span> <span class="nn">mlflow.models.utils</span> <span class="kn">import</span> <span class="n">add_libraries_to_model</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">add_libraries_to_model</span>
 
 <span class="c1"># Log libraries to the original run of the model</span>
 <span class="n">add_libraries_to_model</span><span class="p">(</span><span class="n">model_uri</span><span class="p">)</span>
@@ -1485,7 +1488,7 @@ of a valid function:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_uri</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">fn</span><span class="p">(</span><span class="n">model_input</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">fn</span><span class="p">(</span><span class="n">model_input</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">model_input</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1565,7 +1568,7 @@ contains model outputs.</p></li>
 <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;question&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;foo&quot;</span><span class="p">]})</span>
 
 
-<span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;answer&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;bar&quot;</span><span class="p">],</span> <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;baz&quot;</span><span class="p">]})</span>
 
 
@@ -1614,11 +1617,11 @@ specified in <cite>extra_metrics</cite>. See the <cite>mlflow.metrics</cite> mod
 the builtin metrics and how to define extra metrics.</p>
 <div class="literal-block-wrapper docutils container" id="id27">
 <div class="code-block-caption"><span class="caption-text">Example usage of extra metrics</span><a class="headerlink" href="#id27" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 
-<span class="k">def</span> <span class="nf">root_mean_squared_error</span><span class="p">(</span><span class="n">eval_df</span><span class="p">,</span> <span class="n">_builtin_metrics</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">root_mean_squared_error</span><span class="p">(</span><span class="n">eval_df</span><span class="p">,</span> <span class="n">_builtin_metrics</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">eval_df</span><span class="p">[</span><span class="s2">&quot;prediction&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">eval_df</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
 
 
@@ -1632,7 +1635,7 @@ the builtin metrics and how to define extra metrics.</p>
 </div>
 </p></li>
 <li><p><strong>custom_artifacts</strong> – <p>(Optional) A list of custom artifact functions with the following signature:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">custom_artifact</span><span class="p">(</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">custom_artifact</span><span class="p">(</span>
     <span class="n">eval_df</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pandas</span><span class="o">.</span><span class="n">Dataframe</span><span class="p">,</span> <span class="n">pyspark</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span>
     <span class="n">builtin_metrics</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
     <span class="n">artifacts_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -1681,11 +1684,11 @@ its file path or define customizations through environment variables in
 </div></blockquote>
 <div class="literal-block-wrapper docutils container" id="id28">
 <div class="code-block-caption"><span class="caption-text">Example usage of custom artifacts</span><a class="headerlink" href="#id28" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
 
-<span class="k">def</span> <span class="nf">scatter_plot</span><span class="p">(</span><span class="n">eval_df</span><span class="p">,</span> <span class="n">builtin_metrics</span><span class="p">,</span> <span class="n">artifacts_dir</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">scatter_plot</span><span class="p">(</span><span class="n">eval_df</span><span class="p">,</span> <span class="n">builtin_metrics</span><span class="p">,</span> <span class="n">artifacts_dir</span><span class="p">):</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">eval_df</span><span class="p">[</span><span class="s2">&quot;prediction&quot;</span><span class="p">],</span> <span class="n">eval_df</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">])</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Targets&quot;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Predictions&quot;</span><span class="p">)</span>
@@ -1695,7 +1698,7 @@ its file path or define customizations through environment variables in
     <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;pred_target_scatter&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">artifacts_dir</span><span class="p">,</span> <span class="s2">&quot;example.png&quot;</span><span class="p">)}</span>
 
 
-<span class="k">def</span> <span class="nf">pred_sample</span><span class="p">(</span><span class="n">eval_df</span><span class="p">,</span> <span class="n">_builtin_metrics</span><span class="p">,</span> <span class="n">_artifacts_dir</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">pred_sample</span><span class="p">(</span><span class="n">eval_df</span><span class="p">,</span> <span class="n">_builtin_metrics</span><span class="p">,</span> <span class="n">_artifacts_dir</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;pred_sample&quot;</span><span class="p">:</span> <span class="n">pred_sample</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">)}</span>
 
 
@@ -1767,9 +1770,9 @@ metadata of the logged model.</p>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id29">
 <div class="code-block-caption"><span class="caption-text">Example usage of get_model_info</span><a class="headerlink" href="#id29" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow.models</span>
-<span class="kn">import</span> <span class="nn">mlflow.sklearn</span>
-<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestRegressor</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow.models</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mlflow.sklearn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.ensemble</span><span class="w"> </span><span class="kn">import</span> <span class="n">RandomForestRegressor</span>
 
 <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">()</span> <span class="k">as</span> <span class="n">run</span><span class="p">:</span>
     <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;n_estimators&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;random_state&quot;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}</span>
@@ -1850,8 +1853,8 @@ dataset.</p></li>
 that can be set on the model during inference by passing <cite>params</cite> to pyfunc
 <cite>predict</cite> method.</p>
 <p>An example of valid parameters:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">infer_signature</span>
-<span class="kn">from</span> <span class="nn">mlflow.transformers</span> <span class="kn">import</span> <span class="n">generate_signature_output</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">infer_signature</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_signature_output</span>
 
 <span class="c1"># Define parameters for inference</span>
 <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
@@ -1904,7 +1907,7 @@ that can be set on the model during inference by passing <cite>params</cite> to 
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>eval_fn</strong> – <p>A function that computes the metric with the following signature:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">eval_fn</span><span class="p">(</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">eval_fn</span><span class="p">(</span>
     <span class="n">predictions</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
     <span class="n">targets</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
     <span class="n">metrics</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">MetricValue</span><span class="p">],</span>
@@ -2022,7 +2025,7 @@ current os.environ are passed, and this parameter can be used to override them.<
 </dd>
 </dl>
 <p>Code example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="n">run_id</span> <span class="o">=</span> <span class="s2">&quot;...&quot;</span>
 
@@ -2098,7 +2101,7 @@ that need to be retrieved during trace logging.</p></li>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id30">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id30" title="Permalink to this code"> </a></div>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">set_retriever_schema</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_retriever_schema</span>
 
 <span class="n">set_retriever_schema</span><span class="p">(</span>
     <span class="n">primary_key</span><span class="o">=</span><span class="s2">&quot;chunk_id&quot;</span><span class="p">,</span>
@@ -2146,8 +2149,8 @@ information about setting signatures on model versions, see
 </dl>
 <div class="literal-block-wrapper docutils container" id="id31">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id31" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">set_signature</span><span class="p">,</span> <span class="n">infer_signature</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_signature</span><span class="p">,</span> <span class="n">infer_signature</span>
 
 <span class="c1"># load model from run artifacts</span>
 <span class="n">run_id</span> <span class="o">=</span> <span class="s2">&quot;96771d893a5e46159d9f3b49bf9013e2&quot;</span>
@@ -2233,7 +2236,7 @@ For example: [“numpy==1.20.3”, “pandas&gt;=1.3.3”]</p></li>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id32">
 <div class="code-block-caption"><span class="caption-text">Example usage of validate_schema</span><a class="headerlink" href="#id32" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow.models</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow.models</span>
 
 <span class="c1"># Suppose you&#39;ve already got a model_uri</span>
 <span class="n">model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">get_model_info</span><span class="p">(</span><span class="n">model_uri</span><span class="p">)</span>
@@ -2350,10 +2353,10 @@ serving of the model</p>
 <div class="code-block-caption"><span class="caption-text">Example usage of Model Metadata</span><a class="headerlink" href="#id34" title="Permalink to this code"> </a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create and log a model with metadata to the Model Registry</span>
 
-<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">datasets</span>
-<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span>
-<span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">infer_signature</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn</span><span class="w"> </span><span class="kn">import</span> <span class="n">datasets</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.ensemble</span><span class="w"> </span><span class="kn">import</span> <span class="n">RandomForestClassifier</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">infer_signature</span>
 
 <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
     <span class="n">iris</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">load_iris</span><span class="p">()</span>

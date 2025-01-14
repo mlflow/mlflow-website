@@ -164,6 +164,7 @@
 <li class="toctree-l2"><a class="reference internal" href="mlflow.fastai.html">mlflow.fastai</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.gateway.html">mlflow.gateway</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.gemini.html">mlflow.gemini</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mlflow.groq.html">mlflow.groq</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.h2o.html">mlflow.h2o</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.johnsnowlabs.html">mlflow.johnsnowlabs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.keras.html">mlflow.keras</a></li>
@@ -285,7 +286,7 @@ MLeap-compatible arguments.</p>
 <code class="sig-prename descclassname"><span class="pre">mlflow.spark.</span></code><code class="sig-name descname"><span class="pre">autolog</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">disable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mlflow/spark.html#autolog"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.spark.autolog" title="Permalink to this definition"> </a></dt>
 <dd><div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Autologging is known to be compatible with the following package versions: <code class="docutils literal notranslate"><span class="pre">3.1.2</span></code> &lt;= <code class="docutils literal notranslate"><span class="pre">pyspark</span></code> &lt;= <code class="docutils literal notranslate"><span class="pre">3.5.3</span></code>. Autologging may not succeed when used with package versions outside of this range.</p>
+<p>Autologging is known to be compatible with the following package versions: <code class="docutils literal notranslate"><span class="pre">3.1.2</span></code> &lt;= <code class="docutils literal notranslate"><span class="pre">pyspark</span></code> &lt;= <code class="docutils literal notranslate"><span class="pre">3.5.4</span></code>. Autologging may not succeed when used with package versions outside of this range.</p>
 </div>
 <p>Enables (or disables) and configures logging of Spark datasource paths, versions
 (if applicable), and formats when they are read. This method is not threadsafe and assumes a
@@ -311,10 +312,10 @@ Spark, so logs relevant to debugging may show up amongst the Spark logs.</p>
 </div>
 <div class="literal-block-wrapper docutils container" id="id3">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id3" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow.spark</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">shutil</span>
-<span class="kn">from</span> <span class="nn">pyspark.sql</span> <span class="kn">import</span> <span class="n">SparkSession</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow.spark</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyspark.sql</span><span class="w"> </span><span class="kn">import</span> <span class="n">SparkSession</span>
 
 <span class="c1"># Create and persist some dummy data</span>
 <span class="c1"># Note: the 2.12 in &#39;org.mlflow:mlflow-spark_2.12:2.16.2&#39; below indicates the Scala</span>
@@ -334,7 +335,7 @@ Spark, so logs relevant to debugging may show up amongst the Spark logs.</p>
     <span class="p">[(</span><span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;spark i j k&quot;</span><span class="p">),</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;l m n&quot;</span><span class="p">),</span> <span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="s2">&quot;spark hadoop spark&quot;</span><span class="p">),</span> <span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="s2">&quot;apache hadoop&quot;</span><span class="p">)],</span>
     <span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">],</span>
 <span class="p">)</span>
-<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 
 <span class="n">tempdir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
 <span class="n">df</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tempdir</span><span class="p">,</span> <span class="s2">&quot;my-data-path&quot;</span><span class="p">),</span> <span class="n">header</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -425,7 +426,7 @@ path will be created.</p></li>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id4">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id4" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow</span> <span class="kn">import</span> <span class="n">spark</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">mlflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">spark</span>
 
 <span class="n">model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">spark</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="s2">&quot;spark-model&quot;</span><span class="p">)</span>
 <span class="c1"># Prepare test documents, which are unlabeled (id, text) tuples.</span>
@@ -525,12 +526,12 @@ pyfunc model, it accepts <code class="docutils literal notranslate"><span class=
 the array into Spark ML vector and then invoke Spark model for inference. Similarly,
 if the model has vector type output, MLflow internally converts Spark ML vector
 output data into <code class="docutils literal notranslate"><span class="pre">Array[double]</span></code> type inference result.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">infer_signature</span>
-<span class="kn">from</span> <span class="nn">pyspark.sql.functions</span> <span class="kn">import</span> <span class="n">col</span>
-<span class="kn">from</span> <span class="nn">pyspark.ml.classification</span> <span class="kn">import</span> <span class="n">LogisticRegression</span>
-<span class="kn">from</span> <span class="nn">pyspark.ml.functions</span> <span class="kn">import</span> <span class="n">array_to_vector</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">infer_signature</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyspark.sql.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">col</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyspark.ml.classification</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogisticRegression</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyspark.ml.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">array_to_vector</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="n">train_df</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">createDataFrame</span><span class="p">(</span>
     <span class="p">[([</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">],</span> <span class="mi">0</span><span class="p">),</span> <span class="p">([</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">],</span> <span class="mi">1</span><span class="p">)],</span> <span class="n">schema</span><span class="o">=</span><span class="s2">&quot;features array&lt;double&gt;, label long&quot;</span>
@@ -617,9 +618,9 @@ metadata of the logged model.</p>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id5">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id5" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyspark.ml</span> <span class="kn">import</span> <span class="n">Pipeline</span>
-<span class="kn">from</span> <span class="nn">pyspark.ml.classification</span> <span class="kn">import</span> <span class="n">LogisticRegression</span>
-<span class="kn">from</span> <span class="nn">pyspark.ml.feature</span> <span class="kn">import</span> <span class="n">HashingTF</span><span class="p">,</span> <span class="n">Tokenizer</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyspark.ml</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyspark.ml.classification</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogisticRegression</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyspark.ml.feature</span><span class="w"> </span><span class="kn">import</span> <span class="n">HashingTF</span><span class="p">,</span> <span class="n">Tokenizer</span>
 
 <span class="n">training</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">createDataFrame</span><span class="p">(</span>
     <span class="p">[</span>
@@ -741,8 +742,8 @@ section of the model’s conda environment (<code class="docutils literal notran
 </dl>
 <div class="literal-block-wrapper docutils container" id="id6">
 <div class="code-block-caption"><span class="caption-text">Example</span><a class="headerlink" href="#id6" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow</span> <span class="kn">import</span> <span class="n">spark</span>
-<span class="kn">from</span> <span class="nn">pyspark.ml.pipeline</span> <span class="kn">import</span> <span class="n">PipelineModel</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">mlflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">spark</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyspark.ml.pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">PipelineModel</span>
 
 <span class="c1"># your pyspark.ml.pipeline.PipelineModel type</span>
 <span class="n">model</span> <span class="o">=</span> <span class="o">...</span>

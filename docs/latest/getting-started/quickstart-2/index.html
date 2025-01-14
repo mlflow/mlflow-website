@@ -254,15 +254,15 @@ our MLflow tracking server:</p>
 free-of-charge solution with Databricks Community Edition, please see <a class="reference external" href="../running-notebooks/index.html">this page</a>.</p>
 </div>
 <p>Import the following packages</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">keras</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">hyperopt</span> <span class="kn">import</span> <span class="n">STATUS_OK</span><span class="p">,</span> <span class="n">Trials</span><span class="p">,</span> <span class="n">fmin</span><span class="p">,</span> <span class="n">hp</span><span class="p">,</span> <span class="n">tpe</span>
-<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">mean_squared_error</span>
-<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">keras</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hyperopt</span><span class="w"> </span><span class="kn">import</span> <span class="n">STATUS_OK</span><span class="p">,</span> <span class="n">Trials</span><span class="p">,</span> <span class="n">fmin</span><span class="p">,</span> <span class="n">hp</span><span class="p">,</span> <span class="n">tpe</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">mean_squared_error</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">train_test_split</span>
 
-<span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">infer_signature</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">infer_signature</span>
 </pre></div>
 </div>
 <p>Now load the dataset and split it into training, validation, and test sets.</p>
@@ -286,7 +286,7 @@ free-of-charge solution with Databricks Community Edition, please see <a class="
 </div>
 <p>Then let’s define the model architecture and train the model. The <code class="docutils literal notranslate"><span class="pre">train_model</span></code> function uses MLflow to track the
 parameters, results, and model itself of each trial as a child run.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">train_model</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">epochs</span><span class="p">,</span> <span class="n">train_x</span><span class="p">,</span> <span class="n">train_y</span><span class="p">,</span> <span class="n">valid_x</span><span class="p">,</span> <span class="n">valid_y</span><span class="p">,</span> <span class="n">test_x</span><span class="p">,</span> <span class="n">test_y</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">train_model</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">epochs</span><span class="p">,</span> <span class="n">train_x</span><span class="p">,</span> <span class="n">train_y</span><span class="p">,</span> <span class="n">valid_x</span><span class="p">,</span> <span class="n">valid_y</span><span class="p">,</span> <span class="n">test_x</span><span class="p">,</span> <span class="n">test_y</span><span class="p">):</span>
     <span class="c1"># Define model architecture</span>
     <span class="n">mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">train_x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">var</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">train_x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
@@ -333,7 +333,7 @@ parameters, results, and model itself of each trial as a child run.</p>
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">objective</span></code> function takes in the hyperparameters and returns the results of the <code class="docutils literal notranslate"><span class="pre">train_model</span></code>
 function for that set of hyperparameters.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">objective</span><span class="p">(</span><span class="n">params</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">objective</span><span class="p">(</span><span class="n">params</span><span class="p">):</span>
     <span class="c1"># MLflow will track the parameters and results for each run</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">train_model</span><span class="p">(</span>
         <span class="n">params</span><span class="p">,</span>

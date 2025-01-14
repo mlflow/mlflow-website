@@ -202,42 +202,42 @@
               <div itemprop="articleBody">
                 
   <h1>Source code for mlflow.sentence_transformers</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">pathlib</span>
-<span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">yaml</span>
-<span class="kn">from</span> <span class="nn">packaging.version</span> <span class="kn">import</span> <span class="n">Version</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">packaging.version</span><span class="w"> </span><span class="kn">import</span> <span class="n">Version</span>
 
-<span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">from</span> <span class="nn">mlflow</span> <span class="kn">import</span> <span class="n">pyfunc</span>
-<span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
-<span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">Model</span><span class="p">,</span> <span class="n">ModelInputExample</span><span class="p">,</span> <span class="n">ModelSignature</span><span class="p">,</span> <span class="n">infer_pip_requirements</span>
-<span class="kn">from</span> <span class="nn">mlflow.models.model</span> <span class="kn">import</span> <span class="n">MLMODEL_FILE_NAME</span>
-<span class="kn">from</span> <span class="nn">mlflow.models.signature</span> <span class="kn">import</span> <span class="n">_infer_signature_from_input_example</span>
-<span class="kn">from</span> <span class="nn">mlflow.models.utils</span> <span class="kn">import</span> <span class="n">_save_example</span>
-<span class="kn">from</span> <span class="nn">mlflow.tracking._model_registry</span> <span class="kn">import</span> <span class="n">DEFAULT_AWAIT_MAX_SLEEP_SECONDS</span>
-<span class="kn">from</span> <span class="nn">mlflow.transformers.llm_inference_utils</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyfunc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">MlflowException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Model</span><span class="p">,</span> <span class="n">ModelInputExample</span><span class="p">,</span> <span class="n">ModelSignature</span><span class="p">,</span> <span class="n">infer_pip_requirements</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">MLMODEL_FILE_NAME</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models.signature</span><span class="w"> </span><span class="kn">import</span> <span class="n">_infer_signature_from_input_example</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_save_example</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.tracking._model_registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_AWAIT_MAX_SLEEP_SECONDS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.transformers.llm_inference_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_LLM_INFERENCE_TASK_EMBEDDING</span><span class="p">,</span>
     <span class="n">_LLM_V1_EMBEDDING_INPUT_KEY</span><span class="p">,</span>
     <span class="n">postprocess_output_for_llm_v1_embedding_task</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.types.llm</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.types.llm</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">EMBEDDING_MODEL_INPUT_SCHEMA</span><span class="p">,</span>
     <span class="n">EMBEDDING_MODEL_OUTPUT_SCHEMA</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.types.schema</span> <span class="kn">import</span> <span class="n">ColSpec</span><span class="p">,</span> <span class="n">Schema</span><span class="p">,</span> <span class="n">TensorSpec</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.annotations</span> <span class="kn">import</span> <span class="n">experimental</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.docstring_utils</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.types.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">ColSpec</span><span class="p">,</span> <span class="n">Schema</span><span class="p">,</span> <span class="n">TensorSpec</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">experimental</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.docstring_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">LOG_MODEL_PARAM_DOCS</span><span class="p">,</span>
     <span class="n">docstring_version_compatibility_warning</span><span class="p">,</span>
     <span class="n">format_docstring</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.environment</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.environment</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_CONDA_ENV_FILE_NAME</span><span class="p">,</span>
     <span class="n">_CONSTRAINTS_FILE_NAME</span><span class="p">,</span>
     <span class="n">_PYTHON_ENV_FILE_NAME</span><span class="p">,</span>
@@ -248,15 +248,15 @@
     <span class="n">_PythonEnv</span><span class="p">,</span>
     <span class="n">_validate_env_arguments</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.file_utils</span> <span class="kn">import</span> <span class="n">get_total_file_size</span><span class="p">,</span> <span class="n">write_to</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.model_utils</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.file_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_total_file_size</span><span class="p">,</span> <span class="n">write_to</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.model_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_add_code_from_conf_to_system_path</span><span class="p">,</span>
     <span class="n">_download_artifact_from_uri</span><span class="p">,</span>
     <span class="n">_get_flavor_configuration_from_uri</span><span class="p">,</span>
     <span class="n">_validate_and_copy_code_paths</span><span class="p">,</span>
     <span class="n">_validate_and_prepare_target_save_path</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.requirements_utils</span> <span class="kn">import</span> <span class="n">_get_pinned_requirement</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.requirements_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_get_pinned_requirement</span>
 
 <span class="n">FLAVOR_NAME</span> <span class="o">=</span> <span class="s2">&quot;sentence_transformers&quot;</span>
 <span class="n">_TRANSFORMER_SOURCE_MODEL_NAME_KEY</span> <span class="o">=</span> <span class="s2">&quot;source_model_name&quot;</span>
@@ -274,7 +274,7 @@
 
 
 <div class="viewcode-block" id="get_default_pip_requirements"><a class="viewcode-back" href="../../python_api/mlflow.sentence_transformers.html#mlflow.sentence_transformers.get_default_pip_requirements">[docs]</a><span class="nd">@experimental</span>
-<span class="k">def</span> <span class="nf">get_default_pip_requirements</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_default_pip_requirements</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Retrieves the set of minimal dependencies for the ``sentence_transformers`` flavor.</span>
 
@@ -289,7 +289,7 @@
 
 
 <div class="viewcode-block" id="get_default_conda_env"><a class="viewcode-back" href="../../python_api/mlflow.sentence_transformers.html#mlflow.sentence_transformers.get_default_conda_env">[docs]</a><span class="nd">@experimental</span>
-<span class="k">def</span> <span class="nf">get_default_conda_env</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_default_conda_env</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns:</span>
 <span class="sd">        The default Conda environment for MLflow Models produced with the</span>
@@ -299,7 +299,7 @@
 
 
 <span class="nd">@experimental</span>
-<span class="k">def</span> <span class="nf">_verify_task_and_update_metadata</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_verify_task_and_update_metadata</span><span class="p">(</span>
     <span class="n">task</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
     <span class="k">if</span> <span class="n">task</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">_LLM_INFERENCE_TASK_EMBEDDING</span><span class="p">]:</span>
@@ -321,7 +321,7 @@
 <div class="viewcode-block" id="save_model"><a class="viewcode-back" href="../../python_api/mlflow.sentence_transformers.html#mlflow.sentence_transformers.save_model">[docs]</a><span class="nd">@experimental</span>
 <span class="nd">@docstring_version_compatibility_warning</span><span class="p">(</span><span class="n">integration_name</span><span class="o">=</span><span class="n">FLAVOR_NAME</span><span class="p">)</span>
 <span class="nd">@format_docstring</span><span class="p">(</span><span class="n">LOG_MODEL_PARAM_DOCS</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">package_name</span><span class="o">=</span><span class="n">FLAVOR_NAME</span><span class="p">))</span>
-<span class="k">def</span> <span class="nf">save_model</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">save_model</span><span class="p">(</span>
     <span class="n">model</span><span class="p">,</span>
     <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">task</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -376,7 +376,7 @@
 <span class="sd">        metadata: {{ metadata }}</span>
 <span class="sd">        example_no_conversion: {{ example_no_conversion }}</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">sentence_transformers</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">sentence_transformers</span>
 
     <span class="n">_validate_env_arguments</span><span class="p">(</span><span class="n">conda_env</span><span class="p">,</span> <span class="n">pip_requirements</span><span class="p">,</span> <span class="n">extra_pip_requirements</span><span class="p">)</span>
 
@@ -463,7 +463,7 @@
     <span class="n">_PythonEnv</span><span class="o">.</span><span class="n">current</span><span class="p">()</span><span class="o">.</span><span class="n">to_yaml</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">_PYTHON_ENV_FILE_NAME</span><span class="p">)))</span></div>
 
 
-<span class="k">def</span> <span class="nf">_get_transformers_model_metadata</span><span class="p">(</span><span class="n">model</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_transformers_model_metadata</span><span class="p">(</span><span class="n">model</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extract metadata about the underlying Transformers model, such as the model class name</span>
 <span class="sd">    and the repository id.</span>
@@ -474,7 +474,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        A dictionary containing metadata about the Transformers model.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">sentence_transformers.models</span> <span class="kn">import</span> <span class="n">Transformer</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">sentence_transformers.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Transformer</span>
 
     <span class="c1"># NB: We assume the SentenceTransformer model contains only up to one Transformer model.</span>
     <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">modules</span><span class="p">():</span>
@@ -489,7 +489,7 @@
     <span class="k">return</span> <span class="p">{}</span>
 
 
-<span class="k">def</span> <span class="nf">_get_transformers_model_name</span><span class="p">(</span><span class="n">model_name_or_path</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_transformers_model_name</span><span class="p">(</span><span class="n">model_name_or_path</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extract the Transformers model name from name_or_path attribute of a Transformer model.</span>
 
@@ -506,7 +506,7 @@
 <div class="viewcode-block" id="log_model"><a class="viewcode-back" href="../../python_api/mlflow.sentence_transformers.html#mlflow.sentence_transformers.log_model">[docs]</a><span class="nd">@experimental</span>
 <span class="nd">@docstring_version_compatibility_warning</span><span class="p">(</span><span class="n">integration_name</span><span class="o">=</span><span class="n">FLAVOR_NAME</span><span class="p">)</span>
 <span class="nd">@format_docstring</span><span class="p">(</span><span class="n">LOG_MODEL_PARAM_DOCS</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">package_name</span><span class="o">=</span><span class="n">FLAVOR_NAME</span><span class="p">))</span>
-<span class="k">def</span> <span class="nf">log_model</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">log_model</span><span class="p">(</span>
     <span class="n">model</span><span class="p">,</span>
     <span class="n">artifact_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">task</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -611,8 +611,8 @@
     <span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">_get_load_kwargs</span><span class="p">():</span>
-    <span class="kn">import</span> <span class="nn">sentence_transformers</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_load_kwargs</span><span class="p">():</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">sentence_transformers</span>
 
     <span class="n">load_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="c1"># The trust_remote_code is supported since Sentence Transformers 2.3.0</span>
@@ -625,14 +625,14 @@
     <span class="k">return</span> <span class="n">load_kwargs</span>
 
 
-<span class="k">def</span> <span class="nf">_load_pyfunc</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">model_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>  <span class="c1"># noqa: D417</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_load_pyfunc</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">model_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>  <span class="c1"># noqa: D417</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Load PyFunc implementation for SentenceTransformer. Called by ``pyfunc.load_model``.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        path: Local filesystem path to the MLflow Model with the ``sentence_transformer`` flavor.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">sentence_transformers</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">sentence_transformers</span>
 
     <span class="n">load_kwargs</span> <span class="o">=</span> <span class="n">_get_load_kwargs</span><span class="p">()</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">sentence_transformers</span><span class="o">.</span><span class="n">SentenceTransformer</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">load_kwargs</span><span class="p">)</span>
@@ -643,7 +643,7 @@
 
 <div class="viewcode-block" id="load_model"><a class="viewcode-back" href="../../python_api/mlflow.sentence_transformers.html#mlflow.sentence_transformers.load_model">[docs]</a><span class="nd">@experimental</span>
 <span class="nd">@docstring_version_compatibility_warning</span><span class="p">(</span><span class="n">integration_name</span><span class="o">=</span><span class="n">FLAVOR_NAME</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">load_model</span><span class="p">(</span><span class="n">model_uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dst_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_model</span><span class="p">(</span><span class="n">model_uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dst_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Load a ``sentence_transformers`` object from a local file or a run.</span>
 
@@ -667,7 +667,7 @@
 <span class="sd">        A ``sentence_transformers`` model instance</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="kn">import</span> <span class="nn">sentence_transformers</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">sentence_transformers</span>
 
     <span class="n">model_uri</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">model_uri</span><span class="p">)</span>
 
@@ -683,7 +683,7 @@
     <span class="k">return</span> <span class="n">sentence_transformers</span><span class="o">.</span><span class="n">SentenceTransformer</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">local_model_dir</span><span class="p">),</span> <span class="o">**</span><span class="n">load_kwargs</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">_get_default_signature</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_default_signature</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates a default signature for the ``sentence_transformers`` flavor to be applied if not</span>
 <span class="sd">    set or overridden by supplying the `signature` argument to `log_model` or `save_model`.</span>
@@ -694,18 +694,18 @@
     <span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">_SentenceTransformerModelWrapper</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">task</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_SentenceTransformerModelWrapper</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">task</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="o">=</span> <span class="n">task</span>
 
-    <span class="k">def</span> <span class="nf">get_raw_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_raw_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the underlying model.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span>
 
-    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sentences</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sentences</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            sentences: Model input data.</span>
@@ -733,7 +733,7 @@
             <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
                     <span class="s2">&quot;Received invalid parameter value for `params` argument&quot;</span>
-                <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">output_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">sentences</span><span class="p">)</span>
 

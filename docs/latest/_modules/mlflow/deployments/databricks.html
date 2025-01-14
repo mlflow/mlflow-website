@@ -204,27 +204,27 @@
               <div itemprop="articleBody">
                 
   <h1>Source code for mlflow.deployments.databricks</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">posixpath</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Optional</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">posixpath</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">from</span> <span class="nn">mlflow.deployments</span> <span class="kn">import</span> <span class="n">BaseDeploymentClient</span>
-<span class="kn">from</span> <span class="nn">mlflow.deployments.constants</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.deployments</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseDeploymentClient</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.deployments.constants</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">MLFLOW_DEPLOYMENT_CLIENT_REQUEST_RETRY_CODES</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.environment_variables</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.environment_variables</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">MLFLOW_DEPLOYMENT_PREDICT_TIMEOUT</span><span class="p">,</span>
     <span class="n">MLFLOW_HTTP_REQUEST_TIMEOUT</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils</span> <span class="kn">import</span> <span class="n">AttrDict</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.annotations</span> <span class="kn">import</span> <span class="n">deprecated</span><span class="p">,</span> <span class="n">experimental</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.databricks_utils</span> <span class="kn">import</span> <span class="n">get_databricks_host_creds</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.rest_utils</span> <span class="kn">import</span> <span class="n">augmented_raise_for_status</span><span class="p">,</span> <span class="n">http_request</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">MlflowException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">AttrDict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">deprecated</span><span class="p">,</span> <span class="n">experimental</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.databricks_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_databricks_host_creds</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.rest_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">augmented_raise_for_status</span><span class="p">,</span> <span class="n">http_request</span>
 
 
-<div class="viewcode-block" id="DatabricksEndpoint"><a class="viewcode-back" href="../../../python_api/mlflow.deployments.html#mlflow.deployments.DatabricksEndpoint">[docs]</a><span class="k">class</span> <span class="nc">DatabricksEndpoint</span><span class="p">(</span><span class="n">AttrDict</span><span class="p">):</span>
+<div class="viewcode-block" id="DatabricksEndpoint"><a class="viewcode-back" href="../../../python_api/mlflow.deployments.html#mlflow.deployments.DatabricksEndpoint">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">DatabricksEndpoint</span><span class="p">(</span><span class="n">AttrDict</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A dictionary-like object representing a Databricks serving endpoint.</span>
 
@@ -247,7 +247,7 @@
 
 
 <div class="viewcode-block" id="DatabricksDeploymentClient"><a class="viewcode-back" href="../../../python_api/mlflow.deployments.html#mlflow.deployments.DatabricksDeploymentClient">[docs]</a><span class="nd">@experimental</span>
-<span class="k">class</span> <span class="nc">DatabricksDeploymentClient</span><span class="p">(</span><span class="n">BaseDeploymentClient</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DatabricksDeploymentClient</span><span class="p">(</span><span class="n">BaseDeploymentClient</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Client for interacting with Databricks serving endpoints.</span>
 
@@ -286,7 +286,7 @@
 <span class="sd">        ]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="DatabricksDeploymentClient.create_deployment"><a class="viewcode-back" href="../../../python_api/mlflow.deployments.html#mlflow.deployments.DatabricksDeploymentClient.create_deployment">[docs]</a>    <span class="k">def</span> <span class="nf">create_deployment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">model_uri</span><span class="p">,</span> <span class="n">flavor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="DatabricksDeploymentClient.create_deployment"><a class="viewcode-back" href="../../../python_api/mlflow.deployments.html#mlflow.deployments.DatabricksDeploymentClient.create_deployment">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">create_deployment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">model_uri</span><span class="p">,</span> <span class="n">flavor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        .. warning::</span>
 
@@ -294,7 +294,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
-<div class="viewcode-block" id="DatabricksDeploymentClient.update_deployment"><a class="viewcode-back" href="../../../python_api/mlflow.deployments.html#mlflow.deployments.DatabricksDeploymentClient.update_deployment">[docs]</a>    <span class="k">def</span> <span class="nf">update_deployment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">model_uri</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flavor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="DatabricksDeploymentClient.update_deployment"><a class="viewcode-back" href="../../../python_api/mlflow.deployments.html#mlflow.deployments.DatabricksDeploymentClient.update_deployment">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_deployment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">model_uri</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flavor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        .. warning::</span>
 
@@ -302,7 +302,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
-<div class="viewcode-block" id="DatabricksDeploymentClient.delete_deployment"><a class="viewcode-back" href="../../../python_api/mlflow.deployments.html#mlflow.deployments.DatabricksDeploymentClient.delete_deployment">[docs]</a>    <span class="k">def</span> <span class="nf">delete_deployment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="DatabricksDeploymentClient.delete_deployment"><a class="viewcode-back" href="../../../python_api/mlflow.deployments.html#mlflow.deployments.DatabricksDeploymentClient.delete_deployment">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">delete_deployment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        .. warning::</span>
 
@@ -310,7 +310,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
-<div class="viewcode-block" id="DatabricksDeploymentClient.list_deployments"><a class="viewcode-back" href="../../../python_api/mlflow.deployments.html#mlflow.deployments.DatabricksDeploymentClient.list_deployments">[docs]</a>    <span class="k">def</span> <span class="nf">list_deployments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="DatabricksDeploymentClient.list_deployments"><a class="viewcode-back" href="../../../python_api/mlflow.deployments.html#mlflow.deployments.DatabricksDeploymentClient.list_deployments">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">list_deployments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        .. warning::</span>
 
@@ -318,7 +318,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
-<div class="viewcode-block" id="DatabricksDeploymentClient.get_deployment"><a class="viewcode-back" href="../../../python_api/mlflow.deployments.html#mlflow.deployments.DatabricksDeploymentClient.get_deployment">[docs]</a>    <span class="k">def</span> <span class="nf">get_deployment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="DatabricksDeploymentClient.get_deployment"><a class="viewcode-back" href="../../../python_api/mlflow.deployments.html#mlflow.deployments.DatabricksDeploymentClient.get_deployment">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_deployment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        .. warning::</span>
 
@@ -326,7 +326,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
-    <span class="k">def</span> <span class="nf">_call_endpoint</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_call_endpoint</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -354,7 +354,7 @@
         <span class="n">augmented_raise_for_status</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">DatabricksEndpoint</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
 
-    <span class="k">def</span> <span class="nf">_call_endpoint_stream</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_call_endpoint_stream</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -391,7 +391,7 @@
         <span class="p">)</span>
 
 <div class="viewcode-block" id="DatabricksDeploymentClient.predict"><a class="viewcode-back" href="../../../python_api/mlflow.deployments.html#mlflow.deployments.DatabricksDeploymentClient.predict">[docs]</a>    <span class="nd">@experimental</span>
-    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deployment_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deployment_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Query a serving endpoint with the provided model inputs.</span>
 <span class="sd">        See https://docs.databricks.com/api/workspace/servingendpoints/query for request/response</span>
@@ -451,7 +451,7 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="DatabricksDeploymentClient.predict_stream"><a class="viewcode-back" href="../../../python_api/mlflow.deployments.html#mlflow.deployments.DatabricksDeploymentClient.predict_stream">[docs]</a>    <span class="nd">@experimental</span>
-    <span class="k">def</span> <span class="nf">predict_stream</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict_stream</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">deployment_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -533,7 +533,7 @@
             <span class="k">yield</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="DatabricksDeploymentClient.create_endpoint"><a class="viewcode-back" href="../../../python_api/mlflow.deployments.html#mlflow.deployments.DatabricksDeploymentClient.create_endpoint">[docs]</a>    <span class="nd">@experimental</span>
-    <span class="k">def</span> <span class="nf">create_endpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">route_optimized</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_endpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">route_optimized</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a new serving endpoint with the provided name and configuration.</span>
 
@@ -679,7 +679,7 @@
             <span class="s2">&quot;or update_endpoint_ai_gateway&quot;</span>
         <span class="p">)</span>
     <span class="p">)</span>
-    <span class="k">def</span> <span class="nf">update_endpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_endpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Update a specified serving endpoint with the provided configuration.</span>
 <span class="sd">        See https://docs.databricks.com/api/workspace/servingendpoints/updateconfig for</span>
@@ -767,7 +767,7 @@
             <span class="p">)</span></div>
 
 <div class="viewcode-block" id="DatabricksDeploymentClient.update_endpoint_config"><a class="viewcode-back" href="../../../python_api/mlflow.deployments.html#mlflow.deployments.DatabricksDeploymentClient.update_endpoint_config">[docs]</a>    <span class="nd">@experimental</span>
-    <span class="k">def</span> <span class="nf">update_endpoint_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_endpoint_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Update the configuration of a specified serving endpoint. See</span>
 <span class="sd">        https://docs.databricks.com/api/workspace/servingendpoints/updateconfig for request/response</span>
@@ -827,7 +827,7 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="DatabricksDeploymentClient.update_endpoint_tags"><a class="viewcode-back" href="../../../python_api/mlflow.deployments.html#mlflow.deployments.DatabricksDeploymentClient.update_endpoint_tags">[docs]</a>    <span class="nd">@experimental</span>
-    <span class="k">def</span> <span class="nf">update_endpoint_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_endpoint_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Update the tags of a specified serving endpoint. See</span>
 <span class="sd">        https://docs.databricks.com/api/workspace/servingendpoints/patch for request/response</span>
@@ -857,7 +857,7 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="DatabricksDeploymentClient.update_endpoint_rate_limits"><a class="viewcode-back" href="../../../python_api/mlflow.deployments.html#mlflow.deployments.DatabricksDeploymentClient.update_endpoint_rate_limits">[docs]</a>    <span class="nd">@experimental</span>
-    <span class="k">def</span> <span class="nf">update_endpoint_rate_limits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_endpoint_rate_limits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Update the rate limits of a specified serving endpoint.</span>
 <span class="sd">        See https://docs.databricks.com/api/workspace/servingendpoints/put for request/response</span>
@@ -893,7 +893,7 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="DatabricksDeploymentClient.update_endpoint_ai_gateway"><a class="viewcode-back" href="../../../python_api/mlflow.deployments.html#mlflow.deployments.DatabricksDeploymentClient.update_endpoint_ai_gateway">[docs]</a>    <span class="nd">@experimental</span>
-    <span class="k">def</span> <span class="nf">update_endpoint_ai_gateway</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_endpoint_ai_gateway</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Update the AI Gateway configuration of a specified serving endpoint.</span>
 
@@ -940,7 +940,7 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="DatabricksDeploymentClient.delete_endpoint"><a class="viewcode-back" href="../../../python_api/mlflow.deployments.html#mlflow.deployments.DatabricksDeploymentClient.delete_endpoint">[docs]</a>    <span class="nd">@experimental</span>
-    <span class="k">def</span> <span class="nf">delete_endpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delete_endpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Delete a specified serving endpoint.</span>
 <span class="sd">        See https://docs.databricks.com/api/workspace/servingendpoints/delete for request/response</span>
@@ -964,7 +964,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_call_endpoint</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;DELETE&quot;</span><span class="p">,</span> <span class="n">route</span><span class="o">=</span><span class="n">endpoint</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="DatabricksDeploymentClient.list_endpoints"><a class="viewcode-back" href="../../../python_api/mlflow.deployments.html#mlflow.deployments.DatabricksDeploymentClient.list_endpoints">[docs]</a>    <span class="nd">@experimental</span>
-    <span class="k">def</span> <span class="nf">list_endpoints</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">list_endpoints</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Retrieve all serving endpoints.</span>
 
@@ -999,7 +999,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_call_endpoint</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;GET&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">endpoints</span></div>
 
 <div class="viewcode-block" id="DatabricksDeploymentClient.get_endpoint"><a class="viewcode-back" href="../../../python_api/mlflow.deployments.html#mlflow.deployments.DatabricksDeploymentClient.get_endpoint">[docs]</a>    <span class="nd">@experimental</span>
-    <span class="k">def</span> <span class="nf">get_endpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_endpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get a specified serving endpoint.</span>
 <span class="sd">        See https://docs.databricks.com/api/workspace/servingendpoints/get for request/response</span>
@@ -1033,11 +1033,11 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_call_endpoint</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="n">route</span><span class="o">=</span><span class="n">endpoint</span><span class="p">)</span></div></div>
 
 
-<span class="k">def</span> <span class="nf">run_local</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">model_uri</span><span class="p">,</span> <span class="n">flavor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_local</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">model_uri</span><span class="p">,</span> <span class="n">flavor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="k">pass</span>
 
 
-<span class="k">def</span> <span class="nf">target_help</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">target_help</span><span class="p">():</span>
     <span class="k">pass</span>
 </pre></div>
 

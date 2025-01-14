@@ -164,6 +164,7 @@
 <li class="toctree-l2"><a class="reference internal" href="mlflow.fastai.html">mlflow.fastai</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.gateway.html">mlflow.gateway</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.gemini.html">mlflow.gemini</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mlflow.groq.html">mlflow.groq</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.h2o.html">mlflow.h2o</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.johnsnowlabs.html">mlflow.johnsnowlabs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.keras.html">mlflow.keras</a></li>
@@ -278,11 +279,11 @@ Tracing is <a class="reference internal" href="mlflow.html#mlflow-tracing-fluent
 and effectively disables all tracing operations.</p>
 </div>
 <p>Example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 
 <span class="nd">@mlflow</span><span class="o">.</span><span class="n">trace</span>
-<span class="k">def</span> <span class="nf">f</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">():</span>
     <span class="k">return</span> <span class="mi">0</span>
 
 
@@ -310,11 +311,11 @@ Call <a class="reference internal" href="#mlflow.tracing.enable_notebook_display
 <code class="sig-prename descclassname"><span class="pre">mlflow.tracing.</span></code><code class="sig-name descname"><span class="pre">enable</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mlflow/tracing/provider.html#enable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.tracing.enable" title="Permalink to this definition"> </a></dt>
 <dd><p>Enable tracing.</p>
 <p>Example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 
 <span class="nd">@mlflow</span><span class="o">.</span><span class="n">trace</span>
-<span class="k">def</span> <span class="nf">f</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">():</span>
     <span class="k">return</span> <span class="mi">0</span>
 
 
@@ -352,7 +353,7 @@ or <a class="reference internal" href="mlflow.client.html#mlflow.client.MlflowCl
 
 <dl class="py function">
 <dt id="mlflow.tracing.set_span_chat_messages">
-<code class="sig-prename descclassname"><span class="pre">mlflow.tracing.</span></code><code class="sig-name descname"><span class="pre">set_span_chat_messages</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">span</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">LiveSpan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">messages</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">RequestMessage</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mlflow/tracing/utils.html#set_span_chat_messages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.tracing.set_span_chat_messages" title="Permalink to this definition"> </a></dt>
+<code class="sig-prename descclassname"><span class="pre">mlflow.tracing.</span></code><code class="sig-name descname"><span class="pre">set_span_chat_messages</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">span</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">LiveSpan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">messages</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">,</span> </span><span class="pre">ChatMessage</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">append</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mlflow/tracing/utils.html#set_span_chat_messages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mlflow.tracing.set_span_chat_messages" title="Permalink to this definition"> </a></dt>
 <dd><p>Set the <cite>mlflow.chat.messages</cite> attribute on the specified span. This
 attribute is used in the UI, and also by downstream applications that
 consume trace data, such as MLflow evaluate.</p>
@@ -363,16 +364,20 @@ consume trace data, such as MLflow evaluate.</p>
 <li><p><strong>messages</strong> – A list of standardized chat messages (refer to the
 <a class="reference external" href="../llms/tracing/tracing-schema.html#chat-completion-spans">spec</a>
 for details)</p></li>
+<li><p><strong>append</strong> – If True, the messages will be appended to the existing messages. Otherwise,
+the attribute will be overwritten entirely. Default is False.
+This is useful when you want to record messages incrementally, e.g., log
+input messages first, and then log output messages later.</p></li>
 </ul>
 </dd>
 </dl>
 <p>Example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">from</span> <span class="nn">mlflow.tracing</span> <span class="kn">import</span> <span class="n">set_span_chat_messages</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.tracing</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_span_chat_messages</span>
 
 
 <span class="nd">@mlflow</span><span class="o">.</span><span class="n">trace</span>
-<span class="k">def</span> <span class="nf">f</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">():</span>
     <span class="n">messages</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;hello&quot;</span><span class="p">}]</span>
     <span class="n">span</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">get_current_active_span</span><span class="p">()</span>
     <span class="n">set_span_chat_messages</span><span class="p">(</span><span class="n">span</span><span class="p">,</span> <span class="n">messages</span><span class="p">)</span>
@@ -402,8 +407,8 @@ for details)</p>
 </dd>
 </dl>
 <p>Example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">from</span> <span class="nn">mlflow.tracing</span> <span class="kn">import</span> <span class="n">set_span_chat_tools</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.tracing</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_span_chat_tools</span>
 
 <span class="n">tools</span> <span class="o">=</span> <span class="p">[</span>
     <span class="p">{</span>
@@ -425,7 +430,7 @@ for details)</p>
 
 
 <span class="nd">@mlflow</span><span class="o">.</span><span class="n">trace</span>
-<span class="k">def</span> <span class="nf">f</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">():</span>
     <span class="n">span</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">get_current_active_span</span><span class="p">()</span>
     <span class="n">set_span_chat_tools</span><span class="p">(</span><span class="n">span</span><span class="p">,</span> <span class="n">tools</span><span class="p">)</span>
     <span class="k">return</span> <span class="mi">0</span>

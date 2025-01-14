@@ -164,6 +164,7 @@
 <li class="toctree-l2"><a class="reference internal" href="mlflow.fastai.html">mlflow.fastai</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.gateway.html">mlflow.gateway</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.gemini.html">mlflow.gemini</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mlflow.groq.html">mlflow.groq</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.h2o.html">mlflow.h2o</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.johnsnowlabs.html">mlflow.johnsnowlabs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mlflow.keras.html">mlflow.keras</a></li>
@@ -278,7 +279,7 @@
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>eval_fn</strong> – <p>A function that computes the metric with the following signature:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">eval_fn</span><span class="p">(</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">eval_fn</span><span class="p">(</span>
     <span class="n">predictions</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
     <span class="n">targets</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
     <span class="n">metrics</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">MetricValue</span><span class="p">],</span>
@@ -325,8 +326,8 @@ are persisted so that we can deserialize the same metric object later.</p></li>
 
 <p>These <a class="reference internal" href="#mlflow.metrics.EvaluationMetric" title="mlflow.metrics.EvaluationMetric"><code class="xref py py-class docutils literal notranslate"><span class="pre">EvaluationMetric</span></code></a> are used by the <a class="reference internal" href="mlflow.html#mlflow.evaluate" title="mlflow.evaluate"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code></a> API, either computed automatically depending on the <code class="docutils literal notranslate"><span class="pre">model_type</span></code> or specified via the <code class="docutils literal notranslate"><span class="pre">extra_metrics</span></code> parameter.</p>
 <p>The following code demonstrates how to use <a class="reference internal" href="mlflow.html#mlflow.evaluate" title="mlflow.evaluate"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.evaluate()</span></code></a> with an  <a class="reference internal" href="#mlflow.metrics.EvaluationMetric" title="mlflow.metrics.EvaluationMetric"><code class="xref py py-class docutils literal notranslate"><span class="pre">EvaluationMetric</span></code></a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">from</span> <span class="nn">mlflow.metrics.genai</span> <span class="kn">import</span> <span class="n">EvaluationExample</span><span class="p">,</span> <span class="n">answer_similarity</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.metrics.genai</span><span class="w"> </span><span class="kn">import</span> <span class="n">EvaluationExample</span><span class="p">,</span> <span class="n">answer_similarity</span>
 
 <span class="n">eval_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
     <span class="p">{</span>
@@ -366,8 +367,8 @@ are persisted so that we can deserialize the same metric object later.</p></li>
 </pre></div>
 </div>
 <p>Information about how an <a class="reference internal" href="#mlflow.metrics.EvaluationMetric" title="mlflow.metrics.EvaluationMetric"><code class="xref py py-class docutils literal notranslate"><span class="pre">EvaluationMetric</span></code></a> is calculated, such as the grading prompt used is available via the <code class="docutils literal notranslate"><span class="pre">metric_details</span></code> property.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">from</span> <span class="nn">mlflow.metrics.genai</span> <span class="kn">import</span> <span class="n">relevance</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.metrics.genai</span><span class="w"> </span><span class="kn">import</span> <span class="n">relevance</span>
 
 <span class="n">my_relevance_metric</span> <span class="o">=</span> <span class="n">relevance</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">my_relevance_metric</span><span class="o">.</span><span class="n">metric_details</span><span class="p">)</span>
@@ -791,7 +792,7 @@ ground truth doc IDs [10, 11, 12, 2] and retrieved doc IDs [10, 11, 12, 3].</p><
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>eval_fn</strong> – <p>A function that computes the metric with the following signature:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">eval_fn</span><span class="p">(</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">eval_fn</span><span class="p">(</span>
     <span class="n">predictions</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
     <span class="n">targets</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
     <span class="n">metrics</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">MetricValue</span><span class="p">],</span>
@@ -1093,7 +1094,7 @@ If not specified, the default URL for the LLM provider will be used
 </dl>
 <div class="literal-block-wrapper docutils container" id="id9">
 <div class="code-block-caption"><span class="caption-text">Example for creating a genai metric</span><a class="headerlink" href="#id9" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.metrics.genai</span> <span class="kn">import</span> <span class="n">make_genai_metric_from_prompt</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.metrics.genai</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_genai_metric_from_prompt</span>
 
 <span class="n">metric</span> <span class="o">=</span> <span class="n">make_genai_metric_from_prompt</span><span class="p">(</span>
     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;ease_of_understanding&quot;</span><span class="p">,</span>
@@ -1180,10 +1181,10 @@ If None, retrieve all metrics.</p></li>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id10">
 <div class="code-block-caption"><span class="caption-text">Example for retrieving a custom genai metric</span><a class="headerlink" href="#id10" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
-<span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">from</span> <span class="nn">mlflow.metrics.genai.genai_metric</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.metrics.genai.genai_metric</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">make_genai_metric_from_prompt</span><span class="p">,</span>
     <span class="n">retrieve_custom_metrics</span><span class="p">,</span>
 <span class="p">)</span>
@@ -1282,7 +1283,7 @@ If not specified, the default URL for the LLM provider will be used
 </dl>
 <div class="literal-block-wrapper docutils container" id="id11">
 <div class="code-block-caption"><span class="caption-text">Example for creating a genai metric</span><a class="headerlink" href="#id11" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.metrics.genai</span> <span class="kn">import</span> <span class="n">EvaluationExample</span><span class="p">,</span> <span class="n">make_genai_metric</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.metrics.genai</span><span class="w"> </span><span class="kn">import</span> <span class="n">EvaluationExample</span><span class="p">,</span> <span class="n">make_genai_metric</span>
 
 <span class="n">example</span> <span class="o">=</span> <span class="n">EvaluationExample</span><span class="p">(</span>
     <span class="nb">input</span><span class="o">=</span><span class="s2">&quot;What is MLflow?&quot;</span><span class="p">,</span>
@@ -1367,7 +1368,7 @@ or a single grading context string.</p></li>
 </dl>
 <div class="literal-block-wrapper docutils container" id="id12">
 <div class="code-block-caption"><span class="caption-text">Example for creating an EvaluationExample</span><a class="headerlink" href="#id12" title="Permalink to this code"> </a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.metrics.base</span> <span class="kn">import</span> <span class="n">EvaluationExample</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.metrics.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">EvaluationExample</span>
 
 <span class="n">example</span> <span class="o">=</span> <span class="n">EvaluationExample</span><span class="p">(</span>
     <span class="nb">input</span><span class="o">=</span><span class="s2">&quot;What is MLflow?&quot;</span><span class="p">,</span>

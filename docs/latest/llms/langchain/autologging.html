@@ -251,14 +251,15 @@
 <li><p><a class="reference internal" href="#quickstart" id="id3">Quickstart</a></p></li>
 <li><p><a class="reference internal" href="#configure-autologging" id="id4">Configure Autologging</a></p></li>
 <li><p><a class="reference internal" href="#example-code-of-langchain-autologging" id="id5">Example Code of LangChain Autologging</a></p></li>
-<li><p><a class="reference internal" href="#how-it-works" id="id6">How It Works</a></p></li>
-<li><p><a class="reference internal" href="#troubleshooting" id="id7">Troubleshooting</a></p></li>
+<li><p><a class="reference internal" href="#tracing-langgraph" id="id6">Tracing LangGraph</a></p></li>
+<li><p><a class="reference internal" href="#how-it-works" id="id7">How It Works</a></p></li>
+<li><p><a class="reference internal" href="#faq" id="id8">FAQ</a></p></li>
 </ul>
 </div>
 <div class="section" id="quickstart">
 <h2><a class="toc-backref" href="#id3">Quickstart</a><a class="headerlink" href="#quickstart" title="Permalink to this headline"> </a></h2>
 <p>To enable autologging for LangChain models, call <a class="reference internal" href="../../python_api/mlflow.langchain.html#mlflow.langchain.autolog" title="mlflow.langchain.autolog"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.langchain.autolog()</span></code></a> at the beginning of your script or notebook. This will automatically log the traces by default as well as other artifacts such as models, input examples, and model signatures if you explicitly enable them. For more information about the configuration, please refer to the <a class="reference internal" href="#configure-lc-autologging"><span class="std std-ref">Configure Autologging</span></a> section.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="n">mlflow</span><span class="o">.</span><span class="n">langchain</span><span class="o">.</span><span class="n">autolog</span><span class="p">()</span>
 
@@ -315,7 +316,7 @@
 </tbody>
 </table>
 <p>For example, to disable logging of traces, and instead enable model logging, run the following code:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="n">mlflow</span><span class="o">.</span><span class="n">langchain</span><span class="o">.</span><span class="n">autolog</span><span class="p">(</span>
     <span class="n">log_traces</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -330,15 +331,15 @@
 </div>
 <div class="section" id="example-code-of-langchain-autologging">
 <h2><a class="toc-backref" href="#id5">Example Code of LangChain Autologging</a><a class="headerlink" href="#example-code-of-langchain-autologging" title="Permalink to this headline"> </a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">itemgetter</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">operator</span><span class="w"> </span><span class="kn">import</span> <span class="n">itemgetter</span>
 
-<span class="kn">from</span> <span class="nn">langchain.llms</span> <span class="kn">import</span> <span class="n">OpenAI</span>
-<span class="kn">from</span> <span class="nn">langchain.prompts</span> <span class="kn">import</span> <span class="n">PromptTemplate</span>
-<span class="kn">from</span> <span class="nn">langchain.schema.output_parser</span> <span class="kn">import</span> <span class="n">StrOutputParser</span>
-<span class="kn">from</span> <span class="nn">langchain.schema.runnable</span> <span class="kn">import</span> <span class="n">RunnableLambda</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain.llms</span><span class="w"> </span><span class="kn">import</span> <span class="n">OpenAI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain.prompts</span><span class="w"> </span><span class="kn">import</span> <span class="n">PromptTemplate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain.schema.output_parser</span><span class="w"> </span><span class="kn">import</span> <span class="n">StrOutputParser</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain.schema.runnable</span><span class="w"> </span><span class="kn">import</span> <span class="n">RunnableLambda</span>
 
-<span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="c1"># Uncomment the following to use the full abilities of langchain autologgin</span>
 <span class="c1"># %pip install `langchain_community&gt;=0.0.16`</span>
@@ -366,11 +367,11 @@
 <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">extract_question</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">extract_question</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
     <span class="k">return</span> <span class="nb">input</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;content&quot;</span><span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">extract_history</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">extract_history</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
     <span class="k">return</span> <span class="nb">input</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
 
@@ -403,8 +404,51 @@
 </pre></div>
 </div>
 </div>
+<div class="section" id="tracing-langgraph">
+<h2><a class="toc-backref" href="#id6">Tracing LangGraph</a><a class="headerlink" href="#tracing-langgraph" title="Permalink to this headline"> </a></h2>
+<p>MLflow support automatic tracing for LangGraph, an open-source library from LangChain for building stateful, multi-actor applications with LLMs, used to create agent and multi-agent workflows. To enable auto-tracing for LangGraph, use the same <a class="reference internal" href="../../python_api/mlflow.langchain.html#mlflow.langchain.autolog" title="mlflow.langchain.autolog"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.langchain.autolog()</span></code></a> function.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_core.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">tool</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_openai</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChatOpenAI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph.prebuilt</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_react_agent</span>
+
+<span class="c1"># Enabling tracing for LangGraph (LangChain)</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">langchain</span><span class="o">.</span><span class="n">autolog</span><span class="p">()</span>
+
+<span class="c1"># Optional: Set a tracking URI and an experiment</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_tracking_uri</span><span class="p">(</span><span class="s2">&quot;http://localhost:5000&quot;</span><span class="p">)</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s2">&quot;LangGraph&quot;</span><span class="p">)</span>
+
+
+<span class="nd">@tool</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_weather</span><span class="p">(</span><span class="n">city</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;nyc&quot;</span><span class="p">,</span> <span class="s2">&quot;sf&quot;</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Use this to get weather information.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">city</span> <span class="o">==</span> <span class="s2">&quot;nyc&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;It might be cloudy in nyc&quot;</span>
+    <span class="k">elif</span> <span class="n">city</span> <span class="o">==</span> <span class="s2">&quot;sf&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;It&#39;s always sunny in sf&quot;</span>
+
+
+<span class="n">llm</span> <span class="o">=</span> <span class="n">ChatOpenAI</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-4o-mini&quot;</span><span class="p">)</span>
+<span class="n">tools</span> <span class="o">=</span> <span class="p">[</span><span class="n">get_weather</span><span class="p">]</span>
+<span class="n">graph</span> <span class="o">=</span> <span class="n">create_react_agent</span><span class="p">(</span><span class="n">llm</span><span class="p">,</span> <span class="n">tools</span><span class="p">)</span>
+
+<span class="c1"># Invoke the graph</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span>
+    <span class="p">{</span><span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;what is the weather in sf?&quot;</span><span class="p">}]}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>MLflow does not support other auto-logging features for LangGraph, such as automatic model logging. Only traces are logged for LangGraph.</p>
+</div>
+</div>
 <div class="section" id="how-it-works">
-<h2><a class="toc-backref" href="#id6">How It Works</a><a class="headerlink" href="#how-it-works" title="Permalink to this headline"> </a></h2>
+<h2><a class="toc-backref" href="#id7">How It Works</a><a class="headerlink" href="#how-it-works" title="Permalink to this headline"> </a></h2>
 <p>MLflow LangChain Autologging uses two ways to log traces and other artifacts. Tracing is made possible via the <a class="reference external" href="https://python.langchain.com/v0.1/docs/modules/callbacks/">Callbacks</a> framework of LangChain. Other artifacts are recorded by patching <cite>the invocation functions</cite> of the supported models. In typical scenarios, you don’t need to care about the internal implementation details, but this section provides a brief overview of how it works under the hood.</p>
 <div class="section" id="mlflow-tracing-callbacks">
 <h3>MLflow Tracing Callbacks<a class="headerlink" href="#mlflow-tracing-callbacks" title="Permalink to this headline"> </a></h3>
@@ -413,12 +457,12 @@
 <div class="section" id="customize-callback">
 <h3>Customize Callback<a class="headerlink" href="#customize-callback" title="Permalink to this headline"> </a></h3>
 <p>Sometimes you may want to customize what information is logged in the traces. You can achieve this by creating a custom callback handler that inherits from <a class="reference external" href="https://github.com/mlflow/mlflow/blob/master/mlflow/langchain/langchain_tracer.py">MlflowLangchainTracer</a>. The following example demonstrates how to record an additional attribute to the span when a chat model starts running.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlflow.langchain.langchain_tracer</span> <span class="kn">import</span> <span class="n">MlflowLangchainTracer</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.langchain.langchain_tracer</span><span class="w"> </span><span class="kn">import</span> <span class="n">MlflowLangchainTracer</span>
 
-<span class="k">class</span> <span class="nc">CustomLangchainTracer</span><span class="p">(</span><span class="n">MlflowLangchainTracer</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CustomLangchainTracer</span><span class="p">(</span><span class="n">MlflowLangchainTracer</span><span class="p">):</span>
 
     <span class="c1"># Override the handler functions to customize the behavior. The method signature is defined by LangChain Callbacks.</span>
-    <span class="k">def</span> <span class="nf">on_chat_model_start</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_chat_model_start</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">serialized</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
         <span class="n">messages</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">BaseMessage</span><span class="p">]],</span>
@@ -471,14 +515,14 @@ the logging overhead may slow down the model inference process. Please be aware 
 </div>
 </div>
 </div>
-<div class="section" id="troubleshooting">
-<h2><a class="toc-backref" href="#id7">Troubleshooting</a><a class="headerlink" href="#troubleshooting" title="Permalink to this headline"> </a></h2>
+<div class="section" id="faq">
+<h2><a class="toc-backref" href="#id8">FAQ</a><a class="headerlink" href="#faq" title="Permalink to this headline"> </a></h2>
 <p>If you encounter any issues with MLflow LangChain flavor, please also refer to <cite>FAQ &lt;../index.html#faq&gt;</cite>. If you still have questions, please feel free to open an issue in <a class="reference external" href="https://github.com/mlflow/mlflow/issues">MLflow Github repo</a>.</p>
 <div class="section" id="how-to-suppress-the-warning-messages-during-autologging">
 <h3>How to suppress the warning messages during autologging?<a class="headerlink" href="#how-to-suppress-the-warning-messages-during-autologging" title="Permalink to this headline"> </a></h3>
 <p>MLflow Langchain Autologging calls various logging functions and LangChain utilities under the hood. Some of them may
 generate warning messages that are not critical to the autologging process. If you want to suppress these warning messages, pass <code class="docutils literal notranslate"><span class="pre">silent=True</span></code> to the <a class="reference internal" href="../../python_api/mlflow.langchain.html#mlflow.langchain.autolog" title="mlflow.langchain.autolog"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.langchain.autolog()</span></code></a> function.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
 <span class="n">mlflow</span><span class="o">.</span><span class="n">langchain</span><span class="o">.</span><span class="n">autolog</span><span class="p">(</span><span class="n">silent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
@@ -505,6 +549,51 @@ environment has <cite>pydantic</cite> installed with at least version 2.</p>
 </div></blockquote>
 </li>
 </ul>
+</div>
+<div class="section" id="how-to-customize-span-names-in-the-traces">
+<h3>How to customize span names in the traces?<a class="headerlink" href="#how-to-customize-span-names-in-the-traces" title="Permalink to this headline"> </a></h3>
+<p>By default, MLflow creates span names based on the class name in LangChain, such as <code class="docutils literal notranslate"><span class="pre">ChatOpenAI</span></code>, <code class="docutils literal notranslate"><span class="pre">RunnableLambda</span></code>, etc. If you want to customize the span names, you can do the following:</p>
+<ol class="arabic simple">
+<li><p>Pass <code class="docutils literal notranslate"><span class="pre">name</span></code> parameter to the constructor of the LangChain class. This is useful when you want to set a specific name for a single component.</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">with_config</span></code> method to set the name for the runnables. You can pass the <code class="docutils literal notranslate"><span class="pre">&quot;run_name&quot;</span></code> key to the config dictionary to set a name for a sub chain that contains multiple components.</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_openai</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChatOpenAI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_core.output_parsers</span><span class="w"> </span><span class="kn">import</span> <span class="n">StrOutputParser</span>
+
+<span class="c1"># Enable auto-tracing for LangChain</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">langchain</span><span class="o">.</span><span class="n">autolog</span><span class="p">()</span>
+
+<span class="c1"># Method 1: Pass `name` parameter to the constructor</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">ChatOpenAI</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;custom-llm&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-4o-mini&quot;</span><span class="p">)</span>
+<span class="c1"># Method 2: Use `with_config` method to set the name for the runnables</span>
+<span class="n">runnable</span><span class="o">=</span> <span class="p">(</span><span class="n">model</span> <span class="o">|</span> <span class="n">StrOutputParser</span><span class="p">())</span><span class="o">.</span><span class="n">with_config</span><span class="p">({</span><span class="s2">&quot;run_name&quot;</span><span class="p">:</span> <span class="s2">&quot;custom-chain&quot;</span><span class="p">})</span>
+
+<span class="n">runnable</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="s2">&quot;Hi&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The above code will create a trace like the following:</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="../../_images/langchain-name-customize.png"><img alt="Customize Span Names in LangChain Traces" src="../../_images/langchain-name-customize.png" style="width: 100%;" /></a>
+</div>
+</div>
+<div class="section" id="how-to-add-extra-metadata-to-a-span">
+<h3>How to add extra metadata to a span?<a class="headerlink" href="#how-to-add-extra-metadata-to-a-span" title="Permalink to this headline"> </a></h3>
+<p>You can record extra metadata to the span by passing the <code class="docutils literal notranslate"><span class="pre">metadata</span></code> parameter of the LangChain’s <code class="docutils literal notranslate"><span class="pre">RunnableConfig</span></code> dictionary, either to the constructor or at runtime.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_openai</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChatOpenAI</span>
+
+<span class="c1"># Enable auto-tracing for LangChain</span>
+<span class="n">mlflow</span><span class="o">.</span><span class="n">langchain</span><span class="o">.</span><span class="n">autolog</span><span class="p">()</span>
+
+<span class="c1"># Pass metadata to the constructor using `with_config` method</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">ChatOpenAI</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-4o-mini&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">with_config</span><span class="p">({</span><span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;key1&quot;</span><span class="p">:</span> <span class="s2">&quot;value1&quot;</span><span class="p">}})</span>
+
+<span class="c1"># Pass metadata at runtime using the `config` parameter</span>
+<span class="n">model</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="s2">&quot;Hi&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;key2&quot;</span><span class="p">:</span> <span class="s2">&quot;value2&quot;</span><span class="p">}})</span>
+</pre></div>
+</div>
+<p>The metadata can be accessed in the <code class="docutils literal notranslate"><span class="pre">Attributes</span></code> tab in the MLflow UI.</p>
 </div>
 </div>
 </div>

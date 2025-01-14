@@ -204,30 +204,30 @@
               <div itemprop="articleBody">
                 
   <h1>Source code for mlflow.data.numpy_dataset</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">cached_property</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">cached_property</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">mlflow.data.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
-<span class="kn">from</span> <span class="nn">mlflow.data.dataset_source</span> <span class="kn">import</span> <span class="n">DatasetSource</span>
-<span class="kn">from</span> <span class="nn">mlflow.data.digest_utils</span> <span class="kn">import</span> <span class="n">compute_numpy_digest</span>
-<span class="kn">from</span> <span class="nn">mlflow.data.evaluation_dataset</span> <span class="kn">import</span> <span class="n">EvaluationDataset</span>
-<span class="kn">from</span> <span class="nn">mlflow.data.pyfunc_dataset_mixin</span> <span class="kn">import</span> <span class="n">PyFuncConvertibleDatasetMixin</span><span class="p">,</span> <span class="n">PyFuncInputsOutputs</span>
-<span class="kn">from</span> <span class="nn">mlflow.data.schema</span> <span class="kn">import</span> <span class="n">TensorDatasetSchema</span>
-<span class="kn">from</span> <span class="nn">mlflow.types.utils</span> <span class="kn">import</span> <span class="n">_infer_schema</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.data.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.data.dataset_source</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatasetSource</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.data.digest_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">compute_numpy_digest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.data.evaluation_dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">EvaluationDataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.data.pyfunc_dataset_mixin</span><span class="w"> </span><span class="kn">import</span> <span class="n">PyFuncConvertibleDatasetMixin</span><span class="p">,</span> <span class="n">PyFuncInputsOutputs</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.data.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">TensorDatasetSchema</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.types.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_infer_schema</span>
 
 <span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="NumpyDataset"><a class="viewcode-back" href="../../../python_api/mlflow.data.html#mlflow.data.NumpyDataset">[docs]</a><span class="k">class</span> <span class="nc">NumpyDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">PyFuncConvertibleDatasetMixin</span><span class="p">):</span>
+<div class="viewcode-block" id="NumpyDataset"><a class="viewcode-back" href="../../../python_api/mlflow.data.html#mlflow.data.NumpyDataset">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">NumpyDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">PyFuncConvertibleDatasetMixin</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Represents a NumPy dataset for use with MLflow Tracking.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">features</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]],</span>
         <span class="n">source</span><span class="p">:</span> <span class="n">DatasetSource</span><span class="p">,</span>
@@ -250,14 +250,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_targets</span> <span class="o">=</span> <span class="n">targets</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">digest</span><span class="o">=</span><span class="n">digest</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_compute_digest</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_compute_digest</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Computes a digest for the dataset. Called if the user doesn&#39;t supply</span>
 <span class="sd">        a digest when constructing the dataset.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">compute_numpy_digest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_targets</span><span class="p">)</span>
 
-<div class="viewcode-block" id="NumpyDataset.to_dict"><a class="viewcode-back" href="../../../python_api/mlflow.data.html#mlflow.data.NumpyDataset.to_dict">[docs]</a>    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="NumpyDataset.to_dict"><a class="viewcode-back" href="../../../python_api/mlflow.data.html#mlflow.data.NumpyDataset.to_dict">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create config dictionary for the dataset.</span>
 
 <span class="sd">        Returns a string dictionary containing the following fields: name, digest, source, source</span>
@@ -274,33 +274,33 @@
         <span class="k">return</span> <span class="n">config</span></div>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">source</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DatasetSource</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">source</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DatasetSource</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The source of the dataset.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_source</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">features</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">features</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The features of the dataset.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_features</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">targets</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">targets</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The targets of the dataset. May be ``None`` if no targets are available.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_targets</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">profile</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">profile</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        A profile of the dataset. May be ``None`` if a profile cannot be computed.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">def</span> <span class="nf">get_profile_attribute</span><span class="p">(</span><span class="n">numpy_data</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">get_profile_attribute</span><span class="p">(</span><span class="n">numpy_data</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">numpy_data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
                 <span class="k">return</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">array</span> <span class="ow">in</span> <span class="n">numpy_data</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
             <span class="k">else</span><span class="p">:</span>
@@ -323,7 +323,7 @@
         <span class="k">return</span> <span class="n">profile</span>
 
     <span class="nd">@cached_property</span>
-    <span class="k">def</span> <span class="nf">schema</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TensorDatasetSchema</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">schema</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TensorDatasetSchema</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        MLflow TensorSpec schema representing the dataset features and targets (optional).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -337,14 +337,14 @@
             <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Failed to infer schema for NumPy dataset. Exception: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">to_pyfunc</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PyFuncInputsOutputs</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_pyfunc</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PyFuncInputsOutputs</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Converts the dataset to a collection of pyfunc inputs and outputs for model</span>
 <span class="sd">        evaluation. Required for use with mlflow.evaluate().</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">PyFuncInputsOutputs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_targets</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">to_evaluation_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">feature_names</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluationDataset</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_evaluation_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">feature_names</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluationDataset</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Converts the dataset to an EvaluationDataset for model evaluation. Required</span>
 <span class="sd">        for use with mlflow.sklearn.evaluate().</span>
@@ -357,7 +357,7 @@
         <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="from_numpy"><a class="viewcode-back" href="../../../python_api/mlflow.data.html#mlflow.data.from_numpy">[docs]</a><span class="k">def</span> <span class="nf">from_numpy</span><span class="p">(</span>
+<div class="viewcode-block" id="from_numpy"><a class="viewcode-back" href="../../../python_api/mlflow.data.html#mlflow.data.from_numpy">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">from_numpy</span><span class="p">(</span>
     <span class="n">features</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]],</span>
     <span class="n">source</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DatasetSource</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">targets</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -408,9 +408,9 @@
 <span class="sd">        y = np.random.randint(2, size=[2])</span>
 <span class="sd">        dataset = mlflow.data.from_numpy(x, targets=y)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">mlflow.data.code_dataset_source</span> <span class="kn">import</span> <span class="n">CodeDatasetSource</span>
-    <span class="kn">from</span> <span class="nn">mlflow.data.dataset_source_registry</span> <span class="kn">import</span> <span class="n">resolve_dataset_source</span>
-    <span class="kn">from</span> <span class="nn">mlflow.tracking.context</span> <span class="kn">import</span> <span class="n">registry</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.data.code_dataset_source</span><span class="w"> </span><span class="kn">import</span> <span class="n">CodeDatasetSource</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.data.dataset_source_registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">resolve_dataset_source</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.tracking.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">registry</span>
 
     <span class="k">if</span> <span class="n">source</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">DatasetSource</span><span class="p">):</span>

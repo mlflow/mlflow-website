@@ -202,26 +202,26 @@
               <div itemprop="articleBody">
                 
   <h1>Source code for mlflow.entities.trace</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">from</span> <span class="nn">mlflow.entities._mlflow_object</span> <span class="kn">import</span> <span class="n">_MlflowObject</span>
-<span class="kn">from</span> <span class="nn">mlflow.entities.span</span> <span class="kn">import</span> <span class="n">Span</span><span class="p">,</span> <span class="n">SpanType</span>
-<span class="kn">from</span> <span class="nn">mlflow.entities.trace_data</span> <span class="kn">import</span> <span class="n">TraceData</span>
-<span class="kn">from</span> <span class="nn">mlflow.entities.trace_info</span> <span class="kn">import</span> <span class="n">TraceInfo</span>
-<span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
-<span class="kn">from</span> <span class="nn">mlflow.protos.databricks_pb2</span> <span class="kn">import</span> <span class="n">INVALID_PARAMETER_VALUE</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.entities._mlflow_object</span><span class="w"> </span><span class="kn">import</span> <span class="n">_MlflowObject</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.entities.span</span><span class="w"> </span><span class="kn">import</span> <span class="n">Span</span><span class="p">,</span> <span class="n">SpanType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.entities.trace_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">TraceData</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.entities.trace_info</span><span class="w"> </span><span class="kn">import</span> <span class="n">TraceInfo</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">MlflowException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.protos.databricks_pb2</span><span class="w"> </span><span class="kn">import</span> <span class="n">INVALID_PARAMETER_VALUE</span>
 
 <span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="Trace"><a class="viewcode-back" href="../../../python_api/mlflow.entities.html#mlflow.entities.Trace">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">Trace</span><span class="p">(</span><span class="n">_MlflowObject</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Trace</span><span class="p">(</span><span class="n">_MlflowObject</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A trace object.</span>
 
 <span class="sd">    Args:</span>
@@ -232,19 +232,19 @@
     <span class="n">info</span><span class="p">:</span> <span class="n">TraceInfo</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">TraceData</span>
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Trace(request_id=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">request_id</span><span class="si">}</span><span class="s2">)&quot;</span>
 
-<div class="viewcode-block" id="Trace.to_dict"><a class="viewcode-back" href="../../../python_api/mlflow.entities.html#mlflow.entities.Trace.to_dict">[docs]</a>    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<div class="viewcode-block" id="Trace.to_dict"><a class="viewcode-back" href="../../../python_api/mlflow.entities.html#mlflow.entities.Trace.to_dict">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;info&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span> <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()}</span></div>
 
-<div class="viewcode-block" id="Trace.to_json"><a class="viewcode-back" href="../../../python_api/mlflow.entities.html#mlflow.entities.Trace.to_json">[docs]</a>    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pretty</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="kn">from</span> <span class="nn">mlflow.tracing.utils</span> <span class="kn">import</span> <span class="n">TraceJSONEncoder</span>
+<div class="viewcode-block" id="Trace.to_json"><a class="viewcode-back" href="../../../python_api/mlflow.entities.html#mlflow.entities.Trace.to_json">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pretty</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.tracing.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">TraceJSONEncoder</span>
 
         <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span> <span class="bp">cls</span><span class="o">=</span><span class="n">TraceJSONEncoder</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span> <span class="k">if</span> <span class="n">pretty</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Trace.from_dict"><a class="viewcode-back" href="../../../python_api/mlflow.entities.html#mlflow.entities.Trace.from_dict">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">trace_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Trace</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">trace_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Trace</span><span class="p">:</span>
         <span class="n">info</span> <span class="o">=</span> <span class="n">trace_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;info&quot;</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">trace_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">info</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -260,7 +260,7 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Trace.from_json"><a class="viewcode-back" href="../../../python_api/mlflow.entities.html#mlflow.entities.Trace.from_json">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_json</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">trace_json</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Trace</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_json</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">trace_json</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Trace</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">trace_dict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">trace_json</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
@@ -270,13 +270,13 @@
             <span class="p">)</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">trace_dict</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_serialize_for_mimebundle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_serialize_for_mimebundle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># databricks notebooks will use the request ID to</span>
         <span class="c1"># fetch the trace from the backend. including the</span>
         <span class="c1"># full JSON can cause notebooks to exceed size limits</span>
         <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">request_id</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_repr_mimebundle_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">include</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_repr_mimebundle_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">include</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method is used to trigger custom display logic in IPython notebooks.</span>
 <span class="sd">        See https://ipython.readthedocs.io/en/stable/config/integrating.html#MyObject</span>
@@ -286,12 +286,12 @@
 <span class="sd">        which contains a JSON representation of the Trace object. This object is deserialized</span>
 <span class="sd">        in Databricks notebooks to display the Trace object in a nicer UI.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">mlflow.tracing.display</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.tracing.display</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
             <span class="n">get_display_handler</span><span class="p">,</span>
             <span class="n">get_notebook_iframe_html</span><span class="p">,</span>
             <span class="n">is_using_tracking_server</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="kn">from</span> <span class="nn">mlflow.utils.databricks_utils</span> <span class="kn">import</span> <span class="n">is_in_databricks_runtime</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.databricks_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_in_databricks_runtime</span>
 
         <span class="n">bundle</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;text/plain&quot;</span><span class="p">:</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="p">)}</span>
 
@@ -303,7 +303,7 @@
 
         <span class="k">return</span> <span class="n">bundle</span>
 
-<div class="viewcode-block" id="Trace.to_pandas_dataframe_row"><a class="viewcode-back" href="../../../python_api/mlflow.entities.html#mlflow.entities.Trace.to_pandas_dataframe_row">[docs]</a>    <span class="k">def</span> <span class="nf">to_pandas_dataframe_row</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<div class="viewcode-block" id="Trace.to_pandas_dataframe_row"><a class="viewcode-back" href="../../../python_api/mlflow.entities.html#mlflow.entities.Trace.to_pandas_dataframe_row">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">to_pandas_dataframe_row</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">&quot;request_id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">request_id</span><span class="p">,</span>
             <span class="s2">&quot;trace&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="p">,</span>
@@ -317,14 +317,14 @@
             <span class="s2">&quot;tags&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">tags</span><span class="p">,</span>
         <span class="p">}</span></div>
 
-    <span class="k">def</span> <span class="nf">_deserialize_json_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_deserialize_json_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to deserialize JSON attribute: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">value</span>
 
-<div class="viewcode-block" id="Trace.search_spans"><a class="viewcode-back" href="../../../python_api/mlflow.entities.html#mlflow.entities.Trace.search_spans">[docs]</a>    <span class="k">def</span> <span class="nf">search_spans</span><span class="p">(</span>
+<div class="viewcode-block" id="Trace.search_spans"><a class="viewcode-back" href="../../../python_api/mlflow.entities.html#mlflow.entities.Trace.search_spans">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">search_spans</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">span_type</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SpanType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">Pattern</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Span</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -394,7 +394,7 @@
 <span class="sd">            # Output: [Span(name=&#39;add_one&#39;, ...)]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">def</span> <span class="nf">_match_name</span><span class="p">(</span><span class="n">span</span><span class="p">:</span> <span class="n">Span</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_match_name</span><span class="p">(</span><span class="n">span</span><span class="p">:</span> <span class="n">Span</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
                 <span class="k">return</span> <span class="n">span</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span>
             <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">Pattern</span><span class="p">):</span>
@@ -407,7 +407,7 @@
                     <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span><span class="p">,</span>
                 <span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">_match_type</span><span class="p">(</span><span class="n">span</span><span class="p">:</span> <span class="n">Span</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_match_type</span><span class="p">(</span><span class="n">span</span><span class="p">:</span> <span class="n">Span</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">span_type</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
                 <span class="k">return</span> <span class="n">span</span><span class="o">.</span><span class="n">span_type</span> <span class="o">==</span> <span class="n">span_type</span>
             <span class="k">elif</span> <span class="n">span_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -422,7 +422,7 @@
         <span class="k">return</span> <span class="p">[</span><span class="n">span</span> <span class="k">for</span> <span class="n">span</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">spans</span> <span class="k">if</span> <span class="n">_match_name</span><span class="p">(</span><span class="n">span</span><span class="p">)</span> <span class="ow">and</span> <span class="n">_match_type</span><span class="p">(</span><span class="n">span</span><span class="p">)]</span></div>
 
 <div class="viewcode-block" id="Trace.pandas_dataframe_columns"><a class="viewcode-back" href="../../../python_api/mlflow.entities.html#mlflow.entities.Trace.pandas_dataframe_columns">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">pandas_dataframe_columns</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pandas_dataframe_columns</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">return</span> <span class="p">[</span>
             <span class="s2">&quot;request_id&quot;</span><span class="p">,</span>
             <span class="s2">&quot;trace&quot;</span><span class="p">,</span>

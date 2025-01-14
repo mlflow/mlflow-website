@@ -204,8 +204,8 @@
               <div itemprop="articleBody">
                 
   <h1>Source code for mlflow.server.auth.client</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">mlflow.server.auth.entities</span> <span class="kn">import</span> <span class="n">ExperimentPermission</span><span class="p">,</span> <span class="n">RegisteredModelPermission</span><span class="p">,</span> <span class="n">User</span>
-<span class="kn">from</span> <span class="nn">mlflow.server.auth.routes</span> <span class="kn">import</span> <span class="p">(</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.server.auth.entities</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExperimentPermission</span><span class="p">,</span> <span class="n">RegisteredModelPermission</span><span class="p">,</span> <span class="n">User</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.server.auth.routes</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">CREATE_EXPERIMENT_PERMISSION</span><span class="p">,</span>
     <span class="n">CREATE_REGISTERED_MODEL_PERMISSION</span><span class="p">,</span>
     <span class="n">CREATE_USER</span><span class="p">,</span>
@@ -220,30 +220,30 @@
     <span class="n">UPDATE_USER_ADMIN</span><span class="p">,</span>
     <span class="n">UPDATE_USER_PASSWORD</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.credentials</span> <span class="kn">import</span> <span class="n">get_default_host_creds</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.rest_utils</span> <span class="kn">import</span> <span class="n">http_request_safe</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.credentials</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_default_host_creds</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.rest_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">http_request_safe</span>
 
 
-<div class="viewcode-block" id="AuthServiceClient"><a class="viewcode-back" href="../../../../auth/python-api.html#mlflow.server.auth.client.AuthServiceClient">[docs]</a><span class="k">class</span> <span class="nc">AuthServiceClient</span><span class="p">:</span>
+<div class="viewcode-block" id="AuthServiceClient"><a class="viewcode-back" href="../../../../auth/python-api.html#mlflow.server.auth.client.AuthServiceClient">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">AuthServiceClient</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Client of an MLflow Tracking Server that enabled the default basic authentication plugin.</span>
 <span class="sd">    It is recommended to use :py:func:`mlflow.server.get_app_client()` to instantiate this class.</span>
 <span class="sd">    See https://mlflow.org/docs/latest/auth.html for more information.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tracking_uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tracking_uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            tracking_uri: Address of local or remote tracking server.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tracking_uri</span> <span class="o">=</span> <span class="n">tracking_uri</span>
 
-    <span class="k">def</span> <span class="nf">_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">host_creds</span> <span class="o">=</span> <span class="n">get_default_host_creds</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tracking_uri</span><span class="p">)</span>
         <span class="n">resp</span> <span class="o">=</span> <span class="n">http_request_safe</span><span class="p">(</span><span class="n">host_creds</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">resp</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
 
-<div class="viewcode-block" id="AuthServiceClient.create_user"><a class="viewcode-back" href="../../../../auth/python-api.html#mlflow.server.auth.client.AuthServiceClient.create_user">[docs]</a>    <span class="k">def</span> <span class="nf">create_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">password</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<div class="viewcode-block" id="AuthServiceClient.create_user"><a class="viewcode-back" href="../../../../auth/python-api.html#mlflow.server.auth.client.AuthServiceClient.create_user">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">create_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">password</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a new user.</span>
 
@@ -284,7 +284,7 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">User</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">resp</span><span class="p">[</span><span class="s2">&quot;user&quot;</span><span class="p">])</span></div>
 
-<div class="viewcode-block" id="AuthServiceClient.get_user"><a class="viewcode-back" href="../../../../auth/python-api.html#mlflow.server.auth.client.AuthServiceClient.get_user">[docs]</a>    <span class="k">def</span> <span class="nf">get_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<div class="viewcode-block" id="AuthServiceClient.get_user"><a class="viewcode-back" href="../../../../auth/python-api.html#mlflow.server.auth.client.AuthServiceClient.get_user">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get a user with a specific username.</span>
 
@@ -331,7 +331,7 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">User</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">resp</span><span class="p">[</span><span class="s2">&quot;user&quot;</span><span class="p">])</span></div>
 
-<div class="viewcode-block" id="AuthServiceClient.update_user_password"><a class="viewcode-back" href="../../../../auth/python-api.html#mlflow.server.auth.client.AuthServiceClient.update_user_password">[docs]</a>    <span class="k">def</span> <span class="nf">update_user_password</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">password</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<div class="viewcode-block" id="AuthServiceClient.update_user_password"><a class="viewcode-back" href="../../../../auth/python-api.html#mlflow.server.auth.client.AuthServiceClient.update_user_password">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_user_password</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">password</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Update the password of a specific user.</span>
 
@@ -363,7 +363,7 @@
             <span class="n">json</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="n">username</span><span class="p">,</span> <span class="s2">&quot;password&quot;</span><span class="p">:</span> <span class="n">password</span><span class="p">},</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="AuthServiceClient.update_user_admin"><a class="viewcode-back" href="../../../../auth/python-api.html#mlflow.server.auth.client.AuthServiceClient.update_user_admin">[docs]</a>    <span class="k">def</span> <span class="nf">update_user_admin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">is_admin</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+<div class="viewcode-block" id="AuthServiceClient.update_user_admin"><a class="viewcode-back" href="../../../../auth/python-api.html#mlflow.server.auth.client.AuthServiceClient.update_user_admin">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_user_admin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">is_admin</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Update the admin status of a specific user.</span>
 
@@ -395,7 +395,7 @@
             <span class="n">json</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="n">username</span><span class="p">,</span> <span class="s2">&quot;is_admin&quot;</span><span class="p">:</span> <span class="n">is_admin</span><span class="p">},</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="AuthServiceClient.delete_user"><a class="viewcode-back" href="../../../../auth/python-api.html#mlflow.server.auth.client.AuthServiceClient.delete_user">[docs]</a>    <span class="k">def</span> <span class="nf">delete_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<div class="viewcode-block" id="AuthServiceClient.delete_user"><a class="viewcode-back" href="../../../../auth/python-api.html#mlflow.server.auth.client.AuthServiceClient.delete_user">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">delete_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Delete a specific user.</span>
 
@@ -426,7 +426,7 @@
             <span class="n">json</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="n">username</span><span class="p">},</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="AuthServiceClient.create_experiment_permission"><a class="viewcode-back" href="../../../../auth/python-api.html#mlflow.server.auth.client.AuthServiceClient.create_experiment_permission">[docs]</a>    <span class="k">def</span> <span class="nf">create_experiment_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">experiment_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">permission</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<div class="viewcode-block" id="AuthServiceClient.create_experiment_permission"><a class="viewcode-back" href="../../../../auth/python-api.html#mlflow.server.auth.client.AuthServiceClient.create_experiment_permission">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">create_experiment_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">experiment_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">permission</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a permission on an experiment for a user.</span>
 
@@ -476,7 +476,7 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">ExperimentPermission</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">resp</span><span class="p">[</span><span class="s2">&quot;experiment_permission&quot;</span><span class="p">])</span></div>
 
-<div class="viewcode-block" id="AuthServiceClient.get_experiment_permission"><a class="viewcode-back" href="../../../../auth/python-api.html#mlflow.server.auth.client.AuthServiceClient.get_experiment_permission">[docs]</a>    <span class="k">def</span> <span class="nf">get_experiment_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">experiment_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<div class="viewcode-block" id="AuthServiceClient.get_experiment_permission"><a class="viewcode-back" href="../../../../auth/python-api.html#mlflow.server.auth.client.AuthServiceClient.get_experiment_permission">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_experiment_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">experiment_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get an experiment permission for a user.</span>
 
@@ -525,7 +525,7 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">ExperimentPermission</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">resp</span><span class="p">[</span><span class="s2">&quot;experiment_permission&quot;</span><span class="p">])</span></div>
 
-<div class="viewcode-block" id="AuthServiceClient.update_experiment_permission"><a class="viewcode-back" href="../../../../auth/python-api.html#mlflow.server.auth.client.AuthServiceClient.update_experiment_permission">[docs]</a>    <span class="k">def</span> <span class="nf">update_experiment_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">experiment_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">permission</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<div class="viewcode-block" id="AuthServiceClient.update_experiment_permission"><a class="viewcode-back" href="../../../../auth/python-api.html#mlflow.server.auth.client.AuthServiceClient.update_experiment_permission">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_experiment_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">experiment_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">permission</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Update an existing experiment permission for a user.</span>
 
@@ -560,7 +560,7 @@
             <span class="n">json</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;experiment_id&quot;</span><span class="p">:</span> <span class="n">experiment_id</span><span class="p">,</span> <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="n">username</span><span class="p">,</span> <span class="s2">&quot;permission&quot;</span><span class="p">:</span> <span class="n">permission</span><span class="p">},</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="AuthServiceClient.delete_experiment_permission"><a class="viewcode-back" href="../../../../auth/python-api.html#mlflow.server.auth.client.AuthServiceClient.delete_experiment_permission">[docs]</a>    <span class="k">def</span> <span class="nf">delete_experiment_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">experiment_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<div class="viewcode-block" id="AuthServiceClient.delete_experiment_permission"><a class="viewcode-back" href="../../../../auth/python-api.html#mlflow.server.auth.client.AuthServiceClient.delete_experiment_permission">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">delete_experiment_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">experiment_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Delete an existing experiment permission for a user.</span>
 
@@ -596,7 +596,7 @@
             <span class="n">json</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;experiment_id&quot;</span><span class="p">:</span> <span class="n">experiment_id</span><span class="p">,</span> <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="n">username</span><span class="p">},</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="AuthServiceClient.create_registered_model_permission"><a class="viewcode-back" href="../../../../auth/python-api.html#mlflow.server.auth.client.AuthServiceClient.create_registered_model_permission">[docs]</a>    <span class="k">def</span> <span class="nf">create_registered_model_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">permission</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<div class="viewcode-block" id="AuthServiceClient.create_registered_model_permission"><a class="viewcode-back" href="../../../../auth/python-api.html#mlflow.server.auth.client.AuthServiceClient.create_registered_model_permission">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">create_registered_model_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">permission</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a permission on an registered model for a user.</span>
 
@@ -622,7 +622,7 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">RegisteredModelPermission</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">resp</span><span class="p">[</span><span class="s2">&quot;registered_model_permission&quot;</span><span class="p">])</span></div>
 
-<div class="viewcode-block" id="AuthServiceClient.get_registered_model_permission"><a class="viewcode-back" href="../../../../auth/python-api.html#mlflow.server.auth.client.AuthServiceClient.get_registered_model_permission">[docs]</a>    <span class="k">def</span> <span class="nf">get_registered_model_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<div class="viewcode-block" id="AuthServiceClient.get_registered_model_permission"><a class="viewcode-back" href="../../../../auth/python-api.html#mlflow.server.auth.client.AuthServiceClient.get_registered_model_permission">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_registered_model_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get an registered model permission for a user.</span>
 
@@ -671,7 +671,7 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">RegisteredModelPermission</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">resp</span><span class="p">[</span><span class="s2">&quot;registered_model_permission&quot;</span><span class="p">])</span></div>
 
-<div class="viewcode-block" id="AuthServiceClient.update_registered_model_permission"><a class="viewcode-back" href="../../../../auth/python-api.html#mlflow.server.auth.client.AuthServiceClient.update_registered_model_permission">[docs]</a>    <span class="k">def</span> <span class="nf">update_registered_model_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">permission</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<div class="viewcode-block" id="AuthServiceClient.update_registered_model_permission"><a class="viewcode-back" href="../../../../auth/python-api.html#mlflow.server.auth.client.AuthServiceClient.update_registered_model_permission">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_registered_model_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">permission</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Update an existing registered model permission for a user.</span>
 
@@ -706,7 +706,7 @@
             <span class="n">json</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="n">username</span><span class="p">,</span> <span class="s2">&quot;permission&quot;</span><span class="p">:</span> <span class="n">permission</span><span class="p">},</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="AuthServiceClient.delete_registered_model_permission"><a class="viewcode-back" href="../../../../auth/python-api.html#mlflow.server.auth.client.AuthServiceClient.delete_registered_model_permission">[docs]</a>    <span class="k">def</span> <span class="nf">delete_registered_model_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<div class="viewcode-block" id="AuthServiceClient.delete_registered_model_permission"><a class="viewcode-back" href="../../../../auth/python-api.html#mlflow.server.auth.client.AuthServiceClient.delete_registered_model_permission">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">delete_registered_model_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Delete an existing registered model permission for a user.</span>
 

@@ -236,43 +236,43 @@
 <span class="sd">for how to set up secrets on Databricks.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">importlib.metadata</span>
-<span class="kn">import</span> <span class="nn">itertools</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
-<span class="kn">from</span> <span class="nn">string</span> <span class="kn">import</span> <span class="n">Formatter</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">importlib.metadata</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">string</span><span class="w"> </span><span class="kn">import</span> <span class="n">Formatter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">import</span> <span class="nn">yaml</span>
-<span class="kn">from</span> <span class="nn">packaging.version</span> <span class="kn">import</span> <span class="n">Version</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">packaging.version</span><span class="w"> </span><span class="kn">import</span> <span class="n">Version</span>
 
-<span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">from</span> <span class="nn">mlflow</span> <span class="kn">import</span> <span class="n">pyfunc</span>
-<span class="kn">from</span> <span class="nn">mlflow.environment_variables</span> <span class="kn">import</span> <span class="n">MLFLOW_OPENAI_SECRET_SCOPE</span>
-<span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
-<span class="kn">from</span> <span class="nn">mlflow.models</span> <span class="kn">import</span> <span class="n">Model</span><span class="p">,</span> <span class="n">ModelInputExample</span><span class="p">,</span> <span class="n">ModelSignature</span>
-<span class="kn">from</span> <span class="nn">mlflow.models.model</span> <span class="kn">import</span> <span class="n">MLMODEL_FILE_NAME</span>
-<span class="kn">from</span> <span class="nn">mlflow.models.signature</span> <span class="kn">import</span> <span class="n">_infer_signature_from_input_example</span>
-<span class="kn">from</span> <span class="nn">mlflow.models.utils</span> <span class="kn">import</span> <span class="n">_save_example</span>
-<span class="kn">from</span> <span class="nn">mlflow.openai._openai_autolog</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyfunc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.environment_variables</span><span class="w"> </span><span class="kn">import</span> <span class="n">MLFLOW_OPENAI_SECRET_SCOPE</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">MlflowException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Model</span><span class="p">,</span> <span class="n">ModelInputExample</span><span class="p">,</span> <span class="n">ModelSignature</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">MLMODEL_FILE_NAME</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models.signature</span><span class="w"> </span><span class="kn">import</span> <span class="n">_infer_signature_from_input_example</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.models.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_save_example</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.openai._openai_autolog</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">patched_agent_get_chat_completion</span><span class="p">,</span>
     <span class="n">patched_call</span><span class="p">,</span>
     <span class="n">patched_swarm_run</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.protos.databricks_pb2</span> <span class="kn">import</span> <span class="n">INVALID_PARAMETER_VALUE</span>
-<span class="kn">from</span> <span class="nn">mlflow.tracking._model_registry</span> <span class="kn">import</span> <span class="n">DEFAULT_AWAIT_MAX_SLEEP_SECONDS</span>
-<span class="kn">from</span> <span class="nn">mlflow.tracking.artifact_utils</span> <span class="kn">import</span> <span class="n">_download_artifact_from_uri</span>
-<span class="kn">from</span> <span class="nn">mlflow.types</span> <span class="kn">import</span> <span class="n">ColSpec</span><span class="p">,</span> <span class="n">Schema</span><span class="p">,</span> <span class="n">TensorSpec</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.annotations</span> <span class="kn">import</span> <span class="n">experimental</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.autologging_utils</span> <span class="kn">import</span> <span class="n">autologging_integration</span><span class="p">,</span> <span class="n">safe_patch</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.databricks_utils</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.protos.databricks_pb2</span><span class="w"> </span><span class="kn">import</span> <span class="n">INVALID_PARAMETER_VALUE</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.tracking._model_registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_AWAIT_MAX_SLEEP_SECONDS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.tracking.artifact_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_download_artifact_from_uri</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">ColSpec</span><span class="p">,</span> <span class="n">Schema</span><span class="p">,</span> <span class="n">TensorSpec</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">experimental</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.autologging_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">autologging_integration</span><span class="p">,</span> <span class="n">safe_patch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.databricks_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">check_databricks_secret_scope_access</span><span class="p">,</span>
     <span class="n">is_in_databricks_runtime</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.docstring_utils</span> <span class="kn">import</span> <span class="n">LOG_MODEL_PARAM_DOCS</span><span class="p">,</span> <span class="n">format_docstring</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.environment</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.docstring_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOG_MODEL_PARAM_DOCS</span><span class="p">,</span> <span class="n">format_docstring</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.environment</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_CONDA_ENV_FILE_NAME</span><span class="p">,</span>
     <span class="n">_CONSTRAINTS_FILE_NAME</span><span class="p">,</span>
     <span class="n">_PYTHON_ENV_FILE_NAME</span><span class="p">,</span>
@@ -283,20 +283,20 @@
     <span class="n">_PythonEnv</span><span class="p">,</span>
     <span class="n">_validate_env_arguments</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.file_utils</span> <span class="kn">import</span> <span class="n">write_to</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.model_utils</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.file_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">write_to</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.model_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_add_code_from_conf_to_system_path</span><span class="p">,</span>
     <span class="n">_get_flavor_configuration</span><span class="p">,</span>
     <span class="n">_validate_and_copy_code_paths</span><span class="p">,</span>
     <span class="n">_validate_and_prepare_target_save_path</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.openai_utils</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.openai_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_OAITokenHolder</span><span class="p">,</span>
     <span class="n">_OpenAIApiConfig</span><span class="p">,</span>
     <span class="n">_OpenAIEnvVar</span><span class="p">,</span>
     <span class="n">_validate_model_params</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.requirements_utils</span> <span class="kn">import</span> <span class="n">_get_pinned_requirement</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.requirements_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_get_pinned_requirement</span>
 
 <span class="n">FLAVOR_NAME</span> <span class="o">=</span> <span class="s2">&quot;openai&quot;</span>
 <span class="n">MODEL_FILENAME</span> <span class="o">=</span> <span class="s2">&quot;model.yaml&quot;</span>
@@ -306,7 +306,7 @@
 
 
 <div class="viewcode-block" id="get_default_pip_requirements"><a class="viewcode-back" href="../../python_api/openai/index.html#mlflow.openai.get_default_pip_requirements">[docs]</a><span class="nd">@experimental</span>
-<span class="k">def</span> <span class="nf">get_default_pip_requirements</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_default_pip_requirements</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns:</span>
 <span class="sd">        A list of default pip requirements for MLflow Models produced by this flavor.</span>
@@ -317,7 +317,7 @@
 
 
 <div class="viewcode-block" id="get_default_conda_env"><a class="viewcode-back" href="../../python_api/openai/index.html#mlflow.openai.get_default_conda_env">[docs]</a><span class="nd">@experimental</span>
-<span class="k">def</span> <span class="nf">get_default_conda_env</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_default_conda_env</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns:</span>
 <span class="sd">        The default Conda environment for MLflow Models produced by calls to</span>
@@ -326,8 +326,8 @@
     <span class="k">return</span> <span class="n">_mlflow_conda_env</span><span class="p">(</span><span class="n">additional_pip_deps</span><span class="o">=</span><span class="n">get_default_pip_requirements</span><span class="p">())</span></div>
 
 
-<span class="k">def</span> <span class="nf">_get_obj_to_task_mapping</span><span class="p">():</span>
-    <span class="kn">from</span> <span class="nn">openai</span> <span class="kn">import</span> <span class="n">resources</span> <span class="k">as</span> <span class="n">r</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_obj_to_task_mapping</span><span class="p">():</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">openai</span><span class="w"> </span><span class="kn">import</span> <span class="n">resources</span> <span class="k">as</span> <span class="n">r</span>
 
     <span class="k">return</span> <span class="p">{</span>
         <span class="n">r</span><span class="o">.</span><span class="n">Audio</span><span class="p">:</span> <span class="s2">&quot;audio&quot;</span><span class="p">,</span>
@@ -343,8 +343,8 @@
     <span class="p">}</span>
 
 
-<span class="k">def</span> <span class="nf">_get_model_name</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
-    <span class="kn">import</span> <span class="nn">openai</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_model_name</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">openai</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">model</span>
@@ -357,7 +357,7 @@
     <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_get_task_name</span><span class="p">(</span><span class="n">task</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_task_name</span><span class="p">(</span><span class="n">task</span><span class="p">):</span>
     <span class="n">mapping</span> <span class="o">=</span> <span class="n">_get_obj_to_task_mapping</span><span class="p">()</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">task</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mapping</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
@@ -378,9 +378,9 @@
         <span class="k">return</span> <span class="n">task_name</span>
 
 
-<span class="k">def</span> <span class="nf">_get_api_config</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">_OpenAIApiConfig</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_api_config</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">_OpenAIApiConfig</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets the parameters and configuration of the OpenAI API connected to.&quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">openai</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">openai</span>
 
     <span class="n">api_type</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">_OpenAIEnvVar</span><span class="o">.</span><span class="n">OPENAI_API_TYPE</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">openai</span><span class="o">.</span><span class="n">api_type</span><span class="p">)</span>
     <span class="n">api_version</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">_OpenAIEnvVar</span><span class="o">.</span><span class="n">OPENAI_API_VERSION</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">openai</span><span class="o">.</span><span class="n">api_version</span><span class="p">)</span>
@@ -410,21 +410,21 @@
     <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_get_openai_package_version</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_openai_package_version</span><span class="p">():</span>
     <span class="k">return</span> <span class="n">importlib</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="s2">&quot;openai&quot;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_log_secrets_yaml</span><span class="p">(</span><span class="n">local_model_dir</span><span class="p">,</span> <span class="n">scope</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_log_secrets_yaml</span><span class="p">(</span><span class="n">local_model_dir</span><span class="p">,</span> <span class="n">scope</span><span class="p">):</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">local_model_dir</span><span class="p">,</span> <span class="s2">&quot;openai.yaml&quot;</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">yaml</span><span class="o">.</span><span class="n">safe_dump</span><span class="p">({</span><span class="n">e</span><span class="o">.</span><span class="n">value</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">scope</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">secret_key</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">_OpenAIEnvVar</span><span class="p">},</span> <span class="n">f</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_parse_format_fields</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_parse_format_fields</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Parses format fields from a given string, e.g. &quot;Hello {name}&quot; -&gt; [&quot;name&quot;].&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="p">{</span><span class="n">fn</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">Formatter</span><span class="p">()</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">if</span> <span class="n">fn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">}</span>
 
 
-<span class="k">def</span> <span class="nf">_get_input_schema</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_input_schema</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">content</span><span class="p">:</span>
         <span class="n">formatter</span> <span class="o">=</span> <span class="n">_ContentFormatter</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="n">content</span><span class="p">)</span>
         <span class="n">variables</span> <span class="o">=</span> <span class="n">formatter</span><span class="o">.</span><span class="n">variables</span>
@@ -440,7 +440,7 @@
 
 <div class="viewcode-block" id="save_model"><a class="viewcode-back" href="../../python_api/openai/index.html#mlflow.openai.save_model">[docs]</a><span class="nd">@experimental</span>
 <span class="nd">@format_docstring</span><span class="p">(</span><span class="n">LOG_MODEL_PARAM_DOCS</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">package_name</span><span class="o">=</span><span class="n">FLAVOR_NAME</span><span class="p">))</span>
-<span class="k">def</span> <span class="nf">save_model</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">save_model</span><span class="p">(</span>
     <span class="n">model</span><span class="p">,</span>
     <span class="n">task</span><span class="p">,</span>
     <span class="n">path</span><span class="p">,</span>
@@ -520,7 +520,7 @@
     <span class="k">if</span> <span class="n">Version</span><span class="p">(</span><span class="n">_get_openai_package_version</span><span class="p">())</span><span class="o">.</span><span class="n">major</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="s2">&quot;Only openai&gt;=1.0 is supported.&quot;</span><span class="p">)</span>
 
-    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
     <span class="n">_validate_env_arguments</span><span class="p">(</span><span class="n">conda_env</span><span class="p">,</span> <span class="n">pip_requirements</span><span class="p">,</span> <span class="n">extra_pip_requirements</span><span class="p">)</span>
     <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
@@ -641,7 +641,7 @@
 
 <div class="viewcode-block" id="log_model"><a class="viewcode-back" href="../../python_api/openai/index.html#mlflow.openai.log_model">[docs]</a><span class="nd">@experimental</span>
 <span class="nd">@format_docstring</span><span class="p">(</span><span class="n">LOG_MODEL_PARAM_DOCS</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">package_name</span><span class="o">=</span><span class="n">FLAVOR_NAME</span><span class="p">))</span>
-<span class="k">def</span> <span class="nf">log_model</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">log_model</span><span class="p">(</span>
     <span class="n">model</span><span class="p">,</span>
     <span class="n">task</span><span class="p">,</span>
     <span class="n">artifact_path</span><span class="p">,</span>
@@ -749,17 +749,17 @@
     <span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">_load_model</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_load_model</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_is_valid_message</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_is_valid_message</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
     <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;content&quot;</span> <span class="ow">in</span> <span class="n">d</span> <span class="ow">and</span> <span class="s2">&quot;role&quot;</span> <span class="ow">in</span> <span class="n">d</span>
 
 
-<span class="k">class</span> <span class="nc">_ContentFormatter</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_ContentFormatter</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">task</span> <span class="o">==</span> <span class="s2">&quot;completions&quot;</span><span class="p">:</span>
             <span class="n">template</span> <span class="o">=</span> <span class="n">template</span> <span class="ow">or</span> <span class="s2">&quot;</span><span class="si">{prompt}</span><span class="s2">&quot;</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">template</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -798,7 +798,7 @@
                 <span class="sa">f</span><span class="s2">&quot;Task type ``</span><span class="si">{</span><span class="n">task</span><span class="si">}</span><span class="s2">`` is not supported for formatting.&quot;</span>
             <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">missing_params</span> <span class="o">:=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">params</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Expected parameters </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="si">}</span><span class="s2"> to be provided, &quot;</span>
@@ -806,10 +806,10 @@
             <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_fn</span><span class="p">(</span><span class="o">**</span><span class="n">params</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">format_prompt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">format_prompt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">})</span>
 
-    <span class="k">def</span> <span class="nf">format_chat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">format_chat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
         <span class="n">format_args</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">}</span>
         <span class="k">return</span> <span class="p">[</span>
             <span class="p">{</span>
@@ -820,7 +820,7 @@
         <span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">_first_string_column</span><span class="p">(</span><span class="n">pdf</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_first_string_column</span><span class="p">(</span><span class="n">pdf</span><span class="p">):</span>
     <span class="n">iter_str_cols</span> <span class="o">=</span> <span class="p">(</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">pdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">))</span>
     <span class="n">col</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">iter_str_cols</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">col</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -830,8 +830,8 @@
     <span class="k">return</span> <span class="n">col</span>
 
 
-<span class="k">class</span> <span class="nc">_OpenAIWrapper</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_OpenAIWrapper</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
         <span class="n">task</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;task&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">task</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_PYFUNC_SUPPORTED_TASKS</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
@@ -845,23 +845,23 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="o">!=</span> <span class="s2">&quot;embeddings&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_setup_completions</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">get_raw_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_raw_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the underlying model.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span>
 
-    <span class="k">def</span> <span class="nf">_setup_completions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setup_completions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="o">==</span> <span class="s2">&quot;chat.completions&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">template</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;messages&quot;</span><span class="p">,</span> <span class="p">[])</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">template</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;prompt&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">formatter</span> <span class="o">=</span> <span class="n">_ContentFormatter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">template</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">format_completions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params_list</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">format_completions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params_list</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">formatter</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">params</span><span class="p">)</span> <span class="k">for</span> <span class="n">params</span> <span class="ow">in</span> <span class="n">params_list</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">get_params_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_params_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">formatter</span><span class="o">.</span><span class="n">variables</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">variable</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">formatter</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
@@ -872,10 +872,10 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">formatter</span><span class="o">.</span><span class="n">variables</span><span class="p">]</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="n">orient</span><span class="o">=</span><span class="s2">&quot;records&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">get_client</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_retries</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_client</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_retries</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
         <span class="c1"># with_option method should not be used before v1.3.8: https://github.com/openai/openai-python/issues/865</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_config</span><span class="o">.</span><span class="n">api_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;azure&quot;</span><span class="p">,</span> <span class="s2">&quot;azure_ad&quot;</span><span class="p">,</span> <span class="s2">&quot;azuread&quot;</span><span class="p">):</span>
-            <span class="kn">from</span> <span class="nn">openai</span> <span class="kn">import</span> <span class="n">AzureOpenAI</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">openai</span><span class="w"> </span><span class="kn">import</span> <span class="n">AzureOpenAI</span>
 
             <span class="k">return</span> <span class="n">AzureOpenAI</span><span class="p">(</span>
                 <span class="n">api_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_token</span><span class="o">.</span><span class="n">token</span><span class="p">,</span>
@@ -886,7 +886,7 @@
                 <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">openai</span> <span class="kn">import</span> <span class="n">OpenAI</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">openai</span><span class="w"> </span><span class="kn">import</span> <span class="n">OpenAI</span>
 
             <span class="k">return</span> <span class="n">OpenAI</span><span class="p">(</span>
                 <span class="n">api_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_token</span><span class="o">.</span><span class="n">token</span><span class="p">,</span>
@@ -895,8 +895,8 @@
                 <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
             <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_predict_chat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">mlflow.openai.api_request_parallel_processor</span> <span class="kn">import</span> <span class="n">process_api_requests</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_predict_chat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.openai.api_request_parallel_processor</span><span class="w"> </span><span class="kn">import</span> <span class="n">process_api_requests</span>
 
         <span class="n">_validate_model_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
         <span class="n">max_retries</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;max_retries&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_config</span><span class="o">.</span><span class="n">max_retries</span><span class="p">)</span>
@@ -919,8 +919,8 @@
 
         <span class="k">return</span> <span class="p">[</span><span class="n">r</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">content</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">_predict_completions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">mlflow.openai.api_request_parallel_processor</span> <span class="kn">import</span> <span class="n">process_api_requests</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_predict_completions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.openai.api_request_parallel_processor</span><span class="w"> </span><span class="kn">import</span> <span class="n">process_api_requests</span>
 
         <span class="n">_validate_model_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
         <span class="n">prompts_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_completions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_params_list</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
@@ -945,8 +945,8 @@
 
         <span class="k">return</span> <span class="p">[</span><span class="n">row</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">results</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">batch</span><span class="o">.</span><span class="n">choices</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">_predict_embeddings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">mlflow.openai.api_request_parallel_processor</span> <span class="kn">import</span> <span class="n">process_api_requests</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_predict_embeddings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.openai.api_request_parallel_processor</span><span class="w"> </span><span class="kn">import</span> <span class="n">process_api_requests</span>
 
         <span class="n">_validate_model_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
         <span class="n">max_retries</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;max_retries&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_config</span><span class="o">.</span><span class="n">max_retries</span><span class="p">)</span>
@@ -973,7 +973,7 @@
 
         <span class="k">return</span> <span class="p">[</span><span class="n">row</span><span class="o">.</span><span class="n">embedding</span> <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">results</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">batch</span><span class="o">.</span><span class="n">data</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            data: Model input data.</span>
@@ -991,7 +991,7 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_embeddings</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">params</span> <span class="ow">or</span> <span class="p">{})</span>
 
 
-<span class="k">def</span> <span class="nf">_load_pyfunc</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_load_pyfunc</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Loads PyFunc implementation. Called by ``pyfunc.load_model``.</span>
 
 <span class="sd">    Args:</span>
@@ -1001,7 +1001,7 @@
 
 
 <div class="viewcode-block" id="load_model"><a class="viewcode-back" href="../../python_api/openai/index.html#mlflow.openai.load_model">[docs]</a><span class="nd">@experimental</span>
-<span class="k">def</span> <span class="nf">load_model</span><span class="p">(</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">dst_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_model</span><span class="p">(</span><span class="n">model_uri</span><span class="p">,</span> <span class="n">dst_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Load an OpenAI model from a local file or a run.</span>
 
@@ -1032,7 +1032,7 @@
 
 <div class="viewcode-block" id="autolog"><a class="viewcode-back" href="../../python_api/openai/index.html#mlflow.openai.autolog">[docs]</a><span class="nd">@experimental</span>
 <span class="nd">@autologging_integration</span><span class="p">(</span><span class="n">FLAVOR_NAME</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">autolog</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">autolog</span><span class="p">(</span>
     <span class="n">log_input_examples</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">log_model_signatures</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">log_models</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -1091,9 +1091,9 @@
     <span class="k">if</span> <span class="n">Version</span><span class="p">(</span><span class="n">_get_openai_package_version</span><span class="p">())</span><span class="o">.</span><span class="n">major</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span><span class="s2">&quot;OpenAI autologging is only supported for openai &gt;= 1.0.0&quot;</span><span class="p">)</span>
 
-    <span class="kn">from</span> <span class="nn">openai.resources.chat.completions</span> <span class="kn">import</span> <span class="n">Completions</span> <span class="k">as</span> <span class="n">ChatCompletions</span>
-    <span class="kn">from</span> <span class="nn">openai.resources.completions</span> <span class="kn">import</span> <span class="n">Completions</span>
-    <span class="kn">from</span> <span class="nn">openai.resources.embeddings</span> <span class="kn">import</span> <span class="n">Embeddings</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">openai.resources.chat.completions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Completions</span> <span class="k">as</span> <span class="n">ChatCompletions</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">openai.resources.completions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Completions</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">openai.resources.embeddings</span><span class="w"> </span><span class="kn">import</span> <span class="n">Embeddings</span>
 
     <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="p">(</span><span class="n">ChatCompletions</span><span class="p">,</span> <span class="n">Completions</span><span class="p">,</span> <span class="n">Embeddings</span><span class="p">):</span>
         <span class="n">safe_patch</span><span class="p">(</span>
@@ -1105,7 +1105,7 @@
 
     <span class="c1"># Patch Swarm agent to generate traces</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">from</span> <span class="nn">swarm</span> <span class="kn">import</span> <span class="n">Swarm</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">swarm</span><span class="w"> </span><span class="kn">import</span> <span class="n">Swarm</span>
 
         <span class="n">safe_patch</span><span class="p">(</span>
             <span class="n">FLAVOR_NAME</span><span class="p">,</span>

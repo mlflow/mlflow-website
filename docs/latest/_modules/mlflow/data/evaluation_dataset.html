@@ -204,38 +204,38 @@
               <div itemprop="articleBody">
                 
   <h1>Source code for mlflow.data.evaluation_dataset</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">hashlib</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">struct</span>
-<span class="kn">import</span> <span class="nn">sys</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">hashlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">struct</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 
-<span class="kn">from</span> <span class="nn">packaging.version</span> <span class="kn">import</span> <span class="n">Version</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">packaging.version</span><span class="w"> </span><span class="kn">import</span> <span class="n">Version</span>
 
-<span class="kn">import</span> <span class="nn">mlflow</span>
-<span class="kn">from</span> <span class="nn">mlflow.entities</span> <span class="kn">import</span> <span class="n">RunTag</span>
-<span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
-<span class="kn">from</span> <span class="nn">mlflow.protos.databricks_pb2</span> <span class="kn">import</span> <span class="n">INVALID_PARAMETER_VALUE</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.string_utils</span> <span class="kn">import</span> <span class="n">generate_feature_name_if_not_string</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.entities</span><span class="w"> </span><span class="kn">import</span> <span class="n">RunTag</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">MlflowException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.protos.databricks_pb2</span><span class="w"> </span><span class="kn">import</span> <span class="n">INVALID_PARAMETER_VALUE</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.string_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_feature_name_if_not_string</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="c1"># `numpy` and `pandas` are not required for `mlflow-skinny`.</span>
-    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-    <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="k">pass</span>
 
 <span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_hash_uint64_ndarray_as_bytes</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_hash_uint64_ndarray_as_bytes</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
     <span class="c1"># see struct pack format string https://docs.python.org/3/library/struct.html#format-strings</span>
     <span class="k">return</span> <span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&gt;</span><span class="si">{</span><span class="n">array</span><span class="o">.</span><span class="n">size</span><span class="si">}</span><span class="s2">Q&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">array</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_is_empty_list_or_array</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_is_empty_list_or_array</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
@@ -243,7 +243,7 @@
     <span class="k">return</span> <span class="kc">False</span>
 
 
-<span class="k">def</span> <span class="nf">_is_array_has_dict</span><span class="p">(</span><span class="n">nd_array</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_is_array_has_dict</span><span class="p">(</span><span class="n">nd_array</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">_is_empty_list_or_array</span><span class="p">(</span><span class="n">nd_array</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">False</span>
 
@@ -258,7 +258,7 @@
     <span class="k">return</span> <span class="kc">False</span>
 
 
-<span class="k">def</span> <span class="nf">_hash_array_of_dict_as_bytes</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_hash_array_of_dict_as_bytes</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
     <span class="c1"># NB: If an array or list contains dictionary element, it can&#39;t be hashed with</span>
     <span class="c1"># pandas.util.hash_array. Hence we need to manually hash the elements here. This is</span>
     <span class="c1"># particularly for the LLM use case where the input can be a list of dictionary</span>
@@ -274,7 +274,7 @@
     <span class="k">return</span> <span class="n">result</span>
 
 
-<span class="k">def</span> <span class="nf">_hash_ndarray_as_bytes</span><span class="p">(</span><span class="n">nd_array</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_hash_ndarray_as_bytes</span><span class="p">(</span><span class="n">nd_array</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">nd_array</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
         <span class="n">nd_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">nd_array</span><span class="p">)</span>
 
@@ -286,7 +286,7 @@
     <span class="p">)</span> <span class="o">+</span> <span class="n">_hash_uint64_ndarray_as_bytes</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">nd_array</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint64&quot;</span><span class="p">))</span>
 
 
-<span class="k">def</span> <span class="nf">_hash_data_as_bytes</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_hash_data_as_bytes</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
             <span class="k">return</span> <span class="n">_hash_ndarray_as_bytes</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
@@ -298,7 +298,7 @@
         <span class="k">return</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span>  <span class="c1"># Skip unsupported types by returning an empty byte string</span>
 
 
-<span class="k">def</span> <span class="nf">_hash_dict_as_bytes</span><span class="p">(</span><span class="n">data_dict</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_hash_dict_as_bytes</span><span class="p">(</span><span class="n">data_dict</span><span class="p">):</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">_hash_ndarray_as_bytes</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">data_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">result</span> <span class="o">+=</span> <span class="n">_hash_ndarray_as_bytes</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">data_dict</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
@@ -309,7 +309,7 @@
     <span class="k">return</span> <span class="n">result</span>
 
 
-<span class="k">def</span> <span class="nf">_hash_array_like_obj_as_bytes</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_hash_array_like_obj_as_bytes</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Helper method to convert pandas dataframe/numpy array/list into bytes for</span>
 <span class="sd">    MD5 calculation purpose.</span>
@@ -318,11 +318,11 @@
         <span class="c1"># add checking `&#39;pyspark&#39; in sys.modules` to avoid importing pyspark when user</span>
         <span class="c1"># run code not related to pyspark.</span>
         <span class="k">if</span> <span class="s2">&quot;pyspark&quot;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">pyspark.ml.linalg</span> <span class="kn">import</span> <span class="n">Vector</span> <span class="k">as</span> <span class="n">spark_vector_type</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">pyspark.ml.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">Vector</span> <span class="k">as</span> <span class="n">spark_vector_type</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">spark_vector_type</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="k">def</span> <span class="nf">_hash_array_like_element_as_bytes</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_hash_array_like_element_as_bytes</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">spark_vector_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">spark_vector_type</span><span class="p">):</span>
                     <span class="k">return</span> <span class="n">_hash_ndarray_as_bytes</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">toArray</span><span class="p">())</span>
@@ -359,7 +359,7 @@
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unsupported data type.&quot;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_gen_md5_for_arraylike_obj</span><span class="p">(</span><span class="n">md5_gen</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_gen_md5_for_arraylike_obj</span><span class="p">(</span><span class="n">md5_gen</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Helper method to generate MD5 hash array-like object, the MD5 will calculate over:</span>
 <span class="sd">     - array length</span>
@@ -382,11 +382,11 @@
         <span class="n">md5_gen</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">_hash_array_like_obj_as_bytes</span><span class="p">(</span><span class="n">tail_rows</span><span class="p">))</span>
 
 
-<span class="k">def</span> <span class="nf">convert_data_to_mlflow_dataset</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">targets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">predictions</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">convert_data_to_mlflow_dataset</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">targets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">predictions</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert input data to mlflow dataset.&quot;&quot;&quot;</span>
     <span class="n">supported_dataframe_types</span> <span class="o">=</span> <span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]</span>
     <span class="k">if</span> <span class="s2">&quot;pyspark&quot;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
-        <span class="kn">from</span> <span class="nn">mlflow.utils.spark_utils</span> <span class="kn">import</span> <span class="n">get_spark_dataframe_type</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.spark_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_spark_dataframe_type</span>
 
         <span class="n">spark_df_type</span> <span class="o">=</span> <span class="n">get_spark_dataframe_type</span><span class="p">()</span>
         <span class="n">supported_dataframe_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spark_df_type</span><span class="p">)</span>
@@ -419,7 +419,7 @@
         <span class="k">return</span> <span class="n">data</span>
 
 
-<span class="k">def</span> <span class="nf">_validate_dataset_type_supports_predictions</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">supported_predictions_dataset_types</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_validate_dataset_type_supports_predictions</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">supported_predictions_dataset_types</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Validate that the dataset type supports a user-specified &quot;predictions&quot; column.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -434,7 +434,7 @@
         <span class="p">)</span>
 
 
-<div class="viewcode-block" id="EvaluationDataset"><a class="viewcode-back" href="../../../python_api/mlflow.data.html#mlflow.data.evaluation_dataset.EvaluationDataset">[docs]</a><span class="k">class</span> <span class="nc">EvaluationDataset</span><span class="p">:</span>
+<div class="viewcode-block" id="EvaluationDataset"><a class="viewcode-back" href="../../../python_api/mlflow.data.html#mlflow.data.evaluation_dataset.EvaluationDataset">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">EvaluationDataset</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    An input dataset for model evaluation. This is intended for use with the</span>
 <span class="sd">    :py:func:`mlflow.models.evaluate()`</span>
@@ -444,7 +444,7 @@
     <span class="n">NUM_SAMPLE_ROWS_FOR_HASH</span> <span class="o">=</span> <span class="mi">5</span>
     <span class="n">SPARK_DATAFRAME_LIMIT</span> <span class="o">=</span> <span class="mi">10000</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">data</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -484,7 +484,7 @@
             <span class="c1"># add checking `&#39;pyspark&#39; in sys.modules` to avoid importing pyspark when user</span>
             <span class="c1"># run code not related to pyspark.</span>
             <span class="k">if</span> <span class="s2">&quot;pyspark&quot;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
-                <span class="kn">from</span> <span class="nn">mlflow.utils.spark_utils</span> <span class="kn">import</span> <span class="n">get_spark_dataframe_type</span>
+                <span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.spark_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_spark_dataframe_type</span>
 
                 <span class="n">spark_df_type</span> <span class="o">=</span> <span class="n">get_spark_dataframe_type</span><span class="p">()</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_supported_dataframe_types</span> <span class="o">=</span> <span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">spark_df_type</span><span class="p">)</span>
@@ -528,7 +528,7 @@
                 <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
                         <span class="n">message</span><span class="o">=</span><span class="n">shape_message</span><span class="p">,</span> <span class="n">error_code</span><span class="o">=</span><span class="n">INVALID_PARAMETER_VALUE</span>
-                    <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+                    <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
 
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">MlflowException</span><span class="p">(</span>
@@ -625,60 +625,60 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_hash</span> <span class="o">=</span> <span class="n">md5_gen</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_feature_names</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">features_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">features_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        return features data as a numpy array or a pandas DataFrame.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_features_data</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">labels_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">labels_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        return labels data as a numpy array</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels_data</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">has_targets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_targets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns True if the dataset has targets, False otherwise.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_targets</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">targets_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">targets_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        return targets name</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_targets_name</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">predictions_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">predictions_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        return labels data as a numpy array</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predictions_data</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">has_predictions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_predictions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns True if the dataset has targets, False otherwise.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_predictions</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">predictions_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">predictions_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        return predictions name</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predictions_name</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Dataset name, which is specified dataset name or the dataset hash if user don&#39;t specify</span>
 <span class="sd">        name.</span>
@@ -686,21 +686,21 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_specified_name</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_specified_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">hash</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Dataset path</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">hash</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">hash</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Dataset hash, includes hash on first 20 rows and last 20 rows.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hash</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return dataset metadata containing name, hash, and optional path.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -712,7 +712,7 @@
             <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span>
         <span class="k">return</span> <span class="n">metadata</span>
 
-    <span class="k">def</span> <span class="nf">_log_dataset_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">run_id</span><span class="p">,</span> <span class="n">model_uuid</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_log_dataset_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">run_id</span><span class="p">,</span> <span class="n">model_uuid</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Log dataset metadata as a tag &quot;mlflow.datasets&quot;, if the tag already exists, it will</span>
 <span class="sd">        append current dataset metadata into existing tag content.</span>
@@ -738,10 +738,10 @@
             <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="n">RunTag</span><span class="p">(</span><span class="s2">&quot;mlflow.datasets&quot;</span><span class="p">,</span> <span class="n">dataset_metadata_str</span><span class="p">)],</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hash</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">EvaluationDataset</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
 

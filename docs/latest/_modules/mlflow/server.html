@@ -202,20 +202,20 @@
               <div itemprop="articleBody">
                 
   <h1>Source code for mlflow.server</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">importlib</span>
-<span class="kn">import</span> <span class="nn">importlib.metadata</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">shlex</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">textwrap</span>
-<span class="kn">import</span> <span class="nn">types</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">importlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">importlib.metadata</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shlex</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">textwrap</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">types</span>
 
-<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">Response</span><span class="p">,</span> <span class="n">send_from_directory</span>
-<span class="kn">from</span> <span class="nn">packaging.version</span> <span class="kn">import</span> <span class="n">Version</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flask</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">Response</span><span class="p">,</span> <span class="n">send_from_directory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">packaging.version</span><span class="w"> </span><span class="kn">import</span> <span class="n">Version</span>
 
-<span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
-<span class="kn">from</span> <span class="nn">mlflow.server</span> <span class="kn">import</span> <span class="n">handlers</span>
-<span class="kn">from</span> <span class="nn">mlflow.server.handlers</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">MlflowException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.server</span><span class="w"> </span><span class="kn">import</span> <span class="n">handlers</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.server.handlers</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">STATIC_PREFIX_ENV_VAR</span><span class="p">,</span>
     <span class="n">_add_static_prefix</span><span class="p">,</span>
     <span class="n">create_promptlab_run_handler</span><span class="p">,</span>
@@ -228,10 +228,10 @@
     <span class="n">search_datasets_handler</span><span class="p">,</span>
     <span class="n">upload_artifact_handler</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.os</span> <span class="kn">import</span> <span class="n">is_windows</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.plugins</span> <span class="kn">import</span> <span class="n">get_entry_points</span>
-<span class="kn">from</span> <span class="nn">mlflow.utils.process</span> <span class="kn">import</span> <span class="n">_exec_cmd</span>
-<span class="kn">from</span> <span class="nn">mlflow.version</span> <span class="kn">import</span> <span class="n">VERSION</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.os</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_windows</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.plugins</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_entry_points</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.process</span><span class="w"> </span><span class="kn">import</span> <span class="n">_exec_cmd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.version</span><span class="w"> </span><span class="kn">import</span> <span class="n">VERSION</span>
 
 <span class="c1"># NB: These are internal environment variables used for communication between</span>
 <span class="c1"># the cli and the forked gunicorn processes.</span>
@@ -253,7 +253,7 @@
     <span class="n">app</span><span class="o">.</span><span class="n">add_url_rule</span><span class="p">(</span><span class="n">http_path</span><span class="p">,</span> <span class="n">handler</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">handler</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="n">methods</span><span class="p">)</span>
 
 <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">PROMETHEUS_EXPORTER_ENV_VAR</span><span class="p">):</span>
-    <span class="kn">from</span> <span class="nn">mlflow.server.prometheus_exporter</span> <span class="kn">import</span> <span class="n">activate_prometheus_exporter</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.server.prometheus_exporter</span><span class="w"> </span><span class="kn">import</span> <span class="n">activate_prometheus_exporter</span>
 
     <span class="n">prometheus_metrics_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">PROMETHEUS_EXPORTER_ENV_VAR</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">prometheus_metrics_path</span><span class="p">):</span>
@@ -263,59 +263,59 @@
 
 <span class="c1"># Provide a health check endpoint to ensure the application is responsive</span>
 <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/health&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">health</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">health</span><span class="p">():</span>
     <span class="k">return</span> <span class="s2">&quot;OK&quot;</span><span class="p">,</span> <span class="mi">200</span>
 
 
 <span class="c1"># Provide an endpoint to query the version of mlflow running on the server</span>
 <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/version&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">version</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">version</span><span class="p">():</span>
     <span class="k">return</span> <span class="n">VERSION</span><span class="p">,</span> <span class="mi">200</span>
 
 
 <span class="c1"># Serve the &quot;get-artifact&quot; route.</span>
 <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="n">_add_static_prefix</span><span class="p">(</span><span class="s2">&quot;/get-artifact&quot;</span><span class="p">))</span>
-<span class="k">def</span> <span class="nf">serve_artifacts</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">serve_artifacts</span><span class="p">():</span>
     <span class="k">return</span> <span class="n">get_artifact_handler</span><span class="p">()</span>
 
 
 <span class="c1"># Serve the &quot;model-versions/get-artifact&quot; route.</span>
 <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="n">_add_static_prefix</span><span class="p">(</span><span class="s2">&quot;/model-versions/get-artifact&quot;</span><span class="p">))</span>
-<span class="k">def</span> <span class="nf">serve_model_version_artifact</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">serve_model_version_artifact</span><span class="p">():</span>
     <span class="k">return</span> <span class="n">get_model_version_artifact_handler</span><span class="p">()</span>
 
 
 <span class="c1"># Serve the &quot;metrics/get-history-bulk&quot; route.</span>
 <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="n">_add_static_prefix</span><span class="p">(</span><span class="s2">&quot;/ajax-api/2.0/mlflow/metrics/get-history-bulk&quot;</span><span class="p">))</span>
-<span class="k">def</span> <span class="nf">serve_get_metric_history_bulk</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">serve_get_metric_history_bulk</span><span class="p">():</span>
     <span class="k">return</span> <span class="n">get_metric_history_bulk_handler</span><span class="p">()</span>
 
 
 <span class="c1"># Serve the &quot;metrics/get-history-bulk-interval&quot; route.</span>
 <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="n">_add_static_prefix</span><span class="p">(</span><span class="s2">&quot;/ajax-api/2.0/mlflow/metrics/get-history-bulk-interval&quot;</span><span class="p">))</span>
-<span class="k">def</span> <span class="nf">serve_get_metric_history_bulk_interval</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">serve_get_metric_history_bulk_interval</span><span class="p">():</span>
     <span class="k">return</span> <span class="n">get_metric_history_bulk_interval_handler</span><span class="p">()</span>
 
 
 <span class="c1"># Serve the &quot;experiments/search-datasets&quot; route.</span>
 <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="n">_add_static_prefix</span><span class="p">(</span><span class="s2">&quot;/ajax-api/2.0/mlflow/experiments/search-datasets&quot;</span><span class="p">),</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;POST&quot;</span><span class="p">])</span>
-<span class="k">def</span> <span class="nf">serve_search_datasets</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">serve_search_datasets</span><span class="p">():</span>
     <span class="k">return</span> <span class="n">search_datasets_handler</span><span class="p">()</span>
 
 
 <span class="c1"># Serve the &quot;runs/create-promptlab-run&quot; route.</span>
 <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="n">_add_static_prefix</span><span class="p">(</span><span class="s2">&quot;/ajax-api/2.0/mlflow/runs/create-promptlab-run&quot;</span><span class="p">),</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;POST&quot;</span><span class="p">])</span>
-<span class="k">def</span> <span class="nf">serve_create_promptlab_run</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">serve_create_promptlab_run</span><span class="p">():</span>
     <span class="k">return</span> <span class="n">create_promptlab_run_handler</span><span class="p">()</span>
 
 
 <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="n">_add_static_prefix</span><span class="p">(</span><span class="s2">&quot;/ajax-api/2.0/mlflow/gateway-proxy&quot;</span><span class="p">),</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="s2">&quot;GET&quot;</span><span class="p">])</span>
-<span class="k">def</span> <span class="nf">serve_gateway_proxy</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">serve_gateway_proxy</span><span class="p">():</span>
     <span class="k">return</span> <span class="n">gateway_proxy_handler</span><span class="p">()</span>
 
 
 <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="n">_add_static_prefix</span><span class="p">(</span><span class="s2">&quot;/ajax-api/2.0/mlflow/upload-artifact&quot;</span><span class="p">),</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;POST&quot;</span><span class="p">])</span>
-<span class="k">def</span> <span class="nf">serve_upload_artifact</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">serve_upload_artifact</span><span class="p">():</span>
     <span class="k">return</span> <span class="n">upload_artifact_handler</span><span class="p">()</span>
 
 
@@ -323,7 +323,7 @@
 <span class="c1"># and render them in the Trace UI. The request body should contain the request_id</span>
 <span class="c1"># of the trace.</span>
 <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="n">_add_static_prefix</span><span class="p">(</span><span class="s2">&quot;/ajax-api/2.0/mlflow/get-trace-artifact&quot;</span><span class="p">),</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;GET&quot;</span><span class="p">])</span>
-<span class="k">def</span> <span class="nf">serve_get_trace_artifact</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">serve_get_trace_artifact</span><span class="p">():</span>
     <span class="k">return</span> <span class="n">get_trace_artifact_handler</span><span class="p">()</span>
 
 
@@ -331,7 +331,7 @@
 <span class="c1"># CSS/JS resources will be made to e.g. /static-files/main.css and we can handle them here.</span>
 <span class="c1"># The files are hashed based on source code, so ok to send Cache-Control headers via max_age.</span>
 <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="n">_add_static_prefix</span><span class="p">(</span><span class="s2">&quot;/static-files/&lt;path:path&gt;&quot;</span><span class="p">))</span>
-<span class="k">def</span> <span class="nf">serve_static_file</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">serve_static_file</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">IS_FLASK_V1</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">send_from_directory</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">static_folder</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">cache_timeout</span><span class="o">=</span><span class="mi">2419200</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
@@ -340,7 +340,7 @@
 
 <span class="c1"># Serve the index.html for the React App for all other routes.</span>
 <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="n">_add_static_prefix</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">))</span>
-<span class="k">def</span> <span class="nf">serve</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">serve</span><span class="p">():</span>
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">static_folder</span><span class="p">,</span> <span class="s2">&quot;index.html&quot;</span><span class="p">)):</span>
         <span class="k">return</span> <span class="n">send_from_directory</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">static_folder</span><span class="p">,</span> <span class="s2">&quot;index.html&quot;</span><span class="p">)</span>
 
@@ -362,7 +362,7 @@
     <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">mimetype</span><span class="o">=</span><span class="s2">&quot;text/plain&quot;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_find_app</span><span class="p">(</span><span class="n">app_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_find_app</span><span class="p">(</span><span class="n">app_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="n">apps</span> <span class="o">=</span> <span class="n">get_entry_points</span><span class="p">(</span><span class="s2">&quot;mlflow.app&quot;</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">app</span> <span class="ow">in</span> <span class="n">apps</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">app</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">app_name</span><span class="p">:</span>
@@ -373,7 +373,7 @@
     <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_is_factory</span><span class="p">(</span><span class="n">app</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_is_factory</span><span class="p">(</span><span class="n">app</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns True if the given app is a factory function, False otherwise.</span>
 
@@ -386,7 +386,7 @@
     <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">FunctionType</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="get_app_client"><a class="viewcode-back" href="../../python_api/mlflow.server.html#mlflow.server.get_app_client">[docs]</a><span class="k">def</span> <span class="nf">get_app_client</span><span class="p">(</span><span class="n">app_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="get_app_client"><a class="viewcode-back" href="../../python_api/mlflow.server.html#mlflow.server.get_app_client">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">get_app_client</span><span class="p">(</span><span class="n">app_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Instantiate a client provided by an app.</span>
 
@@ -409,7 +409,7 @@
     <span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">_build_waitress_command</span><span class="p">(</span><span class="n">waitress_opts</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">app_name</span><span class="p">,</span> <span class="n">is_factory</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_build_waitress_command</span><span class="p">(</span><span class="n">waitress_opts</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">app_name</span><span class="p">,</span> <span class="n">is_factory</span><span class="p">):</span>
     <span class="n">opts</span> <span class="o">=</span> <span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">waitress_opts</span><span class="p">)</span> <span class="k">if</span> <span class="n">waitress_opts</span> <span class="k">else</span> <span class="p">[]</span>
     <span class="k">return</span> <span class="p">[</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span>
@@ -424,7 +424,7 @@
     <span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">_build_gunicorn_command</span><span class="p">(</span><span class="n">gunicorn_opts</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">workers</span><span class="p">,</span> <span class="n">app_name</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_build_gunicorn_command</span><span class="p">(</span><span class="n">gunicorn_opts</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">workers</span><span class="p">,</span> <span class="n">app_name</span><span class="p">):</span>
     <span class="n">bind_address</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">host</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">port</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="n">opts</span> <span class="o">=</span> <span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">gunicorn_opts</span><span class="p">)</span> <span class="k">if</span> <span class="n">gunicorn_opts</span> <span class="k">else</span> <span class="p">[]</span>
     <span class="k">return</span> <span class="p">[</span>
@@ -440,7 +440,7 @@
     <span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">_run_server</span><span class="p">(</span>  <span class="c1"># noqa: D417</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_run_server</span><span class="p">(</span>  <span class="c1"># noqa: D417</span>
     <span class="n">file_store_path</span><span class="p">,</span>
     <span class="n">registry_store_uri</span><span class="p">,</span>
     <span class="n">default_artifact_root</span><span class="p">,</span>
