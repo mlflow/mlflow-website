@@ -20,17 +20,17 @@ If you're looking to build a Multi-Lingual Query Engine that combines natural la
 
 ## Introduction
 
-SQL is an essential skill needed for managing and accessing data in relational databases and many users fail to possess the necessary skills that are required to write correct SQL queries which can hinder them from utilizing data effectively. Natural language to SQL (NL2SQL) systems help in solving this problem by providing a translation from natural language to SQL commands allowing non-technical people to interact with data: users can just ask questions in a natural language they are comfortable speaking and these systems will assist them in returning the appropriate information.
+SQL is a fundamental skill for managing and accessing data within relational databases. However, constructing complex SQL queries to answer intricate data questions can be challenging and time-consuming. This complexity can make it difficult to fully leverage data effectively. Natural language to SQL (NL2SQL) systems help in solving this problem by providing a translation from natural language to SQL commands allowing non-technical people to interact with data: users can just ask questions in a natural language they are comfortable speaking and these systems will assist them in returning the appropriate information.
 
-However, there are also a number of problems that remain when creating a NL2SQL system like semantic ambiguity, schema mapping or error handling and user feedback. Therefore, it is very important that while building such systems, we must put some guardrails instead of completely relying on LLM.
+However, there are also a number of problems that remain when creating a NL2SQL system such as semantic ambiguity, schema mapping or error handling and user feedback. Therefore, it is very important that while building such systems, we must put some guardrails instead of completely relying on LLM.
 
 In this blog post, we’ll walk you through the process of building a Multi-Lingual Query Engine. This engine supports natural language inputs in multiple languages, generates an SQL query based on the translated user input, and executes the query. Let's jump into an example: using a database containing information about a company's customers, products, and orders, a user might ask a question in any language, such as "Quantos clientes temos por país?" (Portuguese for "How many customers do we have per country?"). The AI Workflow translates the input into English, outputting "How many customers do we have per country?". It then validates the input for safety, checks if the question can be answered using the database schema, generates the appropriate SQL query (e.g., `SELECT COUNT(CustomerID) AS NumberOfCustomers, Country FROM Customers GROUP BY Country;`), and validates the query to ensure no harmful commands (e.g., DROP) are present. Finally, it executes the query against the database to retrieve the results.
 
-We’ll start by demonstrating how to leverage [LangGraph’s](https://www.langchain.com/langgraph) capabilities to build a dynamic AI workflow. This workflow integrates OpenAI and external data sources, such as a Vector Store and an SQLite database, to process user input, perform safety checks, query databases, and generate meaningful responses.
+We’ll start by demonstrating how to leverage [LangGraph’s](https://www.langchain.com/langgraph) capabilities to build a dynamic AI workflow. This workflow integrates OpenAI and external data sources, such as a Vector Store and a SQLite database, to process user input, perform safety checks, query databases, and generate meaningful responses.
 
-Throughout this post, we’ll leverage [MLflow’s Models from Code](https://mlflow.org/docs/latest/model/models-from-code.html) feature to enable seamless tracking and versioning of AI Workflows. Additionally, we’ll deep dive [MLflow’s Tracing](https://mlflow.org/docs/latest/llms/tracing/index.html) feature, designed to enhance the observability of the many different components of an AI workflow by tracking inputs, outputs, and metadata associated with each intermediate step. This enables easy identification of bugs and unexpected behaviors, providing greater transparency over the workflow.
+Throughout this post, we’ll leverage [MLflow’s Models from Code](https://mlflow.org/docs/latest/model/models-from-code.html) feature to enable seamless tracking and versioning of AI Workflows. Additionally, we’ll deep dive into [MLflow’s Tracing](https://mlflow.org/docs/latest/llms/tracing/index.html) feature, designed to enhance the observability of the many different components of an AI workflow by tracking inputs, outputs, and metadata associated with each intermediate step. This enables easy identification of bugs and unexpected behaviors, providing greater transparency over the workflow.
 
-# Requisites
+# Prerequisites
 
 To set up and run this project, ensure the following **Python packages** are installed:
 - `faiss-cpu`
@@ -39,7 +39,7 @@ To set up and run this project, ensure the following **Python packages** are ins
 - `langchain-openai`
 - `langgraph`
 - `langchain-community`
-- `pydantic`
+- `pydantic >=2`
 - `typing_extensions`
 - `python-dotenv`
 
@@ -48,14 +48,12 @@ Additionally, an **MLflow Tracking Server** is required to log and manage experi
 Finally, ensure that your OpenAI API key is saved within a .env file in the project directory. This allows the application to securely access the OpenAI services required for building the AI workflow. The .env file should include a line like:
 
 ```
-
 OPENAI_API_KEY=your_openai_api_key
-
 ```
 
 # Multi-Lingual Query Engine using LangGraph
 
-The Multi-Lingual Query Engine leverages [LangGraph](https://langchain-ai.github.io/langgraph/) library, an AI orchestration tool designed to create stateful, multi-agent, and cyclical graph architectures for applications powered by LLMs.
+The Multi-Lingual Query Engine leverages the [LangGraph](https://langchain-ai.github.io/langgraph/) library, an AI orchestration tool designed to create stateful, multi-agent, and cyclical graph architectures for applications powered by LLMs.
 
 Compared to other AI orchestrators, LangGraph offers three core benefits: cycles, controllability, and persistence. It allows the definition of AI workflows with cycles, which are essential for implementing retry mechanisms like the SQL query generation retries in the Multi-Lingual Query Engine (where the query loops back for regeneration if validation fails). This makes LangGraph the ideal tool for building our Multi-Lingual Query Engine.
 
@@ -89,7 +87,7 @@ The Multi-Lingual Query Engine’s advanced AI workflow is composed of interconn
 
 9. **Query Execution and Result Retrieval**: Executes the SQL query and returns the results if it’s a `SELECT` statement.
 
-The retry mechanism is introduced in Stage 8, where the system dynamically evaluates the current graph state. Specifically, when the SQL query validation node (Stage 7) detects an issue, the state triggers a loop back to the SQL Generation node (Stage 5) for a new SQL Generation attempt (within a maximum of 3 attemps).
+The retry mechanism is introduced in Stage 8, where the system dynamically evaluates the current graph state. Specifically, when the SQL query validation node (Stage 7) detects an issue, the state triggers a loop back to the SQL Generation node (Stage 5) for a new SQL Generation attempt (with a maximum of 3 attempts).
 
 ## Components
 
@@ -97,13 +95,13 @@ The Multi-Lingual Query Engine interacts with several external components to tra
 
 ### OpenAI
 
-OpenAI, more specifically `gpt-4o-mini` language model plays a crucial role in multiple stages of the workflow, providing the intelligence required for:
+OpenAI, more specifically the `gpt-4o-mini` language model, plays a crucial role in multiple stages of the workflow. It provides the intelligence required for:
 
 1. **Translation**: Translates user input into English. If the text is already in English, it simply repeats the input.
 
 2. **Safety Checks**: Analyzes user input to ensure that it does not contain toxic or inappropriate content.
 
-3. **Relevancy Checks**: Evaluates whether the user's question is relevant given the database schema.
+3. **Relevance Checks**: Evaluates whether the user's question is relevant given the database schema.
 
 4. **SQL Generation**: Generates valid and executable SQL queries based on user input, SQL generation documentation, and the database schema.
 
@@ -113,7 +111,7 @@ Details on OpenAI implementation will be provided later on in the [Node Descript
 
 To build an effective natural language to SQL engine capable of generating accurate and executable SQL queries, we leverage Langchain's FAISS Vector Store feature. This setup allows the system to search and extract SQL query generation guidelines from [W3Schools SQL documents](https://www.w3schools.com/sql/) previously stored in the Vector Database, enhancing the success of SQL query generation.
 
-For demo purposes, we are using FAISS, an in-memory vector store where vectors are stored directly in RAM. This provides fast access but means data is not persisted between runs. For a more scalable solution that enables embeddings to be stored and shared across multiple projects, we recommend alternatives like [AWS OpenSearch](https://aws.amazon.com/what-is/opensearch/), a cloud-based solution offering persistent storage, automatic scaling, and seamless integration with other cloud services, making it well-suited for large-scale applications.
+For demo purposes, we are using FAISS, an in-memory vector store where vectors are stored directly in RAM. This provides fast access but means data is not persisted between runs. For a more scalable solution that enables embeddings to be stored and shared across multiple projects, we recommend alternatives like [AWS OpenSearch](https://aws.amazon.com/what-is/opensearch/), [Vertex AI Vector Search](https://cloud.google.com/vertex-ai/docs/vector-search/overview), [Azure Vector Search](https://learn.microsoft.com/en-us/azure/search/vector-search-overview), or [Mosaic AI Vector Search](https://docs.databricks.com/en/generative-ai/vector-search.html). These cloud-based solutions offer persistent storage, automatic scaling, and seamless integration with other cloud services, making them well-suited for large-scale applications.
 
 #### Step 1: Load SQL Documentation
 
@@ -125,37 +123,41 @@ The loaded SQL documentation is a lengthy text, making it difficult to be effect
 
 #### Step 3: Generate Embedding Model
 
-The third step is to create a model that converts these chunks into embeddings (chunks texts numerical representations). Embeddings enable the system to compare the similarity between chunks and the user's input, facilitating the retrieval of the most relevant matches for SQL query generation.
+The third step is to create a model that converts these chunks into embeddings (vectorized numerical representations of each text chunk). Embeddings enable the system to compare the similarity between chunks and the user's input, facilitating the retrieval of the most relevant matches for SQL query generation.
 
 #### Step 4: Create and Store Embeddings in FAISS Vector Store
 
 Finally, we create and store the embeddings using FAISS. The `FAISS.from_texts` method takes all the chunks, computes their embeddings, and stores them in a high speed searchable vector database. This searchable database allows the engine to efficiently retrieve relevant SQL guidelines, significantly improving the success rate of executable SQL query generation.
 
 ```python
+import logging
 import os
+
+from bs4 import BeautifulSoup as Soup
+
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.document_loaders.recursive_url_loader import RecursiveUrlLoader
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
-from langchain_community.document_loaders.recursive_url_loader import RecursiveUrlLoader
-from bs4 import BeautifulSoup as Soup
-from langchain.text_splitter import RecursiveCharacterTextSplitter
 
-def setup_vector_store():
+
+def setup_vector_store(logger: logging.Logger):
     """Setup or load the vector store."""
-    if not os.path.exists('data'):
-        os.makedirs('data')
+    if not os.path.exists("data"):
+        os.makedirs("data")
 
-    vector_store_dir = 'data/vector_store'
+    vector_store_dir = "data/vector_store"
 
     if os.path.exists(vector_store_dir):
         # Load the vector store from disk
-        print("Loading vector store from disk...")
+        logger.info("Loading vector store from disk...")
         vector_store = FAISS.load_local(
             vector_store_dir,
             OpenAIEmbeddings(),
-            allow_dangerous_deserialization=True
+            allow_dangerous_deserialization=True,
         )
     else:
-        print("Creating new vector store...")
+        logger.info("Creating new vector store...")
         # Load SQL documentation
         url = "https://www.w3schools.com/sql/"
         loader = RecursiveUrlLoader(
@@ -174,22 +176,24 @@ def setup_vector_store():
         for doc in docs:
             splits = text_splitter.split_text(doc.page_content)
             for i, split in enumerate(splits):
-                documents.append({
-                    "content": split,
-                    "metadata": {"source": doc.metadata["source"], "chunk": i}
-                })
+                documents.append(
+                    {
+                        "content": split,
+                        "metadata": {"source": doc.metadata["source"], "chunk": i},
+                    }
+                )
 
         # Compute embeddings and create vector store
         embedding_model = OpenAIEmbeddings()
         vector_store = FAISS.from_texts(
             [doc["content"] for doc in documents],
             embedding_model,
-            metadatas=[doc["metadata"] for doc in documents]
+            metadatas=[doc["metadata"] for doc in documents],
         )
 
         # Save the vector store to disk
         vector_store.save_local(vector_store_dir)
-        print("Vector store created and saved to disk.")
+        logger.info("Vector store created and saved to disk.")
 
     return vector_store
 ```
@@ -198,7 +202,7 @@ def setup_vector_store():
 
 The SQLite database is a key component of the Multi-Lingual Query Engine serving as the structured data repository. SQLite offers a lightweight, fast, and self-contained relational database engine that requires no server setup or installation. Its compact size (under 500KB) and zero-configuration nature make it incredibly easy to use, while its platform-agnostic database format ensures seamless portability across different systems. As a local disk database, SQLite was the ideal choice for avoiding the complexity of setting up MySQL or PostgreSQL, while still providing a reliable, full-featured SQL engine with outstanding performance.
 
-The SQLite database supports SQL query efficient generation, validation and execution by enabling:
+The SQLite database supports efficient SQL query generation, validation and execution by enabling:
 
 1. **Schema Extraction**: Suplying schema information for user’s input context validation (Stage 4) and executable SQL Query Generation (Stage 5).
 
@@ -215,19 +219,24 @@ The database is initialized using the `setup_database` function when the AI Work
 3. **Data Population**: Populates the tables with sample data to support query execution and validation stages.
 
 ```python
-import sqlite3
+import logging
 import os
 
-def create_connection(db_file='data/database.db'):
+import sqlite3
+
+
+def create_connection(db_file="data/database.db"):
     """Create a database connection to the SQLite database."""
     conn = sqlite3.connect(db_file)
     return conn
+
 
 def create_tables(conn):
     """Create tables in the database."""
     cursor = conn.cursor()
     # Create Customers table
-    cursor.execute('''
+    cursor.execute(
+        """
     CREATE TABLE IF NOT EXISTS Customers (
         CustomerID INTEGER PRIMARY KEY,
         CustomerName TEXT,
@@ -237,20 +246,24 @@ def create_tables(conn):
         PostalCode TEXT,
         Country TEXT
     )
-    ''')
+    """
+    )
 
     # Create Orders table
-    cursor.execute('''
+    cursor.execute(
+        """
     CREATE TABLE IF NOT EXISTS Orders (
         OrderID INTEGER PRIMARY KEY,
         CustomerID INTEGER,
         OrderDate TEXT,
         FOREIGN KEY (CustomerID) REFERENCES Customers (CustomerID)
     )
-    ''')
+    """
+    )
 
     # Create OrderDetails table
-    cursor.execute('''
+    cursor.execute(
+        """
     CREATE TABLE IF NOT EXISTS OrderDetails (
         OrderDetailID INTEGER PRIMARY KEY,
         OrderID INTEGER,
@@ -259,109 +272,129 @@ def create_tables(conn):
         FOREIGN KEY (OrderID) REFERENCES Orders (OrderID),
         FOREIGN KEY (ProductID) REFERENCES Products (ProductID)
     )
-    ''')
+    """
+    )
 
     # Create Products table
-    cursor.execute('''
+    cursor.execute(
+        """
     CREATE TABLE IF NOT EXISTS Products (
         ProductID INTEGER PRIMARY KEY,
         ProductName TEXT,
         Price REAL
     )
-    ''')
+    """
+    )
 
     conn.commit()
+
 
 def populate_tables(conn):
     """Populate tables with sample data if they are empty."""
     cursor = conn.cursor()
 
     # Populate Customers table if empty
-    cursor.execute('SELECT COUNT(*) FROM Customers')
+    cursor.execute("SELECT COUNT(*) FROM Customers")
     if cursor.fetchone()[0] == 0:
         customers = []
         for i in range(1, 51):
-            customers.append((
-                i,
-                f'Customer {i}',
-                f'Contact {i}',
-                f'Address {i}',
-                f'City {i % 10}',
-                f'{10000 + i}',
-                f'Country {i % 5}'
-            ))
-        cursor.executemany('''
+            customers.append(
+                (
+                    i,
+                    f"Customer {i}",
+                    f"Contact {i}",
+                    f"Address {i}",
+                    f"City {i % 10}",
+                    f"{10000 + i}",
+                    f"Country {i % 5}",
+                )
+            )
+        cursor.executemany(
+            """
         INSERT INTO Customers (CustomerID, CustomerName, ContactName, Address, City, PostalCode, Country)
         VALUES (?, ?, ?, ?, ?, ?, ?)
-        ''', customers)
+        """,
+            customers,
+        )
 
     # Populate Products table if empty
-    cursor.execute('SELECT COUNT(*) FROM Products')
+    cursor.execute("SELECT COUNT(*) FROM Products")
     if cursor.fetchone()[0] == 0:
         products = []
         for i in range(1, 51):
-            products.append((
-                i,
-                f'Product {i}',
-                round(10 + i * 0.5, 2)
-            ))
-        cursor.executemany('''
+            products.append((i, f"Product {i}", round(10 + i * 0.5, 2)))
+        cursor.executemany(
+            """
         INSERT INTO Products (ProductID, ProductName, Price)
         VALUES (?, ?, ?)
-        ''', products)
+        """,
+            products,
+        )
 
     # Populate Orders table if empty
-    cursor.execute('SELECT COUNT(*) FROM Orders')
+    cursor.execute("SELECT COUNT(*) FROM Orders")
     if cursor.fetchone()[0] == 0:
         orders = []
         from datetime import datetime, timedelta
+
         base_date = datetime(2023, 1, 1)
         for i in range(1, 51):
             order_date = base_date + timedelta(days=i)
-            orders.append((
-                i,
-                i % 50 + 1,  # CustomerID between 1 and 50
-                order_date.strftime('%Y-%m-%d')
-            ))
-        cursor.executemany('''
+            orders.append(
+                (
+                    i,
+                    i % 50 + 1,  # CustomerID between 1 and 50
+                    order_date.strftime("%Y-%m-%d"),
+                )
+            )
+        cursor.executemany(
+            """
         INSERT INTO Orders (OrderID, CustomerID, OrderDate)
         VALUES (?, ?, ?)
-        ''', orders)
+        """,
+            orders,
+        )
 
     # Populate OrderDetails table if empty
-    cursor.execute('SELECT COUNT(*) FROM OrderDetails')
+    cursor.execute("SELECT COUNT(*) FROM OrderDetails")
     if cursor.fetchone()[0] == 0:
         order_details = []
         for i in range(1, 51):
-            order_details.append((
-                i,
-                i % 50 + 1,  # OrderID between 1 and 50
-                i % 50 + 1,  # ProductID between 1 and 50
-                (i % 5 + 1) * 2  # Quantity between 2 and 10
-            ))
-        cursor.executemany('''
+            order_details.append(
+                (
+                    i,
+                    i % 50 + 1,  # OrderID between 1 and 50
+                    i % 50 + 1,  # ProductID between 1 and 50
+                    (i % 5 + 1) * 2,  # Quantity between 2 and 10
+                )
+            )
+        cursor.executemany(
+            """
         INSERT INTO OrderDetails (OrderDetailID, OrderID, ProductID, Quantity)
         VALUES (?, ?, ?, ?)
-        ''', order_details)
+        """,
+            order_details,
+        )
 
     conn.commit()
 
-def setup_database():
+
+def setup_database(logger: logging.Logger):
     """Setup the database and return the connection."""
-    db_file = 'data/database.db'
-    if not os.path.exists('data'):
-        os.makedirs('data')
+    db_file = "data/database.db"
+    if not os.path.exists("data"):
+        os.makedirs("data")
 
     db_exists = os.path.exists(db_file)
 
     conn = create_connection(db_file)
 
     if not db_exists:
-        print("Setting up the database...")
+        logger.info("Setting up the database...")
         create_tables(conn)
         populate_tables(conn)
     else:
-        print("Database already exists. Skipping setup.")
+        logger.info("Database already exists. Skipping setup.")
 
     return conn
 ```
@@ -385,9 +418,10 @@ The **SQL Generation Chain** (`sql_gen_chain`) is the backbone of automated SQL 
 This chain is a critical component in our workflow, enabling seamless integration of SQL query generation with downstream processes, ensuring accuracy, and significantly improving efficiency.
 
 ```python
+from pydantic import BaseModel, Field
+
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
-from pydantic import BaseModel, Field
 
 class SQLQuery(BaseModel):
     """Schema for SQL query solutions to questions."""
@@ -400,7 +434,7 @@ def get_sql_gen_chain():
         [
             (
                 "system",
-                """You are an SQL assistant with expertise in SQL query generation. \n
+                """You are a SQL assistant with expertise in SQL query generation. \n
 Answer the user's question based on the provided documentation snippets and the database schema provided below. Ensure any SQL query you provide is valid and executable. \n
 Structure your answer with a description of the query, followed by the SQL code block. Here are the documentation snippets:\n{retrieved_docs}\n\nDatabase Schema:\n{database_schema}""",
             ),
@@ -435,13 +469,14 @@ The `GraphState` class is a custom `TypedDict` that maintains the state informat
 - **`database_schema`**: Maintains the database schema for context validation.
 
 ```python
-from langgraph.graph import END, StateGraph, START
-from typing import List, Optional
-from typing_extensions import TypedDict
-from sql_generation import get_sql_gen_chain
-from langchain_openai import ChatOpenAI  # Import OpenAI LLM
-import re
 import logging
+import re
+from typing import List, Optional
+
+from langchain_openai import ChatOpenAI
+from langgraph.graph import END, START, StateGraph
+from sql_generation import get_sql_gen_chain
+from typing_extensions import TypedDict
 
 # Initialize the logger
 _logger = logging.getLogger(__name__)
@@ -470,7 +505,7 @@ The main function, `get_workflow`, is responsible for defining and compiling the
 - **`vector_store`**: A vector database for contextual retrieval.
 - **`max_iterations`**: Sets a limit on retry attempts to prevent infinite loops.
 - **`sql_gen_chain`**: Retrieves the SQL generation chain from `sql_generation` for producing SQL queries based on contextual inputs.
-- **`ChatOpenAI`**: Initializes the OpenAI GPT-4 model for tasks like safety checks and query translation.
+- **`ChatOpenAI`**: Initializes the OpenAI `gpt-4o-mini` model for tasks like safety checks and query translation.
 
 ```python
 def get_workflow(conn, cursor, vector_store):
@@ -539,7 +574,13 @@ def translate_input(state: GraphState) -> GraphState:
 
 #### 2. Pre-safety Check
 
-The `pre_safety_check` node ensures early detection of disallowed SQL operations and inappropriate content in the user's input. While the check for harmful SQL commands (e.g., `CREATE`, `DELETE`, `DROP`, `INSERT`, `UPDATE`) will occur again later in the workflow, specifically after generating the SQL query, this pre-safety check is crucial for identifying potential issues at the input stage. By doing so, it prevents unnecessary computation and offers immediate feedback to the user. Additionally, the node leverages the LLM to analyze the input for offensive or inappropriate content. If unsafe queries or inappropriate content are detected, the state is updated with an error flag and transparent feedback is provided, safeguarding the workflow from malicious or destructive elements early on.
+The `pre_safety_check` node ensures early detection of disallowed SQL operations and inappropriate content in the user's input. While the check for harmful SQL commands (e.g., `CREATE`, `DELETE`, `DROP`, `INSERT`, `UPDATE`) will occur again later in the workflow, specifically after generating the SQL query, this pre-safety check is crucial for identifying potential issues at the input stage. By doing so, it prevents unnecessary computation and offers immediate feedback to the user. 
+
+While the use of a disallow list for harmful SQL operations provides a quick way to safeguard against destructive queries, maintaining a comprehensive disallow list can become hard to manage when dealing with complex SQL backends like T-SQL. An alternative approach is adopting an allowlist, restricting queries to only safe operations (e.g., `SELECT`, `JOIN`). This approach ensures a more robust solution by narrowing down permissible actions rather than attempting to block every risky command.
+
+To achieve an enterprise-grade solution, the project could leverage frameworks like [Unity Catalog](https://github.com/unitycatalog/unitycatalog/blob/main/ai/core/README.md), which provide a centralized and robust approach to managing security-related functions, such as the `pre_safety_check` for AI workflows. By registering and managing reusable functions within such a framework, you can enforce consistent and reliable behavior across all AI workflows, enhancing both security and scalability.
+
+Additionally, the node leverages the LLM to analyze the input for offensive or inappropriate content. If unsafe queries or inappropriate content are detected, the state is updated with an error flag and transparent feedback is provided, safeguarding the workflow from malicious or destructive elements early on.
 
 - **Examples:**
 1. **Disallowed Operations:**
@@ -984,33 +1025,33 @@ The `decide_next_step` function acts as a control point in the workflow, decidin
 
 - **Code:**
 
-    ```python
-    def decide_next_step(state: GraphState) -> str:
-        """
-        Determines the next step in the workflow based on the current state, including whether the query
-        should be run, the workflow should be finished, or if the query generation needs to be retried.
+```python
+def decide_next_step(state: GraphState) -> str:
+    """
+    Determines the next step in the workflow based on the current state, including whether the query
+    should be run, the workflow should be finished, or if the query generation needs to be retried.
 
-        Args:
-            state (GraphState): The current graph state, which contains error status and iteration count.
+    Args:
+        state (GraphState): The current graph state, which contains error status and iteration count.
 
-        Returns:
-            str: The next step in the workflow, which can be "run_query", "generate", or END.
-        """
-        _logger.info("Deciding next step based on current state.")
-        
-        error = state["error"]
-        iterations = state["iterations"]
+    Returns:
+        str: The next step in the workflow, which can be "run_query", "generate", or END.
+    """
+    _logger.info("Deciding next step based on current state.")
+    
+    error = state["error"]
+    iterations = state["iterations"]
 
-        if error == "no":
-            _logger.info("Error status: no. Proceeding with running the query.")
-            return "run_query"
-        elif iterations >= max_iterations:
-            _logger.info("Maximum iterations reached. Ending the workflow.")
-            return END
-        else:
-            _logger.info("Error detected. Retrying SQL query generation.")
-            return "generate"
-    ```
+    if error == "no":
+        _logger.info("Error status: no. Proceeding with running the query.")
+        return "run_query"
+    elif iterations >= max_iterations:
+        _logger.info("Maximum iterations reached. Ending the workflow.")
+        return END
+    else:
+        _logger.info("Error detected. Retrying SQL query generation.")
+        return "generate"
+```
 
 ### Workflow Orchestration and Conditional Logic
 
@@ -1181,12 +1222,9 @@ with mlflow.start_run():
 client.set_registered_model_alias(
     REGISTERED_MODEL_NAME, MODEL_ALIAS, logged_model_info.registered_model_version
 )
-
-print(f"MLflow Run: {logged_model_info.run_id}")
-print(f"Model URI: {logged_model_info.model_uri}")
 ```
 
-In the MLflow UI, the stored model includes both the `sql_model.py` and `workflow.py` scripts as artifacts within the run. This logging from code feature not only records the model's parameters and metrics but also captures the code defining its functionality. This ensures observability, seamless tracking, and straightforward debugging directly through the UI.
+In the MLflow UI, the stored model includes both the `sql_model.py` and `workflow.py` scripts as artifacts within the run. This logging from code feature not only records the model's parameters and metrics but also captures the code defining its functionality. This ensures observability, seamless tracking, and straightforward debugging directly through the UI. However, it is crucial to ensure that sensitive elements, such as API keys or credentials, are never hardcoded into these scripts. Since the code is stored as-is, any sensitive information included may lead to token leakage and pose security risks. Instead, sensitive data should be securely managed using environment variables, secret management systems, or other secure methods.
 
 ![model_as_code_artifact](model_as_code.png)
 
@@ -1198,6 +1236,7 @@ Executing the code below, we demonstrate that our Multi-Lingual Query Engine is 
 
 ```python
 import os
+import logging
 
 import mlflow
 from database import setup_database
@@ -1213,6 +1252,14 @@ from vector_store import setup_vector_store
 mlflow.set_tracking_uri(REMOTE_SERVER_URI)
 mlflow.set_experiment(EXPERIMENT_NAME)
 mlflow.langchain.autolog()
+
+# Initialize the logger
+_logger = logging.getLogger(__name__)
+_logger.setLevel(logging.INFO)
+handler = logging.StreamHandler()
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+handler.setFormatter(formatter)
+_logger.addHandler(handler)
 
 
 def main():
@@ -1239,7 +1286,7 @@ def main():
     )
 
     # Example user interaction
-    print("Welcome to the SQL Assistant!")
+    _logger.info("Welcome to the SQL Assistant!")
     while True:
         question = input("\nEnter your SQL question (or type 'exit' to quit): ")
         if question.lower() == "exit":
@@ -1260,26 +1307,26 @@ def main():
 
         # Check if an error was set during the safety check
         if solution["error"] == "yes":
-            print("\nAssistant Message:\n")
-            print(solution["messages"][-1][1])  # Display the assistant's message
+            _logger.info("\nAssistant Message:\n")
+            _logger.info(solution["messages"][-1][1])  # Display the assistant's message
             continue  # Skip to the next iteration
 
         # Extract the generated SQL query from solution["generation"]
         sql_query = solution["generation"].sql_code
-        print("\nGenerated SQL Query:\n")
-        print(sql_query)
+        _logger.info("\nGenerated SQL Query:\n")
+        _logger.info(sql_query)
 
         # Extract and display the query results
         if solution.get("no_records_found"):
-            print("\nNo records found matching your query.")
+            _logger.info("\nNo records found matching your query.")
         elif "results" in solution and solution["results"] is not None:
-            print("\nQuery Results:\n")
+            _logger.info("\nQuery Results:\n")
             for row in solution["results"]:
-                print(row)
+                _logger.info(row)
         else:
-            print("\nNo results returned or query did not execute successfully.")
+            _logger.info("\nNo results returned or query did not execute successfully.")
 
-    print("Goodbye!")
+    _logger.info("Goodbye!")
 
 
 if __name__ == "__main__":
