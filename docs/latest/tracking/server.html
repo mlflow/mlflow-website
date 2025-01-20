@@ -55,7 +55,7 @@
         <link rel="index" title="Index"
               href="../genindex.html"/>
         <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="MLflow 2.19.1.dev0 documentation" href="../index.html"/>
+    <link rel="top" title="MLflow 2.20.1.dev0 documentation" href="../index.html"/>
         <link rel="up" title="MLflow Tracking" href="../tracking.html"/>
         <link rel="next" title="Tracking Experiments with a Local Database" href="/tutorials/local-database.html"/>
         <link rel="prev" title="Artifact Stores" href="/artifacts-stores.html"/> 
@@ -88,7 +88,7 @@
     <a href="../index.html" class="wy-nav-top-logo"
       ><img src="../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.19.1.dev0</span>
+    <span class="version">2.20.1.dev0</span>
   </li>
 </ul>
   </nav>
@@ -456,6 +456,49 @@ For example:</p>
 </pre></div>
 </div>
 </div>
+<div class="section" id="handling-timeout-when-uploading-downloading-large-artifacts">
+<h2>Handling timeout when uploading/downloading large artifacts<a class="headerlink" href="#handling-timeout-when-uploading-downloading-large-artifacts" title="Permalink to this headline"> </a></h2>
+<p>When uploading or downloading large artifacts through the tracking server with the artifact proxy enabled, the server may take a long time to process the request. If it exceeds the timeout limit (30 seconds by default), the server will restart the worker process, resulting in a request failure on the client side.</p>
+<p>Example client code:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">set_tracking_uri</span><span class="p">(</span><span class="s2">&quot;&lt;TRACKING_SERVER_URI&gt;&quot;</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_artifact</span><span class="p">(</span><span class="s2">&quot;large.txt&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Client traceback:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
+  <span class="n">File</span> <span class="s2">&quot;/Users/user/python3.10/site-packages/requests/adapters.py&quot;</span><span class="p">,</span> <span class="n">line</span> <span class="mi">486</span><span class="p">,</span> <span class="ow">in</span> <span class="n">send</span>
+    <span class="n">resp</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span>
+  <span class="n">File</span> <span class="s2">&quot;/Users/user/python3.10/site-packages/urllib3/connectionpool.py&quot;</span><span class="p">,</span> <span class="n">line</span> <span class="mi">826</span><span class="p">,</span> <span class="ow">in</span> <span class="n">urlopen</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span>
+  <span class="o">...</span>
+  <span class="n">File</span> <span class="s2">&quot;/Users/user/python3.10/site-packages/urllib3/connectionpool.py&quot;</span><span class="p">,</span> <span class="n">line</span> <span class="mi">798</span><span class="p">,</span> <span class="ow">in</span> <span class="n">urlopen</span>
+    <span class="n">retries</span> <span class="o">=</span> <span class="n">retries</span><span class="o">.</span><span class="n">increment</span><span class="p">(</span>
+  <span class="n">File</span> <span class="s2">&quot;/Users/user/python3.10/site-packages/urllib3/util/retry.py&quot;</span><span class="p">,</span> <span class="n">line</span> <span class="mi">592</span><span class="p">,</span> <span class="ow">in</span> <span class="n">increment</span>
+    <span class="k">raise</span> <span class="n">MaxRetryError</span><span class="p">(</span><span class="n">_pool</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">error</span> <span class="ow">or</span> <span class="n">ResponseError</span><span class="p">(</span><span class="n">cause</span><span class="p">))</span>
+<span class="n">urllib3</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">MaxRetryError</span><span class="p">:</span> <span class="n">HTTPSConnectionPool</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s1">&#39;mlflow.example.com&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">443</span><span class="p">):</span> <span class="n">Max</span> <span class="n">retries</span> <span class="n">exceeded</span> <span class="k">with</span> <span class="n">url</span><span class="p">:</span> <span class="o">...</span> <span class="p">(</span><span class="n">Caused</span> <span class="n">by</span> <span class="n">SSLError</span><span class="p">(</span><span class="n">SSLEOFError</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="s1">&#39;EOF occurred in violation of protocol (_ssl.c:2426)&#39;</span><span class="p">)))</span>
+</pre></div>
+</div>
+<p>During handling of the above exception, another exception occurred:</p>
+<p>Tracking server logs:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">[</span><span class="m">2025</span>-01-10<span class="w"> </span><span class="m">11</span>:59:00<span class="w"> </span>+0000<span class="o">]</span><span class="w"> </span><span class="o">[</span><span class="m">82</span><span class="o">]</span><span class="w"> </span><span class="o">[</span>INFO<span class="o">]</span><span class="w"> </span>Starting<span class="w"> </span>gunicorn<span class="w"> </span><span class="m">20</span>.1.0
+<span class="o">[</span><span class="m">2025</span>-01-10<span class="w"> </span><span class="m">11</span>:59:00<span class="w"> </span>+0000<span class="o">]</span><span class="w"> </span><span class="o">[</span><span class="m">82</span><span class="o">]</span><span class="w"> </span><span class="o">[</span>DEBUG<span class="o">]</span><span class="w"> </span>Arbiter<span class="w"> </span>booted
+<span class="o">[</span><span class="m">2025</span>-01-10<span class="w"> </span><span class="m">11</span>:59:00<span class="w"> </span>+0000<span class="o">]</span><span class="w"> </span><span class="o">[</span><span class="m">82</span><span class="o">]</span><span class="w"> </span><span class="o">[</span>INFO<span class="o">]</span><span class="w"> </span>Listening<span class="w"> </span>at:<span class="w"> </span>http://0.0.0.0:5000<span class="w"> </span><span class="o">(</span><span class="m">82</span><span class="o">)</span>
+...
+<span class="o">[</span><span class="m">2025</span>-01-10<span class="w"> </span><span class="m">11</span>:59:01<span class="w"> </span>+0000<span class="o">]</span><span class="w"> </span><span class="o">[</span><span class="m">82</span><span class="o">]</span><span class="w"> </span><span class="o">[</span>CRITICAL<span class="o">]</span><span class="w"> </span>WORKER<span class="w"> </span>TIMEOUT<span class="w"> </span><span class="o">(</span>pid:86<span class="o">)</span>
+<span class="o">[</span><span class="m">2025</span>-01-10<span class="w"> </span><span class="m">11</span>:59:01<span class="w"> </span>+0000<span class="o">]</span><span class="w"> </span><span class="o">[</span><span class="m">86</span><span class="o">]</span><span class="w"> </span><span class="o">[</span>INFO<span class="o">]</span><span class="w"> </span>Worker<span class="w"> </span>exiting<span class="w"> </span><span class="o">(</span>pid:<span class="w"> </span><span class="m">86</span><span class="o">)</span>
+<span class="o">[</span><span class="m">2025</span>-01-10<span class="w"> </span><span class="m">11</span>:59:01<span class="w"> </span>+0000<span class="o">]</span><span class="w"> </span><span class="o">[</span><span class="m">179</span><span class="o">]</span><span class="w"> </span><span class="o">[</span>INFO<span class="o">]</span><span class="w"> </span>Booting<span class="w"> </span>worker<span class="w"> </span>with<span class="w"> </span>pid:<span class="w"> </span><span class="m">179</span>
+</pre></div>
+</div>
+<p>To mitigate this issue, the timeout length can be increased by using the <code class="docutils literal notranslate"><span class="pre">--gunicorn-opts</span></code> option when starting the server as shown below:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mlflow<span class="w"> </span>server<span class="w"> </span>--gunicorn-opts<span class="w"> </span><span class="s2">&quot;--timeout=60&quot;</span><span class="w"> </span>...
+</pre></div>
+</div>
+<p>See <a class="reference external" href="https://docs.gunicorn.org/en/stable/settings.html#timeout">https://docs.gunicorn.org/en/stable/settings.html#timeout</a> for more information on the timeout option.</p>
+</div>
 </div>
 
 
@@ -496,7 +539,7 @@ For example:</p>
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../',
-      VERSION:'2.19.1.dev0',
+      VERSION:'2.20.1.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',

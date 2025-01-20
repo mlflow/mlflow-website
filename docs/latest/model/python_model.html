@@ -1,0 +1,861 @@
+
+
+<!DOCTYPE html>
+<!-- source: docs/source/model/python_model.rst -->
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>MLflow PythonModel Guide</title>
+  
+   
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="canonical" href="https://mlflow.org/docs/latest/model/python_model.html">
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    
+
+    
+
+  
+    
+        <!-- Google Tag Manager -->
+        <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer',"GTM-N6WMTTJ");</script>
+        <!-- End Google Tag Manager -->
+    
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/cards.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/grids.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/mobile.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/simple-cards.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/tabs.css" type="text/css" />
+    
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="MLflow 2.20.1.dev0 documentation" href="../index.html"/>
+        <link rel="up" title="MLflow Models" href="../models.html"/>
+        <link rel="next" title="MLflow Model Registry" href="/../model-registry.html"/>
+        <link rel="prev" title="Models From Code Guide" href="/models-from-code.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+<script type="text/javascript" src="../_static/jquery.js"></script>
+<script type="text/javascript" src="../_static/underscore.js"></script>
+<script type="text/javascript" src="../_static/doctools.js"></script>
+<script type="text/javascript" src="../_static/languagesections.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+<script type="text/javascript" src="../_static/runllm.js"></script>
+
+<body class="wy-body-for-nav" role="document">
+  
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N6WMTTJ"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+  
+
+  
+  <nav class="wy-nav-top header" role="navigation" aria-label="top navigation">
+    <ul>
+  <li class="menu-toggle">
+    <i data-toggle="wy-nav-top" class="wy-nav-top-menu-button db-icon db-icon-menu pull-left"></i>
+    <a href="../index.html" class="wy-nav-top-logo"
+      ><img src="../_static/MLflow-logo-final-black.png" alt="MLflow"
+    /></a>
+    <span class="version">2.20.1.dev0</span>
+  </li>
+</ul>
+  </nav>
+  <page>
+    
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side relative">
+      <div class="wy-side-scroll">
+  <div class="wy-side-nav-search">
+    
+
+    
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+    
+  </div>
+
+  <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+    
+      <a href="../index.html" class="main-navigation-home"><img src="../_static/icons/nav-home.svg"> MLflow</a>
+    
+
+    
+      
+
+      
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../introduction/index.html">MLflow Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/index.html">Getting Started with MLflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../new-features/index.html">New Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../llms/index.html">LLMs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../llms/tracing/index.html">MLflow Tracing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../model-evaluation/index.html">Model Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deep-learning/index.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../traditional-ml/index.html">Traditional ML</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/index.html">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tracking.html">MLflow Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system-metrics/index.html">System Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../projects.html">MLflow Projects</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../models.html">MLflow Models</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../models.html#storage-format">Storage Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../models.html#managing-model-dependencies">Managing Model Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../models.html#model-signatures-and-input-examples">Model Signatures And Input Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../models.html#model-api">Model API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../models.html#models-from-code">Models From Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../models.html#built-in-model-flavors">Built-In Model Flavors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../models.html#model-evaluation">Model Evaluation</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../models.html#model-customization">Model Customization</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">MLflow PythonModel Guide</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#introduction-to-mlflow-pythonmodel">Introduction to MLflow PythonModel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#type-hint-usage-in-pythonmodel">Type hint usage in PythonModel</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../models.html#custom-python-models">Custom Python Models</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../models.html#custom-flavors">Custom Flavors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../models.html#validate-models-before-deployment">Validate Models before Deployment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../models.html#built-in-deployment-tools">Built-In Deployment Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../models.html#export-a-python-function-model-as-an-apache-spark-udf">Export a <code class="docutils literal notranslate"><span class="pre">python_function</span></code> model as an Apache Spark UDF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../models.html#deployment-to-custom-targets">Deployment to Custom Targets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../models.html#id11">Community Model Flavors</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../model-registry.html">MLflow Model Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../recipes.html">MLflow Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plugins.html">MLflow Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auth/index.html">MLflow Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../search-runs.html">Search Runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../search-experiments.html">Search Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python_api/index.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../R-api.html">R API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../java_api/index.html">Java API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rest-api.html">REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docker.html">Official MLflow Docker Image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../community-model-flavors.html">Community Model Flavors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials-and-examples/index.html">Tutorials and Examples</a></li>
+</ul>
+
+      
+    
+  </div>
+
+  <div role="contentinfo">
+    
+
+    <p>
+      <a id='feedbacklink' href="https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md" target="_blank">Contribute</a>
+    </p>
+  </div>
+</div>
+    </nav>
+
+    <main class="wy-grid-for-nav">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <div class="wy-nav-content">
+          <div class="rst-content">
+            
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Documentation</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+        <li><a href="../models.html">MLflow Models</a> <span class="db-icon db-icon-chevron-right"></span></li>
+    
+    
+      <li>MLflow PythonModel Guide</li>
+    
+    
+    <!-- <li class="wy-breadcrumbs-aside">
+      <a href="https://github.com/mlflow/mlflow/blob/master/docs/source/model/python_model.rst" class="fa fa-github"> Edit on GitHub</a>
+    </li> -->
+    
+  </ul>
+</div>
+            <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <div itemprop="articleBody">
+                
+  <div class="section" id="mlflow-pythonmodel-guide">
+<h1>MLflow PythonModel Guide<a class="headerlink" href="#mlflow-pythonmodel-guide" title="Permalink to this headline"> </a></h1>
+<div class="contents local topic" id="in-this-section">
+<p class="topic-title">In this section:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#introduction-to-mlflow-pythonmodel" id="id2">Introduction to MLflow PythonModel</a></p>
+<ul>
+<li><p><a class="reference internal" href="#define-a-custom-pythonmodel" id="id3">Define a custom PythonModel</a></p></li>
+<li><p><a class="reference internal" href="#log-the-model" id="id4">Log the model</a></p></li>
+<li><p><a class="reference internal" href="#validate-the-model-before-deployment" id="id5">Validate the model before deployment</a></p></li>
+<li><p><a class="reference internal" href="#deploy-the-model" id="id6">Deploy the model</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#type-hint-usage-in-pythonmodel" id="id7">Type hint usage in PythonModel</a></p>
+<ul>
+<li><p><a class="reference internal" href="#supported-type-hints" id="id8">Supported type hints</a></p></li>
+<li><p><a class="reference internal" href="#using-type-hints-in-pythonmodel" id="id9">Using type hints in PythonModel</a></p></li>
+<li><p><a class="reference internal" href="#type-hints-data-validation-in-pythonmodel" id="id10">Type hints data validation in PythonModel</a></p></li>
+<li><p><a class="reference internal" href="#pydantic-model-type-hints-data-conversion" id="id11">Pydantic Model type hints data conversion</a></p></li>
+<li><p><a class="reference internal" href="#model-signature-inference-based-on-type-hints" id="id12">Model signature inference based on type hints</a></p></li>
+<li><p><a class="reference internal" href="#input-example-together-with-type-hints-during-model-logging" id="id13">Input example together with type hints during model logging</a></p></li>
+<li><p><a class="reference internal" href="#query-a-serving-endpoint-hosting-a-pythonmodel-with-type-hints" id="id14">Query a serving endpoint hosting a PythonModel with type hints</a></p></li>
+<li><p><a class="reference internal" href="#extra-allowed-type-hints-that-don-t-support-data-validation-or-schema-inference" id="id15">Extra allowed type hints that don’t support data validation or schema inference</a></p></li>
+<li><p><a class="reference internal" href="#typefromexample-type-hint-usage" id="id16">TypeFromExample type hint usage</a></p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="introduction-to-mlflow-pythonmodel">
+<h2><a class="toc-backref" href="#id2">Introduction to MLflow PythonModel</a><a class="headerlink" href="#introduction-to-mlflow-pythonmodel" title="Permalink to this headline"> </a></h2>
+<p>The <a class="reference internal" href="../python_api/mlflow.pyfunc.html#module-mlflow.pyfunc" title="mlflow.pyfunc"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mlflow.pyfunc</span></code></a> module provides <a class="reference internal" href="../python_api/mlflow.pyfunc.html#mlflow.pyfunc.save_model" title="mlflow.pyfunc.save_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">save_model()</span></code></a> and
+<a class="reference internal" href="../python_api/mlflow.pyfunc.html#mlflow.pyfunc.log_model" title="mlflow.pyfunc.log_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">log_model()</span></code></a> utilities for creating MLflow Models with the
+<code class="docutils literal notranslate"><span class="pre">python_function</span></code> flavor that contain user-specified code and <em>artifact</em> (file) dependencies.
+The MLflow PythonModel enables you to implement custom model logic while leveraging MLflow’s
+packaging and deployment capabilities.There are two ways to define a PythonModel:
+Subclassing <a class="reference internal" href="../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PythonModel" title="mlflow.pyfunc.PythonModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.pyfunc.PythonModel</span></code></a> or defining a callable.
+This guide provides a complete walkthrough on how to define and use a custom PythonModel.</p>
+<div class="section" id="define-a-custom-pythonmodel">
+<h3><a class="toc-backref" href="#id3">Define a custom PythonModel</a><a class="headerlink" href="#define-a-custom-pythonmodel" title="Permalink to this headline"> </a></h3>
+<div class="section" id="option-1-subclass-pythonmodel">
+<h4>Option 1: Subclass PythonModel<a class="headerlink" href="#option-1-subclass-pythonmodel" title="Permalink to this headline"> </a></h4>
+<p>The <a class="reference internal" href="../python_api/mlflow.pyfunc.html#module-mlflow.pyfunc" title="mlflow.pyfunc"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mlflow.pyfunc</span></code></a> module provides a <a class="reference internal" href="../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PythonModel" title="mlflow.pyfunc.PythonModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">generic</span> <span class="pre">PythonModel</span> <span class="pre">class</span></code></a> that can be used to define your own
+customized model. By subclassing it, the model can be seamlessly integrated with other MLflow components.</p>
+<p>Methods of PythonModel:</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt><strong>predict</strong></dt><dd><p>A valid PythonModel must implement the predict method, which defines the model’s prediction logic. This method is called by MLflow when
+the model is loaded as a PyFunc model using <code class="docutils literal notranslate"><span class="pre">mlflow.pyfunc.load_model</span></code> and the <code class="docutils literal notranslate"><span class="pre">predict</span></code> function is invoked.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>predict_stream</strong></dt><dd><p>The predict_stream method should be implemented if the model is intended for use in streaming environments. MLflow invokes this method
+when the model is loaded as a PyFunc model with <code class="docutils literal notranslate"><span class="pre">mlflow.pyfunc.load_model</span></code> and <code class="docutils literal notranslate"><span class="pre">predict_stream</span></code> is called.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>load_context</strong></dt><dd><p>Implement the load_context method if the model requires additional context to be loaded. For more details, refer to <a class="reference internal" href="../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PythonModel.load_context" title="mlflow.pyfunc.PythonModel.load_context"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_context()</span></code></a>.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Starting from MLflow 2.20.0, the <code class="docutils literal notranslate"><span class="pre">context</span></code> parameter can be removed from <code class="docutils literal notranslate"><span class="pre">predict</span></code> and <code class="docutils literal notranslate"><span class="pre">predict_stream</span></code> functions if it is not used.
+e.g. <code class="docutils literal notranslate"><span class="pre">def</span> <span class="pre">predict(self,</span> <span class="pre">model_input,</span> <span class="pre">params)</span></code> is a valid predict function signature.</p>
+</div>
+<p>Below is an example of a simple PythonModel that takes a list of string and returns it.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">MyModel</span><span class="p">(</span><span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">PythonModel</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_input</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">model_input</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="option-2-define-a-callable">
+<h4>Option 2: Define a callable<a class="headerlink" href="#option-2-define-a-callable" title="Permalink to this headline"> </a></h4>
+<p>An alternative way to log a PythonModel is to define a callable that <strong>takes a single argument</strong> and returns a prediction. This callable can be
+logged as a PythonModel by passing it to <code class="docutils literal notranslate"><span class="pre">mlflow.pyfunc.log_model</span></code>.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Starting from MLflow 2.20.0, you can use the <code class="docutils literal notranslate"><span class="pre">&#64;pyfunc</span></code> decorator on the callable to enable data validation on the input based on the type hints.
+Check <a class="reference internal" href="#type-hint-usage-in-pythonmodel"><span class="std std-ref">type hint usage in PythonModel</span></a> for more details.</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.pyfunc.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyfunc</span>
+
+
+<span class="nd">@pyfunc</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="n">model_input</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="n">model_input</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="log-the-model">
+<h3><a class="toc-backref" href="#id4">Log the model</a><a class="headerlink" href="#log-the-model" title="Permalink to this headline"> </a></h3>
+<p>Use the pyfunc module to log a custom model with <a class="reference internal" href="../python_api/mlflow.pyfunc.html#mlflow.pyfunc.log_model" title="mlflow.pyfunc.log_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">mlflow.pyfunc.log_model()</span></code></a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="n">model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+        <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
+        <span class="n">python_model</span><span class="o">=</span><span class="n">MyModel</span><span class="p">(),</span>
+        <span class="n">input_example</span><span class="o">=</span><span class="n">input_example</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="validate-the-model-before-deployment">
+<h3><a class="toc-backref" href="#id5">Validate the model before deployment</a><a class="headerlink" href="#validate-the-model-before-deployment" title="Permalink to this headline"> </a></h3>
+<p>Use :py:func`mlflow.models.predict` API to validate the model dependencies and input data before deploy it.
+Check <a class="reference external" href="../models.html#validate-models-before-deployment">MLflow Model Validation</a> for more details.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span>
+    <span class="n">model_uri</span><span class="o">=</span><span class="n">model_info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">,</span>
+    <span class="n">input_data</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">],</span>
+    <span class="n">env_manager</span><span class="o">=</span><span class="s2">&quot;uv&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>In addition, you can load the model locally and validate it by running predictions.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+
+<span class="n">pyfunc_model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
+<span class="n">pyfunc_model</span><span class="o">.</span><span class="n">predict</span><span class="p">([</span><span class="s2">&quot;hello&quot;</span><span class="p">,</span> <span class="s2">&quot;world&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="deploy-the-model">
+<h3><a class="toc-backref" href="#id6">Deploy the model</a><a class="headerlink" href="#deploy-the-model" title="Permalink to this headline"> </a></h3>
+<p>The final step to use your model in production is to deploy it. Follow <a class="reference external" href="../models.html#deployment-to-custom-targets">MLflow Model Deployment</a> guide to deploy the model.</p>
+</div>
+</div>
+<div class="section" id="type-hint-usage-in-pythonmodel">
+<span id="id1"></span><h2><a class="toc-backref" href="#id7">Type hint usage in PythonModel</a><a class="headerlink" href="#type-hint-usage-in-pythonmodel" title="Permalink to this headline"> </a></h2>
+<p>Starting from MLflow 2.20.0, type hints are now a valid way to define your model’s interfaces. You can use type hints to define the input and output types of the model.
+Utilizing type hints introduces the following benefits:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Data validation</strong>: MLflow validates the input data based on the type hints defined in the model. No matter if the model is a PythonModel instance or a loaded PyFunc model, the input data is consistently validated.</p></li>
+<li><p><strong>Type hint inference</strong>: MLflow infers the input and output schema of the model based on the type hints defined in the model, and sets that inferred structure as the logged model signature.</p></li>
+</ul>
+</div></blockquote>
+<div class="section" id="supported-type-hints">
+<h3><a class="toc-backref" href="#id8">Supported type hints</a><a class="headerlink" href="#supported-type-hints" title="Permalink to this headline"> </a></h3>
+<p><strong>Type hints used within the PythonModel’s input signature must be of type list[…]</strong> because PythonModel’s predict function expects batch input data.
+The following type hints are supported as the element type of <code class="docutils literal notranslate"><span class="pre">list[...]</span></code>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Primitive types</strong>: int, float, str, bool, bytes, datetime.datetime</p></li>
+<li><p><strong>Collection types</strong>: list, dict</p></li>
+<li><p><strong>Union types</strong>: <code class="docutils literal notranslate"><span class="pre">Union[type1,</span> <span class="pre">type2,</span> <span class="pre">...]</span></code> or <code class="docutils literal notranslate"><span class="pre">type1</span> <span class="pre">|</span> <span class="pre">type2</span> <span class="pre">|</span> <span class="pre">...</span></code></p></li>
+<li><p><strong>Optional types</strong>: Optional[type]</p></li>
+<li><p><strong>Pydantic models</strong>: Subclass of pydantic.BaseModel (fields must be of supported types mentioned in this section)</p></li>
+<li><p><strong>typing.Any</strong>: Any</p></li>
+</ul>
+</div></blockquote>
+<p>Constraints of type hints usage:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Pydantic models</strong>: Optional fields must contain a default value.</p></li>
+<li><p><strong>Union types</strong>: Union of more than one valid type is inferred as AnyType in MLflow, and MLflow does no data validation based on it.</p></li>
+<li><p><strong>Optional types</strong>: Optional type cannot be directly used in <code class="docutils literal notranslate"><span class="pre">list[...]</span></code> since the predict function’s input should not be None.</p></li>
+</ul>
+</div></blockquote>
+<p>Below are some examples of supported type hints:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>list[str], list[int], list[float], list[bool], list[bytes], list[datetime.datetime]</p></li>
+<li><p>list[list[str]]…</p></li>
+<li><p>list[dict[str, str]], list[dict[str, int]], list[dict[str, list[str]]]…</p></li>
+<li><p>list[Union[int, str]], list[str | dict[str, int]]…</p></li>
+</ul>
+</div></blockquote>
+<p>Below is an example of nested pydantic models as type hints:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.pyfunc.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyfunc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pydantic</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Message</span><span class="p">(</span><span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">role</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">content</span><span class="p">:</span> <span class="nb">str</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">FunctionParams</span><span class="p">(</span><span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">properties</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
+    <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;object&quot;</span>
+    <span class="n">required</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">additionalProperties</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ToolDefinition</span><span class="p">(</span><span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">description</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">parameters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">FunctionParams</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">strict</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ChatRequest</span><span class="p">(</span><span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">messages</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Message</span><span class="p">]</span>
+    <span class="n">tool</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ToolDefinition</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<span class="nd">@pyfunc</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="n">model_input</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ChatRequest</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+    <span class="k">return</span> <span class="p">[[</span><span class="n">msg</span><span class="o">.</span><span class="n">content</span> <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">messages</span><span class="p">]</span> <span class="k">for</span> <span class="n">request</span> <span class="ow">in</span> <span class="n">model_input</span><span class="p">]</span>
+
+
+<span class="n">input_example</span> <span class="o">=</span> <span class="p">[</span><span class="n">ChatRequest</span><span class="p">(</span><span class="n">messages</span><span class="o">=</span><span class="p">[</span><span class="n">Message</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="s2">&quot;Hello&quot;</span><span class="p">)])]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">predict</span><span class="p">(</span><span class="n">input_example</span><span class="p">))</span>  <span class="c1"># Output: [[&#39;Hello&#39;]]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-type-hints-in-pythonmodel">
+<h3><a class="toc-backref" href="#id9">Using type hints in PythonModel</a><a class="headerlink" href="#using-type-hints-in-pythonmodel" title="Permalink to this headline"> </a></h3>
+<p>To use type hints in PythonModel, you can define the input and output types in the predict function signature. Below is an example of a PythonModel
+that takes a list of Message object and returns a list of string.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pydantic</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Message</span><span class="p">(</span><span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">role</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">content</span><span class="p">:</span> <span class="nb">str</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">CustomModel</span><span class="p">(</span><span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">PythonModel</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_input</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Message</span><span class="p">],</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">msg</span><span class="o">.</span><span class="n">content</span> <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">model_input</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="type-hints-data-validation-in-pythonmodel">
+<h3><a class="toc-backref" href="#id10">Type hints data validation in PythonModel</a><a class="headerlink" href="#type-hints-data-validation-in-pythonmodel" title="Permalink to this headline"> </a></h3>
+<p>By subclassing <a class="reference internal" href="../python_api/mlflow.pyfunc.html#mlflow.pyfunc.PythonModel" title="mlflow.pyfunc.PythonModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlflow.pyfunc.PythonModel</span></code></a>, you can get data validation based on the type hints for free.
+The data validation works for both a PythonModel instance and a loaded PyFunc model.</p>
+<p>Below example demonstrates how data validation works based on the <code class="docutils literal notranslate"><span class="pre">CustomModel</span></code> defined above.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">CustomModel</span><span class="p">()</span>
+
+<span class="c1"># The input_example can be a list of Message objects as defined in the type hint</span>
+<span class="n">input_example</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">Message</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="s2">&quot;Hello&quot;</span><span class="p">),</span>
+    <span class="n">Message</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="s2">&quot;Hi&quot;</span><span class="p">),</span>
+<span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">input_example</span><span class="p">))</span>  <span class="c1"># Output: [&#39;Hello&#39;, &#39;Hi&#39;]</span>
+
+<span class="c1"># The input_example can also be a list of dict with the same schema as Message</span>
+<span class="n">input_example</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;Hello&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;Hi&quot;</span><span class="p">},</span>
+<span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">input_example</span><span class="p">))</span>  <span class="c1"># Output: [&#39;Hello&#39;, &#39;Hi&#39;]</span>
+
+<span class="c1"># If your input doesn&#39;t match the schema, it will raise an exception</span>
+<span class="c1"># e.g. content field is missing here, but it&#39;s required in the Message definition</span>
+<span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">([{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">}])</span>
+<span class="c1"># Output: 1 validation error for Message\ncontent\n  Field required [type=missing, input_value={&#39;role&#39;: &#39;system&#39;}, input_type=dict]</span>
+
+<span class="c1"># The same data validation works if you log and load the model as pyfunc</span>
+<span class="n">model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+    <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
+    <span class="n">python_model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+    <span class="n">input_example</span><span class="o">=</span><span class="n">input_example</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">pyfunc_model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">pyfunc_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">input_example</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>For callables, you can use &#64;pyfunc decorator to enable data validation based on the type hints.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.pyfunc.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyfunc</span>
+
+
+<span class="nd">@pyfunc</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="n">model_input</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Message</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">msg</span><span class="o">.</span><span class="n">content</span> <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">model_input</span><span class="p">]</span>
+
+
+<span class="c1"># The input_example can be a list of Message objects as defined in the type hint</span>
+<span class="n">input_example</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">Message</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="s2">&quot;Hello&quot;</span><span class="p">),</span>
+    <span class="n">Message</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="s2">&quot;Hi&quot;</span><span class="p">),</span>
+<span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">predict</span><span class="p">(</span><span class="n">input_example</span><span class="p">))</span>  <span class="c1"># Output: [&#39;Hello&#39;, &#39;Hi&#39;]</span>
+
+<span class="c1"># The input_example can also be a list of dict with the same schema as Message</span>
+<span class="n">input_example</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;Hello&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;Hi&quot;</span><span class="p">},</span>
+<span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">predict</span><span class="p">(</span><span class="n">input_example</span><span class="p">))</span>  <span class="c1"># Output: [&#39;Hello&#39;, &#39;Hi&#39;]</span>
+
+<span class="c1"># If your input doesn&#39;t match the schema, it will raise an exception</span>
+<span class="c1"># e.g. passing a list of string here will raise an exception</span>
+<span class="n">predict</span><span class="p">([</span><span class="s2">&quot;hello&quot;</span><span class="p">])</span>
+<span class="c1"># Output: Failed to validate data against type hint `list[Message]`, invalid elements:</span>
+<span class="c1"># [(&#39;hello&#39;, &quot;Expecting example to be a dictionary or pydantic model instance for Pydantic type hint, got &lt;class &#39;str&#39;&gt;&quot;)]</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>MLflow doesn’t validate model output against the type hints, but the output type hint is used for model signature inference.</p>
+</div>
+</div>
+<div class="section" id="pydantic-model-type-hints-data-conversion">
+<h3><a class="toc-backref" href="#id11">Pydantic Model type hints data conversion</a><a class="headerlink" href="#pydantic-model-type-hints-data-conversion" title="Permalink to this headline"> </a></h3>
+<p>For Pydantic model type hints, the input data can be either a Pydantic object or a dictionary that matches the schema of the Pydantic model.
+MLflow automatically converts the provided data to the type hint object before passing it to the predict function.
+If comparing to the example in the last section, <code class="docutils literal notranslate"><span class="pre">[{&quot;role&quot;:</span> <span class="pre">&quot;system&quot;,</span> <span class="pre">&quot;content&quot;:</span> <span class="pre">&quot;Hello&quot;}]</span></code> is converted to <code class="docutils literal notranslate"><span class="pre">[Message(role=&quot;system&quot;,</span> <span class="pre">content=&quot;Hello&quot;)]</span></code> within the predict function.</p>
+<p>The example below demonstrates how to use a base class as type hint, while preserving fields in the subclasses.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">ConfigDict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.pyfunc.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyfunc</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">BaseMessage</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="c1"># set extra=&#39;allow&#39; to allow extra fields in the subclass</span>
+    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">extra</span><span class="o">=</span><span class="s2">&quot;allow&quot;</span><span class="p">)</span>
+
+    <span class="n">role</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">content</span><span class="p">:</span> <span class="nb">str</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">SystemMessage</span><span class="p">(</span><span class="n">BaseMessage</span><span class="p">):</span>
+    <span class="n">system_prompt</span><span class="p">:</span> <span class="nb">str</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">UserMessage</span><span class="p">(</span><span class="n">BaseMessage</span><span class="p">):</span>
+    <span class="n">user_prompt</span><span class="p">:</span> <span class="nb">str</span>
+
+
+<span class="nd">@pyfunc</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="n">model_input</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">BaseMessage</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">model_input</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s2">&quot;system_prompt&quot;</span><span class="p">):</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">system_prompt</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s2">&quot;user_prompt&quot;</span><span class="p">):</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">user_prompt</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+
+<span class="n">input_example</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;Hello&quot;</span><span class="p">,</span> <span class="s2">&quot;system_prompt&quot;</span><span class="p">:</span> <span class="s2">&quot;Hi&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;Hi&quot;</span><span class="p">,</span> <span class="s2">&quot;user_prompt&quot;</span><span class="p">:</span> <span class="s2">&quot;Hello&quot;</span><span class="p">},</span>
+<span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">predict</span><span class="p">(</span><span class="n">input_example</span><span class="p">))</span>  <span class="c1"># Output: [&#39;Hi&#39;, &#39;Hello&#39;]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="model-signature-inference-based-on-type-hints">
+<h3><a class="toc-backref" href="#id12">Model signature inference based on type hints</a><a class="headerlink" href="#model-signature-inference-based-on-type-hints" title="Permalink to this headline"> </a></h3>
+<p>When logging a PythonModel with type hints, MLflow automatically infers the input and output schema of the model based on the type hints defined in the model.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Do not pass <code class="docutils literal notranslate"><span class="pre">signature</span></code> parameter explicitly when logging a PythonModel with type hints. If you pass the <code class="docutils literal notranslate"><span class="pre">signature</span></code> parameter,
+MLflow still uses the inferred signature based on the type hints, and raises a warning if they don’t match.</p>
+</div>
+<p>The table below illustrates how type hints map to given schemas in model signatures:</p>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 70%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Type hint</p></th>
+<th class="head"><p>Inferred schema</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>list[str]</p></td>
+<td><p>Schema([ColSpec(type=DataType.string)])</p></td>
+</tr>
+<tr class="row-odd"><td><p>list[list[str]]</p></td>
+<td><p>Schema([ColSpec(type=Array(DataType.string))])</p></td>
+</tr>
+<tr class="row-even"><td><p>list[dict[str, str]]</p></td>
+<td><p>Schema([ColSpec(type=Map(DataType.string))])</p></td>
+</tr>
+<tr class="row-odd"><td><p>list[Union[int, str]]</p></td>
+<td><p>Schema([ColSpec(type=AnyType())])</p></td>
+</tr>
+<tr class="row-even"><td><p>list[Any]</p></td>
+<td><p>Schema([ColSpec(type=AnyType())])</p></td>
+</tr>
+<tr class="row-odd"><td><p>list[pydantic.BaseModel]</p></td>
+<td><p>Schema([ColSpec(type=Object([…]))]) # properties based on the pydantic model fields</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Pydantic objects cannot be used in the <code class="docutils literal notranslate"><span class="pre">infer_signature</span></code> function. To use pydantic objects as model inputs, you must define the type hints
+as the pydantic model in the PythonModel’s predict function signature.</p>
+</div>
+</div>
+<div class="section" id="input-example-together-with-type-hints-during-model-logging">
+<h3><a class="toc-backref" href="#id13">Input example together with type hints during model logging</a><a class="headerlink" href="#input-example-together-with-type-hints-during-model-logging" title="Permalink to this headline"> </a></h3>
+<p>When logging a PythonModel, it is recommended to provide an input example that matches the type hints defined in the model.
+The input example is used to validate the type hints and check if the <code class="docutils literal notranslate"><span class="pre">predict</span></code> function works as expected.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+
+<span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+    <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
+    <span class="n">python_model</span><span class="o">=</span><span class="n">CustomModel</span><span class="p">(),</span>
+    <span class="n">input_example</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">],</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="query-a-serving-endpoint-hosting-a-pythonmodel-with-type-hints">
+<h3><a class="toc-backref" href="#id14">Query a serving endpoint hosting a PythonModel with type hints</a><a class="headerlink" href="#query-a-serving-endpoint-hosting-a-pythonmodel-with-type-hints" title="Permalink to this headline"> </a></h3>
+<p>When querying a serving endpoint hosting a PythonModel with type hints, you <strong>must pass the input data with</strong> <code class="docutils literal notranslate"><span class="pre">inputs</span></code> <strong>key in the request body</strong>.
+The example below demonstrates how to serve the model locally and query it:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mlflow<span class="w"> </span>models<span class="w"> </span>serve<span class="w"> </span>-m<span class="w"> </span>runs:/&lt;run_id&gt;/model<span class="w"> </span>--env-manager<span class="w"> </span><span class="nb">local</span>
+curl<span class="w"> </span>http://127.0.0.1:5000/invocations<span class="w"> </span>-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;inputs&quot;: [{&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: &quot;Hello&quot;}]}&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="extra-allowed-type-hints-that-don-t-support-data-validation-or-schema-inference">
+<h3><a class="toc-backref" href="#id15">Extra allowed type hints that don’t support data validation or schema inference</a><a class="headerlink" href="#extra-allowed-type-hints-that-don-t-support-data-validation-or-schema-inference" title="Permalink to this headline"> </a></h3>
+<p>MLflow also supports using the following type hints in PythonModel, but they are not used for data validation or schema inference, and a
+valid model signature or input_example needs to be provided during model logging.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>pandas.DataFrame</p></li>
+<li><p>pandas.Series</p></li>
+<li><p>numpy.ndarray</p></li>
+<li><p>scipy.sparse.csc_matrix</p></li>
+<li><p>scipy.sparse.csr_matrix</p></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="typefromexample-type-hint-usage">
+<h3><a class="toc-backref" href="#id16">TypeFromExample type hint usage</a><a class="headerlink" href="#typefromexample-type-hint-usage" title="Permalink to this headline"> </a></h3>
+<p>MLflow provides a special type hint, <code class="docutils literal notranslate"><span class="pre">TypeFromExample</span></code>, which helps convert the input data to match the type of your input example
+during PyFunc prediction. This is useful if you don’t want to explicitly define a type hint for the model input but still want
+the data to conform to the input example type during prediction.
+<strong>To use this feature, a valid input example must be provided during model logging.</strong> The input example must be one of the following
+types, as the <code class="docutils literal notranslate"><span class="pre">predict</span></code> function expects batch input data:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>list</p></li>
+<li><p>pandas.DataFrame</p></li>
+<li><p>pandas.Series</p></li>
+</ul>
+</div></blockquote>
+<p>The example below demonstrates how to use <code class="docutils literal notranslate"><span class="pre">TypeFromExample</span></code> type hint:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.types.type_hints</span><span class="w"> </span><span class="kn">import</span> <span class="n">TypeFromExample</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Model</span><span class="p">(</span><span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">PythonModel</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_input</span><span class="p">:</span> <span class="n">TypeFromExample</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">model_input</span>
+
+
+<span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">():</span>
+    <span class="n">model_info</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+        <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
+        <span class="n">python_model</span><span class="o">=</span><span class="n">Model</span><span class="p">(),</span>
+        <span class="n">input_example</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+<span class="n">pyfunc_model</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pyfunc</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_info</span><span class="o">.</span><span class="n">model_uri</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">pyfunc_model</span><span class="o">.</span><span class="n">predict</span><span class="p">([</span><span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="s2">&quot;e&quot;</span><span class="p">,</span> <span class="s2">&quot;f&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="p">[</span><span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="s2">&quot;e&quot;</span><span class="p">,</span> <span class="s2">&quot;f&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If neither type hints nor <code class="docutils literal notranslate"><span class="pre">TypeFromExample</span></code> are used, MLflow’s schema enforcement will default to converting the input data into a pandas DataFrame.
+This may not be ideal if the model expects the same type as the input example. It is strongly recommended to use supported type hints to avoid this
+conversion and enable data validation based on the specified type hints.</p>
+</div>
+</div>
+</div>
+</div>
+
+
+              </div>
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="models-from-code.html" class="btn btn-neutral" title="Models From Code Guide" accesskey="p"><span class="db-icon db-icon-chevron-left"></span> Previous</a>
+      
+      
+        <a href="../model-registry.html" class="btn btn-neutral" title="MLflow Model Registry" accesskey="n">Next <span class="db-icon db-icon-chevron-right"></span></a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+      <p class="copyright">
+          &copy; MLflow Project, a Series of LF Projects, LLC. All rights reserved.
+      </p>
+
+  </div> 
+
+</footer>
+          </div>
+        </div>
+      </section>
+    </main>
+  </page>
+
+  
+
+
+  
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+      URL_ROOT:'../',
+      VERSION:'2.20.1.dev0',
+      COLLAPSE_INDEX:false,
+      FILE_SUFFIX:'.html',
+      LINK_SUFFIX: '.html',
+      HAS_SOURCE:  true
+    };
+  </script>
+
+  
+
+  <script type="text/javascript" src="../_static/js/clipboard.min.js"></script>
+  <script type="text/javascript" src="../_static/js/jquery.waypoints.min.js"></script>
+
+  
+  
+  
+  <script type="text/javascript">var CLIPPY_SVG_PATH = "../_static/clippy.svg";</script>
+  <script type="text/javascript" src="../_static/js/custom.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.StickyNav.enable();
+    });
+
+  </script>
+  
+
+  
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        // Get the code block designator class entries
+        const allHighlights = document.querySelectorAll('.highlight');
+        // Disable copyable links for notebook cell numbering and for cell outputs
+        const highlights = Array.from(allHighlights).filter(highlight => !highlight.closest('.highlight-none') && 
+            !highlight.closest('.nboutput'));
+    
+        highlights.forEach(function(highlight) {
+            const copyIcon = document.createElement('span');
+            copyIcon.classList.add('copy-icon');
+            copyIcon.innerHTML = '&#xf0ea;';
+
+            copyIcon.addEventListener('click', function() {
+                const code = highlight.querySelector('pre').textContent;
+                copyToClipboard(code);
+
+                // Flash effect on click
+                this.style.color = '#0194E2';
+                setTimeout(() => {
+                    this.style.color = ''; 
+                }, 100);
+
+                // Display "Code copied to clipboard" near the clicked icon
+                const message = document.createElement('span');
+                message.textContent = "Copied!";
+                message.classList.add('copy-message'); 
+
+                // Append the message to the icon
+                this.appendChild(message);
+
+                setTimeout(() => {
+                    this.removeChild(message);
+                }, 500);
+            });
+
+            highlight.appendChild(copyIcon);
+        });
+    });
+  </script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Force download for notebook-download-btn
+        const downloadButtons = document.querySelectorAll('.notebook-download-btn');
+        downloadButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                // Fetch the raw content of the notebook from GitHub
+                fetch(button.href)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = url;
+                        const filename = button.href.split('/').pop();
+                        link.download = filename; 
+
+                        document.body.appendChild(link);
+                        link.click();
+
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    })
+                    .catch(err => console.error('Error fetching the notebook:', err));
+            });
+        });
+    });
+</script> 
+</body>
+</html>

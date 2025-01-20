@@ -55,7 +55,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="MLflow 2.19.1.dev0 documentation" href="../../index.html"/>
+    <link rel="top" title="MLflow 2.20.1.dev0 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
@@ -87,7 +87,7 @@
     <a href="../../index.html" class="wy-nav-top-logo"
       ><img src="../../_static/MLflow-logo-final-black.png" alt="MLflow"
     /></a>
-    <span class="version">2.19.1.dev0</span>
+    <span class="version">2.20.1.dev0</span>
   </li>
 </ul>
   </nav>
@@ -779,6 +779,7 @@
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.spark_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_spark_connect_mode</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.virtualenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">_get_python_env</span><span class="p">,</span> <span class="n">_get_virtualenv_name</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mlflow.utils.warnings_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">color_warning</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">pyspark.sql</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataFrame</span> <span class="k">as</span> <span class="n">SparkDataFrame</span>
@@ -3230,11 +3231,23 @@
         <span class="p">)</span>
     <span class="k">elif</span> <span class="n">python_model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">python_model</span><span class="p">):</span>
+            <span class="c1"># TODO: support input_example and TypeFromExample for callables</span>
             <span class="c1"># first argument is the model input</span>
             <span class="n">type_hints</span> <span class="o">=</span> <span class="n">_extract_type_hints</span><span class="p">(</span><span class="n">python_model</span><span class="p">,</span> <span class="n">input_arg_index</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">_signature_cannot_be_inferred_from_type_hint</span><span class="p">(</span><span class="n">type_hints</span><span class="o">.</span><span class="n">input</span><span class="p">):</span>
                 <span class="n">signature_from_type_hints</span> <span class="o">=</span> <span class="n">_infer_signature_from_type_hints</span><span class="p">(</span>
                     <span class="n">func</span><span class="o">=</span><span class="n">python_model</span><span class="p">,</span> <span class="n">type_hints</span><span class="o">=</span><span class="n">type_hints</span><span class="p">,</span> <span class="n">input_example</span><span class="o">=</span><span class="n">input_example</span>
+                <span class="p">)</span>
+            <span class="n">pyfunc_decorator_used</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">python_model</span><span class="p">,</span> <span class="s2">&quot;_is_pyfunc&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="c1"># only show the warning here if @pyfunc is not applied on the function</span>
+            <span class="c1"># since @pyfunc will trigger the warning instead</span>
+            <span class="k">if</span> <span class="n">type_hints</span><span class="o">.</span><span class="n">input</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">pyfunc_decorator_used</span><span class="p">:</span>
+                <span class="c1"># TODO: add link to documentation</span>
+                <span class="n">color_warning</span><span class="p">(</span>
+                    <span class="s2">&quot;Add type hints to the `predict` method to enable &quot;</span>
+                    <span class="s2">&quot;data validation and automatic signature inference.&quot;</span><span class="p">,</span>
+                    <span class="n">stacklevel</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                    <span class="n">color</span><span class="o">=</span><span class="s2">&quot;yellow&quot;</span><span class="p">,</span>
                 <span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">python_model</span><span class="p">,</span> <span class="n">PythonModel</span><span class="p">):</span>
             <span class="n">saved_example</span> <span class="o">=</span> <span class="n">_save_example</span><span class="p">(</span><span class="n">mlflow_model</span><span class="p">,</span> <span class="n">input_example</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">example_no_conversion</span><span class="p">)</span>
@@ -3288,6 +3301,11 @@
                             <span class="s2">&quot;input example is not provided, model signature cannot be inferred.&quot;</span>
                         <span class="p">)</span>
 
+    <span class="k">if</span> <span class="n">metadata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">mlflow_model</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">metadata</span>
+    <span class="k">if</span> <span class="n">saved_example</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">saved_example</span> <span class="o">=</span> <span class="n">_save_example</span><span class="p">(</span><span class="n">mlflow_model</span><span class="p">,</span> <span class="n">input_example</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">example_no_conversion</span><span class="p">)</span>
+
     <span class="k">if</span> <span class="n">signature_from_type_hints</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">signature</span> <span class="ow">and</span> <span class="n">signature_from_type_hints</span> <span class="o">!=</span> <span class="n">signature</span><span class="p">:</span>
             <span class="c1"># TODO: drop this support and raise exception in the next minor release since this</span>
@@ -3313,11 +3331,30 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># TODO: validate input example against signature</span>
                 <span class="n">update_signature_for_type_hint_from_example</span><span class="p">(</span><span class="n">input_example</span><span class="p">,</span> <span class="n">mlflow_model</span><span class="o">.</span><span class="n">signature</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">metadata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">mlflow_model</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">metadata</span>
-    <span class="k">if</span> <span class="n">saved_example</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">saved_example</span> <span class="o">=</span> <span class="n">_save_example</span><span class="p">(</span><span class="n">mlflow_model</span><span class="p">,</span> <span class="n">input_example</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">example_no_conversion</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">saved_example</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">color_warning</span><span class="p">(</span>
+                    <span class="n">message</span><span class="o">=</span><span class="s2">&quot;An input example was not provided when logging the model. To ensure &quot;</span>
+                    <span class="s2">&quot;the model signature functions correctly, specify the `input_example` &quot;</span>
+                    <span class="s2">&quot;parameter. See &quot;</span>
+                    <span class="s2">&quot;https://mlflow.org/docs/latest/model/signatures.html#model-input-example &quot;</span>
+                    <span class="s2">&quot;for more details about the benefits of using input_example.&quot;</span><span class="p">,</span>
+                    <span class="n">stacklevel</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                    <span class="n">color</span><span class="o">=</span><span class="s2">&quot;yellow_bold&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Validating input example against model signature&quot;</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">_validate_prediction_input</span><span class="p">(</span>
+                        <span class="n">data</span><span class="o">=</span><span class="n">saved_example</span><span class="o">.</span><span class="n">inference_data</span><span class="p">,</span>
+                        <span class="n">params</span><span class="o">=</span><span class="n">saved_example</span><span class="o">.</span><span class="n">inference_params</span><span class="p">,</span>
+                        <span class="n">input_schema</span><span class="o">=</span><span class="n">signature</span><span class="o">.</span><span class="n">inputs</span><span class="p">,</span>
+                        <span class="n">params_schema</span><span class="o">=</span><span class="n">signature</span><span class="o">.</span><span class="n">params</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">MlflowException</span><span class="o">.</span><span class="n">invalid_parameter_value</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Input example does not match the model signature. Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
 
     <span class="k">with</span> <span class="n">_get_dependencies_schemas</span><span class="p">()</span> <span class="k">as</span> <span class="n">dependencies_schemas</span><span class="p">:</span>
         <span class="n">schema</span> <span class="o">=</span> <span class="n">dependencies_schemas</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
@@ -3820,7 +3857,7 @@
   <script type="text/javascript">
     var DOCUMENTATION_OPTIONS = {
       URL_ROOT:'../../',
-      VERSION:'2.19.1.dev0',
+      VERSION:'2.20.1.dev0',
       COLLAPSE_INDEX:false,
       FILE_SUFFIX:'.html',
       LINK_SUFFIX: '.html',
