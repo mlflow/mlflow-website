@@ -43,6 +43,66 @@ export const BLOGS: Blog[] = [
         url: "https://www.linkedin.com/in/joanaferreira96/",
         image_url: "/img/authors/joana_ferreira.png",
       },
+    ],
+    date: "2025-01-21",
+    thumbnail: "/img/blog/from-natural-language-to-sql.png",
+  },
+  {
+    title: "MLflow Tracing in Jupyter Notebooks",
+    path: "/blog/mlflow-tracing-in-jupyter",
+    tags: ["genai", "mlops", "tracing"],
+    authors: [
+      {
+        name: "Daniel Lok",
+        title: "Software Engineer at Databricks",
+        url: "https://www.linkedin.com/in/daniel-yk-lok/",
+        image_url: "/img/authors/daniel_lok.png",
+      },
+    ],
+    date: "2024-12-20",
+    thumbnail: "/img/blog/mlflow-tracing-in-jupyter.png",
+  },
+  {
+    title: "Using Bedrock Agent as an MLflow ChatModel with Tracing",
+    path: "/blog/bedrock-chat-model-part-1",
+    tags: ["genai", "pyfunc", "bedrock", "tracing"],
+    authors: [
+      {
+        name: "Jas Bali",
+        title: "Lead Specialist Solutions Architect at Databricks",
+        url: "https://www.linkedin.com/in/jas-bali-195ba410a/",
+        image_url: "/img/authors/jas_bali.png",
+      },
+    ],
+    date: "2024-11-07",
+    thumbnail: "/img/blog/bedrock-chatmodel.png",
+  },
+  {
+    title: "Building Advanced RAG with MLflow and LlamaIndex Workflow",
+    path: "/blog/mlflow-llama-index-workflow",
+    tags: ["genai", "mlops", "mlflow-evaluate"],
+    authors: [
+      {
+        name: "Yuki Watanabe",
+        title: "Software Engineer at Databricks",
+        url: "https://www.linkedin.com/in/yuki-watanabe-a04528164/",
+        image_url: "/img/authors/yuki_watanabe.png",
+      },
+    ],
+    date: "2024-10-25",
+    thumbnail: "/img/blog/llama-index-thumbnail.png",
+  },
+  {
+    title: "LLM as judge",
+    path: "/blog/llm-as-judge",
+    tags: ["genai", "mlflow-evalaute"],
+    authors: [
+      {
+        name: "Pedro Azevedo",
+        title: "Machine Learning Analyst at Adidas",
+        url: "https://www.linkedin.com/in/pedro-azevedo-/",
+        image_url: "/img/authors/pedro.png",
+      },
       {
         name: "Rahul Pandey",
         title: "Sr. Solutions Architect at adidas",
@@ -50,12 +110,49 @@ export const BLOGS: Blog[] = [
         image_url: "/img/ambassadors/Rahul_Pandey.png",
       },
     ],
-    date: "2024-12-04",
-    thumbnail: "/img/blog/from-natural-language-to-sql.png",
+    date: "2024-10-03",
+    thumbnail: "/img/blog/llm-as-judge.png",
   },
   {
-    title: "LangGraph with Custom PyFunc",
-    path: "/blog/mlflow",
+    title: "Models from Code Logging in MLflow - What, Why, and How",
+    path: "/blog/models_from_code",
+    tags: ["genai", "pyfunc", "mlops"],
+    authors: [
+      {
+        name: "Awadelrahman M. A. Ahmed",
+        title:
+          "MLflow Ambassador | Cloud Data & Analytics Architect at REMA 1000",
+        url: "https://www.linkedin.com/in/awadelrahman/",
+        image_url: "/img/authors/awadelrahman_ahmed.png",
+      },
+    ],
+    date: "2024-09-13",
+    thumbnail: "/img/blog/thumbnail-models-from-code.gif",
+  },
+  {
+    title: "AutoGen with Custom PyFunc",
+    path: "/blog/autogen-image-agent",
+    tags: ["genai", "mlops"],
+    authors: [
+      {
+        name: "Michael Berk",
+        title: "Sr. Resident Solutions Architect at Databricks",
+        url: "https://www.linkedin.com/in/-michael-berk/",
+        image_url: "/img/authors/michael_berk.png",
+      },
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2024-08-29",
+    thumbnail: "/img/blog/autogen-blog.png",
+  },
+  {
+    title: "LangGraph with Model From Code",
+    path: "/blog/langgraph-model-from-code",
     tags: ["genai", "mlops"],
     authors: [
       {
@@ -254,21 +351,6 @@ export const BLOGS: Blog[] = [
     thumbnail: "/img/blog/custom-pyfunc.png",
   },
   {
-    title: "MLflow AI Gateway renamed to MLflow Deployments for LLMs",
-    path: "/blog/ai-gateway-rename",
-    tags: ["ai"],
-    authors: [
-      {
-        name: "MLflow maintainers",
-        title: "MLflow maintainers",
-        url: "https://github.com/mlflow/mlflow.git",
-        image_url: "https://github.com/mlflow-automation.png",
-      },
-    ],
-    date: "2023-12-01",
-    thumbnail: "/img/blog/ai-gateway.png",
-  },
-  {
     title:
       "Automatic Metric, Parameter, and Artifact Logging with mlflow.autolog",
     path: "/blog/mlflow-autolog",
@@ -303,6 +385,118 @@ export const BLOGS: Blog[] = [
 
 // Sort by date descending
 export const RELEASES: Release[] = [
+  {
+    title: "MLflow 2.20.0rc0",
+    path: "/releases/2.20.0rc0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2025-01-14",
+    version: "2.20.0",
+  },
+  {
+    title: "MLflow 2.19.0",
+    path: "/releases/2.19.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2024-12-11",
+    version: "2.19.0",
+  },
+  {
+    title: "MLflow 2.18.0",
+    path: "/releases/2.18.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2024-11-12",
+    version: "2.18.0",
+  },
+  {
+    title: "MLflow 2.17.2",
+    path: "/releases/2.17.2",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2024-10-31",
+    version: "2.17.2",
+  },
+  {
+    title: "MLflow 2.17.1",
+    path: "/releases/2.17.1",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2024-10-25",
+    version: "2.17.1",
+  },
+  {
+    title: "MLflow 2.17.0",
+    path: "/releases/2.17.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2024-10-11",
+    version: "2.17.0",
+  },
+  {
+    title: "MLflow 2.16.2",
+    path: "/releases/2.16.2",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2024-09-17",
+    version: "2.16.2",
+  },
+  {
+    title: "MLflow 2.16.1",
+    path: "/releases/2.16.1",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2024-09-13",
+    version: "2.16.1",
+  },
   {
     title: "MLflow 2.16.0",
     path: "/releases/2.16.0",
