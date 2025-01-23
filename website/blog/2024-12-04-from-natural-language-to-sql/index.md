@@ -12,7 +12,7 @@ authors:
   - hugo-carvalho
   - joana-ferreira
   - rahul-pandey
-thumbnail: img/blog/from-natural-language-to-sql.png
+thumbnail: /img/blog/from-natural-language-to-sql.png
 ---
 If you're looking to build a Multi-Lingual Query Engine that combines natural language to SQL generation with query execution while fully leveraging MLflow’s features, this blog post is your guide. We’ll explore how to leverage **MLflow Models from Code** to enable seamless tracking and versioning of AI Workflows. Additionally, we’ll deep dive into **MLflow’s Tracing** feature, which introduces observability into the many different components of an AI Workflow by tracking inputs, outputs, and metadata at every intermediate step.
 
