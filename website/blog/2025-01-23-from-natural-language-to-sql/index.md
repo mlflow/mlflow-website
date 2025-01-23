@@ -14,6 +14,7 @@ authors:
   - rahul-pandey
 thumbnail: /img/blog/from-natural-language-to-sql.png
 ---
+
 If you're looking to build a Multi-Lingual Query Engine that combines natural language to SQL generation with query execution while fully leveraging MLflow’s features, this blog post is your guide. We’ll explore how to leverage **MLflow Models from Code** to enable seamless tracking and versioning of AI Workflows. Additionally, we’ll deep dive into **MLflow’s Tracing** feature, which introduces observability into the many different components of an AI Workflow by tracking inputs, outputs, and metadata at every intermediate step.
 
 <!-- truncate -->
@@ -30,9 +31,10 @@ We’ll start by demonstrating how to leverage [LangGraph’s](https://www.langc
 
 Throughout this post, we’ll leverage [MLflow’s Models from Code](https://mlflow.org/docs/latest/model/models-from-code.html) feature to enable seamless tracking and versioning of AI Workflows. Additionally, we’ll deep dive into [MLflow’s Tracing](https://mlflow.org/docs/latest/llms/tracing/index.html) feature, designed to enhance the observability of the many different components of an AI workflow by tracking inputs, outputs, and metadata associated with each intermediate step. This enables easy identification of bugs and unexpected behaviors, providing greater transparency over the workflow.
 
-# Prerequisites
+## Prerequisites
 
 To set up and run this project, ensure the following **Python packages** are installed:
+
 - `faiss-cpu`
 - `langchain`
 - `langchain-core`
@@ -51,13 +53,13 @@ Finally, ensure that your OpenAI API key is saved within a .env file in the proj
 OPENAI_API_KEY=your_openai_api_key
 ```
 
-# Multi-Lingual Query Engine using LangGraph
+## Multi-Lingual Query Engine using LangGraph
 
 The Multi-Lingual Query Engine leverages the [LangGraph](https://langchain-ai.github.io/langgraph/) library, an AI orchestration tool designed to create stateful, multi-agent, and cyclical graph architectures for applications powered by LLMs.
 
 Compared to other AI orchestrators, LangGraph offers three core benefits: cycles, controllability, and persistence. It allows the definition of AI workflows with cycles, which are essential for implementing retry mechanisms like the SQL query generation retries in the Multi-Lingual Query Engine (where the query loops back for regeneration if validation fails). This makes LangGraph the ideal tool for building our Multi-Lingual Query Engine.
 
-## Key LangGraph features:
+### Key LangGraph features:
 
 1. **Stateful Architecture**: The engine maintains a dynamic snapshot of the graph’s execution status. This snapshot acts as a shared resource across nodes, enabling efficient decision-making and real-time updates at each node execution.
 
@@ -89,11 +91,11 @@ The Multi-Lingual Query Engine’s advanced AI workflow is composed of interconn
 
 The retry mechanism is introduced in Stage 8, where the system dynamically evaluates the current graph state. Specifically, when the SQL query validation node (Stage 7) detects an issue, the state triggers a loop back to the SQL Generation node (Stage 5) for a new SQL Generation attempt (with a maximum of 3 attempts).
 
-## Components
+### Components
 
 The Multi-Lingual Query Engine interacts with several external components to transform natural language user inputs into SQL queries and execute them in a safe and robust manner. In this section, we will take a detailed look at the key AI Workflow components: OpenAI, Vector Store, SQLite Database, and SQL Generation Chain.
 
-### OpenAI
+#### OpenAI
 
 OpenAI, more specifically the `gpt-4o-mini` language model, plays a crucial role in multiple stages of the workflow. It provides the intelligence required for:
 
@@ -107,25 +109,25 @@ OpenAI, more specifically the `gpt-4o-mini` language model, plays a crucial role
 
 Details on OpenAI implementation will be provided later on in the [Node Descriptions](#node-descriptions) section.
 
-### FAISS Vector Store
+#### FAISS Vector Store
 
 To build an effective natural language to SQL engine capable of generating accurate and executable SQL queries, we leverage Langchain's FAISS Vector Store feature. This setup allows the system to search and extract SQL query generation guidelines from [W3Schools SQL documents](https://www.w3schools.com/sql/) previously stored in the Vector Database, enhancing the success of SQL query generation.
 
 For demo purposes, we are using FAISS, an in-memory vector store where vectors are stored directly in RAM. This provides fast access but means data is not persisted between runs. For a more scalable solution that enables embeddings to be stored and shared across multiple projects, we recommend alternatives like [AWS OpenSearch](https://aws.amazon.com/what-is/opensearch/), [Vertex AI Vector Search](https://cloud.google.com/vertex-ai/docs/vector-search/overview), [Azure Vector Search](https://learn.microsoft.com/en-us/azure/search/vector-search-overview), or [Mosaic AI Vector Search](https://docs.databricks.com/en/generative-ai/vector-search.html). These cloud-based solutions offer persistent storage, automatic scaling, and seamless integration with other cloud services, making them well-suited for large-scale applications.
 
-#### Step 1: Load SQL Documentation
+##### Step 1: Load SQL Documentation
 
 The first step in creating a FAISS Vector Store with SQL query generation guidelines is to load SQL documentation from the [W3Schools SQL page](https://www.w3schools.com/sql/) using LangChain's `RecursiveUrlLoader`. This tool retrieves the documentation, allowing us to use it as a knowledge base for our engine.
 
-#### Step 2: Split the Text into Manageable Chunks
+##### Step 2: Split the Text into Manageable Chunks
 
 The loaded SQL documentation is a lengthy text, making it difficult to be effectively ingested by the LLM. To address this, the next step involves splitting the text into smaller, manageable chunks using Langchain's `RecursiveCharacterTextSplitter`. By splitting the text into chunks of 500 characters with a 50-character overlap, we ensure the language model has sufficient context while minimizing the risk of losing important information that spans across chunks. The `split_text` method applies this splitting process, storing the resulting pieces in a list called 'documents'.
 
-#### Step 3: Generate Embedding Model
+##### Step 3: Generate Embedding Model
 
 The third step is to create a model that converts these chunks into embeddings (vectorized numerical representations of each text chunk). Embeddings enable the system to compare the similarity between chunks and the user's input, facilitating the retrieval of the most relevant matches for SQL query generation.
 
-#### Step 4: Create and Store Embeddings in FAISS Vector Store
+##### Step 4: Create and Store Embeddings in FAISS Vector Store
 
 Finally, we create and store the embeddings using FAISS. The `FAISS.from_texts` method takes all the chunks, computes their embeddings, and stores them in a high speed searchable vector database. This searchable database allows the engine to efficiently retrieve relevant SQL guidelines, significantly improving the success rate of executable SQL query generation.
 
@@ -198,7 +200,7 @@ def setup_vector_store(logger: logging.Logger):
     return vector_store
 ```
 
-### SQLite Database
+#### SQLite Database
 
 The SQLite database is a key component of the Multi-Lingual Query Engine serving as the structured data repository. SQLite offers a lightweight, fast, and self-contained relational database engine that requires no server setup or installation. Its compact size (under 500KB) and zero-configuration nature make it incredibly easy to use, while its platform-agnostic database format ensures seamless portability across different systems. As a local disk database, SQLite was the ideal choice for avoiding the complexity of setting up MySQL or PostgreSQL, while still providing a reliable, full-featured SQL engine with outstanding performance.
 
@@ -399,7 +401,7 @@ def setup_database(logger: logging.Logger):
     return conn
 ```
 
-### SQL Generation Chain
+#### SQL Generation Chain
 
 The **SQL Generation Chain** (`sql_gen_chain`) is the backbone of automated SQL query generation in our workflow. This chain leverages LangChain's modular capabilities and OpenAI's advanced natural language processing to transform user questions into precise and executable SQL queries.
 
@@ -409,9 +411,9 @@ The **SQL Generation Chain** (`sql_gen_chain`) is the backbone of automated SQL 
 
 - **Structured Responses**: Delivers outputs in a predefined format, including:
 
-    - A **description** of the query's purpose.
+  - A **description** of the query's purpose.
 
-    - The corresponding **SQL code** ready for execution.
+  - The corresponding **SQL code** ready for execution.
 
 - **Adaptable and Reliable**: Uses `gpt-4o-mini` for robust, consistent query generation, minimizing manual effort and errors.
 
@@ -441,7 +443,7 @@ Structure your answer with a description of the query, followed by the SQL code 
             ("placeholder", "{messages}"),
         ]
     )
-    
+
     # Initialize the OpenAI LLM
     llm = ChatOpenAI(temperature=0, model="gpt-4o-mini")
 
@@ -451,11 +453,11 @@ Structure your answer with a description of the query, followed by the SQL code 
     return sql_gen_chain
 ```
 
-### Workflow Setup and Initialization
+#### Workflow Setup and Initialization
 
 Before delving into the workflow nodes, it's crucial to set up the necessary components and define the structure of the workflow. This section explains the initialization of essential libraries, logging, and the custom `GraphState` class, as well as the main workflow compilation function.
 
-#### Defining `GraphState`
+##### Defining `GraphState`
 
 The `GraphState` class is a custom `TypedDict` that maintains the state information as the workflow progresses. It acts as a shared data structure across the nodes, ensuring continuity and consistency. Key fields include:
 
@@ -497,7 +499,7 @@ class GraphState(TypedDict):
     database_schema: str  # Holds the extracted database schema for context checking
 ```
 
-#### Workflow Compilation Function
+##### Workflow Compilation Function
 
 The main function, `get_workflow`, is responsible for defining and compiling the workflow. Key components include:
 
@@ -525,18 +527,19 @@ def get_workflow(conn, cursor, vector_store):
 
 This function acts as the entry point for creating a complete workflow using `StateGraph`. Individual nodes within the workflow will be defined and connected in subsequent sections.
 
-### Node Descriptions
+#### Node Descriptions
 
-#### 1. Translate Input
+##### 1. Translate Input
 
 The `translate_input` node translates user queries into English to standardize processing and ensure compatibility with downstream nodes. Translating user input as the first step in the AI Workflow ensures task segregation and improves observability. Task segregation simplifies the workflow by isolating translation from the other dowstream tasks like user input safety validation and SQL generation. Improved observability provides clear traces in MLflow, making it easier to debug and monitor the process.
 
 - **Examples:**
-    - Input: _"Quantos pedidos foram realizados em Novembro?"_  
-    - Translated: _"How many orders were made in November?"_
-    - Input: _"Combien de ventes avons-nous enregistrées en France ?"_
-    - Translated: _"How many sales did we record in France?"_
+  - Input: _"Quantos pedidos foram realizados em Novembro?"_
+  - Translated: _"How many orders were made in November?"_
+  - Input: _"Combien de ventes avons-nous enregistrées en France ?"_
+  - Translated: _"How many sales did we record in France?"_
 - **Code:**
+
 ```python
 def translate_input(state: GraphState) -> GraphState:
     """
@@ -560,21 +563,21 @@ def translate_input(state: GraphState) -> GraphState:
     Text:
     {user_input}
     """
-    
+
     # Call the OpenAI LLM to translate the text
     translated_response = llm.invoke(translation_prompt)
     translated_text = translated_response.content.strip()  # Access the 'content' attribute and strip any extra spaces
 
     # Update state with the translated input
-    state["translated_input"] = translated_text  
+    state["translated_input"] = translated_text
     _logger.info("Translation completed successfully. Translated input: %s", translated_text)
 
     return state
 ```
 
-#### 2. Pre-safety Check
+##### 2. Pre-safety Check
 
-The `pre_safety_check` node ensures early detection of disallowed SQL operations and inappropriate content in the user's input. While the check for harmful SQL commands (e.g., `CREATE`, `DELETE`, `DROP`, `INSERT`, `UPDATE`) will occur again later in the workflow, specifically after generating the SQL query, this pre-safety check is crucial for identifying potential issues at the input stage. By doing so, it prevents unnecessary computation and offers immediate feedback to the user. 
+The `pre_safety_check` node ensures early detection of disallowed SQL operations and inappropriate content in the user's input. While the check for harmful SQL commands (e.g., `CREATE`, `DELETE`, `DROP`, `INSERT`, `UPDATE`) will occur again later in the workflow, specifically after generating the SQL query, this pre-safety check is crucial for identifying potential issues at the input stage. By doing so, it prevents unnecessary computation and offers immediate feedback to the user.
 
 While the use of a disallow list for harmful SQL operations provides a quick way to safeguard against destructive queries, maintaining a comprehensive disallow list can become hard to manage when dealing with complex SQL backends like T-SQL. An alternative approach is adopting an allowlist, restricting queries to only safe operations (e.g., `SELECT`, `JOIN`). This approach ensures a more robust solution by narrowing down permissible actions rather than attempting to block every risky command.
 
@@ -583,27 +586,29 @@ To achieve an enterprise-grade solution, the project could leverage frameworks l
 Additionally, the node leverages the LLM to analyze the input for offensive or inappropriate content. If unsafe queries or inappropriate content are detected, the state is updated with an error flag and transparent feedback is provided, safeguarding the workflow from malicious or destructive elements early on.
 
 - **Examples:**
-1. **Disallowed Operations:**
-	- **Input:** *"DROP TABLE customers;"*
-	- **Response:** *"Your query contains disallowed SQL operations and cannot be processed."*
 
-	- **Input:** *"SELECT * FROM orders;"*
-	- **Response:** *"Query allowed."*
+1. **Disallowed Operations:**
+
+   - **Input:** _"DROP TABLE customers;"_
+   - **Response:** _"Your query contains disallowed SQL operations and cannot be processed."_
+
+   - **Input:** _"SELECT _ FROM orders;"\*
+   - **Response:** _"Query allowed."_
 
 2. **Inappropriate Content:**
-	- **Input:** *"Show me orders where customers have names like 'John the Idiot';"*
-	- **Response:** *"Your query contains inappropriate content and cannot be processed."*
-	
-	- **Input:** *"Find total sales by region."*
-	- **Response:** *"Input is safe to process."*
+
+   - **Input:** _"Show me orders where customers have names like 'John the Idiot';"_
+   - **Response:** _"Your query contains inappropriate content and cannot be processed."_
+   - **Input:** _"Find total sales by region."_
+   - **Response:** _"Input is safe to process."_
 
 - **Code:**
 
 ```python
 def pre_safety_check(state: GraphState) -> GraphState:
     """
-    Perform safety checks on the user input to ensure that no dangerous SQL operations 
-    or inappropriate content is present. The function checks for SQL operations like 
+    Perform safety checks on the user input to ensure that no dangerous SQL operations
+    or inappropriate content is present. The function checks for SQL operations like
     DELETE, DROP, and others, and also evaluates the input for toxic or unsafe content.
 
     Args:
@@ -653,24 +658,24 @@ def pre_safety_check(state: GraphState) -> GraphState:
     return state
 ```
 
-#### 3. Schema Extract
+##### 3. Schema Extract
 
 The `schema_extract` node dynamically retrieves the database schema, including table names and column details, by querying metadata. The formatted schema is stored in the state, enabling validation of user queries while adapting to the current database structure.
 
 - **Examples:**
-    - Input: Request for schema extraction.  
-        Schema Output:
-        - Customers(CustomerID (INTEGER), CustomerName (TEXT), ContactName (TEXT), Address (TEXT), City (TEXT), PostalCode (TEXT), Country (TEXT))
-        - Orders(OrderID (INTEGER), CustomerID (INTEGER), OrderDate (TEXT))
-        - OrderDetails(OrderDetailID (INTEGER), OrderID (INTEGER), ProductID (INTEGER), Quantity (INTEGER))
-        - Products(ProductID (INTEGER), ProductName (TEXT), Price (REAL))
+  - Input: Request for schema extraction.  
+     Schema Output:
+    - Customers(CustomerID (INTEGER), CustomerName (TEXT), ContactName (TEXT), Address (TEXT), City (TEXT), PostalCode (TEXT), Country (TEXT))
+    - Orders(OrderID (INTEGER), CustomerID (INTEGER), OrderDate (TEXT))
+    - OrderDetails(OrderDetailID (INTEGER), OrderID (INTEGER), ProductID (INTEGER), Quantity (INTEGER))
+    - Products(ProductID (INTEGER), ProductName (TEXT), Price (REAL))
 - **Code:**
 
 ```python
 def schema_extract(state: GraphState) -> GraphState:
     """
     Extracts the database schema, including all tables and their respective columns,
-    from the connected SQLite database. This function retrieves the list of tables and 
+    from the connected SQLite database. This function retrieves the list of tables and
     iterates through each table to gather column definitions (name and data type).
 
     Args:
@@ -691,7 +696,7 @@ def schema_extract(state: GraphState) -> GraphState:
         table_name = table_name_tuple[0]
         cursor.execute(f"PRAGMA table_info({table_name});")
         columns = cursor.fetchall()
-        
+
         # Format column definitions
         column_defs = ', '.join([f"{col[1]} ({col[2]})" for col in columns])
         schema_details.append(f"- {table_name}({column_defs})")
@@ -704,15 +709,15 @@ def schema_extract(state: GraphState) -> GraphState:
     return state
 ```
 
-#### 4. Context Check
+##### 4. Context Check
 
 The `context_check` node validates user queries by comparing them against the extracted database schema to ensure alignment and relevance. Queries that do not correspond to the schema are flagged as irrelevant, preventing resource waste and enabling user feedback for query reformulation.
 
 - **Examples:**
-    - Input: _"What is the average order value?"_  
-        Schema Match: Input is relevant to the database schema.
-    - Input: _"Show me data from the inventory table."_  
-        Response: _"Your question is not related to the database and cannot be processed."_
+  - Input: _"What is the average order value?"_  
+     Schema Match: Input is relevant to the database schema.
+  - Input: _"Show me data from the inventory table."_  
+     Response: _"Your question is not related to the database and cannot be processed."_
 - **Code:**
 
 ```python
@@ -749,7 +754,7 @@ def context_check(state: GraphState) -> GraphState:
     Database Schema:
     {database_schema}
     """
-    
+
     # Call the LLM for context check
     llm_invoke = llm.invoke(context_prompt)
     llm_response = llm_invoke.content.strip().lower()  # Access the 'content' attribute and strip any extra spaces and lower case
@@ -769,25 +774,25 @@ def context_check(state: GraphState) -> GraphState:
     return state
 ```
 
-#### 5. Generate
+##### 5. Generate
 
 The `generate` node constructs SQL queries from natural language input by retrieving relevant documentation from the vector store and leveraging a pre-defined SQL generation chain. It aligns the query with the user’s intent and schema context, updating the state with the generated SQL and its description.
 
-- **Examples:**  
-    - Input: _"Find total sales."_  
-        Generated SQL: _"SELECT SUM(Products.Price * OrderDetails.Quantity) AS TotalSales FROM OrderDetails LEFT JOIN Products ON OrderDetails.ProductID = Products.ProductID;"_
-    - Input: _"List all customers in New York."_  
-        Generated SQL: _"SELECT name FROM customers WHERE location = 'New York';"_
+- **Examples:**
+  - Input: _"Find total sales."_  
+     Generated SQL: _"SELECT SUM(Products.Price \* OrderDetails.Quantity) AS TotalSales FROM OrderDetails LEFT JOIN Products ON OrderDetails.ProductID = Products.ProductID;"_
+  - Input: _"List all customers in New York."_  
+     Generated SQL: _"SELECT name FROM customers WHERE location = 'New York';"_
 - **Code:**
 
 ```python
 def generate(state: GraphState) -> GraphState:
     """
-    Generates an SQL query based on the user's input. The node retrieves relevant documents from 
+    Generates an SQL query based on the user's input. The node retrieves relevant documents from
     the vector store and uses a generation chain to produce an SQL query.
 
     Args:
-        state (GraphState): The current graph state, which contains the translated input and 
+        state (GraphState): The current graph state, which contains the translated input and
                             other relevant data such as messages and iteration count.
 
     Returns:
@@ -834,28 +839,24 @@ def generate(state: GraphState) -> GraphState:
     return state
 ```
 
-#### 6. Post-safety Check
+##### 6. Post-safety Check
 
 The `post_safety_check` node ensures the generated SQL query is safe by performing a final validation for harmful SQL commands. While the earlier pre-safety check identifies disallowed operations in user inputs, this post-safety check verifies that the SQL query produced after generation adheres to security guidelines. This two-step approach ensures that even if disallowed operations are inadvertently introduced during query generation, they can be caught and flagged. If unsafe queries are detected, the node halts the workflow, updates the state with an error flag, and provides feedback to the user.
 
 - **Examples:**
 
 1. **Disallowed Operations:**
-    - **Generated Query:** _"DROP TABLE orders;"_
-        
-    - **Response:** _"The generated SQL query contains disallowed SQL operations: DROP and cannot be processed."_
-        
-    - **Generated Query:** _"SELECT name FROM customers;"_
-        
-    - **Response:** _"Query is valid."_
-        
+   - **Generated Query:** _"DROP TABLE orders;"_
+   - **Response:** _"The generated SQL query contains disallowed SQL operations: DROP and cannot be processed."_
+   - **Generated Query:** _"SELECT name FROM customers;"_
+   - **Response:** _"Query is valid."_
 
 - **Code:**
 
 ```python
 def post_safety_check(state: GraphState) -> GraphState:
     """
-    Perform safety checks on the generated SQL query to ensure that it doesn't contain disallowed operations 
+    Perform safety checks on the generated SQL query to ensure that it doesn't contain disallowed operations
     such as CREATE, DELETE, DROP, etc. This node checks the SQL query generated earlier in the workflow.
 
     Args:
@@ -865,13 +866,13 @@ def post_safety_check(state: GraphState) -> GraphState:
         GraphState: The updated state with error status and messages if any issues are found.
     """
     _logger.info("Performing post-safety check on the generated SQL query.")
-    
+
     # Retrieve the generated SQL query from the state
     sql_solution = state.get("generation", {})
     sql_query = sql_solution.get("sql_code", "").strip()
     messages = state["messages"]
     error = "no"
-    
+
     # List of disallowed SQL operations
     disallowed_operations = ['CREATE', 'DELETE', 'DROP', 'INSERT', 'UPDATE', 'ALTER', 'TRUNCATE', 'EXEC', 'EXECUTE']
     pattern = re.compile(r'\b(' + '|'.join(disallowed_operations) + r')\b', re.IGNORECASE)
@@ -895,15 +896,15 @@ def post_safety_check(state: GraphState) -> GraphState:
     return state
 ```
 
-#### 7. SQL Check
+##### 7. SQL Check
 
 The `sql_check` node ensures the generated SQL query is safe and syntactically valid by executing it within a transactional savepoint. Any changes are rolled back after validation, with errors flagged and detailed feedback provided to maintain query integrity.
 
-- **Examples:**  
-    - Input SQL: _"SELECT name FROM customers WHERE city = 'New York';"_  
-        Validation: Query is valid.  
-    - Input SQL: _"SELECT MONTH(date) AS month, SUM(total) AS total_sales FROM orders GROUP BY MONTH(date);"_  
-        Response: _"Your SQL query failed to execute: no such function: MONTH."_ 
+- **Examples:**
+  - Input SQL: _"SELECT name FROM customers WHERE city = 'New York';"_  
+     Validation: Query is valid.
+  - Input SQL: _"SELECT MONTH(date) AS month, SUM(total) AS total_sales FROM orders GROUP BY MONTH(date);"_  
+     Response: _"Your SQL query failed to execute: no such function: MONTH."_
 - **Code:**
 
 ```python
@@ -951,15 +952,15 @@ def sql_check(state: GraphState) -> GraphState:
     return state
 ```
 
-#### 8. Run Query
+##### 8. Run Query
 
 The `run_query` node executes the validated SQL query, connecting to the database to retrieve results. It updates the state with the query output, ensuring the data is formatted for further analysis or reporting while implementing robust error handling.
 
 - **Examples:**
-    - Input SQL: _"SELECT COUNT(*) FROM Customers WHERE City = 'New York';"_  
-        Query Result: _"(0,)"_
-    - Input SQL: _"SELECT SUM(Products.Price * OrderDetails.Quantity) AS TotalSales FROM OrderDetails LEFT JOIN Products ON OrderDetails.ProductID = Products.ProductID;"*  
-        Query Result: _"(6925.0,)"_
+  - Input SQL: _"SELECT COUNT(\*) FROM Customers WHERE City = 'New York';"_  
+     Query Result: _"(0,)"_
+  - Input SQL: _"SELECT SUM(Products.Price * OrderDetails.Quantity) AS TotalSales FROM OrderDetails LEFT JOIN Products ON OrderDetails.ProductID = Products.ProductID;"*  
+     Query Result: _"(6925.0,)"\_
 - **Code:**
 
 ```python
@@ -976,7 +977,7 @@ def run_query(state: GraphState) -> GraphState:
         GraphState: The updated state with the query results, or a flag indicating if no records were found.
     """
     _logger.info("Running SQL query.")
-    
+
     # Extract the SQL query from the state
     sql_solution = state["generation"]
     sql_code = sql_solution.sql_code.strip()
@@ -986,7 +987,7 @@ def run_query(state: GraphState) -> GraphState:
     try:
         # Execute the SQL query
         cursor.execute(sql_code)
-        
+
         # For SELECT queries, fetch and store results
         if sql_code.upper().startswith("SELECT"):
             results = cursor.fetchall()
@@ -1009,19 +1010,21 @@ def run_query(state: GraphState) -> GraphState:
     return state
 ```
 
-#### Decision Step: Determine Next Action
+##### Decision Step: Determine Next Action
 
 The `decide_next_step` function acts as a control point in the workflow, deciding what action should be taken next based on the current state. It evaluates the `error` status and the number of iterations performed so far to determine if the query should be run, the workflow should be finished, or if the system should retry generating the SQL query.
 
 - **Process:**
-    - If there is no error (`error == "no"`), the system proceeds with running the SQL query.
-    - If the maximum number of iterations (`max_iterations`) has been reached, the workflow ends.
-    - If an error occurred and the maximum iterations haven't been reached, the system will retry the query generation.
+
+  - If there is no error (`error == "no"`), the system proceeds with running the SQL query.
+  - If the maximum number of iterations (`max_iterations`) has been reached, the workflow ends.
+  - If an error occurred and the maximum iterations haven't been reached, the system will retry the query generation.
 
 - **Example Workflow Decisions:**
-    - **No Error, Proceed with Query**: If no errors are found in the previous steps, the workflow moves forward to run the query.
-    - **Maximum Iterations Reached, End Workflow**: If the workflow has already attempted a set number of times (`max_iterations`), it terminates.
-    - **Error Detected, Retry SQL Generation**: If an error occurs and the system has not yet reached the retry limit, it will attempt to regenerate the SQL query.
+
+  - **No Error, Proceed with Query**: If no errors are found in the previous steps, the workflow moves forward to run the query.
+  - **Maximum Iterations Reached, End Workflow**: If the workflow has already attempted a set number of times (`max_iterations`), it terminates.
+  - **Error Detected, Retry SQL Generation**: If an error occurs and the system has not yet reached the retry limit, it will attempt to regenerate the SQL query.
 
 - **Code:**
 
@@ -1038,7 +1041,7 @@ def decide_next_step(state: GraphState) -> str:
         str: The next step in the workflow, which can be "run_query", "generate", or END.
     """
     _logger.info("Deciding next step based on current state.")
-    
+
     error = state["error"]
     iterations = state["iterations"]
 
@@ -1053,7 +1056,7 @@ def decide_next_step(state: GraphState) -> str:
         return "generate"
 ```
 
-### Workflow Orchestration and Conditional Logic
+#### Workflow Orchestration and Conditional Logic
 
 To define the orchestration of tasks in our system, we construct a workflow graph using the `StateGraph` class. Each task is represented as a node, and the transitions between tasks are defined as edges. Conditional edges are used to control the flow based on the state of the workflow.
 
@@ -1135,38 +1138,36 @@ def get_workflow(conn, cursor, vector_store):
 ```
 
 1. **Start to `translate_input`**:  
-    The workflow begins by translating user input into a structured format.
+   The workflow begins by translating user input into a structured format.
 2. **`translate_input` to `pre_safety_check`**:  
-    After translation, the workflow proceeds to check the safety of the input.
+   After translation, the workflow proceeds to check the safety of the input.
 3. **`pre_safety_check` Conditional Rule**:
-    - If the input passes the pre-safety check (`state["error"] == "no"`), the workflow moves to `schema_extract`.
-    - If the input fails the pre-safety check, the workflow terminates (`END`).
+   - If the input passes the pre-safety check (`state["error"] == "no"`), the workflow moves to `schema_extract`.
+   - If the input fails the pre-safety check, the workflow terminates (`END`).
 4. **`schema_extract` to `context_check`**:  
-    The schema is extracted, and then the workflow validates the input’s relevance to the database context.
+   The schema is extracted, and then the workflow validates the input’s relevance to the database context.
 5. **`context_check` Conditional Rule**:
-    - If the input is relevant (`state["error"] == "no"`), the workflow moves to `generate`.
-    - If not, the workflow terminates (`END`).
+   - If the input is relevant (`state["error"] == "no"`), the workflow moves to `generate`.
+   - If not, the workflow terminates (`END`).
 6. **`generate` to `post_safety_check`**:  
-    The workflow generates an SQL query and sends it for validation.\
-7. **`post_safety_check` Conditional Rule**:
-		- If the input passes the post-safety check (`state["error"] == "no"`), the workflow moves to `sql_check`.	
-		- If the input fails the post-safety check, the workflow terminates (`END`).
+   The workflow generates an SQL query and sends it for validation.\
+7. **`post_safety_check` Conditional Rule**: - If the input passes the post-safety check (`state["error"] == "no"`), the workflow moves to `sql_check`. - If the input fails the post-safety check, the workflow terminates (`END`).
 8. **`sql_check` Conditional Rule**:
-    - If the query is valid, the workflow proceeds to `run_query`.
-    - If the query needs adjustments and the number of iteractions is lower than 3, the workflow loops back to `generate`.
-    - If validation fails and the number of iteractions is higher than 3, the workflow terminates (`END`).
+   - If the query is valid, the workflow proceeds to `run_query`.
+   - If the query needs adjustments and the number of iteractions is lower than 3, the workflow loops back to `generate`.
+   - If validation fails and the number of iteractions is higher than 3, the workflow terminates (`END`).
 9. **`run_query` to `END`**:  
-    Once the query is executed, the workflow ends.
+   Once the query is executed, the workflow ends.
 
 The schema above provides a representation of the LangGraph Nodes and Edges:
 
-![graph_representation](graph.png)
+<img src={require("./graph.png").default} alt="Graph Representation of our Agent" width="50%"/>
 
-# Logging the Model in MLflow
+## Logging the Model in MLflow
 
 Now that we have built a Multi-Lingual Query Engine using LangGraph, we are ready to log the model using MLflow’s [Models from Code](https://mlflow.org/docs/latest/model/models-from-code.html). Logging the model into MLflow allows us to treat the Multi-Lingual Query Engine as a traditional ML model, enabling seamless tracking, versioning, and packaging for deployment across diverse serving infrastructures. MLflow’s Models from Code strategy, where we log the code that represents the model, contrasts with MLflow object-based logging, where a model object is created, serialized, and logged as a pickle or JSON object.
 
-## Step 1: Create our Model from Code File
+### Step 1: Create our Model from Code File
 
 So far, we have defined the `get_workflow` function in a file named `workflow.py`. In this step, we will create a new file, `sql_model.py`, which introduces the `SQLGenerator` class. This script will:
 
@@ -1192,7 +1193,7 @@ class SQLGenerator(mlflow.pyfunc.PythonModel):
 mlflow.models.set_model(SQLGenerator())
 ```
 
-## Step 2: Log with MLflow Models from Code feature
+### Step 2: Log with MLflow Models from Code feature
 
 With the SQLGenerator custom Python model defined, the next step is to log it using MLflow's Models from Code feature. This involves using the log model standard API specifying the path to the sql_model.py script and using the code_paths parameter to include workflow.py as a dependency. This approach ensures that all necessary code files are available when the model is loaded in a different environment or on another machine.
 
@@ -1228,7 +1229,7 @@ In the MLflow UI, the stored model includes both the `sql_model.py` and `workflo
 
 ![model_as_code_artifact](model_as_code.png)
 
-# Use the Logged Multi-Lingual Query Engine in `main.py`
+## Use the Logged Multi-Lingual Query Engine in `main.py`
 
 After logging the model, it can be loaded back from the MLflow Tracking Server using the model URI and the standard `mlflow.pyfunc.load_model` API. When the model is loaded, the `workflow.py` script will be executed along with the `sql_model.py` script, ensuring that the `get_workflow` function is available when the `predict` method is called.
 
@@ -1334,19 +1335,19 @@ if __name__ == "__main__":
 
 ```
 
-# Project File Structure
+## Project File Structure
 
 The Project follows a simple file structure:
 
 <img src={require("./file_structure.png").default} alt="file structure" width="60%"/>
 
-# MLflow Tracing
+## MLflow Tracing
 
 [MLflow Automated Tracing](https://mlflow.org/docs/latest/llms/tracing/index.html) provides fully automated integrations with various GenAI libraries such as LangChain, OpenAI, LlamaIndex, DSPy, and AutoGen. Since our AI Workflow is built using LangGraph, we can activate automated LangChain tracing by enabling `mlflow.langchain.autolog()`.
 
 With LangChain autologging, traces are automatically logged to the active MLflow experiment whenever invocation APIs are called on chains. This seamless integration ensures that every interaction is captured for monitoring and analysis.
 
-## Viewing Traces in MLflow
+### Viewing Traces in MLflow
 
 Traces can be easily accessed by navigating to the MLflow experiment of interest and clicking on the "Tracing" tab. Once inside, selecting a specific trace provides detailed execution information.
 
