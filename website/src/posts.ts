@@ -27,6 +27,34 @@ export type Release = {
 // Sort by date descending
 export const BLOGS: Blog[] = [
   {
+    title:
+      "From Natural Language to SQL: Building and Tracking a Multi-Lingual Query Engine",
+    path: "/blog/from-natural-language-to-sql",
+    tags: ["pyfunc", "mlflow", "sql-generator", "models-from-code", "tracing"],
+    authors: [
+      {
+        name: "Hugo Carvalho",
+        title: "Machine Learning Analyst at adidas",
+        url: "https://www.linkedin.com/in/hugodscarvalho/",
+        image_url: "/img/authors/hugo_carvalho.png",
+      },
+      {
+        name: "Joana Ferreira",
+        title: "Machine Learning Engineer at adidas",
+        url: "https://www.linkedin.com/in/joanaferreira96/",
+        image_url: "/img/authors/joana_ferreira.png",
+      },
+      {
+        name: "Rahul Pandey",
+        title: "Sr. Solutions Architect at adidas",
+        url: "https://www.linkedin.com/in/rahulpandey1901/",
+        image_url: "/img/ambassadors/Rahul_Pandey.png",
+      },
+    ],
+    date: "2025-01-23",
+    thumbnail: "/img/blog/from-natural-language-to-sql.png",
+  },
+  {
     title: "MLflow Tracing in Jupyter Notebooks",
     path: "/blog/mlflow-tracing-in-jupyter",
     tags: ["genai", "mlops", "tracing"],
