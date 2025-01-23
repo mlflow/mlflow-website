@@ -1338,7 +1338,7 @@ if __name__ == "__main__":
 
 The Project follows a simple file structure:
 
-<img src="file_structure.png" alt="file_structure" width="300">
+<img src={require("./file_structure.png").default} alt="file structure" width="60%"/>
 
 # MLflow Tracing
 
