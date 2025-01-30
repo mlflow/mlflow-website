@@ -16,7 +16,7 @@ MLflow provides [built-in Tracing support](https://mlflow.org/docs/latest/llms/t
 - Showing how to capture both simple completions and more complex tool-calling workflows
 - Illustrating how tracing can be added with minimal changes to existing code
 
-We'll use [the Ollama Python SDK](https://github.com/ollama/ollama-python), an open-source Python SDK for the [Ollama](https://ollama.ai/) LLM platform, as our example. We'll work through the process step-by-step, showing how to capture the key information with MLflow tracing while maintaining a clean integration with the provider's SDK. Note that MLflow *does* have autologging support for Ollama, but currently only for use via the OpenAI client, not directly with the Ollama Python SDK.
+We'll use [the Ollama Python SDK](https://github.com/ollama/ollama-python), an open-source Python SDK for the [Ollama](https://ollama.ai/) LLM platform, as our example. We'll work through the process step-by-step, showing how to capture the key information with MLflow tracing while maintaining a clean integration with the provider's SDK. Note that MLflow _does_ have autologging support for Ollama, but currently only for use via the OpenAI client, not directly with the Ollama Python SDK.
 
 ## Adding MLflow Tracing to a New Provider: General Principles
 
@@ -28,11 +28,11 @@ Adding tracing to a new provider involves a few key considerations:
 
 1. **Understand the Provider's key functionality:** We first need to understand what API methods need to be traced in order to get the tracing information we want. For LLM inference providers, this typically involves operations such as chat completions, tool calls, or embedding generation. In orchestration frameworks, this may involve operations such as retrieval, reasoning, routing, or any of a wide range of custom steps. In our Ollama example, we will focus on the chat completions API. This step will vary significantly depending on the provider.
 
-2. **Map operations to spans:** MLflow tracing uses different *span types* to represent different types of operations. You can find descriptions of built-in span types [here](https://mlflow.org/docs/latest/llms/tracing/index.html#span-type). Different span types are displayed differently in the MLflow UI and can enable specific functionality. Within spans, we also want to map the provider's inputs and outputs to the formats expected by MLflow. MLflow offers utilities for recording chat and tool inputs and outputs, which are then displayed as formatted messages in the MLflow UI.
+2. **Map operations to spans:** MLflow tracing uses different _span types_ to represent different types of operations. You can find descriptions of built-in span types [here](https://mlflow.org/docs/latest/llms/tracing/index.html#span-type). Different span types are displayed differently in the MLflow UI and can enable specific functionality. Within spans, we also want to map the provider's inputs and outputs to the formats expected by MLflow. MLflow offers utilities for recording chat and tool inputs and outputs, which are then displayed as formatted messages in the MLflow UI.
 
-    ![Chat Messages](./1_chat_type.png)
+   ![Chat Messages](./1_chat_type.png)
 
-    When adding tracing to a new provider, our main task is to map the provider's API methods to MLflow Tracing spans with appropriate span types.
+   When adding tracing to a new provider, our main task is to map the provider's API methods to MLflow Tracing spans with appropriate span types.
 
 3. **Structure and preserve key data:** For each operation we want to trace, we need to identify the key information we want to preserve and make sure it is captured and displayed in a useful way. For example, we may want to capture the input and configuration data that control the operation's behavior, the outputs and metadata that explain the results, errors that terminated the operation prematurely, etc. Looking at traces and tracing implementations for similar providers can provide a good starting point for how to structure and preserve these data.
 
@@ -75,15 +75,15 @@ ChatResponse(
     eval_duration=3447000000,
     message=Message(
         role='assistant',
-        content="In MLflow, a model consists of several key components:\n\n1. **Model Registry**: A centralized 
-storage for models, containing metadata such as the model's name, version, and description.\n2. **Model Version**: 
-A specific iteration of a model, represented by a unique version number. This can be thought of as a snapshot of 
-the model at a particular point in time.\n3. **Model Artifacts**: The actual model code, parameters, and data used 
-to train the model. These artifacts are stored in the Model Registry and can be easily deployed or reused.\n4. 
-**Experiment**: A collection of runs that use the same hyperparameters and model version to train and evaluate a 
-model. Experiments help track progress, provide reproducibility, and facilitate collaboration.\n5. **Run**: An 
-individual instance of training or testing a model using a specific experiment. Runs capture the output of each 
-run, including metrics such as accuracy, loss, and more.\n\nThese components work together to enable efficient 
+        content="In MLflow, a model consists of several key components:\n\n1. **Model Registry**: A centralized
+storage for models, containing metadata such as the model's name, version, and description.\n2. **Model Version**:
+A specific iteration of a model, represented by a unique version number. This can be thought of as a snapshot of
+the model at a particular point in time.\n3. **Model Artifacts**: The actual model code, parameters, and data used
+to train the model. These artifacts are stored in the Model Registry and can be easily deployed or reused.\n4.
+**Experiment**: A collection of runs that use the same hyperparameters and model version to train and evaluate a
+model. Experiments help track progress, provide reproducibility, and facilitate collaboration.\n5. **Run**: An
+individual instance of training or testing a model using a specific experiment. Runs capture the output of each
+run, including metrics such as accuracy, loss, and more.\n\nThese components work together to enable efficient
 model management, version control, and reproducibility in machine learning workflows.",
         images=None,
         tool_calls=None
@@ -120,32 +120,32 @@ def trace_ollama_chat(func):
             # Set model name as a span attribute
             model_name = kwargs.get("model", "")
             span.set_attribute("model_name", model_name)
-            
+
             # Log the inputs
             input_messages = kwargs.get("messages", [])
             span.set_inputs({
                 "messages": input_messages,
                 "model": model_name,
             })
-            
+
             # Set input messages
             set_span_chat_messages(span, input_messages)
-            
+
             # Make the API call
             response = func(*args, **kwargs)
-            
+
             # Log the outputs
             if hasattr(response, 'to_dict'):
                 output = response.to_dict()
             else:
                 output = response
             span.set_outputs(output)
-            
+
             output_message = response.message
-            
+
             # Append the output message
             set_span_chat_messages(span, [{"role": output_message.role, "content": output_message.content}], append=True)
-            
+
             return response
     return wrapper
 ```
@@ -155,23 +155,24 @@ Let's break down the code and see how it works.
 1. We start by defining a helper function, `_get_span_type`, that maps Ollama methods to MLflow span types. This isn't strictly necessary as we are currently only tracing the `chat` function, but it shows a pattern that could be applied to other methods. This follows the reference implementation for the [Anthropic provider](https://github.com/mlflow/mlflow/blob/master/mlflow/anthropic/autolog.py), as recommended in the tracing contribution guide.
 
 2. We define a decorator, `trace_ollama_chat`, using [`functools.wraps`](https://docs.python.org/3/library/functools.html#functools.wraps), that wraps the `chat` function. There are a few key steps here:
-    1. We start a new span with `mlflow.start_span`. The span name is set to "ollama.chat" and the span type is set to the value returned by `_get_span_type`.
-    2. We set `model_name` as an attribute on the span with `span.set_attribute`. This isn't strictly necessary as model name will be captured in the inputs, but it illustrates how to set arbitrary attributes on a span.
-    3. We log the messages as inputs to the span with `span.set_inputs`. We get these from the `messages` argument by accessing the `kwargs` dictionary. These messages will be logged to the "inputs" section of the span in the MLflow UI. We also log the model name as an input, again to illustrate how to record arbitrary inputs.
 
-        ![Inputs](./2_log_inputs.png)
+   1. We start a new span with `mlflow.start_span`. The span name is set to "ollama.chat" and the span type is set to the value returned by `_get_span_type`.
+   2. We set `model_name` as an attribute on the span with `span.set_attribute`. This isn't strictly necessary as model name will be captured in the inputs, but it illustrates how to set arbitrary attributes on a span.
+   3. We log the messages as inputs to the span with `span.set_inputs`. We get these from the `messages` argument by accessing the `kwargs` dictionary. These messages will be logged to the "inputs" section of the span in the MLflow UI. We also log the model name as an input, again to illustrate how to record arbitrary inputs.
 
-    4. We use MLflow's `set_span_chat_messages` utility function to format the input messages in a way that will be displayed nicely in the MLflow UI's Chat panel. This helper ensures that the messages are properly formatted and displayed with appropriate styling for each message role.
-    5. We call the original function with `func(*args, **kwargs)`. This is the Ollama `chat` function.
-    6. We log the outputs of the function as a span attribute with `span.set_outputs`. This takes the response from the Ollama API and sets it as an attribute on the span. These outputs will be logged to the "outputs" section of the span in the MLflow UI.
+      ![Inputs](./2_log_inputs.png)
 
-        ![Outputs](./3_log_outputs.png)
+   4. We use MLflow's `set_span_chat_messages` utility function to format the input messages in a way that will be displayed nicely in the MLflow UI's Chat panel. This helper ensures that the messages are properly formatted and displayed with appropriate styling for each message role.
+   5. We call the original function with `func(*args, **kwargs)`. This is the Ollama `chat` function.
+   6. We log the outputs of the function as a span attribute with `span.set_outputs`. This takes the response from the Ollama API and sets it as an attribute on the span. These outputs will be logged to the "outputs" section of the span in the MLflow UI.
 
-    7. We extract the output message from the response and use `set_span_chat_messages` again to append it to the chat history, ensuring it appears in the Chat panel of the MLflow UI.
+      ![Outputs](./3_log_outputs.png)
 
-        ![Messages Panel](./4_chat_panel.png)
+   7. We extract the output message from the response and use `set_span_chat_messages` again to append it to the chat history, ensuring it appears in the Chat panel of the MLflow UI.
 
-    8. Finally, we return the response from the API call, without any changes. Now, when we wrap the chat function with `trace_ollama_chat`, the function will be traced, but will otherwise behave as normal.
+      ![Messages Panel](./4_chat_panel.png)
+
+   8. Finally, we return the response from the API call, without any changes. Now, when we wrap the chat function with `trace_ollama_chat`, the function will be traced, but will otherwise behave as normal.
 
 A few points to note:
 
@@ -382,17 +383,17 @@ class ToolExecutor:
                 }
             }
         ]
-        
+
         # Map tool names to their Python implementations
         self.tool_implementations = {
             "calculate_tip": self._calculate_tip
         }
-    
+
     def _calculate_tip(self, bill_amount: float, tip_percentage: float) -> float:
         """Calculate the tip amount based on the bill amount and tip percentage."""
         bill_amount = float(bill_amount)
         tip_percentage = float(tip_percentage)
-        return round(bill_amount * (tip_percentage / 100), 2)    
+        return round(bill_amount * (tip_percentage / 100), 2)
     def execute_tool_calling_loop(self, messages):
         """Execute a complete tool calling loop with tracing."""
         with mlflow.start_span(
@@ -407,7 +408,7 @@ class ToolExecutor:
 
             # Set input messages
             set_span_chat_messages(parent_span, messages)
-            
+
             # First LLM call (already traced by our chat method patch)
             response = chat(
                 messages=messages,
@@ -416,10 +417,10 @@ class ToolExecutor:
             )
 
             messages.append(response.message)
-            
+
             tool_calls = response.message.tool_calls
             tool_results = []
-            
+
             # Execute tool calls
             for tool_call in tool_calls:
                 with mlflow.start_span(
@@ -429,15 +430,15 @@ class ToolExecutor:
                     # Parse tool inputs
                     tool_inputs = tool_call.function.arguments
                     tool_span.set_inputs(tool_inputs)
-                    
+
                     # Execute tool
                     func = self.tool_implementations.get(tool_call.function.name)
                     if func is None:
                         raise ValueError(f"No implementation for tool: {tool_call.function.name}")
-                    
+
                     result = func(**tool_inputs)
                     tool_span.set_outputs({"result": result})
-                    
+
                     tool_results.append({
                         "tool_call_id": str(uuid4()),
                         "output": str(result)
@@ -448,19 +449,19 @@ class ToolExecutor:
                         "tool_call_id": str(uuid4()),
                         "content": str(result)
                     })
-                
+
             # Prepare messages for final response
             messages.append({
                 "role": "user",
                 "content": "Answer the initial question based on the tool call results. Do not refer to the tool call results in your response. Just give a direct answer."
             })
-            
+
             # Final LLM call (already traced by our chat method patch)
             final_response = chat(
                 messages=messages,
                 model="llama3.2"
             )
-            
+
             # Set the final output for the parent span
             parent_span.set_outputs({
                 "final_response": final_response.message.content,
@@ -471,7 +472,7 @@ class ToolExecutor:
 
             # set output messages
             set_span_chat_messages(parent_span, [final_response.message.model_dump()], append=True)
-            
+
             return final_response
 ```
 
