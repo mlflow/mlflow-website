@@ -154,7 +154,7 @@ Let's break down the code and see how it works.
 
 1. We start by defining a helper function, `_get_span_type`, that maps Ollama methods to MLflow span types. This isn't strictly necessary as we are currently only tracing the `chat` function, but it shows a pattern that could be applied to other methods. This follows the reference implementation for the [Anthropic provider](https://github.com/mlflow/mlflow/blob/master/mlflow/anthropic/autolog.py), as recommended in the tracing contribution guide.
 
-2. We define a decorator, `trace_ollama_chat`, using [`functools.wraps`](https://docs.python.org/3/library/functools.html#functools.wraps), that wraps the `chat` function. There are a few key steps here:
+2. We define a decorator, `trace_ollama_chat`, using [`functools.wraps`](https://docs.python.org/3/library/functools.html#functools.wraps), that patches the `chat` function. There are a few key steps here:
 
    1. We start a new span with `mlflow.start_span`. The span name is set to "ollama.chat" and the span type is set to the value returned by `_get_span_type`.
    2. We set `model_name` as an attribute on the span with `span.set_attribute`. This isn't strictly necessary as model name will be captured in the inputs, but it illustrates how to set arbitrary attributes on a span.
@@ -172,7 +172,7 @@ Let's break down the code and see how it works.
 
       ![Messages Panel](./4_chat_panel.png)
 
-   8. Finally, we return the response from the API call, without any changes. Now, when we wrap the chat function with `trace_ollama_chat`, the function will be traced, but will otherwise behave as normal.
+   8. Finally, we return the response from the API call, without any changes. Now, when we patch the chat function with `trace_ollama_chat`, the function will be traced, but will otherwise behave as normal.
 
 A few points to note:
 
@@ -180,9 +180,9 @@ A few points to note:
 - The use of `set_span_chat_messages` ensures that both input and output messages are displayed in a user-friendly way in the MLflow UI's Chat panel, making it easy to follow the conversation flow.
 - There are several other ways we could have implemented this tracing behavior. We could have written a wrapper class or used a simple wrapper function that decorates the `chat` function with `@mlflow.trace`. Some orchestration frameworks may require a more complex approach, such as callbacks or API hooks. See the [MLflow Tracing Contribution Guide](https://mlflow.org/docs/latest/llms/tracing/contribute.html) for more details.
 
-### Step 3: Wrap the instance method and try it out
+### Step 3: Patch the `chat` method and try it out
 
-Now that we have a tracing decorator, we can wrap Ollama's `chat` method and try it out.
+Now that we have a tracing decorator, we can patch Ollama's `chat` method and try it out.
 
 ```python
 original_chat = ollama_chat
@@ -490,7 +490,7 @@ Here's how we handled tracing in this tool calling loop:
 
 This process creates a comprehensive trace of the entire tool calling loop, from the initial request through tool executions and the final response.
 
-We can execute this as follows:
+We can execute this as follows. However, note that you should _not_ run arbitrary code generated or invoked by LLMs without fully understanding what it will do on your system.
 
 ```python
 executor = ToolExecutor()
