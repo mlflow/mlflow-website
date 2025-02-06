@@ -403,20 +403,6 @@ export const RELEASES: Release[] = [
         image_url: "https://github.com/mlflow-automation.png",
       },
     ],
-    date: "2025-02-06",
-    version: "2.20.1",
-  },
-  {
-    title: "MLflow 2.20.1",
-    path: "/releases/2.20.1",
-    authors: [
-      {
-        name: "MLflow maintainers",
-        title: "MLflow maintainers",
-        url: "https://github.com/mlflow/mlflow.git",
-        image_url: "https://github.com/mlflow-automation.png",
-      },
-    ],
     date: "2025-01-30",
     version: "2.20.1",
   },
