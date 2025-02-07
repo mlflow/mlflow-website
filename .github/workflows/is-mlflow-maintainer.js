@@ -6,6 +6,7 @@ const MLFLOW_CORE_MAINTAINERS = [
   "mlflow-automation",
   "serena-ruan",
   "WeichenXu123",
+  "TomeHirata",
 ]
 
 const isMLflowMaintainer = (username) => {
