@@ -50,7 +50,7 @@ const config: Config = {
           containerId: process.env.GTM_ID || "GTM-TEST",
         },
         gtag: {
-          trackingID: process.env.GTAG_ID || "GTAG-TEST",
+          trackingID: "AW-16857946923",
           anonymizeIP: true,
         },
       } satisfies Preset.Options,
