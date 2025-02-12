@@ -3,7 +3,7 @@ title: "Beyond Autolog: Add MLflow Tracing to a New LLM Provider"
 tags: [genai, tracing, ollama]
 slug: custom-tracing
 authors: [daniel-liden]
-thumbnail: img/blog/tracing-new-provider.png
+thumbnail: /img/blog/tracing-new-provider.png
 ---
 
 In this post, we will show how to add MLflow Tracing to a new LLM provider by adding tracing support to the `chat` method of the Ollama Python SDK.
