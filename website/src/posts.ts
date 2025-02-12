@@ -39,7 +39,7 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2025-01-30",
-    thumbnail: "img/blog/tracing-new-provider.png",
+    thumbnail: "/img/blog/tracing-new-provider.png",
   },
   {
     title:
