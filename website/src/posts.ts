@@ -27,6 +27,21 @@ export type Release = {
 // Sort by date descending
 export const BLOGS: Blog[] = [
   {
+    title: "Beyond Autolog: Add MLflow Tracing to a New LLM Provider",
+    path: "/blog/custom-tracing",
+    tags: ["genai", "tracing", "ollama"],
+    authors: [
+      {
+        name: "Daniel Liden",
+        title: "Developer Advocate at Databricks",
+        url: "https://www.linkedin.com/in/danielliden",
+        image_url: "/img/authors/daniel_liden.png",
+      },
+    ],
+    date: "2025-01-30",
+    thumbnail: "/img/blog/tracing-new-provider.png",
+  },
+  {
     title:
       "From Natural Language to SQL: Building and Tracking a Multi-Lingual Query Engine",
     path: "/blog/from-natural-language-to-sql",
