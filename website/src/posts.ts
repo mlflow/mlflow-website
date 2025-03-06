@@ -27,6 +27,21 @@ export type Release = {
 // Sort by date descending
 export const BLOGS: Blog[] = [
   {
+    title: "Practical AI Observability: Getting Started with MLflow Tracing",
+    path: "/blog/ai-observability-mlflow-tracing",
+    tags: ["genai", "observability", "tracing"],
+    authors: [
+      {
+        name: "Daniel Liden",
+        title: "Developer Advocate at Databricks",
+        url: "https://www.linkedin.com/in/danielliden",
+        image_url: "/img/authors/daniel_liden.png",
+      },
+    ],
+    date: "2025-03-06",
+    thumbnail: "/img/blog/tracing-intro-thumbnail.png",
+  },
+  {
     title: "Beyond Autolog: Add MLflow Tracing to a New LLM Provider",
     path: "/blog/custom-tracing",
     tags: ["genai", "tracing", "ollama"],
