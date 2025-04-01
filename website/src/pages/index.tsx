@@ -411,7 +411,7 @@ export default function Home(): JSX.Element {
                     "Build applications with prompt engineering",
                     "Track progress during fine tuning",
                     "Package and deploy models",
-                    "Securely host LLMs at scale with MLflow Deployments",
+                    "Securely manage LLM deployments at scale with the MLflow AI Gateway",
                   ]}
                   imgs={[
                     "img/media/tracing.png",
