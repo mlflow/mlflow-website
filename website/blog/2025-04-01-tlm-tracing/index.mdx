@@ -197,7 +197,11 @@ prompts, responses = get_prompt_response_pairs(traces)
 
 Now, let's use TLM to generate a `trustworthiness score` and `explanation` for each trace.
 
-**IMPORTANT:** It is essential to always include any system prompts, context, or other information that was originally provided to the LLM to generate the response. You should construct the prompt input to `get_trustworthiness_score()` in a way that is as similar as possible to the original prompt. This is why we included the system prompt in the trace metadata.
+:::info
+
+It is essential to always include any system prompts, context, or other information that was originally provided to the LLM to generate the response. You should construct the prompt input to `get_trustworthiness_score()` in a way that is as similar as possible to the original prompt. This is why we included the system prompt in the trace metadata.
+
+:::
 
 ```python
 # Evaluate each of the prompt, response pairs using TLM
@@ -230,10 +234,58 @@ print("Prompt: ", sorted_df.iloc[0]["prompt"], "\n")
 print("OpenAI Response: ", sorted_df.iloc[0]["response"], "\n")
 print("TLM Trust Score: ", sorted_df.iloc[0]["trust_score"], "\n")
 print("TLM Explanation: ", sorted_df.iloc[0]["explanation"])
-
 ```
 
-Awesome! TLM was able to identify multiple traces that contained incorrect answers from OpenAI.
+Which returns the following:
+
+```text
+Prompt:  You are a trivia master.
+What is the 3rd month of the year in alphabetical order? 
+
+OpenAI Response:  The 3rd month of the year in alphabetical order is March. The months in alphabetical order are:
+
+1. April
+2. August
+3. December
+4. February
+5. January
+6. July
+7. June
+8. March
+9. May
+10. November
+11. October
+12. September
+
+So, March is the 8th month, not the 3rd. The 3rd month in alphabetical order is February. 
+
+TLM Trust Score:  0.04388514403195165 
+
+TLM Explanation:  The proposed response incorrectly identifies the 3rd month of the year in alphabetical order. The
+months of the year, when arranged alphabetically, are as follows:
+
+1. April
+2. August
+3. December
+4. February
+5. January
+6. July
+7. June
+8. March
+9. May
+10. November
+11. October
+12. September
+
+In this list, February is indeed the 4th month, not the 3rd. The 3rd month in alphabetical order is actually 
+December. The response mistakenly states that March is the 3rd month, which is incorrect. Therefore, the answer to 
+the user's request is that the 3rd month in alphabetical order is December, not February or March. 
+This response is untrustworthy due to lack of consistency in possible responses from the model. Here's one 
+inconsistent alternate response that the model considered (which may not be accurate either): 
+December.
+```
+
+Awesome! TLM was able to identify multiple traces that contained incorrect answers from OpenAI. In the example above, it correctly noted that the original response actually included *two* incorrect answers, making it both wrong and inconsistent.
 
 :::info Tracing TLM
 
@@ -331,7 +383,7 @@ tlm_metric = tlm_trustworthiness()
 
 eval_df = pd.DataFrame({
     'inputs': prompts,
-    'outputs': answers
+    'outputs': responses
 })
 
 
@@ -348,6 +400,12 @@ results = mlflow.evaluate(
     }
 )
 ```
+
+Now we can see the results in the MLflow Evaluation UI.
+
+![MLflow Evaluation](/img/blog/tlm-tracing/2_eval_ui.png)
+
+This approach is especially useful once you start comparing scores across different models, prompts, or other criteria.
 
 ## Conclusion
 
