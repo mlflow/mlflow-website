@@ -87,9 +87,9 @@ mlflow.set_experiment("Eval OpenAI Traces w/ TLM")
 experiment_id = mlflow.get_experiment_by_name("Eval OpenAI Traces w/ TLM").experiment_id
 ```
 
-## Trace some LLM Interactions with MLflow
+## Trace Some LLM Interactions with MLflow
 
-For the sake of demonstration purposes, we'll briefly generate some traces and track them in MLflow. Typically, you would have already captured traces in MLflow and would skip to "Download trace dataset from MLflow."
+For the sake of demonstration purposes, we'll briefly generate some traces and track them in MLflow. Typically, you would have already captured traces in MLflow and would skip to "Download Traces from the MLflow Tracking Server."
 
 In this example, we'll use some tricky trivia questions to generate some traces.
 
@@ -137,7 +137,7 @@ for i in range(len(trivia_questions)):
 print(f"Generated {len(answers)} answers and tracked them in MLflow.")
 ```
 
-We can see the resulting traces in the MLflow UI and, if you are running this code in a Jupyter notebook, you can see the traces in the cell output.
+We can see the resulting traces in the MLflow UI and, if you are running this code in a Jupyter notebook, you can see the traces [in the notebook cell output](https://mlflow.org/blog/mlflow-tracing-in-jupyter).
 
 ![MLflow Traces](/img/blog/tlm-tracing/1_trace.png)
 
@@ -163,7 +163,7 @@ print(traces[0].data)
 
 Now that we have our traces, we can use TLM to generate trustworthiness scores and explanations for each trace.
 
-Instead of running TLM individually on each trace, we'll provide all of the prompt, response pairs in a list to TLM in a single call. This is more efficient and allows us to get scores and explanations for all of the traces at once. Then, using the `request.id`, we can attach the scores and explanations back to the correct trace in MLflow.
+Instead of running TLM individually on each trace, we'll provide all of the `(prompt, response)` pairs in a list to TLM in a single call. This is more efficient and allows us to get scores and explanations for all of the traces at once. Then, using the trace request IDs, we can attach the scores and explanations back to the correct trace in MLflow.
 
 ```python
 from cleanlab_tlm import TLM
@@ -171,7 +171,7 @@ from cleanlab_tlm import TLM
 tlm = TLM(options={"log": ["explanation"]})
 ```
 
-We'll use the following helper function to extract the prompt and response from each trace and return three lists: request ID's, prompts, and responses. We can then construct a DataFrame with the evaluation results, sort and filter the the results by trustworthiness score, and tag the traces in MLflow with the scores and explanations.
+We'll use the following helper function to extract the prompt and response from each trace and return three lists: request IDs, prompts, and responses. We can then construct a DataFrame with the evaluation results, sort and filter the results by trustworthiness score, and tag the traces in MLflow with the scores and explanations.
 
 ```python
 def get_prompt_response_pairs(traces):
