@@ -27,6 +27,22 @@ export type Release = {
 // Sort by date descending
 export const BLOGS: Blog[] = [
   {
+    title:
+      "Automatically find the bad LLM responses in your LLM Evals with Cleanlab",
+    path: "/blog/tlm-tracing",
+    tags: ["genai", "observability", "tracing"],
+    authors: [
+      {
+        name: "Chris Mauck",
+        title: "Data Scientist at Cleanlab",
+        url: "https://www.linkedin.com/in/chris-mauck/",
+        image_url: "/img/authors/chris_mauck.jpg",
+      },
+    ],
+    date: "2025-04-01",
+    thumbnail: "/img/blog/tlm-tracing-thumbnail.png",
+  },
+  {
     title: "Practical AI Observability: Getting Started with MLflow Tracing",
     path: "/blog/ai-observability-mlflow-tracing",
     tags: ["genai", "observability", "tracing"],
