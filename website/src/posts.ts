@@ -27,6 +27,37 @@ export type Release = {
 // Sort by date descending
 export const BLOGS: Blog[] = [
   {
+    title:
+      "Automatically find the bad LLM responses in your LLM Evals with Cleanlab",
+    path: "/blog/tlm-tracing",
+    tags: ["genai", "observability", "tracing"],
+    authors: [
+      {
+        name: "Chris Mauck",
+        title: "Data Scientist at Cleanlab",
+        url: "https://www.linkedin.com/in/chris-mauck/",
+        image_url: "/img/authors/chris_mauck.jpg",
+      },
+    ],
+    date: "2025-04-01",
+    thumbnail: "/img/blog/tlm-tracing-thumbnail.png",
+  },
+  {
+    title: "Practical AI Observability: Getting Started with MLflow Tracing",
+    path: "/blog/ai-observability-mlflow-tracing",
+    tags: ["genai", "observability", "tracing"],
+    authors: [
+      {
+        name: "Daniel Liden",
+        title: "Developer Advocate at Databricks",
+        url: "https://www.linkedin.com/in/danielliden",
+        image_url: "/img/authors/daniel_liden.png",
+      },
+    ],
+    date: "2025-03-06",
+    thumbnail: "/img/blog/tracing-intro-thumbnail.png",
+  },
+  {
     title: "Beyond Autolog: Add MLflow Tracing to a New LLM Provider",
     path: "/blog/custom-tracing",
     tags: ["genai", "tracing", "ollama"],
@@ -407,6 +438,76 @@ export const BLOGS: Blog[] = [
 
 // Sort by date descending
 export const RELEASES: Release[] = [
+  {
+    title: "MLflow 2.22.0",
+    path: "/releases/2.22.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2025-04-24",
+    version: "2.22.0",
+  },
+  {
+    title: "MLflow 2.21.2",
+    path: "/releases/2.21.2",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2025-03-26",
+    version: "2.21.2",
+  },
+  {
+    title: "MLflow 2.21.1",
+    path: "/releases/2.21.1",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2025-03-25",
+    version: "2.21.1",
+  },
+  {
+    title: "MLflow 2.21.0",
+    path: "/releases/2.21.0",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2025-03-14",
+    version: "2.21.0",
+  },
+  {
+    title: "MLflow 2.20.4",
+    path: "/releases/2.20.4",
+    authors: [
+      {
+        name: "MLflow maintainers",
+        title: "MLflow maintainers",
+        url: "https://github.com/mlflow/mlflow.git",
+        image_url: "https://github.com/mlflow-automation.png",
+      },
+    ],
+    date: "2025-03-13",
+    version: "2.20.4",
+  },
   {
     title: "MLflow 2.20.3",
     path: "/releases/2.20.3",
