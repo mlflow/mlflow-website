@@ -27,6 +27,21 @@ export type Release = {
 // Sort by date descending
 export const BLOGS: Blog[] = [
   {
+    title: "MLflow Go",
+    path: "/blog/mlflow-go",
+    tags: ["mlflow"],
+    authors: [
+      {
+        name: "Florian Verdonck",
+        title: "Open Source Developer at G-Research",
+        url: "https://www.linkedin.com/in/florian-verdonck/",
+        image_url: "/img/authors/florian_verdonck.jpeg",
+      },
+    ],
+    date: "2025-04-28",
+    thumbnail: "/img/blog/mlflow-go.jpeg",
+  },
+  {
     title:
       "Automatically find the bad LLM responses in your LLM Evals with Cleanlab",
     path: "/blog/tlm-tracing",
