@@ -26,6 +26,7 @@ jobs:
         env:
           GTM_ID: ${{ secrets.GTM_ID }}
           PIP_EXTRA_INDEX_URL: https://download.pytorch.org/whl/cpu
+          DOCS_BASE_URL: /docs/latest
         run: |
           curl https://github.com/jgm/pandoc/releases/download/3.1.9/pandoc-3.1.9-1-amd64.deb -L -o /tmp/pandoc.deb
           sudo dpkg -i /tmp/pandoc.deb
@@ -35,11 +36,11 @@ jobs:
           pip install '.[gateway]'
           pip install -r requirements/doc-requirements.txt
           cd docs
-          make rsthtml
+          yarn build
           popd
           rm -rf website/static/docs
           mkdir -p website/static/docs/latest
-          cp -r /tmp/mlflow/docs/build/html/* website/static/docs/latest
+          cp -r /tmp/mlflow/docs/build/* website/static/docs/latest
       - name: Install dependencies
         working-directory: website
         run: yarn
