@@ -6,6 +6,9 @@ on:
       - main
     # Review gh actions docs if you want to further define triggers, paths, etc
     # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#on
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: write
@@ -26,6 +29,7 @@ jobs:
         env:
           GTM_ID: ${{ secrets.GTM_ID }}
           PIP_EXTRA_INDEX_URL: https://download.pytorch.org/whl/cpu
+          DOCS_BASE_URL: /docs/latest
         run: |
           curl https://github.com/jgm/pandoc/releases/download/3.1.9/pandoc-3.1.9-1-amd64.deb -L -o /tmp/pandoc.deb
           sudo dpkg -i /tmp/pandoc.deb
@@ -35,11 +39,13 @@ jobs:
           pip install '.[gateway]'
           pip install -r requirements/doc-requirements.txt
           cd docs
-          make rsthtml
+          yarn install
+          yarn convert-notebooks
+          yarn build
           popd
           rm -rf website/static/docs
           mkdir -p website/static/docs/latest
-          cp -r /tmp/mlflow/docs/build/html/* website/static/docs/latest
+          cp -r /tmp/mlflow/docs/build/* website/static/docs/latest
       - name: Install dependencies
         working-directory: website
         run: yarn
@@ -53,6 +59,7 @@ jobs:
       # Popular action to deploy to GitHub Pages:
       # Docs: https://github.com/peaceiris/actions-gh-pages#%EF%B8%8F-docusaurus
       - name: Deploy to GitHub Pages
+        if: github.event_name == 'push'
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
