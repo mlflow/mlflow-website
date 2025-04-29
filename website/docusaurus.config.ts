@@ -8,15 +8,15 @@ const config: Config = {
   favicon: "img/mlflow-favicon.ico",
 
   // Set the production url of your site here
-  url: "https://your-docusaurus-site.example.com",
+  url: "http://mlflow.org",
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: process.env.BASE_URL || "/",
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: "facebook", // Usually your GitHub org/user name.
-  projectName: "docusaurus", // Usually your repo name.
+  organizationName: "mlflow", // Usually your GitHub org/user name.
+  projectName: "mlflow-website", // Usually your repo name.
 
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
@@ -42,9 +42,6 @@ const config: Config = {
           // Remove this to remove the "edit this page" links.
           // editUrl:
           //   "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
-        },
-        theme: {
-          customCss: "./src/css/custom.css",
         },
         googleTagManager: {
           containerId: process.env.GTM_ID || "GTM-TEST",
@@ -128,26 +125,14 @@ const config: Config = {
       disableSwitch: true,
       respectPrefersColorScheme: false,
     },
-    // announcementBar: {
-    //   id: "support_us",
-    //   content: "WIP",
-    //   isCloseable: true,
-    // },
     navbar: {
-      // title: 'My Site',
       logo: {
         alt: "MLflow",
         src: "img/mlflow-white.svg",
         srcDark: "img/mlflow-black.svg",
       },
+      style: "dark",
       items: [
-        // {
-        //   type: 'docSidebar',
-        //   sidebarId: 'tutorialSidebar',
-        //   position: 'left',
-        //   label: 'Tutorial',
-        // },
-        // { to: "/features", label: "Features", position: "right" },
         { to: "/blog", label: "Blog", position: "right" },
         { to: "/releases", label: "Releases", position: "right" },
         {

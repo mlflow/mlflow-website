@@ -12,6 +12,7 @@ export default function BlogLayout(props) {
     <Layout {...layoutProps}>
       <div className="container margin-vert--lg">
         <div className="row">
+          <div>something</div>
           {hasSidebar && <BlogSidebar sidebar={sidebar} />}
           <main
             className={clsx("col", {

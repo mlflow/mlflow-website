@@ -1,6 +1,5 @@
 import React from "react";
 import styles from "./styles.module.css";
-import ArrowText from "../ArrowText";
 import clsx from "clsx";
 
 interface LearnCardProps {
@@ -19,18 +18,8 @@ const LearnCard: React.FC<LearnCardProps> = ({ title, content, href, img }) => {
             <img src={img} alt="" className={styles.img} />
           </div>
           <div className={styles.body}>
-            {/* <span
-              style={{
-                color: "var(--ifm-color-success)",
-                fontSize: "12px",
-                marginBottom: "16px",
-              }}
-            >
-              RESOURCE TYPE
-            </span> */}
             <h2>{title}</h2>
             {content}
-            {/* <ArrowText text="Read the docs" /> */}
           </div>
         </div>
       </div>
