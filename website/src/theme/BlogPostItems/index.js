@@ -1,7 +1,7 @@
 import React from "react";
 import { BlogPostProvider } from "@docusaurus/theme-common/internal";
 import BlogPostItem from "@theme/BlogPostItem";
-import { BlogItem } from "../components";
+import { BlogItem } from "../../components";
 
 export default function BlogPostItems({
   items,
