@@ -1,5 +1,5 @@
 import React from "react";
-import { AmbassadorCard } from "../AmbassadorCard";
+import { AmbassadorCard } from "../AmbassadorCard/AmbassadorCard";
 import ambassadors from "../../pages/ambassadors.json";
 
 const AmbassadorGrid = () => (

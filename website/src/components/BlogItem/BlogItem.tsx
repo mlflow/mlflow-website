@@ -1,4 +1,4 @@
-import styles from "./styles.module.css";
+import styles from "./BlogItem.module.css";
 import { Blog as BlogType } from "../../posts";
 import clsx from "clsx";
 import Link from "@docusaurus/Link";

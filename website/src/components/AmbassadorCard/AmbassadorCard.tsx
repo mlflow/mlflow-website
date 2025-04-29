@@ -1,4 +1,4 @@
-import LearnCard from "../LearnCard";
+import LearnCard from "../LearnCard/LearnCard";
 
 interface AmbassadorCardProps {
   title: string;

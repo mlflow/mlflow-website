@@ -1,6 +1,6 @@
 import { Release } from "../../posts";
 import clsx from "clsx";
-import styles from "./styles.module.css";
+import styles from "./ReleaseNote.module.css";
 import Link from "@docusaurus/Link";
 
 const ReleaseNote = ({ release }: { release: Release }) => {
