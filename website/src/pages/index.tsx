@@ -1,6 +1,6 @@
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 
-import { Button } from "../components";
+import { Button, SectionLabel } from "../components";
 
 export default function Home(): JSX.Element {
   const { siteConfig } = useDocusaurusContext();
@@ -29,6 +29,10 @@ export default function Home(): JSX.Element {
           <Button variant="outline" size="medium">Medium Outline Button</Button>
           <Button variant="outline" size="large">Large Outline Button</Button>
           <Button variant="outline" size="large" width="full">Full Width Outline Button</Button>
+        </div>
+        <div className="flex flex-col gap-5">
+          <SectionLabel label="Core Features" color="red" />
+          <SectionLabel label="Core Features" color="green" />
         </div>
       </div>
     </div>

@@ -5,3 +5,4 @@ export { default as BlogItem } from "./BlogItem/BlogItem";
 export { Button } from "./Button/Button";
 export { default as LearnCard } from "./LearnCard/LearnCard";
 export { default as ReleaseNote } from "./ReleaseNote/ReleaseNote";
+export { SectionLabel } from "./SectionLabel/SectionLabel";
