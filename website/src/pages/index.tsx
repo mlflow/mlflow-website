@@ -1,12 +1,12 @@
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 
-import { Button, SectionLabel } from "../components";
+import { Button, SectionLabel, CopyCommand } from "../components";
 
 export default function Home(): JSX.Element {
   const { siteConfig } = useDocusaurusContext();
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-[#0E1416]">
+    <div className="flex flex-col items-center justify-center h-screen bg-[#0E1416] gap-8">
       <h1 className="text-4xl font-bold">New homepage</h1>
       <div className="flex flex-row gap-12 w-full justify-center">
         <div className="flex flex-col gap-4 w-[300px]">
@@ -30,11 +30,12 @@ export default function Home(): JSX.Element {
           <Button variant="outline" size="large">Large Outline Button</Button>
           <Button variant="outline" size="large" width="full">Full Width Outline Button</Button>
         </div>
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-5 min-w-[300px]">
           <SectionLabel label="Core Features" color="red" />
           <SectionLabel label="Core Features" color="green" />
         </div>
       </div>
+      <CopyCommand code="pip install mlflow" />
     </div>
   );
 }
