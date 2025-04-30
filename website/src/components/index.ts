@@ -7,3 +7,4 @@ export { default as LearnCard } from "./LearnCard/LearnCard";
 export { default as ReleaseNote } from "./ReleaseNote/ReleaseNote";
 export { SectionLabel } from "./SectionLabel/SectionLabel";
 export { CopyCommand } from "./CopyCommand/CopyCommand";
+export { LogosCarousel } from "./LogosCarousel/LogosCarousel";
