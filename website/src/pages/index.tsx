@@ -5,60 +5,110 @@ import {
   SectionLabel,
   CopyCommand,
   LogosCarousel,
+  Grid,
+  GridRow,
+  GridItem,
 } from "../components";
 
 export default function Home(): JSX.Element {
   const { siteConfig } = useDocusaurusContext();
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-[#0E1416] gap-8">
+    <div className="flex flex-col items-center justify-center bg-[#0E1416] gap-8">
       <h1 className="text-4xl font-bold">New homepage</h1>
+
+      <div className="flex flex-col gap-2 mb-50 px-20 w-full">
+        <h3>Grid example 1</h3>
+        <Grid>
+          <GridRow>
+            <GridItem>
+              <Button variant="primary" size="small">
+                Small Primary Button
+              </Button>
+            </GridItem>
+            <GridItem>
+              <Button variant="primary" size="medium">
+                Medium Primary Button
+              </Button>
+            </GridItem>
+            <GridItem>
+              <Button variant="primary" size="large">
+                Large Primary Button
+              </Button>
+            </GridItem>
+          </GridRow>
+        </Grid>
+      </div>
+      <div className="flex flex-col gap-2 mb-50 px-20 w-full">
+        <h3>Grid example 2</h3>
+        <Grid>
+          <GridRow>
+            <GridItem>
+              <Button variant="secondary" size="small">
+                Small Secondary Button
+              </Button>
+            </GridItem>
+          </GridRow>
+          <GridRow>
+            <GridItem>
+              <Button variant="secondary" size="medium">
+                Medium Secondary Button
+              </Button>
+            </GridItem>
+            <GridItem>
+              <Button variant="secondary" size="large">
+                Large Secondary Button
+              </Button>
+            </GridItem>
+          </GridRow>
+          <GridRow>
+            <GridItem>
+              <Button variant="secondary" size="large" width="full">
+                Full Width Secondary Button
+              </Button>
+            </GridItem>
+          </GridRow>
+        </Grid>
+      </div>
+      <div className="flex flex-col gap-2 mb-10 px-20 w-full">
+        <h3>Grid example 3</h3>
+
+        <Grid>
+          <GridRow>
+            <GridItem>
+              <Button variant="outline" size="small">
+                Small Outline Button
+              </Button>
+            </GridItem>
+          </GridRow>
+          <GridRow>
+            <GridItem>
+              <Button variant="outline" size="medium">
+                Medium Outline Button
+              </Button>
+            </GridItem>
+            <GridItem>
+              <Button variant="outline" size="large">
+                Large Outline Button
+              </Button>
+            </GridItem>
+          </GridRow>
+          <GridRow>
+            <GridItem>
+              <Button variant="outline" size="large" width="full">
+                Full Width Outline Button
+              </Button>
+            </GridItem>
+            <GridItem>
+              <Button variant="outline" size="large" width="full">
+                Full Width Outline Button
+              </Button>
+            </GridItem>
+          </GridRow>
+        </Grid>
+      </div>
+
       <div className="flex flex-row gap-12 w-full justify-center">
-        <div className="flex flex-col gap-4 w-[300px]">
-          <p>Primary</p>
-          <Button variant="primary" size="small">
-            Small Primary Button
-          </Button>
-          <Button variant="primary" size="medium">
-            Medium Primary Button
-          </Button>
-          <Button variant="primary" size="large">
-            Large Primary Button
-          </Button>
-          <Button variant="primary" size="large" width="full">
-            Full Width Primary Button
-          </Button>
-        </div>
-        <div className="flex flex-col gap-4 w-[300px]">
-          <p>Secondary</p>
-          <Button variant="secondary" size="small">
-            Small Secondary Button
-          </Button>
-          <Button variant="secondary" size="medium">
-            Medium Secondary Button
-          </Button>
-          <Button variant="secondary" size="large">
-            Large Secondary Button
-          </Button>
-          <Button variant="secondary" size="large" width="full">
-            Full Width Secondary Button
-          </Button>
-        </div>
-        <div className="flex flex-col gap-4 w-[300px]">
-          <p>Outline</p>
-          <Button variant="outline" size="small">
-            Small Outline Button
-          </Button>
-          <Button variant="outline" size="medium">
-            Medium Outline Button
-          </Button>
-          <Button variant="outline" size="large">
-            Large Outline Button
-          </Button>
-          <Button variant="outline" size="large" width="full">
-            Full Width Outline Button
-          </Button>
-        </div>
         <div className="flex flex-col gap-5 min-w-[300px]">
           <SectionLabel label="Core Features" color="red" />
           <SectionLabel label="Core Features" color="green" />
