@@ -2,6 +2,8 @@ import { themes as prismThemes } from "prism-react-renderer";
 import type { Config } from "@docusaurus/types";
 import type * as Preset from "@docusaurus/preset-classic";
 
+import tailwindPlugin from "./plugins/tailwind-config.cjs";
+
 const config: Config = {
   title: "MLflow",
   // tagline: 'Dinosaurs are cool',
@@ -28,6 +30,32 @@ const config: Config = {
     defaultLocale: "en",
     locales: ["en"],
   },
+
+  headTags: [
+    {
+      tagName: "link",
+      attributes: {
+        rel: "preconnect",
+        href: "https://fonts.googleapis.com",
+      },
+    },
+    {
+      tagName: "link",
+      attributes: {
+        rel: "preconnect",
+        href: "https://fonts.gstatic.com",
+        crossorigin: "anonymous",
+      },
+    },
+    {
+      tagName: "link",
+      attributes: {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap",
+        display: "swap",
+      },
+    },
+  ],
 
   presets: [
     [
@@ -58,6 +86,7 @@ const config: Config = {
   ],
 
   plugins: [
+    tailwindPlugin,
     [
       "@docusaurus/plugin-content-blog",
       {
