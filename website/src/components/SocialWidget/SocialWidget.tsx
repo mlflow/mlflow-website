@@ -13,7 +13,7 @@ interface Props {
 export const SocialWidget = ({ variant }: Props) => {
   return (
     <div className="flex flex-col w-full gap-16">
-      <div className="flex flex-col w-full gap-6 items-center justify-center">
+      <div className="flex flex-col w-full gap-6 items-center justify-center text-center">
         <SectionLabel label="GET INVOLVED" color={variant} />
         <h1>Connect with the community</h1>
         <p className="text-white/60 text-lg">
