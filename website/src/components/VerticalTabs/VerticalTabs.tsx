@@ -45,7 +45,7 @@ const VerticalTabsTrigger = React.forwardRef<
   <TabsPrimitive.Trigger
     ref={ref}
     className={cn(
-      "vertical-tabs-trigger w-full p-5 inline-flex whitespace-nowrap rounded-lg data-[state=active]:bg-[#fff]/4 data-[state=active]:text-foreground data-[state=active]:border data-[state=active]:border-[#fff]/8",
+      "vertical-tabs-trigger w-full p-5 inline-flex whitespace-nowrap rounded-lg data-[state=active]:bg-[#fff]/4 data-[state=active]:text-foreground data-[state=active]:border data-[state=active]:border-[#fff]/8 cursor-pointer",
       className,
     )}
     {...props}
