@@ -9,3 +9,4 @@ export { default as LearnCard } from "./LearnCard/LearnCard";
 export { LogosCarousel } from "./LogosCarousel/LogosCarousel";
 export { default as ReleaseNote } from "./ReleaseNote/ReleaseNote";
 export { SectionLabel } from "./SectionLabel/SectionLabel";
+export * from "./VerticalTabs/VerticalTabs";

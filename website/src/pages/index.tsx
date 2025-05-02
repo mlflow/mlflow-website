@@ -8,6 +8,10 @@ import {
   Grid,
   GridRow,
   GridItem,
+  VerticalTabs,
+  VerticalTabsList,
+  VerticalTabsTrigger,
+  VerticalTabsContent,
 } from "../components";
 
 export default function Home(): JSX.Element {
@@ -157,6 +161,52 @@ export default function Home(): JSX.Element {
           alt="SavvyCal"
         />
       </LogosCarousel>
+      <VerticalTabs defaultValue="tab1" className="w-full my-12 px-10">
+        <VerticalTabsList>
+          <VerticalTabsTrigger
+            value="tab1"
+            label="LLM Judges"
+            description="Ex aliquip commodo irure. Cupidatat veniam commodo cupidatat ex non sit lorem eu proident."
+          />
+          <VerticalTabsTrigger
+            value="tab2"
+            label="Tracing"
+            description="Ex aliquip commodo irure. Cupidatat veniam commodo cupidatat ex non sit lorem eu proident."
+          />
+          <VerticalTabsTrigger
+            value="tab3"
+            label="Evaluation Datasets"
+            description="Ex aliquip commodo irure. Cupidatat veniam commodo cupidatat ex non sit lorem eu proident."
+          />
+          <VerticalTabsTrigger
+            value="tab4"
+            label="Review app"
+            description="Ex aliquip commodo irure. Cupidatat veniam commodo cupidatat ex non sit lorem eu proident."
+          />
+          <VerticalTabsTrigger
+            value="tab5"
+            label="Enterprise-Ready Governance"
+            description="Ex aliquip commodo irure. Cupidatat veniam commodo cupidatat ex non sit lorem eu proident."
+          />
+        </VerticalTabsList>
+        <VerticalTabsContent value="tab1">
+          <img src="/img/demo-image.png" />
+        </VerticalTabsContent>
+        <VerticalTabsContent value="tab2">
+          <img src="/img/demo-image.png" />
+        </VerticalTabsContent>
+        <VerticalTabsContent value="tab3">
+          <img src="/img/demo-image.png" />
+        </VerticalTabsContent>
+
+        <VerticalTabsContent value="tab4">
+          <img src="/img/demo-image.png" />
+        </VerticalTabsContent>
+
+        <VerticalTabsContent value="tab5">
+          <img src="/img/demo-image.png" />
+        </VerticalTabsContent>
+      </VerticalTabs>
     </div>
   );
 }
