@@ -247,3 +247,7 @@ While MLflow is powerful in itself, it needs support. Consider these limitations
 - [Documentation of the computer-vision model in this example](https://pytorch.org/vision/main/models/generated/torchvision.models.detection.fasterrcnn_resnet50_fpn.html)
 
 We hope this guide helps you streamline your image dataset tracking with MLflow and gave you some pondering in image datasets. Happy ML model training!
+
+**And never let those GPU/CPUs cool down.**
+
+![System metrics](systemmetrics.png)
