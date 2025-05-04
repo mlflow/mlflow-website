@@ -128,7 +128,7 @@ We can go into our MLflow UI and see the dataset registered under the experiment
 
 Image and text visualization of files is supported.
 
-[COCO dataset annotated image example](coco-dataset.png)
+![COCO dataset annotated image example](coco-dataset.png)
 
 ### Logging Artifacts of Datasets Together with Model
 
