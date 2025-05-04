@@ -68,7 +68,9 @@ In this post, I will go through both approaches in code.
 
 Start by installing the dependencies for this example in your `python <= 3.10` environment.
 
-`pip install mlflow datasets torch torchvision pycocotools`
+`pip install mlflow datasets torch torchvision pycocotools psutil`
+
+Also install `pynvml` if you want to GPU metrics.
 
 For the Hugging Face dataset download, also make sure to log in.
 
