@@ -12,6 +12,7 @@ import {
   VerticalTabsList,
   VerticalTabsTrigger,
   VerticalTabsContent,
+  Footer,
 } from "../components";
 
 export default function Home(): JSX.Element {
@@ -207,6 +208,7 @@ export default function Home(): JSX.Element {
           <img src="/img/demo-image.png" />
         </VerticalTabsContent>
       </VerticalTabs>
+      <Footer variant="colorful" />
     </div>
   );
 }
