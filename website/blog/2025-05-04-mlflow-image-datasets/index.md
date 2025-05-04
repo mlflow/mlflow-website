@@ -74,8 +74,13 @@ For the Hugging Face dataset download, also make sure to log in.
 
 `huggingface-cli login`
 
+One of the examples requires compute; therefore, be sure to turn on [MLflow system metrics](https://mlflow.org/docs/latest/system-metrics/) to track what happens on your compute during training.
+
+`export MLFLOW_ENABLE_SYSTEM_METRICS_LOGGING=true`
+
 > Note: The validation split is used to save space, but you can also use the "train" split 
 > if you want to train/finetune the model on the full dataset (requires +25 GB storage).
+> Number of epochs and a subset of the dataset is also used during training.
 
 ### Logging Artifacts of Datasets Together with Model
 ```python
@@ -130,8 +135,13 @@ import numpy as np
 import cv2
 import io
 import mlflow
+from torchvision import models
+from torchvision.models.detection import FasterRCNN_ResNet50_FPN_Weights
+import os
 
-# Load the COCO dataset from Hugging Face
+os.environ["MLFLOW_ENABLE_SYSTEM_METRICS_LOGGING"] = "true"
+
+# Load the COCO dataset from Huggingface
 dataset = load_dataset("detection-datasets/coco", split="val")
 
 # Transform to MLFlow Dataset
@@ -140,11 +150,11 @@ mlflow_dataset = mlflow.data.huggingface_dataset.from_huggingface(dataset)
 # For this example we create a subset of the dataset with the first 100 rows
 subset_dataset = dataset.select(range(100))
 
-# For evaluation, we transform it again
+# Note; evaluation, we transform it again
 mlflow_eval_dataset = mlflow_dataset.to_evaluation_dataset()
 
-# Load a pre-trained object detection model
-model = models.detection.fasterrcnn_resnet50_fpn(pretrained=True)
+# Load a pre-trained object detection / segmentation model
+model = models.detection.fasterrcnn_resnet50_fpn(weights=FasterRCNN_ResNet50_FPN_Weights.DEFAULT)
 # Let’s fine-tune it, log dataset, metrics, and model in an MLflow Experiment run 
 
 mlflow.set_experiment("hg_image_experiment")
@@ -159,8 +169,9 @@ with mlflow.start_run():
 
     print(f"Training object detection model, epoch {epoch+1}...")
 
-    for row in subset_dataset: # run a subset of the dataset
-      # Convert image bytes to ndarray
+    for row in subset_dataset: # We run a subset of the dataset to save time
+      
+      # In this example we are not using a dataloader but just converting image bytes to ndarray
       image_bytes = io.BytesIO()
       row["image"].save(image_bytes, format="JPEG")
       image_bytes = image_bytes.getvalue()
@@ -211,6 +222,8 @@ with mlflow.start_run():
     )
 ```
 
+As shown, we had to take the work with the tabular format to make a Huggingface dataset work for training.
+
 Under the second experiment, you will now have a dataset logged.
 
 ![Dataset huggingface training example](dataset-training.png)
@@ -229,5 +242,6 @@ While MLflow is powerful in itself, it needs support. Consider these limitations
 - [COCO Dataset Format](https://cocodataset.org/#format-data)
 - [Hugging Face Image Datasets](https://huggingface.co/docs/datasets/en/image_dataset)
 - [MLflow tutorial on how to evaluate a model on a dataset](https://mlflow.org/docs/latest/model#evaluating-with-a-static-dataset)
+- [Documentation of the computer-vision model in this example](https://pytorch.org/vision/main/models/generated/torchvision.models.detection.fasterrcnn_resnet50_fpn.html)
 
 We hope this guide helps you streamline your image dataset tracking with MLflow and gave you some pondering in image datasets. Happy ML model training!
