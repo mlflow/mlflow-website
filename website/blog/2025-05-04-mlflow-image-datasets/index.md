@@ -220,7 +220,7 @@ with mlflow.start_run():
     mlflow.pytorch.log_model(
       model, 
       "model", 
-      input_examples=input_batch
+      input_example=input_batch
     )
 ```
 
