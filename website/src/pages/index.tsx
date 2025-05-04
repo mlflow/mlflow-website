@@ -288,7 +288,7 @@ export default function Home(): JSX.Element {
             <Line />
           </div>
           <div style={{ textAlign: "center", whiteSpace: "nowrap" }}>
-            Join thousands of users worldwide
+            Join thousands of organizations worldwide
           </div>
           <div style={{ width: "100%" }}>
             <Line />
