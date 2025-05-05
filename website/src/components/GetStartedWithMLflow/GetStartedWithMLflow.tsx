@@ -14,13 +14,13 @@ export const GetStartedWithMLflow = () => {
       </div>
       <div className="flex flex-col w-full lg:w-1/2 gap-6">
         <div className="flex flex-col gap-8 p-8 bg-[#fff]/4 rounded-2xl">
-          <div className="flex flex-row justify-between items-center">
-            <div className="flex flex-row justify-center items-end gap-3">
+          <div className="flex flex-row justify-between items-center gap-4">
+            <div className="flex flex-row justify-center items-end gap-3 flex-wrap">
               <h3 className="m-0">Managed </h3>
               <span className="text-white/50 text-sm">WITH</span>
               <DatabricksLogo />
             </div>
-            <div className="hidden lg:block rounded-full uppercase px-4 py-2 bg-[#EB1700] text-xs font-semibold">
+            <div className="hidden lg:block rounded-full uppercase px-4 py-2 bg-[#EB1700] text-xs font-semibold whitespace-nowrap">
               <span>MOST POPULAR</span>
             </div>
           </div>
@@ -50,7 +50,7 @@ export const GetStartedWithMLflow = () => {
         </div>
         <div className="flex flex-col gap-8 p-8 bg-[#fff]/4 rounded-2xl">
           <h3 className="m-0">Self-Hosting</h3>
-          <Button size="large" width="full" variant="secondary">
+          <Button size="large" width="full" variant="dark">
             Get started
           </Button>
         </div>
