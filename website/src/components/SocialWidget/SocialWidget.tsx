@@ -24,15 +24,15 @@ export const SocialWidget = ({ variant }: Props) => {
         <GridRow>
           <GridItem>
             <SocialWidgetItem
-              href="#"
+              href="https://github.com/mlflow/mlflow"
               icon={<GithubIcon />}
               label="GitHub"
-              description="50k followers"
+              description="20k followers"
             />
           </GridItem>
           <GridItem>
             <SocialWidgetItem
-              href="#"
+              href="https://www.youtube.com/@mlflowoss"
               icon={<YoutubeIcon />}
               label="YouTube"
               description="View tutorials"
@@ -40,7 +40,7 @@ export const SocialWidget = ({ variant }: Props) => {
           </GridItem>
           <GridItem>
             <SocialWidgetItem
-              href="#"
+              href="https://mlflow.org/docs/latest/"
               icon={<BookIcon />}
               label="Docs"
               description="Read documentation"
