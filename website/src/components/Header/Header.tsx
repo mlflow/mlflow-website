@@ -24,7 +24,7 @@ export const Header = () => {
   }, []);
 
   return (
-    <nav className="fixed w-full z-20 top-0 start-0 bg-[#F7F8F8]/1 border-b border-[#F7F8F8]/8 backdrop-blur-[10px]">
+    <nav className="fixed w-full z-20 top-0 start-0 bg-[#F7F8F8]/1 border-b border-[#F7F8F8]/8 backdrop-blur-[20px]">
       <div className="flex flex-wrap items-center justify-between mx-auto px-6 py-4">
         <a href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
           <img src={Logo} alt="MLflow" />
