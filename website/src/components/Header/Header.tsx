@@ -30,8 +30,15 @@ export const Header = () => {
           <img src={Logo} alt="MLflow" />
         </a>
         <div className="flex flex-row items-center gap-6 md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
-          <HeaderMenuItem href="/" label="Login" className="hidden md:block" />
-          <a href="/" className="hidden md:block">
+          <HeaderMenuItem
+            href="https://login.databricks.com/"
+            label="Login"
+            className="hidden md:block"
+          />
+          <a
+            href="https://login.databricks.com/?intent=SIGN_UP"
+            className="hidden md:block"
+          >
             <Button variant="primary" size="small">
               Sign up
             </Button>
@@ -81,6 +88,19 @@ export const Header = () => {
                 href="https://mlflow.org/docs/latest/"
                 label="Docs"
               />
+            </li>
+            <li className="w-full md:w-auto md:hidden">
+              <HeaderMenuItem
+                href="https://login.databricks.com/"
+                label="Login"
+              />
+            </li>
+            <li className="w-full md:w-auto md:hidden">
+              <a href="https://login.databricks.com/?intent=SIGN_UP">
+                <Button variant="primary" size="small" width="full">
+                  Sign up
+                </Button>
+              </a>
             </li>
           </ul>
         </div>
