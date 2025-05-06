@@ -1,6 +1,7 @@
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 
 import { SocialWidget, LatestNews } from "../components";
+import { GetStartedWithMLflow } from "../components";
 
 export default function Home(): JSX.Element {
   const { siteConfig } = useDocusaurusContext();
