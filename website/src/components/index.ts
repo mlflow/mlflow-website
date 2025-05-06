@@ -13,4 +13,3 @@ export { SectionLabel } from "./SectionLabel/SectionLabel";
 export * from "./VerticalTabs/VerticalTabs";
 export { SocialWidget } from "./SocialWidget/SocialWidget";
 export { LatestNews } from "./LatestNews/LatestNews";
-
