@@ -15,3 +15,7 @@ export { SocialWidget } from "./SocialWidget/SocialWidget";
 export { LatestNews } from "./LatestNews/LatestNews";
 export { GetStartedWithMLflow } from "./GetStartedWithMLflow/GetStartedWithMLflow";
 export { Header } from "./Header/Header";
+export { Layout } from "./Layout/Layout";
+export { GlossyCard } from "./GlossyCard/GlossyCard";
+export { GetStartedTagline } from "./GetStartedTagline/GetStartedTagline";
+export { Testimonials } from "./Testimonials/Testimonials";
