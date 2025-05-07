@@ -9,6 +9,7 @@ import {
   Button,
   GetStartedTagline,
   Testimonials,
+  LogosCarousel,
 } from "../components";
 
 export default function Home(): JSX.Element {
@@ -32,16 +33,17 @@ export default function Home(): JSX.Element {
             <GlossyCard image={null}>
               <h3>GenAI Apps & Agents</h3>
               <p>
-                Ex aliquip commodo irure. Cupidatat veniam commodo cupidatat ex
-                non sit lorem eu.
+                Enhance your GenAI applications with end-to-end observability,
+                monitoring, and enterprise governance, all in one integrated
+                platform.
               </p>
               <Button variant="primary">Learn more &gt;</Button>
             </GlossyCard>
             <GlossyCard image={null}>
               <h3>Model Training</h3>
               <p>
-                Ex aliquip commodo irure. Cupidatat veniam commodo cupidatat ex
-                non sit lorem eu.
+                Streamline your machine learning workflows with enterprise-grade
+                tracking, model management, and deployment.
               </p>
               <Button variant="primary">Learn more &gt;</Button>
             </GlossyCard>
@@ -50,7 +52,21 @@ export default function Home(): JSX.Element {
       </div>
       <div className="flex flex-col px-6 md:px-20 gap-40 mt-20">
         <Testimonials />
-        {/** <Carousel /> */}
+        <LogosCarousel>
+          <img
+            className="mx-4 inline h-16"
+            src="img/companies/databricks.svg"
+          />
+          <img className="mx-4 inline h-16" src="img/companies/microsoft.svg" />
+          <img className="mx-4 inline h-16" src="img/companies/meta.svg" />
+          <img className="mx-4 inline h-16" src="img/companies/mosaicml.svg" />
+          <img className="mx-4 inline h-16" src="img/companies/zillow.svg" />
+          <img className="mx-4 inline h-16" src="img/companies/toyota.svg" />
+          <img className="mx-4 inline h-16" src="img/companies/booking.svg" />
+          <img className="mx-4 inline h-16" src="img/companies/wix.svg" />
+          <img className="mx-4 inline h-16" src="img/companies/accenture.svg" />
+          <img className="mx-4 inline h-16" src="img/companies/asml.svg" />
+        </LogosCarousel>
         <GetStartedWithMLflow />
         <LatestNews variant="red" />
         <GetStartedTagline />
