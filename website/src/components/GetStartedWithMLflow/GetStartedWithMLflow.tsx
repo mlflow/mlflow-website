@@ -2,8 +2,13 @@ import DatabricksLogo from "@site/static/img/databricks-logo.svg";
 import Checkmark from "@site/static/img/checkmark.svg";
 
 import { Button } from "../Button/Button";
+import { cn } from "../../utils";
 
-export const GetStartedWithMLflow = () => {
+interface Props {
+  variant?: "red" | "blue";
+}
+
+export const GetStartedWithMLflow = ({ variant = "red" }: Props) => {
   return (
     <div className="flex flex-col lg:flex-row w-full justify-between gap-6">
       <div className="flex flex-col gap-6 w-full lg:w-1/2">
@@ -20,7 +25,14 @@ export const GetStartedWithMLflow = () => {
               <span className="text-white/50 text-sm">WITH</span>
               <DatabricksLogo />
             </div>
-            <div className="hidden lg:block rounded-full uppercase px-4 py-2 bg-[#EB1700] text-xs font-semibold whitespace-nowrap">
+            <div
+              className={cn(
+                "hidden lg:block rounded-full uppercase px-4 py-2 text-xs font-semibold whitespace-nowrap",
+                variant === "blue"
+                  ? "bg-[#44EDBC] text-black"
+                  : "bg-[#EB1700] text-white",
+              )}
+            >
               <span>MOST POPULAR</span>
             </div>
           </div>
@@ -44,7 +56,11 @@ export const GetStartedWithMLflow = () => {
               </span>
             </div>
           </div>
-          <Button size="large" width="full">
+          <Button
+            size="large"
+            width="full"
+            variant={variant === "blue" ? "blue" : "primary"}
+          >
             Get started
           </Button>
         </div>
