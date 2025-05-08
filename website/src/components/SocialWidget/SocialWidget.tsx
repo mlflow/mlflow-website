@@ -1,6 +1,7 @@
 import GithubIcon from "@site/static/img/social/github.svg";
 import YoutubeIcon from "@site/static/img/social/youtube.svg";
 import BookIcon from "@site/static/img/social/book.svg";
+import LinkedinIcon from "@site/static/img/social/linkedin.svg";
 
 import { SectionLabel } from "../SectionLabel/SectionLabel";
 import { SocialWidgetItem } from "../SocialWidgetItem/SocialWidgetItem";
@@ -28,6 +29,14 @@ export const SocialWidget = ({ variant }: Props) => {
               icon={<GithubIcon />}
               label="GitHub"
               description="20k followers"
+            />
+          </GridItem>
+          <GridItem>
+            <SocialWidgetItem
+              href="https://www.linkedin.com/company/mlflow-org"
+              icon={<LinkedinIcon />}
+              label="LinkedIn"
+              description="69k followers"
             />
           </GridItem>
           <GridItem>
