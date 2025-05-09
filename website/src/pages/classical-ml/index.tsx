@@ -13,29 +13,24 @@ import {
   GetStartedWithMLflow,
   LatestNews,
   SocialWidget,
-} from "../components";
+} from "../../components";
 
 export default function GenAi(): JSX.Element {
   return (
-    <Layout variant="red">
+    <Layout variant="blue">
       <div
-        className="flex flex-col bg-[linear-gradient(to_bottom,rgba(12,20,20,0),rgba(14,20,20,100)),url('/img/background-image-2.png')]
+        className="flex flex-col bg-[linear-gradient(to_bottom,rgba(12,20,20,0),rgba(14,20,20,100)),url('/img/background-image-3.png')]
  bg-top bg-no-repeat bg-cover w-full pt-42 pb-20 py-20"
       >
         <div className="flex flex-col gap-16 w-full px-6 md:px-20">
           <div className="flex flex-col justify-center items-center gap-6 w-full">
             <h1 className="text-center text-wrap">
-              Ship high-quality GenAI, fast
+              Mastering the ML lifecycle
             </h1>
             <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto">
-              Traditional software and ML tests aren’t built for GenAI’s
-              free-form language, making it difficult for teams to measure and
-              improve quality.
-            </p>
-            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto">
-              MLflow combines metrics that reliably measure GenAI quality with
-              trace observability so you can measure, improve, and monitor
-              quality, cost, and latency.
+              From experiment to production, MLflow streamlines your complete
+              machine learning journey with enterprise-grade tracking, model
+              management, and deployment.
             </p>
           </div>
           <div className="flex flex-col md:flex-row gap-10">
@@ -48,33 +43,36 @@ export default function GenAi(): JSX.Element {
           <div className="flex flex-col w-full items-center justify-center gap-6">
             <SectionLabel color="red" label="CORE FEATURES" />
             <h1>Build confidently, deploy seamlessly</h1>
-            <p>Tackle the challenges of building GenAI head on</p>
+            <p>
+              Cover experimentation, reproducibility, deployment, and a central
+              model registry
+            </p>
           </div>
           <VerticalTabs defaultValue="tab1" className="w-full my-12 px-10">
             <VerticalTabsList>
               <VerticalTabsTrigger
                 value="tab1"
-                label="LLM Judges"
-                description="Capture and debug application logs with end-to-end observability.."
+                label="Unified Workflow"
+                description="MLflow streamlines your entire ML process with tracking, packaging, and deployment capabilities, eliminating tool fragmentation so you can focus on model development rather than infrastructure"
               />
               <VerticalTabsTrigger
                 value="tab2"
-                label="Tracing"
+                label="Reliable Reproducability"
                 description="Ex aliquip commodo irure. Cupidatat veniam commodo cupidatat ex non sit lorem eu proident."
               />
               <VerticalTabsTrigger
                 value="tab3"
-                label="Evaluation Datasets"
+                label="Framework Neutral"
                 description="Ex aliquip commodo irure. Cupidatat veniam commodo cupidatat ex non sit lorem eu proident."
               />
               <VerticalTabsTrigger
                 value="tab4"
-                label="Review app"
+                label="Deployment Ready"
                 description="Ex aliquip commodo irure. Cupidatat veniam commodo cupidatat ex non sit lorem eu proident."
               />
               <VerticalTabsTrigger
                 value="tab5"
-                label="Enterprise-Ready Governance"
+                label="Enterprise Ready"
                 description="Ex aliquip commodo irure. Cupidatat veniam commodo cupidatat ex non sit lorem eu proident."
               />
             </VerticalTabsList>
@@ -120,22 +118,25 @@ export default function GenAi(): JSX.Element {
             <GridRow>
               <GridItem className="py-10 pr-0 md:pr-10 gap-10">
                 <div className="flex flex-col gap-4">
-                  <h3>Built on top of a data platform</h3>
+                  <h3>Industry pioneer</h3>
                   <p className="text-white/60">
-                    Evaluation and monitoring are workflows that generate data.
-                    Easily use the data from your evaluation & monitoring
-                    workflows to build dashboards & apps using the features of
-                    the Databricks platform.
+                    MLflow has established itself as a pioneering open-source
+                    platform for managing the end-to-end machine learning
+                    lifecycle. Created by Databricks, it has become one of the
+                    most widely adopted MLOps tools in the industry, with
+                    integration support from major cloud providers.
                   </p>
                 </div>
               </GridItem>
               <GridItem className="py-10 pl-0 md:pl-10 gap-10">
                 <div className="flex flex-col gap-4">
-                  <h3>Integrated and unified governance</h3>
+                  <h3>Framework neutrality</h3>
                   <p className="text-white/60">
-                    Tightly integrated with Unity Catalog, which offers unified,
-                    enterprise-grade governance across all your data and ai
-                    assets - including all assets created by MLflow.
+                    MLflow's framework-agnostic design is one of its strongest
+                    differentiators. Unlike proprietary solutions that lock you
+                    into specific ecosystems, MLflow works seamlessly with all
+                    popular ML frameworks including scikit-learn, PyTorch,
+                    TensorFlow, and XGBoost.
                   </p>
                 </div>
               </GridItem>
@@ -143,22 +144,26 @@ export default function GenAi(): JSX.Element {
             <GridRow>
               <GridItem className="py-10 pr-0 md:pr-10 gap-10">
                 <div className="flex flex-col gap-4">
-                  <h3>Data intelligence</h3>
+                  <h3>Comprehensive Lifecycle Management</h3>
                   <p className="text-white/60">
-                    Data Intelligence that helps make the developer workflow for
-                    improving quality faster/more efficient - LLM judges that
-                    are tuned to understand your business data; topic detection
-                    & classification that help understand your users.
+                    MLflow uniquely addresses the complete machine learning
+                    lifecycle through four integrated components: - MLflow
+                    Tracking for logging parameters, metrics, and artifacts -
+                    MLflow Projects for reproducible code packaging - MLflow
+                    Models for standardized deployment - MLflow Model Registry
+                    for centralized version management
                   </p>
                 </div>
               </GridItem>
               <GridItem className="py-10 pl-0 md:pl-10 gap-10">
                 <div className="flex flex-col gap-4">
-                  <h3>Secure and scalable</h3>
+                  <h3>Enterprise Adoption</h3>
                   <p className="text-white/60">
-                    Databricks is a trusted vendor and we host the managed
-                    version - no need to self host since we are a trusted
-                    vendor.
+                    MLflow's impact extends beyond its technical capabilities.
+                    It has gained significant traction among enterprise teams
+                    requiring robust experiment tracking and model lifecycle
+                    management. Databricks offers a managed MLflow service with
+                    enhanced security and scalability.
                   </p>
                 </div>
               </GridItem>
@@ -166,8 +171,8 @@ export default function GenAi(): JSX.Element {
           </Grid>
         </div>
         <GetStartedWithMLflow />
-        <LatestNews variant="red" />
-        <SocialWidget variant="red" />
+        <LatestNews variant="green" />
+        <SocialWidget variant="green" />
       </div>
     </Layout>
   );

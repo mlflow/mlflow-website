@@ -7,7 +7,7 @@ import {
   GridItem,
   GetStartedWithMLflow,
   SocialWidget,
-} from "../components";
+} from "../../components";
 
 const FakeImage = () => (
   <div className="w-[600px] h-[400px] bg-black rounded-lg"></div>

@@ -178,7 +178,7 @@ const config: Config = {
           label: "Contribute",
           position: "right",
         },
-        { to: "/ambassador", label: "Ambassador Program", position: "right" },
+        { to: "/ambassadors", label: "Ambassador Program", position: "right" },
         {
           to: "pathname:///docs/latest/getting-started/index.html",
           label: "Get Started",
