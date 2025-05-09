@@ -2,8 +2,13 @@ import { PropsWithChildren } from "react";
 
 import { cn } from "../../utils";
 
-export const Grid = ({ children }: PropsWithChildren) => {
-  return <div className="flex flex-col w-full">{children}</div>;
+export const Grid = ({
+  children,
+  className,
+}: PropsWithChildren<{ className?: string }>) => {
+  return (
+    <div className={cn("flex flex-col w-full", className)}>{children}</div>
+  );
 };
 
 export const GridRow = ({ children }: PropsWithChildren) => {
