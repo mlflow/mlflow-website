@@ -1,7 +1,12 @@
 import React from "react";
+import { useLocation } from "@docusaurus/router";
+
 import { Layout } from "../../components";
+
 export default function BlogLayout({ children, ...props }) {
-  const isBlogHomePage = window.location.pathname === "/blog";
+  const location = useLocation();
+
+  const isBlogHomePage = location.pathname === "/blog";
 
   return (
     <Layout>
