@@ -1,6 +1,6 @@
 import { cva, type VariantProps } from "class-variance-authority";
 
-import Logo from "@site/static/img/mlflow-logo-white.png";
+import Logo from "@site/static/img/mlflow-logo-white.svg";
 
 import { FooterMenuItem } from "../FooterMenuItem/FooterMenuItem";
 import { cn } from "../../utils";
@@ -22,7 +22,7 @@ export const Footer = ({ variant }: VariantProps<typeof footerVariants>) => {
   return (
     <footer className={cn(footerVariants({ variant }))}>
       <div className="flex flex-row justify-between items-start md:items-center px-20 gap-10 xs:gap-0">
-        <img src={Logo} alt="MLflow" />
+        <Logo className="h-[36px]" />
 
         <div className="flex flex-col md:flex-row gap-10">
           <FooterMenuItem href="/" label="Product" />

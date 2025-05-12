@@ -1,5 +1,5 @@
 import { useState, useLayoutEffect } from "react";
-import Logo from "@site/static/img/mlflow-logo-white.png";
+import Logo from "@site/static/img/mlflow-logo-white.svg";
 
 import { cn } from "../../utils";
 
@@ -27,7 +27,7 @@ export const Header = () => {
     <nav className="fixed w-full z-20 top-0 start-0 bg-[#F7F8F8]/1 border-b border-[#F7F8F8]/8 backdrop-blur-[20px]">
       <div className="flex flex-wrap items-center justify-between mx-auto px-6 md:px-20 py-2">
         <a href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
-          <img src={Logo} alt="MLflow" />
+          <Logo className="h-[36px]" />
         </a>
         <div className="flex flex-row items-center gap-6 md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
           <HeaderMenuItem

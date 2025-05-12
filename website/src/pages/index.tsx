@@ -37,7 +37,9 @@ export default function Home(): JSX.Element {
                 monitoring, and enterprise governance, all in one integrated
                 platform.
               </p>
-              <Button variant="primary">Learn more &gt;</Button>
+              <a href="/genai">
+                <Button variant="primary">Learn more &gt;</Button>
+              </a>
             </GlossyCard>
             <GlossyCard image={null}>
               <h3>Model Training</h3>
@@ -45,7 +47,9 @@ export default function Home(): JSX.Element {
                 Streamline your machine learning workflows with enterprise-grade
                 tracking, model management, and deployment.
               </p>
-              <Button variant="primary">Learn more &gt;</Button>
+              <a href="/classical-ml">
+                <Button variant="primary">Learn more &gt;</Button>
+              </a>
             </GlossyCard>
           </div>
         </div>

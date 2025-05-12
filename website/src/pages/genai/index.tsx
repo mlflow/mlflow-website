@@ -1,3 +1,8 @@
+import ReviewApp from "@site/static/img/review-app.jpg";
+import TraceTab from "@site/static/img/trace-tab.jpg";
+import EvalsTab from "@site/static/img/evals-tab.jpg";
+import AssessmentsTab from "@site/static/img/assessments.jpg";
+
 import {
   Layout,
   CopyCommand,
@@ -13,6 +18,7 @@ import {
   GetStartedWithMLflow,
   LatestNews,
   SocialWidget,
+  Button,
 } from "../../components";
 
 export default function GenAi(): JSX.Element {
@@ -28,7 +34,7 @@ export default function GenAi(): JSX.Element {
               Ship high-quality GenAI, fast
             </h1>
             <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto">
-              Traditional software and ML tests aren’t built for GenAI’s
+              Traditional software and ML tests aren't built for GenAI's
               free-form language, making it difficult for teams to measure and
               improve quality.
             </p>
@@ -39,7 +45,7 @@ export default function GenAi(): JSX.Element {
             </p>
           </div>
           <div className="flex flex-col md:flex-row gap-10">
-            <CopyCommand code="pip install <package name>" />
+            <CopyCommand code="pip install mlflow" />
           </div>
         </div>
       </div>
@@ -118,48 +124,132 @@ export default function GenAi(): JSX.Element {
           </div>
           <Grid>
             <GridRow>
-              <GridItem className="py-10 pr-0 md:pr-10 gap-10">
+              <GridItem className="py-10 px-10 gap-10">
                 <div className="flex flex-col gap-4">
-                  <h3>Built on top of a data platform</h3>
-                  <p className="text-white/60">
-                    Evaluation and monitoring are workflows that generate data.
-                    Easily use the data from your evaluation & monitoring
-                    workflows to build dashboards & apps using the features of
-                    the Databricks platform.
+                  <h2>Tracing</h2>
+                  <h3>
+                    Capture and debug application logs with end-to-end
+                    observability
+                  </h3>
+                  <p style={{ marginBottom: 0 }} className="text-white/60">
+                    Trace your app with OpenTelemetry-compatible SDKs that
+                    capture every invocation's inputs, outputs, and step-by-step
+                    execution - prompts, retrievals, tool calls, and more -
+                    alongside cost, latency, and errors.
                   </p>
+                  <p style={{ marginBottom: 0 }} className="text-white/60">
+                    Use these traces to quickly debug errors, improve business
+                    logic, and optimize cost and latency.
+                  </p>
+                  <Button variant="outline" size="small">
+                    Learn more &gt;
+                  </Button>
                 </div>
               </GridItem>
-              <GridItem className="py-10 pl-0 md:pl-10 gap-10">
+              <GridItem className="justify-center px-10 py-10">
+                <img
+                  className="rounded-xl"
+                  src={TraceTab}
+                  alt="MLflow tracing"
+                />
+              </GridItem>
+            </GridRow>
+            <GridRow>
+              <GridItem className="justify-center px-10 py-10">
+                <img
+                  className="rounded-xl"
+                  src={EvalsTab}
+                  alt="MLflow evaluations"
+                />
+              </GridItem>
+              <GridItem className="py-10 px-10 gap-10">
                 <div className="flex flex-col gap-4">
-                  <h3>Integrated and unified governance</h3>
-                  <p className="text-white/60">
-                    Tightly integrated with Unity Catalog, which offers unified,
-                    enterprise-grade governance across all your data and ai
-                    assets - including all assets created by MLflow.
+                  <h3>
+                    Adapt to evolving user behavior with production log
+                    evaluation
+                  </h3>
+                  <p style={{ marginBottom: 0 }} className="text-white/60">
+                    Use production logs to understand user behavior, turning
+                    low-quality responses into evaluation datasets and
+                    high-quality responses into regression tests.
                   </p>
+                  <p style={{ marginBottom: 0 }} className="text-white/60">
+                    Replay these datasets to evaluate new prompts or app
+                    variants in development so you can ship the best variants to
+                    ensure your application continues to deliver high-quality
+                    responses as user behavior evolves.
+                  </p>
+                  <Button variant="outline" size="small">
+                    Learn more &gt;
+                  </Button>
                 </div>
               </GridItem>
             </GridRow>
             <GridRow>
-              <GridItem className="py-10 pr-0 md:pr-10 gap-10">
+              <GridItem className="px-10 py-10">
                 <div className="flex flex-col gap-4">
-                  <h3>Data intelligence</h3>
-                  <p className="text-white/60">
-                    Data Intelligence that helps make the developer workflow for
-                    improving quality faster/more efficient - LLM judges that
-                    are tuned to understand your business data; topic detection
-                    & classification that help understand your users.
+                  <img
+                    className="rounded-xl mt-10 mb-4"
+                    src={AssessmentsTab}
+                    alt="MLflow LLM judges"
+                  />
+                  <h3>
+                    Measure and improve quality with human-aligned, automated
+                    metrics
+                  </h3>
+                  <p style={{ marginBottom: 0 }} className="text-white/60">
+                    Capture and convert expert feedback into metrics (LLM
+                    judges) that understand your business requirements and can
+                    measure the nuances of plain-language GenAI outputs.
                   </p>
+                  <p style={{ marginBottom: 0 }} className="text-white/60">
+                    Use these metrics to evaluate, monitor, and improve quality
+                    in development and production at scale, without waiting for
+                    human review.
+                  </p>
+                  <Button variant="outline" size="small">
+                    Learn more &gt;
+                  </Button>
                 </div>
               </GridItem>
-              <GridItem className="py-10 pl-0 md:pl-10 gap-10">
+              <GridItem className="px-10 py-10">
                 <div className="flex flex-col gap-4">
-                  <h3>Secure and scalable</h3>
-                  <p className="text-white/60">
-                    Databricks is a trusted vendor and we host the managed
-                    version - no need to self host since we are a trusted
-                    vendor.
+                  <img
+                    className="rounded-xl mt-10 mb-4"
+                    src={AssessmentsTab}
+                    alt="MLflow LLM judges"
+                  />
+                  <h3>
+                    Incorporate human insight with an intuitive labeling and
+                    review experience
+                  </h3>
+                  <p style={{ marginBottom: 0 }} className="text-white/60">
+                    Capture domain expert feedback via web-based UIs and
+                    end-user ratings from your app via APIs.
                   </p>
+                  <p style={{ marginBottom: 0 }} className="text-white/60">
+                    Use this feedback to enrich your understanding of how the
+                    app should behave and improve your custom LLM-judge metrics.
+                  </p>
+                  <Button variant="outline" size="small">
+                    Learn more &gt;
+                  </Button>
+                </div>
+              </GridItem>
+            </GridRow>
+            <GridRow>
+              <GridItem className="px-10 py-10" />
+              <GridItem className="px-10 py-10">
+                <div className="flex flex-col gap-4 justify-center">
+                  <h3>Enterprise governance with Unity Catalog</h3>
+                  <p style={{ marginBottom: 0 }} className="text-white/60">
+                    MLflow is integrated with Unity Catalog to track the
+                    lifecycle and lineage of your app’s assets - models,
+                    prompts, datasets, and metrics - and apply access controls
+                  </p>
+                  <Button variant="outline" size="small">
+                    Learn more &gt;
+                  </Button>
                 </div>
               </GridItem>
             </GridRow>
