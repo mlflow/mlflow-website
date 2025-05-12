@@ -48,7 +48,10 @@ export default function GenAi(): JSX.Element {
               model registry
             </p>
           </div>
-          <VerticalTabs defaultValue="unified-workflow" className="w-full my-12 px-10">
+          <VerticalTabs
+            defaultValue="unified-workflow"
+            className="w-full my-12 px-10"
+          >
             <VerticalTabsList>
               <VerticalTabsTrigger
                 value="unified-workflow"
