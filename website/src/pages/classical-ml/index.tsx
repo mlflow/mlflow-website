@@ -34,14 +34,14 @@ export default function GenAi(): JSX.Element {
             </p>
           </div>
           <div className="flex flex-col md:flex-row gap-10">
-            <CopyCommand code="pip install <package name>" />
+            <CopyCommand code="pip install mlflow" />
           </div>
         </div>
       </div>
       <div className="flex flex-col gap-40 w-full px-6 md:px-20">
         <div className="flex flex-col w-full items-center justify-center gap-16">
           <div className="flex flex-col w-full items-center justify-center gap-6">
-            <SectionLabel color="red" label="CORE FEATURES" />
+            <SectionLabel color="green" label="CORE FEATURES" />
             <h1>Build confidently, deploy seamlessly</h1>
             <p>
               Cover experimentation, reproducibility, deployment, and a central
@@ -111,7 +111,7 @@ export default function GenAi(): JSX.Element {
         />
         <div className="flex flex-col items-center justify-center gap-16">
           <div className="flex flex-col gap-6">
-            <SectionLabel color="red" label="WHY US?" />
+            <SectionLabel color="green" label="WHY US?" />
             <h1>Why MLflow is unique</h1>
           </div>
           <Grid>
