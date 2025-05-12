@@ -24,10 +24,18 @@ export default function QualityMetrics() {
           <div className="flex flex-col justify-center items-center gap-6 w-full">
             <SectionLabel color="red" label="QUALITY METRICS" />
             <h1 className="text-center text-wrap">
-              Lorem ipsum dolor sit amet
+              Capture and debug application logs with end-to-end observability
+              (tracing)
             </h1>
             <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto">
-              Cupidatat veniam commodo cupidatat ex non sit.
+              Trace your app with OpenTelemetry-compatible SDKs that capture
+              every invocation’s inputs, outputs, and step-by-step execution -
+              prompts, retrievals, tool calls, and more - alongside cost,
+              latency, and errors.
+            </p>
+            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto">
+              Use these traces to quickly debug errors, improve business logic,
+              and optimize cost and latency.
             </p>
             <Button>Get Started</Button>
           </div>

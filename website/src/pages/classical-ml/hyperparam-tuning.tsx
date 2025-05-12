@@ -13,7 +13,7 @@ const FakeImage = () => (
   <div className="w-[600px] h-[400px] bg-black rounded-lg"></div>
 );
 
-export default function Tracking() {
+export default function HyperparamTuning() {
   return (
     <Layout variant="blue">
       <div
@@ -24,11 +24,11 @@ export default function Tracking() {
           <div className="flex flex-col justify-center items-center gap-6 w-full">
             <SectionLabel color="green" label="TRACKING" />
             <h1 className="text-center text-wrap">
-              Comprehensive Experiment Tracking for ML Excellenc
+              Simplify your model training workflow
             </h1>
             <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto">
-              Document, compare, and reproduce your machine learning experiments
-              with MLflow's powerful tracking capabilities
+              Use state-of-the-art hyperparameter optimization techniques with
+              an intuitive set of APIs
             </p>
             <Button>Get Started</Button>
           </div>
@@ -40,40 +40,44 @@ export default function Tracking() {
           <GridRow>
             <GridItem className="py-10 pr-0 md:pr-10 gap-10">
               <div className="flex flex-col gap-4">
-                <h3>Complete Experiment Lifecycle</h3>
+                <h3>Scalable HPO</h3>
                 <p className="text-white/60 text-lg">
-                  MLflow Tracking automatically captures parameters, code
-                  versions, metrics, and model weights for each training
-                  iteration. Log trained models, visualizations, interface
-                  signatures, and data samples to ensure complete
-                  reproducibility across your entire ML workflow
+                  Leverage the native integration between MLflow and Optuna to
+                  run distributed hyperparameter optimization at scale using
+                  Spark UDFs. The MLflow tracking server provides robust trial
+                  data storage that persists through node failures, ensuring
+                  your optimization jobs complete successfully even in complex
+                  scalable distributed environments.
                 </p>
               </div>
               <FakeImage />
             </GridItem>
             <GridItem className="py-10 pl-0 md:pl-10 gap-10">
               <div className="flex flex-col gap-4">
-                <h3>Visual Comparison</h3>
+                <h3>Native Tracking</h3>
                 <p className="text-white/60 text-lg">
-                  Compare results across multiple experiments with MLflow's
-                  powerful visualization tools. Quickly identify best-performing
-                  models and retrieve their corresponding code and parameters
-                  based on different metrics of interest across various
-                  projects.
+                  Every Optuna trial is automatically logged to MLflow, creating
+                  a comprehensive record of your hyperparameter search space and
+                  results. MLflow's intuitive UI enables teams to visualize
+                  parameter importance, correlation between hyperparameters and
+                  metrics, and identify promising regions in the search space
+                  without writing additional code.
                 </p>
               </div>
               <FakeImage />
             </GridItem>
           </GridRow>
           <GridRow>
-            <GridItem className="flex flex-col md:flex-row gap-6 md:gap-20 py-10 justify-between items-center">
+            <GridItem className="py-10 pr-0 md:pr-10 gap-10">
               <div className="flex flex-col gap-4">
-                <h3>Seamless Collaboration</h3>
+                <h3>Enterprise-Ready</h3>
                 <p className="text-white/60 text-lg">
-                  Organize models and iterations into experiments for easy team
-                  collaboration while maintaining traceability. Enable team
-                  members to share results while maintaining a unified view of
-                  all projects through a single interface.
+                  Scale your hyperparameter optimization from development to
+                  production with MLflow's project packaging and model registry
+                  integration. Easily compare models across different
+                  optimization runs, promote the best performers to production,
+                  and maintain full lineage tracking from hyperparameter
+                  selection to deployed model.
                 </p>
               </div>
               <FakeImage />
