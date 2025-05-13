@@ -7,6 +7,7 @@ import {
   GridItem,
   GetStartedWithMLflow,
   SocialWidget,
+  GetStartedButton,
 } from "../../components";
 
 const FakeImage = () => (
@@ -31,7 +32,7 @@ export default function Governance() {
               lineage of your app’s assets - models, prompts, datasets, and
               metrics - and apply access controls.
             </p>
-            <Button>Get Started</Button>
+            <GetStartedButton />
           </div>
           <div className="w-[800px] h-[450px] bg-black rounded-lg mx-auto"></div>
         </div>

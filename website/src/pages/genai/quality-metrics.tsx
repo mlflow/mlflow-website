@@ -7,6 +7,7 @@ import {
   GridItem,
   GetStartedWithMLflow,
   SocialWidget,
+  GetStartedButton,
 } from "../../components";
 
 const FakeImage = () => (
@@ -37,7 +38,7 @@ export default function QualityMetrics() {
               development and production at scale, without waiting for human
               review.
             </p>
-            <Button>Get Started</Button>
+            <GetStartedButton />
           </div>
           <div className="w-[800px] h-[450px] bg-black rounded-lg mx-auto"></div>
         </div>

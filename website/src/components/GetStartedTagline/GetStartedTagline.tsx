@@ -1,4 +1,4 @@
-import { Button } from "../Button/Button";
+import { GetStartedButton } from "../GetStartedButton/GetStartedButton";
 
 export const GetStartedTagline = () => {
   return (
@@ -6,7 +6,7 @@ export const GetStartedTagline = () => {
       <span className="text-lg text-white/60 text-center">
         Join the industry leading companies building with MLflow
       </span>
-      <Button variant="primary">Get Started &gt;</Button>
+      <GetStartedButton variant="primary" />
     </div>
   );
 };

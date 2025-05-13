@@ -7,6 +7,7 @@ import {
   GridItem,
   GetStartedWithMLflow,
   SocialWidget,
+  GetStartedButton,
 } from "../../components";
 
 const FakeImage = () => (
@@ -30,7 +31,7 @@ export default function HyperparamTuning() {
               Use state-of-the-art hyperparameter optimization techniques with
               an intuitive set of APIs
             </p>
-            <Button>Get Started</Button>
+            <GetStartedButton />
           </div>
           <div className="w-[800px] h-[450px] bg-black rounded-lg mx-auto"></div>
         </div>

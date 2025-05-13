@@ -7,6 +7,7 @@ import {
   GridItem,
   GetStartedWithMLflow,
   SocialWidget,
+  GetStartedButton,
 } from "../../components";
 
 const FakeImage = () => (
@@ -35,7 +36,7 @@ export default function HumanFeedback() {
               Use this feedback to enrich your understanding of how the app
               should behave and improve your custom LLM-judge metrics.
             </p>
-            <Button>Get Started</Button>
+            <GetStartedButton />
           </div>
           <div className="w-[800px] h-[450px] bg-black rounded-lg mx-auto"></div>
         </div>

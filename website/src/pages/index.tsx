@@ -1,5 +1,3 @@
-import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
-
 import {
   SocialWidget,
   LatestNews,
@@ -13,8 +11,6 @@ import {
 } from "../components";
 
 export default function Home(): JSX.Element {
-  const { siteConfig } = useDocusaurusContext();
-
   return (
     <Layout variant="colorful">
       <div
