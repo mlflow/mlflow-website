@@ -22,7 +22,7 @@ export default function UnifiedRegistry() {
       >
         <div className="flex flex-col gap-16 w-full px-6 md:px-20">
           <div className="flex flex-col justify-center items-center gap-6 w-full">
-            <SectionLabel color="green" label="TRACKING" />
+            <SectionLabel color="green" label="UNIFIED REGISTRY" />
             <h1 className="text-center text-wrap">
               Centralized Model Governance and Discovery
             </h1>

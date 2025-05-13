@@ -24,18 +24,18 @@ export default function QualityMetrics() {
           <div className="flex flex-col justify-center items-center gap-6 w-full">
             <SectionLabel color="red" label="QUALITY METRICS" />
             <h1 className="text-center text-wrap">
-              Capture and debug application logs with end-to-end observability
-              (tracing)
+              Measure and improve quality with human-aligned, automated metrics
+              (LLM judges)
             </h1>
             <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto">
-              Trace your app with OpenTelemetry-compatible SDKs that capture
-              every invocation’s inputs, outputs, and step-by-step execution -
-              prompts, retrievals, tool calls, and more - alongside cost,
-              latency, and errors.
+              Capture and convert expert feedback into metrics (LLM judges) that
+              understand your business requirements and can measure the nuances
+              of plain-language GenAI outputs.
             </p>
             <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto">
-              Use these traces to quickly debug errors, improve business logic,
-              and optimize cost and latency.
+              Use these metrics to evaluate, monitor, and improve quality in
+              development and production at scale, without waiting for human
+              review.
             </p>
             <Button>Get Started</Button>
           </div>

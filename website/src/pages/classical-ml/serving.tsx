@@ -22,7 +22,7 @@ export default function Serving() {
       >
         <div className="flex flex-col gap-16 w-full px-6 md:px-20">
           <div className="flex flex-col justify-center items-center gap-6 w-full">
-            <SectionLabel color="green" label="TRACKING" />
+            <SectionLabel color="green" label="SERVING" />
             <h1 className="text-center text-wrap">
               Flexible Model Deployment for Any Production Environment
             </h1>

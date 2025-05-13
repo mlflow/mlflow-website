@@ -22,7 +22,7 @@ export default function HyperparamTuning() {
       >
         <div className="flex flex-col gap-16 w-full px-6 md:px-20">
           <div className="flex flex-col justify-center items-center gap-6 w-full">
-            <SectionLabel color="green" label="TRACKING" />
+            <SectionLabel color="green" label="HYPERPARAM TUNING" />
             <h1 className="text-center text-wrap">
               Simplify your model training workflow
             </h1>

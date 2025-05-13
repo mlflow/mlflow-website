@@ -22,7 +22,7 @@ export default function Evaluations() {
       >
         <div className="flex flex-col gap-16 w-full px-6 md:px-20">
           <div className="flex flex-col justify-center items-center gap-6 w-full">
-            <SectionLabel color="red" label="QUALITY METRICS" />
+            <SectionLabel color="red" label="EVALUATIONS" />
             <h1 className="text-center text-wrap">
               Adapt to evolving user behavior with production log evaluation
               (evaluation datasets)

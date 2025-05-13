@@ -24,7 +24,7 @@ export default function Tracking() {
           <div className="flex flex-col justify-center items-center gap-6 w-full">
             <SectionLabel color="green" label="TRACKING" />
             <h1 className="text-center text-wrap">
-              Comprehensive Experiment Tracking for ML Excellenc
+              Comprehensive Experiment Tracking for ML Excellence
             </h1>
             <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto">
               Document, compare, and reproduce your machine learning experiments

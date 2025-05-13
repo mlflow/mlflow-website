@@ -22,20 +22,20 @@ export default function Observability() {
       >
         <div className="flex flex-col gap-16 w-full px-6 md:px-20">
           <div className="flex flex-col justify-center items-center gap-6 w-full">
-            <SectionLabel color="red" label="QUALITY METRICS" />
+            <SectionLabel color="red" label="OBSERVABILITY" />
             <h1 className="text-center text-wrap">
-              Measure and improve quality with human-aligned, automated metrics
-              (LLM judges)
+              Capture and debug application logs with end-to-end observability
+              (tracing)
             </h1>
             <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto">
-              Capture and convert expert feedback into metrics (LLM judges) that
-              understand your business requirements and can measure the nuances
-              of plain-language GenAI outputs.
+              Trace your app with OpenTelemetry-compatible SDKs that capture
+              every invocation’s inputs, outputs, and step-by-step execution -
+              prompts, retrievals, tool calls, and more - alongside cost,
+              latency, and errors.
             </p>
             <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto">
-              Use these metrics to evaluate, monitor, and improve quality in
-              development and production at scale, without waiting for human
-              review.
+              Use these traces to quickly debug errors, improve business logic,
+              and optimize cost and latency.
             </p>
             <Button>Get Started</Button>
           </div>
