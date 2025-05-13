@@ -13,7 +13,7 @@ const FakeImage = () => (
   <div className="w-[600px] h-[400px] bg-black rounded-lg"></div>
 );
 
-export default function Tracking() {
+export default function Models() {
   return (
     <Layout variant="blue">
       <div
@@ -22,13 +22,13 @@ export default function Tracking() {
       >
         <div className="flex flex-col gap-16 w-full px-6 md:px-20">
           <div className="flex flex-col justify-center items-center gap-6 w-full">
-            <SectionLabel color="green" label="TRACKING" />
+            <SectionLabel color="green" label="MODELS" />
             <h1 className="text-center text-wrap">
-              Comprehensive Experiment Tracking for ML Excellence
+              Transform ML Experiments into Production-Ready Models
             </h1>
             <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto">
-              Document, compare, and reproduce your machine learning experiments
-              with MLflow's powerful tracking capabilities
+              Build, deploy, and manage machine learning models with confidence
+              using MLflow's comprehensive model lifecycle management
             </p>
             <Button>Get Started</Button>
           </div>
@@ -40,26 +40,27 @@ export default function Tracking() {
           <GridRow>
             <GridItem className="py-10 pr-0 md:pr-10 gap-10">
               <div className="flex flex-col gap-4">
-                <h3>Complete Experiment Lifecycle</h3>
+                <h3>Unified Model Format</h3>
                 <p className="text-white/60 text-lg">
-                  MLflow Tracking automatically captures parameters, code
-                  versions, metrics, and model weights for each training
-                  iteration. Log trained models, visualizations, interface
-                  signatures, and data samples to ensure complete
-                  reproducibility across your entire ML workflow
+                  MLflow's MLModel file provides a standardized structure for
+                  packaging models from any framework, capturing essential
+                  dependencies and input/output specifications. This consistent
+                  packaging approach eliminates integration friction while
+                  ensuring models can be reliably deployed across any
+                  environment.
                 </p>
               </div>
               <FakeImage />
             </GridItem>
             <GridItem className="py-10 pl-0 md:pl-10 gap-10">
               <div className="flex flex-col gap-4">
-                <h3>Visual Comparison</h3>
+                <h3>Comprehensive Model Metadata</h3>
                 <p className="text-white/60 text-lg">
-                  Compare results across multiple experiments with MLflow's
-                  powerful visualization tools. Quickly identify best-performing
-                  models and retrieve their corresponding code and parameters
-                  based on different metrics of interest across various
-                  projects.
+                  Track crucial model requirements and artifacts including data
+                  schemas, preprocessing steps, and environment dependencies
+                  automatically with MLflow's metadata system. Create fully
+                  reproducible model packages that document the complete model
+                  context for simplified governance and troubleshooting.
                 </p>
               </div>
               <FakeImage />
@@ -68,12 +69,14 @@ export default function Tracking() {
           <GridRow>
             <GridItem className="flex flex-col md:flex-row gap-6 md:gap-20 py-10 justify-between items-center">
               <div className="flex flex-col gap-4">
-                <h3>Seamless Collaboration</h3>
+                <h3>Flexible Deployment Options</h3>
                 <p className="text-white/60 text-lg">
-                  Organize models and iterations into experiments for easy team
-                  collaboration while maintaining traceability. Enable team
-                  members to share results while maintaining a unified view of
-                  all projects through a single interface.
+                  Deploy models as Docker containers, Python functions, REST
+                  endpoints, or directly to various serving platforms with
+                  MLflow's versatile deployment capabilities. Streamline the
+                  transition from development to production with consistent
+                  model behavior across any target environment, from local
+                  testing to cloud-based serving.
                 </p>
               </div>
               <FakeImage />

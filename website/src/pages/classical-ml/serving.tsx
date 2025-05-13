@@ -13,7 +13,7 @@ const FakeImage = () => (
   <div className="w-[600px] h-[400px] bg-black rounded-lg"></div>
 );
 
-export default function Tracking() {
+export default function Serving() {
   return (
     <Layout variant="blue">
       <div
@@ -22,13 +22,13 @@ export default function Tracking() {
       >
         <div className="flex flex-col gap-16 w-full px-6 md:px-20">
           <div className="flex flex-col justify-center items-center gap-6 w-full">
-            <SectionLabel color="green" label="TRACKING" />
+            <SectionLabel color="green" label="SERVING" />
             <h1 className="text-center text-wrap">
-              Comprehensive Experiment Tracking for ML Excellence
+              Flexible Model Deployment for Any Production Environment
             </h1>
             <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto">
-              Document, compare, and reproduce your machine learning experiments
-              with MLflow's powerful tracking capabilities
+              Deploy your ML and DL models with confidence using MLflow's
+              versatile serving options for real-time and batch inference
             </p>
             <Button>Get Started</Button>
           </div>
@@ -40,26 +40,25 @@ export default function Tracking() {
           <GridRow>
             <GridItem className="py-10 pr-0 md:pr-10 gap-10">
               <div className="flex flex-col gap-4">
-                <h3>Complete Experiment Lifecycle</h3>
+                <h3>Scalable Real-Time Serving</h3>
                 <p className="text-white/60 text-lg">
-                  MLflow Tracking automatically captures parameters, code
-                  versions, metrics, and model weights for each training
-                  iteration. Log trained models, visualizations, interface
-                  signatures, and data samples to ensure complete
-                  reproducibility across your entire ML workflow
+                  MLflow provides a unified, scalable interface for deploying
+                  models as REST APIs that automatically adjust to meet demand
+                  fluctuations. With managed deployment on Databricks, your
+                  endpoints can intelligently scale up or down based on traffic
+                  patterns, optimizing both performance and infrastructure costs
+                  with no manual intervention required.
                 </p>
               </div>
               <FakeImage />
             </GridItem>
             <GridItem className="py-10 pl-0 md:pl-10 gap-10">
               <div className="flex flex-col gap-4">
-                <h3>Visual Comparison</h3>
+                <h3>High-Performance Batch Inference</h3>
                 <p className="text-white/60 text-lg">
-                  Compare results across multiple experiments with MLflow's
-                  powerful visualization tools. Quickly identify best-performing
-                  models and retrieve their corresponding code and parameters
-                  based on different metrics of interest across various
-                  projects.
+                  Deploy production models for batch inference directly on
+                  Apache Spark, enabling efficient processing of billions of
+                  predictions on massive datasets
                 </p>
               </div>
               <FakeImage />
@@ -68,12 +67,11 @@ export default function Tracking() {
           <GridRow>
             <GridItem className="flex flex-col md:flex-row gap-6 md:gap-20 py-10 justify-between items-center">
               <div className="flex flex-col gap-4">
-                <h3>Seamless Collaboration</h3>
+                <h3>Comprehensive Deployment Options</h3>
                 <p className="text-white/60 text-lg">
-                  Organize models and iterations into experiments for easy team
-                  collaboration while maintaining traceability. Enable team
-                  members to share results while maintaining a unified view of
-                  all projects through a single interface.
+                  Deploy models across multiple environments including Docker
+                  containers, cloud services like Databricks, Azure ML and AWS
+                  SageMaker, or Kubernetes clusters with consistent behavior.
                 </p>
               </div>
               <FakeImage />

@@ -24,10 +24,18 @@ export default function QualityMetrics() {
           <div className="flex flex-col justify-center items-center gap-6 w-full">
             <SectionLabel color="red" label="QUALITY METRICS" />
             <h1 className="text-center text-wrap">
-              Lorem ipsum dolor sit amet
+              Measure and improve quality with human-aligned, automated metrics
+              (LLM judges)
             </h1>
             <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto">
-              Cupidatat veniam commodo cupidatat ex non sit.
+              Capture and convert expert feedback into metrics (LLM judges) that
+              understand your business requirements and can measure the nuances
+              of plain-language GenAI outputs.
+            </p>
+            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto">
+              Use these metrics to evaluate, monitor, and improve quality in
+              development and production at scale, without waiting for human
+              review.
             </p>
             <Button>Get Started</Button>
           </div>

@@ -56,45 +56,45 @@ export default function GenAi(): JSX.Element {
             <h1>Build confidently, deploy seamlessly</h1>
             <p>Tackle the challenges of building GenAI head on</p>
           </div>
-          <VerticalTabs defaultValue="tab1" className="w-full my-12 px-10">
+          <VerticalTabs defaultValue="tracking" className="w-full my-12 px-10">
             <VerticalTabsList>
               <VerticalTabsTrigger
-                value="tab1"
-                label="LLM Judges"
-                description="Capture and debug application logs with end-to-end observability.."
+                value="tracking"
+                label="Capture and debug application logs with end-to-end observability (tracing)"
+                description="Trace your app with OpenTelemetry-compatible SDKs that capture every invocation’s inputs, outputs, and step-by-step execution -  prompts, retrievals, tool calls, and more - alongside cost, latency, and errors. Use these traces to quickly debug errors, improve business logic, and optimize cost and latency."
               />
               <VerticalTabsTrigger
-                value="tab2"
-                label="Tracing"
-                description="Ex aliquip commodo irure. Cupidatat veniam commodo cupidatat ex non sit lorem eu proident."
+                value="llm-judges"
+                label="Measure and improve quality with human-aligned, automated metrics (LLM judges)"
+                description="Capture and convert expert feedback into metrics (LLM judges) that understand your business requirements and can measure the nuances of plain-language GenAI outputs. Use these metrics to evaluate, monitor, and improve quality in development and production at scale, without waiting for human review."
               />
               <VerticalTabsTrigger
-                value="tab3"
-                label="Evaluation Datasets"
-                description="Ex aliquip commodo irure. Cupidatat veniam commodo cupidatat ex non sit lorem eu proident."
+                value="evaluation-datasets"
+                label="Adapt to evolving user behavior with production log evaluation (evaluation datasets)"
+                description="Use production logs to understand user behavior, turning low-quality responses into evaluation datasets and high-quality responses into regression tests. Replay these datasets to evaluate new prompts or app variants in development so you can ship the best variants to ensure your application continues to deliver high-quality responses as user behavior evolves."
               />
               <VerticalTabsTrigger
-                value="tab4"
-                label="Review app"
-                description="Ex aliquip commodo irure. Cupidatat veniam commodo cupidatat ex non sit lorem eu proident."
+                value="human-insight"
+                label="Incorporate human insight with an intuitive labeling and review experience "
+                description="Capture domain expert feedback via web-based UIs and end-user ratings from your app via APIs. Use this feedback to enrich your understanding of how the app should behave and improve your custom LLM-judge metrics. "
               />
               <VerticalTabsTrigger
-                value="tab5"
-                label="Enterprise-Ready Governance"
-                description="Ex aliquip commodo irure. Cupidatat veniam commodo cupidatat ex non sit lorem eu proident."
+                value="enterprise-governance"
+                label="Enterprise governance with Unity Catalog"
+                description="MLflow is integrated with Unity Catalog to track the lifecycle and lineage of your app’s assets - models, prompts, datasets, and metrics - and apply access controls."
               />
             </VerticalTabsList>
-            <VerticalTabsContent value="tab1">
+            <VerticalTabsContent value="tracking">
               <img src="/img/demo-image.png" />
             </VerticalTabsContent>
-            <VerticalTabsContent value="tab2">
+            <VerticalTabsContent value="llm-judges">
               <img src="/img/demo-image.png" />
             </VerticalTabsContent>
-            <VerticalTabsContent value="tab3">
+            <VerticalTabsContent value="evaluation-datasets">
               <img src="/img/demo-image.png" />
             </VerticalTabsContent>
 
-            <VerticalTabsContent value="tab4">
+            <VerticalTabsContent value="human-insight">
               <img src="/img/demo-image.png" />
             </VerticalTabsContent>
 
