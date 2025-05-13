@@ -26,7 +26,7 @@ export default function Serving() {
             <h1 className="text-center text-wrap">
               Flexible Model Deployment for Any Production Environment
             </h1>
-            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto">
+            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-white/60">
               Deploy your ML and DL models with confidence using MLflow's
               versatile serving options for real-time and batch inference
             </p>
@@ -40,7 +40,7 @@ export default function Serving() {
           <GridRow>
             <GridItem className="py-10 pr-0 md:pr-10 gap-10">
               <div className="flex flex-col gap-4">
-                <h3>Scalable Real-Time Serving</h3>
+                <h3 className="text-white">Scalable Real-Time Serving</h3>
                 <p className="text-white/60 text-lg">
                   MLflow provides a unified, scalable interface for deploying
                   models as REST APIs that automatically adjust to meet demand
@@ -54,7 +54,7 @@ export default function Serving() {
             </GridItem>
             <GridItem className="py-10 pl-0 md:pl-10 gap-10">
               <div className="flex flex-col gap-4">
-                <h3>High-Performance Batch Inference</h3>
+                <h3 className="text-white">High-Performance Batch Inference</h3>
                 <p className="text-white/60 text-lg">
                   Deploy production models for batch inference directly on
                   Apache Spark, enabling efficient processing of billions of
@@ -67,7 +67,7 @@ export default function Serving() {
           <GridRow>
             <GridItem className="flex flex-col md:flex-row gap-6 md:gap-20 py-10 justify-between items-center">
               <div className="flex flex-col gap-4">
-                <h3>Comprehensive Deployment Options</h3>
+                <h3 className="text-white">Comprehensive Deployment Options</h3>
                 <p className="text-white/60 text-lg">
                   Deploy models across multiple environments including Docker
                   containers, cloud services like Databricks, Azure ML and AWS

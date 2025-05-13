@@ -100,16 +100,16 @@ export default function GenAi(): JSX.Element {
         </div>
         <LogosCarousel
           images={[
-            "img/companies/databricks.svg",
-            "img/companies/microsoft.svg",
-            "img/companies/meta.svg",
-            "img/companies/mosaicml.svg",
-            "img/companies/zillow.svg",
-            "img/companies/toyota.svg",
-            "img/companies/booking.svg",
-            "img/companies/wix.svg",
-            "img/companies/accenture.svg",
-            "img/companies/asml.svg",
+            "/img/companies/databricks.svg",
+            "/img/companies/microsoft.svg",
+            "/img/companies/meta.svg",
+            "/img/companies/mosaicml.svg",
+            "/img/companies/zillow.svg",
+            "/img/companies/toyota.svg",
+            "/img/companies/booking.svg",
+            "/img/companies/wix.svg",
+            "/img/companies/accenture.svg",
+            "/img/companies/asml.svg",
           ]}
         />
         <div className="flex flex-col items-center justify-center gap-16">

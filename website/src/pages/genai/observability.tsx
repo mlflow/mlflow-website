@@ -27,13 +27,13 @@ export default function Observability() {
               Capture and debug application logs with end-to-end observability
               (tracing)
             </h1>
-            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto">
+            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-white/60">
               Trace your app with OpenTelemetry-compatible SDKs that capture
               every invocation’s inputs, outputs, and step-by-step execution -
               prompts, retrievals, tool calls, and more - alongside cost,
               latency, and errors.
             </p>
-            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto">
+            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-white/60">
               Use these traces to quickly debug errors, improve business logic,
               and optimize cost and latency.
             </p>
@@ -48,7 +48,9 @@ export default function Observability() {
             <GridItem className="flex flex-col md:flex-row gap-6 md:gap-20 py-10 justify-between items-center">
               <div className="flex flex-col gap-10">
                 <div className="flex flex-col gap-4">
-                  <h3>Automatic Instrumentation, yet fully customizable</h3>
+                  <h3 className="text-white">
+                    Automatic Instrumentation, yet fully customizable
+                  </h3>
                 </div>
 
                 <p className="text-white/60">
@@ -65,7 +67,9 @@ export default function Observability() {
             <GridItem className="py-10 pr-0 md:pr-10 gap-10">
               <FakeImage />
               <div className="flex flex-col gap-4">
-                <h3>Visualize Your app’s Execution Flow</h3>
+                <h3 className="text-white">
+                  Visualize Your app’s Execution Flow
+                </h3>
                 <p className="text-white/60 text-lg">
                   Visualize, understand, and rapidly debug your application's
                   logic flow, capturing the complete request-response cycle,
@@ -77,7 +81,9 @@ export default function Observability() {
             </GridItem>
             <GridItem className="py-10 pl-0 md:pl-10 gap-10">
               <div className="flex flex-col gap-4">
-                <h3>Instrument once, use in development and production</h3>
+                <h3 className="text-white">
+                  Instrument once, use in development and production
+                </h3>
                 <p className="text-white/60 text-lg">
                   he same trace instrumentation works for production and
                   development - so you can instrument once and get the same
@@ -92,7 +98,7 @@ export default function Observability() {
             <GridItem className="py-10 pr-0 md:pr-10 gap-10">
               <FakeImage />
               <div className="flex flex-col gap-4">
-                <h3>Attach Quality Feedback</h3>
+                <h3 className="text-white">Attach Quality Feedback</h3>
                 <p className="text-white/60 text-lg">
                   Attach quality assessments from users, domain experts, or LLM
                   judges/metrics directly on each trace so you can quickly
@@ -102,7 +108,7 @@ export default function Observability() {
             </GridItem>
             <GridItem className="py-10 pl-0 md:pl-10 gap-10">
               <div className="flex flex-col gap-4">
-                <h3>Attach Operational Metrics</h3>
+                <h3 className="text-white">Attach Operational Metrics</h3>
                 <p className="text-white/60 text-lg">
                   Attach operational metrics like latency, cost, and resource
                   utilization to measure and improve your application’s
@@ -117,7 +123,7 @@ export default function Observability() {
             <GridItem className="py-10 pr-0 md:pr-10 gap-10">
               <FakeImage />
               <div className="flex flex-col gap-4">
-                <h3>Monitoring and Alerting</h3>
+                <h3 className="text-white">Monitoring and Alerting</h3>
                 <p className="text-white/60 text-lg">
                   Visualize operational metrics with real-time dashboards and
                   set alerts that flag quality issues, latency spikes, and
@@ -128,7 +134,7 @@ export default function Observability() {
             </GridItem>
             <GridItem className="py-10 pl-0 md:pl-10 gap-10">
               <div className="flex flex-col gap-4">
-                <h3>Comprehensive Audit Trail</h3>
+                <h3 className="text-white">Comprehensive Audit Trail</h3>
                 <p className="text-white/60 text-lg">
                   Traces can be used as an audit trail that captures every
                   execution of your app for full transparency and accountability

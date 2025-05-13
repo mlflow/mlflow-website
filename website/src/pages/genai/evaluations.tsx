@@ -27,12 +27,12 @@ export default function Evaluations() {
               Adapt to evolving user behavior with production log evaluation
               (evaluation datasets)
             </h1>
-            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto">
+            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-white/60">
               Use production logs to understand user behavior, turning
               low-quality responses into evaluation datasets and high-quality
               responses into regression tests.
             </p>
-            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto">
+            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-white/60">
               Replay these datasets to evaluate new prompts or app variants in
               development so you can ship the best variants to ensure your
               application continues to deliver high-quality responses as user
@@ -49,7 +49,7 @@ export default function Evaluations() {
             <GridItem className="flex flex-col md:flex-row gap-6 md:gap-20 py-10 justify-between items-center">
               <div className="flex flex-col gap-10">
                 <div className="flex flex-col gap-4">
-                  <h3>Evaluation datasets</h3>
+                  <h3 className="text-white">Evaluation datasets</h3>
                 </div>
 
                 <p className="text-white/60">
@@ -66,7 +66,7 @@ export default function Evaluations() {
             <GridItem className="py-10 pr-0 md:pr-10 gap-10">
               <FakeImage />
               <div className="flex flex-col gap-4">
-                <h3>Test new app / prompt variants</h3>
+                <h3 className="text-white">Test new app / prompt variants</h3>
                 <p className="text-white/60 text-lg">
                   Use MLflow’s Evaluation SDK to test new variants (prompts,
                   models, code changes, etc) against the evaluation and
@@ -77,7 +77,7 @@ export default function Evaluations() {
             </GridItem>
             <GridItem className="py-10 pl-0 md:pl-10 gap-10">
               <div className="flex flex-col gap-4">
-                <h3>Intuitive evaluation review UIs</h3>
+                <h3 className="text-white">Intuitive evaluation review UIs</h3>
                 <p className="text-white/60 text-lg">
                   Review evaluation results using MLflow’s evaluation UI that
                   visualizes record-by-record results, compares diffs between
@@ -97,7 +97,7 @@ export default function Evaluations() {
             <GridItem className="py-10 pr-0 md:pr-10 gap-10">
               <FakeImage />
               <div className="flex flex-col gap-4">
-                <h3>CI/CD support</h3>
+                <h3 className="text-white">CI/CD support</h3>
                 <p className="text-white/60 text-lg">
                   Automatically run evaluations in CI/CD workflows so you can
                   systematically validate every PR drives quality improvements,

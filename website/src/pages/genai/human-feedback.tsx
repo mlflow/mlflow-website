@@ -27,11 +27,11 @@ export default function HumanFeedback() {
               Incorporate human insight with an intuitive labeling and review
               experience
             </h1>
-            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto">
+            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-white/60">
               Capture domain expert feedback via web-based UIs and end-user
               ratings from your app via APIs.
             </p>
-            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto">
+            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-white/60">
               Use this feedback to enrich your understanding of how the app
               should behave and improve your custom LLM-judge metrics.
             </p>
@@ -46,7 +46,9 @@ export default function HumanFeedback() {
             <GridItem className="flex flex-col md:flex-row gap-6 md:gap-20 py-10 justify-between items-center">
               <div className="flex flex-col gap-10">
                 <div className="flex flex-col gap-4">
-                  <h3>Initiative labeling UIs, built for business user</h3>
+                  <h3 className="text-white">
+                    Initiative labeling UIs, built for business user
+                  </h3>
                 </div>
 
                 <p className="text-white/60">
@@ -65,7 +67,7 @@ export default function HumanFeedback() {
             <GridItem className="py-10 pr-0 md:pr-10 gap-10">
               <FakeImage />
               <div className="flex flex-col gap-4">
-                <h3>No more spreadsheets!</h3>
+                <h3 className="text-white">No more spreadsheets!</h3>
                 <p className="text-white/60 text-lg">
                   Replace your spreadsheet-based labeling workflow with MLflow’s
                   data model - feedback from the review app flows is directly
@@ -76,7 +78,7 @@ export default function HumanFeedback() {
             </GridItem>
             <GridItem className="py-10 pl-0 md:pl-10 gap-10">
               <div className="flex flex-col gap-4">
-                <h3>Capture end-user feedback</h3>
+                <h3 className="text-white">Capture end-user feedback</h3>
                 <p className="text-white/60 text-lg">
                   In addition to domain experts, use MLflow’s APIs to capture
                   feedback that end users provide in your deployed application.
@@ -92,7 +94,7 @@ export default function HumanFeedback() {
             <GridItem className="flex flex-col md:flex-row gap-6 md:gap-20 py-10 justify-between items-center">
               <FakeImage />
               <div className="flex flex-col gap-4">
-                <h3>Integrated Chat App</h3>
+                <h3 className="text-white">Integrated Chat App</h3>
                 <p className="text-white/60 text-lg">
                   When you have a new version ready for testing, load it into
                   the Review App’s pre-built chat UI to let domain experts use

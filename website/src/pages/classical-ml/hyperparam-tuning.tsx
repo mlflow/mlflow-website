@@ -26,7 +26,7 @@ export default function HyperparamTuning() {
             <h1 className="text-center text-wrap">
               Simplify your model training workflow
             </h1>
-            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto">
+            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-white/60">
               Use state-of-the-art hyperparameter optimization techniques with
               an intuitive set of APIs
             </p>
@@ -40,7 +40,7 @@ export default function HyperparamTuning() {
           <GridRow>
             <GridItem className="py-10 pr-0 md:pr-10 gap-10">
               <div className="flex flex-col gap-4">
-                <h3>Scalable HPO</h3>
+                <h3 className="text-white">Scalable HPO</h3>
                 <p className="text-white/60 text-lg">
                   Leverage the native integration between MLflow and Optuna to
                   run distributed hyperparameter optimization at scale using
@@ -54,7 +54,7 @@ export default function HyperparamTuning() {
             </GridItem>
             <GridItem className="py-10 pl-0 md:pl-10 gap-10">
               <div className="flex flex-col gap-4">
-                <h3>Native Tracking</h3>
+                <h3 className="text-white">Native Tracking</h3>
                 <p className="text-white/60 text-lg">
                   Every Optuna trial is automatically logged to MLflow, creating
                   a comprehensive record of your hyperparameter search space and
@@ -70,7 +70,7 @@ export default function HyperparamTuning() {
           <GridRow>
             <GridItem className="py-10 pr-0 md:pr-10 gap-10">
               <div className="flex flex-col gap-4">
-                <h3>Enterprise-Ready</h3>
+                <h3 className="text-white">Enterprise-Ready</h3>
                 <p className="text-white/60 text-lg">
                   Scale your hyperparameter optimization from development to
                   production with MLflow's project packaging and model registry
