@@ -38,7 +38,7 @@ export default function GenAi(): JSX.Element {
               free-form language, making it difficult for teams to measure and
               improve quality.
             </p>
-            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto">
+            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-white">
               MLflow combines metrics that reliably measure GenAI quality with
               trace observability so you can measure, improve, and monitor
               quality, cost, and latency.
@@ -54,7 +54,9 @@ export default function GenAi(): JSX.Element {
           <div className="flex flex-col w-full items-center justify-center gap-6">
             <SectionLabel color="red" label="CORE FEATURES" />
             <h1>Build confidently, deploy seamlessly</h1>
-            <p>Tackle the challenges of building GenAI head on</p>
+            <p className="text-white">
+              Tackle the challenges of building GenAI head on
+            </p>
           </div>
           <VerticalTabs defaultValue="tracking" className="w-full my-12 px-10">
             <VerticalTabsList>
