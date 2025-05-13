@@ -33,7 +33,7 @@ export default function GenAi(): JSX.Element {
             <h1 className="text-center text-wrap">
               Ship high-quality GenAI, fast
             </h1>
-            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto">
+            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-white">
               Traditional software and ML tests aren't built for GenAI's
               free-form language, making it difficult for teams to measure and
               improve quality.
@@ -107,16 +107,16 @@ export default function GenAi(): JSX.Element {
         </div>
         <LogosCarousel
           images={[
-            "img/companies/databricks.svg",
-            "img/companies/microsoft.svg",
-            "img/companies/meta.svg",
-            "img/companies/mosaicml.svg",
-            "img/companies/zillow.svg",
-            "img/companies/toyota.svg",
-            "img/companies/booking.svg",
-            "img/companies/wix.svg",
-            "img/companies/accenture.svg",
-            "img/companies/asml.svg",
+            "/img/companies/databricks.svg",
+            "/img/companies/microsoft.svg",
+            "/img/companies/meta.svg",
+            "/img/companies/mosaicml.svg",
+            "/img/companies/zillow.svg",
+            "/img/companies/toyota.svg",
+            "/img/companies/booking.svg",
+            "/img/companies/wix.svg",
+            "/img/companies/accenture.svg",
+            "/img/companies/asml.svg",
           ]}
         />
         <div className="flex flex-col items-center justify-center gap-16">
@@ -128,8 +128,8 @@ export default function GenAi(): JSX.Element {
             <GridRow>
               <GridItem className="py-10 px-10 gap-10">
                 <div className="flex flex-col gap-4">
-                  <h2>Tracing</h2>
-                  <h3>
+                  <h2 className="text-white">Tracing</h2>
+                  <h3 className="text-white">
                     Capture and debug application logs with end-to-end
                     observability
                   </h3>
@@ -137,7 +137,7 @@ export default function GenAi(): JSX.Element {
                     Trace your app with OpenTelemetry-compatible SDKs that
                     capture every invocation's inputs, outputs, and step-by-step
                     execution - prompts, retrievals, tool calls, and more -
-                    alongside cost, latency, and errors.
+                    alongside cost, latency, and errors. g{" "}
                   </p>
                   <p style={{ marginBottom: 0 }} className="text-white/60">
                     Use these traces to quickly debug errors, improve business
@@ -166,7 +166,7 @@ export default function GenAi(): JSX.Element {
               </GridItem>
               <GridItem className="py-10 px-10 gap-10">
                 <div className="flex flex-col gap-4">
-                  <h3>
+                  <h3 className="text-white">
                     Adapt to evolving user behavior with production log
                     evaluation
                   </h3>
@@ -195,7 +195,7 @@ export default function GenAi(): JSX.Element {
                     src={AssessmentsTab}
                     alt="MLflow LLM judges"
                   />
-                  <h3>
+                  <h3 className="text-white">
                     Measure and improve quality with human-aligned, automated
                     metrics
                   </h3>
@@ -221,7 +221,7 @@ export default function GenAi(): JSX.Element {
                     src={AssessmentsTab}
                     alt="MLflow LLM judges"
                   />
-                  <h3>
+                  <h3 className="text-white">
                     Incorporate human insight with an intuitive labeling and
                     review experience
                   </h3>
@@ -243,7 +243,9 @@ export default function GenAi(): JSX.Element {
               <GridItem className="px-10 py-10" />
               <GridItem className="px-10 py-10">
                 <div className="flex flex-col gap-4 justify-center">
-                  <h3>Enterprise governance with Unity Catalog</h3>
+                  <h3 className="text-white">
+                    Enterprise governance with Unity Catalog
+                  </h3>
                   <p style={{ marginBottom: 0 }} className="text-white/60">
                     MLflow is integrated with Unity Catalog to track the
                     lifecycle and lineage of your app’s assets - models,
