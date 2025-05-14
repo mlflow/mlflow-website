@@ -64,7 +64,12 @@ export const GetStartedWithMLflow = ({ variant = "red" }: Props) => {
         </div>
         <div className="flex flex-col gap-8 p-8 bg-[#fff]/4 rounded-2xl">
           <h3 className="m-0 text-white">Self-Hosting</h3>
-          <GetStartedButton size="large" width="full" variant="dark" />
+          <GetStartedButton
+            size="large"
+            width="full"
+            variant="dark"
+            link="http://mlflow.org/docs/latest/getting-started/intro-quickstart/"
+          />
         </div>
       </div>
     </div>
