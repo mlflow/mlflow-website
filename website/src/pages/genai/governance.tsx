@@ -26,7 +26,7 @@ export default function Governance() {
             <h1 className="text-center text-wrap">
               Enterprise governance with Unity Catalog
             </h1>
-            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto">
+            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-white/60">
               MLflow is integrated with Unity Catalog to track the lifecycle and
               lineage of your app’s assets - models, prompts, datasets, and
               metrics - and apply access controls.
@@ -42,7 +42,9 @@ export default function Governance() {
             <GridItem className="flex flex-col md:flex-row gap-6 md:gap-20 py-10 justify-between items-center">
               <div className="flex flex-col gap-10">
                 <div className="flex flex-col gap-4">
-                  <h3>Unified Data and AI governancer</h3>
+                  <h3 className="text-white">
+                    Unified Data and AI governancer
+                  </h3>
                 </div>
 
                 <p className="text-white/60">
@@ -58,7 +60,7 @@ export default function Governance() {
           <GridRow>
             <GridItem className="py-10 pr-0 md:pr-10 gap-10">
               <div className="flex flex-col gap-4">
-                <h3>Prompt Registry</h3>
+                <h3 className="text-white">Prompt Registry</h3>
                 <p className="text-white/60 text-lg">
                   Track every prompt template, its version history, and
                   deployment lifecycle in the Unity Catalog. Each prompt is
@@ -73,7 +75,7 @@ export default function Governance() {
             <GridItem className="py-10 pl-0 md:pl-10 gap-10">
               <FakeImage />
               <div className="flex flex-col gap-4">
-                <h3>App Version Registry</h3>
+                <h3 className="text-white">App Version Registry</h3>
                 <p className="text-white/60 text-lg">
                   Track every application version and its associated prompts and
                   evaluation results in the Unity Catalog.
@@ -89,7 +91,9 @@ export default function Governance() {
           <GridRow>
             <GridItem className="py-10 pr-0 md:pr-10 gap-10">
               <div className="flex flex-col gap-4">
-                <h3>Evaluation Dataset & Metric Registry</h3>
+                <h3 className="text-white">
+                  Evaluation Dataset & Metric Registry
+                </h3>
                 <p className="text-white/60 text-lg">
                   Track and manage evaluation datasets and custom metrics as UC
                   assets.
@@ -100,7 +104,7 @@ export default function Governance() {
             <GridItem className="py-10 pl-0 md:pl-10 gap-10">
               <FakeImage />
               <div className="flex flex-col gap-4">
-                <h3>Collaboration & Sharing</h3>
+                <h3 className="text-white">Collaboration & Sharing</h3>
                 <p className="text-white/60 text-lg">
                   Enable cross-organization discovery and sharing of prompts and
                   apps

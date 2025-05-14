@@ -26,7 +26,7 @@ export default function AiGateway() {
             <h1 className="text-center text-wrap">
               Build AI Systems with confidence
             </h1>
-            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto">
+            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-white/60">
               The AI developer platform to build AI applications and models with
               confidence
             </p>
@@ -41,7 +41,7 @@ export default function AiGateway() {
             <GridItem className="flex flex-col md:flex-row gap-6 md:gap-20 py-10 justify-between items-center">
               <div className="flex flex-col gap-10">
                 <div className="flex flex-col gap-4">
-                  <h3>Feature heading</h3>
+                  <h3 className="text-white">Feature heading</h3>
                 </div>
 
                 <p className="text-white/60">
@@ -55,7 +55,7 @@ export default function AiGateway() {
           <GridRow>
             <GridItem className="py-10 pl-0 pr-0 md:pr-10 gap-10">
               <div className="flex flex-col gap-4">
-                <h3>Feature heading</h3>
+                <h3 className="text-white">Feature heading</h3>
                 <p className="text-white/60 text-lg">
                   Lorem ipsum dolor sit amet consectetur adipisicing elit.
                   Quisquam, quos. your code base.
@@ -66,7 +66,7 @@ export default function AiGateway() {
             <GridItem className="py-10 md:pl-10 gap-10">
               <FakeImage />
               <div className="flex flex-col gap-4">
-                <h3>Feature heading</h3>
+                <h3 className="text-white">Feature heading</h3>
                 <p className="text-white/60 text-lg">
                   Lorem ipsum dolor sit amet consectetur adipisicing elit.
                   Quisquam, quos.

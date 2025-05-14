@@ -1,32 +1,28 @@
 import React from "react";
-import clsx from "clsx";
-import Layout from "@theme/Layout";
-import BlogSidebar from "@theme/BlogSidebar";
-export default function BlogLayout(props) {
-  const { sidebar, toc, children, ...layoutProps } = props;
-  const isBlog = sidebar.items.some(({ permalink }) =>
-    permalink.startsWith("/blog/"),
-  );
-  const hasSidebar = !isBlog;
+import { useLocation } from "@docusaurus/router";
+import ThemeLayout from "@theme/Layout";
+
+import { Layout } from "../../components";
+
+export default function BlogLayout({ children, ...props }) {
+  const location = useLocation();
+
+  const isHomeOrTagsPage =
+    location.pathname === "/blog" || location.pathname.includes("/blog/tags");
+
   return (
-    <Layout {...layoutProps}>
-      <div className="container margin-vert--lg">
-        <div className="row">
-          <div>something</div>
-          {hasSidebar && <BlogSidebar sidebar={sidebar} />}
-          <main
-            className={clsx("col", {
-              "col--7": hasSidebar,
-              "col--9 col--offset-1": !hasSidebar,
-            })}
-            itemScope
-            itemType="https://schema.org/Blog"
-          >
-            {children}
-          </main>
-          {toc && <div className="col col--2">{toc}</div>}
+    <ThemeLayout {...props}>
+      <Layout>
+        <div
+          className={
+            isHomeOrTagsPage
+              ? "flex flex-col px-6 md:px-20 pt-32 "
+              : "flex flex-col mt-40 max-w-4xl mx-auto w-full px-6"
+          }
+        >
+          {children}
         </div>
-      </div>
-    </Layout>
+      </Layout>
+    </ThemeLayout>
   );
 }

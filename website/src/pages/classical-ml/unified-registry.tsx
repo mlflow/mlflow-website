@@ -26,7 +26,7 @@ export default function UnifiedRegistry() {
             <h1 className="text-center text-wrap">
               Centralized Model Governance and Discovery
             </h1>
-            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto">
+            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-white/60">
               Streamline your ML workflows with MLflow's comprehensive model
               registry for version control, approvals, and deployment management
             </p>
@@ -40,7 +40,9 @@ export default function UnifiedRegistry() {
           <GridRow>
             <GridItem className="py-10 pr-0 md:pr-10 gap-10">
               <div className="flex flex-col gap-4">
-                <h3>Seamless Unity Catalog Integration</h3>
+                <h3 className="text-white">
+                  Seamless Unity Catalog Integration
+                </h3>
                 <p className="text-white/60 text-lg">
                   MLflow Model Registry integrates directly with Unity Catalog
                   to provide enterprise-grade governance across your entire ML
@@ -53,7 +55,7 @@ export default function UnifiedRegistry() {
             </GridItem>
             <GridItem className="py-10 pl-0 md:pl-10 gap-10">
               <div className="flex flex-col gap-4">
-                <h3>Stage-Based Model Lifecycle</h3>
+                <h3 className="text-white">Stage-Based Model Lifecycle</h3>
                 <p className="text-white/60 text-lg">
                   Move models through customizable staging environments
                   (Development, Staging, Production, or any stage alias you
@@ -69,7 +71,7 @@ export default function UnifiedRegistry() {
           <GridRow>
             <GridItem className="flex flex-col md:flex-row gap-6 md:gap-20 py-10 justify-between items-center">
               <div className="flex flex-col gap-4">
-                <h3>Model Deployment Flexibility</h3>
+                <h3 className="text-white">Model Deployment Flexibility</h3>
                 <p className="text-white/60 text-lg">
                   Deploy models as containers, batch jobs, or REST endpoints
                   with MLflow's streamlined deployment capabilities that

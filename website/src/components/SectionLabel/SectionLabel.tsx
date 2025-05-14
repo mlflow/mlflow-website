@@ -9,7 +9,7 @@ export const SectionLabel = ({ label, color }: Props) => {
   return (
     <div className="flex flex-row gap-3 justify-center items-center">
       <div className={`w-2 h-2 rotate-45 ${colorClass}`}></div>
-      <div className="text-sm font-medium uppercase">{label}</div>
+      <div className="text-sm font-medium uppercase text-white">{label}</div>
     </div>
   );
 };

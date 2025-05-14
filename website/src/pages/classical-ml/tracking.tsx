@@ -26,7 +26,7 @@ export default function Tracking() {
             <h1 className="text-center text-wrap">
               Comprehensive Experiment Tracking for ML Excellence
             </h1>
-            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto">
+            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-white/60">
               Document, compare, and reproduce your machine learning experiments
               with MLflow's powerful tracking capabilities
             </p>
@@ -40,7 +40,7 @@ export default function Tracking() {
           <GridRow>
             <GridItem className="py-10 pr-0 md:pr-10 gap-10">
               <div className="flex flex-col gap-4">
-                <h3>Complete Experiment Lifecycle</h3>
+                <h3 className="text-white">Complete Experiment Lifecycle</h3>
                 <p className="text-white/60 text-lg">
                   MLflow Tracking automatically captures parameters, code
                   versions, metrics, and model weights for each training
@@ -53,7 +53,7 @@ export default function Tracking() {
             </GridItem>
             <GridItem className="py-10 pl-0 md:pl-10 gap-10">
               <div className="flex flex-col gap-4">
-                <h3>Visual Comparison</h3>
+                <h3 className="text-white">Visual Comparison</h3>
                 <p className="text-white/60 text-lg">
                   Compare results across multiple experiments with MLflow's
                   powerful visualization tools. Quickly identify best-performing
@@ -68,7 +68,7 @@ export default function Tracking() {
           <GridRow>
             <GridItem className="flex flex-col md:flex-row gap-6 md:gap-20 py-10 justify-between items-center">
               <div className="flex flex-col gap-4">
-                <h3>Seamless Collaboration</h3>
+                <h3 className="text-white">Seamless Collaboration</h3>
                 <p className="text-white/60 text-lg">
                   Organize models and iterations into experiments for easy team
                   collaboration while maintaining traceability. Enable team

@@ -27,12 +27,12 @@ export default function QualityMetrics() {
               Measure and improve quality with human-aligned, automated metrics
               (LLM judges)
             </h1>
-            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto">
+            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-white/60">
               Capture and convert expert feedback into metrics (LLM judges) that
               understand your business requirements and can measure the nuances
               of plain-language GenAI outputs.
             </p>
-            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto">
+            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-white/60">
               Use these metrics to evaluate, monitor, and improve quality in
               development and production at scale, without waiting for human
               review.
@@ -48,7 +48,9 @@ export default function QualityMetrics() {
             <GridItem className="flex flex-col md:flex-row gap-6 md:gap-20 py-10 justify-between items-center">
               <div className="flex flex-col gap-10">
                 <div className="flex flex-col gap-4">
-                  <h3>Define once—use in dev and production</h3>
+                  <h3 className="text-white">
+                    Define once—use in dev and production
+                  </h3>
                   <p className="text-white/60">
                     Define once—use in dev and production
                   </p>
@@ -77,7 +79,7 @@ export default function QualityMetrics() {
             <GridItem className="py-10 pr-0 md:pr-10 gap-10">
               <FakeImage />
               <div className="flex flex-col gap-4">
-                <h3>Best-in-class judges—ready to go</h3>
+                <h3 className="text-white">Best-in-class judges—ready to go</h3>
                 <p className="text-white/60 text-lg">
                   Get started quickly with out-of-the-box judges for safety,
                   hallucination, retrieval quality, relevance, and other common
@@ -89,7 +91,9 @@ export default function QualityMetrics() {
             </GridItem>
             <GridItem className="py-10 pl-0 md:pl-10 gap-10">
               <div className="flex flex-col gap-4">
-                <h3>Customized LLM judges for your use case</h3>
+                <h3 className="text-white">
+                  Customized LLM judges for your use case
+                </h3>
                 <p className="text-white/60 text-lg">
                   Adapt our base judge model to create custom judges tailored to
                   your business requirements that agree with your human experts’
@@ -104,7 +108,7 @@ export default function QualityMetrics() {
               <FakeImage />
               <div className="flex flex-col gap-10">
                 <div className="flex flex-col gap-4">
-                  <h3>Customized code-based metrics</h3>
+                  <h3 className="text-white">Customized code-based metrics</h3>
                   <p className="text-white/60">
                     Further customize evaluation to measure any aspect of your
                     application’s quality using our custom metrics SDK to write
