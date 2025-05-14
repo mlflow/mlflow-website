@@ -1,11 +1,13 @@
 import { useState, useLayoutEffect } from "react";
 import Link from "@docusaurus/Link";
 import Logo from "@site/static/img/mlflow-logo-white.svg";
+import DownIcon from "@site/static/img/chevron-down-small.svg";
 
 import { cn } from "../../utils";
 
 import { Button } from "../Button/Button";
 import { HeaderMenuItem } from "../HeaderMenuItem/HeaderMenuItem";
+import { HeaderProductsSubmenu } from "../HeaderProductsSubmenu/HeaderProductsSubmenu";
 
 import "./Header.module.css";
 
@@ -13,6 +15,20 @@ const MD_BREAKPOINT = 640;
 
 export const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isProductItemHovered, setIsProductItemHovered] = useState(false);
+  const [isProductSubmenuOpen, setIsProductSubmenuOpen] = useState(false);
+
+  const handleProductItemHover = () => {
+    setIsProductItemHovered(true);
+  };
+
+  const handleProductSubmenuLeave = () => {
+    setIsProductItemHovered(false);
+  };
+
+  const handleProductItemClick = () => {
+    setIsProductSubmenuOpen(!isProductSubmenuOpen);
+  };
 
   useLayoutEffect(() => {
     const handleResize = () => {
@@ -78,8 +94,34 @@ export const Header = () => {
           )}
         >
           <ul className="flex flex-col font-medium md:flex-row gap-6 md:gap-10 w-full md:w-auto">
-            <li className="w-full md:w-auto">
-              <HeaderMenuItem href="/product" label="Product" />
+            <li
+              className="w-full md:w-auto md:hidden"
+              onClick={handleProductItemClick}
+            >
+              <span
+                className={cn(
+                  "flex items-center gap-2 py-2 text-white text-[15px] w-full md:w-auto cursor-pointer",
+                )}
+              >
+                Products
+                <DownIcon className="w-6 h-6" />
+              </span>
+              <div
+                className={cn(
+                  "transition-all duration-300 ease-in",
+                  isProductSubmenuOpen
+                    ? "h-auto min-h-50"
+                    : "h-0 overflow-hidden",
+                )}
+              >
+                <HeaderProductsSubmenu />
+              </div>
+            </li>
+            <li
+              className="w-full md:w-auto hidden md:block"
+              onMouseEnter={handleProductItemHover}
+            >
+              <HeaderMenuItem href="/product" label="Product" hasDropdown />
             </li>
             <li className="w-full md:w-auto">
               <HeaderMenuItem href="/releases" label="Releases" />
@@ -108,6 +150,16 @@ export const Header = () => {
             </li>
           </ul>
         </div>
+      </div>
+
+      <div
+        className={cn(
+          "flex-col w-full py-6",
+          isProductItemHovered ? "flex" : "hidden",
+        )}
+        onMouseLeave={handleProductSubmenuLeave}
+      >
+        <HeaderProductsSubmenu />
       </div>
     </nav>
   );
