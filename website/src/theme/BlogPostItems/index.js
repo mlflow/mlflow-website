@@ -20,7 +20,7 @@ export default function BlogPostItems({
     );
 
     return (
-      <div className="flex flex-col gap-10 px-6 md:px-20 mb-10">
+      <div className="flex flex-col gap-10 px-6 md:px-20 mb-10 max-w-7xl mx-auto">
         <div className="flex flex-col-reverse md:flex-row gap-10">
           <a
             href={firstBlogPost.content.metadata.permalink}

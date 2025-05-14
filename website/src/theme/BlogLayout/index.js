@@ -17,7 +17,7 @@ export default function BlogLayout({ children, ...props }) {
           className={
             isHomeOrTagsPage
               ? "flex flex-col px-6 md:px-20 pt-32 "
-              : "flex flex-col mt-40 max-w-4xl mx-auto w-full px-6"
+              : "flex flex-col mt-40 max-w-7xl mx-auto w-full px-6"
           }
         >
           {children}

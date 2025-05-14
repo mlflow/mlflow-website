@@ -28,7 +28,7 @@ export default function GenAi(): JSX.Element {
         className="flex flex-col bg-[linear-gradient(to_bottom,rgba(12,20,20,0),rgba(14,20,20,100)),url('/img/background-image-2.png')]
  bg-top bg-no-repeat bg-cover w-full pt-42 pb-20 py-20"
       >
-        <div className="flex flex-col gap-16 w-full px-6 md:px-20">
+        <div className="flex flex-col gap-16 w-full px-6 md:px-20 max-w-7xl mx-auto">
           <div className="flex flex-col justify-center items-center gap-6 w-full">
             <h1 className="text-center text-wrap">
               Ship high-quality GenAI, fast
@@ -49,7 +49,7 @@ export default function GenAi(): JSX.Element {
           </div>
         </div>
       </div>
-      <div className="flex flex-col gap-40 w-full px-6 md:px-20">
+      <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-7xl mx-auto">
         <div className="flex flex-col w-full items-center justify-center gap-16">
           <div className="flex flex-col w-full items-center justify-center gap-6">
             <SectionLabel color="red" label="CORE FEATURES" />
@@ -143,9 +143,11 @@ export default function GenAi(): JSX.Element {
                     Use these traces to quickly debug errors, improve business
                     logic, and optimize cost and latency.
                   </p>
-                  <Button variant="outline" size="small">
-                    Learn more &gt;
-                  </Button>
+                  <a href="/genai/observability">
+                    <Button variant="outline" size="small">
+                      Learn more &gt;
+                    </Button>
+                  </a>
                 </div>
               </GridItem>
               <GridItem className="justify-center px-10 py-10">
@@ -181,9 +183,11 @@ export default function GenAi(): JSX.Element {
                     ensure your application continues to deliver high-quality
                     responses as user behavior evolves.
                   </p>
-                  <Button variant="outline" size="small">
-                    Learn more &gt;
-                  </Button>
+                  <a href="/genai/evaluations">
+                    <Button variant="outline" size="small">
+                      Learn more &gt;
+                    </Button>
+                  </a>
                 </div>
               </GridItem>
             </GridRow>
@@ -209,9 +213,11 @@ export default function GenAi(): JSX.Element {
                     in development and production at scale, without waiting for
                     human review.
                   </p>
-                  <Button variant="outline" size="small">
-                    Learn more &gt;
-                  </Button>
+                  <a href="/genai/quality-metrics">
+                    <Button variant="outline" size="small">
+                      Learn more &gt;
+                    </Button>
+                  </a>
                 </div>
               </GridItem>
               <GridItem className="px-10 py-10">
@@ -233,9 +239,11 @@ export default function GenAi(): JSX.Element {
                     Use this feedback to enrich your understanding of how the
                     app should behave and improve your custom LLM-judge metrics.
                   </p>
-                  <Button variant="outline" size="small">
-                    Learn more &gt;
-                  </Button>
+                  <a href="/genai/human-feedback">
+                    <Button variant="outline" size="small">
+                      Learn more &gt;
+                    </Button>
+                  </a>
                 </div>
               </GridItem>
             </GridRow>
@@ -251,9 +259,11 @@ export default function GenAi(): JSX.Element {
                     lifecycle and lineage of your app’s assets - models,
                     prompts, datasets, and metrics - and apply access controls
                   </p>
-                  <Button variant="outline" size="small">
-                    Learn more &gt;
-                  </Button>
+                  <a href="/genai/governance">
+                    <Button variant="outline" size="small">
+                      Learn more &gt;
+                    </Button>
+                  </a>
                 </div>
               </GridItem>
             </GridRow>

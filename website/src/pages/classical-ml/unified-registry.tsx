@@ -20,7 +20,7 @@ export default function UnifiedRegistry() {
         className="flex flex-col bg-[linear-gradient(to_top,rgba(12,20,20,0),rgba(14,20,20,100)),url('/img/background-image-3.png')]
  bg-center bg-no-repeat bg-cover w-full pt-42 pb-20 py-20 bg-size-[100%_340px]"
       >
-        <div className="flex flex-col gap-16 w-full px-6 md:px-20">
+        <div className="flex flex-col gap-16 w-full px-6 md:px-20 max-w-7xl mx-auto">
           <div className="flex flex-col justify-center items-center gap-6 w-full">
             <SectionLabel color="green" label="UNIFIED REGISTRY" />
             <h1 className="text-center text-wrap">
@@ -35,7 +35,7 @@ export default function UnifiedRegistry() {
           <div className="w-[800px] h-[450px] bg-black rounded-lg mx-auto"></div>
         </div>
       </div>
-      <div className="flex flex-col gap-40 w-full px-6 md:px-20">
+      <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-7xl mx-auto">
         <Grid>
           <GridRow>
             <GridItem className="py-10 pr-0 md:pr-10 gap-10">
