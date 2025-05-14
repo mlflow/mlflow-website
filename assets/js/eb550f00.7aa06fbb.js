@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkwebsite=self.webpackChunkwebsite||[]).push([[8462],{13732:e=>{e.exports=JSON.parse('{"label":"genai","permalink":"/blog/tags/genai","allTagsPath":"/blog/tags","count":11,"unlisted":false}')}}]);

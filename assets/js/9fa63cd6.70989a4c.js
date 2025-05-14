@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkwebsite=self.webpackChunkwebsite||[]).push([[9754],{54361:e=>{e.exports=JSON.parse('{"label":"Linux Foundation","permalink":"/blog/tags/linux-foundation","allTagsPath":"/blog/tags","count":1,"unlisted":false}')}}]);

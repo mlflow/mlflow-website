@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkwebsite=self.webpackChunkwebsite||[]).push([[2698],{27506:e=>{e.exports=JSON.parse('{"label":"pyfunc","permalink":"/blog/tags/pyfunc","allTagsPath":"/blog/tags","count":5,"unlisted":false}')}}]);
