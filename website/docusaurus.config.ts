@@ -104,6 +104,8 @@ const config: Config = {
          */
         path: "./releases",
         authorsMapPath: "../blog/authors.yml",
+        blogListComponent: "@site/src/theme/ReleaseItemsList",
+        blogPostComponent: "@site/src/theme/ReleasePost",
         blogSidebarTitle: "All posts",
         blogSidebarCount: "ALL",
         blogTitle: "Releases",

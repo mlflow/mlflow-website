@@ -20,7 +20,7 @@ export default function HumanFeedback() {
         className="flex flex-col bg-[linear-gradient(to_top,rgba(12,20,20,0),rgba(14,20,20,100)),url('/img/background-image-2.png')]
  bg-center bg-no-repeat bg-cover w-full pt-42 pb-20 py-20 bg-size-[100%_340px]"
       >
-        <div className="flex flex-col gap-16 w-full px-6 md:px-20">
+        <div className="flex flex-col gap-16 w-full px-6 md:px-20 max-w-7xl mx-auto">
           <div className="flex flex-col justify-center items-center gap-6 w-full">
             <SectionLabel color="red" label="QUALITY METRICS" />
             <h1 className="text-center text-wrap">
@@ -40,7 +40,7 @@ export default function HumanFeedback() {
           <div className="w-[800px] h-[450px] bg-black rounded-lg mx-auto"></div>
         </div>
       </div>
-      <div className="flex flex-col gap-40 w-full px-6 md:px-20">
+      <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-7xl mx-auto">
         <Grid>
           <GridRow>
             <GridItem className="flex flex-col md:flex-row gap-6 md:gap-20 py-10 justify-between items-center">

@@ -78,7 +78,7 @@ export const Header = () => {
               <HeaderMenuItem href="/product" label="Product" />
             </li>
             <li className="w-full md:w-auto">
-              <HeaderMenuItem href="/compare" label="Compare" />
+              <HeaderMenuItem href="/releases" label="Releases" />
             </li>
             <li className="w-full md:w-auto">
               <HeaderMenuItem href="/blog" label="Blog" />

@@ -26,9 +26,9 @@ export const Footer = ({ variant }: VariantProps<typeof footerVariants>) => {
 
         <div className="flex flex-col md:flex-row gap-10">
           <FooterMenuItem href="/" label="Product" />
-          <FooterMenuItem href="/" label="Compare" />
-          <FooterMenuItem href="/" label="Customers" />
-          <FooterMenuItem href="/" label="Docs" />
+          <FooterMenuItem href="/releases" label="Releases" />
+          <FooterMenuItem href="/blog" label="Blog" />
+          <FooterMenuItem href="/docs/latest" label="Docs" />
         </div>
       </div>
     </footer>
