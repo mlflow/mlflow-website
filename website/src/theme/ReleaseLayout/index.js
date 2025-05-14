@@ -7,7 +7,6 @@ import BlogSidebar from "@theme/BlogSidebar";
 
 export default function ReleaseLayout(props) {
   const { sidebar, toc, children, ...layoutProps } = props;
-  console.log("@@@ sidebar", props);
   return (
     <ThemeLayout {...layoutProps}>
       <Layout>
