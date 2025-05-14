@@ -25,7 +25,6 @@ export default function Observability() {
             <SectionLabel color="red" label="OBSERVABILITY" />
             <h1 className="text-center text-wrap">
               Capture and debug application logs with end-to-end observability
-              (tracing)
             </h1>
             <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-white/60">
               Trace your app with OpenTelemetry-compatible SDKs that capture

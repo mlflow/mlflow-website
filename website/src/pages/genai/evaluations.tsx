@@ -25,7 +25,6 @@ export default function Evaluations() {
             <SectionLabel color="red" label="EVALUATIONS" />
             <h1 className="text-center text-wrap">
               Adapt to evolving user behavior with production log evaluation
-              (evaluation datasets)
             </h1>
             <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-white/60">
               Use production logs to understand user behavior, turning
