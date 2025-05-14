@@ -31,7 +31,7 @@ export default function GenAi(): JSX.Element {
         <div className="flex flex-col gap-16 w-full px-6 md:px-20 max-w-7xl mx-auto">
           <div className="flex flex-col justify-center items-center gap-6 w-full">
             <h1 className="text-center text-wrap">
-              Ship high-quality GenAI, fast
+              Ship high-quality AI, fast
             </h1>
             <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-white">
               Traditional software and ML tests aren't built for GenAI's
