@@ -1,7 +1,7 @@
 import DatabricksLogo from "@site/static/img/databricks-logo.svg";
 import Checkmark from "@site/static/img/checkmark.svg";
 
-import { Button } from "../Button/Button";
+import { GetStartedButton } from "../GetStartedButton/GetStartedButton";
 import { cn } from "../../utils";
 
 interface Props {
@@ -56,19 +56,20 @@ export const GetStartedWithMLflow = ({ variant = "red" }: Props) => {
               </span>
             </div>
           </div>
-          <Button
+          <GetStartedButton
             size="large"
             width="full"
             variant={variant === "blue" ? "blue" : "primary"}
-          >
-            Get started
-          </Button>
+          />
         </div>
         <div className="flex flex-col gap-8 p-8 bg-[#fff]/4 rounded-2xl">
           <h3 className="m-0 text-white">Self-Hosting</h3>
-          <Button size="large" width="full" variant="dark">
-            Get started
-          </Button>
+          <GetStartedButton
+            size="large"
+            width="full"
+            variant="dark"
+            link="http://mlflow.org/docs/latest/getting-started/intro-quickstart/"
+          />
         </div>
       </div>
     </div>

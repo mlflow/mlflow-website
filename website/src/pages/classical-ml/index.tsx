@@ -22,7 +22,7 @@ export default function GenAi(): JSX.Element {
         className="flex flex-col bg-[linear-gradient(to_bottom,rgba(12,20,20,0),rgba(14,20,20,100)),url('/img/background-image-3.png')]
  bg-top bg-no-repeat bg-cover w-full pt-42 pb-20 py-20"
       >
-        <div className="flex flex-col gap-16 w-full px-6 md:px-20 max-w-7xl mx-auto">
+        <div className="flex flex-col gap-16 w-full px-6 md:px-20 max-w-container">
           <div className="flex flex-col justify-center items-center gap-6 w-full">
             <h1 className="text-center text-wrap">
               Mastering the ML lifecycle
@@ -38,7 +38,7 @@ export default function GenAi(): JSX.Element {
           </div>
         </div>
       </div>
-      <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-7xl mx-auto">
+      <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-container">
         <div className="flex flex-col w-full items-center justify-center gap-16">
           <div className="flex flex-col w-full items-center justify-center gap-6">
             <SectionLabel color="green" label="CORE FEATURES" />
@@ -98,20 +98,7 @@ export default function GenAi(): JSX.Element {
             </VerticalTabsContent>
           </VerticalTabs>
         </div>
-        <LogosCarousel
-          images={[
-            "/img/companies/databricks.svg",
-            "/img/companies/microsoft.svg",
-            "/img/companies/meta.svg",
-            "/img/companies/mosaicml.svg",
-            "/img/companies/zillow.svg",
-            "/img/companies/toyota.svg",
-            "/img/companies/booking.svg",
-            "/img/companies/wix.svg",
-            "/img/companies/accenture.svg",
-            "/img/companies/asml.svg",
-          ]}
-        />
+        <LogosCarousel />
         <div className="flex flex-col items-center justify-center gap-16">
           <div className="flex flex-col gap-6">
             <SectionLabel color="green" label="WHY US?" />

@@ -15,3 +15,4 @@ export { Layout } from "./Layout/Layout";
 export { GlossyCard } from "./GlossyCard/GlossyCard";
 export { GetStartedTagline } from "./GetStartedTagline/GetStartedTagline";
 export { Testimonials } from "./Testimonials/Testimonials";
+export { GetStartedButton } from "./GetStartedButton/GetStartedButton";

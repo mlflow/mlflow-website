@@ -1,4 +1,4 @@
-import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
+import Link from "@docusaurus/Link";
 
 import {
   SocialWidget,
@@ -13,15 +13,13 @@ import {
 } from "../components";
 
 export default function Home(): JSX.Element {
-  const { siteConfig } = useDocusaurusContext();
-
   return (
     <Layout variant="colorful">
       <div
         className="flex flex-col bg-[linear-gradient(to_bottom,rgba(12,20,20,0),rgba(14,20,20,100)),url('/img/background-image-1.png')]
  bg-top bg-no-repeat bg-cover w-full pt-42 pb-20 py-20"
       >
-        <div className="flex flex-col gap-16 w-full px-6 md:px-20 max-w-7xl mx-auto">
+        <div className="flex flex-col gap-16 w-full px-6 md:px-20 max-w-container">
           <div className="flex flex-col justify-center items-center gap-6 w-full">
             <h1 className="text-center text-wrap">AI and ML made simple</h1>
             <p className="text-center text-wrap text-lg text-white">
@@ -37,9 +35,9 @@ export default function Home(): JSX.Element {
                 monitoring, and enterprise governance, all in one integrated
                 platform.
               </p>
-              <a href="/genai">
+              <Link href="/genai">
                 <Button variant="primary">Learn more &gt;</Button>
-              </a>
+              </Link>
             </GlossyCard>
             <GlossyCard image={null}>
               <h3 className="text-white">Model Training</h3>
@@ -47,30 +45,17 @@ export default function Home(): JSX.Element {
                 Streamline your machine learning workflows with enterprise-grade
                 tracking, model management, and deployment.
               </p>
-              <a href="/classical-ml">
+              <Link href="/classical-ml">
                 <Button variant="primary">Learn more &gt;</Button>
-              </a>
+              </Link>
             </GlossyCard>
           </div>
         </div>
       </div>
-      <div className="flex flex-col px-6 md:px-20 gap-40 mt-20 max-w-7xl mx-auto">
+      <div className="flex flex-col px-6 md:px-20 gap-40 mt-20 max-w-container">
         <div className="flex flex-col gap-16">
           <Testimonials />
-          <LogosCarousel
-            images={[
-              "img/companies/databricks.svg",
-              "img/companies/microsoft.svg",
-              "img/companies/meta.svg",
-              "img/companies/mosaicml.svg",
-              "img/companies/zillow.svg",
-              "img/companies/toyota.svg",
-              "img/companies/booking.svg",
-              "img/companies/wix.svg",
-              "img/companies/accenture.svg",
-              "img/companies/asml.svg",
-            ]}
-          />
+          <LogosCarousel />
         </div>
         <GetStartedWithMLflow />
         <LatestNews variant="red" />

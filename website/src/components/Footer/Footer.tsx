@@ -21,7 +21,7 @@ const footerVariants = cva(
 export const Footer = ({ variant }: VariantProps<typeof footerVariants>) => {
   return (
     <footer className={cn(footerVariants({ variant }))}>
-      <div className="flex flex-row justify-between items-start md:items-center px-20 gap-10 xs:gap-0">
+      <div className="flex flex-row justify-between items-start md:items-center px-6 md:px-20 gap-10 xs:gap-0 max-w-container">
         <Logo className="h-[36px]" />
 
         <div className="flex flex-col md:flex-row gap-10">

@@ -1,3 +1,5 @@
+import Link from "@docusaurus/Link";
+
 import { BLOGS } from "../../posts";
 import { Grid, GridRow, GridItem } from "../Grid/Grid";
 import { SectionLabel } from "../SectionLabel/SectionLabel";
@@ -11,11 +13,11 @@ export const LatestNews = ({ variant }: Props) => {
   const posts = BLOGS.slice(0, 3);
 
   const viewAllLinkNode = (
-    <a href="/blog" className="">
+    <Link href="/blog" className="">
       <Button variant="outline" size="small">
         View all
       </Button>
-    </a>
+    </Link>
   );
 
   return (
@@ -34,7 +36,7 @@ export const LatestNews = ({ variant }: Props) => {
               key={post.path}
               className="p-0 md:px-10 py-8 first:pl-0 last:pr-0 md:max-w-1/3"
             >
-              <a
+              <Link
                 href={post.path}
                 className="flex flex-col gap-6 h-full justify-between"
               >
@@ -55,7 +57,7 @@ export const LatestNews = ({ variant }: Props) => {
                   alt={post.title}
                   className="rounded-2xl md:max-h-[210px] object-cover"
                 />
-              </a>
+              </Link>
             </GridItem>
           ))}
         </GridRow>

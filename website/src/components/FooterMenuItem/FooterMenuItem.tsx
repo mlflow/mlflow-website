@@ -1,3 +1,5 @@
+import Link from "@docusaurus/Link";
+
 import "./FooterMenuItem.module.css";
 
 interface Props {
@@ -8,7 +10,7 @@ interface Props {
 export const FooterMenuItem = ({ href, label }: Props) => {
   return (
     <div className="min-w-[120px]">
-      <a href={href}>{label}</a>
+      <Link href={href}>{label}</Link>
     </div>
   );
 };

@@ -1,3 +1,4 @@
+import Link from "@docusaurus/Link";
 import IconRight from "@site/static/img/social/icon-right.svg";
 
 interface Props {
@@ -9,7 +10,7 @@ interface Props {
 
 export const SocialWidgetItem = ({ href, icon, label, description }: Props) => {
   return (
-    <a
+    <Link
       href={href}
       target="_blank"
       className="flex sm:flex-row md:flex-col xl:flex-row group w-full sm:items-center md:items-start xl:items-center p-8 h-full cursor-pointer gap-6 hover:bg-white/4"
@@ -24,6 +25,6 @@ export const SocialWidgetItem = ({ href, icon, label, description }: Props) => {
           <IconRight />
         </div>
       </div>
-    </a>
+    </Link>
   );
 };

@@ -7,6 +7,7 @@ import {
   GridItem,
   GetStartedWithMLflow,
   SocialWidget,
+  GetStartedButton,
 } from "../../components";
 
 const FakeImage = () => (
@@ -20,10 +21,10 @@ export default function Evaluations() {
         className="flex flex-col bg-[linear-gradient(to_top,rgba(12,20,20,0),rgba(14,20,20,100)),url('/img/background-image-2.png')]
  bg-center bg-no-repeat bg-cover w-full pt-42 pb-20 py-20 bg-size-[100%_340px]"
       >
-        <div className="flex flex-col gap-16 w-full px-6 md:px-20 max-w-7xl mx-auto">
+        <div className="flex flex-col gap-16 w-full px-6 md:px-20 max-w-container">
           <div className="flex flex-col justify-center items-center gap-6 w-full">
             <SectionLabel color="red" label="EVALUATIONS" />
-            <h1 className="text-center text-wrap">
+            <h1 className="text-center text-wrap max-w-2xl">
               Adapt to evolving user behavior with production log evaluation
             </h1>
             <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-white/60">
@@ -37,12 +38,12 @@ export default function Evaluations() {
               application continues to deliver high-quality responses as user
               behavior evolves.
             </p>
-            <Button>Get Started</Button>
+            <GetStartedButton />
           </div>
           <div className="w-[800px] h-[450px] bg-black rounded-lg mx-auto"></div>
         </div>
       </div>
-      <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-7xl mx-auto">
+      <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-container">
         <Grid>
           <GridRow>
             <GridItem className="flex flex-col md:flex-row gap-6 md:gap-20 py-10 justify-between items-center">
