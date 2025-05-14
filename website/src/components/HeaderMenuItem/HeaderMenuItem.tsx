@@ -1,3 +1,4 @@
+import Link from "@docusaurus/Link";
 import { cn } from "../../utils";
 
 interface Props {
@@ -8,11 +9,11 @@ interface Props {
 
 export const HeaderMenuItem = ({ href, label, className }: Props) => {
   return (
-    <a
+    <Link
       href={href}
       className={cn("block py-2 text-gray-900 w-full md:w-auto", className)}
     >
       {label}
-    </a>
+    </Link>
   );
 };

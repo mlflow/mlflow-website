@@ -105,20 +105,7 @@ export default function GenAi(): JSX.Element {
             </VerticalTabsContent>
           </VerticalTabs>
         </div>
-        <LogosCarousel
-          images={[
-            "/img/companies/databricks.svg",
-            "/img/companies/microsoft.svg",
-            "/img/companies/meta.svg",
-            "/img/companies/mosaicml.svg",
-            "/img/companies/zillow.svg",
-            "/img/companies/toyota.svg",
-            "/img/companies/booking.svg",
-            "/img/companies/wix.svg",
-            "/img/companies/accenture.svg",
-            "/img/companies/asml.svg",
-          ]}
-        />
+        <LogosCarousel />
         <div className="flex flex-col items-center justify-center gap-16">
           <div className="flex flex-col gap-6">
             <SectionLabel color="red" label="WHY US?" />

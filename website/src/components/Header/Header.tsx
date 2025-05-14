@@ -1,4 +1,5 @@
 import { useState, useLayoutEffect } from "react";
+import Link from "@docusaurus/Link";
 import Logo from "@site/static/img/mlflow-logo-white.svg";
 
 import { cn } from "../../utils";
@@ -26,23 +27,26 @@ export const Header = () => {
   return (
     <nav className="fixed w-full z-20 top-0 start-0 bg-[#F7F8F8]/1 border-b border-[#F7F8F8]/8 backdrop-blur-[20px]">
       <div className="flex flex-wrap items-center justify-between mx-auto px-6 md:px-20 py-2 max-w-container">
-        <a href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
+        <Link
+          href="/"
+          className="flex items-center space-x-3 rtl:space-x-reverse"
+        >
           <Logo className="h-[36px]" />
-        </a>
+        </Link>
         <div className="flex flex-row items-center gap-6 md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
           <HeaderMenuItem
             href="https://login.databricks.com/"
             label="Login"
             className="hidden md:block"
           />
-          <a
+          <Link
             href="https://login.databricks.com/?intent=SIGN_UP"
             className="hidden md:block"
           >
             <Button variant="primary" size="small">
               Sign up
             </Button>
-          </a>
+          </Link>
           <button
             data-collapse-toggle="navbar-sticky"
             type="button"
@@ -96,11 +100,11 @@ export const Header = () => {
               />
             </li>
             <li className="w-full md:w-auto md:hidden">
-              <a href="https://login.databricks.com/?intent=SIGN_UP">
+              <Link href="https://login.databricks.com/?intent=SIGN_UP">
                 <Button variant="primary" size="small" width="full">
                   Sign up
                 </Button>
-              </a>
+              </Link>
             </li>
           </ul>
         </div>

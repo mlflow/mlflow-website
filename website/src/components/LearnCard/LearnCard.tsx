@@ -1,4 +1,6 @@
 import React from "react";
+import Link from "@docusaurus/Link";
+
 import styles from "./LearnCard.module.css";
 import clsx from "clsx";
 
@@ -11,7 +13,7 @@ interface LearnCardProps {
 
 const LearnCard: React.FC<LearnCardProps> = ({ title, content, href, img }) => {
   return (
-    <a href={href} className={clsx("card", styles.card, styles.a)}>
+    <Link href={href} className={clsx("card", styles.card, styles.a)}>
       <div className={clsx("card__body", styles.cardBody)}>
         <div className={styles.container}>
           <div className={styles.thumbnail}>
@@ -23,7 +25,7 @@ const LearnCard: React.FC<LearnCardProps> = ({ title, content, href, img }) => {
           </div>
         </div>
       </div>
-    </a>
+    </Link>
   );
 };
 export default LearnCard;

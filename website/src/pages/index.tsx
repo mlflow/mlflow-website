@@ -1,3 +1,5 @@
+import Link from "@docusaurus/Link";
+
 import {
   SocialWidget,
   LatestNews,
@@ -33,9 +35,9 @@ export default function Home(): JSX.Element {
                 monitoring, and enterprise governance, all in one integrated
                 platform.
               </p>
-              <a href="/genai">
+              <Link href="/genai">
                 <Button variant="primary">Learn more &gt;</Button>
-              </a>
+              </Link>
             </GlossyCard>
             <GlossyCard image={null}>
               <h3 className="text-white">Model Training</h3>
@@ -43,9 +45,9 @@ export default function Home(): JSX.Element {
                 Streamline your machine learning workflows with enterprise-grade
                 tracking, model management, and deployment.
               </p>
-              <a href="/classical-ml">
+              <Link href="/classical-ml">
                 <Button variant="primary">Learn more &gt;</Button>
-              </a>
+              </Link>
             </GlossyCard>
           </div>
         </div>
@@ -53,20 +55,7 @@ export default function Home(): JSX.Element {
       <div className="flex flex-col px-6 md:px-20 gap-40 mt-20 max-w-container">
         <div className="flex flex-col gap-16">
           <Testimonials />
-          <LogosCarousel
-            images={[
-              "img/companies/databricks.svg",
-              "img/companies/microsoft.svg",
-              "img/companies/meta.svg",
-              "img/companies/mosaicml.svg",
-              "img/companies/zillow.svg",
-              "img/companies/toyota.svg",
-              "img/companies/booking.svg",
-              "img/companies/wix.svg",
-              "img/companies/accenture.svg",
-              "img/companies/asml.svg",
-            ]}
-          />
+          <LogosCarousel />
         </div>
         <GetStartedWithMLflow />
         <LatestNews variant="red" />

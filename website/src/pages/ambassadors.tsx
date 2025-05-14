@@ -1,3 +1,5 @@
+import Link from "@docusaurus/Link";
+
 import { Layout, Grid, GridRow, GridItem } from "../components";
 
 import ambassadors from "./ambassadors.json";
@@ -44,13 +46,13 @@ export default function Ambassadors() {
                   <img src={item.img} alt={item.title} className="rounded-md" />
                   <h3>{item.title}</h3>
                   <p>{item.role}</p>
-                  <a
+                  <Link
                     href={item.companyLink}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
                     {item.company}
-                  </a>
+                  </Link>
                 </GridItem>
               ))}
             </GridRow>
@@ -126,7 +128,7 @@ export default function Ambassadors() {
         <div>
           <p>
             Are you interested in becoming an official MLflow Ambassador?
-            <a href="https://forms.gle/foW9ZtietYLLYCp99">Apply here!</a>
+            <Link href="https://forms.gle/foW9ZtietYLLYCp99">Apply here!</Link>
           </p>
           <p>
             The MLflow Ambassador Selection Committee reviews applications on a
