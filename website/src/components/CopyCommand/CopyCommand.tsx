@@ -17,7 +17,7 @@ export const CopyCommand = ({ code }: Props) => {
         <div className="bg-white rounded-[20px] p-2 pl-5 border border-white/30">
           <div className="flex items-center justify-between gap-20">
             <div className="flex-1">
-              <span className="text-base text-black">{code}</span>
+              <div className="text-black !font-[DM_Mono]">{code}</div>
             </div>
             <Button variant="secondary" size="medium" onClick={handleCopy}>
               Copy to begin
