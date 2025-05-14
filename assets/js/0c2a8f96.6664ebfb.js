@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkwebsite=self.webpackChunkwebsite||[]).push([[8257],{1628:e=>{e.exports=JSON.parse('{"label":"bedrock","permalink":"/blog/tags/bedrock","allTagsPath":"/blog/tags","count":1,"unlisted":false}')}}]);
