@@ -13,22 +13,22 @@ export const HeaderProductsSubmenu = () => {
           <div className="flex flex-row">
             <div className="min-w-50 flex flex-col gap-4 md:gap-1">
               <HeaderMenuItem
-                href="/gen-ai/quality-metrics"
+                href="/genai/quality-metrics"
                 label="Quality metrics"
               />
               <HeaderMenuItem
-                href="/gen-ai/observability"
+                href="/genai/observability"
                 label="Observability"
               />
-              <HeaderMenuItem href="/gen-ai/evaluations" label="Evaluations" />
+              <HeaderMenuItem href="/genai/evaluations" label="Evaluations" />
             </div>
             <div className="min-w-50 flex flex-col gap-4 md:gap-1">
               <HeaderMenuItem
-                href="/gen-ai/human-feedback"
+                href="/genai/human-feedback"
                 label="Human feedback"
               />
-              <HeaderMenuItem href="/gen-ai/governance" label="Governance" />
-              <HeaderMenuItem href="/gen-ai/ai-gateway" label="AI gateway" />
+              <HeaderMenuItem href="/genai/governance" label="Governance" />
+              <HeaderMenuItem href="/genai/ai-gateway" label="AI gateway" />
             </div>
           </div>
         </div>
@@ -44,7 +44,7 @@ export const HeaderProductsSubmenu = () => {
             <div className="min-w-50 flex flex-col gap-4 md:gap-1">
               <HeaderMenuItem href="/classical-ml/tracking" label="Tracking" />
               <HeaderMenuItem
-                href="/classical-ml/hyperparameter-tuning"
+                href="/classical-ml/hyperparam-tuning"
                 label="Hyperparameter tuning"
               />
               <HeaderMenuItem href="/classical-ml/models" label="Models" />
