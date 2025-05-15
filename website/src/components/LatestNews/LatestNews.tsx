@@ -55,7 +55,7 @@ export const LatestNews = ({ variant }: Props) => {
                 <img
                   src={post.thumbnail}
                   alt={post.title}
-                  className="rounded-2xl md:max-h-[210px] object-cover"
+                  className="rounded-2xl md:max-h-[210px] object-cover max-w-full"
                 />
               </Link>
             </GridItem>
