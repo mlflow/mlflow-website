@@ -10,6 +10,11 @@ import { HeaderMenuItem } from "../HeaderMenuItem/HeaderMenuItem";
 import { HeaderProductsSubmenu } from "../HeaderProductsSubmenu/HeaderProductsSubmenu";
 
 import "./Header.module.css";
+import {
+  MLFLOW_DOCS_URL,
+  MLFLOW_LOGIN_URL,
+  MLFLOW_SIGNUP_URL,
+} from "@site/src/constants";
 
 const MD_BREAKPOINT = 640;
 
@@ -51,14 +56,11 @@ export const Header = () => {
         </Link>
         <div className="flex flex-row items-center gap-6 md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
           <HeaderMenuItem
-            href="https://login.databricks.com/"
+            href={MLFLOW_LOGIN_URL}
             label="Login"
             className="hidden md:block"
           />
-          <Link
-            href="https://login.databricks.com/?intent=SIGN_UP"
-            className="hidden md:block"
-          >
+          <Link href={MLFLOW_SIGNUP_URL} className="hidden md:block">
             <Button variant="primary" size="small">
               Sign up
             </Button>
@@ -121,7 +123,7 @@ export const Header = () => {
               className="w-full md:w-auto hidden md:block"
               onMouseEnter={handleProductItemHover}
             >
-              <HeaderMenuItem href="/product" label="Product" hasDropdown />
+              <HeaderMenuItem label="Product" hasDropdown />
             </li>
             <li className="w-full md:w-auto">
               <HeaderMenuItem href="/releases" label="Releases" />
@@ -130,19 +132,13 @@ export const Header = () => {
               <HeaderMenuItem href="/blog" label="Blog" />
             </li>
             <li className="w-full md:w-auto">
-              <HeaderMenuItem
-                href="https://mlflow.org/docs/latest/"
-                label="Docs"
-              />
+              <HeaderMenuItem href={MLFLOW_DOCS_URL} label="Docs" />
             </li>
             <li className="w-full md:w-auto md:hidden">
-              <HeaderMenuItem
-                href="https://login.databricks.com/"
-                label="Login"
-              />
+              <HeaderMenuItem href={MLFLOW_LOGIN_URL} label="Login" />
             </li>
             <li className="w-full md:w-auto md:hidden">
-              <Link href="https://login.databricks.com/?intent=SIGN_UP">
+              <Link href={MLFLOW_SIGNUP_URL}>
                 <Button variant="primary" size="small" width="full">
                   Sign up
                 </Button>

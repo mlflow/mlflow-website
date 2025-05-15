@@ -2,7 +2,7 @@ import Link from "@docusaurus/Link";
 import { cn } from "../../utils";
 import DownIcon from "@site/static/img/chevron-down-small.svg";
 interface Props {
-  href: string;
+  href?: string;
   label: string;
   className?: string;
   onMouseEnter?: () => void;
