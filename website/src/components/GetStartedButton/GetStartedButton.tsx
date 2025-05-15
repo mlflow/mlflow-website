@@ -1,5 +1,6 @@
 import Link from "@docusaurus/Link";
 import { Button } from "../Button/Button";
+import { MLFLOW_SIGNUP_URL } from "@site/src/constants";
 
 interface Props {
   variant?: "blue" | "primary" | "dark";
@@ -9,7 +10,7 @@ interface Props {
 }
 
 export const GetStartedButton = ({
-  link = "https://login.databricks.com/?intent=SIGN_UP",
+  link = MLFLOW_SIGNUP_URL,
   size = "medium",
   width = "default",
   variant = "primary",
