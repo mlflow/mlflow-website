@@ -121,7 +121,7 @@ export const Header = () => {
               className="w-full md:w-auto hidden md:block"
               onMouseEnter={handleProductItemHover}
             >
-              <HeaderMenuItem href="/product" label="Product" hasDropdown />
+              <HeaderMenuItem label="Product" hasDropdown />
             </li>
             <li className="w-full md:w-auto">
               <HeaderMenuItem href="/releases" label="Releases" />
@@ -137,12 +137,12 @@ export const Header = () => {
             </li>
             <li className="w-full md:w-auto md:hidden">
               <HeaderMenuItem
-                href="https://login.databricks.com/"
+                href="https://login.databricks.com/?destination_url=/ml/experiments&dbx_source=MLFLOW_WEBSITE&source=MLFLOW_WEBSITE"
                 label="Login"
               />
             </li>
             <li className="w-full md:w-auto md:hidden">
-              <Link href="https://login.databricks.com/?intent=SIGN_UP">
+              <Link href="https://signup.databricks.com/?destination_url=/ml/experiments-signup?source=TRY_MLFLOW&dbx_source=TRY_MLFLOW&signup_experience_step=EXPRESS">
                 <Button variant="primary" size="small" width="full">
                   Sign up
                 </Button>
