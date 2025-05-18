@@ -70,7 +70,7 @@ In this post, I will go through both approaches in code.
 
 ### Install MLflow and Other Dependencies
 
-Start by installing the dependencies for this example in your `python >= 3.10` environment.
+Start by installing the dependencies for both code examples in your `python >= 3.10` environment. opencv can be ommited if only using the first examples and pycocotools can be ommitted if only using the second example.
 
 `pip install mlflow datasets torch torchvision pycocotools opencv-python-headless psutil`
 
@@ -89,6 +89,19 @@ One of the examples requires compute; therefore, be sure to turn on [MLflow syst
 > Number of epochs and a subset of the dataset is also used during training.
 
 ### Logging Artifacts of Datasets Together with Model
+Since the COCO dataset is filebased, files need to be downloaded first. We use the smallest version of the newest version of the dataset from the official author's website.
+
+```bash
+# download the COCO val 2017 dataset
+wget -P datasets http://images.cocodataset.org/zips/val2017.zip 
+unzip -q datasets/val2017.zip -d datasets
+wget -P datasets http://images.cocodataset.org/annotations/annotations_trainval2017.zip 
+unzip -q datasets/annotations_trainval2017.zip -d datasets
+rm datasets/val2017.zip & rm datasets/annotations_trainval2017.zip
+```
+
+We can now train a model and track the artifacts of the training dataset as well as inputs in the same run.
+
 ```python
 from torchvision.datasets import CocoDetection
 from torchvision import models
