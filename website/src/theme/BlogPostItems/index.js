@@ -50,12 +50,12 @@ export default function BlogPostItems({
                 <GridItem className="py-10 pl-0 pr-0 md:pl-10 md:pr-10 first:pl-0 last:pr-0 gap-6">
                   <a
                     href={blogPost.content.metadata.permalink}
-                    className="flex flex-col w-full"
+                    className="flex flex-col w-full h-full gap-4"
                   >
                     <img
                       src={blogPost.content.frontMatter.thumbnail}
                       alt={blogPost.content.frontMatter.title}
-                      className="object-cover rounded-md max-h-[210px]"
+                      className="object-cover rounded-md max-h-[210px] grow"
                     />
                     <span className="text-white/60">
                       {new Date(
@@ -66,7 +66,7 @@ export default function BlogPostItems({
                         day: "numeric",
                       })}
                     </span>
-                    <div role="heading" aria-level={3} className="text-xl">
+                    <div role="heading" aria-level={3} className="text-xl h-20">
                       {blogPost.content.metadata.title}
                     </div>
                   </a>
