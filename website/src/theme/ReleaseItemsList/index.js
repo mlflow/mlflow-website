@@ -11,7 +11,7 @@ export default function ReleaseItemsList({ items, ...layoutProps }) {
           key={BlogPostContent.metadata.permalink}
           content={BlogPostContent}
         >
-          <BlogPostItem>
+          <BlogPostItem className="max-w-prose">
             <BlogPostContent />
           </BlogPostItem>
         </BlogPostProvider>
