@@ -44,10 +44,13 @@ export default function BlogPostItems({
         </div>
 
         <Grid>
-          {blogPostsGrid.map((blogPostsRow) => (
-            <GridRow>
+          {blogPostsGrid.map((blogPostsRow, index) => (
+            <GridRow key={index}>
               {blogPostsRow.map((blogPost) => (
-                <GridItem className="py-10 pl-0 pr-0 md:pl-10 md:pr-10 first:pl-0 last:pr-0 gap-6">
+                <GridItem
+                  key={blogPost.content.metadata.permalink}
+                  className="py-10 pl-0 pr-0 md:pl-10 md:pr-10 first:pl-0 last:pr-0 gap-6"
+                >
                   <a
                     href={blogPost.content.metadata.permalink}
                     className="flex flex-col w-full"
