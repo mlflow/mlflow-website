@@ -1,8 +1,10 @@
 import React from "react";
 import ThemeLayout from "@theme/Layout";
+import { BlogPostProvider } from "@docusaurus/theme-common/internal";
 
 import { Layout } from "../../components";
 import BlogSidebar from "@theme/BlogSidebar";
+import BlogPostItem from "@theme/BlogPostItem";
 
 export default function ReleasePost({
   content: BlogPostContent,
@@ -15,10 +17,11 @@ export default function ReleasePost({
         <div className="pt-24 max-w-7xl mx-auto">
           <div className="flex flex-row">
             <BlogSidebar className="text-white" sidebar={sidebar} />
-            <div className="flex flex-col">
-              <h1 className="text-white">{BlogPostContent.metadata.title}</h1>
-              <BlogPostContent />
-            </div>
+            <BlogPostProvider content={BlogPostContent}>
+              <BlogPostItem>
+                <BlogPostContent />
+              </BlogPostItem>
+            </BlogPostProvider>
           </div>
         </div>
       </Layout>
