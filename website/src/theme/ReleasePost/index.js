@@ -18,7 +18,7 @@ export default function ReleasePost({
           <div className="flex flex-row">
             <BlogSidebar className="text-white" sidebar={sidebar} />
             <BlogPostProvider content={BlogPostContent}>
-              <BlogPostItem className="max-w-prose">
+              <BlogPostItem className="max-w-prose **:[h2>a]:!text-2xl">
                 <BlogPostContent />
               </BlogPostItem>
             </BlogPostProvider>
