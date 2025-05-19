@@ -66,7 +66,9 @@ export default function BlogPostItems({
                         day: "numeric",
                       })}
                     </span>
-                    <h3>{blogPost.content.metadata.title}</h3>
+                    <div role="heading" aria-level={3} className="text-xl">
+                      {blogPost.content.metadata.title}
+                    </div>
                   </a>
                 </GridItem>
               ))}
