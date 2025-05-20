@@ -172,13 +172,8 @@ export default function GenAi(): JSX.Element {
                 />
               </div>
             </GridItem>
-            <GridItem>
+            <GridItem direction="reverse">
               <div className="flex flex-col gap-4">
-                <img
-                  className="rounded-xl mt-10 mb-4"
-                  src={AssessmentsTab}
-                  alt="MLflow LLM judges"
-                />
                 <h3 className="text-white">
                   Measure and improve quality with human-aligned, automated
                   metrics
@@ -199,14 +194,16 @@ export default function GenAi(): JSX.Element {
                   </Button>
                 </a>
               </div>
-            </GridItem>
-            <GridItem>
-              <div className="flex flex-col gap-4">
+              <div>
                 <img
                   className="rounded-xl mt-10 mb-4"
                   src={AssessmentsTab}
                   alt="MLflow LLM judges"
                 />
+              </div>
+            </GridItem>
+            <GridItem direction="reverse">
+              <div className="flex flex-col gap-4">
                 <h3 className="text-white">
                   Incorporate human insight with an intuitive labeling and
                   review experience
@@ -224,6 +221,13 @@ export default function GenAi(): JSX.Element {
                     Learn more &gt;
                   </Button>
                 </a>
+              </div>
+              <div>
+                <img
+                  className="rounded-xl mt-10 mb-4"
+                  src={AssessmentsTab}
+                  alt="MLflow LLM judges"
+                />
               </div>
             </GridItem>
             <GridItem className="hidden md:block"></GridItem>

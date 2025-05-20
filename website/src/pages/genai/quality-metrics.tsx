@@ -76,7 +76,6 @@ export default function QualityMetrics() {
             <FakeImage />
           </GridItem>
           <GridItem>
-            <FakeImage />
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Best-in-class judges—ready to go</h3>
               <p className="text-white/60 text-lg">
@@ -87,6 +86,7 @@ export default function QualityMetrics() {
                 reliable quality evaluation.
               </p>
             </div>
+            <FakeImage />
           </GridItem>
           <GridItem direction="reverse">
             <div className="flex flex-col gap-4">
@@ -102,7 +102,6 @@ export default function QualityMetrics() {
             <FakeImage />
           </GridItem>
           <GridItem width="wide">
-            <FakeImage />
             <div className="flex flex-col gap-10">
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">Customized code-based metrics</h3>
@@ -114,6 +113,7 @@ export default function QualityMetrics() {
                 </p>
               </div>
             </div>
+            <FakeImage />
           </GridItem>
         </Grid>
         <GetStartedWithMLflow />
