@@ -48,7 +48,7 @@ export default function BlogPostItems({
             blogPostsRow.map((blogPost) => (
               <GridItem
                 key={blogPost.content.metadata.permalink}
-                className="py-10 pl-0 pr-0 md:pl-10 md:pr-10 first:pl-0 last:pr-0 gap-6"
+                className="nth-[3n]:border-r-0 border-b"
               >
                 <a
                   href={blogPost.content.metadata.permalink}
@@ -68,7 +68,11 @@ export default function BlogPostItems({
                       day: "numeric",
                     })}
                   </span>
-                  <div role="heading" aria-level={3} className="text-xl h-20">
+                  <div
+                    role="heading"
+                    aria-level={3}
+                    className="text-xl h-21 line-clamp-3"
+                  >
                     {blogPost.content.metadata.title}
                   </div>
                 </a>
