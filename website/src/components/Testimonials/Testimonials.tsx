@@ -10,7 +10,7 @@ export const Testimonials = () => {
           Trusted by thousands of businesses and research teams
         </h1>
       </div>
-      <Grid columns={3}>
+      <Grid>
         <GridItem className="p-6">
           <span className="text-white/60 text-lg">
             Ex aliquip commodo irure. Cupidatat veniam commodo cupidatat ex non

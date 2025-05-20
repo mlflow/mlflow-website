@@ -56,7 +56,7 @@ export const SocialWidget = ({ variant }: Props) => {
           Connect with thousands of customers using MLflow
         </p>
       </div>
-      <Grid columns={4}>
+      <Grid>
         {socials.map((social) => (
           <GridItem key={social.key} className="p-0">
             <SocialWidgetItem

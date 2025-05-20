@@ -29,7 +29,7 @@ export const LatestNews = ({ variant }: Props) => {
         </div>
         <div className="hidden md:block">{viewAllLinkNode}</div>
       </div>
-      <Grid columns={3}>
+      <Grid>
         {posts.map((post) => (
           <GridItem key={post.path}>
             <Link

@@ -11,10 +11,14 @@ const gridVariants = cva(
   {
     variants: {
       columns: {
+        default: "md:auto-cols-fr md:grid-flow-col",
         2: "md:grid-cols-2",
         3: "md:grid-cols-3",
         4: "md:grid-cols-4",
       },
+    },
+    defaultVariants: {
+      columns: "default",
     },
   },
 );
