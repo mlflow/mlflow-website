@@ -3,41 +3,11 @@ import {
   SectionLabel,
   Button,
   Grid,
-  GridRow,
   GridItem,
   GetStartedWithMLflow,
   SocialWidget,
   GetStartedButton,
 } from "../../components";
-import { cva } from "class-variance-authority";
-
-const gridItem = cva(
-  [
-    "flex flex-col items-start p-10 gap-20 justify-between w-full",
-    "border-[rgba(255,255,255,0.08)] border-t last:border-b",
-  ],
-  {
-    variants: {
-      width: {
-        narrow: "md:last:border-b-0 md:border-r md:last:border-r-0",
-        wide: "md:col-span-2 md:flex-row md:not-last:border-b *:flex-1",
-      },
-      direction: {
-        reverse: "md:flex-col-reverse md:border-r-0",
-      },
-    },
-    compoundVariants: [
-      {
-        width: "wide",
-        direction: "reverse",
-        className: "md:flex-row-reverse",
-      },
-    ],
-    defaultVariants: {
-      width: "narrow",
-    },
-  },
-);
 
 const FakeImage = () => (
   <div className="w-full aspect-[3/2] bg-black rounded-lg border border-[rgba(255,255,255,0.08)]"></div>
@@ -72,8 +42,8 @@ export default function Observability() {
         </div>
       </div>
       <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-container">
-        <div className="grid md:grid-cols-2">
-          <div className={gridItem()}>
+        <Grid>
+          <GridItem>
             <div className="flex flex-col gap-10">
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">
@@ -89,8 +59,8 @@ export default function Observability() {
               </p>
             </div>
             <FakeImage />
-          </div>
-          <div className={gridItem({ direction: "reverse" })}>
+          </GridItem>
+          <GridItem direction="reverse">
             <div className="flex flex-col gap-4">
               <h3 className="text-white">
                 Visualize Your app’s Execution Flow
@@ -104,8 +74,8 @@ export default function Observability() {
               </p>
             </div>
             <FakeImage />
-          </div>
-          <div className={gridItem({ width: "wide" })}>
+          </GridItem>
+          <GridItem width="wide">
             <div className="flex flex-col gap-4">
               <h3 className="text-white">
                 Instrument once, use in development and production
@@ -118,8 +88,8 @@ export default function Observability() {
               </p>
             </div>
             <FakeImage />
-          </div>
-          <div className={gridItem()}>
+          </GridItem>
+          <GridItem>
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Attach Quality Feedback</h3>
               <p className="text-white/60 text-lg">
@@ -129,8 +99,8 @@ export default function Observability() {
               </p>
             </div>
             <FakeImage />
-          </div>
-          <div className={gridItem({ direction: "reverse" })}>
+          </GridItem>
+          <GridItem direction="reverse">
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Attach Operational Metrics</h3>
               <p className="text-white/60 text-lg">
@@ -141,8 +111,8 @@ export default function Observability() {
               </p>
             </div>
             <FakeImage />
-          </div>
-          <div className={gridItem({ width: "wide" })}>
+          </GridItem>
+          <GridItem width="wide">
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Monitoring and Alerting</h3>
               <p className="text-white/60 text-lg">
@@ -153,8 +123,8 @@ export default function Observability() {
               </p>
             </div>
             <FakeImage />
-          </div>
-          <div className={gridItem({ width: "wide", direction: "reverse" })}>
+          </GridItem>
+          <GridItem width="wide" direction="reverse">
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Comprehensive Audit Trail</h3>
               <p className="text-white/60 text-lg">
@@ -164,8 +134,8 @@ export default function Observability() {
               </p>
             </div>
             <FakeImage />
-          </div>
-        </div>
+          </GridItem>
+        </Grid>
         <GetStartedWithMLflow />
         <SocialWidget variant="red" />
       </div>

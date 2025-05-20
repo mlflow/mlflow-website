@@ -13,7 +13,6 @@ import {
   SectionLabel,
   LogosCarousel,
   Grid,
-  GridRow,
   GridItem,
   GetStartedWithMLflow,
   LatestNews,
@@ -112,148 +111,139 @@ export default function GenAi(): JSX.Element {
             <h1>Why MLflow is unique</h1>
           </div>
           <Grid>
-            <GridRow>
-              <GridItem className="py-10 px-10 gap-10">
-                <div className="flex flex-col gap-4">
-                  <h2 className="text-white">Tracing</h2>
-                  <h3 className="text-white">
-                    Capture and debug application logs with end-to-end
-                    observability
-                  </h3>
-                  <p style={{ marginBottom: 0 }} className="text-white/60">
-                    Trace your app with OpenTelemetry-compatible SDKs that
-                    capture every invocation's inputs, outputs, and step-by-step
-                    execution - prompts, retrievals, tool calls, and more -
-                    alongside cost, latency, and errors. g{" "}
-                  </p>
-                  <p style={{ marginBottom: 0 }} className="text-white/60">
-                    Use these traces to quickly debug errors, improve business
-                    logic, and optimize cost and latency.
-                  </p>
-                  <a href="/genai/observability">
-                    <Button variant="outline" size="small">
-                      Learn more &gt;
-                    </Button>
-                  </a>
-                </div>
-              </GridItem>
-              <GridItem className="justify-center px-10 py-10">
+            <GridItem width="wide">
+              <div className="flex flex-col gap-4">
+                <h2 className="text-white">Tracing</h2>
+                <h3 className="text-white">
+                  Capture and debug application logs with end-to-end
+                  observability
+                </h3>
+                <p style={{ marginBottom: 0 }} className="text-white/60">
+                  Trace your app with OpenTelemetry-compatible SDKs that capture
+                  every invocation's inputs, outputs, and step-by-step execution
+                  - prompts, retrievals, tool calls, and more - alongside cost,
+                  latency, and errors. g{" "}
+                </p>
+                <p style={{ marginBottom: 0 }} className="text-white/60">
+                  Use these traces to quickly debug errors, improve business
+                  logic, and optimize cost and latency.
+                </p>
+                <a href="/genai/observability">
+                  <Button variant="outline" size="small">
+                    Learn more &gt;
+                  </Button>
+                </a>
+              </div>
+              <div>
                 <img
                   className="rounded-xl"
                   src={TraceTab}
                   alt="MLflow tracing"
                 />
-              </GridItem>
-            </GridRow>
-            <GridRow>
-              <GridItem className="justify-center px-10 py-10">
+              </div>
+            </GridItem>
+            <GridItem width="wide" direction="reverse">
+              <div className="flex flex-col gap-4">
+                <h3 className="text-white">
+                  Adapt to evolving user behavior with production log evaluation
+                </h3>
+                <p style={{ marginBottom: 0 }} className="text-white/60">
+                  Use production logs to understand user behavior, turning
+                  low-quality responses into evaluation datasets and
+                  high-quality responses into regression tests.
+                </p>
+                <p style={{ marginBottom: 0 }} className="text-white/60">
+                  Replay these datasets to evaluate new prompts or app variants
+                  in development so you can ship the best variants to ensure
+                  your application continues to deliver high-quality responses
+                  as user behavior evolves.
+                </p>
+                <a href="/genai/evaluations">
+                  <Button variant="outline" size="small">
+                    Learn more &gt;
+                  </Button>
+                </a>
+              </div>
+              <div>
                 <img
                   className="rounded-xl"
                   src={EvalsTab}
                   alt="MLflow evaluations"
                 />
-              </GridItem>
-              <GridItem className="py-10 px-10 gap-10">
-                <div className="flex flex-col gap-4">
-                  <h3 className="text-white">
-                    Adapt to evolving user behavior with production log
-                    evaluation
-                  </h3>
-                  <p style={{ marginBottom: 0 }} className="text-white/60">
-                    Use production logs to understand user behavior, turning
-                    low-quality responses into evaluation datasets and
-                    high-quality responses into regression tests.
-                  </p>
-                  <p style={{ marginBottom: 0 }} className="text-white/60">
-                    Replay these datasets to evaluate new prompts or app
-                    variants in development so you can ship the best variants to
-                    ensure your application continues to deliver high-quality
-                    responses as user behavior evolves.
-                  </p>
-                  <a href="/genai/evaluations">
-                    <Button variant="outline" size="small">
-                      Learn more &gt;
-                    </Button>
-                  </a>
-                </div>
-              </GridItem>
-            </GridRow>
-            <GridRow>
-              <GridItem className="px-10 py-10">
-                <div className="flex flex-col gap-4">
-                  <img
-                    className="rounded-xl mt-10 mb-4"
-                    src={AssessmentsTab}
-                    alt="MLflow LLM judges"
-                  />
-                  <h3 className="text-white">
-                    Measure and improve quality with human-aligned, automated
-                    metrics
-                  </h3>
-                  <p style={{ marginBottom: 0 }} className="text-white/60">
-                    Capture and convert expert feedback into metrics (LLM
-                    judges) that understand your business requirements and can
-                    measure the nuances of plain-language GenAI outputs.
-                  </p>
-                  <p style={{ marginBottom: 0 }} className="text-white/60">
-                    Use these metrics to evaluate, monitor, and improve quality
-                    in development and production at scale, without waiting for
-                    human review.
-                  </p>
-                  <a href="/genai/quality-metrics">
-                    <Button variant="outline" size="small">
-                      Learn more &gt;
-                    </Button>
-                  </a>
-                </div>
-              </GridItem>
-              <GridItem className="px-10 py-10">
-                <div className="flex flex-col gap-4">
-                  <img
-                    className="rounded-xl mt-10 mb-4"
-                    src={AssessmentsTab}
-                    alt="MLflow LLM judges"
-                  />
-                  <h3 className="text-white">
-                    Incorporate human insight with an intuitive labeling and
-                    review experience
-                  </h3>
-                  <p style={{ marginBottom: 0 }} className="text-white/60">
-                    Capture domain expert feedback via web-based UIs and
-                    end-user ratings from your app via APIs.
-                  </p>
-                  <p style={{ marginBottom: 0 }} className="text-white/60">
-                    Use this feedback to enrich your understanding of how the
-                    app should behave and improve your custom LLM-judge metrics.
-                  </p>
-                  <a href="/genai/human-feedback">
-                    <Button variant="outline" size="small">
-                      Learn more &gt;
-                    </Button>
-                  </a>
-                </div>
-              </GridItem>
-            </GridRow>
-            <GridRow>
-              <GridItem className="px-10 py-10" />
-              <GridItem className="px-10 py-10">
-                <div className="flex flex-col gap-4 justify-center">
-                  <h3 className="text-white">
-                    Enterprise governance with Unity Catalog
-                  </h3>
-                  <p style={{ marginBottom: 0 }} className="text-white/60">
-                    MLflow is integrated with Unity Catalog to track the
-                    lifecycle and lineage of your app’s assets - models,
-                    prompts, datasets, and metrics - and apply access controls
-                  </p>
-                  <a href="/genai/governance">
-                    <Button variant="outline" size="small">
-                      Learn more &gt;
-                    </Button>
-                  </a>
-                </div>
-              </GridItem>
-            </GridRow>
+              </div>
+            </GridItem>
+            <GridItem>
+              <div className="flex flex-col gap-4">
+                <img
+                  className="rounded-xl mt-10 mb-4"
+                  src={AssessmentsTab}
+                  alt="MLflow LLM judges"
+                />
+                <h3 className="text-white">
+                  Measure and improve quality with human-aligned, automated
+                  metrics
+                </h3>
+                <p style={{ marginBottom: 0 }} className="text-white/60">
+                  Capture and convert expert feedback into metrics (LLM judges)
+                  that understand your business requirements and can measure the
+                  nuances of plain-language GenAI outputs.
+                </p>
+                <p style={{ marginBottom: 0 }} className="text-white/60">
+                  Use these metrics to evaluate, monitor, and improve quality in
+                  development and production at scale, without waiting for human
+                  review.
+                </p>
+                <a href="/genai/quality-metrics">
+                  <Button variant="outline" size="small">
+                    Learn more &gt;
+                  </Button>
+                </a>
+              </div>
+            </GridItem>
+            <GridItem>
+              <div className="flex flex-col gap-4">
+                <img
+                  className="rounded-xl mt-10 mb-4"
+                  src={AssessmentsTab}
+                  alt="MLflow LLM judges"
+                />
+                <h3 className="text-white">
+                  Incorporate human insight with an intuitive labeling and
+                  review experience
+                </h3>
+                <p style={{ marginBottom: 0 }} className="text-white/60">
+                  Capture domain expert feedback via web-based UIs and end-user
+                  ratings from your app via APIs.
+                </p>
+                <p style={{ marginBottom: 0 }} className="text-white/60">
+                  Use this feedback to enrich your understanding of how the app
+                  should behave and improve your custom LLM-judge metrics.
+                </p>
+                <a href="/genai/human-feedback">
+                  <Button variant="outline" size="small">
+                    Learn more &gt;
+                  </Button>
+                </a>
+              </div>
+            </GridItem>
+            <GridItem></GridItem>
+            <GridItem>
+              <div className="flex flex-col gap-4 justify-center">
+                <h3 className="text-white">
+                  Enterprise governance with Unity Catalog
+                </h3>
+                <p style={{ marginBottom: 0 }} className="text-white/60">
+                  MLflow is integrated with Unity Catalog to track the lifecycle
+                  and lineage of your app’s assets - models, prompts, datasets,
+                  and metrics - and apply access controls
+                </p>
+                <a href="/genai/governance">
+                  <Button variant="outline" size="small">
+                    Learn more &gt;
+                  </Button>
+                </a>
+              </div>
+            </GridItem>
           </Grid>
         </div>
         <GetStartedWithMLflow />

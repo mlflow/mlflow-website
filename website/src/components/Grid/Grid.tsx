@@ -1,36 +1,69 @@
 import { PropsWithChildren } from "react";
 
-import { cn } from "../../utils";
+import { cva, VariantProps } from "class-variance-authority";
+import { twMerge } from "tailwind-merge";
+
+const gridVariants = cva("grid w-full", {
+  variants: {
+    columns: {
+      2: "md:grid-cols-2",
+      3: "md:grid-cols-3",
+      4: "md:grid-cols-4",
+    },
+  },
+});
+
+export const grid: typeof gridVariants = (variants) =>
+  twMerge(gridVariants(variants));
 
 export const Grid = ({
   children,
   className,
-}: PropsWithChildren<{ className?: string }>) => {
-  return (
-    <div className={cn("flex flex-col w-full", className)}>{children}</div>
-  );
+  columns,
+}: VariantProps<typeof gridVariants> &
+  PropsWithChildren<{ className?: string }>) => {
+  return <div className={grid({ columns, className })}>{children}</div>;
 };
 
-export const GridRow = ({ children }: PropsWithChildren) => {
-  return (
-    <div className="flex flex-col md:flex-row border-[rgba(255,255,255,0.08)] md:border-t md:last:border-b w-full">
-      {children}
-    </div>
-  );
-};
+const gridItemVariants = cva(
+  [
+    "flex flex-col items-start p-10 gap-20 justify-between w-full",
+    "border-[rgba(255,255,255,0.08)] border-t last:border-b",
+  ],
+  {
+    variants: {
+      width: {
+        narrow: "md:border-r md:last:border-r-0",
+        wide: "md:col-span-2 md:flex-row md:not-last:border-b *:flex-1 md:items-center",
+      },
+      direction: {
+        reverse: "md:flex-col-reverse md:border-r-0",
+      },
+    },
+    compoundVariants: [
+      {
+        width: "wide",
+        direction: "reverse",
+        className: "md:flex-row-reverse",
+      },
+    ],
+    defaultVariants: {
+      width: "narrow",
+    },
+  },
+);
+
+export const gridItem: typeof gridItemVariants = (variants) =>
+  twMerge(gridItemVariants(variants));
 
 export const GridItem = ({
   children,
   className,
-}: PropsWithChildren<{ className?: string }>) => {
+  width,
+  direction,
+}: VariantProps<typeof gridItem> &
+  PropsWithChildren<{ className?: string }>) => {
   return (
-    <div
-      className={cn(
-        "flex flex-col border-[rgba(255,255,255,0.08)] border-t last:border-b md:last:border-b-0 md:border-t-0 md:border-l md:first:border-l-0 w-full",
-        className,
-      )}
-    >
-      {children}
-    </div>
+    <div className={gridItem({ width, direction, className })}>{children}</div>
   );
 };

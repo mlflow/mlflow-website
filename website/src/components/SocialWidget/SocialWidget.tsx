@@ -5,11 +5,46 @@ import LinkedinIcon from "@site/static/img/social/linkedin.svg";
 
 import { SectionLabel } from "../SectionLabel/SectionLabel";
 import { SocialWidgetItem } from "../SocialWidgetItem/SocialWidgetItem";
-import { Grid, GridRow, GridItem } from "../Grid/Grid";
+import { Grid, GridItem } from "../Grid/Grid";
 
 interface Props {
   variant: "red" | "green";
 }
+
+const socials = [
+  {
+    key: "github",
+    icon: <GithubIcon />,
+    label: "GitHub",
+    description: "20k followers",
+    href: "https://github.com/mlflow/mlflow",
+  },
+  {
+    key: "linkedin",
+    icon: <LinkedinIcon />,
+    label: "LinkedIn",
+    description: "69k followers",
+    href: "https://www.linkedin.com/company/mlflow-org",
+  },
+  {
+    key: "youtube",
+    icon: <YoutubeIcon />,
+    label: "YouTube",
+    description: "View tutorials",
+    href: "https://www.youtube.com/@mlflowoss",
+  },
+  {
+    key: "docs",
+    icon: (
+      <div>
+        <BookIcon />
+      </div>
+    ),
+    label: "Documentation",
+    description: "Read documentation",
+    href: "https://mlflow.org/docs/latest/",
+  },
+];
 
 export const SocialWidget = ({ variant }: Props) => {
   return (
@@ -21,41 +56,17 @@ export const SocialWidget = ({ variant }: Props) => {
           Connect with thousands of customers using MLflow
         </p>
       </div>
-      <Grid>
-        <GridRow>
-          <GridItem>
+      <Grid columns={4}>
+        {socials.map((social) => (
+          <GridItem key={social.key} className="border-b">
             <SocialWidgetItem
-              href="https://github.com/mlflow/mlflow"
-              icon={<GithubIcon />}
-              label="GitHub"
-              description="20k followers"
+              href={social.href}
+              icon={social.icon}
+              label={social.label}
+              description={social.description}
             />
           </GridItem>
-          <GridItem>
-            <SocialWidgetItem
-              href="https://www.linkedin.com/company/mlflow-org"
-              icon={<LinkedinIcon />}
-              label="LinkedIn"
-              description="69k followers"
-            />
-          </GridItem>
-          <GridItem>
-            <SocialWidgetItem
-              href="https://www.youtube.com/@mlflowoss"
-              icon={<YoutubeIcon />}
-              label="YouTube"
-              description="View tutorials"
-            />
-          </GridItem>
-          <GridItem>
-            <SocialWidgetItem
-              href="https://mlflow.org/docs/latest/"
-              icon={<BookIcon />}
-              label="Docs"
-              description="Read documentation"
-            />
-          </GridItem>
-        </GridRow>
+        ))}
       </Grid>
     </div>
   );

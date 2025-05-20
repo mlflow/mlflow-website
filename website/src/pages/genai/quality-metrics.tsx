@@ -3,7 +3,6 @@ import {
   SectionLabel,
   Button,
   Grid,
-  GridRow,
   GridItem,
   GetStartedWithMLflow,
   SocialWidget,
@@ -11,7 +10,7 @@ import {
 } from "../../components";
 
 const FakeImage = () => (
-  <div className="w-[600px] h-[400px] bg-black rounded-lg"></div>
+  <div className="w-full aspect-[3/2] bg-black rounded-lg border border-[rgba(255,255,255,0.08)]"></div>
 );
 
 export default function QualityMetrics() {
@@ -45,81 +44,75 @@ export default function QualityMetrics() {
       </div>
       <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-container">
         <Grid>
-          <GridRow>
-            <GridItem className="flex flex-col md:flex-row gap-6 md:gap-20 py-10 justify-between items-center">
-              <div className="flex flex-col gap-10">
-                <div className="flex flex-col gap-4">
-                  <h3 className="text-white">
-                    Define once—use in dev and production
-                  </h3>
-                  <p className="text-white/60">
-                    Define once—use in dev and production
-                  </p>
-                </div>
-
-                <div className="flex flex-col pl-4 border-l border-white/8 gap-2">
-                  <span className="text-white text-sm">DEVELOPMENT</span>
-                  <span className="text-white/60">
-                    Evaluate every new variant offline so you can drive
-                    iterative improvements in quality and verify that changes
-                    don’t cause regressions
-                  </span>
-                </div>
-                <div className="flex flex-col pl-4 border-l border-white/8 gap-2">
-                  <span className="text-white text-sm">PRODUCTION</span>
-                  <span className="text-white/60">
-                    Evaluate every live response and set alerts, giving you
-                    always-on monitoring of production quality.
-                  </span>
-                </div>
-              </div>
-              <FakeImage />
-            </GridItem>
-          </GridRow>
-          <GridRow>
-            <GridItem className="py-10 pr-0 md:pr-10 gap-10">
-              <FakeImage />
-              <div className="flex flex-col gap-4">
-                <h3 className="text-white">Best-in-class judges—ready to go</h3>
-                <p className="text-white/60 text-lg">
-                  Get started quickly with out-of-the-box judges for safety,
-                  hallucination, retrieval quality, relevance, and other common
-                  aspects of quality evaluation. Our research team has tuned
-                  these judges to agree with human experts, giving you accurate,
-                  reliable quality evaluation.
-                </p>
-              </div>
-            </GridItem>
-            <GridItem className="py-10 pl-0 md:pl-10 gap-10">
+          <GridItem width="wide">
+            <div className="flex flex-col gap-10">
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">
-                  Customized LLM judges for your use case
+                  Define once—use in dev and production
                 </h3>
-                <p className="text-white/60 text-lg">
-                  Adapt our base judge model to create custom judges tailored to
-                  your business requirements that agree with your human experts’
-                  judgment.
+                <p className="text-white/60">
+                  Define once—use in dev and production
                 </p>
               </div>
-              <FakeImage />
-            </GridItem>
-          </GridRow>
-          <GridRow>
-            <GridItem className="flex flex-col md:flex-row gap-6 md:gap-20 py-10 justify-between items-center">
-              <FakeImage />
-              <div className="flex flex-col gap-10">
-                <div className="flex flex-col gap-4">
-                  <h3 className="text-white">Customized code-based metrics</h3>
-                  <p className="text-white/60">
-                    Further customize evaluation to measure any aspect of your
-                    application’s quality using our custom metrics SDK to write
-                    Python functions that track any metric, from regex checks to
-                    custom business logic.
-                  </p>
-                </div>
+
+              <div className="flex flex-col pl-4 border-l border-white/8 gap-2">
+                <span className="text-white text-sm">DEVELOPMENT</span>
+                <span className="text-white/60">
+                  Evaluate every new variant offline so you can drive iterative
+                  improvements in quality and verify that changes don’t cause
+                  regressions
+                </span>
               </div>
-            </GridItem>
-          </GridRow>
+              <div className="flex flex-col pl-4 border-l border-white/8 gap-2">
+                <span className="text-white text-sm">PRODUCTION</span>
+                <span className="text-white/60">
+                  Evaluate every live response and set alerts, giving you
+                  always-on monitoring of production quality.
+                </span>
+              </div>
+            </div>
+            <FakeImage />
+          </GridItem>
+          <GridItem>
+            <FakeImage />
+            <div className="flex flex-col gap-4">
+              <h3 className="text-white">Best-in-class judges—ready to go</h3>
+              <p className="text-white/60 text-lg">
+                Get started quickly with out-of-the-box judges for safety,
+                hallucination, retrieval quality, relevance, and other common
+                aspects of quality evaluation. Our research team has tuned these
+                judges to agree with human experts, giving you accurate,
+                reliable quality evaluation.
+              </p>
+            </div>
+          </GridItem>
+          <GridItem direction="reverse">
+            <div className="flex flex-col gap-4">
+              <h3 className="text-white">
+                Customized LLM judges for your use case
+              </h3>
+              <p className="text-white/60 text-lg">
+                Adapt our base judge model to create custom judges tailored to
+                your business requirements that agree with your human experts’
+                judgment.
+              </p>
+            </div>
+            <FakeImage />
+          </GridItem>
+          <GridItem width="wide">
+            <FakeImage />
+            <div className="flex flex-col gap-10">
+              <div className="flex flex-col gap-4">
+                <h3 className="text-white">Customized code-based metrics</h3>
+                <p className="text-white/60">
+                  Further customize evaluation to measure any aspect of your
+                  application’s quality using our custom metrics SDK to write
+                  Python functions that track any metric, from regex checks to
+                  custom business logic.
+                </p>
+              </div>
+            </div>
+          </GridItem>
         </Grid>
         <GetStartedWithMLflow />
         <SocialWidget variant="red" />
