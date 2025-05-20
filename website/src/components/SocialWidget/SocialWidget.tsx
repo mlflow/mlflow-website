@@ -58,7 +58,7 @@ export const SocialWidget = ({ variant }: Props) => {
       </div>
       <Grid columns={4}>
         {socials.map((social) => (
-          <GridItem key={social.key} className="border-b p-0">
+          <GridItem key={social.key} className="p-0">
             <SocialWidgetItem
               href={social.href}
               icon={social.icon}

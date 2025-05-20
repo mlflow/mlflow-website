@@ -46,10 +46,7 @@ export default function BlogPostItems({
         <Grid columns={3}>
           {blogPostsGrid.flatMap((blogPostsRow) =>
             blogPostsRow.map((blogPost) => (
-              <GridItem
-                key={blogPost.content.metadata.permalink}
-                className="nth-[3n]:border-r-0 border-b"
-              >
+              <GridItem key={blogPost.content.metadata.permalink}>
                 <a
                   href={blogPost.content.metadata.permalink}
                   className="flex flex-col w-full h-full gap-4"

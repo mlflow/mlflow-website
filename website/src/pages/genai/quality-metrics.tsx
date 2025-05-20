@@ -55,20 +55,22 @@ export default function QualityMetrics() {
                 </p>
               </div>
 
-              <div className="flex flex-col pl-4 border-l border-white/8 gap-2">
-                <span className="text-white text-sm">DEVELOPMENT</span>
-                <span className="text-white/60">
-                  Evaluate every new variant offline so you can drive iterative
-                  improvements in quality and verify that changes don’t cause
-                  regressions
-                </span>
-              </div>
-              <div className="flex flex-col pl-4 border-l border-white/8 gap-2">
-                <span className="text-white text-sm">PRODUCTION</span>
-                <span className="text-white/60">
-                  Evaluate every live response and set alerts, giving you
-                  always-on monitoring of production quality.
-                </span>
+              <div className="md:hidden lg:block">
+                <div className="flex flex-col pl-4 border-l border-white/8 gap-2">
+                  <span className="text-white text-sm">DEVELOPMENT</span>
+                  <span className="text-white/60">
+                    Evaluate every new variant offline so you can drive
+                    iterative improvements in quality and verify that changes
+                    don’t cause regressions
+                  </span>
+                </div>
+                <div className="flex flex-col pl-4 border-l border-white/8 gap-2">
+                  <span className="text-white text-sm">PRODUCTION</span>
+                  <span className="text-white/60">
+                    Evaluate every live response and set alerts, giving you
+                    always-on monitoring of production quality.
+                  </span>
+                </div>
               </div>
             </div>
             <FakeImage />

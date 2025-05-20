@@ -226,7 +226,7 @@ export default function GenAi(): JSX.Element {
                 </a>
               </div>
             </GridItem>
-            <GridItem></GridItem>
+            <GridItem className="hidden md:block"></GridItem>
             <GridItem>
               <div className="flex flex-col gap-4 justify-center">
                 <h3 className="text-white">
