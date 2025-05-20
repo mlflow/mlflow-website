@@ -110,7 +110,7 @@ export default function GenAi(): JSX.Element {
             <SectionLabel color="red" label="WHY US?" />
             <h1>Why MLflow is unique</h1>
           </div>
-          <Grid>
+          <Grid columns={2}>
             <GridItem width="wide">
               <div className="flex flex-col gap-4">
                 <h2 className="text-white">Tracing</h2>

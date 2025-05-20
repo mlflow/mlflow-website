@@ -42,7 +42,7 @@ export default function Observability() {
         </div>
       </div>
       <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-container">
-        <Grid>
+        <Grid columns={2}>
           <GridItem>
             <div className="flex flex-col gap-10">
               <div className="flex flex-col gap-4">
