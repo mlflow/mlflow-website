@@ -32,7 +32,7 @@ export default function Models() {
             </p>
             <GetStartedButton />
           </div>
-          <div className="w-[800px] h-[450px] bg-black rounded-lg mx-auto"></div>
+          <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
         </div>
       </div>
       <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-container">
