@@ -55,7 +55,7 @@ export default function BlogPostItems({
                     <img
                       src={blogPost.content.frontMatter.thumbnail}
                       alt={blogPost.content.frontMatter.title}
-                      className="object-cover rounded-md max-h-[210px] grow"
+                      className="object-contain rounded-md max-h-[210px] grow"
                     />
                     <span className="text-white/60">
                       {new Date(
