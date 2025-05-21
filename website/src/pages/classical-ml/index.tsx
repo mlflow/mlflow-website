@@ -12,6 +12,7 @@ import {
   GetStartedWithMLflow,
   LatestNews,
   SocialWidget,
+  Button,
 } from "../../components";
 
 export default function GenAi(): JSX.Element {
@@ -47,55 +48,131 @@ export default function GenAi(): JSX.Element {
               model registry
             </p>
           </div>
-          <VerticalTabs
-            defaultValue="unified-workflow"
-            className="w-full my-12 px-10"
-          >
-            <VerticalTabsList>
-              <VerticalTabsTrigger
-                value="unified-workflow"
-                label="Unified Workflow"
-                description="MLflow streamlines your entire ML process with tracking, packaging, and deployment capabilities, eliminating tool fragmentation so you can focus on model development rather than infrastructure"
-              />
-              <VerticalTabsTrigger
-                value="reliable-reproducability"
-                label="Reliable Reproducability"
-                description="Automatically logs parameters, weights, artifacts, code, metrics, and dependencies to ensure experiments can be restored accurately, enabling confident governance for enterprise deployments."
-              />
-              <VerticalTabsTrigger
-                value="framework-neutral"
-                label="Framework Neutral"
-                description="Works seamlessly with popular tools like scikit-learn, PyTorch, TensorFlow, and XGBoost without vendor lock-in, providing flexibility with a common interface."
-              />
-              <VerticalTabsTrigger
-                value="deployment-ready"
-                label="Deployment Ready"
-                description="Simplifies the path from experimentation to production with a built-in registry that gives you complete control over model states, whether sharing new approaches or deploying solutions."
-              />
-              <VerticalTabsTrigger
-                value="enterprise-ready"
-                label="Enterprise Ready"
-                description="Databricks-managed MLflow adds robust security, automated scaling, and high availability for mission-critical workloads while reducing operational overhead and delivering exceptional performance."
-              />
-            </VerticalTabsList>
-            <VerticalTabsContent value="unified-workflow">
-              <img src="/img/demo-image.png" />
-            </VerticalTabsContent>
-            <VerticalTabsContent value="reliable-reproducability">
-              <img src="/img/demo-image.png" />
-            </VerticalTabsContent>
-            <VerticalTabsContent value="framework-neutral">
-              <img src="/img/demo-image.png" />
-            </VerticalTabsContent>
-
-            <VerticalTabsContent value="deployment-ready">
-              <img src="/img/demo-image.png" />
-            </VerticalTabsContent>
-
-            <VerticalTabsContent value="enterprise-ready">
-              <img src="/img/demo-image.png" />
-            </VerticalTabsContent>
-          </VerticalTabs>
+          <Grid columns={2}>
+            <GridItem lg-width="wide">
+              <div className="flex flex-col gap-4">
+                <div
+                  role="heading"
+                  aria-level={3}
+                  className="text-white text-xl"
+                >
+                  Unified Workflow
+                </div>
+                <p style={{ marginBottom: 0 }} className="text-white/60">
+                  MLflow streamlines your entire ML process with tracking,
+                  packaging, and deployment capabilities, eliminating tool
+                  fragmentation so you can focus on model development rather
+                  than infrastructure
+                </p>
+                <a href="#" className="hidden md:block">
+                  <Button variant="outline" size="small">
+                    Learn more &gt;
+                  </Button>
+                </a>
+              </div>
+              <div>
+                <img src="/img/demo-image.png" alt="" />
+              </div>
+            </GridItem>
+            <GridItem direction="reverse" lg-width="wide" lg-direction="normal">
+              <div className="flex flex-col gap-4">
+                <div
+                  role="heading"
+                  aria-level={3}
+                  className="text-white text-xl"
+                >
+                  Reliable Reproducability
+                </div>
+                <p style={{ marginBottom: 0 }} className="text-white/60">
+                  Automatically logs parameters, weights, artifacts, code,
+                  metrics, and dependencies to ensure experiments can be
+                  restored accurately, enabling confident governance for
+                  enterprise deployments.
+                </p>
+                <a href="#" className="hidden md:block">
+                  <Button variant="outline" size="small">
+                    Learn more &gt;
+                  </Button>
+                </a>
+              </div>
+              <div>
+                <img src="/img/demo-image.png" alt="" />
+              </div>
+            </GridItem>
+            <GridItem width="wide">
+              <div className="flex flex-col gap-4">
+                <div
+                  role="heading"
+                  aria-level={3}
+                  className="text-white text-xl"
+                >
+                  Framework Neutral
+                </div>
+                <p style={{ marginBottom: 0 }} className="text-white/60">
+                  Works seamlessly with popular tools like scikit-learn,
+                  PyTorch, TensorFlow, and XGBoost without vendor lock-in,
+                  providing flexibility with a common interface.
+                </p>
+                <a href="#" className="hidden md:block">
+                  <Button variant="outline" size="small">
+                    Learn more &gt;
+                  </Button>
+                </a>
+              </div>
+              <div>
+                <img src="/img/demo-image.png" alt="" />
+              </div>
+            </GridItem>
+            <GridItem direction="reverse" lg-width="wide" lg-direction="normal">
+              <div className="flex flex-col gap-4">
+                <div
+                  role="heading"
+                  aria-level={3}
+                  className="text-white text-xl"
+                >
+                  Deployment Ready
+                </div>
+                <p style={{ marginBottom: 0 }} className="text-white/60">
+                  Simplifies the path from experimentation to production with a
+                  built-in registry that gives you complete control over model
+                  states, whether sharing new approaches or deploying solutions.
+                </p>
+                <a href="#" className="hidden md:block">
+                  <Button variant="outline" size="small">
+                    Learn more &gt;
+                  </Button>
+                </a>
+              </div>
+              <div>
+                <img src="/img/demo-image.png" alt="" />
+              </div>
+            </GridItem>
+            <GridItem lg-width="wide">
+              <div className="flex flex-col gap-4">
+                <div
+                  role="heading"
+                  aria-level={3}
+                  className="text-white text-xl"
+                >
+                  Enterprise Ready
+                </div>
+                <p style={{ marginBottom: 0 }} className="text-white/60">
+                  Databricks-managed MLflow adds robust security, automated
+                  scaling, and high availability for mission-critical workloads
+                  while reducing operational overhead and delivering exceptional
+                  performance.
+                </p>
+                <a href="#" className="hidden md:block">
+                  <Button variant="outline" size="small">
+                    Learn more &gt;
+                  </Button>
+                </a>
+              </div>
+              <div>
+                <img src="/img/demo-image.png" alt="" />
+              </div>
+            </GridItem>
+          </Grid>
         </div>
         <LogosCarousel />
         <div className="flex flex-col items-center justify-center gap-16">
