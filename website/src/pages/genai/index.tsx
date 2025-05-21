@@ -57,67 +57,18 @@ export default function GenAi(): JSX.Element {
               Tackle the challenges of building GenAI head on
             </p>
           </div>
-          <VerticalTabs defaultValue="tracking" className="w-full my-12 px-10">
-            <VerticalTabsList>
-              <VerticalTabsTrigger
-                value="tracking"
-                label="Capture and debug application logs with end-to-end observability (tracing)"
-                description="Trace your app with OpenTelemetry-compatible SDKs that capture every invocation’s inputs, outputs, and step-by-step execution -  prompts, retrievals, tool calls, and more - alongside cost, latency, and errors. Use these traces to quickly debug errors, improve business logic, and optimize cost and latency."
-              />
-              <VerticalTabsTrigger
-                value="llm-judges"
-                label="Measure and improve quality with human-aligned, automated metrics (LLM judges)"
-                description="Capture and convert expert feedback into metrics (LLM judges) that understand your business requirements and can measure the nuances of plain-language GenAI outputs. Use these metrics to evaluate, monitor, and improve quality in development and production at scale, without waiting for human review."
-              />
-              <VerticalTabsTrigger
-                value="evaluation-datasets"
-                label="Adapt to evolving user behavior with production log evaluation (evaluation datasets)"
-                description="Use production logs to understand user behavior, turning low-quality responses into evaluation datasets and high-quality responses into regression tests. Replay these datasets to evaluate new prompts or app variants in development so you can ship the best variants to ensure your application continues to deliver high-quality responses as user behavior evolves."
-              />
-              <VerticalTabsTrigger
-                value="human-insight"
-                label="Incorporate human insight with an intuitive labeling and review experience "
-                description="Capture domain expert feedback via web-based UIs and end-user ratings from your app via APIs. Use this feedback to enrich your understanding of how the app should behave and improve your custom LLM-judge metrics. "
-              />
-              <VerticalTabsTrigger
-                value="enterprise-governance"
-                label="Enterprise governance with Unity Catalog"
-                description="MLflow is integrated with Unity Catalog to track the lifecycle and lineage of your app’s assets - models, prompts, datasets, and metrics - and apply access controls."
-              />
-            </VerticalTabsList>
-            <VerticalTabsContent value="tracking">
-              <img src="/img/demo-image.png" />
-            </VerticalTabsContent>
-            <VerticalTabsContent value="llm-judges">
-              <img src="/img/demo-image.png" />
-            </VerticalTabsContent>
-            <VerticalTabsContent value="evaluation-datasets">
-              <img src="/img/demo-image.png" />
-            </VerticalTabsContent>
-
-            <VerticalTabsContent value="human-insight">
-              <img src="/img/demo-image.png" />
-            </VerticalTabsContent>
-
-            <VerticalTabsContent value="tab5">
-              <img src="/img/demo-image.png" />
-            </VerticalTabsContent>
-          </VerticalTabs>
-        </div>
-        <LogosCarousel />
-        <div className="flex flex-col items-center justify-center gap-16">
-          <div className="flex flex-col gap-6">
-            <SectionLabel color="red" label="WHY US?" />
-            <h1>Why MLflow is unique</h1>
-          </div>
           <Grid columns={2}>
             <GridItem width="wide">
               <div className="flex flex-col gap-4">
                 <h2 className="text-white">Tracing</h2>
-                <h3 className="text-white">
+                <div
+                  role="heading"
+                  aria-level={3}
+                  className="text-white text-lg"
+                >
                   Capture and debug application logs with end-to-end
                   observability
-                </h3>
+                </div>
                 <p style={{ marginBottom: 0 }} className="text-white/60">
                   Trace your app with OpenTelemetry-compatible SDKs that capture
                   every invocation's inputs, outputs, and step-by-step execution
@@ -128,7 +79,7 @@ export default function GenAi(): JSX.Element {
                   Use these traces to quickly debug errors, improve business
                   logic, and optimize cost and latency.
                 </p>
-                <a href="/genai/observability">
+                <a href="/genai/observability" className="hidden md:block">
                   <Button variant="outline" size="small">
                     Learn more &gt;
                   </Button>
@@ -142,11 +93,20 @@ export default function GenAi(): JSX.Element {
                 />
               </div>
             </GridItem>
-            <GridItem width="wide" direction="reverse">
+            <GridItem
+              width="wide"
+              direction="reverse"
+              lg-width="wide"
+              lg-direction="normal"
+            >
               <div className="flex flex-col gap-4">
-                <h3 className="text-white">
+                <div
+                  role="heading"
+                  aria-level={3}
+                  className="text-white text-xl"
+                >
                   Adapt to evolving user behavior with production log evaluation
-                </h3>
+                </div>
                 <p style={{ marginBottom: 0 }} className="text-white/60">
                   Use production logs to understand user behavior, turning
                   low-quality responses into evaluation datasets and
@@ -158,7 +118,7 @@ export default function GenAi(): JSX.Element {
                   your application continues to deliver high-quality responses
                   as user behavior evolves.
                 </p>
-                <a href="/genai/evaluations">
+                <a href="/genai/evaluations" className="hidden md:block">
                   <Button variant="outline" size="small">
                     Learn more &gt;
                   </Button>
@@ -172,12 +132,16 @@ export default function GenAi(): JSX.Element {
                 />
               </div>
             </GridItem>
-            <GridItem direction="reverse">
+            <GridItem direction="reverse" lg-width="wide" lg-direction="normal">
               <div className="flex flex-col gap-4">
-                <h3 className="text-white">
+                <div
+                  role="heading"
+                  aria-level={3}
+                  className="text-white text-xl"
+                >
                   Measure and improve quality with human-aligned, automated
                   metrics
-                </h3>
+                </div>
                 <p style={{ marginBottom: 0 }} className="text-white/60">
                   Capture and convert expert feedback into metrics (LLM judges)
                   that understand your business requirements and can measure the
@@ -188,7 +152,7 @@ export default function GenAi(): JSX.Element {
                   development and production at scale, without waiting for human
                   review.
                 </p>
-                <a href="/genai/quality-metrics">
+                <a href="/genai/quality-metrics" className="hidden md:block">
                   <Button variant="outline" size="small">
                     Learn more &gt;
                   </Button>
@@ -202,12 +166,16 @@ export default function GenAi(): JSX.Element {
                 />
               </div>
             </GridItem>
-            <GridItem direction="reverse">
+            <GridItem direction="reverse" lg-width="wide" lg-direction="normal">
               <div className="flex flex-col gap-4">
-                <h3 className="text-white">
+                <div
+                  role="heading"
+                  aria-level={3}
+                  className="text-white text-xl"
+                >
                   Incorporate human insight with an intuitive labeling and
                   review experience
-                </h3>
+                </div>
                 <p style={{ marginBottom: 0 }} className="text-white/60">
                   Capture domain expert feedback via web-based UIs and end-user
                   ratings from your app via APIs.
@@ -216,7 +184,7 @@ export default function GenAi(): JSX.Element {
                   Use this feedback to enrich your understanding of how the app
                   should behave and improve your custom LLM-judge metrics.
                 </p>
-                <a href="/genai/human-feedback">
+                <a href="/genai/human-feedback" className="hidden md:block">
                   <Button variant="outline" size="small">
                     Learn more &gt;
                   </Button>
@@ -230,23 +198,112 @@ export default function GenAi(): JSX.Element {
                 />
               </div>
             </GridItem>
-            <GridItem className="hidden md:block"></GridItem>
-            <GridItem>
+            <GridItem
+              width="wide"
+              direction="reverse"
+              lg-width="wide"
+              lg-direction="normal"
+            >
               <div className="flex flex-col gap-4 justify-center">
-                <h3 className="text-white">
+                <div
+                  role="heading"
+                  aria-level={3}
+                  className="text-white text-xl"
+                >
                   Enterprise governance with Unity Catalog
-                </h3>
+                </div>
                 <p style={{ marginBottom: 0 }} className="text-white/60">
                   MLflow is integrated with Unity Catalog to track the lifecycle
                   and lineage of your app’s assets - models, prompts, datasets,
                   and metrics - and apply access controls
                 </p>
-                <a href="/genai/governance">
+                <a href="/genai/governance" className="hidden md:block">
                   <Button variant="outline" size="small">
                     Learn more &gt;
                   </Button>
                 </a>
               </div>
+              <div>
+                <img
+                  className="rounded-xl mt-10 mb-4"
+                  src={AssessmentsTab}
+                  alt="MLflow LLM judges"
+                />
+              </div>
+            </GridItem>
+          </Grid>
+        </div>
+        <LogosCarousel />
+        <div className="flex flex-col items-center justify-center gap-16">
+          <div className="flex flex-col gap-6">
+            <SectionLabel color="red" label="WHY US?" />
+            <h1>Why MLflow is unique</h1>
+          </div>
+          <Grid columns={2} lg-columns={4}>
+            <GridItem>
+              <article className="flex flex-col gap-4">
+                <div
+                  role="heading"
+                  aria-level={2}
+                  className="text-xl font-bold"
+                >
+                  Built on top of a data platform
+                </div>
+                <p className="text-white/60 text-sm">
+                  Evaluation and monitoring are workflows that generate data.
+                  Easily use the data from your evaluation & monitoring
+                  workflows to build dashboards & apps using the features of the
+                  Databricks platform.
+                </p>
+              </article>
+            </GridItem>
+            <GridItem>
+              <article className="flex flex-col gap-4">
+                <div
+                  role="heading"
+                  aria-level={2}
+                  className="text-xl font-bold"
+                >
+                  Integrated and unified governance
+                </div>
+                <p className="text-white/60 text-sm">
+                  Tightly integrated with Unity Catalog, which offers unified,
+                  enterprise-grade governance across all your data and ai assets
+                  - including all assets created by MLflow.
+                </p>
+              </article>
+            </GridItem>
+            <GridItem>
+              <article className="flex flex-col gap-4">
+                <div
+                  role="heading"
+                  aria-level={2}
+                  className="text-xl font-bold"
+                >
+                  Data intelligence
+                </div>
+                <p className="text-white/60 text-sm">
+                  Data Intelligence that helps make the developer workflow for
+                  improving quality faster/more efficient - LLM judges that are
+                  tuned to understand your business data; topic detection &
+                  classification that help understand your users.
+                </p>
+              </article>
+            </GridItem>
+            <GridItem>
+              <article className="flex flex-col gap-4">
+                <div
+                  role="heading"
+                  aria-level={2}
+                  className="text-xl font-bold"
+                >
+                  Secure and scalable
+                </div>
+                <p className="text-white/60 text-sm">
+                  Databricks is a trusted vendor and we host the managed version
+                  - no need to self host since we are a trusted vendor.
+                </p>
+              </article>
             </GridItem>
           </Grid>
         </div>
