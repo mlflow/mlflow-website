@@ -60,21 +60,16 @@ export default function GenAi(): JSX.Element {
           <Grid columns={2}>
             <GridItem width="wide">
               <div className="flex flex-col gap-4">
-                <h2 className="text-white">Tracing</h2>
                 <h3 className="text-white">
-                  Capture and debug application logs with end-to-end
-                  observability
+                  End-to-End Observability with Tracing
                 </h3>
-                <p style={{ marginBottom: 0 }} className="text-white/60">
-                  Trace your app with OpenTelemetry-compatible SDKs that capture
-                  every invocation's inputs, outputs, and step-by-step execution
-                  - prompts, retrievals, tool calls, and more - alongside cost,
-                  latency, and errors. g{" "}
+                <p style={{ marginBottom: 0 }} className="text-white/60">                
+                Effortlessly debug and iterate on your GenAI application's behavior - both in development and production - by leveraging MLFlow's tracing that captures crucial details like prompts, retrievals, and tool calls. 
                 </p>
                 <p style={{ marginBottom: 0 }} className="text-white/60">
-                  Use these traces to quickly debug errors, improve business
-                  logic, and optimize cost and latency.
+                Avoid vendor-lock in with MLflow's open source, OpenTelemetry-compatible tracing SDK.
                 </p>
+
                 <a href="/genai/observability">
                   <Button variant="outline" size="small">
                     Learn more &gt;
@@ -180,13 +175,12 @@ export default function GenAi(): JSX.Element {
             <GridItem>
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">
-                  Continuously Monitor and Alert on Production AI Quality & Performance
+                  Continuous Production AI Monitoring & Quality Assurance
                 </h3>
                 <p style={{ marginBottom: 0 }} className="text-white/60">
-                  GenAI application behavior can drift in production due to changing data patterns or user interactions, potentially degrading quality or increasing costs. MLflow enables you to continuously monitor key quality, cost, and latency metrics for your deployed GenAI applications.
-                </p>
-                <p style={{ marginBottom: 0 }} className="text-white/60">
-                  Set up automated alerts to be notified of issues in real-time, allowing you to proactively address problems, maintain high performance, and ensure a consistent user experience.
+                Maintain high standards in production with continuous online quality monitoring. Gain real-time visibility with rich dashboards and detailed trace explorers in MLflow's powerful observability UI. Configure automated online evaluation with alerts to swiftly identify and address issues.
+
+           
                 </p>
                 <a href="/genai/monitoring"> {/* Placeholder link */}
                   <Button variant="outline" size="small">
