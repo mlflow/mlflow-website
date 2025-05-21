@@ -16,6 +16,11 @@ const gridVariants = cva(
         3: "md:grid-cols-3",
         4: "md:grid-cols-4",
       },
+      "lg-columns": {
+        2: "lg:grid-cols-2",
+        3: "lg:grid-cols-3",
+        4: "lg:grid-cols-4",
+      },
     },
     defaultVariants: {
       columns: "default",
@@ -29,10 +34,10 @@ export const grid: typeof gridVariants = (variants) =>
 export const Grid = ({
   children,
   className,
-  columns,
+  ...variants
 }: VariantProps<typeof gridVariants> &
   PropsWithChildren<{ className?: string }>) => {
-  return <div className={grid({ columns, className })}>{children}</div>;
+  return <div className={grid({ className, ...variants })}>{children}</div>;
 };
 
 const gridItemVariants = cva(
@@ -41,10 +46,19 @@ const gridItemVariants = cva(
     variants: {
       width: {
         narrow: "",
-        wide: "md:col-span-2 md:flex-row *:flex-1 md:items-center",
+        wide: "md:col-span-2 md:flex-row md:*:flex-1 md:items-center",
+      },
+      "lg-width": {
+        narrow: "lg:col-span-1",
+        wide: "lg:col-span-2 lg:flex-row lg:*:flex-1 lg:items-center",
       },
       direction: {
+        normal: "md:flex-col",
         reverse: "md:flex-col-reverse",
+      },
+      "lg-direction": {
+        normal: "lg:flex-col",
+        reverse: "lg:flex-col-reverse",
       },
     },
     compoundVariants: [
@@ -53,9 +67,25 @@ const gridItemVariants = cva(
         direction: "reverse",
         className: "md:flex-row-reverse",
       },
+      {
+        width: "wide",
+        direction: "normal",
+        className: "md:flex-row",
+      },
+      {
+        "lg-width": "wide",
+        "lg-direction": "reverse",
+        className: "lg:flex-row-reverse",
+      },
+      {
+        "lg-width": "wide",
+        "lg-direction": "normal",
+        className: "lg:flex-row",
+      },
     ],
     defaultVariants: {
       width: "narrow",
+      direction: "normal",
     },
   },
 );
@@ -66,11 +96,8 @@ export const gridItem: typeof gridItemVariants = (variants) =>
 export const GridItem = ({
   children,
   className,
-  width,
-  direction,
+  ...variants
 }: VariantProps<typeof gridItem> &
   PropsWithChildren<{ className?: string }>) => {
-  return (
-    <div className={gridItem({ width, direction, className })}>{children}</div>
-  );
+  return <div className={gridItem({ className, ...variants })}>{children}</div>;
 };
