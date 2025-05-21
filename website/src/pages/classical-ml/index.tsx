@@ -1,10 +1,6 @@
 import {
   Layout,
   CopyCommand,
-  VerticalTabs,
-  VerticalTabsList,
-  VerticalTabsTrigger,
-  VerticalTabsContent,
   SectionLabel,
   LogosCarousel,
   Grid,

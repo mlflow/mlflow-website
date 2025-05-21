@@ -6,10 +6,6 @@ import AssessmentsTab from "@site/static/img/assessments.jpg";
 import {
   Layout,
   CopyCommand,
-  VerticalTabs,
-  VerticalTabsList,
-  VerticalTabsTrigger,
-  VerticalTabsContent,
   SectionLabel,
   LogosCarousel,
   Grid,
