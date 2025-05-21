@@ -243,6 +243,39 @@ export default function GenAi(): JSX.Element {
             </VerticalTabsContent>
           </VerticalTabs> */}
         </div>
+        <LogosCarousel />
+        <div className="flex flex-col items-center justify-center gap-16">
+          <div className="flex flex-col gap-6">
+            <SectionLabel color="red" label="WHY US?" />
+            <h1>Why MLflow is unique</h1>
+          </div>
+          <Grid columns={3}>
+            <GridItem>
+              <div className="flex flex-col gap-4 h-full">
+                <h2 className="text-white">Unified, End-to-End MLOps and AI Observability</h2>
+                <p className="text-white/60">
+                  Streamline your AI and ML workflows with a cohesive platform that standardizes the entire development and deployment lifecycle for your cutting-edge generative AI applications and machine learning models. MLflow provides robust support for generative AI tracing, prompt management, rich LLM-as-a-judge evaluations, and continuous AI quality monitoring for production deployments. For classical ML, MLflow offers comprehensive experiment tracking, model packaging, collaborative model management, and deployment solutions for batch and real-time inference. This unified platform delivers a consistent, simplified experience, accelerating collaboration and innovation by removing the friction of integrating multiple tools.
+                </p>
+              </div>
+            </GridItem>
+            <GridItem>
+              <div className="flex flex-col gap-4 h-full">
+                <h2 className="text-white">Enterprise-Grade Security &amp; Governance on a Unified Data &amp; AI Platform</h2>
+                <p className="text-white/60">
+                  Managed MLflow is powered by Databricks, built on an enterprise data platform (the Databricks Lakehouse), so you can trust it with your most sensitive data without the burden of managing a self-hosted deployment. As a core component of the Databricks Data Intelligence Platform, it offers deep integrations with the broader Mosaic AI product suite, enabling high-quality training datasets, accelerated model development, powerful RAG applications, scalable Model Serving, and secure AI Gateway deployments. All of this is underpinned by Databricks Unity Catalog, giving you centralized, enterprise-grade governance over every AI asset—from data and models to agents and applications—ensuring compliance and control. Furthermore, leverage your GenAI and ML data for downstream business processes by building rich performance dashboards, reports, and queries with Databricks AI/BI and Databricks SQL.
+                </p>
+              </div>
+            </GridItem>
+            <GridItem>
+              <div className="flex flex-col gap-4 h-full">
+                <h2 className="text-white">Open, Flexible, and Extensible</h2>
+                <p className="text-white/60">
+                  MLflow is open source, allowing you to maintain agility and avoid vendor lock-in. Its extensible architecture integrates with the whole GenAI and ML ecosystem, enabling you to use your preferred frameworks, libraries, and languages. Data is stored and transmitted according to open protocols, giving you ownership of your data. Managed MLflow seamlessly integrates with a rich ecosystem of data sources, ML/AI tools, and deployment solutions, ensuring it can adapt to your existing stack and evolve with your future needs.
+                </p>
+              </div>
+            </GridItem>
+          </Grid>
+        </div>
         <GetStartedWithMLflow />
         <LatestNews variant="red" />
         <SocialWidget variant="red" />
