@@ -196,52 +196,6 @@ export default function GenAi(): JSX.Element {
               </div>
             </GridItem>
           </Grid>
-          {/* <VerticalTabs defaultValue="tracking" className="w-full my-12 px-10">
-            <VerticalTabsList>
-              <VerticalTabsTrigger
-                value="tracking"
-                label="Capture and debug application logs with end-to-end observability (tracing)"
-                description="Trace your app with OpenTelemetry-compatible SDKs that capture every invocation’s inputs, outputs, and step-by-step execution -  prompts, retrievals, tool calls, and more - alongside cost, latency, and errors. Use these traces to quickly debug errors, improve business logic, and optimize cost and latency."
-              />
-              <VerticalTabsTrigger
-                value="llm-judges"
-                label="Measure and improve quality with human-aligned, automated metrics (LLM judges)"
-                description="Capture and convert expert feedback into metrics (LLM judges) that understand your business requirements and can measure the nuances of plain-language GenAI outputs. Use these metrics to evaluate, monitor, and improve quality in development and production at scale, without waiting for human review."
-              />
-              <VerticalTabsTrigger
-                value="evaluation-datasets"
-                label="Adapt to evolving user behavior with production log evaluation (evaluation datasets)"
-                description="Use production logs to understand user behavior, turning low-quality responses into evaluation datasets and high-quality responses into regression tests. Replay these datasets to evaluate new prompts or app variants in development so you can ship the best variants to ensure your application continues to deliver high-quality responses as user behavior evolves."
-              />
-              <VerticalTabsTrigger
-                value="human-insight"
-                label="Incorporate human insight with an intuitive labeling and review experience "
-                description="Capture domain expert feedback via web-based UIs and end-user ratings from your app via APIs. Use this feedback to enrich your understanding of how the app should behave and improve your custom LLM-judge metrics. "
-              />
-              <VerticalTabsTrigger
-                value="enterprise-governance"
-                label="Enterprise governance with Unity Catalog"
-                description="MLflow is integrated with Unity Catalog to track the lifecycle and lineage of your app’s assets - models, prompts, datasets, and metrics - and apply access controls."
-              />
-            </VerticalTabsList>
-            <VerticalTabsContent value="tracking">
-              <img src="/img/demo-image.png" />
-            </VerticalTabsContent>
-            <VerticalTabsContent value="llm-judges">
-              <img src="/img/demo-image.png" />
-            </VerticalTabsContent>
-            <VerticalTabsContent value="evaluation-datasets">
-              <img src="/img/demo-image.png" />
-            </VerticalTabsContent>
-
-            <VerticalTabsContent value="human-insight">
-              <img src="/img/demo-image.png" />
-            </VerticalTabsContent>
-
-            <VerticalTabsContent value="tab5">
-              <img src="/img/demo-image.png" />
-            </VerticalTabsContent>
-          </VerticalTabs> */}
         </div>
         <LogosCarousel />
         <div className="flex flex-col items-center justify-center gap-16">
