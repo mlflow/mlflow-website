@@ -8,7 +8,6 @@ import {
   SectionLabel,
   LogosCarousel,
   Grid,
-  GridRow,
   GridItem,
   GetStartedWithMLflow,
   LatestNews,
@@ -104,62 +103,58 @@ export default function GenAi(): JSX.Element {
             <SectionLabel color="green" label="WHY US?" />
             <h1>Why MLflow is unique</h1>
           </div>
-          <Grid>
-            <GridRow>
-              <GridItem className="py-10 pr-0 md:pr-10 gap-10">
-                <div className="flex flex-col gap-4">
-                  <h3 className="text-white">Industry pioneer</h3>
-                  <p className="text-white/60">
-                    MLflow has established itself as a pioneering open-source
-                    platform for managing the end-to-end machine learning
-                    lifecycle. Created by Databricks, it has become one of the
-                    most widely adopted MLOps tools in the industry, with
-                    integration support from major cloud providers.
-                  </p>
-                </div>
-              </GridItem>
-              <GridItem className="py-10 pl-0 md:pl-10 gap-10">
-                <div className="flex flex-col gap-4">
-                  <h3 className="text-white">Framework neutrality</h3>
-                  <p className="text-white/60">
-                    MLflow's framework-agnostic design is one of its strongest
-                    differentiators. Unlike proprietary solutions that lock you
-                    into specific ecosystems, MLflow works seamlessly with all
-                    popular ML frameworks including scikit-learn, PyTorch,
-                    TensorFlow, and XGBoost.
-                  </p>
-                </div>
-              </GridItem>
-            </GridRow>
-            <GridRow>
-              <GridItem className="py-10 pr-0 md:pr-10 gap-10">
-                <div className="flex flex-col gap-4">
-                  <h3 className="text-white">
-                    Comprehensive Lifecycle Management
-                  </h3>
-                  <p className="text-white/60">
-                    MLflow uniquely addresses the complete machine learning
-                    lifecycle through four integrated components: - MLflow
-                    Tracking for logging parameters, metrics, and artifacts -
-                    MLflow Projects for reproducible code packaging - MLflow
-                    Models for standardized deployment - MLflow Model Registry
-                    for centralized version management
-                  </p>
-                </div>
-              </GridItem>
-              <GridItem className="py-10 pl-0 md:pl-10 gap-10">
-                <div className="flex flex-col gap-4">
-                  <h3 className="text-white">Enterprise Adoption</h3>
-                  <p className="text-white/60">
-                    MLflow's impact extends beyond its technical capabilities.
-                    It has gained significant traction among enterprise teams
-                    requiring robust experiment tracking and model lifecycle
-                    management. Databricks offers a managed MLflow service with
-                    enhanced security and scalability.
-                  </p>
-                </div>
-              </GridItem>
-            </GridRow>
+          <Grid columns={2}>
+            <GridItem>
+              <div className="flex flex-col gap-4">
+                <h3 className="text-white">Industry pioneer</h3>
+                <p className="text-white/60">
+                  MLflow has established itself as a pioneering open-source
+                  platform for managing the end-to-end machine learning
+                  lifecycle. Created by Databricks, it has become one of the
+                  most widely adopted MLOps tools in the industry, with
+                  integration support from major cloud providers.
+                </p>
+              </div>
+            </GridItem>
+            <GridItem>
+              <div className="flex flex-col gap-4">
+                <h3 className="text-white">Framework neutrality</h3>
+                <p className="text-white/60">
+                  MLflow's framework-agnostic design is one of its strongest
+                  differentiators. Unlike proprietary solutions that lock you
+                  into specific ecosystems, MLflow works seamlessly with all
+                  popular ML frameworks including scikit-learn, PyTorch,
+                  TensorFlow, and XGBoost.
+                </p>
+              </div>
+            </GridItem>
+            <GridItem>
+              <div className="flex flex-col gap-4">
+                <h3 className="text-white">
+                  Comprehensive Lifecycle Management
+                </h3>
+                <p className="text-white/60">
+                  MLflow uniquely addresses the complete machine learning
+                  lifecycle through four integrated components: - MLflow
+                  Tracking for logging parameters, metrics, and artifacts -
+                  MLflow Projects for reproducible code packaging - MLflow
+                  Models for standardized deployment - MLflow Model Registry for
+                  centralized version management
+                </p>
+              </div>
+            </GridItem>
+            <GridItem>
+              <div className="flex flex-col gap-4">
+                <h3 className="text-white">Enterprise Adoption</h3>
+                <p className="text-white/60">
+                  MLflow's impact extends beyond its technical capabilities. It
+                  has gained significant traction among enterprise teams
+                  requiring robust experiment tracking and model lifecycle
+                  management. Databricks offers a managed MLflow service with
+                  enhanced security and scalability.
+                </p>
+              </div>
+            </GridItem>
           </Grid>
         </div>
         <GetStartedWithMLflow />

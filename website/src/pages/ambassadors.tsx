@@ -1,6 +1,6 @@
 import Link from "@docusaurus/Link";
 
-import { Layout, Grid, GridRow, GridItem } from "../components";
+import { Layout, Grid, GridItem } from "../components";
 
 import ambassadors from "./ambassadors.json";
 
@@ -35,28 +35,23 @@ export default function Ambassadors() {
       </div>
       <div className="flex flex-col gap-8 max-w-4xl mx-auto mt-20">
         <h1>Meet the MLflow Ambassadors</h1>
-        <Grid>
-          {ambassadors.map((row, index) => (
-            <GridRow key={index}>
-              {row.map((item) => (
-                <GridItem
-                  key={item.title}
-                  className="gap-3 py-10 odd:pr-10 even:pl-10"
+        <Grid columns={2}>
+          {ambassadors.flatMap((row) =>
+            row.map((item) => (
+              <GridItem key={item.title} className="gap-3">
+                <img src={item.img} alt={item.title} className="rounded-md" />
+                <h3>{item.title}</h3>
+                <p>{item.role}</p>
+                <Link
+                  href={item.companyLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
-                  <img src={item.img} alt={item.title} className="rounded-md" />
-                  <h3>{item.title}</h3>
-                  <p>{item.role}</p>
-                  <Link
-                    href={item.companyLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {item.company}
-                  </Link>
-                </GridItem>
-              ))}
-            </GridRow>
-          ))}
+                  {item.company}
+                </Link>
+              </GridItem>
+            )),
+          )}
         </Grid>
       </div>
       <div className="flex flex-col gap-10 max-w-4xl mx-auto mt-20">
