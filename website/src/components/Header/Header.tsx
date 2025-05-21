@@ -31,6 +31,10 @@ export const Header = () => {
     setIsProductItemHovered(false);
   };
 
+  const toggleProductSubmenuHovered = () => {
+    setIsProductItemHovered(!isProductItemHovered);
+  };
+
   const handleProductItemClick = () => {
     setIsProductSubmenuOpen(!isProductSubmenuOpen);
   };
@@ -122,6 +126,7 @@ export const Header = () => {
             <li
               className="w-full md:w-auto hidden md:block"
               onMouseEnter={handleProductItemHover}
+              onClick={toggleProductSubmenuHovered}
             >
               <HeaderMenuItem label="Product" hasDropdown />
             </li>
