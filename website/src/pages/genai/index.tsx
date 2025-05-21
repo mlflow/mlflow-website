@@ -177,16 +177,67 @@ export default function GenAi(): JSX.Element {
                 />
               </div>
             </GridItem>
+            <GridItem>
+              <div className="flex flex-col gap-4">
+                <h3 className="text-white">
+                  Continuously Monitor and Alert on Production AI Quality & Performance
+                </h3>
+                <p style={{ marginBottom: 0 }} className="text-white/60">
+                  GenAI application behavior can drift in production due to changing data patterns or user interactions, potentially degrading quality or increasing costs. MLflow enables you to continuously monitor key quality, cost, and latency metrics for your deployed GenAI applications.
+                </p>
+                <p style={{ marginBottom: 0 }} className="text-white/60">
+                  Set up automated alerts to be notified of issues in real-time, allowing you to proactively address problems, maintain high performance, and ensure a consistent user experience.
+                </p>
+                <a href="/genai/monitoring"> {/* Placeholder link */}
+                  <Button variant="outline" size="small">
+                    Learn more &gt;
+                  </Button>
+                </a>
+              </div>
+              <div>
+                <img
+                  className="rounded-xl mt-10 mb-4"
+                  src={AssessmentsTab} /* Placeholder image */
+                  alt="MLflow Monitoring"
+                />
+              </div>
+            </GridItem>
+            <GridItem direction="reverse">
+              <div className="flex flex-col gap-4">
+                <h3 className="text-white">
+                  Secure and Streamline LLM Access with AI Gateway
+                </h3>
+                <p style={{ marginBottom: 0 }} className="text-white/60">
+                  Organizations often struggle to securely manage and standardize access to various Large Language Models (LLMs) at scale. MLflow's AI Gateway provides a centralized and secure interface for managing LLM API keys and endpoints.
+                </p>
+                <p style={{ marginBottom: 0 }} className="text-white/60">
+                  Control who has access to specific LLMs, enforce rate limits, and leverage AI guardrails to protect your applications from exposing sensitive data or generating inappropriate responses, ensuring both security and compliance. (Managed MLflow feature)
+                </p>
+                <a href="/genai/ai-gateway"> {/* Placeholder link */}
+                  <Button variant="outline" size="small">
+                    Learn more &gt;
+                  </Button>
+                </a>
+              </div>
+              <div>
+                <img
+                  className="rounded-xl mt-10 mb-4"
+                  src={AssessmentsTab} /* Placeholder image */
+                  alt="MLflow AI Gateway"
+                />
+              </div>
+            </GridItem>
             <GridItem className="hidden md:block"></GridItem>
             <GridItem>
               <div className="flex flex-col gap-4 justify-center">
                 <h3 className="text-white">
-                  Enterprise governance with Unity Catalog
+                  Comprehensive GenAI Lifecycle Management with Unity Catalog and Git Integration
                 </h3>
                 <p style={{ marginBottom: 0 }} className="text-white/60">
-                  MLflow is integrated with Unity Catalog to track the lifecycle
-                  and lineage of your app’s assets - models, prompts, datasets,
-                  and metrics - and apply access controls
+                  Tracking GenAI assets like prompts, their versions, and associated quality evaluations can be challenging with traditional tools. MLflow, integrated with Unity Catalog, provides a robust Prompt Registry to manage the lifecycle of your prompts.
+                </p>
+                <p style={{ marginBottom: 0 }} className="text-white/60">
+                  Furthermore, MLflow complements Git by linking evaluation data, traces, and specific prompt versions from Unity Catalog directly to your Git revisions. This offers end-to-end versioning and lineage for your entire GenAI application, ensuring reproducibility and streamlined collaboration. It also tracks models, datasets, and metrics, applying access controls for enterprise governance.
                 </p>
                 <a href="/genai/governance">
                   <Button variant="outline" size="small">
