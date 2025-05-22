@@ -80,6 +80,7 @@ export default function GenAi(): JSX.Element {
                   src={TraceTab}
                   alt="MLflow tracing"
                 />
+                {/* Product GIF of the tracing UI for a complex trace */}
               </div>
             </GridItem>
             <GridItem width="wide" direction="reverse">
@@ -109,6 +110,7 @@ export default function GenAi(): JSX.Element {
                   alt="MLflow Monitoring"
                 />
               </div>
+              {/* Product GIF of the Trace UI view + charts */}
             </GridItem>
           </Grid>
         </div>
@@ -150,6 +152,7 @@ export default function GenAi(): JSX.Element {
                   alt="MLflow LLM judges"
                 />
               </div>
+              {/* Animation showing humans providing feedback and it being synthesized into an llm judge */}
             </GridItem>
 
             <GridItem width="wide" direction="reverse">
@@ -176,6 +179,7 @@ export default function GenAi(): JSX.Element {
                   alt="MLflow evaluations"
                 />
               </div>
+              {/* Product GIF of running mlflow.evaluate and then seeing the eval results list UI */}
             </GridItem>
 
             <GridItem width="wide">
@@ -202,6 +206,7 @@ export default function GenAi(): JSX.Element {
                   alt="MLflow LLM judges"
                 />
               </div>
+              {/* Product GIF of the review app adding a custom feedback label and then it showing on the mlflow trace UI */}
             </GridItem>
           </Grid>
         </div>
@@ -240,6 +245,7 @@ export default function GenAi(): JSX.Element {
                   alt="MLflow LLM judges"
                 />
               </div>
+              {/* Figma of the prompt registry, showing adding a prompt and then comparing 2 versions */}
             </GridItem>
 
             <GridItem width="wide" direction="reverse">
@@ -268,6 +274,7 @@ export default function GenAi(): JSX.Element {
                   src={AssessmentsTab}
                   alt="MLflow LLM judges"
                 />
+                {/* Product GIF of the versions tab showing multiple models and then zooming into one to see evals + params like a prompt  */}
               </div>
             </GridItem>
           </Grid>
