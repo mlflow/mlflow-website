@@ -283,10 +283,7 @@ export default function GenAi(): JSX.Element {
               <div className="flex flex-col gap-4 h-full">
                 <h2 className="text-white">Unified, End-to-End MLOps and AI Observability</h2>
                 <p className="text-white/60">
-                  MLflow provides a cohesive platform that standardizes the entire development and deployment lifecycle for <i>both</i>your generative AI applications and machine learning models.
-                </p>
-                <p className="text-white/60">
-                MLflow's unified platform delivers a consistent, simplified experience, accelerating collaboration and innovation by removing the friction of integrating multiple tools.
+                  MLflow offers a unified platform for the entire GenAI and ML model lifecycle, simplifying the experience and boosting collaboration by reducing tool integration friction.
                 </p>
               </div>
             </GridItem>
@@ -295,29 +292,22 @@ export default function GenAi(): JSX.Element {
               <div className="flex flex-col gap-4 h-full">
                 <h2 className="text-white">Open, Flexible, and Extensible</h2>
                 <p className="text-white/60">
-                  MLflow is open source, allowing you to maintain agility and avoid vendor lock-in. Its extensible architecture integrates with the whole GenAI and ML ecosystem, enabling you to use your preferred frameworks, libraries, and languages. 
-                </p>
-                <p className="text-white/60">
-                Data is stored and transmitted according to open protocols, giving you ownership of your data.
-                </p>
-                <p className="text-white/60">
-                 MLflow seamlessly integrates with a rich ecosystem of data sources, ML/AI tools, and deployment solutions, ensuring it can adapt to your existing stack and evolve with your future needs.
+                  Open-source and extensible, MLflow prevents vendor lock-in by integrating with the GenAI/ML ecosystem and using open protocols for data ownership, adapting to your existing and future stacks.
                 </p>
               </div>
             </GridItem>
-            <GridItem width="wide">
+            <GridItem>
               <div className="flex flex-col gap-4 h-full">
                 <h2 className="text-white">Enterprise-Grade Security &amp; Governance on a Unified Data &amp; AI Platform</h2>
                 <p className="text-white/60">
-                  Managed MLflow is powered by Databricks, built on an enterprise data platform (the Databricks Lakehouse), so you can trust it with your most sensitive data without the burden of managing a self-hosted deployment. 
+                  Managed MLflow on Databricks offers enterprise-grade security and deep Mosaic AI integrations for enhanced datasets, development, RAG, serving, and gateways. Unity Catalog ensures centralized governance over all AI assets.
                 </p>
+              </div>
+            </GridItem>
+            <GridItem>
+              <div className="flex flex-col gap-4 h-full">
+                <h2 className="text-white">Unlock Downstream Value with Databricks AI/BI</h2>
                 <p className="text-white/60">
-                  As a core component of the Databricks Data Intelligence Platform, MLflow offers deep integrations with the broader Mosaic AI product suite, enabling high-quality training datasets, accelerated model development, powerful RAG applications, scalable Model Serving, and secure AI Gateway deployments. 
-                  </p>
-                  <p className="text-white/60">
-                  MLflow is underpinned by Databricks Unity Catalog, providing centralized, enterprise-grade governance over every AI asset—from data and models to agents and applications—ensuring compliance and control. 
-                  </p>
-                  <p className="text-white/60">
                   Leverage your GenAI and ML data for downstream business processes by building rich performance dashboards, reports, and queries with Databricks AI/BI and Databricks SQL.
                 </p>
               </div>
