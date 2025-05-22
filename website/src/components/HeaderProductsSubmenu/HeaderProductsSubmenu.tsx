@@ -12,10 +12,7 @@ export const HeaderProductsSubmenu = () => {
           <span className="text-[#F7F8F8]/60 text-sm">Features</span>
           <div className="flex flex-row">
             <div className="min-w-50 flex flex-col gap-4 md:gap-1">
-              <HeaderMenuItem
-                href="/genai/quality-metrics"
-                label="Quality metrics"
-              />
+            
               <HeaderMenuItem
                 href="/genai/observability"
                 label="Observability"
