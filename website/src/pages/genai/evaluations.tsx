@@ -38,7 +38,9 @@ export default function Evaluations() {
       </div>
       <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-container">
         <div className="flex flex-col w-full items-center justify-center gap-1">
-          <h2>Accurately evaluate free-form language outputs with LLM judges</h2>
+          <div role="heading" aria-level={2} className="text-4xl">
+            Accurately evaluate free-form language outputs with LLM judges
+          </div>
         </div>
         <Grid columns={2}>
           <GridItem>
@@ -66,13 +68,13 @@ export default function Evaluations() {
           </GridItem>
           {/* Animation showing humans providing feedback and it being synthesized into an llm judge */}
         </Grid>
-      </div>
-      <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-container">
         <div className="flex flex-col w-full items-center justify-center gap-1">
-          <h2>Use production traffic to drive offline improvements</h2>
+          <div role="heading" aria-level={2} className="text-4xl">
+            Use production traffic to drive offline improvements
+          </div>
         </div>
         <Grid columns={2}>
-          <GridItem>
+          <GridItem width="wide">
             <div className="flex flex-col gap-10">
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">Evaluation datasets</h3>
@@ -88,13 +90,13 @@ export default function Evaluations() {
           </GridItem>
           {/* Show selecting traces from monitoring UI and saving into eval set */}
         </Grid>
-      </div>
-      <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-container">
         <div className="flex flex-col w-full items-center justify-center gap-1">
-          <h2>Iteratively improve quality through evaluation</h2>
+          <div role="heading" aria-level={2} className="text-4xl">
+            Iteratively improve quality through evaluation
+          </div>
         </div>
         <Grid columns={2}>
-          <GridItem direction="reverse">
+          <GridItem width="wide" direction="reverse">
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Test new app / prompt variants</h3>
               <p className="text-white/60 text-lg">
@@ -123,7 +125,7 @@ export default function Evaluations() {
             <FakeImage />
             {/* Code snippet of a custom metric function */}
           </GridItem>
-          <GridItem width="wide">
+          <GridItem width="wide" direction="reverse">
             <div className="flex flex-col gap-4">
               <h3 className="text-white">
                 Identify root causes with evaluation review UIs

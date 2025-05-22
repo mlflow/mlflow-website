@@ -39,7 +39,9 @@ export default function Observability() {
       </div>
       <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-container">
         <div className="flex flex-col w-full items-center justify-center gap-1">
-          <h2>Best-in-class tracing</h2>
+          <div role="heading" aria-level={2} className="text-4xl">
+            Best-in-class tracing
+          </div>
         </div>
         <Grid columns={2}>
           <GridItem>
@@ -89,10 +91,10 @@ export default function Observability() {
             {/* GIF screenshot of summary view paging through several traces */}
           </GridItem>
         </Grid>
-      </div>
-      <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-container">
         <div className="flex flex-col w-full items-center justify-center gap-1">
-          <h2>Simple, customizable instrumentation</h2>
+          <div role="heading" aria-level={2} className="text-4xl">
+            Simple, customizable instrumentation
+          </div>
         </div>
         <Grid columns={2}>
           <GridItem width="wide" direction="reverse">
@@ -124,7 +126,7 @@ export default function Observability() {
             <FakeImage />
             {/* Code example of using custom instrumentation that maps the code to a sample trace from the code (example in go/genai/quality) */}
           </GridItem>
-          <GridItem width="wide">
+          <GridItem width="wide" direction="reverse">
             <div className="flex flex-col gap-4">
               <h3 className="text-white">
                 Instrument once, use in development and production
@@ -151,13 +153,13 @@ export default function Observability() {
             <FakeImage />
           </GridItem>
         </Grid>
-      </div>
-      <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-container">
         <div className="flex flex-col w-full items-center justify-center gap-1">
-          <h2>Annotation capabilities</h2>
+          <div role="heading" aria-level={2} className="text-4xl">
+            Annotation capabilities
+          </div>
         </div>
 
-        <Grid columns={3}>
+        <Grid columns={2}>
           <GridItem>
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Attach Quality Feedback</h3>
@@ -182,7 +184,7 @@ export default function Observability() {
             <FakeImage />
             {/* Animation of grouping traces by user and conversation session */}
           </GridItem>
-          <GridItem direction="reverse">
+          <GridItem width="wide">
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Comments and notes</h3>
               <p className="text-white/60 text-lg">
@@ -194,15 +196,14 @@ export default function Observability() {
             {/* Product GIF of adding feedback in the trace UI */}
           </GridItem>
         </Grid>
-      </div>
-
-      <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-container">
         <div className="flex flex-col w-full items-center justify-center gap-16">
           <div className="flex flex-col w-full items-center justify-center gap-1">
-            <h2>Production monitoring</h2>
+            <div role="heading" aria-level={2} className="text-4xl">
+              Production monitoring
+            </div>
           </div>
           <Grid columns={2}>
-            <GridItem width="wide">
+            <GridItem width="wide" direction="reverse">
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">Dashboards</h3>
                 <p className="text-white/60 text-lg">
