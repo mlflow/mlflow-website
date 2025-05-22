@@ -22,18 +22,18 @@ export default function HumanFeedback() {
       >
         <div className="flex flex-col gap-16 w-full px-6 md:px-20 max-w-container">
           <div className="flex flex-col justify-center items-center gap-6 w-full">
-            <SectionLabel color="red" label="QUALITY METRICS" />
+            <SectionLabel color="red" label="HUMAN FEEDBACK" />
             <h1 className="text-center text-wrap">
-              Incorporate human insight with an intuitive labeling and review
-              experience
+              Incorporate human insight to understand and improve quality
             </h1>
             <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-white/60">
-              Capture domain expert feedback via web-based UIs and end-user
-              ratings from your app via APIs.
+              Capture domain expert feedback to understand how your app should
+              behave and align your custom LLM-judge metrics with those expert's
+              judgement.
             </p>
             <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-white/60">
-              Use this feedback to enrich your understanding of how the app
-              should behave and improve your custom LLM-judge metrics.
+              Capture end user feedback to quickly pinpoint quality issues in
+              production.
             </p>
             <GetStartedButton />
           </div>
@@ -51,24 +51,24 @@ export default function HumanFeedback() {
               </div>
 
               <p className="text-white/60">
-                MLflow’s Review App is built from the ground up to quickly and
-                easily collect feedback from busy domain experts on production
-                logs - experts can view inputs and outputs, alongside
-                intermediate steps such as retrieval and tool calls, so they can
-                provide feedback in seconds. Use our pre-defined feedback
-                questions or add your own custom questions.
+                MLflow's Review App is built from the ground up to quickly and
+                easily collect feedback from busy domain experts. Share any
+                production log to experts so they can review the interaction and
+                provide feedback. Use pre-defined questions or create custom
+                questions.
               </p>
             </div>
             <FakeImage />
           </GridItem>
           <GridItem direction="reverse">
             <div className="flex flex-col gap-4">
-              <h3 className="text-white">No more spreadsheets!</h3>
+              <h3 className="text-white">Track and visualize feedback</h3>
               <p className="text-white/60 text-lg">
-                Replace your spreadsheet-based labeling workflow with MLflow’s
-                data model - feedback from the review app flows is directly
-                attached to the source traces as version-controlled labels.
-                Track labeling progress and visualize results via the UI.
+                Replace spreadsheet-based labeling workflow with MLflow's
+                feedback data model - end user and domain expert feedback is
+                directly attached to the traces as version-controlled labels.
+                Visualize feedback in the MLflow Trace UIs and dashboards to
+                quickly pinpoint quality issues.
               </p>
             </div>
             <FakeImage />
@@ -77,11 +77,8 @@ export default function HumanFeedback() {
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Capture end-user feedback</h3>
               <p className="text-white/60 text-lg">
-                In addition to domain experts, use MLflow’s APIs to capture
-                feedback that end users provide in your deployed application.
-                Similar to the review app, feedback is directly attached to the
-                source traces as version-controlled labels & can be visualized
-                via the UI.
+                Use MLflow's APIs to link end user feedback from your deployed
+                application to the source MLflow Trace.
               </p>
             </div>
             <FakeImage />
@@ -90,9 +87,9 @@ export default function HumanFeedback() {
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Integrated Chat App</h3>
               <p className="text-white/60 text-lg">
-                When you have a new version ready for testing, load it into the
-                Review App’s pre-built chat UI to let domain experts use the
-                version and quickly provide feedback.
+                Quickly deploy new app versions to the Review App's built-in
+                chat UI so domain experts can interact and provide instant
+                feedback so you can rapidly assess quality and pinpoint issues.
               </p>
             </div>
             <FakeImage />
