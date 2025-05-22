@@ -38,7 +38,7 @@ export default function Evaluations() {
       </div>
       <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-container">
         <div className="flex flex-col w-full items-center justify-center gap-1">
-          <h2>Accurately measure free-form language with LLM judges</h2>
+          <h2>Accurately evaluate free-form language outputs with LLM judges</h2>
         </div>
         <Grid columns={2}>
           <GridItem>
