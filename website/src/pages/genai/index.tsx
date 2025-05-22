@@ -61,10 +61,10 @@ export default function GenAi(): JSX.Element {
                   Debug with tracing
                 </h3>
                 <p style={{ marginBottom: 0 }} className="text-white/60">                
-                Effortlessly debug and iterate on your GenAI application's behavior - both in development and production - by leveraging MLFlow's tracing that captures crucial details like prompts, retrievals, and tool calls. 
+                Debug and iterate on GenAI applications using MLflow's tracing, which captures your app's entire execution, including prompts, retrievals, tool calls.
                 </p>
                 <p style={{ marginBottom: 0 }} className="text-white/60">
-                Avoid vendor-lock in with MLflow's open source, OpenTelemetry-compatible tracing SDK.
+                MLflow's open-source, OpenTelemetry-compatible tracing SDK helps avoid vendor lock-in.
                 </p>
 
                 <a href="/genai/observability">
@@ -87,10 +87,10 @@ export default function GenAi(): JSX.Element {
                   Monitor in production
                 </h3>
                 <p style={{ marginBottom: 0 }} className="text-white/60">
-                Maintain high standards in production with continuous online quality and operational (latency, cost) monitoring. Gain real-time visibility with rich dashboards and detailed trace explorers in MLflow's powerful observability UI.
+                Maintain production quality with continuous monitoring of quality, latency, and cost. Gain real-time visibility via MLflow's dashboards and trace explorers.
                 </p>
                 <p style={{ marginBottom: 0 }} className="text-white/60">
-                Configure automated online evaluation with alerts to swiftly identify and address issues.
+                Configure automated online evaluations with alerts to quickly address issues.
                 </p>
                 <a href="/genai/monitoring"> {/* Placeholder link */}
                   <Button variant="outline" size="small">
@@ -112,7 +112,7 @@ export default function GenAi(): JSX.Element {
           <div className="flex flex-col w-full items-center justify-center gap-6">
             <SectionLabel color="red" label="CORE FEATURES" />
             <h1>Evaluation to measure and improve quality</h1>
-            {/* MISSING: MLflow makes generative AI evaluation intuitive, allowing you to easily collect and record LLM judge and human feedback directly on traces. */}
+            <p className="text-lg text-center text-wrap max-w-2xl mx-auto text-white/80">MLflow simplifies GenAI evaluation, enabling easy collection and recording of LLM judge and human feedback directly on traces.</p>
             {/* <p className="text-white">
               Tackle the challenges of building GenAI head on
             </p> */}
@@ -121,17 +121,10 @@ export default function GenAi(): JSX.Element {
           <GridItem width="wide">
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">
-                Measure and improve quality with human-aligned LLM judges
+                  LLM Judges for Quality Measurement
                 </h3>
-                
                 <p style={{ marginBottom: 0 }} className="text-white/60">
-                  Use LLM-as-a-judge metrics that mimic human expert's judgment and understand the nuances of plain-language GenAI outputs to evaluate, monitor, and improve your application's quality.
-                </p>
-                <p style={{ marginBottom: 0 }} className="text-white/60">
-                  Leverage "batteries included" LLM judges with industry-leading quality for common metrics, such as hallucination or relevance.
-                </p>
-                <p style={{ marginBottom: 0 }} className="text-white/60">
-                Create custom LLM judges tuned to specific business requirements and your domain experts' judgement.
+                  Utilize LLM-as-a-judge metrics, mimicking human expertise, to assess and enhance GenAI quality. Access pre-built judges for common metrics like hallucination or relevance, or develop custom judges tailored to your business needs and expert insights.
                 </p>
                 <a href="/genai/quality-metrics">
                   <Button variant="outline" size="small">
@@ -151,16 +144,10 @@ export default function GenAi(): JSX.Element {
           <GridItem width="wide" direction="reverse">
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">
-                  Adapt to evolving user behavior by using production logs for evaluation
+                  Evaluate with production logs
                 </h3>
                 <p style={{ marginBottom: 0 }} className="text-white/60">
-                Adapt to evolving user behavior by creating evaluation datasets and regression tests from production logs.
-                </p>
-                <p style={{ marginBottom: 0 }} className="text-white/60">
-                  Replay these datasets to evaluate new prompts or app variants
-                  in development so you can ship the best variants to production.
-
-                  
+                  Adapt to user behavior by creating evaluation datasets and regression tests from production logs. Replay these to assess new prompts or app versions in development, ensuring optimal variants reach production.
                 </p>
                 <a href="/genai/evaluations">
                   <Button variant="outline" size="small">
@@ -180,16 +167,10 @@ export default function GenAi(): JSX.Element {
             <GridItem width="wide">
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">
-                  Incorporate human insight with an intuitive labeling and
-                  review experience
+                Capture and incorporate human feedback
                 </h3>
                 <p style={{ marginBottom: 0 }} className="text-white/60">
-                  Capture domain expert feedback via hosted, web-based UIs and end-user
-                  ratings from your app via APIs.
-                </p>
-                <p style={{ marginBottom: 0 }} className="text-white/60">
-                  Use this feedback to enrich your understanding of how the app
-                  should behave and improve your custom LLM-judge metrics.
+                  Collect expert feedback through web UIs and end-user ratings from your app via APIs. Use this feedback to understand how your app should behave and align your custom LLM-judge metrics with expert judgement.
                 </p>
                 <a href="/genai/human-feedback">
                   <Button variant="outline" size="small">
