@@ -10,13 +10,17 @@ export const HeaderProductsSubmenu = () => {
         </div>
         <div className="flex flex-col gap-3">
           <span className="text-[#F7F8F8]/60 text-sm">Features</span>
-          <div className="flex flex-row">
+          <div className="flex flex-row gap-4">
             <div className="min-w-50 flex flex-col gap-4 md:gap-1">
               <HeaderMenuItem
                 href="/genai/observability"
                 label="Observability"
               />
               <HeaderMenuItem href="/genai/evaluations" label="Evaluations" />
+              <HeaderMenuItem
+                href="/genai/prompt-registry-versioning"
+                label="Prompt registry & versioning"
+              />
             </div>
             <div className="min-w-50 flex flex-col gap-4 md:gap-1">
               <HeaderMenuItem
