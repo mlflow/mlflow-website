@@ -128,7 +128,7 @@ export default function GenAi(): JSX.Element {
             <GridItem width="wide">
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">
-                Accurately measure free-form language with LLM judges
+                  Accurately measure free-form language with LLM judges
                 </h3>
                 <p style={{ marginBottom: 0 }} className="text-white/60">
                   Utilize LLM-as-a-judge metrics, mimicking human expertise, to
@@ -154,7 +154,9 @@ export default function GenAi(): JSX.Element {
 
             <GridItem width="wide" direction="reverse">
               <div className="flex flex-col gap-4">
-                <h3 className="text-white">Use production traffic to drive offline improvements</h3>
+                <h3 className="text-white">
+                  Use production traffic to drive offline improvements
+                </h3>
                 <p style={{ marginBottom: 0 }} className="text-white/60">
                   Adapt to user behavior by creating evaluation datasets and
                   regression tests from production logs. Replay these to assess
@@ -179,7 +181,7 @@ export default function GenAi(): JSX.Element {
             <GridItem width="wide">
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">
-                Use human feedback to improve quality
+                  Use human feedback to improve quality
                 </h3>
                 <p style={{ marginBottom: 0 }} className="text-white/60">
                   Collect expert feedback through web UIs and end-user ratings

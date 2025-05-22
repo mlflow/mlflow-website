@@ -141,11 +141,11 @@ export default function Observability() {
           </GridItem>
           <GridItem width="wide">
             <div className="flex flex-col gap-4">
-              <h3 className="text-white">
-                OpenTelemetry compatible
-              </h3>
+              <h3 className="text-white">OpenTelemetry compatible</h3>
               <p className="text-white/60 text-lg">
-              Fully compatible with OpenTelemetry, so you can export traces to any OpenTelemetry compatible tool, providing you total ownership and portability of your generative AI data.
+                Fully compatible with OpenTelemetry, so you can export traces to
+                any OpenTelemetry compatible tool, providing you total ownership
+                and portability of your generative AI data.
               </p>
             </div>
             <FakeImage />
@@ -186,7 +186,8 @@ export default function Observability() {
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Comments and notes</h3>
               <p className="text-white/60 text-lg">
-              Add notes and context directly to traces for collaborative analysis.
+                Add notes and context directly to traces for collaborative
+                analysis.
               </p>
             </div>
             <FakeImage />
@@ -225,7 +226,6 @@ export default function Observability() {
               </div>
               <FakeImage />
               {/* Product GIF searching and filtering for tags + feedback */}
-
             </GridItem>
             <GridItem direction="reverse">
               <div className="flex flex-col gap-4">
@@ -237,7 +237,7 @@ export default function Observability() {
                 </p>
               </div>
               <FakeImage />
-                {/* Figma of what this design will be! */}
+              {/* Figma of what this design will be! */}
             </GridItem>
           </Grid>
         </div>

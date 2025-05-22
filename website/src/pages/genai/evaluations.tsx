@@ -45,10 +45,10 @@ export default function Evaluations() {
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Pre-built LLM judges</h3>
               <p className="text-white/60 text-lg">
-                Quickly start with built-in LLM judges for safety, hallucination,
-                retrieval quality, and relevance. Our research-backed judges
-                provide accurate, reliable quality evaluation aligned with human
-                expertise.
+                Quickly start with built-in LLM judges for safety,
+                hallucination, retrieval quality, and relevance. Our
+                research-backed judges provide accurate, reliable quality
+                evaluation aligned with human expertise.
               </p>
             </div>
             <FakeImage />
@@ -80,7 +80,8 @@ export default function Evaluations() {
 
               <p className="text-white/60">
                 Curate high-scoring traces for regression datasets and
-                low-scoring ones for evaluation datasets to use offline to improve quality.
+                low-scoring ones for evaluation datasets to use offline to
+                improve quality.
               </p>
             </div>
             <FakeImage />
@@ -97,9 +98,10 @@ export default function Evaluations() {
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Test new app / prompt variants</h3>
               <p className="text-white/60 text-lg">
-                MLflow's Evaluation SDK lets you test new application variants (prompts,
-                models, code) against evaluation and regression datasets. Each variant is linked to its
-                evaluation results, enabling tracking of improvements over time.
+                MLflow's Evaluation SDK lets you test new application variants
+                (prompts, models, code) against evaluation and regression
+                datasets. Each variant is linked to its evaluation results,
+                enabling tracking of improvements over time.
               </p>
             </div>
             <FakeImage />
@@ -112,9 +114,9 @@ export default function Evaluations() {
                   Customize with code-based metrics
                 </h3>
                 <p className="text-white/60">
-                  Customize evaluation to measure any aspect of your app's quality or
-                  performance using our custom metrics SDK. Convert any Python
-                  function—from regex to custom logic—into a metric.
+                  Customize evaluation to measure any aspect of your app's
+                  quality or performance using our custom metrics SDK. Convert
+                  any Python function—from regex to custom logic—into a metric.
                 </p>
               </div>
             </div>
@@ -127,7 +129,9 @@ export default function Evaluations() {
                 Identify root causes with evaluation review UIs
               </h3>
               <p className="text-white/60 text-lg">
-                  Use MLflow's Evaluation UI to visualize a summary of your evals and view results record-by-record to quickly identify root causes and further improvement opportunities.
+                Use MLflow's Evaluation UI to visualize a summary of your evals
+                and view results record-by-record to quickly identify root
+                causes and further improvement opportunities.
               </p>
             </div>
             <FakeImage />
@@ -137,7 +141,10 @@ export default function Evaluations() {
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Compare versions side-by-side</h3>
               <p className="text-white/60 text-lg">
-                Compare evaluations of 2 app variants to understand if your changes improved or regressed quality.  Review individual questions side-by-side in the Trace Comparison UI to find differences, debug regressions, and inform your next version.
+                Compare evaluations of 2 app variants to understand if your
+                changes improved or regressed quality. Review individual
+                questions side-by-side in the Trace Comparison UI to find
+                differences, debug regressions, and inform your next version.
               </p>
             </div>
             <FakeImage />
