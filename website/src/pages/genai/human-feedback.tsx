@@ -46,16 +46,14 @@ export default function HumanFeedback() {
             <div className="flex flex-col gap-10">
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">
-                  Initiative labeling UIs, built for business user
+                  Intuitive labeling UIs for business users
                 </h3>
               </div>
 
               <p className="text-white/60">
-                MLflow's Review App is built from the ground up to quickly and
-                easily collect feedback from busy domain experts. Share any
-                production log to experts so they can review the interaction and
-                provide feedback. Use pre-defined questions or create custom
-                questions.
+                MLflow's Review App enables busy domain experts to quickly
+                provide feedback on production logs. Share logs for review and
+                use predefined or custom questions.
               </p>
             </div>
             <FakeImage />
@@ -64,11 +62,9 @@ export default function HumanFeedback() {
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Track and visualize feedback</h3>
               <p className="text-white/60 text-lg">
-                Replace spreadsheet-based labeling workflow with MLflow's
-                feedback data model - end user and domain expert feedback is
-                directly attached to the traces as version-controlled labels.
-                Visualize feedback in the MLflow Trace UIs and dashboards to
-                quickly pinpoint quality issues.
+                MLflow replaces spreadsheets by attaching expert/user feedback
+                to traces as versioned labels. Visualize this data in MLflow
+                Trace UIs and dashboards to swiftly identify quality issues.
               </p>
             </div>
             <FakeImage />
@@ -77,8 +73,10 @@ export default function HumanFeedback() {
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Capture end-user feedback</h3>
               <p className="text-white/60 text-lg">
-                Use MLflow's APIs to link end user feedback from your deployed
-                application to the source MLflow Trace.
+                MLflow scalable feedback APIs allow you to attach end-user
+                feedback from your deployed app to the source MLflow Trace, so
+                you debug negative feedback with access to the step-by-step
+                execution.
               </p>
             </div>
             <FakeImage />
@@ -87,9 +85,9 @@ export default function HumanFeedback() {
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Integrated Chat App</h3>
               <p className="text-white/60 text-lg">
-                Quickly deploy new app versions to the Review App's built-in
-                chat UI so domain experts can interact and provide instant
-                feedback so you can rapidly assess quality and pinpoint issues.
+                Deploy new app versions to the Review App's chat UI. Domain
+                experts can interact, give instant feedback, and help rapidly
+                assess quality and pinpoint issues.
               </p>
             </div>
             <FakeImage />
