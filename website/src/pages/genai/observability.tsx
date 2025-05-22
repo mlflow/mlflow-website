@@ -95,7 +95,7 @@ export default function Observability() {
           <h2>Simple, customizable instrumentation</h2>
         </div>
         <Grid columns={2}>
-          <GridItem direction="reverse">
+          <GridItem width="wide" direction="reverse">
             <div className="flex flex-col gap-10">
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">
@@ -157,7 +157,7 @@ export default function Observability() {
           <h2>Annotation capabilities</h2>
         </div>
 
-        <Grid>
+        <Grid columns={3}>
           <GridItem>
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Attach Quality Feedback</h3>
