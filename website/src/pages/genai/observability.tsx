@@ -24,57 +24,105 @@ export default function Observability() {
           <div className="flex flex-col justify-center items-center gap-6 w-full">
             <SectionLabel color="red" label="OBSERVABILITY" />
             <h1 className="text-center text-wrap">
-              Capture and debug application logs with end-to-end observability
+              Observability to debug and monitor
             </h1>
             <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-white/60">
-              Trace your app with OpenTelemetry-compatible SDKs that capture
-              every invocation’s inputs, outputs, and step-by-step execution -
-              prompts, retrievals, tool calls, and more - alongside cost,
-              latency, and errors.
+              Gain visibility into your app's logic to debug issues and improve
+              latency. Attach quality feedback and metadata to help you
+              understand user behavior and improve quality.
             </p>
-            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-white/60">
-              Use these traces to quickly debug errors, improve business logic,
-              and optimize cost and latency.
-            </p>
+
             <GetStartedButton />
           </div>
           <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
         </div>
       </div>
       <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-container">
+        <div className="flex flex-col w-full items-center justify-center gap-1">
+          <h2>Best-in-class tracing</h2>
+        </div>
         <Grid columns={2}>
           <GridItem>
+            <div className="flex flex-col gap-4">
+              <h3 className="text-white">End to end observability</h3>
+              <p className="text-white/60">
+                Capture your app's inputs, outputs, and step-by-step execution:
+                prompts, retrievals, tool calls, and more.
+              </p>
+            </div>
+            <FakeImage />
+            {/* Animation of an app going from user request to retriever to LLM to tool call to response*/}
+          </GridItem>
+          <GridItem>
+            <div className="flex flex-col gap-4">
+              <h3 className="text-white">Cost & latency tracking</h3>
+              <p className="text-white/60">
+                Track cost and latency for each step of your app's execution.
+              </p>
+            </div>
+            <FakeImage />
+            {/* GIF screenshot of summary view paging through several traces */}
+          </GridItem>
+          <GridItem>
+            <div className="flex flex-col gap-4">
+              <h3 className="text-white">
+                Visualize your app's execution flow
+              </h3>
+              <p className="text-white/60">
+                Deep dive into your app's logic and latency with an intuitive UI
+                for effective debugging.
+              </p>
+            </div>
+            <FakeImage />
+            {/* GIF screenshot of detailed view + switching to see the timeline view */}
+          </GridItem>
+          <GridItem>
+            <div className="flex flex-col gap-4">
+              <h3 className="text-white">Quickly understand many traces</h3>
+              <p className="text-white/60">
+                Zoom out with a simplified summary UI to quickly review many
+                traces at once to understand how your app processes user
+                requests.
+              </p>
+            </div>
+            <FakeImage />
+            {/* GIF screenshot of summary view paging through several traces */}
+          </GridItem>
+        </Grid>
+      </div>
+      <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-container">
+        <div className="flex flex-col w-full items-center justify-center gap-1">
+          <h2>Simple, customizable instrumentation</h2>
+        </div>
+        <Grid columns={2}>
+          <GridItem direction="reverse">
             <div className="flex flex-col gap-10">
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">
-                  Automatic Tracing, yet fully customizable
+                  Automatic instrumentation that's fully customizable
                 </h3>
               </div>
-
               <p className="text-white/60">
-                Effortlessly capture traces with automatic, no-code-added
-                integrations for over 20 popular generative AI libraries. Use
-                our intuitive APIs to customize the integrations or to
-                instrument tracing in any Python or Typescript application.
+                Instrument your app with 1-line-of-code integrations for over 20
+                popular LLM SDKs and generative AI frameworks. Optionally, use
+                our intuitive APIs to customize the integrations.
               </p>
             </div>
             <FakeImage />
+            {/* Rendering of all the logos we support + a 1-liner of "mlflow.<flavor>.autolog()" in the center of the logos */}
           </GridItem>
-          <GridItem direction="reverse">
+
+          <GridItem width="wide">
             <div className="flex flex-col gap-4">
-              <h3 className="text-white">
-                Visualize Your app’s Execution Flow
-              </h3>
+              <h3 className="text-white">SDKs for custom instrumentation</h3>
               <p className="text-white/60 text-lg">
-                Visualize, understand, and rapidly debug your application's
-                logic flow, capturing the complete request-response cycle, from
-                user queries to application responses, including each
-                intermediate step (e.g., retrieval, tool calls, LLM
-                interactions, and more). A 
-                Timeline View shows breakdown of latency by step, so you can quickly pinpoint the root causes of slow performance.
+                Use our intuitive SDK - decorators, context managers, and
+                low-level APIs - to trace custom code or customize the
+                integrations.
               </p>
             </div>
             <FakeImage />
+            {/* Code example of using custom instrumentation that maps the code to a sample trace from the code (example in go/genai/quality) */}
           </GridItem>
           <GridItem width="wide">
             <div className="flex flex-col gap-4">
@@ -82,94 +130,118 @@ export default function Observability() {
                 Instrument once, use in development and production
               </h3>
               <p className="text-white/60 text-lg">
-                he same trace instrumentation works for production and
+                The same trace instrumentation works for production and
                 development - so you can instrument once and get the same
                 insight whether you are debugging in dev or observing in
                 production.
               </p>
             </div>
             <FakeImage />
+            {/* Animation showing the same trace instrumentation working for production and development ?? */}
           </GridItem>
+          <GridItem width="wide">
+            <div className="flex flex-col gap-4">
+              <h3 className="text-white">
+                OpenTelemetry compatible
+              </h3>
+              <p className="text-white/60 text-lg">
+              Fully compatible with OpenTelemetry, so you can export traces to any OpenTelemetry compatible tool, providing you total ownership and portability of your generative AI data.
+              </p>
+            </div>
+            <FakeImage />
+          </GridItem>
+        </Grid>
+      </div>
+      <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-container">
+        <div className="flex flex-col w-full items-center justify-center gap-1">
+          <h2>Annotation capabilities</h2>
+        </div>
+
+        <Grid>
           <GridItem>
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Attach Quality Feedback</h3>
               <p className="text-white/60 text-lg">
                 Attach quality assessments from users, domain experts, or LLM
                 judges/metrics directly on each trace so you can quickly
-                pinpoint and debug quality issues
+                understand and debug quality issues.
               </p>
             </div>
             <FakeImage />
+            {/* Product GIF of the feedback annotation view - show judge + review app + then show the feedback showing up on the trace in the trace UI */}
           </GridItem>
           <GridItem direction="reverse">
             <div className="flex flex-col gap-4">
-              <h3 className="text-white">Attach Operational Metrics</h3>
+              <h3 className="text-white">Attach Metadata</h3>
               <p className="text-white/60 text-lg">
-                Attach operational metrics like latency, cost, and resource
-                utilization to measure and improve your application’s
-                operational performance and cost. Errors/exceptions and their
-                associated stack traces are automatically captured.
+                Attach metadata, such as users, converastions sessions, and
+                custom tags to traces to help you slice and dice based on user
+                behavior.
               </p>
             </div>
             <FakeImage />
-          </GridItem>
-          <GridItem width="wide">
-            <div className="flex flex-col gap-4">
-              <h3 className="text-white">Monitoring and Alerting</h3>
-              <p className="text-white/60 text-lg">
-                Visualize operational metrics with real-time dashboards and set
-                alerts that flag quality issues, latency spikes, and errors.
-                Drill into dashboards and alerts to see the exact trace and step
-                so you can rapidly debug issues.
-              </p>
-            </div>
-            <FakeImage />
-          </GridItem>
-          <GridItem width="wide" direction="reverse">
-            <div className="flex flex-col gap-4">
-              <h3 className="text-white">Comprehensive Audit Trail</h3>
-              <p className="text-white/60 text-lg">
-                Traces can be used as an audit trail that captures every
-                execution of your app for full transparency and accountability
-                across your GenAI apps.
-              </p>
-            </div>
-            <FakeImage />
-          </GridItem>
-          <GridItem>
-            <div className="flex flex-col gap-4">
-              <h3 className="text-white">Advanced Search & Filtering</h3>
-              <p className="text-white/60 text-lg">
-                Quickly find relevant traces with powerful search and filtering
-                options, allowing you to sift through large volumes of data
-                efficiently.
-              </p>
-            </div>
-            <FakeImage />
+            {/* Animation of grouping traces by user and conversation session */}
           </GridItem>
           <GridItem direction="reverse">
             <div className="flex flex-col gap-4">
-              <h3 className="text-white">Conversation Grouping</h3>
+              <h3 className="text-white">Comments and notes</h3>
               <p className="text-white/60 text-lg">
-                Easily group traces by chat conversation or user for
-                streamlined analysis and a clearer understanding of interaction
-                histories.
+              Add notes and context directly to traces for collaborative analysis.
               </p>
             </div>
             <FakeImage />
-          </GridItem>
-          <GridItem width="wide">
-            <div className="flex flex-col gap-4">
-              <h3 className="text-white">Trace Comparison View</h3>
-              <p className="text-white/60 text-lg">
-                Visually compare multiple traces side-by-side in the UI to
-                identify differences, debug regressions, and understand variations
-                in performance or output.
-              </p>
-            </div>
-            <FakeImage />
+            {/* Product GIF of adding feedback in the trace UI */}
           </GridItem>
         </Grid>
+      </div>
+
+      <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-container">
+        <div className="flex flex-col w-full items-center justify-center gap-16">
+          <div className="flex flex-col w-full items-center justify-center gap-1">
+            <h2>Production monitoring</h2>
+          </div>
+          <Grid columns={2}>
+            <GridItem width="wide">
+              <div className="flex flex-col gap-4">
+                <h3 className="text-white">Dashboards</h3>
+                <p className="text-white/60 text-lg">
+                  Visualize operational and quality metrics with real-time
+                  dashboards that flag quality issues, latency spikes, and
+                  errors. Drill into dashboards to see the exact trace and step
+                  so you can rapidly debug issues.
+                </p>
+              </div>
+              <FakeImage />
+              {/* Product GIF of the monitoring dashboard and clicking into a trace */}
+            </GridItem>
+            <GridItem>
+              <div className="flex flex-col gap-4">
+                <h3 className="text-white">Advanced Search & Filtering</h3>
+                <p className="text-white/60 text-lg">
+                  Quickly find relevant traces with powerful search and
+                  filtering options, allowing you to sift through large volumes
+                  of data efficiently.
+                </p>
+              </div>
+              <FakeImage />
+              {/* Product GIF searching and filtering for tags + feedback */}
+
+            </GridItem>
+            <GridItem direction="reverse">
+              <div className="flex flex-col gap-4">
+                <h3 className="text-white">Conversation Grouping</h3>
+                <p className="text-white/60 text-lg">
+                  Easily group traces by chat conversation or user for
+                  streamlined analysis and a clearer understanding of
+                  interaction histories.
+                </p>
+              </div>
+              <FakeImage />
+                {/* Figma of what this design will be! */}
+            </GridItem>
+          </Grid>
+        </div>
+
         <GetStartedWithMLflow />
         <SocialWidget variant="red" />
       </div>
