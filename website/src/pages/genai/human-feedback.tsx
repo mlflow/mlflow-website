@@ -66,12 +66,10 @@ export default function HumanFeedback() {
                 MLflow replaces spreadsheets by attaching expert/user feedback
                 to traces as versioned labels. Visualize this data in MLflow
                 Trace UIs and dashboards to swiftly identify quality issues.
-                
               </p>
             </div>
             <FakeImage />
             {/* Animation of an app executing, producing a trace, having feedback attached to it, and then seeing the feedback in the trace UI */}
-
           </GridItem>
           <GridItem width="wide">
             <div className="flex flex-col gap-4">
@@ -81,7 +79,6 @@ export default function HumanFeedback() {
                 feedback from your deployed app to the source MLflow Trace, so
                 you debug negative feedback with access to the step-by-step
                 execution.
-                
               </p>
             </div>
             <FakeImage />
