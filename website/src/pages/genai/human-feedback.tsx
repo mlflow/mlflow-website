@@ -57,6 +57,7 @@ export default function HumanFeedback() {
               </p>
             </div>
             <FakeImage />
+            {/* Hybrid animation / product GIF of showing a trace in the trace UI, then animating it to go to the review app, and then seeing the review app in action (provide feedback clicked) and then animation to see it on the trace UI */}
           </GridItem>
           <GridItem direction="reverse">
             <div className="flex flex-col gap-4">
@@ -65,9 +66,12 @@ export default function HumanFeedback() {
                 MLflow replaces spreadsheets by attaching expert/user feedback
                 to traces as versioned labels. Visualize this data in MLflow
                 Trace UIs and dashboards to swiftly identify quality issues.
+                
               </p>
             </div>
             <FakeImage />
+            {/* Animation of an app executing, producing a trace, having feedback attached to it, and then seeing the feedback in the trace UI */}
+
           </GridItem>
           <GridItem width="wide">
             <div className="flex flex-col gap-4">
@@ -77,9 +81,11 @@ export default function HumanFeedback() {
                 feedback from your deployed app to the source MLflow Trace, so
                 you debug negative feedback with access to the step-by-step
                 execution.
+                
               </p>
             </div>
             <FakeImage />
+            {/* Product GIF of a fake production app and then seeing the feedback in the trace UI */}
           </GridItem>
           <GridItem width="wide" direction="reverse">
             <div className="flex flex-col gap-4">
@@ -91,6 +97,7 @@ export default function HumanFeedback() {
               </p>
             </div>
             <FakeImage />
+            {/* Product GIF of the review app chat mode and then seeing the feedback in the trace UI */}
           </GridItem>
         </Grid>
         <GetStartedWithMLflow />
