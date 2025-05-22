@@ -1,3 +1,4 @@
+import Link from "@docusaurus/Link";
 import { HeaderMenuItem } from "../HeaderMenuItem/HeaderMenuItem";
 
 export const HeaderProductsSubmenu = () => {
@@ -5,8 +6,12 @@ export const HeaderProductsSubmenu = () => {
     <div className="flex flex-col md:flex-row md:max-w-4xl mx-auto gap-6 md:gap-8 lg:gap-10 px-4 lg:pl-0 products-submenu">
       <div className="flex flex-col gap-1 md:gap-4">
         <div className="flex flex-col gap-1 md:gap-4 md:border-b border-[#F7F8F8]/8 pb-4">
-          <h3>Gen AI</h3>
-          <p className="text-[#F7F8F8]/60 m-0">Ship high-quality GenAI, fast</p>
+          <Link to="/genai">
+            <h3 className="text-white">Gen AI</h3>
+            <p className="text-[#F7F8F8]/60 m-0">
+              Ship high-quality GenAI, fast
+            </p>
+          </Link>
         </div>
         <div className="flex flex-col gap-3">
           <span className="text-[#F7F8F8]/60 text-sm">Features</span>
@@ -35,8 +40,10 @@ export const HeaderProductsSubmenu = () => {
       </div>
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1 md:gap-4 md:border-b border-[#F7F8F8]/8 pb-4">
-          <h3>Model training</h3>
-          <p className="text-[#F7F8F8]/60">Mastering the ML lifecycle</p>
+          <Link to="/classical-ml">
+            <h3 className="text-white">Model training</h3>
+            <p className="text-[#F7F8F8]/60">Mastering the ML lifecycle</p>
+          </Link>
         </div>
         <div className="flex flex-col gap-3">
           <span className="text-[#F7F8F8]/60 text-sm">Features</span>
@@ -45,7 +52,7 @@ export const HeaderProductsSubmenu = () => {
               <HeaderMenuItem href="/classical-ml/tracking" label="Tracking" />
               <HeaderMenuItem
                 href="/classical-ml/hyperparam-tuning"
-                label="Hyperparam tuning"
+                label="Hyperparameter tuning"
               />
               <HeaderMenuItem href="/classical-ml/models" label="Models" />
             </div>
