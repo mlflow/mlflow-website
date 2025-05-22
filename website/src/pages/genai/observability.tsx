@@ -47,15 +47,15 @@ export default function Observability() {
             <div className="flex flex-col gap-10">
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">
-                  Automatic Instrumentation, yet fully customizable
+                  Automatic Tracing, yet fully customizable
                 </h3>
               </div>
 
               <p className="text-white/60">
-                Use our 19+ authoring framework / LLM SDK integrations to
-                instrument your application with one line of code. Use our
-                intuitive APIs to customize the integrations or to instrument
-                tracing in any Python or Typescript application.
+                Effortlessly capture traces with automatic, no-code-added
+                integrations for over 20 popular generative AI libraries. Use
+                our intuitive APIs to customize the integrations or to
+                instrument tracing in any Python or Typescript application.
               </p>
             </div>
             <FakeImage />
@@ -70,7 +70,8 @@ export default function Observability() {
                 logic flow, capturing the complete request-response cycle, from
                 user queries to application responses, including each
                 intermediate step (e.g., retrieval, tool calls, LLM
-                interactions, and more).
+                interactions, and more). A 
+                Timeline View shows breakdown of latency by step, so you can quickly pinpoint the root causes of slow performance.
               </p>
             </div>
             <FakeImage />
@@ -131,6 +132,39 @@ export default function Observability() {
                 Traces can be used as an audit trail that captures every
                 execution of your app for full transparency and accountability
                 across your GenAI apps.
+              </p>
+            </div>
+            <FakeImage />
+          </GridItem>
+          <GridItem>
+            <div className="flex flex-col gap-4">
+              <h3 className="text-white">Advanced Search & Filtering</h3>
+              <p className="text-white/60 text-lg">
+                Quickly find relevant traces with powerful search and filtering
+                options, allowing you to sift through large volumes of data
+                efficiently.
+              </p>
+            </div>
+            <FakeImage />
+          </GridItem>
+          <GridItem direction="reverse">
+            <div className="flex flex-col gap-4">
+              <h3 className="text-white">Conversation Grouping</h3>
+              <p className="text-white/60 text-lg">
+                Easily group traces by chat conversation or user for
+                streamlined analysis and a clearer understanding of interaction
+                histories.
+              </p>
+            </div>
+            <FakeImage />
+          </GridItem>
+          <GridItem width="wide">
+            <div className="flex flex-col gap-4">
+              <h3 className="text-white">Trace Comparison View</h3>
+              <p className="text-white/60 text-lg">
+                Visually compare multiple traces side-by-side in the UI to
+                identify differences, debug regressions, and understand variations
+                in performance or output.
               </p>
             </div>
             <FakeImage />
