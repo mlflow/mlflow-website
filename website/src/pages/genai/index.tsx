@@ -19,6 +19,7 @@ import {
   SocialWidget,
   Button,
 } from "../../components";
+import Link from "@docusaurus/Link";
 
 export default function GenAi(): JSX.Element {
   return (
@@ -68,11 +69,11 @@ export default function GenAi(): JSX.Element {
                   helps avoid vendor lock-in.
                 </p>
 
-                <a href="/genai/observability">
+                <Link href="/genai/observability">
                   <Button variant="outline" size="small">
                     Learn more &gt;
                   </Button>
-                </a>
+                </Link>
               </div>
               <div>
                 <img
@@ -94,13 +95,13 @@ export default function GenAi(): JSX.Element {
                   Configure automated online evaluations with alerts to quickly
                   address issues.
                 </p>
-                <a href="/genai/monitoring">
+                <Link href="/genai/monitoring">
                   {" "}
                   {/* Placeholder link */}
                   <Button variant="outline" size="small">
                     Learn more &gt;
                   </Button>
-                </a>
+                </Link>
               </div>
               <div>
                 <img
@@ -137,11 +138,11 @@ export default function GenAi(): JSX.Element {
                   custom judges tailored to your business needs and expert
                   insights.
                 </p>
-                <a href="/genai/quality-metrics">
+                <Link href="/genai/quality-metrics">
                   <Button variant="outline" size="small">
                     Learn more &gt;
                   </Button>
-                </a>
+                </Link>
               </div>
               <div>
                 <img
@@ -161,11 +162,11 @@ export default function GenAi(): JSX.Element {
                   new prompts or app versions in development, ensuring optimal
                   variants reach production.
                 </p>
-                <a href="/genai/evaluations">
+                <Link href="/genai/evaluations">
                   <Button variant="outline" size="small">
                     Learn more &gt;
                   </Button>
-                </a>
+                </Link>
               </div>
               <div>
                 <img
@@ -187,11 +188,11 @@ export default function GenAi(): JSX.Element {
                   your app should behave and align your custom LLM-judge metrics
                   with expert judgement.
                 </p>
-                <a href="/genai/human-feedback">
+                <Link href="/genai/human-feedback">
                   <Button variant="outline" size="small">
                     Learn more &gt;
                   </Button>
-                </a>
+                </Link>
               </div>
               <div>
                 <img
@@ -225,11 +226,11 @@ export default function GenAi(): JSX.Element {
                   Evaluate and monitor prompt quality and performance across
                   multiple versions.
                 </p>
-                <a href="/genai/governance">
+                <Link href="/genai/governance">
                   <Button variant="outline" size="small">
                     Learn more &gt;
                   </Button>
-                </a>
+                </Link>
               </div>
               <div>
                 <img
@@ -254,11 +255,11 @@ export default function GenAi(): JSX.Element {
                   agent/application versions, offering end-to-end versioning and
                   lineage for your entire GenAI application.
                 </p>
-                <a href="/genai/governance">
+                <Link href="/genai/governance">
                   <Button variant="outline" size="small">
                     Learn more &gt;
                   </Button>
-                </a>
+                </Link>
               </div>
               <div>
                 <img

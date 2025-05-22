@@ -22,7 +22,7 @@ export default function BlogPostItems({
     return (
       <div className="flex flex-col gap-10 px-6 md:px-20 mb-10 max-w-7xl mx-auto">
         <div className="flex flex-col-reverse md:flex-row gap-10">
-          <a
+          <Link
             href={firstBlogPost.content.metadata.permalink}
             className="flex flex-col justify-center items-start gap-4"
           >
@@ -31,8 +31,8 @@ export default function BlogPostItems({
             <p className="text-white/60">
               {firstBlogPost.content.metadata.description}
             </p>
-          </a>
-          <a href={firstBlogPost.content.metadata.permalink}>
+          </Link>
+          <Link href={firstBlogPost.content.metadata.permalink}>
             <div>
               <img
                 src={firstBlogPost.content.frontMatter.thumbnail}
@@ -40,14 +40,14 @@ export default function BlogPostItems({
                 className="w-full h-full object-cover rounded-md"
               />
             </div>
-          </a>
+          </Link>
         </div>
 
         <Grid columns={3}>
           {blogPostsGrid.flatMap((blogPostsRow) =>
             blogPostsRow.map((blogPost) => (
               <GridItem key={blogPost.content.metadata.permalink}>
-                <a
+                <Link
                   href={blogPost.content.metadata.permalink}
                   className="flex flex-col w-full h-full gap-4"
                 >
@@ -72,7 +72,7 @@ export default function BlogPostItems({
                   >
                     {blogPost.content.metadata.title}
                   </div>
-                </a>
+                </Link>
               </GridItem>
             )),
           )}
