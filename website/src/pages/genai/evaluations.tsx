@@ -45,11 +45,10 @@ export default function Evaluations() {
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Pre-built LLM judges</h3>
               <p className="text-white/60 text-lg">
-                Get started quickly with LLM judges for safety, hallucination,
-                retrieval quality, relevance, and other common aspects of
-                quality evaluation. Our research team has tuned these judges to
-                agree with human experts, giving you accurate, reliable quality
-                evaluation.
+                Quickly start with built-in LLM judges for safety, hallucination,
+                retrieval quality, and relevance. Our research-backed judges
+                provide accurate, reliable quality evaluation aligned with human
+                expertise.
               </p>
             </div>
             <FakeImage />
@@ -59,9 +58,8 @@ export default function Evaluations() {
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Customized LLM judges</h3>
               <p className="text-white/60 text-lg">
-                Adapt our base judge model to create custom LLM judges that are
-                tailored to your business requirements and agree with your human
-                expert's judgment.
+                Adapt our base model to create custom LLM judges tailored to
+                your business needs, aligning with your human expert's judgment.
               </p>
             </div>
             <FakeImage />
@@ -81,9 +79,8 @@ export default function Evaluations() {
               </div>
 
               <p className="text-white/60">
-                Curate top-scoring traces into regression datasets and
-                low-scoring traces needing improvement into evaluation datasets
-                to use offline to improve quality.
+                Curate high-scoring traces for regression datasets and
+                low-scoring ones for evaluation datasets to use offline to improve quality.
               </p>
             </div>
             <FakeImage />
@@ -100,10 +97,9 @@ export default function Evaluations() {
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Test new app / prompt variants</h3>
               <p className="text-white/60 text-lg">
-                MLflow's Evaluation SDK enables you to test new variants
-                (prompts, models, code changes, etc) against evaluation and
-                regression datasets. Every variant is linked to its evaluation
-                results so you can track improvements over time.
+                MLflow's Evaluation SDK lets you test new application variants (prompts,
+                models, code) against evaluation and regression datasets. Each variant is linked to its
+                evaluation results, enabling tracking of improvements over time.
               </p>
             </div>
             <FakeImage />
@@ -116,10 +112,9 @@ export default function Evaluations() {
                   Customize with code-based metrics
                 </h3>
                 <p className="text-white/60">
-                  Customize evaluation to measure any aspect of your
-                  application's quality or performance using our custom metrics
-                  SDK to turn any Python function into a metric - regex checks
-                  to custom business logic.
+                  Customize evaluation to measure any aspect of your app's quality or
+                  performance using our custom metrics SDK. Convert any Python
+                  function—from regex to custom logic—into a metric.
                 </p>
               </div>
             </div>
@@ -132,9 +127,7 @@ export default function Evaluations() {
                 Identify root causes with evaluation review UIs
               </h3>
               <p className="text-white/60 text-lg">
-                Use MLflow's Evaluation UI to visualize evaluation results
-                record-by-record to identify root causes and identify further
-                improvement opportunities.
+                  Use MLflow's Evaluation UI to visualize a summary of your evals and view results record-by-record to quickly identify root causes and further improvement opportunities.
               </p>
             </div>
             <FakeImage />
@@ -144,10 +137,7 @@ export default function Evaluations() {
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Compare versions side-by-side</h3>
               <p className="text-white/60 text-lg">
-                Compare a summary of 2 versions and dig into side-by-side of
-                individual questions in the Trace Comparison UI to identify
-                differences, debug regressions, and understand variations in
-                quality or performance.
+                Compare evaluations of 2 app variants to understand if your changes improved or regressed quality.  Review individual questions side-by-side in the Trace Comparison UI to find differences, debug regressions, and inform your next version.
               </p>
             </div>
             <FakeImage />
@@ -157,9 +147,9 @@ export default function Evaluations() {
             <div className="flex flex-col gap-4">
               <h3 className="text-white">CI/CD support</h3>
               <p className="text-white/60 text-lg">
-                Automatically run evaluations in CI/CD workflows so you can
-                systematically validate every that every change drives quality
-                improvements, not quality regressions.
+                Automatically run evaluations in CI/CD workflows to
+                systematically validate that every change improves quality,
+                preventing regressions.
               </p>
             </div>
             <FakeImage />
