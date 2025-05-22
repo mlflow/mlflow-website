@@ -2,6 +2,7 @@ import React from "react";
 import { BlogPostProvider } from "@docusaurus/theme-common/internal";
 import BlogPostItem from "@theme/BlogPostItem";
 import { SectionLabel, Grid, GridItem } from "../../components";
+import Link from "@docusaurus/Link";
 
 export default function BlogPostItems({
   items,
