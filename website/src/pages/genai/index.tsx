@@ -77,6 +77,7 @@ export default function GenAi(): JSX.Element {
                   src={TraceTab}
                   alt="MLflow tracing"
                 />
+                {/* Product GIF of the tracing UI for a complex trace */}
               </div>
             </GridItem>
             <GridItem width="wide" direction="reverse">
@@ -106,6 +107,7 @@ export default function GenAi(): JSX.Element {
                   alt="MLflow Monitoring"
                 />
               </div>
+              {/* Product GIF of the Trace UI view + charts */}
             </GridItem>
           </Grid>
         </div>
@@ -125,7 +127,7 @@ export default function GenAi(): JSX.Element {
             <GridItem width="wide">
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">
-                  LLM Judges for Quality Measurement
+                  Accurately measure free-form language with LLM judges
                 </h3>
                 <p style={{ marginBottom: 0 }} className="text-white/60">
                   Utilize LLM-as-a-judge metrics, mimicking human expertise, to
@@ -147,11 +149,14 @@ export default function GenAi(): JSX.Element {
                   alt="MLflow LLM judges"
                 />
               </div>
+              {/* Animation showing humans providing feedback and it being synthesized into an llm judge */}
             </GridItem>
 
             <GridItem width="wide" direction="reverse">
               <div className="flex flex-col gap-4">
-                <h3 className="text-white">Evaluate with production logs</h3>
+                <h3 className="text-white">
+                  Use production traffic to drive offline improvements
+                </h3>
                 <p style={{ marginBottom: 0 }} className="text-white/60">
                   Adapt to user behavior by creating evaluation datasets and
                   regression tests from production logs. Replay these to assess
@@ -171,12 +176,13 @@ export default function GenAi(): JSX.Element {
                   alt="MLflow evaluations"
                 />
               </div>
+              {/* Product GIF of running mlflow.evaluate and then seeing the eval results list UI */}
             </GridItem>
 
             <GridItem width="wide">
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">
-                  Capture and incorporate human feedback
+                  Use human feedback to improve quality
                 </h3>
                 <p style={{ marginBottom: 0 }} className="text-white/60">
                   Collect expert feedback through web UIs and end-user ratings
@@ -197,6 +203,7 @@ export default function GenAi(): JSX.Element {
                   alt="MLflow LLM judges"
                 />
               </div>
+              {/* Product GIF of the review app adding a custom feedback label and then it showing on the mlflow trace UI */}
             </GridItem>
           </Grid>
         </div>
@@ -235,6 +242,7 @@ export default function GenAi(): JSX.Element {
                   alt="MLflow LLM judges"
                 />
               </div>
+              {/* Figma of the prompt registry, showing adding a prompt and then comparing 2 versions */}
             </GridItem>
 
             <GridItem width="wide" direction="reverse">
@@ -263,6 +271,7 @@ export default function GenAi(): JSX.Element {
                   src={AssessmentsTab}
                   alt="MLflow LLM judges"
                 />
+                {/* Product GIF of the versions tab showing multiple models and then zooming into one to see evals + params like a prompt  */}
               </div>
             </GridItem>
           </Grid>
