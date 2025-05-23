@@ -13,8 +13,8 @@ export const CopyCommand = ({ code }: Props) => {
 
   return (
     <div className="w-full max-w-3xl mx-auto">
-      <div className="bg-white/10 backdrop-blur-[24px] rounded-[32px] p-3 border border-white/20 shadow-lg">
-        <div className="bg-white rounded-[20px] p-2 pl-5 border border-white/30">
+      <div className="bg-gray-100 backdrop-blur-[24px] rounded-[32px] p-3 border border-gray-200 shadow-lg">
+        <div className="bg-white rounded-[20px] p-2 pl-5 border border-gray-300">
           <div className="flex items-center justify-between gap-20">
             <div className="flex-1">
               <div className="text-black !font-[DM_Mono]">{code}</div>

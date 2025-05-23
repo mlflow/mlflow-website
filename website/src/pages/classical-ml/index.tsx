@@ -107,7 +107,7 @@ export default function GenAi(): JSX.Element {
             <GridItem>
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">Industry pioneer</h3>
-                <p className="text-white/60">
+                <p className="text-gray-600">
                   MLflow has established itself as a pioneering open-source
                   platform for managing the end-to-end machine learning
                   lifecycle. Created by Databricks, it has become one of the
@@ -119,7 +119,7 @@ export default function GenAi(): JSX.Element {
             <GridItem>
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">Framework neutrality</h3>
-                <p className="text-white/60">
+                <p className="text-gray-600">
                   MLflow's framework-agnostic design is one of its strongest
                   differentiators. Unlike proprietary solutions that lock you
                   into specific ecosystems, MLflow works seamlessly with all
@@ -133,7 +133,7 @@ export default function GenAi(): JSX.Element {
                 <h3 className="text-white">
                   Comprehensive Lifecycle Management
                 </h3>
-                <p className="text-white/60">
+                <p className="text-gray-600">
                   MLflow uniquely addresses the complete machine learning
                   lifecycle through four integrated components: - MLflow
                   Tracking for logging parameters, metrics, and artifacts -
@@ -146,7 +146,7 @@ export default function GenAi(): JSX.Element {
             <GridItem>
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">Enterprise Adoption</h3>
-                <p className="text-white/60">
+                <p className="text-gray-600">
                   MLflow's impact extends beyond its technical capabilities. It
                   has gained significant traction among enterprise teams
                   requiring robust experiment tracking and model lifecycle

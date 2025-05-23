@@ -26,7 +26,7 @@ export default function Models() {
             <h1 className="text-center text-wrap">
               Transform ML Experiments into Production-Ready Models
             </h1>
-            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-white/60">
+            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-gray-600">
               Build, deploy, and manage machine learning models with confidence
               using MLflow's comprehensive model lifecycle management
             </p>
@@ -40,7 +40,7 @@ export default function Models() {
           <GridItem>
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Unified Model Format</h3>
-              <p className="text-white/60 text-lg">
+              <p className="text-gray-600 text-lg">
                 MLflow's MLModel file provides a standardized structure for
                 packaging models from any framework, capturing essential
                 dependencies and input/output specifications. This consistent
@@ -53,7 +53,7 @@ export default function Models() {
           <GridItem>
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Comprehensive Model Metadata</h3>
-              <p className="text-white/60 text-lg">
+              <p className="text-gray-600 text-lg">
                 Track crucial model requirements and artifacts including data
                 schemas, preprocessing steps, and environment dependencies
                 automatically with MLflow's metadata system. Create fully
@@ -66,7 +66,7 @@ export default function Models() {
           <GridItem width="wide">
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Flexible Deployment Options</h3>
-              <p className="text-white/60 text-lg">
+              <p className="text-gray-600 text-lg">
                 Deploy models as Docker containers, Python functions, REST
                 endpoints, or directly to various serving platforms with
                 MLflow's versatile deployment capabilities. Streamline the

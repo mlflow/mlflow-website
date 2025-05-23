@@ -26,7 +26,7 @@ export default function Tracking() {
             <h1 className="text-center text-wrap">
               Comprehensive Experiment Tracking for ML Excellence
             </h1>
-            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-white/60">
+            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-gray-600">
               Document, compare, and reproduce your machine learning experiments
               with MLflow's powerful tracking capabilities
             </p>
@@ -40,7 +40,7 @@ export default function Tracking() {
           <GridItem>
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Complete Experiment Lifecycle</h3>
-              <p className="text-white/60 text-lg">
+              <p className="text-gray-600 text-lg">
                 MLflow Tracking automatically captures parameters, code
                 versions, metrics, and model weights for each training
                 iteration. Log trained models, visualizations, interface
@@ -53,7 +53,7 @@ export default function Tracking() {
           <GridItem>
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Visual Comparison</h3>
-              <p className="text-white/60 text-lg">
+              <p className="text-gray-600 text-lg">
                 Compare results across multiple experiments with MLflow's
                 powerful visualization tools. Quickly identify best-performing
                 models and retrieve their corresponding code and parameters
@@ -65,7 +65,7 @@ export default function Tracking() {
           <GridItem width="wide">
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Seamless Collaboration</h3>
-              <p className="text-white/60 text-lg">
+              <p className="text-gray-600 text-lg">
                 Organize models and iterations into experiments for easy team
                 collaboration while maintaining traceability. Enable team
                 members to share results while maintaining a unified view of all

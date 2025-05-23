@@ -1,6 +1,25 @@
+const defaultTheme = require("tailwindcss/defaultTheme");
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   theme: {
+    ...defaultTheme,
+    colors: {
+      ...defaultTheme.colors,
+      gray: {
+        1000: "rgb(255 255 255 / 100%)",
+        900: "rgb(255 255 255 / 90%)",
+        800: "rgb(255 255 255 / 80%)",
+        700: "rgb(255 255 255 / 70%)",
+        600: "rgb(255 255 255 / 60%)",
+        500: "rgb(255 255 255 / 50%)",
+        400: "rgb(255 255 255 / 40%)",
+        300: "rgb(255 255 255 / 30%)",
+        200: "rgb(255 255 255 / 20%)",
+        100: "rgb(255 255 255 / 10%)",
+        50: "rgb(255 255 255 / 5%)",
+      },
+    },
     extend: {
       fontFamily: {
         sans: ["DM Sans", "sans-serif"],

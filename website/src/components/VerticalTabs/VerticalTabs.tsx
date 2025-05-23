@@ -55,7 +55,7 @@ const VerticalTabsTrigger = React.forwardRef<
         {label}
       </span>
 
-      <span className="vertical-tabs-trigger-description text-md text-white/50 text-left text-wrap h-0 overflow-hidden">
+      <span className="vertical-tabs-trigger-description text-md text-gray-500 text-left text-wrap h-0 overflow-hidden">
         {description}
       </span>
     </div>

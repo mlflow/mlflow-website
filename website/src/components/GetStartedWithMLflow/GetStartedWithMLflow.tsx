@@ -13,7 +13,7 @@ export const GetStartedWithMLflow = ({ variant = "red" }: Props) => {
     <div className="flex flex-col lg:flex-row w-full justify-between gap-6">
       <div className="flex flex-col gap-6 w-full lg:w-1/2">
         <h1>Get started with MLflow</h1>
-        <span className="text-white/60 font-light text-lg">
+        <span className="text-gray-600 font-light text-lg">
           Choose from two options depending on your needs
         </span>
       </div>
@@ -22,7 +22,7 @@ export const GetStartedWithMLflow = ({ variant = "red" }: Props) => {
           <div className="flex flex-row justify-between items-center gap-4">
             <div className="flex flex-row justify-center items-end gap-3 flex-wrap">
               <h3 className="m-0 text-white">Managed </h3>
-              <span className="text-white/50 text-sm">WITH</span>
+              <span className="text-gray-500 text-sm">WITH</span>
               <DatabricksLogo />
             </div>
             <div
@@ -39,19 +39,19 @@ export const GetStartedWithMLflow = ({ variant = "red" }: Props) => {
           <div className="flex flex-col gap-4">
             <div className="flex flex-row items-center gap-4">
               <Checkmark />
-              <span className="text-md font-light text-white/60">
+              <span className="text-md font-light text-gray-600">
                 Production-ready
               </span>
             </div>
             <div className="flex flex-row items-center gap-4">
               <Checkmark />
-              <span className="text-md font-light text-white/60">
+              <span className="text-md font-light text-gray-600">
                 Secure & scalable
               </span>
             </div>
             <div className="flex flex-row items-center gap-4">
               <Checkmark />
-              <span className="text-md font-light text-white/60">
+              <span className="text-md font-light text-gray-600">
                 24/7 support
               </span>
             </div>

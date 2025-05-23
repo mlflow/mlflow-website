@@ -37,7 +37,7 @@ export const LatestNews = ({ variant }: Props) => {
               className="flex flex-col gap-6 h-full justify-between"
             >
               <div className="flex flex-col gap-6">
-                <span className="text-white/50">
+                <span className="text-gray-500">
                   {new Date(post.date).toLocaleDateString("en-us", {
                     month: "short",
                     day: "numeric",

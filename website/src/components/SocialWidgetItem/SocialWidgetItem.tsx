@@ -19,7 +19,7 @@ export const SocialWidgetItem = ({ href, icon, label, description }: Props) => {
       <div className="flex flex-row justify-between items-center w-full">
         <div className="flex flex-col">
           <span className="text-white text-lg font-medium">{label}</span>
-          <span className="text-white/60 text-base">{description}</span>
+          <span className="text-gray-600 text-base">{description}</span>
         </div>
         <div className="invisible group-hover:visible">
           <IconRight />
