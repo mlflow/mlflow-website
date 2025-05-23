@@ -47,7 +47,7 @@ export default function GenAi(): JSX.Element {
         <div className="flex flex-col w-full items-center justify-center gap-16">
           <div className="flex flex-col w-full items-center justify-center gap-6">
             <SectionLabel color="red" label="CORE FEATURES" />
-            <h1>Observability to debug and monitor</h1>
+            <Heading level={2}>Observability to debug and monitor</Heading>
           </div>
           <Grid columns={2}>
             <GridItem width="wide">
@@ -112,7 +112,9 @@ export default function GenAi(): JSX.Element {
         <div className="flex flex-col w-full items-center justify-center gap-16">
           <div className="flex flex-col w-full items-center justify-center gap-6">
             <SectionLabel color="red" label="CORE FEATURES" />
-            <h1>Evaluation to measure and improve quality</h1>
+            <Heading level={2}>
+              Evaluation to measure and improve quality
+            </Heading>
             <p className="text-lg text-center text-wrap max-w-2xl mx-auto text-gray-800">
               MLflow simplifies GenAI evaluation, enabling easy collection and
               recording of LLM judge and human feedback directly on traces.
@@ -208,7 +210,9 @@ export default function GenAi(): JSX.Element {
         <div className="flex flex-col w-full items-center justify-center gap-16">
           <div className="flex flex-col w-full items-center justify-center gap-6">
             <SectionLabel color="red" label="CORE FEATURES" />
-            <h1>Lifecycle management to track and version</h1>
+            <Heading level={2}>
+              Lifecycle management to track and version
+            </Heading>
             {/* <p className="text-white">
               Tackle the challenges of building GenAI head on
             </p> */}
@@ -279,7 +283,7 @@ export default function GenAi(): JSX.Element {
         <div className="flex flex-col items-center justify-center gap-16">
           <div className="flex flex-col gap-6">
             <SectionLabel color="red" label="WHY US?" />
-            <h1>Why MLflow is unique</h1>
+            <Heading level={2}>Why MLflow is unique</Heading>
           </div>
           <Grid columns={2}>
             <GridItem>
