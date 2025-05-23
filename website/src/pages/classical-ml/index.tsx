@@ -40,7 +40,7 @@ export default function GenAi(): JSX.Element {
         <div className="flex flex-col w-full items-center justify-center gap-16">
           <div className="flex flex-col w-full items-center justify-center gap-6">
             <SectionLabel color="green" label="CORE FEATURES" />
-            <h1>Build confidently, deploy seamlessly</h1>
+            <Heading level={2}>Build confidently, deploy seamlessly</Heading>
             <p className="text-white">
               Cover experimentation, reproducibility, deployment, and a central
               model registry
@@ -100,7 +100,7 @@ export default function GenAi(): JSX.Element {
         <div className="flex flex-col items-center justify-center gap-16">
           <div className="flex flex-col gap-6">
             <SectionLabel color="green" label="WHY US?" />
-            <h1>Why MLflow is unique</h1>
+            <Heading level={2}>Why MLflow is unique</Heading>
           </div>
           <Grid columns={2}>
             <GridItem>
