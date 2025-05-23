@@ -76,7 +76,7 @@ export default function Tracking() {
           </GridItem>
         </Grid>
         <GetStartedWithMLflow variant="blue" />
-        <SocialWidget variant="red" />
+        <SocialWidget variant="green" />
       </div>
     </Layout>
   );

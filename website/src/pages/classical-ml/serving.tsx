@@ -75,7 +75,7 @@ export default function Serving() {
           </GridItem>
         </Grid>
         <GetStartedWithMLflow variant="blue" />
-        <SocialWidget variant="red" />
+        <SocialWidget variant="green" />
       </div>
     </Layout>
   );
