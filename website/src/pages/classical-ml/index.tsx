@@ -12,6 +12,7 @@ import {
   GetStartedWithMLflow,
   LatestNews,
   SocialWidget,
+  Heading,
 } from "../../components";
 
 export default function GenAi(): JSX.Element {
@@ -23,9 +24,7 @@ export default function GenAi(): JSX.Element {
       >
         <div className="flex flex-col gap-16 w-full px-6 md:px-20 max-w-container">
           <div className="flex flex-col justify-center items-center gap-6 w-full">
-            <h1 className="text-center text-wrap">
-              Mastering the ML lifecycle
-            </h1>
+            <Heading level={1}>Mastering the ML lifecycle</Heading>
             <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-white">
               From experiment to production, MLflow streamlines your complete
               machine learning journey with enterprise-grade tracking, model

@@ -7,6 +7,7 @@ import {
   GetStartedWithMLflow,
   SocialWidget,
   GetStartedButton,
+  Heading,
 } from "../../components";
 
 const FakeImage = () => (
@@ -23,9 +24,9 @@ export default function Serving() {
         <div className="flex flex-col gap-16 w-full px-6 md:px-20 max-w-container">
           <div className="flex flex-col justify-center items-center gap-6 w-full">
             <SectionLabel color="green" label="SERVING" />
-            <h1 className="text-center text-wrap">
+            <Heading level={1}>
               Flexible Model Deployment for Any Production Environment
-            </h1>
+            </Heading>
             <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-gray-600">
               Deploy your ML and DL models with confidence using MLflow's
               versatile serving options for real-time and batch inference

@@ -7,6 +7,7 @@ import {
   GetStartedWithMLflow,
   SocialWidget,
   GetStartedButton,
+  Heading,
 } from "../../components";
 
 const FakeImage = () => (
@@ -23,16 +24,14 @@ export default function AiGateway() {
         <div className="flex flex-col gap-16 w-full px-6 md:px-20 max-w-container">
           <div className="flex flex-col justify-center items-center gap-6 w-full">
             <SectionLabel color="red" label="AI GATEWAY" />
-            <h1 className="text-center text-wrap">
-              Build AI Systems with confidence
-            </h1>
+            <Heading level={1}>Build AI Systems with confidence</Heading>
             <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-gray-600">
               The AI developer platform to build AI applications and models with
               confidence
             </p>
             <GetStartedButton />
           </div>
-          <div className="w-[800px] h-[450px] bg-black rounded-lg mx-auto"></div>
+          <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
         </div>
       </div>
       <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-container">
