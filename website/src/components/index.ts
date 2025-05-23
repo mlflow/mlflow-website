@@ -16,3 +16,6 @@ export { GlossyCard } from "./GlossyCard/GlossyCard";
 export { GetStartedTagline } from "./GetStartedTagline/GetStartedTagline";
 export { Testimonials } from "./Testimonials/Testimonials";
 export { GetStartedButton } from "./GetStartedButton/GetStartedButton";
+export { Heading } from "./Typography/Heading";
+export { Body } from "./Typography/Body";
+export { Label } from "./Typography/Label";
