@@ -81,7 +81,7 @@ export default function HyperparamTuning() {
           </GridItem>
         </Grid>
         <GetStartedWithMLflow variant="blue" />
-        <SocialWidget variant="red" />
+        <SocialWidget variant="green" />
       </div>
     </Layout>
   );
