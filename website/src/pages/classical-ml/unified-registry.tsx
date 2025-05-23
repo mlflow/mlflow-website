@@ -7,6 +7,7 @@ import {
   GetStartedWithMLflow,
   SocialWidget,
   GetStartedButton,
+  Heading,
 } from "../../components";
 
 const FakeImage = () => (
@@ -23,9 +24,9 @@ export default function UnifiedRegistry() {
         <div className="flex flex-col gap-16 w-full px-6 md:px-20 max-w-container">
           <div className="flex flex-col justify-center items-center gap-6 w-full">
             <SectionLabel color="green" label="UNIFIED REGISTRY" />
-            <h1 className="text-center text-wrap">
+            <Heading level={1}>
               Centralized Model Governance and Discovery
-            </h1>
+            </Heading>
             <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-gray-600">
               Streamline your ML workflows with MLflow's comprehensive model
               registry for version control, approvals, and deployment management

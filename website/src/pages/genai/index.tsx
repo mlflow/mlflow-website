@@ -13,6 +13,7 @@ import {
   LatestNews,
   SocialWidget,
   Button,
+  Heading,
 } from "../../components";
 import Link from "@docusaurus/Link";
 
@@ -25,9 +26,7 @@ export default function GenAi(): JSX.Element {
       >
         <div className="flex flex-col gap-16 w-full px-6 md:px-20 max-w-container">
           <div className="flex flex-col justify-center items-center gap-6 w-full">
-            <h1 className="text-center text-wrap">
-              Ship high-quality AI, fast
-            </h1>
+            <Heading level={1}>Ship high-quality AI, fast</Heading>
             <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-white">
               Traditional software and ML tests aren't built for GenAI's
               free-form language, making it difficult for teams to measure and
