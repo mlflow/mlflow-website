@@ -4,7 +4,7 @@ interface Props {
 }
 
 export const SectionLabel = ({ label, color }: Props) => {
-  const colorClass = color === "red" ? "bg-[#EB1700]" : "bg-[#44EDBC]";
+  const colorClass = color === "red" ? "bg-brand-red" : "bg-brand-teal";
 
   return (
     <div className="flex flex-row gap-3 justify-center items-center">

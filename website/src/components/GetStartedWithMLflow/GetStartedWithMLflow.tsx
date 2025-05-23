@@ -29,8 +29,8 @@ export const GetStartedWithMLflow = ({ variant = "red" }: Props) => {
               className={cn(
                 "hidden lg:block rounded-full uppercase px-4 py-2 text-xs font-semibold whitespace-nowrap",
                 variant === "blue"
-                  ? "bg-[#44EDBC] text-black"
-                  : "bg-[#EB1700] text-white",
+                  ? "bg-brand-teal text-black"
+                  : "bg-brand-red text-white",
               )}
             >
               <span>MOST POPULAR</span>
