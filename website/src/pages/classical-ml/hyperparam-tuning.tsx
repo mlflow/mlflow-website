@@ -26,7 +26,7 @@ export default function HyperparamTuning() {
             <h1 className="text-center text-wrap">
               Simplify your model training workflow
             </h1>
-            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-white/60">
+            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-gray-600">
               Use state-of-the-art hyperparameter optimization techniques with
               an intuitive set of APIs
             </p>
@@ -40,7 +40,7 @@ export default function HyperparamTuning() {
           <GridItem>
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Scalable HPO</h3>
-              <p className="text-white/60 text-lg">
+              <p className="text-gray-600 text-lg">
                 Leverage the native integration between MLflow and Optuna to run
                 distributed hyperparameter optimization at scale using Spark
                 UDFs. The MLflow tracking server provides robust trial data
@@ -54,7 +54,7 @@ export default function HyperparamTuning() {
           <GridItem>
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Native Tracking</h3>
-              <p className="text-white/60 text-lg">
+              <p className="text-gray-600 text-lg">
                 Every Optuna trial is automatically logged to MLflow, creating a
                 comprehensive record of your hyperparameter search space and
                 results. MLflow's intuitive UI enables teams to visualize
@@ -68,7 +68,7 @@ export default function HyperparamTuning() {
           <GridItem width="wide">
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Enterprise-Ready</h3>
-              <p className="text-white/60 text-lg">
+              <p className="text-gray-600 text-lg">
                 Scale your hyperparameter optimization from development to
                 production with MLflow's project packaging and model registry
                 integration. Easily compare models across different optimization

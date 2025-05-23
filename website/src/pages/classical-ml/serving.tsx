@@ -26,7 +26,7 @@ export default function Serving() {
             <h1 className="text-center text-wrap">
               Flexible Model Deployment for Any Production Environment
             </h1>
-            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-white/60">
+            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-gray-600">
               Deploy your ML and DL models with confidence using MLflow's
               versatile serving options for real-time and batch inference
             </p>
@@ -40,7 +40,7 @@ export default function Serving() {
           <GridItem>
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Scalable Real-Time Serving</h3>
-              <p className="text-white/60 text-lg">
+              <p className="text-gray-600 text-lg">
                 MLflow provides a unified, scalable interface for deploying
                 models as REST APIs that automatically adjust to meet demand
                 fluctuations. With managed deployment on Databricks, your
@@ -54,7 +54,7 @@ export default function Serving() {
           <GridItem>
             <div className="flex flex-col gap-4">
               <h3 className="text-white">High-Performance Batch Inference</h3>
-              <p className="text-white/60 text-lg">
+              <p className="text-gray-600 text-lg">
                 Deploy production models for batch inference directly on Apache
                 Spark, enabling efficient processing of billions of predictions
                 on massive datasets
@@ -65,7 +65,7 @@ export default function Serving() {
           <GridItem width="wide">
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Comprehensive Deployment Options</h3>
-              <p className="text-white/60 text-lg">
+              <p className="text-gray-600 text-lg">
                 Deploy models across multiple environments including Docker
                 containers, cloud services like Databricks, Azure ML and AWS
                 SageMaker, or Kubernetes clusters with consistent behavior.

@@ -26,7 +26,7 @@ export default function UnifiedRegistry() {
             <h1 className="text-center text-wrap">
               Centralized Model Governance and Discovery
             </h1>
-            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-white/60">
+            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-gray-600">
               Streamline your ML workflows with MLflow's comprehensive model
               registry for version control, approvals, and deployment management
             </p>
@@ -40,7 +40,7 @@ export default function UnifiedRegistry() {
           <GridItem>
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Seamless Unity Catalog Integration</h3>
-              <p className="text-white/60 text-lg">
+              <p className="text-gray-600 text-lg">
                 MLflow Model Registry integrates directly with Unity Catalog to
                 provide enterprise-grade governance across your entire ML asset
                 portfolio. Apply consistent security policies, lineage tracking,
@@ -53,7 +53,7 @@ export default function UnifiedRegistry() {
           <GridItem>
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Stage-Based Model Lifecycle</h3>
-              <p className="text-white/60 text-lg">
+              <p className="text-gray-600 text-lg">
                 Move models through customizable staging environments
                 (Development, Staging, Production, or any stage alias you
                 choose) with built-in approval workflow capabilities and
@@ -67,7 +67,7 @@ export default function UnifiedRegistry() {
           <GridItem width="wide">
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Model Deployment Flexibility</h3>
-              <p className="text-white/60 text-lg">
+              <p className="text-gray-600 text-lg">
                 Deploy models as containers, batch jobs, or REST endpoints with
                 MLflow's streamlined deployment capabilities that eliminate
                 boilerplate code. Use model aliases to create named references

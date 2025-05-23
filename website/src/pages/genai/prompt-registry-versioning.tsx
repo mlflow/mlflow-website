@@ -26,7 +26,7 @@ export default function PromptRegistryVersioning() {
             <h1 className="text-center text-wrap">
               Prompt registry & versioning
             </h1>
-            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-white/60">
+            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-gray-600">
               Lorem ipsum
             </p>
 
@@ -40,14 +40,14 @@ export default function PromptRegistryVersioning() {
           <GridItem>
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Card 1</h3>
-              <p className="text-white/60">Lorem ipsum</p>
+              <p className="text-gray-600">Lorem ipsum</p>
             </div>
             <FakeImage />
           </GridItem>
           <GridItem>
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Card 2</h3>
-              <p className="text-white/60">Lorem ipsum</p>
+              <p className="text-gray-600">Lorem ipsum</p>
             </div>
             <FakeImage />
           </GridItem>

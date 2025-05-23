@@ -26,7 +26,7 @@ export default function Evaluations() {
             <h1 className="text-center text-wrap max-w-2xl">
               Evaluation to measure and improve quality
             </h1>
-            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-white/60">
+            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-gray-600">
               Confidently evaluate quality in development and production to
               identify issues and iteratively test improvements.
             </p>
@@ -47,7 +47,7 @@ export default function Evaluations() {
             <GridItem>
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">Pre-built LLM judges</h3>
-                <p className="text-white/60 text-lg">
+                <p className="text-gray-600 text-lg">
                   Quickly start with built-in LLM judges for safety,
                   hallucination, retrieval quality, and relevance. Our
                   research-backed judges provide accurate, reliable quality
@@ -60,7 +60,7 @@ export default function Evaluations() {
             <GridItem direction="reverse">
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">Customized LLM judges</h3>
-                <p className="text-white/60 text-lg">
+                <p className="text-gray-600 text-lg">
                   Adapt our base model to create custom LLM judges tailored to
                   your business needs, aligning with your human expert's
                   judgment.
@@ -84,7 +84,7 @@ export default function Evaluations() {
                   <h3 className="text-white">Evaluation datasets</h3>
                 </div>
 
-                <p className="text-white/60">
+                <p className="text-gray-600">
                   Curate high-scoring traces for regression datasets and
                   low-scoring ones for evaluation datasets to use offline to
                   improve quality.
@@ -105,7 +105,7 @@ export default function Evaluations() {
             <GridItem width="wide" direction="reverse">
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">Test new app / prompt variants</h3>
-                <p className="text-white/60 text-lg">
+                <p className="text-gray-600 text-lg">
                   MLflow's Evaluation SDK lets you test new application variants
                   (prompts, models, code) against evaluation and regression
                   datasets. Each variant is linked to its evaluation results,
@@ -121,7 +121,7 @@ export default function Evaluations() {
                   <h3 className="text-white">
                     Customize with code-based metrics
                   </h3>
-                  <p className="text-white/60">
+                  <p className="text-gray-600">
                     Customize evaluation to measure any aspect of your app's
                     quality or performance using our custom metrics SDK. Convert
                     any Python function—from regex to custom logic—into a
@@ -137,7 +137,7 @@ export default function Evaluations() {
                 <h3 className="text-white">
                   Identify root causes with evaluation review UIs
                 </h3>
-                <p className="text-white/60 text-lg">
+                <p className="text-gray-600 text-lg">
                   Use MLflow's Evaluation UI to visualize a summary of your
                   evals and view results record-by-record to quickly identify
                   root causes and further improvement opportunities.
@@ -149,7 +149,7 @@ export default function Evaluations() {
             <GridItem width="wide">
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">Compare versions side-by-side</h3>
-                <p className="text-white/60 text-lg">
+                <p className="text-gray-600 text-lg">
                   Compare evaluations of 2 app variants to understand if your
                   changes improved or regressed quality. Review individual
                   questions side-by-side in the Trace Comparison UI to find
@@ -162,7 +162,7 @@ export default function Evaluations() {
             <GridItem width="wide" direction="reverse">
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">CI/CD support</h3>
-                <p className="text-white/60 text-lg">
+                <p className="text-gray-600 text-lg">
                   Automatically run evaluations in CI/CD workflows to
                   systematically validate that every change improves quality,
                   preventing regressions.

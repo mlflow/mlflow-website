@@ -29,7 +29,7 @@ export default function BlogPostItems({
           >
             <SectionLabel color="green" label="FEATURED" />
             <h1>{firstBlogPost.content.metadata.title}</h1>
-            <p className="text-white/60">
+            <p className="text-gray-600">
               {firstBlogPost.content.metadata.description}
             </p>
           </Link>
@@ -57,7 +57,7 @@ export default function BlogPostItems({
                     alt={blogPost.content.frontMatter.title}
                     className="object-contain rounded-md max-h-[210px] grow"
                   />
-                  <span className="text-white/60">
+                  <span className="text-gray-600">
                     {new Date(
                       blogPost.content.metadata.date,
                     ).toLocaleDateString("en-US", {

@@ -52,7 +52,7 @@ export const SocialWidget = ({ variant }: Props) => {
       <div className="flex flex-col w-full gap-6 items-center justify-center text-center">
         <SectionLabel label="GET INVOLVED" color={variant} />
         <h1>Connect with the community</h1>
-        <p className="text-white/60 text-lg">
+        <p className="text-gray-600 text-lg">
           Connect with thousands of customers using MLflow
         </p>
       </div>

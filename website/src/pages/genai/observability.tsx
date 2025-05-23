@@ -26,7 +26,7 @@ export default function Observability() {
             <h1 className="text-center text-wrap">
               Observability to debug and monitor
             </h1>
-            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-white/60">
+            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-gray-600">
               Gain visibility into your app's logic to debug issues and improve
               latency. Attach quality feedback and metadata to help you
               understand user behavior and improve quality.
@@ -48,7 +48,7 @@ export default function Observability() {
             <GridItem>
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">End to end observability</h3>
-                <p className="text-white/60">
+                <p className="text-gray-600">
                   Capture your app's inputs, outputs, and step-by-step
                   execution: prompts, retrievals, tool calls, and more.
                 </p>
@@ -59,7 +59,7 @@ export default function Observability() {
             <GridItem>
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">Cost & latency tracking</h3>
-                <p className="text-white/60">
+                <p className="text-gray-600">
                   Track cost and latency for each step of your app's execution.
                 </p>
               </div>
@@ -71,7 +71,7 @@ export default function Observability() {
                 <h3 className="text-white">
                   Visualize your app's execution flow
                 </h3>
-                <p className="text-white/60">
+                <p className="text-gray-600">
                   Deep dive into your app's logic and latency with an intuitive
                   UI for effective debugging.
                 </p>
@@ -82,7 +82,7 @@ export default function Observability() {
             <GridItem>
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">Quickly understand many traces</h3>
-                <p className="text-white/60">
+                <p className="text-gray-600">
                   Zoom out with a simplified summary UI to quickly review many
                   traces at once to understand how your app processes user
                   requests.
@@ -107,7 +107,7 @@ export default function Observability() {
                     Automatic instrumentation that's fully customizable
                   </h3>
                 </div>
-                <p className="text-white/60">
+                <p className="text-gray-600">
                   Instrument your app with 1-line-of-code integrations for over
                   20 popular LLM SDKs and generative AI frameworks. Optionally,
                   use our intuitive APIs to customize the integrations.
@@ -120,7 +120,7 @@ export default function Observability() {
             <GridItem width="wide">
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">SDKs for custom instrumentation</h3>
-                <p className="text-white/60 text-lg">
+                <p className="text-gray-600 text-lg">
                   Use our intuitive SDK - decorators, context managers, and
                   low-level APIs - to trace custom code or customize the
                   integrations.
@@ -134,7 +134,7 @@ export default function Observability() {
                 <h3 className="text-white">
                   Instrument once, use in development and production
                 </h3>
-                <p className="text-white/60 text-lg">
+                <p className="text-gray-600 text-lg">
                   The same trace instrumentation works for production and
                   development - so you can instrument once and get the same
                   insight whether you are debugging in dev or observing in
@@ -147,7 +147,7 @@ export default function Observability() {
             <GridItem width="wide">
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">OpenTelemetry compatible</h3>
-                <p className="text-white/60 text-lg">
+                <p className="text-gray-600 text-lg">
                   Fully compatible with OpenTelemetry, so you can export traces
                   to any OpenTelemetry compatible tool, providing you total
                   ownership and portability of your generative AI data.
@@ -168,7 +168,7 @@ export default function Observability() {
             <GridItem>
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">Attach Quality Feedback</h3>
-                <p className="text-white/60 text-lg">
+                <p className="text-gray-600 text-lg">
                   Attach quality assessments from users, domain experts, or LLM
                   judges/metrics directly on each trace so you can quickly
                   understand and debug quality issues.
@@ -180,7 +180,7 @@ export default function Observability() {
             <GridItem direction="reverse">
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">Attach Metadata</h3>
-                <p className="text-white/60 text-lg">
+                <p className="text-gray-600 text-lg">
                   Attach metadata, such as users, converastions sessions, and
                   custom tags to traces to help you slice and dice based on user
                   behavior.
@@ -192,7 +192,7 @@ export default function Observability() {
             <GridItem width="wide">
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">Comments and notes</h3>
-                <p className="text-white/60 text-lg">
+                <p className="text-gray-600 text-lg">
                   Add notes and context directly to traces for collaborative
                   analysis.
                 </p>
@@ -212,7 +212,7 @@ export default function Observability() {
             <GridItem width="wide" direction="reverse">
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">Dashboards</h3>
-                <p className="text-white/60 text-lg">
+                <p className="text-gray-600 text-lg">
                   Visualize operational and quality metrics with real-time
                   dashboards that flag quality issues, latency spikes, and
                   errors. Drill into dashboards to see the exact trace and step
@@ -225,7 +225,7 @@ export default function Observability() {
             <GridItem>
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">Advanced Search & Filtering</h3>
-                <p className="text-white/60 text-lg">
+                <p className="text-gray-600 text-lg">
                   Quickly find relevant traces with powerful search and
                   filtering options, allowing you to sift through large volumes
                   of data efficiently.
@@ -237,7 +237,7 @@ export default function Observability() {
             <GridItem direction="reverse">
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">Conversation Grouping</h3>
-                <p className="text-white/60 text-lg">
+                <p className="text-gray-600 text-lg">
                   Easily group traces by chat conversation or user for
                   streamlined analysis and a clearer understanding of
                   interaction histories.

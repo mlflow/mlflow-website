@@ -26,7 +26,7 @@ export default function AiGateway() {
             <h1 className="text-center text-wrap">
               Build AI Systems with confidence
             </h1>
-            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-white/60">
+            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-gray-600">
               The AI developer platform to build AI applications and models with
               confidence
             </p>
@@ -43,7 +43,7 @@ export default function AiGateway() {
                 <h3 className="text-white">Feature heading</h3>
               </div>
 
-              <p className="text-white/60">
+              <p className="text-gray-600">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit.
                 Quisquam, quos.
               </p>
@@ -53,7 +53,7 @@ export default function AiGateway() {
           <GridItem>
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Feature heading</h3>
-              <p className="text-white/60 text-lg">
+              <p className="text-gray-600 text-lg">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit.
                 Quisquam, quos. your code base.
               </p>
@@ -63,7 +63,7 @@ export default function AiGateway() {
           <GridItem width="wide">
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Feature heading</h3>
-              <p className="text-white/60 text-lg">
+              <p className="text-gray-600 text-lg">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit.
                 Quisquam, quos.
               </p>
