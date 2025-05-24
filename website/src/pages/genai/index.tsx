@@ -1,4 +1,3 @@
-import ReviewApp from "@site/static/img/review-app.jpg";
 import TraceTab from "@site/static/img/trace-tab.jpg";
 import EvalsTab from "@site/static/img/evals-tab.jpg";
 import AssessmentsTab from "@site/static/img/assessments.jpg";
