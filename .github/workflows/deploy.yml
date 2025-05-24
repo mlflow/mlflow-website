@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - mlflow-3-website-update
     # Review gh actions docs if you want to further define triggers, paths, etc
     # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#on
   pull_request:
@@ -26,6 +27,9 @@ jobs:
         with:
           node-version: 18
       - name: Build docs
+        # Only build docs for main branch, otherwise
+        # the build will take a long time.
+        if: github.ref == 'refs/heads/main'
         env:
           GTM_ID: ${{ secrets.GTM_ID }}
           PIP_EXTRA_INDEX_URL: https://download.pytorch.org/whl/cpu
