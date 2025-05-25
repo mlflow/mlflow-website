@@ -89,7 +89,7 @@ One of the examples requires compute; therefore, be sure to turn on [MLflow syst
 > Number of epochs and a subset of the dataset is also used during training.
 
 ### Logging Artifacts of Datasets Together with Model
-Since the COCO dataset is filebased, files need to be downloaded first. We use the smallest version of the newest version of the dataset from the official author's website.
+Since the COCO dataset is file-based, files need to be downloaded first. We use the smallest version of the newest version of the dataset from the official author's website.
 
 ```bash
 # download the COCO val 2017 dataset
