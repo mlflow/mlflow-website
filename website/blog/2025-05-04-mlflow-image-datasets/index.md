@@ -76,7 +76,7 @@ Start by installing the dependencies for both code examples in your `python >= 3
 
 Also install `pynvml` if you want to track GPU metrics.
 
-For the Hugging Face dataset download, also make sure to log in.
+For the HuggingFace dataset download, also make sure to log in.
 
 `huggingface-cli login`
 
