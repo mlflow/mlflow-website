@@ -6,7 +6,7 @@ authors: [thorsteen]
 thumbnail: /img/blog/coco-dataset.png
 ---
 
-Tracking datasets is a critical aspect of machine learning training and fine-tuning workflows. In this post, we will do it with maybe most difficult format of all datasets—images—and show the nice capabilities of MLflow experiment tracking and the UI.
+Dataset tracking is fundamental to building robust and reproducible machine learning models. Among all data types, images present unique tracking challenges due to their high dimensionality, variability, and storage requirements. In this post, we'll demonstrate how to effectively track image datasets using MLflow's experiment tracking capabilities and UI, providing you with practical techniques to enhance your computer vision workflows' tracking of data and models.
 
 > **NOTE**: This guide assumes familiarity with MLflow and its tracking capabilities as well as PyTorch. For beginners, refer to the [MLflow starters tutorial](https://mlflow.org/docs/latest/getting-started/) and this [PyTorch Vision tutorial](https://pytorch.org/tutorials/intermediate/torchvision_tutorial.html).
 
@@ -21,6 +21,25 @@ Tracking image datasets is essential for structured machine learning projects. I
 ## Understanding Image Dataset Formats
 There exist many formats for datasets in the global machine-learning community. 
 In this blog post, we will use a widely used format for computer-vision models, COCO, in the traditional fileformat and a Hugging Face version of the same dataset. These two formats have pros and cons and different possibilites for MLflow tracking.
+
+Pros using the native fileformat:
+- dataloaders ready to use in `pycocotools` / `torchvision`
+- fast to load
+- smaller filesize
+- simple directory structure
+- artifacts can be tracked and shown, e.g. as image
+Cons:
+- not trackable
+- unstructured data so can be messy to search and explore
+- not queryable
+
+Pros using Huggingface datasets / tabular datasets
+- very structured
+- fully trackable as a training dataset using mlflow.data  (se more below)
+- metadata can be added for data in mlflow
+Cons:
+- huge filesize due to binary written as text in tabel entries
+- requires a custom dataloader
 
 ### COCO: Common Objects in Context
 COCO is a widely used dataset format in computer vision, known for its rich annotations. 
