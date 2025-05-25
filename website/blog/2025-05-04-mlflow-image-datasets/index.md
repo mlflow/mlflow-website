@@ -28,7 +28,7 @@ It supports:
 - Object Detection, Keypoint Detection, Stuff Segmentation, Image Captioning, and more.
 - JSON-based annotations for storing metadata.
 
-We will throught the blog post use this dataset.
+We will be using this dataset throughout this blog post.
 
 > It is important to visualize annotations in image datasets to quality check. You can explore the dataset on the [COCO dataset official site](https://cocodataset.org/#explore).
 
