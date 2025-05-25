@@ -70,7 +70,7 @@ In this post, I will go through both approaches in code.
 
 ### Install MLflow and Other Dependencies
 
-Start by installing the dependencies for both code examples in your `python >= 3.10` environment. opencv can be ommited if only using the first examples and pycocotools can be ommitted if only using the second example.
+Start by installing the dependencies for both code examples in your `python >= 3.10` environment. `opencv` can be omitted if only using the first examples and `pycocotools` can be omitted if only using the second example.
 
 `pip install mlflow datasets torch torchvision pycocotools opencv-python-headless psutil`
 
