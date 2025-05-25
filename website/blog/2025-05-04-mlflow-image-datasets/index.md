@@ -148,7 +148,7 @@ Image and text visualization of files is supported.
 ![COCO dataset annotated image example](coco-dataset.png)
 
 ### Logging Artifacts of Datasets Together with Model
-We can do this in a more structured way using a Huggingface dataset and use a simple hacks that reads in the data. In this way, we have our MLflow tracked dataset, training metrics and models all in the same experiment run!  
+We can do this in a more structured way using a HuggingFace dataset and leverage a convenient way to read in the data. In this way, we have our MLflow tracked dataset, training metrics and models all in the same experiment run!  
 
 ```python
 import numpy as np
