@@ -32,7 +32,7 @@ We will be using this dataset throughout this blog post.
 
 > It is important to visualize annotations in image datasets to perform comprehensive quality checks. You can explore the dataset on the [COCO dataset official site](https://cocodataset.org/#explore) to understand more about the nature of the data included within it.
 
-Image datasets have annotations which can be segments of an object in picture or an bounding box. This means there for every image will be a class and a set of coordinates. See the following example from the COCO datasat.
+Image datasets have annotations which can be segments of an object in picture or an bounding box. This means that for every image, there will be a class and a set of coordinates for each identified object. See the following example from the COCO dataset:
 > ![COCO dataset annotated image example](id-337458-COCO.png)
 
 ### Hugging Face Image Datasets
