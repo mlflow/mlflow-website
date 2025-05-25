@@ -242,7 +242,7 @@ with mlflow.start_run():
     )
 ```
 
-As shown, we had to take the work with the tabular format to make a Huggingface dataset work for training.
+As shown, we demonstrated how to work with our images in a tabular format to simplify the use of the Huggingface dataset in our training run.
 
 Under the second experiment, you will now have a dataset logged.
 
