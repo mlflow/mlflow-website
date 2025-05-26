@@ -12,7 +12,7 @@ export default function BlogLayout({ children, ...props }) {
   const isHomeOrTagsPage =
     location.pathname === blogUrl ||
     location.pathname === blogUrl + `/` ||
-    location.pathname.includes("/blog/tags");
+    location.pathname.includes(blogUrl + "/tags");
 
   return (
     <ThemeLayout {...props}>
