@@ -1,6 +1,6 @@
 import Link from "@docusaurus/Link";
 
-import { Layout, Grid, GridItem } from "../components";
+import { Layout, Grid, GridItem, Heading } from "../components";
 
 import ambassadors from "./ambassadors.json";
 
@@ -34,7 +34,7 @@ export default function Ambassadors() {
         </p>
       </div>
       <div className="flex flex-col gap-8 max-w-4xl mx-auto mt-20">
-        <h1>Meet the MLflow Ambassadors</h1>
+        <Heading level={1}>Meet the MLflow Ambassadors</Heading>
         <Grid columns={2}>
           {ambassadors.flatMap((row) =>
             row.map((item) => (

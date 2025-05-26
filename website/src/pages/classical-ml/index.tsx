@@ -12,6 +12,8 @@ import {
   GetStartedWithMLflow,
   LatestNews,
   SocialWidget,
+  Heading,
+  Body,
 } from "../../components";
 
 export default function GenAi(): JSX.Element {
@@ -23,14 +25,14 @@ export default function GenAi(): JSX.Element {
       >
         <div className="flex flex-col gap-16 w-full px-6 md:px-20 max-w-container">
           <div className="flex flex-col justify-center items-center gap-6 w-full">
-            <h1 className="text-center text-wrap">
-              Mastering the ML lifecycle
-            </h1>
-            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-white">
-              From experiment to production, MLflow streamlines your complete
-              machine learning journey with enterprise-grade tracking, model
-              management, and deployment.
-            </p>
+            <Heading level={1}>Mastering the ML lifecycle</Heading>
+            <div className="max-w-3xl mx-auto text-center">
+              <Body size="l">
+                From experiment to production, MLflow streamlines your complete
+                machine learning journey with enterprise-grade tracking, model
+                management, and deployment.
+              </Body>
+            </div>
           </div>
           <div className="flex flex-col md:flex-row gap-10">
             <CopyCommand code="pip install mlflow" />
@@ -41,11 +43,11 @@ export default function GenAi(): JSX.Element {
         <div className="flex flex-col w-full items-center justify-center gap-16">
           <div className="flex flex-col w-full items-center justify-center gap-6">
             <SectionLabel color="green" label="CORE FEATURES" />
-            <h1>Build confidently, deploy seamlessly</h1>
-            <p className="text-white">
+            <Heading level={2}>Build confidently, deploy seamlessly</Heading>
+            <Body size="m">
               Cover experimentation, reproducibility, deployment, and a central
               model registry
-            </p>
+            </Body>
           </div>
           <VerticalTabs
             defaultValue="unified-workflow"
@@ -101,31 +103,31 @@ export default function GenAi(): JSX.Element {
         <div className="flex flex-col items-center justify-center gap-16">
           <div className="flex flex-col gap-6">
             <SectionLabel color="green" label="WHY US?" />
-            <h1>Why MLflow is unique</h1>
+            <Heading level={2}>Why MLflow is unique</Heading>
           </div>
           <Grid columns={2}>
             <GridItem>
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">Industry pioneer</h3>
-                <p className="text-white/60">
+                <Body size="m">
                   MLflow has established itself as a pioneering open-source
                   platform for managing the end-to-end machine learning
                   lifecycle. Created by Databricks, it has become one of the
                   most widely adopted MLOps tools in the industry, with
                   integration support from major cloud providers.
-                </p>
+                </Body>
               </div>
             </GridItem>
             <GridItem>
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">Framework neutrality</h3>
-                <p className="text-white/60">
+                <Body size="m">
                   MLflow's framework-agnostic design is one of its strongest
                   differentiators. Unlike proprietary solutions that lock you
                   into specific ecosystems, MLflow works seamlessly with all
                   popular ML frameworks including scikit-learn, PyTorch,
                   TensorFlow, and XGBoost.
-                </p>
+                </Body>
               </div>
             </GridItem>
             <GridItem>
@@ -133,31 +135,31 @@ export default function GenAi(): JSX.Element {
                 <h3 className="text-white">
                   Comprehensive Lifecycle Management
                 </h3>
-                <p className="text-white/60">
+                <Body size="m">
                   MLflow uniquely addresses the complete machine learning
                   lifecycle through four integrated components: - MLflow
                   Tracking for logging parameters, metrics, and artifacts -
                   MLflow Projects for reproducible code packaging - MLflow
                   Models for standardized deployment - MLflow Model Registry for
                   centralized version management
-                </p>
+                </Body>
               </div>
             </GridItem>
             <GridItem>
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">Enterprise Adoption</h3>
-                <p className="text-white/60">
+                <Body size="m">
                   MLflow's impact extends beyond its technical capabilities. It
                   has gained significant traction among enterprise teams
                   requiring robust experiment tracking and model lifecycle
                   management. Databricks offers a managed MLflow service with
                   enhanced security and scalability.
-                </p>
+                </Body>
               </div>
             </GridItem>
           </Grid>
         </div>
-        <GetStartedWithMLflow />
+        <GetStartedWithMLflow variant="blue" />
         <LatestNews variant="green" />
         <SocialWidget variant="green" />
       </div>

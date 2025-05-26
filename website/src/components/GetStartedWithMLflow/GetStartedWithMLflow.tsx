@@ -3,6 +3,8 @@ import Checkmark from "@site/static/img/checkmark.svg";
 
 import { GetStartedButton } from "../GetStartedButton/GetStartedButton";
 import { cn } from "../../utils";
+import { Heading } from "../Typography/Heading";
+import { Body } from "../Typography/Body";
 
 interface Props {
   variant?: "red" | "blue";
@@ -11,26 +13,24 @@ interface Props {
 export const GetStartedWithMLflow = ({ variant = "red" }: Props) => {
   return (
     <div className="flex flex-col lg:flex-row w-full justify-between gap-6">
-      <div className="flex flex-col gap-6 w-full lg:w-1/2">
-        <h1>Get started with MLflow</h1>
-        <span className="text-white/60 font-light text-lg">
-          Choose from two options depending on your needs
-        </span>
+      <div className="flex flex-col gap-6 w-full lg:w-1/2 items-start">
+        <Heading level={2}>Get started with MLflow</Heading>
+        <Body size="l">Choose from two options depending on your needs</Body>
       </div>
       <div className="flex flex-col w-full lg:w-1/2 gap-6">
         <div className="flex flex-col gap-8 p-8 bg-[#fff]/4 rounded-2xl">
           <div className="flex flex-row justify-between items-center gap-4">
             <div className="flex flex-row justify-center items-end gap-3 flex-wrap">
               <h3 className="m-0 text-white">Managed </h3>
-              <span className="text-white/50 text-sm">WITH</span>
+              <span className="text-gray-500 text-sm">WITH</span>
               <DatabricksLogo />
             </div>
             <div
               className={cn(
                 "hidden lg:block rounded-full uppercase px-4 py-2 text-xs font-semibold whitespace-nowrap",
                 variant === "blue"
-                  ? "bg-[#44EDBC] text-black"
-                  : "bg-[#EB1700] text-white",
+                  ? "bg-brand-teal text-black"
+                  : "bg-brand-red text-white",
               )}
             >
               <span>MOST POPULAR</span>
@@ -39,19 +39,19 @@ export const GetStartedWithMLflow = ({ variant = "red" }: Props) => {
           <div className="flex flex-col gap-4">
             <div className="flex flex-row items-center gap-4">
               <Checkmark />
-              <span className="text-md font-light text-white/60">
+              <span className="text-md font-light text-gray-600">
                 Production-ready
               </span>
             </div>
             <div className="flex flex-row items-center gap-4">
               <Checkmark />
-              <span className="text-md font-light text-white/60">
+              <span className="text-md font-light text-gray-600">
                 Secure & scalable
               </span>
             </div>
             <div className="flex flex-row items-center gap-4">
               <Checkmark />
-              <span className="text-md font-light text-white/60">
+              <span className="text-md font-light text-gray-600">
                 24/7 support
               </span>
             </div>

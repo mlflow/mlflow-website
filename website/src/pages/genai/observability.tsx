@@ -7,6 +7,8 @@ import {
   GetStartedWithMLflow,
   SocialWidget,
   GetStartedButton,
+  Heading,
+  Body,
 } from "../../components";
 
 const FakeImage = () => (
@@ -23,14 +25,14 @@ export default function Observability() {
         <div className="flex flex-col gap-16 w-full px-6 md:px-20 max-w-container">
           <div className="flex flex-col justify-center items-center gap-6 w-full">
             <SectionLabel color="red" label="OBSERVABILITY" />
-            <h1 className="text-center text-wrap">
-              Observability to debug and monitor
-            </h1>
-            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-white/60">
-              Gain visibility into your app's logic to debug issues and improve
-              latency. Attach quality feedback and metadata to help you
-              understand user behavior and improve quality.
-            </p>
+            <Heading level={1}>Observability to debug and monitor</Heading>
+            <div className="max-w-3xl mx-auto text-center">
+              <Body size="l">
+                Gain visibility into your app's logic to debug issues and
+                improve latency. Attach quality feedback and metadata to help
+                you understand user behavior and improve quality.
+              </Body>
+            </div>
 
             <GetStartedButton />
           </div>
@@ -48,10 +50,10 @@ export default function Observability() {
             <GridItem>
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">End to end observability</h3>
-                <p className="text-white/60">
+                <Body size="l">
                   Capture your app's inputs, outputs, and step-by-step
                   execution: prompts, retrievals, tool calls, and more.
-                </p>
+                </Body>
               </div>
               <FakeImage />
               {/* Animation of an app going from user request to retriever to LLM to tool call to response*/}
@@ -59,9 +61,9 @@ export default function Observability() {
             <GridItem>
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">Cost & latency tracking</h3>
-                <p className="text-white/60">
+                <Body size="l">
                   Track cost and latency for each step of your app's execution.
-                </p>
+                </Body>
               </div>
               <FakeImage />
               {/* GIF screenshot of summary view paging through several traces */}
@@ -71,10 +73,10 @@ export default function Observability() {
                 <h3 className="text-white">
                   Visualize your app's execution flow
                 </h3>
-                <p className="text-white/60">
+                <Body size="l">
                   Deep dive into your app's logic and latency with an intuitive
                   UI for effective debugging.
-                </p>
+                </Body>
               </div>
               <FakeImage />
               {/* GIF screenshot of detailed view + switching to see the timeline view */}
@@ -82,11 +84,11 @@ export default function Observability() {
             <GridItem>
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">Quickly understand many traces</h3>
-                <p className="text-white/60">
+                <Body size="l">
                   Zoom out with a simplified summary UI to quickly review many
                   traces at once to understand how your app processes user
                   requests.
-                </p>
+                </Body>
               </div>
               <FakeImage />
               {/* GIF screenshot of summary view paging through several traces */}
@@ -107,11 +109,11 @@ export default function Observability() {
                     Automatic instrumentation that's fully customizable
                   </h3>
                 </div>
-                <p className="text-white/60">
+                <Body size="l">
                   Instrument your app with 1-line-of-code integrations for over
                   20 popular LLM SDKs and generative AI frameworks. Optionally,
                   use our intuitive APIs to customize the integrations.
-                </p>
+                </Body>
               </div>
               <FakeImage />
               {/* Rendering of all the logos we support + a 1-liner of "mlflow.<flavor>.autolog()" in the center of the logos */}
@@ -120,11 +122,11 @@ export default function Observability() {
             <GridItem width="wide">
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">SDKs for custom instrumentation</h3>
-                <p className="text-white/60 text-lg">
+                <Body size="l">
                   Use our intuitive SDK - decorators, context managers, and
                   low-level APIs - to trace custom code or customize the
                   integrations.
-                </p>
+                </Body>
               </div>
               <FakeImage />
               {/* Code example of using custom instrumentation that maps the code to a sample trace from the code (example in go/genai/quality) */}
@@ -134,12 +136,12 @@ export default function Observability() {
                 <h3 className="text-white">
                   Instrument once, use in development and production
                 </h3>
-                <p className="text-white/60 text-lg">
+                <Body size="l">
                   The same trace instrumentation works for production and
                   development - so you can instrument once and get the same
                   insight whether you are debugging in dev or observing in
                   production.
-                </p>
+                </Body>
               </div>
               <FakeImage />
               {/* Animation showing the same trace instrumentation working for production and development ?? */}
@@ -147,11 +149,11 @@ export default function Observability() {
             <GridItem width="wide">
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">OpenTelemetry compatible</h3>
-                <p className="text-white/60 text-lg">
+                <Body size="l">
                   Fully compatible with OpenTelemetry, so you can export traces
                   to any OpenTelemetry compatible tool, providing you total
                   ownership and portability of your generative AI data.
-                </p>
+                </Body>
               </div>
               <FakeImage />
             </GridItem>
@@ -168,11 +170,11 @@ export default function Observability() {
             <GridItem>
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">Attach Quality Feedback</h3>
-                <p className="text-white/60 text-lg">
+                <Body size="l">
                   Attach quality assessments from users, domain experts, or LLM
                   judges/metrics directly on each trace so you can quickly
                   understand and debug quality issues.
-                </p>
+                </Body>
               </div>
               <FakeImage />
               {/* Product GIF of the feedback annotation view - show judge + review app + then show the feedback showing up on the trace in the trace UI */}
@@ -180,11 +182,11 @@ export default function Observability() {
             <GridItem direction="reverse">
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">Attach Metadata</h3>
-                <p className="text-white/60 text-lg">
+                <Body size="l">
                   Attach metadata, such as users, converastions sessions, and
                   custom tags to traces to help you slice and dice based on user
                   behavior.
-                </p>
+                </Body>
               </div>
               <FakeImage />
               {/* Animation of grouping traces by user and conversation session */}
@@ -192,10 +194,10 @@ export default function Observability() {
             <GridItem width="wide">
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">Comments and notes</h3>
-                <p className="text-white/60 text-lg">
+                <Body size="l">
                   Add notes and context directly to traces for collaborative
                   analysis.
-                </p>
+                </Body>
               </div>
               <FakeImage />
               {/* Product GIF of adding feedback in the trace UI */}
@@ -212,12 +214,12 @@ export default function Observability() {
             <GridItem width="wide" direction="reverse">
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">Dashboards</h3>
-                <p className="text-white/60 text-lg">
+                <Body size="l">
                   Visualize operational and quality metrics with real-time
                   dashboards that flag quality issues, latency spikes, and
                   errors. Drill into dashboards to see the exact trace and step
                   so you can rapidly debug issues.
-                </p>
+                </Body>
               </div>
               <FakeImage />
               {/* Product GIF of the monitoring dashboard and clicking into a trace */}
@@ -225,11 +227,11 @@ export default function Observability() {
             <GridItem>
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">Advanced Search & Filtering</h3>
-                <p className="text-white/60 text-lg">
+                <Body size="l">
                   Quickly find relevant traces with powerful search and
                   filtering options, allowing you to sift through large volumes
                   of data efficiently.
-                </p>
+                </Body>
               </div>
               <FakeImage />
               {/* Product GIF searching and filtering for tags + feedback */}
@@ -237,11 +239,11 @@ export default function Observability() {
             <GridItem direction="reverse">
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">Conversation Grouping</h3>
-                <p className="text-white/60 text-lg">
+                <Body size="l">
                   Easily group traces by chat conversation or user for
                   streamlined analysis and a clearer understanding of
                   interaction histories.
-                </p>
+                </Body>
               </div>
               <FakeImage />
               {/* Figma of what this design will be! */}

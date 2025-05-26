@@ -4,6 +4,7 @@ import { BLOGS } from "../../posts";
 import { Grid, GridItem } from "../Grid/Grid";
 import { SectionLabel } from "../SectionLabel/SectionLabel";
 import { Button } from "../Button/Button";
+import { Heading } from "../Typography/Heading";
 
 interface Props {
   variant: "red" | "green";
@@ -25,7 +26,7 @@ export const LatestNews = ({ variant }: Props) => {
       <div className="flex flex-row justify-between items-center gap-4 flex-wrap w-full">
         <div className="flex flex-col gap-6 items-start">
           <SectionLabel color={variant} label="Blog" />
-          <h1>Latest news</h1>
+          <Heading level={2}>Latest news</Heading>
         </div>
         <div className="hidden md:block">{viewAllLinkNode}</div>
       </div>
@@ -37,7 +38,7 @@ export const LatestNews = ({ variant }: Props) => {
               className="flex flex-col gap-6 h-full justify-between"
             >
               <div className="flex flex-col gap-6">
-                <span className="text-white/50">
+                <span className="text-gray-500">
                   {new Date(post.date).toLocaleDateString("en-us", {
                     month: "short",
                     day: "numeric",
