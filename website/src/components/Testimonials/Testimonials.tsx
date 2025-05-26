@@ -1,14 +1,15 @@
 import { SectionLabel } from "../SectionLabel/SectionLabel";
 import { Grid, GridItem } from "../Grid/Grid";
+import { Heading } from "../Typography/Heading";
 
 export const Testimonials = () => {
   return (
     <div className="flex flex-col gap-16">
       <div className="flex flex-col gap-6 items-center">
         <SectionLabel color="red" label="Customers" />
-        <h1 className="max-w-2xl text-center text-wrap">
+        <Heading level={2}>
           Trusted by thousands of businesses and research teams
-        </h1>
+        </Heading>
       </div>
       <Grid>
         <GridItem className="p-6">

@@ -5,7 +5,7 @@ const styles = cva("text-center text-wrap", {
   variants: {
     level: {
       1: "font-light text-[64px] leading-[100%] tracking-[-3%]",
-      2: "font-light text-[52px] leading-[120%] tracking-[-1%]",
+      2: "font-light text-[52px] leading-[120%] tracking-[-1%] text-white",
       3: "font-regular text-[40px] leading-[120%] tracking-[-1%]",
       4: "font-regular text-[32px] leading-[120%] tracking-[0%]",
       5: "font-medium text-[24px] leading-[120%] tracking-[0%]",
