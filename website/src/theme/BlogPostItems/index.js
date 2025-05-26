@@ -3,13 +3,16 @@ import { BlogPostProvider } from "@docusaurus/theme-common/internal";
 import BlogPostItem from "@theme/BlogPostItem";
 import { SectionLabel, Grid, GridItem } from "../../components";
 import Link from "@docusaurus/Link";
+import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 
 export default function BlogPostItems({
   items,
   component: BlogPostItemComponent = BlogPostItem,
 }) {
+  const { siteConfig } = useDocusaurusContext();
+
   const isBlog = items.some(({ content }) =>
-    content.metadata.permalink.startsWith("/blog/"),
+    content.metadata.permalink.startsWith(`${siteConfig.baseUrl}blog/`),
   );
 
   if (isBlog) {
