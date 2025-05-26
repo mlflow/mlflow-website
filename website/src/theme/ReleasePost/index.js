@@ -1,6 +1,6 @@
 import React from "react";
 import ThemeLayout from "@theme/Layout";
-import { BlogPostProvider } from "@docusaurus/theme-common/internal";
+import { BlogPostProvider } from "@docusaurus/plugin-content-blog/client";
 
 import { Layout } from "../../components";
 import BlogSidebar from "@theme/BlogSidebar";

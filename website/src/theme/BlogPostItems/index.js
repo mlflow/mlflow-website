@@ -1,15 +1,17 @@
 import React from "react";
-import { BlogPostProvider } from "@docusaurus/theme-common/internal";
+import { BlogPostProvider } from "@docusaurus/plugin-content-blog/client";
 import BlogPostItem from "@theme/BlogPostItem";
 import { SectionLabel, Grid, GridItem } from "../../components";
 import Link from "@docusaurus/Link";
+import useBaseUrl from "@docusaurus/useBaseUrl";
 
 export default function BlogPostItems({
   items,
   component: BlogPostItemComponent = BlogPostItem,
 }) {
+  const blogUrl = useBaseUrl("blog");
   const isBlog = items.some(({ content }) =>
-    content.metadata.permalink.startsWith("/blog/"),
+    content.metadata.permalink.startsWith(blogUrl),
   );
 
   if (isBlog) {
@@ -36,7 +38,7 @@ export default function BlogPostItems({
           <Link href={firstBlogPost.content.metadata.permalink}>
             <div>
               <img
-                src={firstBlogPost.content.frontMatter.thumbnail}
+                src={useBaseUrl(firstBlogPost.content.frontMatter.thumbnail)}
                 alt={firstBlogPost.content.frontMatter.title}
                 className="w-full h-full object-cover rounded-md"
               />
@@ -53,7 +55,7 @@ export default function BlogPostItems({
                   className="flex flex-col w-full h-full gap-4"
                 >
                   <img
-                    src={blogPost.content.frontMatter.thumbnail}
+                    src={useBaseUrl(blogPost.content.frontMatter.thumbnail)}
                     alt={blogPost.content.frontMatter.title}
                     className="object-contain rounded-md max-h-[210px] grow"
                   />

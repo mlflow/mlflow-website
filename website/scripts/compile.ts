@@ -1,6 +1,7 @@
 import { load } from "js-yaml";
 import { readFileSync, readdirSync, writeFileSync, statSync } from "fs";
 import { join } from "path";
+import { baseUrl } from "../docusaurus.config";
 
 type Frontmatter = {
   title: string;
@@ -79,11 +80,11 @@ function loadBlogs(dir: string): Blog[] {
       const yaml = load(readFileSync("blog/authors.yml", "utf8")) as AuthorMap;
       return {
         title,
-        path: `/${dir}/${slug}`,
+        path: `${baseUrl}${dir}/${slug}`,
         tags,
-        authors: authors.map((author) => yaml[author]),
+        authors: authors.map((authorName) => yaml[authorName]),
         date,
-        thumbnail,
+        thumbnail: thumbnail && join(baseUrl, thumbnail),
       };
     });
 }

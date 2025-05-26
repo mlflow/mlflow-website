@@ -4,6 +4,9 @@ import type * as Preset from "@docusaurus/preset-classic";
 
 import tailwindPlugin from "./plugins/tailwind-config.cjs";
 
+// ensure baseUrl always ends in `/`
+export const baseUrl = (process.env.BASE_URL ?? "/").replace(/\/?$/, "/");
+
 const config: Config = {
   title: "MLflow",
   // tagline: 'Dinosaurs are cool',
@@ -13,7 +16,7 @@ const config: Config = {
   url: "http://mlflow.org",
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: process.env.BASE_URL || "/",
+  baseUrl,
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
