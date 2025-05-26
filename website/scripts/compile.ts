@@ -1,6 +1,7 @@
 import { load } from "js-yaml";
 import { readFileSync, readdirSync, writeFileSync, statSync } from "fs";
 import { join } from "path";
+import { baseUrl } from "../docusaurus.config";
 
 type Frontmatter = {
   title: string;
@@ -51,8 +52,6 @@ function walk(dir: string): string[] {
   });
   return files;
 }
-
-const baseUrl = process.env.BASE_URL || "/";
 
 function resolvePath(path: string): BlogPath {
   const regex = new RegExp(/(.+)\/(\d{4}-\d{2}-\d{2})-(.*?)(\/index)?\.mdx?$/);

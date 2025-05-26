@@ -1,17 +1,17 @@
 import React from "react";
 import { useLocation } from "@docusaurus/router";
 import ThemeLayout from "@theme/Layout";
-import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
+import useBaseUrl from "@docusaurus/useBaseUrl";
 
 import { Layout } from "../../components";
 
 export default function BlogLayout({ children, ...props }) {
   const location = useLocation();
-  const { siteConfig } = useDocusaurusContext();
+  const blogUrl = useBaseUrl("blog");
 
   const isHomeOrTagsPage =
-    location.pathname === `${siteConfig.baseUrl}blog` ||
-    location.pathname === `${siteConfig.baseUrl}blog/` ||
+    location.pathname === blogUrl ||
+    location.pathname === blogUrl + `/` ||
     location.pathname.includes("/blog/tags");
 
   return (
