@@ -52,6 +52,8 @@ function walk(dir: string): string[] {
   return files;
 }
 
+const baseUrl = process.env.BASE_URL || "/";
+
 function resolvePath(path: string): BlogPath {
   const regex = new RegExp(/(.+)\/(\d{4}-\d{2}-\d{2})-(.*?)(\/index)?\.mdx?$/);
   const match = regex.exec(path);
@@ -79,11 +81,11 @@ function loadBlogs(dir: string): Blog[] {
       const yaml = load(readFileSync("blog/authors.yml", "utf8")) as AuthorMap;
       return {
         title,
-        path: `/${dir}/${slug}`,
+        path: `${baseUrl}${dir}/${slug}`,
         tags,
-        authors: authors.map((author) => yaml[author]),
+        authors: authors.map((authorName) => yaml[authorName]),
         date,
-        thumbnail,
+        thumbnail: thumbnail && join(baseUrl, thumbnail),
       };
     });
 }

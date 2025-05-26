@@ -28,7 +28,7 @@ export type Release = {
 export const BLOGS: Blog[] = [
   {
     title: "MLflow Go",
-    path: "/blog/mlflow-go",
+    path: "/mlflow-website/blog/mlflow-go",
     tags: ["mlflow"],
     authors: [
       {
@@ -39,12 +39,12 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2025-04-28",
-    thumbnail: "/img/blog/mlflow-go.jpeg",
+    thumbnail: "/mlflow-website/img/blog/mlflow-go.jpeg",
   },
   {
     title:
       "Automatically find the bad LLM responses in your LLM Evals with Cleanlab",
-    path: "/blog/tlm-tracing",
+    path: "/mlflow-website/blog/tlm-tracing",
     tags: ["genai", "observability", "tracing"],
     authors: [
       {
@@ -55,11 +55,11 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2025-04-01",
-    thumbnail: "/img/blog/tlm-tracing-thumbnail.png",
+    thumbnail: "/mlflow-website/img/blog/tlm-tracing-thumbnail.png",
   },
   {
     title: "Practical AI Observability: Getting Started with MLflow Tracing",
-    path: "/blog/ai-observability-mlflow-tracing",
+    path: "/mlflow-website/blog/ai-observability-mlflow-tracing",
     tags: ["genai", "observability", "tracing"],
     authors: [
       {
@@ -70,11 +70,11 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2025-03-06",
-    thumbnail: "/img/blog/tracing-intro-thumbnail.png",
+    thumbnail: "/mlflow-website/img/blog/tracing-intro-thumbnail.png",
   },
   {
     title: "Beyond Autolog: Add MLflow Tracing to a New LLM Provider",
-    path: "/blog/custom-tracing",
+    path: "/mlflow-website/blog/custom-tracing",
     tags: ["genai", "tracing", "ollama"],
     authors: [
       {
@@ -85,12 +85,12 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2025-01-30",
-    thumbnail: "/img/blog/tracing-new-provider.png",
+    thumbnail: "/mlflow-website/img/blog/tracing-new-provider.png",
   },
   {
     title:
       "From Natural Language to SQL: Building and Tracking a Multi-Lingual Query Engine",
-    path: "/blog/from-natural-language-to-sql",
+    path: "/mlflow-website/blog/from-natural-language-to-sql",
     tags: ["pyfunc", "mlflow", "sql-generator", "models-from-code", "tracing"],
     authors: [
       {
@@ -113,11 +113,11 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2025-01-23",
-    thumbnail: "/img/blog/from-natural-language-to-sql.png",
+    thumbnail: "/mlflow-website/img/blog/from-natural-language-to-sql.png",
   },
   {
     title: "MLflow Tracing in Jupyter Notebooks",
-    path: "/blog/mlflow-tracing-in-jupyter",
+    path: "/mlflow-website/blog/mlflow-tracing-in-jupyter",
     tags: ["genai", "mlops", "tracing"],
     authors: [
       {
@@ -128,11 +128,11 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2024-12-20",
-    thumbnail: "/img/blog/mlflow-tracing-in-jupyter.png",
+    thumbnail: "/mlflow-website/img/blog/mlflow-tracing-in-jupyter.png",
   },
   {
     title: "Using Bedrock Agent as an MLflow ChatModel with Tracing",
-    path: "/blog/bedrock-chat-model-part-1",
+    path: "/mlflow-website/blog/bedrock-chat-model-part-1",
     tags: ["genai", "pyfunc", "bedrock", "tracing"],
     authors: [
       {
@@ -143,11 +143,11 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2024-11-07",
-    thumbnail: "/img/blog/bedrock-chatmodel.png",
+    thumbnail: "/mlflow-website/img/blog/bedrock-chatmodel.png",
   },
   {
     title: "Building Advanced RAG with MLflow and LlamaIndex Workflow",
-    path: "/blog/mlflow-llama-index-workflow",
+    path: "/mlflow-website/blog/mlflow-llama-index-workflow",
     tags: ["genai", "mlops", "mlflow-evaluate"],
     authors: [
       {
@@ -158,11 +158,11 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2024-10-25",
-    thumbnail: "/img/blog/llama-index-thumbnail.png",
+    thumbnail: "/mlflow-website/img/blog/llama-index-thumbnail.png",
   },
   {
     title: "LLM as judge",
-    path: "/blog/llm-as-judge",
+    path: "/mlflow-website/blog/llm-as-judge",
     tags: ["genai", "mlflow-evalaute"],
     authors: [
       {
@@ -179,11 +179,11 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2024-10-03",
-    thumbnail: "/img/blog/llm-as-judge.png",
+    thumbnail: "/mlflow-website/img/blog/llm-as-judge.png",
   },
   {
     title: "Models from Code Logging in MLflow - What, Why, and How",
-    path: "/blog/models_from_code",
+    path: "/mlflow-website/blog/models_from_code",
     tags: ["genai", "pyfunc", "mlops"],
     authors: [
       {
@@ -195,11 +195,11 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2024-09-13",
-    thumbnail: "/img/blog/thumbnail-models-from-code.gif",
+    thumbnail: "/mlflow-website/img/blog/thumbnail-models-from-code.gif",
   },
   {
     title: "AutoGen with Custom PyFunc",
-    path: "/blog/autogen-image-agent",
+    path: "/mlflow-website/blog/autogen-image-agent",
     tags: ["genai", "mlops"],
     authors: [
       {
@@ -216,11 +216,11 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2024-08-29",
-    thumbnail: "/img/blog/autogen-blog.png",
+    thumbnail: "/mlflow-website/img/blog/autogen-blog.png",
   },
   {
     title: "LangGraph with Model From Code",
-    path: "/blog/langgraph-model-from-code",
+    path: "/mlflow-website/blog/langgraph-model-from-code",
     tags: ["genai", "mlops"],
     authors: [
       {
@@ -237,11 +237,11 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2024-08-06",
-    thumbnail: "/img/blog/release-candidates.png",
+    thumbnail: "/mlflow-website/img/blog/release-candidates.png",
   },
   {
     title: "PyFunc in Practice",
-    path: "/blog/pyfunc-in-practice",
+    path: "/mlflow-website/blog/pyfunc-in-practice",
     tags: ["pyfunc", "mlflow", "ensemble-models"],
     authors: [
       {
@@ -270,11 +270,11 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2024-07-26",
-    thumbnail: "/img/blog/pyfunc-in-practice.png",
+    thumbnail: "/mlflow-website/img/blog/pyfunc-in-practice.png",
   },
   {
     title: "Introducing MLflow Tracing",
-    path: "/blog/mlflow-tracing",
+    path: "/mlflow-website/blog/mlflow-tracing",
     tags: ["tracing", "genai", "mlops"],
     authors: [
       {
@@ -285,11 +285,11 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2024-06-10",
-    thumbnail: "/img/blog/trace-intro.gif",
+    thumbnail: "/mlflow-website/img/blog/trace-intro.gif",
   },
   {
     title: "Deep Learning with MLflow (Part 2)",
-    path: "/blog/deep-learning-part-2",
+    path: "/mlflow-website/blog/deep-learning-part-2",
     tags: ["Deep Learning"],
     authors: [
       {
@@ -318,11 +318,11 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2024-04-26",
-    thumbnail: "/img/blog/dl-blog-2.png",
+    thumbnail: "/mlflow-website/img/blog/dl-blog-2.png",
   },
   {
     title: "MLflow Release Candidates",
-    path: "/blog/release-candidates",
+    path: "/mlflow-website/blog/release-candidates",
     tags: ["mlflow"],
     authors: [
       {
@@ -333,12 +333,12 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2024-04-17",
-    thumbnail: "/img/blog/release-candidates.png",
+    thumbnail: "/mlflow-website/img/blog/release-candidates.png",
   },
   {
     title:
       "Announcing MLflow Enhancements - Deep Learning with MLflow (Part 1)",
-    path: "/blog/deep-learning-part-1",
+    path: "/mlflow-website/blog/deep-learning-part-1",
     tags: ["Deep Learning"],
     authors: [
       {
@@ -371,11 +371,11 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2024-03-05",
-    thumbnail: "/img/blog/dl-chart-grouping.gif",
+    thumbnail: "/mlflow-website/img/blog/dl-chart-grouping.gif",
   },
   {
     title: "2023 Year in Review",
-    path: "/blog/mlflow-year-in-review",
+    path: "/mlflow-website/blog/mlflow-year-in-review",
     tags: ["MLflow", "2023", "Linux Foundation"],
     authors: [
       {
@@ -386,11 +386,11 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2024-01-26",
-    thumbnail: "/img/blog/2023-year-in-review.png",
+    thumbnail: "/mlflow-website/img/blog/2023-year-in-review.png",
   },
   {
     title: "Streamline your MLflow Projects with Free Hosted MLflow",
-    path: "/blog/databricks-ce",
+    path: "/mlflow-website/blog/databricks-ce",
     tags: ["managed mlflow", "getting started"],
     authors: [
       {
@@ -401,11 +401,11 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2024-01-25",
-    thumbnail: "/img/blog/databricks-ce.png",
+    thumbnail: "/mlflow-website/img/blog/databricks-ce.png",
   },
   {
     title: "Custom MLflow Models with mlflow.pyfunc",
-    path: "/blog/custom-pyfunc",
+    path: "/mlflow-website/blog/custom-pyfunc",
     tags: ["pyfunc", "models"],
     authors: [
       {
@@ -416,12 +416,12 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2024-01-23",
-    thumbnail: "/img/blog/custom-pyfunc.png",
+    thumbnail: "/mlflow-website/img/blog/custom-pyfunc.png",
   },
   {
     title:
       "Automatic Metric, Parameter, and Artifact Logging with mlflow.autolog",
-    path: "/blog/mlflow-autolog",
+    path: "/mlflow-website/blog/mlflow-autolog",
     tags: ["autolog"],
     authors: [
       {
@@ -432,11 +432,11 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2023-11-30",
-    thumbnail: "/img/blog/mlflow-autolog.png",
+    thumbnail: "/mlflow-website/img/blog/mlflow-autolog.png",
   },
   {
     title: "MLflow Docs Overhaul",
-    path: "/blog/mlflow-docs-overhaul",
+    path: "/mlflow-website/blog/mlflow-docs-overhaul",
     tags: ["docs"],
     authors: [
       {
@@ -447,7 +447,7 @@ export const BLOGS: Blog[] = [
       },
     ],
     date: "2023-10-31",
-    thumbnail: "/img/blog/docs-overhaul.png",
+    thumbnail: "/mlflow-website/img/blog/docs-overhaul.png",
   },
 ];
 
@@ -455,7 +455,7 @@ export const BLOGS: Blog[] = [
 export const RELEASES: Release[] = [
   {
     title: "MLflow 2.22.0",
-    path: "/releases/2.22.0",
+    path: "/mlflow-website/releases/2.22.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -469,7 +469,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.21.2",
-    path: "/releases/2.21.2",
+    path: "/mlflow-website/releases/2.21.2",
     authors: [
       {
         name: "MLflow maintainers",
@@ -483,7 +483,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.21.1",
-    path: "/releases/2.21.1",
+    path: "/mlflow-website/releases/2.21.1",
     authors: [
       {
         name: "MLflow maintainers",
@@ -497,7 +497,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.21.0",
-    path: "/releases/2.21.0",
+    path: "/mlflow-website/releases/2.21.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -511,7 +511,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.20.4",
-    path: "/releases/2.20.4",
+    path: "/mlflow-website/releases/2.20.4",
     authors: [
       {
         name: "MLflow maintainers",
@@ -525,7 +525,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.20.3",
-    path: "/releases/2.20.3",
+    path: "/mlflow-website/releases/2.20.3",
     authors: [
       {
         name: "MLflow maintainers",
@@ -539,7 +539,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.20.2",
-    path: "/releases/2.20.2",
+    path: "/mlflow-website/releases/2.20.2",
     authors: [
       {
         name: "MLflow maintainers",
@@ -553,7 +553,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.20.1",
-    path: "/releases/2.20.1",
+    path: "/mlflow-website/releases/2.20.1",
     authors: [
       {
         name: "MLflow maintainers",
@@ -567,7 +567,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.20.0",
-    path: "/releases/2.20.0",
+    path: "/mlflow-website/releases/2.20.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -581,7 +581,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.20.0rc0",
-    path: "/releases/2.20.0rc0",
+    path: "/mlflow-website/releases/2.20.0rc0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -595,7 +595,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.19.0",
-    path: "/releases/2.19.0",
+    path: "/mlflow-website/releases/2.19.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -609,7 +609,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.18.0",
-    path: "/releases/2.18.0",
+    path: "/mlflow-website/releases/2.18.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -623,7 +623,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.17.2",
-    path: "/releases/2.17.2",
+    path: "/mlflow-website/releases/2.17.2",
     authors: [
       {
         name: "MLflow maintainers",
@@ -637,7 +637,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.17.1",
-    path: "/releases/2.17.1",
+    path: "/mlflow-website/releases/2.17.1",
     authors: [
       {
         name: "MLflow maintainers",
@@ -651,7 +651,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.17.0",
-    path: "/releases/2.17.0",
+    path: "/mlflow-website/releases/2.17.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -665,7 +665,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.16.2",
-    path: "/releases/2.16.2",
+    path: "/mlflow-website/releases/2.16.2",
     authors: [
       {
         name: "MLflow maintainers",
@@ -679,7 +679,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.16.1",
-    path: "/releases/2.16.1",
+    path: "/mlflow-website/releases/2.16.1",
     authors: [
       {
         name: "MLflow maintainers",
@@ -693,7 +693,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.16.0",
-    path: "/releases/2.16.0",
+    path: "/mlflow-website/releases/2.16.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -707,7 +707,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.15.1",
-    path: "/releases/2.15.1",
+    path: "/mlflow-website/releases/2.15.1",
     authors: [
       {
         name: "MLflow maintainers",
@@ -721,7 +721,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.15.0",
-    path: "/releases/2.15.0",
+    path: "/mlflow-website/releases/2.15.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -735,7 +735,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.14.3",
-    path: "/releases/2.14.3",
+    path: "/mlflow-website/releases/2.14.3",
     authors: [
       {
         name: "MLflow maintainers",
@@ -749,7 +749,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.14.2",
-    path: "/releases/2.14.2",
+    path: "/mlflow-website/releases/2.14.2",
     authors: [
       {
         name: "MLflow maintainers",
@@ -763,7 +763,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.14.1",
-    path: "/releases/2.14.1",
+    path: "/mlflow-website/releases/2.14.1",
     authors: [
       {
         name: "MLflow maintainers",
@@ -777,7 +777,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.14.0",
-    path: "/releases/2.14.0",
+    path: "/mlflow-website/releases/2.14.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -791,7 +791,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.13.2",
-    path: "/releases/2.13.2",
+    path: "/mlflow-website/releases/2.13.2",
     authors: [
       {
         name: "MLflow maintainers",
@@ -805,7 +805,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.13.1",
-    path: "/releases/2.13.1",
+    path: "/mlflow-website/releases/2.13.1",
     authors: [
       {
         name: "MLflow maintainers",
@@ -819,7 +819,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.13.0",
-    path: "/releases/2.13.0",
+    path: "/mlflow-website/releases/2.13.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -833,7 +833,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.12.2",
-    path: "/releases/2.12.2",
+    path: "/mlflow-website/releases/2.12.2",
     authors: [
       {
         name: "MLflow maintainers",
@@ -847,7 +847,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.12.1",
-    path: "/releases/2.12.1",
+    path: "/mlflow-website/releases/2.12.1",
     authors: [
       {
         name: "MLflow maintainers",
@@ -861,7 +861,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.12.0",
-    path: "/releases/2.12.0",
+    path: "/mlflow-website/releases/2.12.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -875,7 +875,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.11.3",
-    path: "/releases/2.11.3",
+    path: "/mlflow-website/releases/2.11.3",
     authors: [
       {
         name: "MLflow maintainers",
@@ -889,7 +889,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.11.2",
-    path: "/releases/2.11.2",
+    path: "/mlflow-website/releases/2.11.2",
     authors: [
       {
         name: "MLflow maintainers",
@@ -903,7 +903,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.11.1",
-    path: "/releases/2.11.1",
+    path: "/mlflow-website/releases/2.11.1",
     authors: [
       {
         name: "MLflow maintainers",
@@ -917,7 +917,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.11.0",
-    path: "/releases/2.11.0",
+    path: "/mlflow-website/releases/2.11.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -931,7 +931,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.10.2",
-    path: "/releases/2.10.2",
+    path: "/mlflow-website/releases/2.10.2",
     authors: [
       {
         name: "MLflow maintainers",
@@ -945,7 +945,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.10.1",
-    path: "/releases/2.10.1",
+    path: "/mlflow-website/releases/2.10.1",
     authors: [
       {
         name: "MLflow maintainers",
@@ -959,7 +959,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.10.0",
-    path: "/releases/2.10.0",
+    path: "/mlflow-website/releases/2.10.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -973,7 +973,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.9.2",
-    path: "/releases/2.9.2",
+    path: "/mlflow-website/releases/2.9.2",
     authors: [
       {
         name: "MLflow maintainers",
@@ -987,7 +987,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.9.1",
-    path: "/releases/2.9.1",
+    path: "/mlflow-website/releases/2.9.1",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1001,7 +1001,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.9.0",
-    path: "/releases/2.9.0",
+    path: "/mlflow-website/releases/2.9.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1015,7 +1015,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.8.1",
-    path: "/releases/2.8.1",
+    path: "/mlflow-website/releases/2.8.1",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1029,7 +1029,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.8.0",
-    path: "/releases/2.8.0",
+    path: "/mlflow-website/releases/2.8.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1043,7 +1043,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.7.1",
-    path: "/releases/2.7.1",
+    path: "/mlflow-website/releases/2.7.1",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1057,7 +1057,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.7.0",
-    path: "/releases/2.7.0",
+    path: "/mlflow-website/releases/2.7.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1071,7 +1071,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.6.0",
-    path: "/releases/2.6.0",
+    path: "/mlflow-website/releases/2.6.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1085,7 +1085,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.5.0",
-    path: "/releases/2.5.0",
+    path: "/mlflow-website/releases/2.5.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1099,7 +1099,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.4.0",
-    path: "/releases/2.4.0",
+    path: "/mlflow-website/releases/2.4.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1113,7 +1113,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.3.2",
-    path: "/releases/2.3.2",
+    path: "/mlflow-website/releases/2.3.2",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1127,7 +1127,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.3.1",
-    path: "/releases/2.3.1",
+    path: "/mlflow-website/releases/2.3.1",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1141,7 +1141,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.3.0",
-    path: "/releases/2.3.0",
+    path: "/mlflow-website/releases/2.3.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1155,7 +1155,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.2.2",
-    path: "/releases/2.2.2",
+    path: "/mlflow-website/releases/2.2.2",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1169,7 +1169,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.2.1",
-    path: "/releases/2.2.1",
+    path: "/mlflow-website/releases/2.2.1",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1183,7 +1183,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.2.0",
-    path: "/releases/2.2.0",
+    path: "/mlflow-website/releases/2.2.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1197,7 +1197,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.1.1",
-    path: "/releases/2.1.1",
+    path: "/mlflow-website/releases/2.1.1",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1211,7 +1211,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.1.0",
-    path: "/releases/2.1.0",
+    path: "/mlflow-website/releases/2.1.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1225,7 +1225,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 2.0.1",
-    path: "/releases/2.0.1",
+    path: "/mlflow-website/releases/2.0.1",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1239,7 +1239,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 1.30.0",
-    path: "/releases/1.30.0",
+    path: "/mlflow-website/releases/1.30.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1253,7 +1253,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 1.29.0",
-    path: "/releases/1.29.0",
+    path: "/mlflow-website/releases/1.29.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1267,7 +1267,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 1.28.0",
-    path: "/releases/1.28.0",
+    path: "/mlflow-website/releases/1.28.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1281,7 +1281,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 1.27.0",
-    path: "/releases/1.27.0",
+    path: "/mlflow-website/releases/1.27.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1295,7 +1295,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 1.26.1",
-    path: "/releases/1.26.1",
+    path: "/mlflow-website/releases/1.26.1",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1309,7 +1309,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 1.26.0",
-    path: "/releases/1.26.0",
+    path: "/mlflow-website/releases/1.26.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1323,7 +1323,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 1.24.0",
-    path: "/releases/1.24.0",
+    path: "/mlflow-website/releases/1.24.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1337,7 +1337,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 1.23.1",
-    path: "/releases/1.23.1",
+    path: "/mlflow-website/releases/1.23.1",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1351,7 +1351,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 1.23.0",
-    path: "/releases/1.23.0",
+    path: "/mlflow-website/releases/1.23.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1365,7 +1365,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 1.22.0",
-    path: "/releases/1.22.0",
+    path: "/mlflow-website/releases/1.22.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1379,7 +1379,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 1.21.0",
-    path: "/releases/1.21.0",
+    path: "/mlflow-website/releases/1.21.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1393,7 +1393,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 1.20.2",
-    path: "/releases/1.20.2",
+    path: "/mlflow-website/releases/1.20.2",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1407,7 +1407,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 1.20.0",
-    path: "/releases/1.20.0",
+    path: "/mlflow-website/releases/1.20.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1421,7 +1421,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 1.20.1",
-    path: "/releases/1.20.1",
+    path: "/mlflow-website/releases/1.20.1",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1435,7 +1435,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 1.19.0",
-    path: "/releases/1.19.0",
+    path: "/mlflow-website/releases/1.19.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1449,7 +1449,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 1.18.0",
-    path: "/releases/1.18.0",
+    path: "/mlflow-website/releases/1.18.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1463,7 +1463,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 1.17.0",
-    path: "/releases/1.17.0",
+    path: "/mlflow-website/releases/1.17.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1477,7 +1477,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 1.16.0",
-    path: "/releases/1.16.0",
+    path: "/mlflow-website/releases/1.16.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1491,7 +1491,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 1.15.0",
-    path: "/releases/1.15.0",
+    path: "/mlflow-website/releases/1.15.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1505,7 +1505,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 1.14.1",
-    path: "/releases/1.14.1",
+    path: "/mlflow-website/releases/1.14.1",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1519,7 +1519,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 1.14.0",
-    path: "/releases/1.14.0",
+    path: "/mlflow-website/releases/1.14.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1533,7 +1533,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 1.13.1",
-    path: "/releases/1.13.1",
+    path: "/mlflow-website/releases/1.13.1",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1547,7 +1547,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 1.13.0",
-    path: "/releases/1.13.0",
+    path: "/mlflow-website/releases/1.13.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1561,7 +1561,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 1.12.1",
-    path: "/releases/1.12.1",
+    path: "/mlflow-website/releases/1.12.1",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1575,7 +1575,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 1.12.0",
-    path: "/releases/1.12.0",
+    path: "/mlflow-website/releases/1.12.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1589,7 +1589,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 1.11.0",
-    path: "/releases/1.11.0",
+    path: "/mlflow-website/releases/1.11.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1603,7 +1603,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 1.10.0",
-    path: "/releases/1.10.0",
+    path: "/mlflow-website/releases/1.10.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1617,7 +1617,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 1.9.1",
-    path: "/releases/1.9.1",
+    path: "/mlflow-website/releases/1.9.1",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1631,7 +1631,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 1.9.0",
-    path: "/releases/1.9.0",
+    path: "/mlflow-website/releases/1.9.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1645,7 +1645,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 1.8.0",
-    path: "/releases/1.8.0",
+    path: "/mlflow-website/releases/1.8.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1659,7 +1659,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 1.7.2",
-    path: "/releases/1.7.2",
+    path: "/mlflow-website/releases/1.7.2",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1673,7 +1673,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 1.7.1",
-    path: "/releases/1.7.1",
+    path: "/mlflow-website/releases/1.7.1",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1687,7 +1687,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 1.7.0",
-    path: "/releases/1.7.0",
+    path: "/mlflow-website/releases/1.7.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1701,7 +1701,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 1.6.0",
-    path: "/releases/1.6.0",
+    path: "/mlflow-website/releases/1.6.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1715,7 +1715,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 1.5.0",
-    path: "/releases/1.5.0",
+    path: "/mlflow-website/releases/1.5.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1729,7 +1729,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 1.4.0",
-    path: "/releases/1.4.0",
+    path: "/mlflow-website/releases/1.4.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1743,7 +1743,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 1.3.0",
-    path: "/releases/1.3.0",
+    path: "/mlflow-website/releases/1.3.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1757,7 +1757,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 1.2.0",
-    path: "/releases/1.2.0",
+    path: "/mlflow-website/releases/1.2.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1771,7 +1771,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 1.1.0",
-    path: "/releases/1.1.0",
+    path: "/mlflow-website/releases/1.1.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1785,7 +1785,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 0.9.1",
-    path: "/releases/0.9.1",
+    path: "/mlflow-website/releases/0.9.1",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1799,7 +1799,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 0.9.0",
-    path: "/releases/0.9.0",
+    path: "/mlflow-website/releases/0.9.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1813,7 +1813,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 0.8.2",
-    path: "/releases/0.8.2",
+    path: "/mlflow-website/releases/0.8.2",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1827,7 +1827,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 0.8.1",
-    path: "/releases/0.8.1",
+    path: "/mlflow-website/releases/0.8.1",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1841,7 +1841,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 0.8.0",
-    path: "/releases/0.8.0",
+    path: "/mlflow-website/releases/0.8.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1855,7 +1855,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 0.7.0",
-    path: "/releases/0.7.0",
+    path: "/mlflow-website/releases/0.7.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1869,7 +1869,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 0.6.0",
-    path: "/releases/0.6.0",
+    path: "/mlflow-website/releases/0.6.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1883,7 +1883,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 0.5.2",
-    path: "/releases/0.5.2",
+    path: "/mlflow-website/releases/0.5.2",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1897,7 +1897,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 0.5.1",
-    path: "/releases/0.5.1",
+    path: "/mlflow-website/releases/0.5.1",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1911,7 +1911,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 0.5.0",
-    path: "/releases/0.5.0",
+    path: "/mlflow-website/releases/0.5.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1925,7 +1925,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 0.4.2",
-    path: "/releases/0.4.2",
+    path: "/mlflow-website/releases/0.4.2",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1939,7 +1939,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 0.4.1",
-    path: "/releases/0.4.1",
+    path: "/mlflow-website/releases/0.4.1",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1953,7 +1953,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 0.4.0",
-    path: "/releases/0.4.0",
+    path: "/mlflow-website/releases/0.4.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1967,7 +1967,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 0.3.0",
-    path: "/releases/0.3.0",
+    path: "/mlflow-website/releases/0.3.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1981,7 +1981,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 0.2.1",
-    path: "/releases/0.2.1",
+    path: "/mlflow-website/releases/0.2.1",
     authors: [
       {
         name: "MLflow maintainers",
@@ -1995,7 +1995,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 0.2.0",
-    path: "/releases/0.2.0",
+    path: "/mlflow-website/releases/0.2.0",
     authors: [
       {
         name: "MLflow maintainers",
@@ -2009,7 +2009,7 @@ export const RELEASES: Release[] = [
   },
   {
     title: "MLflow 0.1.0",
-    path: "/releases/0.1.0",
+    path: "/mlflow-website/releases/0.1.0",
     authors: [
       {
         name: "MLflow maintainers",
