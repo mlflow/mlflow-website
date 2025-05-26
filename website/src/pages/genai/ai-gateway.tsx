@@ -1,13 +1,13 @@
 import {
   Layout,
   SectionLabel,
-  Button,
   Grid,
   GridItem,
   GetStartedWithMLflow,
   SocialWidget,
   GetStartedButton,
   Heading,
+  Body,
 } from "../../components";
 
 const FakeImage = () => (
@@ -25,10 +25,12 @@ export default function AiGateway() {
           <div className="flex flex-col justify-center items-center gap-6 w-full">
             <SectionLabel color="red" label="AI GATEWAY" />
             <Heading level={1}>Build AI Systems with confidence</Heading>
-            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-gray-600">
-              The AI developer platform to build AI applications and models with
-              confidence
-            </p>
+            <div className="max-w-3xl mx-auto text-center">
+              <Body size="l">
+                The AI developer platform to build AI applications and models
+                with confidence
+              </Body>
+            </div>
             <GetStartedButton />
           </div>
           <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
@@ -42,30 +44,30 @@ export default function AiGateway() {
                 <h3 className="text-white">Feature heading</h3>
               </div>
 
-              <p className="text-gray-600">
+              <Body size="l">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit.
                 Quisquam, quos.
-              </p>
+              </Body>
             </div>
             <FakeImage />
           </GridItem>
           <GridItem>
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Feature heading</h3>
-              <p className="text-gray-600 text-lg">
+              <Body size="l">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit.
                 Quisquam, quos. your code base.
-              </p>
+              </Body>
             </div>
             <FakeImage />
           </GridItem>
           <GridItem width="wide">
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Feature heading</h3>
-              <p className="text-gray-600 text-lg">
+              <Body size="l">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit.
                 Quisquam, quos.
-              </p>
+              </Body>
             </div>
             <FakeImage />
           </GridItem>

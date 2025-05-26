@@ -11,6 +11,7 @@ import {
   Testimonials,
   LogosCarousel,
   Heading,
+  Body,
 } from "../components";
 
 export default function Home(): JSX.Element {
@@ -23,29 +24,29 @@ export default function Home(): JSX.Element {
         <div className="flex flex-col gap-16 w-full px-6 md:px-20 max-w-container">
           <div className="flex flex-col justify-center items-center gap-6 w-full">
             <Heading level={1}>AI and ML made simple</Heading>
-            <p className="text-center text-wrap text-lg text-white">
+            <Body size="l">
               The AI developer platform to build AI applications and models with
               confidence
-            </p>
+            </Body>
           </div>
           <div className="flex flex-col md:flex-row gap-10">
             <GlossyCard image={null}>
               <h3 className="text-white">GenAI Apps & Agents</h3>
-              <p className="text-white">
+              <Body size="m">
                 Enhance your GenAI applications with end-to-end observability,
                 monitoring, and enterprise governance, all in one integrated
                 platform.
-              </p>
+              </Body>
               <Link href="/genai">
                 <Button variant="primary">Learn more &gt;</Button>
               </Link>
             </GlossyCard>
             <GlossyCard image={null}>
               <h3 className="text-white">Model Training</h3>
-              <p className="text-white">
+              <Body size="m">
                 Streamline your machine learning workflows with enterprise-grade
                 tracking, model management, and deployment.
-              </p>
+              </Body>
               <Link href="/classical-ml">
                 <Button variant="primary">Learn more &gt;</Button>
               </Link>

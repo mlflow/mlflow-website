@@ -14,6 +14,7 @@ import {
   SocialWidget,
   Button,
   Heading,
+  Body,
 } from "../../components";
 import Link from "@docusaurus/Link";
 
@@ -27,16 +28,18 @@ export default function GenAi(): JSX.Element {
         <div className="flex flex-col gap-16 w-full px-6 md:px-20 max-w-container">
           <div className="flex flex-col justify-center items-center gap-6 w-full">
             <Heading level={1}>Ship high-quality AI, fast</Heading>
-            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-white">
-              Traditional software and ML tests aren't built for GenAI's
-              free-form language, making it difficult for teams to measure and
-              improve quality.
-            </p>
-            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-white">
-              MLflow combines metrics that reliably measure GenAI quality with
-              trace observability so you can measure, improve, and monitor
-              quality, cost, and latency.
-            </p>
+            <div className="max-w-3xl mx-auto text-center">
+              <Body size="l">
+                Traditional software and ML tests aren't built for GenAI's
+                free-form language, making it difficult for teams to measure and
+                improve quality.
+              </Body>
+              <Body size="l">
+                MLflow combines metrics that reliably measure GenAI quality with
+                trace observability so you can measure, improve, and monitor
+                quality, cost, and latency.
+              </Body>
+            </div>
           </div>
           <div className="flex flex-col md:flex-row gap-10">
             <CopyCommand code="pip install mlflow" />
@@ -53,15 +56,15 @@ export default function GenAi(): JSX.Element {
             <GridItem width="wide">
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">Debug with tracing</h3>
-                <p style={{ marginBottom: 0 }} className="text-gray-600">
+                <Body size="l">
                   Debug and iterate on GenAI applications using MLflow's
                   tracing, which captures your app's entire execution, including
                   prompts, retrievals, tool calls.
-                </p>
-                <p style={{ marginBottom: 0 }} className="text-gray-600">
+                </Body>
+                <Body size="l">
                   MLflow's open-source, OpenTelemetry-compatible tracing SDK
                   helps avoid vendor lock-in.
-                </p>
+                </Body>
 
                 <Link href="/genai/observability">
                   <Button variant="outline" size="small">
@@ -81,15 +84,15 @@ export default function GenAi(): JSX.Element {
             <GridItem width="wide" direction="reverse">
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">Monitor in production</h3>
-                <p style={{ marginBottom: 0 }} className="text-gray-600">
+                <Body size="l">
                   Maintain production quality with continuous monitoring of
                   quality, latency, and cost. Gain real-time visibility via
                   MLflow's dashboards and trace explorers.
-                </p>
-                <p style={{ marginBottom: 0 }} className="text-gray-600">
+                </Body>
+                <Body size="l">
                   Configure automated online evaluations with alerts to quickly
                   address issues.
-                </p>
+                </Body>
                 <Link href="/genai/monitoring">
                   {" "}
                   {/* Placeholder link */}
@@ -115,10 +118,10 @@ export default function GenAi(): JSX.Element {
             <Heading level={2}>
               Evaluation to measure and improve quality
             </Heading>
-            <p className="text-lg text-center text-wrap max-w-2xl mx-auto text-gray-800">
+            <Body size="l">
               MLflow simplifies GenAI evaluation, enabling easy collection and
               recording of LLM judge and human feedback directly on traces.
-            </p>
+            </Body>
             {/* <p className="text-white">
               Tackle the challenges of building GenAI head on
             </p> */}
@@ -129,13 +132,13 @@ export default function GenAi(): JSX.Element {
                 <h3 className="text-white">
                   Accurately measure free-form language with LLM judges
                 </h3>
-                <p style={{ marginBottom: 0 }} className="text-gray-600">
+                <Body size="l">
                   Utilize LLM-as-a-judge metrics, mimicking human expertise, to
                   assess and enhance GenAI quality. Access pre-built judges for
                   common metrics like hallucination or relevance, or develop
                   custom judges tailored to your business needs and expert
                   insights.
-                </p>
+                </Body>
                 <Link href="/genai/quality-metrics">
                   <Button variant="outline" size="small">
                     Learn more &gt;
@@ -157,12 +160,12 @@ export default function GenAi(): JSX.Element {
                 <h3 className="text-white">
                   Use production traffic to drive offline improvements
                 </h3>
-                <p style={{ marginBottom: 0 }} className="text-gray-600">
+                <Body size="l">
                   Adapt to user behavior by creating evaluation datasets and
                   regression tests from production logs. Replay these to assess
                   new prompts or app versions in development, ensuring optimal
                   variants reach production.
-                </p>
+                </Body>
                 <Link href="/genai/evaluations">
                   <Button variant="outline" size="small">
                     Learn more &gt;
@@ -184,12 +187,12 @@ export default function GenAi(): JSX.Element {
                 <h3 className="text-white">
                   Use human feedback to improve quality
                 </h3>
-                <p style={{ marginBottom: 0 }} className="text-gray-600">
+                <Body size="l">
                   Collect expert feedback through web UIs and end-user ratings
                   from your app via APIs. Use this feedback to understand how
                   your app should behave and align your custom LLM-judge metrics
                   with expert judgement.
-                </p>
+                </Body>
                 <Link href="/genai/human-feedback">
                   <Button variant="outline" size="small">
                     Learn more &gt;
@@ -221,16 +224,16 @@ export default function GenAi(): JSX.Element {
             <GridItem width="wide">
               <div className="flex flex-col gap-4 justify-center">
                 <h3 className="text-white">Prompt registry</h3>
-                <p style={{ marginBottom: 0 }} className="text-gray-600">
+                <Body size="l">
                   Version, compare, iterate on, and discover prompt templates
                   directly through the MLflow UI. Reuse prompts across multiple
                   versions of your agent or application code, and view rich
                   lineage identifying which versions are using each prompt.
-                </p>
-                <p style={{ marginBottom: 0 }} className="text-gray-600">
+                </Body>
+                <Body size="l">
                   Evaluate and monitor prompt quality and performance across
                   multiple versions.
-                </p>
+                </Body>
                 <Link href="/genai/governance">
                   <Button variant="outline" size="small">
                     Learn more &gt;
@@ -250,17 +253,17 @@ export default function GenAi(): JSX.Element {
             <GridItem width="wide" direction="reverse">
               <div className="flex flex-col gap-4 justify-center">
                 <h3 className="text-white">Agent and application versioning</h3>
-                <p style={{ marginBottom: 0 }} className="text-gray-600">
+                <Body size="l">
                   Version your agents, capturing their associated code,
                   parameters, and evalation metrics for each iteration. MLflow's
                   centralized management of agents complements Git, providing
                   full lifecycle capabilities for all your generative AI assets.
-                </p>
-                <p style={{ marginBottom: 0 }} className="text-gray-600">
+                </Body>
+                <Body size="l">
                   Evaluation and observability data are linked to specific
                   agent/application versions, offering end-to-end versioning and
                   lineage for your entire GenAI application.
-                </p>
+                </Body>
                 <Link href="/genai/governance">
                   <Button variant="outline" size="small">
                     Learn more &gt;
@@ -291,23 +294,23 @@ export default function GenAi(): JSX.Element {
                 <h2 className="text-white">
                   Unified, End-to-End MLOps and AI Observability
                 </h2>
-                <p className="text-gray-600">
+                <Body size="l">
                   MLflow offers a unified platform for the entire GenAI and ML
                   model lifecycle, simplifying the experience and boosting
                   collaboration by reducing tool integration friction.
-                </p>
+                </Body>
               </div>
             </GridItem>
 
             <GridItem>
               <div className="flex flex-col gap-4 h-full">
                 <h2 className="text-white">Open, Flexible, and Extensible</h2>
-                <p className="text-gray-600">
+                <Body size="l">
                   Open-source and extensible, MLflow prevents vendor lock-in by
                   integrating with the GenAI/ML ecosystem and using open
                   protocols for data ownership, adapting to your existing and
                   future stacks.
-                </p>
+                </Body>
               </div>
             </GridItem>
             <GridItem>
@@ -316,12 +319,12 @@ export default function GenAi(): JSX.Element {
                   Enterprise-Grade Security &amp; Governance on a Unified Data
                   &amp; AI Platform
                 </h2>
-                <p className="text-gray-600">
+                <Body size="l">
                   Managed MLflow on Databricks offers enterprise-grade security
                   and deep Mosaic AI integrations for enhanced datasets,
                   development, RAG, serving, and gateways. Unity Catalog ensures
                   centralized governance over all AI assets.
-                </p>
+                </Body>
               </div>
             </GridItem>
             <GridItem>
@@ -329,11 +332,11 @@ export default function GenAi(): JSX.Element {
                 <h2 className="text-white">
                   Unlock Downstream Value with Databricks AI/BI
                 </h2>
-                <p className="text-gray-600">
+                <Body size="l">
                   Leverage your GenAI and ML data for downstream business
                   processes by building rich performance dashboards, reports,
                   and queries with Databricks AI/BI and Databricks SQL.
-                </p>
+                </Body>
               </div>
             </GridItem>
           </Grid>

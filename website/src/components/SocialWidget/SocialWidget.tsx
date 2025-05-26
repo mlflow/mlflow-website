@@ -7,6 +7,7 @@ import { SectionLabel } from "../SectionLabel/SectionLabel";
 import { SocialWidgetItem } from "../SocialWidgetItem/SocialWidgetItem";
 import { Grid, GridItem } from "../Grid/Grid";
 import { Heading } from "../Typography/Heading";
+import { Body } from "../Typography/Body";
 
 interface Props {
   variant: "red" | "green";
@@ -53,9 +54,7 @@ export const SocialWidget = ({ variant }: Props) => {
       <div className="flex flex-col w-full gap-6 items-center justify-center text-center">
         <SectionLabel label="GET INVOLVED" color={variant} />
         <Heading level={2}>Connect with the community</Heading>
-        <p className="text-gray-600 text-lg">
-          Connect with thousands of customers using MLflow
-        </p>
+        <Body size="l">Connect with thousands of customers using MLflow</Body>
       </div>
       <Grid>
         {socials.map((social) => (

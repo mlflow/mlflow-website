@@ -1,13 +1,13 @@
 import {
   Layout,
   SectionLabel,
-  Button,
   Grid,
   GridItem,
   GetStartedWithMLflow,
   SocialWidget,
   GetStartedButton,
   Heading,
+  Body,
 } from "../../components";
 
 const FakeImage = () => (
@@ -25,9 +25,9 @@ export default function PromptRegistryVersioning() {
           <div className="flex flex-col justify-center items-center gap-6 w-full">
             <SectionLabel color="red" label="Prompt registry & versioning" />
             <Heading level={1}>Prompt registry & versioning</Heading>
-            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-gray-600">
-              Lorem ipsum
-            </p>
+            <div className="max-w-3xl mx-auto text-center">
+              <Body size="l">Lorem ipsum</Body>
+            </div>
 
             <GetStartedButton />
           </div>
@@ -39,14 +39,14 @@ export default function PromptRegistryVersioning() {
           <GridItem>
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Card 1</h3>
-              <p className="text-gray-600">Lorem ipsum</p>
+              <Body size="l">Lorem ipsum</Body>
             </div>
             <FakeImage />
           </GridItem>
           <GridItem>
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Card 2</h3>
-              <p className="text-gray-600">Lorem ipsum</p>
+              <Body size="l">Lorem ipsum</Body>
             </div>
             <FakeImage />
           </GridItem>

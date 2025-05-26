@@ -1,7 +1,7 @@
 import React from "react";
 import { BlogPostProvider } from "@docusaurus/theme-common/internal";
 import BlogPostItem from "@theme/BlogPostItem";
-import { SectionLabel, Grid, GridItem, Heading } from "../../components";
+import { SectionLabel, Grid, GridItem, Heading, Body } from "../../components";
 import Link from "@docusaurus/Link";
 
 export default function BlogPostItems({
@@ -29,9 +29,7 @@ export default function BlogPostItems({
           >
             <SectionLabel color="green" label="FEATURED" />
             <Heading level={2}>{firstBlogPost.content.metadata.title}</Heading>
-            <p className="text-gray-600">
-              {firstBlogPost.content.metadata.description}
-            </p>
+            <Body size="l">{firstBlogPost.content.metadata.description}</Body>
           </Link>
           <Link href={firstBlogPost.content.metadata.permalink}>
             <div>

@@ -1,13 +1,13 @@
 import {
   Layout,
   SectionLabel,
-  Button,
   Grid,
   GridItem,
   GetStartedWithMLflow,
   SocialWidget,
   GetStartedButton,
   Heading,
+  Body,
 } from "../../components";
 
 const FakeImage = () => (
@@ -25,10 +25,12 @@ export default function HyperparamTuning() {
           <div className="flex flex-col justify-center items-center gap-6 w-full">
             <SectionLabel color="green" label="HYPERPARAM TUNING" />
             <Heading level={1}>Simplify your model training workflow</Heading>
-            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-gray-600">
-              Use state-of-the-art hyperparameter optimization techniques with
-              an intuitive set of APIs
-            </p>
+            <div className="max-w-3xl mx-auto text-center">
+              <Body size="l">
+                Use state-of-the-art hyperparameter optimization techniques with
+                an intuitive set of APIs
+              </Body>
+            </div>
             <GetStartedButton />
           </div>
           <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
@@ -39,42 +41,42 @@ export default function HyperparamTuning() {
           <GridItem>
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Scalable HPO</h3>
-              <p className="text-gray-600 text-lg">
+              <Body size="l">
                 Leverage the native integration between MLflow and Optuna to run
                 distributed hyperparameter optimization at scale using Spark
                 UDFs. The MLflow tracking server provides robust trial data
                 storage that persists through node failures, ensuring your
                 optimization jobs complete successfully even in complex scalable
                 distributed environments.
-              </p>
+              </Body>
             </div>
             <FakeImage />
           </GridItem>
           <GridItem>
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Native Tracking</h3>
-              <p className="text-gray-600 text-lg">
+              <Body size="l">
                 Every Optuna trial is automatically logged to MLflow, creating a
                 comprehensive record of your hyperparameter search space and
                 results. MLflow's intuitive UI enables teams to visualize
                 parameter importance, correlation between hyperparameters and
                 metrics, and identify promising regions in the search space
                 without writing additional code.
-              </p>
+              </Body>
             </div>
             <FakeImage />
           </GridItem>
           <GridItem width="wide">
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Enterprise-Ready</h3>
-              <p className="text-gray-600 text-lg">
+              <Body size="l">
                 Scale your hyperparameter optimization from development to
                 production with MLflow's project packaging and model registry
                 integration. Easily compare models across different optimization
                 runs, promote the best performers to production, and maintain
                 full lineage tracking from hyperparameter selection to deployed
                 model.
-              </p>
+              </Body>
             </div>
             <FakeImage />
           </GridItem>

@@ -1,13 +1,13 @@
 import {
   Layout,
   SectionLabel,
-  Button,
   Grid,
   GridItem,
   GetStartedWithMLflow,
   SocialWidget,
   GetStartedButton,
   Heading,
+  Body,
 } from "../../components";
 
 const FakeImage = () => (
@@ -27,10 +27,12 @@ export default function Serving() {
             <Heading level={1}>
               Flexible Model Deployment for Any Production Environment
             </Heading>
-            <p className="text-center text-wrap text-lg max-w-3xl w-full mx-auto text-gray-600">
-              Deploy your ML and DL models with confidence using MLflow's
-              versatile serving options for real-time and batch inference
-            </p>
+            <div className="max-w-3xl mx-auto text-center">
+              <Body size="l">
+                Deploy your ML and DL models with confidence using MLflow's
+                versatile serving options for real-time and batch inference
+              </Body>
+            </div>
             <GetStartedButton />
           </div>
           <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
@@ -41,36 +43,36 @@ export default function Serving() {
           <GridItem>
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Scalable Real-Time Serving</h3>
-              <p className="text-gray-600 text-lg">
+              <Body size="l">
                 MLflow provides a unified, scalable interface for deploying
                 models as REST APIs that automatically adjust to meet demand
                 fluctuations. With managed deployment on Databricks, your
                 endpoints can intelligently scale up or down based on traffic
                 patterns, optimizing both performance and infrastructure costs
                 with no manual intervention required.
-              </p>
+              </Body>
             </div>
             <FakeImage />
           </GridItem>
           <GridItem>
             <div className="flex flex-col gap-4">
               <h3 className="text-white">High-Performance Batch Inference</h3>
-              <p className="text-gray-600 text-lg">
+              <Body size="l">
                 Deploy production models for batch inference directly on Apache
                 Spark, enabling efficient processing of billions of predictions
                 on massive datasets
-              </p>
+              </Body>
             </div>
             <FakeImage />
           </GridItem>
           <GridItem width="wide">
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Comprehensive Deployment Options</h3>
-              <p className="text-gray-600 text-lg">
+              <Body size="l">
                 Deploy models across multiple environments including Docker
                 containers, cloud services like Databricks, Azure ML and AWS
                 SageMaker, or Kubernetes clusters with consistent behavior.
-              </p>
+              </Body>
             </div>
             <FakeImage />
           </GridItem>
