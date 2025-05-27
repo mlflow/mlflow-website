@@ -5,12 +5,10 @@ import { GetStartedButton } from "../GetStartedButton/GetStartedButton";
 import { cn } from "../../utils";
 import { Heading } from "../Typography/Heading";
 import { Body } from "../Typography/Body";
+import { useLayoutVariant } from "../Layout/Layout";
 
-interface Props {
-  variant?: "red" | "blue";
-}
-
-export const GetStartedWithMLflow = ({ variant = "red" }: Props) => {
+export const GetStartedWithMLflow = () => {
+  const variant = useLayoutVariant();
   return (
     <div className="flex flex-col lg:flex-row w-full justify-between gap-6">
       <div className="flex flex-col gap-6 w-full lg:w-1/2 items-start">

@@ -5,12 +5,10 @@ import { Grid, GridItem } from "../Grid/Grid";
 import { SectionLabel } from "../SectionLabel/SectionLabel";
 import { Button } from "../Button/Button";
 import { Heading } from "../Typography/Heading";
+import { useLayoutVariant } from "../Layout/Layout";
 
-interface Props {
-  variant: "red" | "green";
-}
-
-export const LatestNews = ({ variant }: Props) => {
+export const LatestNews = () => {
+  const variant = useLayoutVariant() === "blue" ? "green" : "red";
   const posts = BLOGS.slice(0, 3);
 
   const viewAllLinkNode = (

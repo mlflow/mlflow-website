@@ -337,8 +337,8 @@ export default function GenAi(): JSX.Element {
           </Grid>
         </div>
         <GetStartedWithMLflow />
-        <LatestNews variant="red" />
-        <SocialWidget variant="red" />
+        <LatestNews />
+        <SocialWidget />
       </div>
     </Layout>
   );

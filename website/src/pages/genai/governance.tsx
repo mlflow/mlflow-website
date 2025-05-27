@@ -105,7 +105,7 @@ export default function Governance() {
           </GridItem>
         </Grid>
         <GetStartedWithMLflow />
-        <SocialWidget variant="red" />
+        <SocialWidget />
       </div>
     </Layout>
   );

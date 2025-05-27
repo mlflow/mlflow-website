@@ -170,7 +170,7 @@ export default function Evaluations() {
           </Grid>
         </div>
         <GetStartedWithMLflow />
-        <SocialWidget variant="red" />
+        <SocialWidget />
       </div>
     </Layout>
   );
