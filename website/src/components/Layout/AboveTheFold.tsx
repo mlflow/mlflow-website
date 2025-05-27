@@ -17,7 +17,7 @@ export function AboveTheFold({
 }: Props) {
   const bodyParts = Array.isArray(body) ? body : [body];
   return (
-    <div className="flex flex-col gap-16 w-full px-6 md:px-20 max-w-container">
+    <div className="flex flex-col gap-16">
       <div className="flex flex-col justify-center items-center gap-6 w-full max-w-3xl mx-auto">
         {sectionLabel && <SectionLabel label={sectionLabel} />}
         <Heading level={1}>{title}</Heading>

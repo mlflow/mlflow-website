@@ -5,6 +5,7 @@ import {
   Body,
   AboveTheFold,
   BelowTheFold,
+  Section,
 } from "../../components";
 
 const FakeImage = () => (
@@ -23,12 +24,7 @@ export default function Observability() {
         <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
       </AboveTheFold>
 
-      <div className="flex flex-col gap-10">
-        <div className="flex flex-col w-full items-center justify-center gap-1">
-          <div role="heading" aria-level={2} className="text-4xl">
-            Best-in-class tracing
-          </div>
-        </div>
+      <Section title="Best-in-class tracing">
         <Grid columns={2}>
           <GridItem>
             <div className="flex flex-col gap-4">
@@ -77,13 +73,9 @@ export default function Observability() {
             {/* GIF screenshot of summary view paging through several traces */}
           </GridItem>
         </Grid>
-      </div>
-      <div className="flex flex-col gap-10">
-        <div className="flex flex-col w-full items-center justify-center gap-1">
-          <div role="heading" aria-level={2} className="text-4xl">
-            Simple, customizable instrumentation
-          </div>
-        </div>
+      </Section>
+
+      <Section title="Simple, customizable instrumentation">
         <Grid columns={2}>
           <GridItem width="wide" direction="reverse">
             <div className="flex flex-col gap-10">
@@ -101,7 +93,6 @@ export default function Observability() {
             <FakeImage />
             {/* Rendering of all the logos we support + a 1-liner of "mlflow.<flavor>.autolog()" in the center of the logos */}
           </GridItem>
-
           <GridItem width="wide">
             <div className="flex flex-col gap-4">
               <h3 className="text-white">SDKs for custom instrumentation</h3>
@@ -141,14 +132,9 @@ export default function Observability() {
             <FakeImage />
           </GridItem>
         </Grid>
-      </div>
-      <div className="flex flex-col gap-10">
-        <div className="flex flex-col w-full items-center justify-center gap-1">
-          <div role="heading" aria-level={2} className="text-4xl">
-            Annotation capabilities
-          </div>
-        </div>
+      </Section>
 
+      <Section title="Annotation capabilities">
         <Grid columns={2}>
           <GridItem>
             <div className="flex flex-col gap-4">
@@ -186,13 +172,9 @@ export default function Observability() {
             {/* Product GIF of adding feedback in the trace UI */}
           </GridItem>
         </Grid>
-      </div>
-      <div className="flex flex-col gap-10">
-        <div className="flex flex-col w-full items-center justify-center gap-1">
-          <div role="heading" aria-level={2} className="text-4xl">
-            Production monitoring
-          </div>
-        </div>
+      </Section>
+
+      <Section title="Production monitoring">
         <Grid columns={2}>
           <GridItem width="wide" direction="reverse">
             <div className="flex flex-col gap-4">
@@ -231,7 +213,7 @@ export default function Observability() {
             {/* Figma of what this design will be! */}
           </GridItem>
         </Grid>
-      </div>
+      </Section>
 
       <BelowTheFold />
     </Layout>

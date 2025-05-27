@@ -14,6 +14,7 @@ import {
   Body,
   AboveTheFold,
   BelowTheFold,
+  Section,
 } from "../../components";
 
 export default function GenAi(): JSX.Element {
@@ -26,15 +27,11 @@ export default function GenAi(): JSX.Element {
         <CopyCommand code="pip install mlflow" />
       </AboveTheFold>
 
-      <div className="flex flex-col w-full items-center justify-center gap-16">
-        <div className="flex flex-col w-full items-center justify-center gap-6">
-          <SectionLabel label="CORE FEATURES" />
-          <Heading level={2}>Build confidently, deploy seamlessly</Heading>
-          <Body size="m">
-            Cover experimentation, reproducibility, deployment, and a central
-            model registry
-          </Body>
-        </div>
+      <Section
+        label="Core features"
+        title="Build confidently, deploy seamlessly"
+        body="Cover experimentation, reproducibility, deployment, and a central model registry"
+      >
         <VerticalTabs
           defaultValue="unified-workflow"
           className="w-full my-12 px-10"
@@ -75,22 +72,18 @@ export default function GenAi(): JSX.Element {
           <VerticalTabsContent value="framework-neutral">
             <img src="/img/demo-image.png" />
           </VerticalTabsContent>
-
           <VerticalTabsContent value="deployment-ready">
             <img src="/img/demo-image.png" />
           </VerticalTabsContent>
-
           <VerticalTabsContent value="enterprise-ready">
             <img src="/img/demo-image.png" />
           </VerticalTabsContent>
         </VerticalTabs>
-      </div>
+      </Section>
+
       <LogosCarousel />
-      <div className="flex flex-col items-center justify-center gap-16">
-        <div className="flex flex-col gap-6">
-          <SectionLabel label="WHY US?" />
-          <Heading level={2}>Why MLflow is unique</Heading>
-        </div>
+
+      <Section label="Why us?" title="Why MLflow is unique">
         <Grid columns={2}>
           <GridItem>
             <div className="flex flex-col gap-4">
@@ -142,7 +135,7 @@ export default function GenAi(): JSX.Element {
             </div>
           </GridItem>
         </Grid>
-      </div>
+      </Section>
 
       <BelowTheFold>
         <LatestNews />

@@ -1,7 +1,7 @@
 import Link from "@docusaurus/Link";
 
 import { Grid, GridItem } from "../Grid/Grid";
-import { SectionLabel } from "../SectionLabel/SectionLabel";
+import { SectionLabel } from "../Section/SectionLabel";
 import { Button } from "../Button/Button";
 import { Heading } from "../Typography/Heading";
 import blogPosts from "@site/.docusaurus/blog-posts.json";

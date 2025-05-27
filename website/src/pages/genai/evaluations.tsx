@@ -5,6 +5,7 @@ import {
   Body,
   AboveTheFold,
   BelowTheFold,
+  Section,
 } from "../../components";
 
 const FakeImage = () => (
@@ -23,12 +24,7 @@ export default function Evaluations() {
         <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
       </AboveTheFold>
 
-      <div className="flex flex-col gap-10">
-        <div className="flex flex-col w-full items-center justify-center gap-1">
-          <div role="heading" aria-level={2} className="text-4xl">
-            Accurately evaluate free-form language outputs with LLM judges
-          </div>
-        </div>
+      <Section title="Accurately evaluate free-form language outputs with LLM judges">
         <Grid columns={2}>
           <GridItem>
             <div className="flex flex-col gap-4">
@@ -55,20 +51,15 @@ export default function Evaluations() {
           </GridItem>
           {/* Animation showing humans providing feedback and it being synthesized into an llm judge */}
         </Grid>
-      </div>
-      <div className="flex flex-col gap-10">
-        <div className="flex flex-col w-full items-center justify-center gap-1">
-          <div role="heading" aria-level={2} className="text-4xl">
-            Use production traffic to drive offline improvements
-          </div>
-        </div>
+      </Section>
+
+      <Section title="Use production traffic to drive offline improvements">
         <Grid columns={2}>
           <GridItem width="wide">
             <div className="flex flex-col gap-10">
               <div className="flex flex-col gap-4">
                 <h3 className="text-white">Evaluation datasets</h3>
               </div>
-
               <Body size="l">
                 Curate high-scoring traces for regression datasets and
                 low-scoring ones for evaluation datasets to use offline to
@@ -79,13 +70,9 @@ export default function Evaluations() {
           </GridItem>
           {/* Show selecting traces from monitoring UI and saving into eval set */}
         </Grid>
-      </div>
-      <div className="flex flex-col gap-10">
-        <div className="flex flex-col w-full items-center justify-center gap-1">
-          <div role="heading" aria-level={2} className="text-4xl">
-            Iteratively improve quality through evaluation
-          </div>
-        </div>
+      </Section>
+
+      <Section title="Iteratively improve quality through evaluation">
         <Grid columns={2}>
           <GridItem width="wide" direction="reverse">
             <div className="flex flex-col gap-4">
@@ -156,7 +143,7 @@ export default function Evaluations() {
             {/* Animation of running eval in CI/CD workflow?? */}
           </GridItem>
         </Grid>
-      </div>
+      </Section>
 
       <BelowTheFold />
     </Layout>

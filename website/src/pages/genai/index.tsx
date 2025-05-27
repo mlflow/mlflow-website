@@ -15,6 +15,7 @@ import {
   Body,
   AboveTheFold,
   BelowTheFold,
+  Section,
 } from "../../components";
 import Link from "@docusaurus/Link";
 
@@ -31,11 +32,7 @@ export default function GenAi(): JSX.Element {
         <CopyCommand code="pip install mlflow" />
       </AboveTheFold>
 
-      <div className="flex flex-col w-full items-center justify-center gap-16">
-        <div className="flex flex-col w-full items-center justify-center gap-6">
-          <SectionLabel label="CORE FEATURES" />
-          <Heading level={2}>Observability to debug and monitor</Heading>
-        </div>
+      <Section label="Core features" title="Observability to debug and monitor">
         <Grid columns={2}>
           <GridItem width="wide">
             <div className="flex flex-col gap-4">
@@ -49,7 +46,6 @@ export default function GenAi(): JSX.Element {
                 MLflow's open-source, OpenTelemetry-compatible tracing SDK helps
                 avoid vendor lock-in.
               </Body>
-
               <Link href="/genai/observability">
                 <Button variant="outline" size="small">
                   Learn more &gt;
@@ -91,19 +87,13 @@ export default function GenAi(): JSX.Element {
             {/* Product GIF of the Trace UI view + charts */}
           </GridItem>
         </Grid>
-      </div>
-      <div className="flex flex-col w-full items-center justify-center gap-16">
-        <div className="flex flex-col w-full items-center justify-center gap-6">
-          <SectionLabel label="CORE FEATURES" />
-          <Heading level={2}>Evaluation to measure and improve quality</Heading>
-          <Body size="l">
-            MLflow simplifies GenAI evaluation, enabling easy collection and
-            recording of LLM judge and human feedback directly on traces.
-          </Body>
-          {/* <p className="text-white">
-              Tackle the challenges of building GenAI head on
-            </p> */}
-        </div>
+      </Section>
+
+      <Section
+        label="Core features"
+        title="Evaluation to measure and improve quality"
+        body="MLflow simplifies GenAI evaluation, enabling easy collection and recording of LLM judge and human feedback directly on traces."
+      >
         <Grid columns={2}>
           <GridItem width="wide">
             <div className="flex flex-col gap-4">
@@ -132,7 +122,6 @@ export default function GenAi(): JSX.Element {
             </div>
             {/* Animation showing humans providing feedback and it being synthesized into an llm judge */}
           </GridItem>
-
           <GridItem width="wide" direction="reverse">
             <div className="flex flex-col gap-4">
               <h3 className="text-white">
@@ -159,7 +148,6 @@ export default function GenAi(): JSX.Element {
             </div>
             {/* Product GIF of running mlflow.evaluate and then seeing the eval results list UI */}
           </GridItem>
-
           <GridItem width="wide">
             <div className="flex flex-col gap-4">
               <h3 className="text-white">
@@ -187,15 +175,12 @@ export default function GenAi(): JSX.Element {
             {/* Product GIF of the review app adding a custom feedback label and then it showing on the mlflow trace UI */}
           </GridItem>
         </Grid>
-      </div>
-      <div className="flex flex-col w-full items-center justify-center gap-16">
-        <div className="flex flex-col w-full items-center justify-center gap-6">
-          <SectionLabel label="CORE FEATURES" />
-          <Heading level={2}>Lifecycle management to track and version</Heading>
-          {/* <p className="text-white">
-              Tackle the challenges of building GenAI head on
-            </p> */}
-        </div>
+      </Section>
+
+      <Section
+        label="Core features"
+        title="Lifecycle management to track and version"
+      >
         <Grid columns={2}>
           <GridItem width="wide">
             <div className="flex flex-col gap-4 justify-center">
@@ -225,7 +210,6 @@ export default function GenAi(): JSX.Element {
             </div>
             {/* Figma of the prompt registry, showing adding a prompt and then comparing 2 versions */}
           </GridItem>
-
           <GridItem width="wide" direction="reverse">
             <div className="flex flex-col gap-4 justify-center">
               <h3 className="text-white">Agent and application versioning</h3>
@@ -256,14 +240,11 @@ export default function GenAi(): JSX.Element {
             </div>
           </GridItem>
         </Grid>
-      </div>
+      </Section>
 
       <LogosCarousel />
-      <div className="flex flex-col items-center justify-center gap-16">
-        <div className="flex flex-col gap-6">
-          <SectionLabel label="WHY US?" />
-          <Heading level={2}>Why MLflow is unique</Heading>
-        </div>
+
+      <Section label="Why us?" title="Why MLflow is unique">
         <Grid columns={2}>
           <GridItem>
             <div className="flex flex-col gap-4 h-full">
@@ -277,7 +258,6 @@ export default function GenAi(): JSX.Element {
               </Body>
             </div>
           </GridItem>
-
           <GridItem>
             <div className="flex flex-col gap-4 h-full">
               <h2 className="text-white">Open, Flexible, and Extensible</h2>
@@ -315,7 +295,7 @@ export default function GenAi(): JSX.Element {
             </div>
           </GridItem>
         </Grid>
-      </div>
+      </Section>
 
       <BelowTheFold>
         <LatestNews />

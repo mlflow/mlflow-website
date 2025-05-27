@@ -1,4 +1,4 @@
-import { SectionLabel } from "../SectionLabel/SectionLabel";
+import { SectionLabel } from "../Section/SectionLabel";
 import { Grid, GridItem } from "../Grid/Grid";
 import { Heading } from "../Typography/Heading";
 

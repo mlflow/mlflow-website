@@ -3,7 +3,7 @@ import YoutubeIcon from "@site/static/img/social/youtube.svg";
 import BookIcon from "@site/static/img/social/book.svg";
 import LinkedinIcon from "@site/static/img/social/linkedin.svg";
 
-import { SectionLabel } from "../SectionLabel/SectionLabel";
+import { SectionLabel } from "../Section/SectionLabel";
 import { SocialWidgetItem } from "../SocialWidgetItem/SocialWidgetItem";
 import { Grid, GridItem } from "../Grid/Grid";
 import { Heading } from "../Typography/Heading";
