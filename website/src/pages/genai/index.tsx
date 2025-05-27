@@ -5,13 +5,11 @@ import AssessmentsTab from "@site/static/img/assessments.jpg";
 import {
   Layout,
   CopyCommand,
-  SectionLabel,
   LogosCarousel,
   Grid,
   GridItem,
   LatestNews,
   Button,
-  Heading,
   Body,
   AboveTheFold,
   BelowTheFold,

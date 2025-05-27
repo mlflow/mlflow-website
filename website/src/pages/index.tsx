@@ -45,10 +45,9 @@ export default function Home(): JSX.Element {
         </div>
       </AboveTheFold>
 
-      <div className="flex flex-col gap-16">
-        <Testimonials />
-        <LogosCarousel />
-      </div>
+      <Testimonials />
+
+      <LogosCarousel />
 
       <BelowTheFold>
         <LatestNews />
