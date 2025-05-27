@@ -19,24 +19,19 @@ import {
 export default function GenAi(): JSX.Element {
   return (
     <Layout variant="blue">
-      <div
-        className="flex flex-col bg-[linear-gradient(to_bottom,rgba(12,20,20,0),rgba(14,20,20,100)),url('/img/background-image-3.png')]
- bg-top bg-no-repeat bg-cover w-full pt-42 pb-20 py-20"
-      >
-        <div className="flex flex-col gap-16 w-full px-6 md:px-20 max-w-container">
-          <div className="flex flex-col justify-center items-center gap-6 w-full">
-            <Heading level={1}>Mastering the ML lifecycle</Heading>
-            <div className="max-w-3xl mx-auto text-center">
-              <Body size="l">
-                From experiment to production, MLflow streamlines your complete
-                machine learning journey with enterprise-grade tracking, model
-                management, and deployment.
-              </Body>
-            </div>
+      <div className="flex flex-col gap-16 w-full px-6 md:px-20 max-w-container">
+        <div className="flex flex-col justify-center items-center gap-6 w-full">
+          <Heading level={1}>Mastering the ML lifecycle</Heading>
+          <div className="max-w-3xl mx-auto text-center">
+            <Body size="l">
+              From experiment to production, MLflow streamlines your complete
+              machine learning journey with enterprise-grade tracking, model
+              management, and deployment.
+            </Body>
           </div>
-          <div className="flex flex-col md:flex-row gap-10">
-            <CopyCommand code="pip install mlflow" />
-          </div>
+        </div>
+        <div className="flex flex-col md:flex-row gap-10">
+          <CopyCommand code="pip install mlflow" />
         </div>
       </div>
       <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-container">
