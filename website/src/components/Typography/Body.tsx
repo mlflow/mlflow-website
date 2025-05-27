@@ -10,13 +10,17 @@ const styles = cva(
         m: "text-[16px]",
         s: "text-[14px]",
       },
+      align: {
+        center: "text-center",
+      },
     },
   },
 );
 
 export const Body = ({
   size,
+  align,
   children,
 }: PropsWithChildren<VariantProps<typeof styles>>) => {
-  return <p className={styles({ size })}>{children}</p>;
+  return <p className={styles({ size, align })}>{children}</p>;
 };

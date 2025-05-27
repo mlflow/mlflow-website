@@ -1,13 +1,12 @@
 import {
   Layout,
-  SectionLabel,
   Grid,
   GridItem,
   GetStartedWithMLflow,
   SocialWidget,
   GetStartedButton,
-  Heading,
   Body,
+  AboveTheFold,
 } from "../../components";
 
 const FakeImage = () => (
@@ -17,22 +16,16 @@ const FakeImage = () => (
 export default function Models() {
   return (
     <Layout variant="blue" direction="up">
-      <div className="flex flex-col gap-16 w-full px-6 md:px-20 max-w-container">
-        <div className="flex flex-col justify-center items-center gap-6 w-full">
-          <SectionLabel color="green" label="MODELS" />
-          <Heading level={1}>
-            Transform ML Experiments into Production-Ready Models
-          </Heading>
-          <div className="max-w-3xl mx-auto text-center">
-            <Body size="l">
-              Build, deploy, and manage machine learning models with confidence
-              using MLflow's comprehensive model lifecycle management
-            </Body>
-          </div>
+      <AboveTheFold
+        sectionLabel="Models"
+        title="Transform ML Experiments into Production-Ready Models"
+        body="Build, deploy, and manage machine learning models with confidence using MLflow's comprehensive model lifecycle management"
+      >
+        <div className="flex flex-col gap-16 items-center -mt-10">
           <GetStartedButton />
+          <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
         </div>
-        <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
-      </div>
+      </AboveTheFold>
       <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-container">
         <Grid columns={2}>
           <GridItem>

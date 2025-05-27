@@ -1,13 +1,12 @@
 import {
   Layout,
-  SectionLabel,
   Grid,
   GridItem,
   GetStartedWithMLflow,
   SocialWidget,
   GetStartedButton,
-  Heading,
   Body,
+  AboveTheFold,
 } from "../../components";
 
 const FakeImage = () => (
@@ -17,21 +16,16 @@ const FakeImage = () => (
 export default function Governance() {
   return (
     <Layout variant="red" direction="up">
-      <div className="flex flex-col gap-16 w-full px-6 md:px-20 max-w-container">
-        <div className="flex flex-col justify-center items-center gap-6 w-full">
-          <SectionLabel color="red" label="QUALITY METRICS" />
-          <Heading level={1}>Enterprise governance with Unity Catalog</Heading>
-          <div className="max-w-3xl mx-auto text-center">
-            <Body size="l">
-              MLflow is integrated with Unity Catalog to track the lifecycle and
-              lineage of your app’s assets - models, prompts, datasets, and
-              metrics - and apply access controls.
-            </Body>
-          </div>
+      <AboveTheFold
+        sectionLabel="Quality metrics"
+        title="Enterprise governance with Unity Catalog"
+        body="MLflow is integrated with Unity Catalog to track the lifecycle and lineage of your app’s assets - models, prompts, datasets, and metrics - and apply access controls."
+      >
+        <div className="flex flex-col gap-16 items-center -mt-10">
           <GetStartedButton />
+          <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
         </div>
-        <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
-      </div>
+      </AboveTheFold>
       <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-container">
         <Grid columns={2}>
           <GridItem>

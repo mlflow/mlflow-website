@@ -1,13 +1,12 @@
 import {
   Layout,
-  SectionLabel,
   Grid,
   GridItem,
   GetStartedWithMLflow,
   SocialWidget,
   GetStartedButton,
-  Heading,
   Body,
+  AboveTheFold,
 } from "../../components";
 
 const FakeImage = () => (
@@ -17,20 +16,16 @@ const FakeImage = () => (
 export default function AiGateway() {
   return (
     <Layout variant="red" direction="up">
-      <div className="flex flex-col gap-16 w-full px-6 md:px-20 max-w-container">
-        <div className="flex flex-col justify-center items-center gap-6 w-full">
-          <SectionLabel color="red" label="AI GATEWAY" />
-          <Heading level={1}>Build AI Systems with confidence</Heading>
-          <div className="max-w-3xl mx-auto text-center">
-            <Body size="l">
-              The AI developer platform to build AI applications and models with
-              confidence
-            </Body>
-          </div>
+      <AboveTheFold
+        sectionLabel="AI gateway"
+        title="Build AI Systems with confidence"
+        body="The AI developer platform to build AI applications and models with confidence"
+      >
+        <div className="flex flex-col gap-16 items-center -mt-10">
           <GetStartedButton />
+          <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
         </div>
-        <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
-      </div>
+      </AboveTheFold>
       <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-container">
         <Grid columns={2}>
           <GridItem>

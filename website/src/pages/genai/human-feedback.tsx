@@ -1,13 +1,12 @@
 import {
   Layout,
-  SectionLabel,
   Grid,
   GridItem,
   GetStartedWithMLflow,
   SocialWidget,
   GetStartedButton,
-  Heading,
   Body,
+  AboveTheFold,
 } from "../../components";
 
 const FakeImage = () => (
@@ -17,27 +16,19 @@ const FakeImage = () => (
 export default function HumanFeedback() {
   return (
     <Layout variant="red" direction="up">
-      <div className="flex flex-col gap-16 w-full px-6 md:px-20 max-w-container">
-        <div className="flex flex-col justify-center items-center gap-6 w-full">
-          <SectionLabel color="red" label="HUMAN FEEDBACK" />
-          <Heading level={1}>
-            Incorporate human insight to understand and improve quality
-          </Heading>
-          <div className="max-w-3xl mx-auto text-center">
-            <Body size="l">
-              Capture domain expert feedback to understand how your app should
-              behave and align your custom LLM-judge metrics with those expert's
-              judgement.
-            </Body>
-            <Body size="l">
-              Capture end user feedback to quickly pinpoint quality issues in
-              production.
-            </Body>
-          </div>
+      <AboveTheFold
+        sectionLabel="Human feedback"
+        title="Incorporate human insight to understand and improve quality"
+        body={[
+          "Capture domain expert feedback to understand how your app should behave and align your custom LLM-judge metrics with those expert's judgement.",
+          "Capture end user feedback to quickly pinpoint quality issues in production.",
+        ]}
+      >
+        <div className="flex flex-col gap-16 items-center -mt-10">
           <GetStartedButton />
+          <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
         </div>
-        <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
-      </div>
+      </AboveTheFold>
       <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-container">
         <Grid columns={2}>
           <GridItem>

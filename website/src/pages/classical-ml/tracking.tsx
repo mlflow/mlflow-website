@@ -1,13 +1,12 @@
 import {
   Layout,
-  SectionLabel,
   Grid,
   GridItem,
   GetStartedWithMLflow,
   SocialWidget,
   GetStartedButton,
-  Heading,
   Body,
+  AboveTheFold,
 } from "../../components";
 
 const FakeImage = () => (
@@ -17,22 +16,16 @@ const FakeImage = () => (
 export default function Tracking() {
   return (
     <Layout variant="blue" direction="up">
-      <div className="flex flex-col gap-16 w-full px-6 md:px-20 max-w-container">
-        <div className="flex flex-col justify-center items-center gap-6 w-full">
-          <SectionLabel color="green" label="TRACKING" />
-          <Heading level={1}>
-            Comprehensive Experiment Tracking for ML Excellence
-          </Heading>
-          <div className="max-w-3xl mx-auto text-center">
-            <Body size="l">
-              Document, compare, and reproduce your machine learning experiments
-              with MLflow's powerful tracking capabilities
-            </Body>
-          </div>
+      <AboveTheFold
+        sectionLabel="Tracking"
+        title="Comprehensive Experiment Tracking for ML Excellence"
+        body=" Document, compare, and reproduce your machine learning experiments with MLflow's powerful tracking capabilities"
+      >
+        <div className="flex flex-col gap-16 items-center -mt-10">
           <GetStartedButton />
+          <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
         </div>
-        <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
-      </div>
+      </AboveTheFold>
       <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-container">
         <Grid columns={2}>
           <GridItem>

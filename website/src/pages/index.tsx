@@ -10,21 +10,17 @@ import {
   GetStartedTagline,
   Testimonials,
   LogosCarousel,
-  Heading,
   Body,
+  AboveTheFold,
 } from "../components";
 
 export default function Home(): JSX.Element {
   return (
     <Layout variant="colorful">
-      <div className="flex flex-col gap-16 w-full px-6 md:px-20 max-w-container">
-        <div className="flex flex-col justify-center items-center gap-6 w-full">
-          <Heading level={1}>AI and ML made simple</Heading>
-          <Body size="l">
-            The AI developer platform to build AI applications and models with
-            confidence
-          </Body>
-        </div>
+      <AboveTheFold
+        title="AI and ML made simple"
+        body="The AI developer platform to build AI applications and models with confidence"
+      >
         <div className="flex flex-col md:flex-row gap-10">
           <GlossyCard image={null}>
             <h3 className="text-white">GenAI Apps & Agents</h3>
@@ -48,7 +44,7 @@ export default function Home(): JSX.Element {
             </Link>
           </GlossyCard>
         </div>
-      </div>
+      </AboveTheFold>
       <div className="flex flex-col px-6 md:px-20 gap-40 mt-20 max-w-container">
         <div className="flex flex-col gap-16">
           <Testimonials />

@@ -15,32 +15,22 @@ import {
   Button,
   Heading,
   Body,
+  AboveTheFold,
 } from "../../components";
 import Link from "@docusaurus/Link";
 
 export default function GenAi(): JSX.Element {
   return (
     <Layout variant="red">
-      <div className="flex flex-col gap-16 w-full px-6 md:px-20 max-w-container">
-        <div className="flex flex-col justify-center items-center gap-6 w-full">
-          <Heading level={1}>Ship high-quality AI, fast</Heading>
-          <div className="max-w-3xl mx-auto text-center">
-            <Body size="l">
-              Traditional software and ML tests aren't built for GenAI's
-              free-form language, making it difficult for teams to measure and
-              improve quality.
-            </Body>
-            <Body size="l">
-              MLflow combines metrics that reliably measure GenAI quality with
-              trace observability so you can measure, improve, and monitor
-              quality, cost, and latency.
-            </Body>
-          </div>
-        </div>
-        <div className="flex flex-col md:flex-row gap-10">
-          <CopyCommand code="pip install mlflow" />
-        </div>
-      </div>
+      <AboveTheFold
+        title="Ship high-quality AI, fast"
+        body={[
+          "Traditional software and ML tests aren't built for GenAI's free-form language, making it difficult for teams to measure and improve quality.",
+          "MLflow combines metrics that reliably measure GenAI quality with trace observability so you can measure, improve, and monitor quality, cost, and latency.",
+        ]}
+      >
+        <CopyCommand code="pip install mlflow" />
+      </AboveTheFold>
       <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-container">
         <div className="flex flex-col w-full items-center justify-center gap-16">
           <div className="flex flex-col w-full items-center justify-center gap-6">

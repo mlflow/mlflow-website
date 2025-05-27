@@ -14,26 +14,20 @@ import {
   SocialWidget,
   Heading,
   Body,
+  AboveTheFold,
 } from "../../components";
 
 export default function GenAi(): JSX.Element {
   return (
     <Layout variant="blue">
-      <div className="flex flex-col gap-16 w-full px-6 md:px-20 max-w-container">
-        <div className="flex flex-col justify-center items-center gap-6 w-full">
-          <Heading level={1}>Mastering the ML lifecycle</Heading>
-          <div className="max-w-3xl mx-auto text-center">
-            <Body size="l">
-              From experiment to production, MLflow streamlines your complete
-              machine learning journey with enterprise-grade tracking, model
-              management, and deployment.
-            </Body>
-          </div>
-        </div>
+      <AboveTheFold
+        title="Mastering the ML lifecycle"
+        body="From experiment to production, MLflow streamlines your complete machine learning journey with enterprise-grade tracking, model management, and deployment."
+      >
         <div className="flex flex-col md:flex-row gap-10">
           <CopyCommand code="pip install mlflow" />
         </div>
-      </div>
+      </AboveTheFold>
       <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-container">
         <div className="flex flex-col w-full items-center justify-center gap-16">
           <div className="flex flex-col w-full items-center justify-center gap-6">

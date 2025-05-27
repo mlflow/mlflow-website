@@ -11,6 +11,7 @@ export { LatestNews } from "./LatestNews/LatestNews";
 export { GetStartedWithMLflow } from "./GetStartedWithMLflow/GetStartedWithMLflow";
 export { Header } from "./Header/Header";
 export { Layout } from "./Layout/Layout";
+export { AboveTheFold } from "./Layout/AboveTheFold";
 export { GlossyCard } from "./GlossyCard/GlossyCard";
 export { GetStartedTagline } from "./GetStartedTagline/GetStartedTagline";
 export { Testimonials } from "./Testimonials/Testimonials";
