@@ -4,13 +4,11 @@ import { Grid, GridItem } from "../Grid/Grid";
 import { SectionLabel } from "../SectionLabel/SectionLabel";
 import { Button } from "../Button/Button";
 import { Heading } from "../Typography/Heading";
-import { useLayoutVariant } from "../Layout/Layout";
 import blogPosts from "@site/.docusaurus/blog-posts.json";
 import type { BlogContent } from "@docusaurus/plugin-content-blog";
 import useBaseUrl from "@docusaurus/useBaseUrl";
 
 export const LatestNews = () => {
-  const variant = useLayoutVariant() === "blue" ? "green" : "red";
   const posts = blogPosts.slice(0, 3) as unknown as BlogContent["blogPosts"];
 
   const viewAllLinkNode = (
@@ -25,7 +23,7 @@ export const LatestNews = () => {
     <div className="flex flex-col gap-4 w-full items-center md:item-start">
       <div className="flex flex-row justify-between items-center gap-4 flex-wrap w-full">
         <div className="flex flex-col gap-6 items-start">
-          <SectionLabel color={variant} label="Blog" />
+          <SectionLabel label="Blog" />
           <Heading level={2}>Latest news</Heading>
         </div>
         <div className="hidden md:block">{viewAllLinkNode}</div>

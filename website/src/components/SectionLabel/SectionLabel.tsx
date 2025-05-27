@@ -1,9 +1,11 @@
+import { useLayoutVariant } from "../Layout/Layout";
+
 interface Props {
   label: string;
-  color: "red" | "green";
 }
 
-export const SectionLabel = ({ label, color }: Props) => {
+export const SectionLabel = ({ label }: Props) => {
+  const color = useLayoutVariant() === "blue" ? "green" : "red";
   const colorClass = color === "red" ? "bg-brand-red" : "bg-brand-teal";
 
   return (

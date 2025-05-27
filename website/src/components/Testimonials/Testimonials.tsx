@@ -6,7 +6,7 @@ export const Testimonials = () => {
   return (
     <div className="flex flex-col gap-16">
       <div className="flex flex-col gap-6 items-center">
-        <SectionLabel color="red" label="Customers" />
+        <SectionLabel label="Customers" />
         <Heading level={2}>
           Trusted by thousands of businesses and research teams
         </Heading>

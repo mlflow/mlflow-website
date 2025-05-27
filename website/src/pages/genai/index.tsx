@@ -34,7 +34,7 @@ export default function GenAi(): JSX.Element {
       <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-container">
         <div className="flex flex-col w-full items-center justify-center gap-16">
           <div className="flex flex-col w-full items-center justify-center gap-6">
-            <SectionLabel color="red" label="CORE FEATURES" />
+            <SectionLabel label="CORE FEATURES" />
             <Heading level={2}>Observability to debug and monitor</Heading>
           </div>
           <Grid columns={2}>
@@ -99,7 +99,7 @@ export default function GenAi(): JSX.Element {
         </div>
         <div className="flex flex-col w-full items-center justify-center gap-16">
           <div className="flex flex-col w-full items-center justify-center gap-6">
-            <SectionLabel color="red" label="CORE FEATURES" />
+            <SectionLabel label="CORE FEATURES" />
             <Heading level={2}>
               Evaluation to measure and improve quality
             </Heading>
@@ -197,7 +197,7 @@ export default function GenAi(): JSX.Element {
         </div>
         <div className="flex flex-col w-full items-center justify-center gap-16">
           <div className="flex flex-col w-full items-center justify-center gap-6">
-            <SectionLabel color="red" label="CORE FEATURES" />
+            <SectionLabel label="CORE FEATURES" />
             <Heading level={2}>
               Lifecycle management to track and version
             </Heading>
@@ -270,7 +270,7 @@ export default function GenAi(): JSX.Element {
         <LogosCarousel />
         <div className="flex flex-col items-center justify-center gap-16">
           <div className="flex flex-col gap-6">
-            <SectionLabel color="red" label="WHY US?" />
+            <SectionLabel label="WHY US?" />
             <Heading level={2}>Why MLflow is unique</Heading>
           </div>
           <Grid columns={2}>

@@ -31,7 +31,7 @@ export default function GenAi(): JSX.Element {
       <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-container">
         <div className="flex flex-col w-full items-center justify-center gap-16">
           <div className="flex flex-col w-full items-center justify-center gap-6">
-            <SectionLabel color="green" label="CORE FEATURES" />
+            <SectionLabel label="CORE FEATURES" />
             <Heading level={2}>Build confidently, deploy seamlessly</Heading>
             <Body size="m">
               Cover experimentation, reproducibility, deployment, and a central
@@ -91,7 +91,7 @@ export default function GenAi(): JSX.Element {
         <LogosCarousel />
         <div className="flex flex-col items-center justify-center gap-16">
           <div className="flex flex-col gap-6">
-            <SectionLabel color="green" label="WHY US?" />
+            <SectionLabel label="WHY US?" />
             <Heading level={2}>Why MLflow is unique</Heading>
           </div>
           <Grid columns={2}>
