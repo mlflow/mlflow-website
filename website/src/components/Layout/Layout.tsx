@@ -66,7 +66,9 @@ const wrapper = cva(
   },
 );
 
-const LayoutContext = createContext<"red" | "blue" | "colorful">("colorful");
+export const LayoutContext = createContext<"red" | "blue" | "colorful">(
+  "colorful",
+);
 
 export function useLayoutVariant() {
   const variant = useContext(LayoutContext);
