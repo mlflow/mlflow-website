@@ -73,8 +73,8 @@ export default function Tracking() {
             <FakeImage />
           </GridItem>
         </Grid>
-        <GetStartedWithMLflow variant="blue" />
-        <SocialWidget variant="green" />
+        <GetStartedWithMLflow />
+        <SocialWidget />
       </div>
     </Layout>
   );

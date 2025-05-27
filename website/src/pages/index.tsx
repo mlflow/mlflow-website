@@ -55,9 +55,9 @@ export default function Home(): JSX.Element {
           <LogosCarousel />
         </div>
         <GetStartedWithMLflow />
-        <LatestNews variant="red" />
+        <LatestNews />
         <GetStartedTagline />
-        <SocialWidget variant="red" />
+        <SocialWidget />
       </div>
     </Layout>
   );

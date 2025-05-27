@@ -48,7 +48,7 @@ export default function PromptRegistryVersioning() {
         </Grid>
 
         <GetStartedWithMLflow />
-        <SocialWidget variant="red" />
+        <SocialWidget />
       </div>
     </Layout>
   );

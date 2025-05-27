@@ -8,10 +8,7 @@ import { SocialWidgetItem } from "../SocialWidgetItem/SocialWidgetItem";
 import { Grid, GridItem } from "../Grid/Grid";
 import { Heading } from "../Typography/Heading";
 import { Body } from "../Typography/Body";
-
-interface Props {
-  variant: "red" | "green";
-}
+import { useLayoutVariant } from "../Layout/Layout";
 
 const socials = [
   {
@@ -48,7 +45,8 @@ const socials = [
   },
 ];
 
-export const SocialWidget = ({ variant }: Props) => {
+export const SocialWidget = () => {
+  const variant = useLayoutVariant() === "blue" ? "green" : "red";
   return (
     <div className="flex flex-col w-full gap-16">
       <div className="flex flex-col w-full gap-6 items-center justify-center text-center">

@@ -246,7 +246,7 @@ export default function Observability() {
         </div>
 
         <GetStartedWithMLflow />
-        <SocialWidget variant="red" />
+        <SocialWidget />
       </div>
     </Layout>
   );

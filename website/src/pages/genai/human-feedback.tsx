@@ -96,7 +96,7 @@ export default function HumanFeedback() {
           </GridItem>
         </Grid>
         <GetStartedWithMLflow />
-        <SocialWidget variant="red" />
+        <SocialWidget />
       </div>
     </Layout>
   );

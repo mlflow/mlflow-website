@@ -68,7 +68,7 @@ export default function AiGateway() {
           </GridItem>
         </Grid>
         <GetStartedWithMLflow />
-        <SocialWidget variant="red" />
+        <SocialWidget />
       </div>
     </Layout>
   );

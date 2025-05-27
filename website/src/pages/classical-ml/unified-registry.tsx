@@ -76,8 +76,8 @@ export default function UnifiedRegistry() {
             <FakeImage />
           </GridItem>
         </Grid>
-        <GetStartedWithMLflow variant="blue" />
-        <SocialWidget variant="green" />
+        <GetStartedWithMLflow />
+        <SocialWidget />
       </div>
     </Layout>
   );

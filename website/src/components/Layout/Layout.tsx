@@ -1,7 +1,7 @@
 import { Header } from "../Header/Header";
 import { Footer } from "../Footer/Footer";
 import { cva, VariantProps } from "class-variance-authority";
-import { PropsWithChildren } from "react";
+import { createContext, PropsWithChildren, useContext } from "react";
 
 type Props = PropsWithChildren<VariantProps<typeof wrapper>>;
 
@@ -66,14 +66,26 @@ const wrapper = cva(
   },
 );
 
+const LayoutContext = createContext<"red" | "blue" | "colorful">("colorful");
+
+export function useLayoutVariant() {
+  const variant = useContext(LayoutContext);
+  if (variant === undefined) {
+    throw new Error("useLayoutVariant must be used within a Layout");
+  }
+  return variant;
+}
+
 export const Layout = ({ children, variant, direction }: Props) => {
   return (
-    <div className="flex flex-col min-h-screen w-full bg-[#0E1416]">
-      <Header />
-      <main className="flex flex-col">
-        <div className={wrapper({ variant, direction })}>{children}</div>
-      </main>
-      <Footer variant={variant} />
-    </div>
+    <LayoutContext.Provider value={variant}>
+      <div className="flex flex-col min-h-screen w-full bg-[#0E1416]">
+        <Header />
+        <main className="flex flex-col">
+          <div className={wrapper({ variant, direction })}>{children}</div>
+        </main>
+        <Footer variant={variant} />
+      </div>
+    </LayoutContext.Provider>
   );
 };
