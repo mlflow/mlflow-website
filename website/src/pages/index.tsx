@@ -1,10 +1,8 @@
 import Link from "@docusaurus/Link";
 
 import {
-  SocialWidget,
   LatestNews,
   Layout,
-  GetStartedWithMLflow,
   GlossyCard,
   Button,
   GetStartedTagline,
@@ -12,6 +10,7 @@ import {
   LogosCarousel,
   Body,
   AboveTheFold,
+  BelowTheFold,
 } from "../components";
 
 export default function Home(): JSX.Element {
@@ -45,16 +44,16 @@ export default function Home(): JSX.Element {
           </GlossyCard>
         </div>
       </AboveTheFold>
-      <div className="flex flex-col px-6 md:px-20 gap-40 mt-20 max-w-container">
-        <div className="flex flex-col gap-16">
-          <Testimonials />
-          <LogosCarousel />
-        </div>
-        <GetStartedWithMLflow />
+
+      <div className="flex flex-col gap-16">
+        <Testimonials />
+        <LogosCarousel />
+      </div>
+
+      <BelowTheFold>
         <LatestNews />
         <GetStartedTagline />
-        <SocialWidget />
-      </div>
+      </BelowTheFold>
     </Layout>
   );
 }

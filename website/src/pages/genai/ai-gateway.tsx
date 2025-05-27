@@ -2,10 +2,9 @@ import {
   Layout,
   Grid,
   GridItem,
-  GetStartedWithMLflow,
-  SocialWidget,
   Body,
   AboveTheFold,
+  BelowTheFold,
 } from "../../components";
 
 const FakeImage = () => (
@@ -23,45 +22,44 @@ export default function AiGateway() {
       >
         <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
       </AboveTheFold>
-      <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-container">
-        <Grid columns={2}>
-          <GridItem>
-            <div className="flex flex-col gap-10">
-              <div className="flex flex-col gap-4">
-                <h3 className="text-white">Feature heading</h3>
-              </div>
 
-              <Body size="l">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Quisquam, quos.
-              </Body>
-            </div>
-            <FakeImage />
-          </GridItem>
-          <GridItem>
+      <Grid columns={2}>
+        <GridItem>
+          <div className="flex flex-col gap-10">
             <div className="flex flex-col gap-4">
               <h3 className="text-white">Feature heading</h3>
-              <Body size="l">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Quisquam, quos. your code base.
-              </Body>
             </div>
-            <FakeImage />
-          </GridItem>
-          <GridItem width="wide">
-            <div className="flex flex-col gap-4">
-              <h3 className="text-white">Feature heading</h3>
-              <Body size="l">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Quisquam, quos.
-              </Body>
-            </div>
-            <FakeImage />
-          </GridItem>
-        </Grid>
-        <GetStartedWithMLflow />
-        <SocialWidget />
-      </div>
+
+            <Body size="l">
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
+              quos.
+            </Body>
+          </div>
+          <FakeImage />
+        </GridItem>
+        <GridItem>
+          <div className="flex flex-col gap-4">
+            <h3 className="text-white">Feature heading</h3>
+            <Body size="l">
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
+              quos. your code base.
+            </Body>
+          </div>
+          <FakeImage />
+        </GridItem>
+        <GridItem width="wide">
+          <div className="flex flex-col gap-4">
+            <h3 className="text-white">Feature heading</h3>
+            <Body size="l">
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
+              quos.
+            </Body>
+          </div>
+          <FakeImage />
+        </GridItem>
+      </Grid>
+
+      <BelowTheFold />
     </Layout>
   );
 }

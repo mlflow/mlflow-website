@@ -12,6 +12,7 @@ export { GetStartedWithMLflow } from "./GetStartedWithMLflow/GetStartedWithMLflo
 export { Header } from "./Header/Header";
 export { Layout } from "./Layout/Layout";
 export { AboveTheFold } from "./Layout/AboveTheFold";
+export { BelowTheFold } from "./Layout/BelowTheFold";
 export { GlossyCard } from "./GlossyCard/GlossyCard";
 export { GetStartedTagline } from "./GetStartedTagline/GetStartedTagline";
 export { Testimonials } from "./Testimonials/Testimonials";

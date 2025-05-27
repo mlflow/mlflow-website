@@ -2,10 +2,9 @@ import {
   Layout,
   Grid,
   GridItem,
-  GetStartedWithMLflow,
-  SocialWidget,
   Body,
   AboveTheFold,
+  BelowTheFold,
 } from "../../components";
 
 const FakeImage = () => (
@@ -23,27 +22,25 @@ export default function PromptRegistryVersioning() {
       >
         <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
       </AboveTheFold>
-      <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-container">
-        <Grid columns={2}>
-          <GridItem>
-            <div className="flex flex-col gap-4">
-              <h3 className="text-white">Card 1</h3>
-              <Body size="l">Lorem ipsum</Body>
-            </div>
-            <FakeImage />
-          </GridItem>
-          <GridItem>
-            <div className="flex flex-col gap-4">
-              <h3 className="text-white">Card 2</h3>
-              <Body size="l">Lorem ipsum</Body>
-            </div>
-            <FakeImage />
-          </GridItem>
-        </Grid>
 
-        <GetStartedWithMLflow />
-        <SocialWidget />
-      </div>
+      <Grid columns={2}>
+        <GridItem>
+          <div className="flex flex-col gap-4">
+            <h3 className="text-white">Card 1</h3>
+            <Body size="l">Lorem ipsum</Body>
+          </div>
+          <FakeImage />
+        </GridItem>
+        <GridItem>
+          <div className="flex flex-col gap-4">
+            <h3 className="text-white">Card 2</h3>
+            <Body size="l">Lorem ipsum</Body>
+          </div>
+          <FakeImage />
+        </GridItem>
+      </Grid>
+
+      <BelowTheFold />
     </Layout>
   );
 }
