@@ -4,7 +4,6 @@ import {
   GridItem,
   GetStartedWithMLflow,
   SocialWidget,
-  GetStartedButton,
   Body,
   AboveTheFold,
 } from "../../components";
@@ -20,11 +19,9 @@ export default function Tracking() {
         sectionLabel="Tracking"
         title="Comprehensive Experiment Tracking for ML Excellence"
         body=" Document, compare, and reproduce your machine learning experiments with MLflow's powerful tracking capabilities"
+        hasGetStartedButton
       >
-        <div className="flex flex-col gap-16 items-center -mt-10">
-          <GetStartedButton />
-          <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
-        </div>
+        <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
       </AboveTheFold>
       <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-container">
         <Grid columns={2}>

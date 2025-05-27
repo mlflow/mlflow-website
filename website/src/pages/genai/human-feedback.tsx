@@ -4,7 +4,6 @@ import {
   GridItem,
   GetStartedWithMLflow,
   SocialWidget,
-  GetStartedButton,
   Body,
   AboveTheFold,
 } from "../../components";
@@ -23,11 +22,9 @@ export default function HumanFeedback() {
           "Capture domain expert feedback to understand how your app should behave and align your custom LLM-judge metrics with those expert's judgement.",
           "Capture end user feedback to quickly pinpoint quality issues in production.",
         ]}
+        hasGetStartedButton
       >
-        <div className="flex flex-col gap-16 items-center -mt-10">
-          <GetStartedButton />
-          <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
-        </div>
+        <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
       </AboveTheFold>
       <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-container">
         <Grid columns={2}>

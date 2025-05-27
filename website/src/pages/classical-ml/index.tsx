@@ -24,9 +24,7 @@ export default function GenAi(): JSX.Element {
         title="Mastering the ML lifecycle"
         body="From experiment to production, MLflow streamlines your complete machine learning journey with enterprise-grade tracking, model management, and deployment."
       >
-        <div className="flex flex-col md:flex-row gap-10">
-          <CopyCommand code="pip install mlflow" />
-        </div>
+        <CopyCommand code="pip install mlflow" />
       </AboveTheFold>
       <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-container">
         <div className="flex flex-col w-full items-center justify-center gap-16">

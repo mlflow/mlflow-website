@@ -1,13 +1,20 @@
 import { PropsWithChildren } from "react";
-import { Heading, Body, SectionLabel } from "../index";
+import { Heading, Body, SectionLabel, GetStartedButton } from "../index";
 
 type Props = PropsWithChildren<{
   title: string;
   body: string | string[];
   sectionLabel?: string;
+  hasGetStartedButton?: boolean;
 }>;
 
-export function AboveTheFold({ children, title, body, sectionLabel }: Props) {
+export function AboveTheFold({
+  children,
+  title,
+  body,
+  sectionLabel,
+  hasGetStartedButton,
+}: Props) {
   const bodyParts = Array.isArray(body) ? body : [body];
   return (
     <div className="flex flex-col gap-16 w-full px-6 md:px-20 max-w-container">
@@ -21,6 +28,7 @@ export function AboveTheFold({ children, title, body, sectionLabel }: Props) {
             </Body>
           ))}
         </div>
+        {hasGetStartedButton && <GetStartedButton />}
       </div>
       {children}
     </div>

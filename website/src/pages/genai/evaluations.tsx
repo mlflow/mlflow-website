@@ -4,7 +4,6 @@ import {
   GridItem,
   GetStartedWithMLflow,
   SocialWidget,
-  GetStartedButton,
   Body,
   AboveTheFold,
 } from "../../components";
@@ -20,11 +19,9 @@ export default function Evaluations() {
         sectionLabel="Evaluations"
         title="Evaluation to measure and improve quality"
         body="Confidently evaluate quality in development and production to identify issues and iteratively test improvements."
+        hasGetStartedButton
       >
-        <div className="flex flex-col gap-16 items-center -mt-10">
-          <GetStartedButton />
-          <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
-        </div>
+        <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
       </AboveTheFold>
       <div className="flex flex-col gap-40 pt-20 w-full px-6 md:px-20 max-w-container">
         <div className="flex flex-col gap-10">

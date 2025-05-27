@@ -4,7 +4,6 @@ import {
   GridItem,
   GetStartedWithMLflow,
   SocialWidget,
-  GetStartedButton,
   Body,
   AboveTheFold,
 } from "../../components";
@@ -20,11 +19,9 @@ export default function AiGateway() {
         sectionLabel="AI gateway"
         title="Build AI Systems with confidence"
         body="The AI developer platform to build AI applications and models with confidence"
+        hasGetStartedButton
       >
-        <div className="flex flex-col gap-16 items-center -mt-10">
-          <GetStartedButton />
-          <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
-        </div>
+        <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
       </AboveTheFold>
       <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-container">
         <Grid columns={2}>
