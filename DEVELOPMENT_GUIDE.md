@@ -37,7 +37,7 @@ From this directory, run the following command:
 yarn
 ```
 
-This will fetch the required packages and ensure that your environment is up to date with required dependencies to build, compile, or start an interactive environment.
+This will fetch the required packages and ensure that your environment is up to date with required dependencies to build or start an interactive environment.
 
 ## Development
 
@@ -66,20 +66,7 @@ This will initialize the local development server, providing a local url that ca
 
 Example PRs for adding new blog posts: [#3](https://github.com/mlflow/mlflow-website/pull/3) [#39](https://github.com/mlflow/mlflow-website/pull/39)
 
-Our blogs are written in markdown format, which is compiled to typescript files within Docusaurus for site display. Due to this
-transpile stage, in order to validate the formatting and structure of your blog (and the correct rendering of images or other)
-embedded content, you will have to compile your work in progress before building the site locally for verification.
-
-To compile the blog content into the required `.tsx` files (for linking your blog to the navigation components within the site), you can run:
-
-```bash
-yarn compile
-```
-
-> Note: prior to committing any changes from your blog feature, the blog contents must be compiled. The CI system will not compile your
-markdown into `.tsx` for you.
-
-After the compilation finishes, you can either start a local server with `yarn start` or fully build the website as a static site.
+Our blogs are written in markdown format. To test your changes after drafting a post, you can either start a local server with `yarn start` or fully build the website as a static site.
 
 To build the full static site content, you can run:
 
@@ -119,9 +106,6 @@ cp -r build/html/* /path/to/mlflow-website/website/docs/latest
 
 ### Release tooling
 
-If you are adding a new blog entry, ensure that you have compiled the indexing file by running, from the ``website`` directory, the ``yarn compile`` script.
-This ensures that the main page listing will be updated with the most recent entry.
-
 If you are manually editing release notes or updating an existing release note, you can validate the generated links locally prior to pushing a PR by
 running the script ``yarn fmt-notes`` to run local generation for all release notes that are within the ``releases`` directory.
 
@@ -158,9 +142,6 @@ yarn build
 
 # Format code
 yarn fmt
-
-# Convert blog post and release notes into typescript code
-yarn compile
 
 # Generate links within release notes
 yarn fmt-notes

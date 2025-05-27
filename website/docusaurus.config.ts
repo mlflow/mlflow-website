@@ -3,9 +3,10 @@ import type { Config } from "@docusaurus/types";
 import type * as Preset from "@docusaurus/preset-classic";
 
 import tailwindPlugin from "./plugins/tailwind-config.cjs";
+import extendedBlogPlugin from "./plugins/extended-blog-plugin.cjs";
 
 // ensure baseUrl always ends in `/`
-export const baseUrl = (process.env.BASE_URL ?? "/").replace(/\/?$/, "/");
+const baseUrl = (process.env.BASE_URL ?? "/").replace(/\/?$/, "/");
 
 const config: Config = {
   title: "MLflow",
@@ -65,15 +66,7 @@ const config: Config = {
       "classic",
       {
         docs: false,
-        blog: {
-          showReadingTime: true,
-          blogSidebarTitle: "All posts",
-          blogSidebarCount: "ALL",
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          // editUrl:
-          //   "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
-        },
+        blog: false,
         theme: {
           customCss: "./src/css/custom.css",
         },
@@ -90,6 +83,18 @@ const config: Config = {
 
   plugins: [
     tailwindPlugin,
+    [
+      extendedBlogPlugin,
+      {
+        showReadingTime: true,
+        blogSidebarTitle: "All posts",
+        blogSidebarCount: "ALL",
+        // Please change this to your repo.
+        // Remove this to remove the "edit this page" links.
+        // editUrl:
+        //   "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
+      },
+    ],
     [
       "@docusaurus/plugin-content-blog",
       {
