@@ -2,9 +2,9 @@ import {
   Layout,
   Grid,
   GridItem,
-  Body,
   AboveTheFold,
   BelowTheFold,
+  Card,
 } from "../../components";
 
 const FakeImage = () => (
@@ -25,43 +25,25 @@ export default function Models() {
 
       <Grid columns={2}>
         <GridItem>
-          <div className="flex flex-col gap-4">
-            <h3 className="text-white">Unified Model Format</h3>
-            <Body size="l">
-              MLflow's MLModel file provides a standardized structure for
-              packaging models from any framework, capturing essential
-              dependencies and input/output specifications. This consistent
-              packaging approach eliminates integration friction while ensuring
-              models can be reliably deployed across any environment.
-            </Body>
-          </div>
-          <FakeImage />
+          <Card
+            title="Unified Model Format"
+            body="MLflow's MLModel file provides a standardized structure for packaging models from any framework, capturing essential dependencies and input/output specifications. This consistent packaging approach eliminates integration friction while ensuring models can be reliably deployed across any environment."
+            image={<FakeImage />}
+          />
         </GridItem>
         <GridItem>
-          <div className="flex flex-col gap-4">
-            <h3 className="text-white">Comprehensive Model Metadata</h3>
-            <Body size="l">
-              Track crucial model requirements and artifacts including data
-              schemas, preprocessing steps, and environment dependencies
-              automatically with MLflow's metadata system. Create fully
-              reproducible model packages that document the complete model
-              context for simplified governance and troubleshooting.
-            </Body>
-          </div>
-          <FakeImage />
+          <Card
+            title="Comprehensive Model Metadata"
+            body="Track crucial model requirements and artifacts including data schemas, preprocessing steps, and environment dependencies automatically with MLflow's metadata system. Create fully reproducible model packages that document the complete model context for simplified governance and troubleshooting."
+            image={<FakeImage />}
+          />
         </GridItem>
         <GridItem width="wide">
-          <div className="flex flex-col gap-4">
-            <h3 className="text-white">Flexible Deployment Options</h3>
-            <Body size="l">
-              Deploy models as Docker containers, Python functions, REST
-              endpoints, or directly to various serving platforms with MLflow's
-              versatile deployment capabilities. Streamline the transition from
-              development to production with consistent model behavior across
-              any target environment, from local testing to cloud-based serving.
-            </Body>
-          </div>
-          <FakeImage />
+          <Card
+            title="Flexible Deployment Options"
+            body="Deploy models as Docker containers, Python functions, REST endpoints, or directly to various serving platforms with MLflow's versatile deployment capabilities. Streamline the transition from development to production with consistent model behavior across any target environment, from local testing to cloud-based serving."
+            image={<FakeImage />}
+          />
         </GridItem>
       </Grid>
 

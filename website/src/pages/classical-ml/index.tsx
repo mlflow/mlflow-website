@@ -9,10 +9,10 @@ import {
   Grid,
   GridItem,
   LatestNews,
-  Body,
   AboveTheFold,
   BelowTheFold,
   Section,
+  Card,
 } from "../../components";
 
 export default function GenAi(): JSX.Element {
@@ -84,53 +84,32 @@ export default function GenAi(): JSX.Element {
       <Section label="Why us?" title="Why MLflow is unique">
         <Grid columns={2}>
           <GridItem>
-            <div className="flex flex-col gap-4">
-              <h3 className="text-white">Industry pioneer</h3>
-              <Body size="m">
-                MLflow has established itself as a pioneering open-source
-                platform for managing the end-to-end machine learning lifecycle.
-                Created by Databricks, it has become one of the most widely
-                adopted MLOps tools in the industry, with integration support
-                from major cloud providers.
-              </Body>
-            </div>
+            <Card
+              title="Industry pioneer"
+              bodySize="m"
+              body="MLflow has established itself as a pioneering open-source platform for managing the end-to-end machine learning lifecycle. Created by Databricks, it has become one of the most widely adopted MLOps tools in the industry, with integration support from major cloud providers."
+            />
           </GridItem>
           <GridItem>
-            <div className="flex flex-col gap-4">
-              <h3 className="text-white">Framework neutrality</h3>
-              <Body size="m">
-                MLflow's framework-agnostic design is one of its strongest
-                differentiators. Unlike proprietary solutions that lock you into
-                specific ecosystems, MLflow works seamlessly with all popular ML
-                frameworks including scikit-learn, PyTorch, TensorFlow, and
-                XGBoost.
-              </Body>
-            </div>
+            <Card
+              title="Framework neutrality"
+              bodySize="m"
+              body="MLflow's framework-agnostic design is one of its strongest differentiators. Unlike proprietary solutions that lock you into specific ecosystems, MLflow works seamlessly with all popular ML frameworks including scikit-learn, PyTorch, TensorFlow, and XGBoost."
+            />
           </GridItem>
           <GridItem>
-            <div className="flex flex-col gap-4">
-              <h3 className="text-white">Comprehensive Lifecycle Management</h3>
-              <Body size="m">
-                MLflow uniquely addresses the complete machine learning
-                lifecycle through four integrated components: - MLflow Tracking
-                for logging parameters, metrics, and artifacts - MLflow Projects
-                for reproducible code packaging - MLflow Models for standardized
-                deployment - MLflow Model Registry for centralized version
-                management
-              </Body>
-            </div>
+            <Card
+              title="Comprehensive Lifecycle Management"
+              bodySize="m"
+              body="MLflow uniquely addresses the complete machine learning lifecycle through four integrated components: - MLflow Tracking for logging parameters, metrics, and artifacts - MLflow Projects for reproducible code packaging - MLflow Models for standardized deployment - MLflow Model Registry for centralized version management"
+            />
           </GridItem>
           <GridItem>
-            <div className="flex flex-col gap-4">
-              <h3 className="text-white">Enterprise Adoption</h3>
-              <Body size="m">
-                MLflow's impact extends beyond its technical capabilities. It
-                has gained significant traction among enterprise teams requiring
-                robust experiment tracking and model lifecycle management.
-                Databricks offers a managed MLflow service with enhanced
-                security and scalability.
-              </Body>
-            </div>
+            <Card
+              title="Enterprise Adoption"
+              bodySize="m"
+              body="MLflow's impact extends beyond its technical capabilities. It has gained significant traction among enterprise teams requiring robust experiment tracking and model lifecycle management. Databricks offers a managed MLflow service with enhanced security and scalability."
+            />
           </GridItem>
         </Grid>
       </Section>

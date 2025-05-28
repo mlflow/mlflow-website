@@ -1,5 +1,3 @@
-import Link from "@docusaurus/Link";
-
 import {
   LatestNews,
   Layout,
@@ -8,9 +6,10 @@ import {
   GetStartedTagline,
   Testimonials,
   LogosCarousel,
-  Body,
   AboveTheFold,
   BelowTheFold,
+  Card,
+  GlossyCardContainer,
 } from "../components";
 
 export default function Home(): JSX.Element {
@@ -20,29 +19,40 @@ export default function Home(): JSX.Element {
         title="AI and ML made simple"
         body="The AI developer platform to build AI applications and models with confidence"
       >
-        <div className="flex flex-col md:flex-row gap-10">
-          <GlossyCard image={null}>
-            <h3 className="text-white">GenAI Apps & Agents</h3>
-            <Body size="m">
-              Enhance your GenAI applications with end-to-end observability,
-              monitoring, and enterprise governance, all in one integrated
-              platform.
-            </Body>
-            <Link href="/genai">
-              <Button variant="primary">Learn more &gt;</Button>
-            </Link>
+        <GlossyCardContainer>
+          <GlossyCard>
+            <Card
+              title="GenAI Apps & Agents"
+              bodySize="m"
+              body="Enhance your GenAI applications with end-to-end observability, monitoring, and enterprise governance, all in one integrated platform."
+              padded
+              cta={{
+                href: "/genai",
+                text: "Learn more >",
+                prominent: true,
+              }}
+              image={
+                <div className="w-full bg-brand-black/60 min-h-[270px] rounded-b-4xl hidden md:block" />
+              }
+            />
           </GlossyCard>
-          <GlossyCard image={null}>
-            <h3 className="text-white">Model Training</h3>
-            <Body size="m">
-              Streamline your machine learning workflows with enterprise-grade
-              tracking, model management, and deployment.
-            </Body>
-            <Link href="/classical-ml">
-              <Button variant="primary">Learn more &gt;</Button>
-            </Link>
+          <GlossyCard>
+            <Card
+              title="Model Training"
+              bodySize="m"
+              body="Streamline your machine learning workflows with enterprise-grade tracking, model management, and deployment."
+              padded
+              cta={{
+                href: "/genai",
+                text: "Learn more >",
+                prominent: true,
+              }}
+              image={
+                <div className="w-full bg-brand-black/60 min-h-[270px] rounded-b-4xl hidden md:block" />
+              }
+            />
           </GlossyCard>
-        </div>
+        </GlossyCardContainer>
       </AboveTheFold>
 
       <Testimonials />

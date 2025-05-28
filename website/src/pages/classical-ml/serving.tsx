@@ -2,9 +2,9 @@ import {
   Layout,
   Grid,
   GridItem,
-  Body,
   AboveTheFold,
   BelowTheFold,
+  Card,
 } from "../../components";
 
 const FakeImage = () => (
@@ -25,40 +25,25 @@ export default function Serving() {
 
       <Grid columns={2}>
         <GridItem>
-          <div className="flex flex-col gap-4">
-            <h3 className="text-white">Scalable Real-Time Serving</h3>
-            <Body size="l">
-              MLflow provides a unified, scalable interface for deploying models
-              as REST APIs that automatically adjust to meet demand
-              fluctuations. With managed deployment on Databricks, your
-              endpoints can intelligently scale up or down based on traffic
-              patterns, optimizing both performance and infrastructure costs
-              with no manual intervention required.
-            </Body>
-          </div>
-          <FakeImage />
+          <Card
+            title="Scalable Real-Time Serving"
+            body="MLflow provides a unified, scalable interface for deploying models as REST APIs that automatically adjust to meet demand fluctuations. With managed deployment on Databricks, your endpoints can intelligently scale up or down based on traffic patterns, optimizing both performance and infrastructure costs with no manual intervention required."
+            image={<FakeImage />}
+          />
         </GridItem>
         <GridItem>
-          <div className="flex flex-col gap-4">
-            <h3 className="text-white">High-Performance Batch Inference</h3>
-            <Body size="l">
-              Deploy production models for batch inference directly on Apache
-              Spark, enabling efficient processing of billions of predictions on
-              massive datasets
-            </Body>
-          </div>
-          <FakeImage />
+          <Card
+            title="High-Performance Batch Inference"
+            body="Deploy production models for batch inference directly on Apache Spark, enabling efficient processing of billions of predictions on massive datasets"
+            image={<FakeImage />}
+          />
         </GridItem>
         <GridItem width="wide">
-          <div className="flex flex-col gap-4">
-            <h3 className="text-white">Comprehensive Deployment Options</h3>
-            <Body size="l">
-              Deploy models across multiple environments including Docker
-              containers, cloud services like Databricks, Azure ML and AWS
-              SageMaker, or Kubernetes clusters with consistent behavior.
-            </Body>
-          </div>
-          <FakeImage />
+          <Card
+            title="Comprehensive Deployment Options"
+            body="Deploy models across multiple environments including Docker containers, cloud services like Databricks, Azure ML and AWS SageMaker, or Kubernetes clusters with consistent behavior."
+            image={<FakeImage />}
+          />
         </GridItem>
       </Grid>
 

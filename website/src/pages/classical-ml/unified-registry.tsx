@@ -2,9 +2,9 @@ import {
   Layout,
   Grid,
   GridItem,
-  Body,
   AboveTheFold,
   BelowTheFold,
+  Card,
 } from "../../components";
 
 const FakeImage = () => (
@@ -25,44 +25,25 @@ export default function UnifiedRegistry() {
 
       <Grid columns={2}>
         <GridItem>
-          <div className="flex flex-col gap-4">
-            <h3 className="text-white">Seamless Unity Catalog Integration</h3>
-            <Body size="l">
-              MLflow Model Registry integrates directly with Unity Catalog to
-              provide enterprise-grade governance across your entire ML asset
-              portfolio. Apply consistent security policies, lineage tracking,
-              and access controls to both data and models through a unified
-              permission system.
-            </Body>
-          </div>
-          <FakeImage />
+          <Card
+            title="Seamless Unity Catalog Integration"
+            body="MLflow Model Registry integrates directly with Unity Catalog to provide enterprise-grade governance across your entire ML asset portfolio. Apply consistent security policies, lineage tracking, and access controls to both data and models through a unified permission system."
+            image={<FakeImage />}
+          />
         </GridItem>
         <GridItem>
-          <div className="flex flex-col gap-4">
-            <h3 className="text-white">Stage-Based Model Lifecycle</h3>
-            <Body size="l">
-              Move models through customizable staging environments
-              (Development, Staging, Production, or any stage alias you choose)
-              with built-in approval workflow capabilities and automated
-              notifications. Maintain complete audit trails of model transitions
-              with detailed metadata about who approved changes and when they
-              occurred.
-            </Body>
-          </div>
-          <FakeImage />
+          <Card
+            title="Stage-Based Model Lifecycle"
+            body="Move models through customizable staging environments (Development, Staging, Production, or any stage alias you choose) with built-in approval workflow capabilities and automated notifications. Maintain complete audit trails of model transitions with detailed metadata about who approved changes and when they occurred."
+            image={<FakeImage />}
+          />
         </GridItem>
         <GridItem width="wide">
-          <div className="flex flex-col gap-4">
-            <h3 className="text-white">Model Deployment Flexibility</h3>
-            <Body size="l">
-              Deploy models as containers, batch jobs, or REST endpoints with
-              MLflow's streamlined deployment capabilities that eliminate
-              boilerplate code. Use model aliases to create named references
-              that enable seamless model updates in production without changing
-              your application code.
-            </Body>
-          </div>
-          <FakeImage />
+          <Card
+            title="Model Deployment Flexibility"
+            body="Deploy models as containers, batch jobs, or REST endpoints with MLflow's streamlined deployment capabilities that eliminate boilerplate code. Use model aliases to create named references that enable seamless model updates in production without changing your application code."
+            image={<FakeImage />}
+          />
         </GridItem>
       </Grid>
 

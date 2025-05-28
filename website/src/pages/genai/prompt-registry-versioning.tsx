@@ -2,9 +2,9 @@ import {
   Layout,
   Grid,
   GridItem,
-  Body,
   AboveTheFold,
   BelowTheFold,
+  Card,
 } from "../../components";
 
 const FakeImage = () => (
@@ -25,18 +25,18 @@ export default function PromptRegistryVersioning() {
 
       <Grid columns={2}>
         <GridItem>
-          <div className="flex flex-col gap-4">
-            <h3 className="text-white">Card 1</h3>
-            <Body size="l">Lorem ipsum</Body>
-          </div>
-          <FakeImage />
+          <Card
+            title="Feature heading"
+            body="Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos."
+            image={<FakeImage />}
+          />
         </GridItem>
         <GridItem>
-          <div className="flex flex-col gap-4">
-            <h3 className="text-white">Card 2</h3>
-            <Body size="l">Lorem ipsum</Body>
-          </div>
-          <FakeImage />
+          <Card
+            title="Feature heading"
+            body="Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos."
+            image={<FakeImage />}
+          />
         </GridItem>
       </Grid>
 
