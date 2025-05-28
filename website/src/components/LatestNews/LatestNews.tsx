@@ -1,15 +1,17 @@
 import Link from "@docusaurus/Link";
 
-import { BLOGS } from "../../posts";
 import { Grid, GridItem } from "../Grid/Grid";
 import { SectionLabel } from "../SectionLabel/SectionLabel";
 import { Button } from "../Button/Button";
 import { Heading } from "../Typography/Heading";
 import { useLayoutVariant } from "../Layout/Layout";
+import blogPosts from "@site/.docusaurus/blog-posts.json";
+import type { BlogContent } from "@docusaurus/plugin-content-blog";
+import useBaseUrl from "@docusaurus/useBaseUrl";
 
 export const LatestNews = () => {
   const variant = useLayoutVariant() === "blue" ? "green" : "red";
-  const posts = BLOGS.slice(0, 3);
+  const posts = blogPosts.slice(0, 3) as unknown as BlogContent["blogPosts"];
 
   const viewAllLinkNode = (
     <Link href="/blog" className="">
@@ -30,26 +32,26 @@ export const LatestNews = () => {
       </div>
       <Grid>
         {posts.map((post) => (
-          <GridItem key={post.path}>
+          <GridItem key={post.metadata.permalink}>
             <Link
-              href={post.path}
+              href={post.metadata.permalink}
               className="flex flex-col gap-6 h-full justify-between"
             >
               <div className="flex flex-col gap-6">
                 <span className="text-gray-500">
-                  {new Date(post.date).toLocaleDateString("en-us", {
+                  {new Date(post.metadata.date).toLocaleDateString("en-us", {
                     month: "short",
                     day: "numeric",
                     year: "numeric",
                   })}
                 </span>
                 <h3 className="overflow-hidden text-ellipsis text-pretty">
-                  {post.title}
+                  {post.metadata.title}
                 </h3>
               </div>
               <img
-                src={post.thumbnail}
-                alt={post.title}
+                src={useBaseUrl(post.metadata.frontMatter.thumbnail as string)}
+                alt={post.metadata.title}
                 className="rounded-2xl md:max-h-[210px] object-cover max-w-full"
               />
             </Link>
