@@ -51,7 +51,7 @@ export const Header = () => {
 
   return (
     <nav className="fixed w-full z-20 top-0 start-0 bg-[#F7F8F8]/1 border-b border-[#F7F8F8]/8 backdrop-blur-[20px] drop-shadow-[0px_1px_2px_rgba(0_0_0/75%),0px_1px_12px_rgba(0_0_0/75%)]">
-      <div className="flex flex-wrap items-center justify-between mx-auto px-6 md:px-20 py-2 max-w-container">
+      <div className="flex flex-wrap items-center justify-between mx-auto px-6 lg:px-20 py-2 max-w-container">
         <Link
           href="/"
           className="flex items-center space-x-3 rtl:space-x-reverse"
