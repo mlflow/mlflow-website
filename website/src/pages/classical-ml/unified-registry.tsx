@@ -1,13 +1,10 @@
 import {
   Layout,
-  SectionLabel,
   Grid,
   GridItem,
-  GetStartedWithMLflow,
-  SocialWidget,
-  GetStartedButton,
-  Heading,
   Body,
+  AboveTheFold,
+  BelowTheFold,
 } from "../../components";
 
 const FakeImage = () => (
@@ -17,68 +14,59 @@ const FakeImage = () => (
 export default function UnifiedRegistry() {
   return (
     <Layout variant="blue" direction="up">
-      <div className="flex flex-col gap-16 w-full px-6 md:px-20 max-w-container">
-        <div className="flex flex-col justify-center items-center gap-6 w-full">
-          <SectionLabel color="green" label="UNIFIED REGISTRY" />
-          <Heading level={1}>
-            Centralized Model Governance and Discovery
-          </Heading>
-          <div className="max-w-3xl mx-auto text-center">
+      <AboveTheFold
+        sectionLabel="Unified registry"
+        title="Centralized Model Governance and Discovery"
+        body="Streamline your ML workflows with MLflow's comprehensive model registry for version control, approvals, and deployment management"
+        hasGetStartedButton
+      >
+        <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
+      </AboveTheFold>
+
+      <Grid columns={2}>
+        <GridItem>
+          <div className="flex flex-col gap-4">
+            <h3 className="text-white">Seamless Unity Catalog Integration</h3>
             <Body size="l">
-              Streamline your ML workflows with MLflow's comprehensive model
-              registry for version control, approvals, and deployment management
+              MLflow Model Registry integrates directly with Unity Catalog to
+              provide enterprise-grade governance across your entire ML asset
+              portfolio. Apply consistent security policies, lineage tracking,
+              and access controls to both data and models through a unified
+              permission system.
             </Body>
           </div>
-          <GetStartedButton />
-        </div>
-        <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
-      </div>
-      <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-container">
-        <Grid columns={2}>
-          <GridItem>
-            <div className="flex flex-col gap-4">
-              <h3 className="text-white">Seamless Unity Catalog Integration</h3>
-              <Body size="l">
-                MLflow Model Registry integrates directly with Unity Catalog to
-                provide enterprise-grade governance across your entire ML asset
-                portfolio. Apply consistent security policies, lineage tracking,
-                and access controls to both data and models through a unified
-                permission system.
-              </Body>
-            </div>
-            <FakeImage />
-          </GridItem>
-          <GridItem>
-            <div className="flex flex-col gap-4">
-              <h3 className="text-white">Stage-Based Model Lifecycle</h3>
-              <Body size="l">
-                Move models through customizable staging environments
-                (Development, Staging, Production, or any stage alias you
-                choose) with built-in approval workflow capabilities and
-                automated notifications. Maintain complete audit trails of model
-                transitions with detailed metadata about who approved changes
-                and when they occurred.
-              </Body>
-            </div>
-            <FakeImage />
-          </GridItem>
-          <GridItem width="wide">
-            <div className="flex flex-col gap-4">
-              <h3 className="text-white">Model Deployment Flexibility</h3>
-              <Body size="l">
-                Deploy models as containers, batch jobs, or REST endpoints with
-                MLflow's streamlined deployment capabilities that eliminate
-                boilerplate code. Use model aliases to create named references
-                that enable seamless model updates in production without
-                changing your application code.
-              </Body>
-            </div>
-            <FakeImage />
-          </GridItem>
-        </Grid>
-        <GetStartedWithMLflow />
-        <SocialWidget />
-      </div>
+          <FakeImage />
+        </GridItem>
+        <GridItem>
+          <div className="flex flex-col gap-4">
+            <h3 className="text-white">Stage-Based Model Lifecycle</h3>
+            <Body size="l">
+              Move models through customizable staging environments
+              (Development, Staging, Production, or any stage alias you choose)
+              with built-in approval workflow capabilities and automated
+              notifications. Maintain complete audit trails of model transitions
+              with detailed metadata about who approved changes and when they
+              occurred.
+            </Body>
+          </div>
+          <FakeImage />
+        </GridItem>
+        <GridItem width="wide">
+          <div className="flex flex-col gap-4">
+            <h3 className="text-white">Model Deployment Flexibility</h3>
+            <Body size="l">
+              Deploy models as containers, batch jobs, or REST endpoints with
+              MLflow's streamlined deployment capabilities that eliminate
+              boilerplate code. Use model aliases to create named references
+              that enable seamless model updates in production without changing
+              your application code.
+            </Body>
+          </div>
+          <FakeImage />
+        </GridItem>
+      </Grid>
+
+      <BelowTheFold />
     </Layout>
   );
 }

@@ -66,7 +66,9 @@ const wrapper = cva(
   },
 );
 
-const LayoutContext = createContext<"red" | "blue" | "colorful">("colorful");
+export const LayoutContext = createContext<"red" | "blue" | "colorful">(
+  "colorful",
+);
 
 export function useLayoutVariant() {
   const variant = useContext(LayoutContext);
@@ -82,7 +84,11 @@ export const Layout = ({ children, variant, direction }: Props) => {
       <div className="flex flex-col min-h-screen w-full bg-[#0E1416]">
         <Header />
         <main className="flex flex-col">
-          <div className={wrapper({ variant, direction })}>{children}</div>
+          <div className={wrapper({ variant, direction })}>
+            <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-container">
+              {children}
+            </div>
+          </div>
         </main>
         <Footer variant={variant} />
       </div>

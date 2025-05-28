@@ -1,13 +1,10 @@
 import {
   Layout,
-  SectionLabel,
   Grid,
   GridItem,
-  GetStartedWithMLflow,
-  SocialWidget,
-  GetStartedButton,
-  Heading,
   Body,
+  AboveTheFold,
+  BelowTheFold,
 } from "../../components";
 
 const FakeImage = () => (
@@ -17,39 +14,33 @@ const FakeImage = () => (
 export default function PromptRegistryVersioning() {
   return (
     <Layout variant="red" direction="up">
-      <div className="flex flex-col gap-16 w-full px-6 md:px-20 max-w-container">
-        <div className="flex flex-col justify-center items-center gap-6 w-full">
-          <SectionLabel color="red" label="Prompt registry & versioning" />
-          <Heading level={1}>Prompt registry & versioning</Heading>
-          <div className="max-w-3xl mx-auto text-center">
+      <AboveTheFold
+        sectionLabel="Prompt registry & versioning"
+        title="Prompt registry & versioning"
+        body="Lorem ipsum"
+        hasGetStartedButton
+      >
+        <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
+      </AboveTheFold>
+
+      <Grid columns={2}>
+        <GridItem>
+          <div className="flex flex-col gap-4">
+            <h3 className="text-white">Card 1</h3>
             <Body size="l">Lorem ipsum</Body>
           </div>
+          <FakeImage />
+        </GridItem>
+        <GridItem>
+          <div className="flex flex-col gap-4">
+            <h3 className="text-white">Card 2</h3>
+            <Body size="l">Lorem ipsum</Body>
+          </div>
+          <FakeImage />
+        </GridItem>
+      </Grid>
 
-          <GetStartedButton />
-        </div>
-        <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
-      </div>
-      <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-container">
-        <Grid columns={2}>
-          <GridItem>
-            <div className="flex flex-col gap-4">
-              <h3 className="text-white">Card 1</h3>
-              <Body size="l">Lorem ipsum</Body>
-            </div>
-            <FakeImage />
-          </GridItem>
-          <GridItem>
-            <div className="flex flex-col gap-4">
-              <h3 className="text-white">Card 2</h3>
-              <Body size="l">Lorem ipsum</Body>
-            </div>
-            <FakeImage />
-          </GridItem>
-        </Grid>
-
-        <GetStartedWithMLflow />
-        <SocialWidget />
-      </div>
+      <BelowTheFold />
     </Layout>
   );
 }

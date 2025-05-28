@@ -1,13 +1,10 @@
 import {
   Layout,
-  SectionLabel,
   Grid,
   GridItem,
-  GetStartedWithMLflow,
-  SocialWidget,
-  GetStartedButton,
-  Heading,
   Body,
+  AboveTheFold,
+  BelowTheFold,
 } from "../../components";
 
 const FakeImage = () => (
@@ -17,68 +14,58 @@ const FakeImage = () => (
 export default function Models() {
   return (
     <Layout variant="blue" direction="up">
-      <div className="flex flex-col gap-16 w-full px-6 md:px-20 max-w-container">
-        <div className="flex flex-col justify-center items-center gap-6 w-full">
-          <SectionLabel color="green" label="MODELS" />
-          <Heading level={1}>
-            Transform ML Experiments into Production-Ready Models
-          </Heading>
-          <div className="max-w-3xl mx-auto text-center">
+      <AboveTheFold
+        sectionLabel="Models"
+        title="Transform ML Experiments into Production-Ready Models"
+        body="Build, deploy, and manage machine learning models with confidence using MLflow's comprehensive model lifecycle management"
+        hasGetStartedButton
+      >
+        <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
+      </AboveTheFold>
+
+      <Grid columns={2}>
+        <GridItem>
+          <div className="flex flex-col gap-4">
+            <h3 className="text-white">Unified Model Format</h3>
             <Body size="l">
-              Build, deploy, and manage machine learning models with confidence
-              using MLflow's comprehensive model lifecycle management
+              MLflow's MLModel file provides a standardized structure for
+              packaging models from any framework, capturing essential
+              dependencies and input/output specifications. This consistent
+              packaging approach eliminates integration friction while ensuring
+              models can be reliably deployed across any environment.
             </Body>
           </div>
-          <GetStartedButton />
-        </div>
-        <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
-      </div>
-      <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-container">
-        <Grid columns={2}>
-          <GridItem>
-            <div className="flex flex-col gap-4">
-              <h3 className="text-white">Unified Model Format</h3>
-              <Body size="l">
-                MLflow's MLModel file provides a standardized structure for
-                packaging models from any framework, capturing essential
-                dependencies and input/output specifications. This consistent
-                packaging approach eliminates integration friction while
-                ensuring models can be reliably deployed across any environment.
-              </Body>
-            </div>
-            <FakeImage />
-          </GridItem>
-          <GridItem>
-            <div className="flex flex-col gap-4">
-              <h3 className="text-white">Comprehensive Model Metadata</h3>
-              <Body size="l">
-                Track crucial model requirements and artifacts including data
-                schemas, preprocessing steps, and environment dependencies
-                automatically with MLflow's metadata system. Create fully
-                reproducible model packages that document the complete model
-                context for simplified governance and troubleshooting.
-              </Body>
-            </div>
-            <FakeImage />
-          </GridItem>
-          <GridItem width="wide">
-            <div className="flex flex-col gap-4">
-              <h3 className="text-white">Flexible Deployment Options</h3>
-              <Body size="l">
-                Deploy models as Docker containers, Python functions, REST
-                endpoints, or directly to various serving platforms with
-                MLflow's versatile deployment capabilities. Streamline the
-                transition from development to production with consistent model
-                behavior across any target environment, from local testing to
-                cloud-based serving.
-              </Body>
-            </div>
-            <FakeImage />
-          </GridItem>
-        </Grid>
-        <GetStartedWithMLflow />
-        <SocialWidget />
-      </div>
+          <FakeImage />
+        </GridItem>
+        <GridItem>
+          <div className="flex flex-col gap-4">
+            <h3 className="text-white">Comprehensive Model Metadata</h3>
+            <Body size="l">
+              Track crucial model requirements and artifacts including data
+              schemas, preprocessing steps, and environment dependencies
+              automatically with MLflow's metadata system. Create fully
+              reproducible model packages that document the complete model
+              context for simplified governance and troubleshooting.
+            </Body>
+          </div>
+          <FakeImage />
+        </GridItem>
+        <GridItem width="wide">
+          <div className="flex flex-col gap-4">
+            <h3 className="text-white">Flexible Deployment Options</h3>
+            <Body size="l">
+              Deploy models as Docker containers, Python functions, REST
+              endpoints, or directly to various serving platforms with MLflow's
+              versatile deployment capabilities. Streamline the transition from
+              development to production with consistent model behavior across
+              any target environment, from local testing to cloud-based serving.
+            </Body>
+          </div>
+          <FakeImage />
+        </GridItem>
+      </Grid>
+
+      <BelowTheFold />
     </Layout>
   );
 }
