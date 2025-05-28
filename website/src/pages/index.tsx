@@ -2,7 +2,6 @@ import {
   LatestNews,
   Layout,
   GlossyCard,
-  Button,
   GetStartedTagline,
   Testimonials,
   LogosCarousel,

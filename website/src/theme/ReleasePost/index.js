@@ -13,7 +13,7 @@ export default function ReleasePost({
 }) {
   return (
     <ThemeLayout {...layoutProps}>
-      <Layout>
+      <Layout variant="colorful">
         <div className="pt-24 max-w-7xl mx-auto">
           <div className="flex flex-row">
             <BlogSidebar className="text-white" sidebar={sidebar} />

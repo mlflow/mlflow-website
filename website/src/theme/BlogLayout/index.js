@@ -16,12 +16,12 @@ export default function BlogLayout({ children, ...props }) {
 
   return (
     <ThemeLayout {...props}>
-      <Layout>
+      <Layout variant="colorful">
         <div
           className={
             isHomeOrTagsPage
-              ? "flex flex-col md:px-20 pt-32 "
-              : "flex flex-col mt-40 max-w-7xl mx-auto w-full"
+              ? "flex flex-col md:px-20"
+              : "flex flex-col max-w-7xl mx-auto w-full"
           }
         >
           {children}
