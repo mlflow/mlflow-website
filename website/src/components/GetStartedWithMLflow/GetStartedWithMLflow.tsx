@@ -16,7 +16,7 @@ export const GetStartedWithMLflow = () => {
         <Body size="l">Choose from two options depending on your needs</Body>
       </div>
       <div className="flex flex-col w-full lg:w-1/2 gap-6">
-        <div className="flex flex-col gap-8 p-8 bg-[#fff]/4 rounded-2xl">
+        <div className="flex flex-col gap-8 p-8 bg-[#fff]/4 rounded-2xl @container">
           <div className="flex flex-row justify-between items-center gap-4">
             <div className="flex flex-row justify-center items-end gap-3 flex-wrap">
               <h3 className="m-0 text-white">Managed </h3>
@@ -25,7 +25,7 @@ export const GetStartedWithMLflow = () => {
             </div>
             <div
               className={cn(
-                "hidden lg:block rounded-full uppercase px-4 py-2 text-xs font-semibold whitespace-nowrap",
+                "hidden @md:block rounded-full uppercase px-4 py-2 text-xs font-semibold whitespace-nowrap",
                 variant === "blue"
                   ? "bg-brand-teal text-black"
                   : "bg-brand-red text-white",
