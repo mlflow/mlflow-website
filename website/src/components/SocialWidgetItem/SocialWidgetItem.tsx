@@ -13,7 +13,7 @@ export const SocialWidgetItem = ({ href, icon, label, description }: Props) => {
     <Link
       href={href}
       target="_blank"
-      className="flex sm:flex-row md:flex-col xl:flex-row group w-full sm:items-center md:items-start xl:items-center p-8 h-full cursor-pointer gap-6 hover:bg-white/4"
+      className="flex sm:flex-row md:flex-col xl:flex-row group w-full sm:items-center md:items-start xl:items-center p-8 h-full cursor-pointer gap-6 hover:bg-white/4 bg-[#0E1416]"
     >
       {icon}
       <div className="flex flex-row justify-between items-center w-full">

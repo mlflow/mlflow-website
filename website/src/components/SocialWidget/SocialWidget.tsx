@@ -5,7 +5,7 @@ import LinkedinIcon from "@site/static/img/social/linkedin.svg";
 
 import { SectionLabel } from "../Section/SectionLabel";
 import { SocialWidgetItem } from "../SocialWidgetItem/SocialWidgetItem";
-import { Grid, GridItem } from "../Grid/Grid";
+import { Grid } from "../Grid/Grid";
 import { Heading } from "../Typography/Heading";
 import { Body } from "../Typography/Body";
 
@@ -52,16 +52,15 @@ export const SocialWidget = () => {
         <Heading level={2}>Connect with the community</Heading>
         <Body size="l">Connect with thousands of customers using MLflow</Body>
       </div>
-      <Grid>
+      <Grid className="px-10">
         {socials.map((social) => (
-          <GridItem key={social.key} className="p-0">
-            <SocialWidgetItem
-              href={social.href}
-              icon={social.icon}
-              label={social.label}
-              description={social.description}
-            />
-          </GridItem>
+          <SocialWidgetItem
+            key={social.key}
+            href={social.href}
+            icon={social.icon}
+            label={social.label}
+            description={social.description}
+          />
         ))}
       </Grid>
     </div>
