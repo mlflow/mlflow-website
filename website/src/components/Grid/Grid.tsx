@@ -3,10 +3,14 @@ import { PropsWithChildren } from "react";
 import { cva, VariantProps } from "class-variance-authority";
 import { twMerge } from "tailwind-merge";
 
+// NOTE: this and the following negative margin styles are to hide the outer padding of the grid items, so it's flush with the container.
+const gridContainer = cva("w-full overflow-hidden");
+
 const gridVariants = cva(
   [
     "grid w-full bg-[rgba(255,255,255,0.08)] gap-[1px]",
     "border-[rgba(255,255,255,0.08)] border-t border-b",
+    "-mx-10 w-[calc(100%+var(--spacing)*10*2)]",
   ],
   {
     variants: {
@@ -32,7 +36,11 @@ export const Grid = ({
   columns,
 }: VariantProps<typeof gridVariants> &
   PropsWithChildren<{ className?: string }>) => {
-  return <div className={grid({ columns, className })}>{children}</div>;
+  return (
+    <div className={gridContainer()}>
+      <div className={grid({ columns, className })}>{children}</div>
+    </div>
+  );
 };
 
 const gridItemVariants = cva(
@@ -65,12 +73,8 @@ export const gridItem: typeof gridItemVariants = (variants) =>
 
 export const GridItem = ({
   children,
-  className,
   width,
   direction,
-}: VariantProps<typeof gridItem> &
-  PropsWithChildren<{ className?: string }>) => {
-  return (
-    <div className={gridItem({ width, direction, className })}>{children}</div>
-  );
+}: PropsWithChildren<VariantProps<typeof gridItem>>) => {
+  return <div className={gridItem({ width, direction })}>{children}</div>;
 };

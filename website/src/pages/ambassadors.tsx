@@ -38,17 +38,19 @@ export default function Ambassadors() {
         <Grid columns={2}>
           {ambassadors.flatMap((row) =>
             row.map((item) => (
-              <GridItem key={item.title} className="gap-3">
-                <img src={item.img} alt={item.title} className="rounded-md" />
-                <h3>{item.title}</h3>
-                <p>{item.role}</p>
-                <Link
-                  href={item.companyLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {item.company}
-                </Link>
+              <GridItem key={item.title}>
+                <div className="flex flex-col gap-3">
+                  <img src={item.img} alt={item.title} className="rounded-md" />
+                  <h3>{item.title}</h3>
+                  <p>{item.role}</p>
+                  <Link
+                    href={item.companyLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {item.company}
+                  </Link>
+                </div>
               </GridItem>
             )),
           )}
