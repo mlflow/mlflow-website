@@ -126,7 +126,7 @@ export default function Observability() {
         </Grid>
       </Section>
 
-      <Section title="Production monitoring">
+      <Section id="production-monitoring" title="Production monitoring">
         <Grid columns={2}>
           <GridItem width="wide" direction="reverse">
             <Card

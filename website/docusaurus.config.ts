@@ -24,8 +24,9 @@ const config: Config = {
   organizationName: "mlflow", // Usually your GitHub org/user name.
   projectName: "mlflow-website", // Usually your repo name.
 
-  onBrokenLinks: "warn",
-  onBrokenMarkdownLinks: "warn",
+  onBrokenLinks: "throw",
+  onBrokenMarkdownLinks: "throw",
+  onBrokenAnchors: "throw",
 
   // Even if you don't use internationalization, you can use this field to set
   // useful metadata like html lang. For example, if your site is Chinese, you
@@ -93,6 +94,7 @@ const config: Config = {
         // Remove this to remove the "edit this page" links.
         // editUrl:
         //   "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
+        onUntruncatedBlogPosts: "ignore",
       },
     ],
     [
@@ -117,6 +119,7 @@ const config: Config = {
         blogSidebarTitle: "All posts",
         blogSidebarCount: "ALL",
         blogTitle: "Releases",
+        onUntruncatedBlogPosts: "ignore",
       },
     ],
     [

@@ -25,10 +25,12 @@ export const Footer = ({ variant }: VariantProps<typeof footerVariants>) => {
         <Logo className="h-[36px] shrink-0" />
 
         <div className="flex flex-col md:flex-row gap-10">
-          <FooterMenuItem href="/" label="Product" />
-          <FooterMenuItem href="/releases" label="Releases" />
-          <FooterMenuItem href="/blog" label="Blog" />
-          <FooterMenuItem href="/docs/latest" label="Docs" />
+          <FooterMenuItem href="/">Product</FooterMenuItem>
+          <FooterMenuItem href="/releases">Releases</FooterMenuItem>
+          <FooterMenuItem href="/blog">Blog</FooterMenuItem>
+          <FooterMenuItem href="/docs/latest" data-noBrokenLinkCheck>
+            Docs
+          </FooterMenuItem>
         </div>
       </div>
     </footer>
