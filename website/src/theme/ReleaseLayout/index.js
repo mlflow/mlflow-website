@@ -1,5 +1,4 @@
 import React from "react";
-import clsx from "clsx";
 import ThemeLayout from "@theme/Layout";
 
 import { Layout } from "../../components";
@@ -9,8 +8,8 @@ export default function ReleaseLayout(props) {
   const { sidebar, toc, children, ...layoutProps } = props;
   return (
     <ThemeLayout {...layoutProps}>
-      <Layout>
-        <div className="pt-24 max-w-7xl mx-auto">
+      <Layout variant="colorful">
+        <div className="max-w-7xl mx-auto">
           <div className="flex flex-row">
             <BlogSidebar className="text-white" sidebar={sidebar} />
             <main itemScope itemType="https://schema.org/Blog">

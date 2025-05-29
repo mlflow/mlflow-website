@@ -2,9 +2,9 @@ import {
   Layout,
   Grid,
   GridItem,
-  Body,
   AboveTheFold,
   BelowTheFold,
+  Card,
 } from "../../components";
 
 const FakeImage = () => (
@@ -25,71 +25,45 @@ export default function Governance() {
 
       <Grid columns={2}>
         <GridItem>
-          <div className="flex flex-col gap-10">
-            <div className="flex flex-col gap-4">
-              <h3 className="text-white">Unified Data and AI governance</h3>
-            </div>
-
-            <Body size="l">
-              Unity Catalog provides central, unified governance over all your
-              data and AI assets - including GenAI and classic/deep learning ML.
-              Enforce access controls and automatically track lineage.
-            </Body>
-          </div>
-          <FakeImage />
+          <Card
+            title="Unified Data and AI governance"
+            body="Unity Catalog provides central, unified governance over all your data and AI assets - including GenAI and classic/deep learning ML. Enforce access controls and automatically track lineage."
+            image={<FakeImage />}
+          />
         </GridItem>
         <GridItem direction="reverse">
-          <div className="flex flex-col gap-4">
-            <h3 className="text-white">Prompt Registry</h3>
-            <Body size="l">
-              Track every prompt template, its version history, and deployment
-              lifecycle in the Unity Catalog. Each prompt is linked to its
-              associated apps and evaluation results. Integrate prompts into
-              your app’s code base via our SDK to allow non-technical users to
-              edit prompts without access to your code base.
-            </Body>
-          </div>
-          <FakeImage />
+          <Card
+            title="Prompt Registry"
+            body="Track every prompt template, its version history, and deployment lifecycle in the Unity Catalog. Each prompt is linked to its associated apps and evaluation results. Integrate prompts into your app’s code base via our SDK to allow non-technical users to edit prompts without access to your code base."
+            image={<FakeImage />}
+          />
         </GridItem>
         <GridItem width="wide">
-          <div className="flex flex-col gap-4">
-            <h3 className="text-white">App Version Registry</h3>
-            <Body size="l">
-              Track every application version and its associated prompts and
-              evaluation results in the Unity Catalog.
-            </Body>
-            <Body size="l">
-              You can store the app’s code as a deployable asset or link to Git
-              commits to integrate with your existing software development
-              lifecycle.
-            </Body>
-          </div>
-          <FakeImage />
+          <Card
+            title="App Version Registry"
+            body={[
+              "Track every application version and its associated prompts and evaluation results in the Unity Catalog.",
+              "You can store the app’s code as a deployable asset or link to Git commits to integrate with your existing software development lifecycle.",
+            ]}
+            image={<FakeImage />}
+          />
         </GridItem>
         <GridItem width="wide" direction="reverse">
-          <div className="flex flex-col gap-4">
-            <h3 className="text-white">Evaluation Dataset & Metric Registry</h3>
-            <Body size="l">
-              Track and manage evaluation datasets and custom metrics as UC
-              assets.
-            </Body>
-          </div>
-          <FakeImage />
+          <Card
+            title="Evaluation Dataset & Metric Registry"
+            body="Track and manage evaluation datasets and custom metrics as UC assets."
+            image={<FakeImage />}
+          />
         </GridItem>
         <GridItem width="wide">
-          <div className="flex flex-col gap-4">
-            <h3 className="text-white">Collaboration & Sharing</h3>
-            <Body size="l">
-              Enable cross-organization discovery and sharing of prompts and
-              apps
-            </Body>
-            <Body size="l">
-              You can store the app’s code as a deployable asset or link to Git
-              commits to integrate with your existing software development
-              lifecycle.
-            </Body>
-          </div>
-          <FakeImage />
+          <Card
+            title="Collaboration & Sharing"
+            body={[
+              "Enable cross-organization discovery and sharing of prompts and apps",
+              "You can store the app’s code as a deployable asset or link to Git commits to integrate with your existing software development lifecycle.",
+            ]}
+            image={<FakeImage />}
+          />
         </GridItem>
       </Grid>
 

@@ -2,9 +2,9 @@ import {
   Layout,
   Grid,
   GridItem,
-  Body,
   AboveTheFold,
   BelowTheFold,
+  Card,
 } from "../../components";
 
 const FakeImage = () => (
@@ -25,37 +25,25 @@ export default function AiGateway() {
 
       <Grid columns={2}>
         <GridItem>
-          <div className="flex flex-col gap-10">
-            <div className="flex flex-col gap-4">
-              <h3 className="text-white">Feature heading</h3>
-            </div>
-
-            <Body size="l">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
-              quos.
-            </Body>
-          </div>
-          <FakeImage />
+          <Card
+            title="Feature heading"
+            body="Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos."
+            image={<FakeImage />}
+          />
         </GridItem>
         <GridItem>
-          <div className="flex flex-col gap-4">
-            <h3 className="text-white">Feature heading</h3>
-            <Body size="l">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
-              quos. your code base.
-            </Body>
-          </div>
-          <FakeImage />
+          <Card
+            title="Feature heading"
+            body="Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos."
+            image={<FakeImage />}
+          />
         </GridItem>
         <GridItem width="wide">
-          <div className="flex flex-col gap-4">
-            <h3 className="text-white">Feature heading</h3>
-            <Body size="l">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
-              quos.
-            </Body>
-          </div>
-          <FakeImage />
+          <Card
+            title="Feature heading"
+            body="Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos."
+            image={<FakeImage />}
+          />
         </GridItem>
       </Grid>
 

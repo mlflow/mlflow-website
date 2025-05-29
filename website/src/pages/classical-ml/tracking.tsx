@@ -2,9 +2,9 @@ import {
   Layout,
   Grid,
   GridItem,
-  Body,
   AboveTheFold,
   BelowTheFold,
+  Card,
 } from "../../components";
 
 const FakeImage = () => (
@@ -25,41 +25,25 @@ export default function Tracking() {
 
       <Grid columns={2}>
         <GridItem>
-          <div className="flex flex-col gap-4">
-            <h3 className="text-white">Complete Experiment Lifecycle</h3>
-            <Body size="l">
-              MLflow Tracking automatically captures parameters, code versions,
-              metrics, and model weights for each training iteration. Log
-              trained models, visualizations, interface signatures, and data
-              samples to ensure complete reproducibility across your entire ML
-              workflow
-            </Body>
-          </div>
-          <FakeImage />
+          <Card
+            title="Complete Experiment Lifecycle"
+            body="MLflow Tracking automatically captures parameters, code versions, metrics, and model weights for each training iteration. Log trained models, visualizations, interface signatures, and data samples to ensure complete reproducibility across your entire ML workflow"
+            image={<FakeImage />}
+          />
         </GridItem>
         <GridItem>
-          <div className="flex flex-col gap-4">
-            <h3 className="text-white">Visual Comparison</h3>
-            <Body size="l">
-              Compare results across multiple experiments with MLflow's powerful
-              visualization tools. Quickly identify best-performing models and
-              retrieve their corresponding code and parameters based on
-              different metrics of interest across various projects.
-            </Body>
-          </div>
-          <FakeImage />
+          <Card
+            title="Visual Comparison"
+            body="Compare results across multiple experiments with MLflow's powerful visualization tools. Quickly identify best-performing models and retrieve their corresponding code and parameters based on different metrics of interest across various projects."
+            image={<FakeImage />}
+          />
         </GridItem>
         <GridItem width="wide">
-          <div className="flex flex-col gap-4">
-            <h3 className="text-white">Seamless Collaboration</h3>
-            <Body size="l">
-              Organize models and iterations into experiments for easy team
-              collaboration while maintaining traceability. Enable team members
-              to share results while maintaining a unified view of all projects
-              through a single interface.
-            </Body>
-          </div>
-          <FakeImage />
+          <Card
+            title="Seamless Collaboration"
+            body="Organize models and iterations into experiments for easy team collaboration while maintaining traceability. Enable team members to share results while maintaining a unified view of all projects through a single interface."
+            image={<FakeImage />}
+          />
         </GridItem>
       </Grid>
 
