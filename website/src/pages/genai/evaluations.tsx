@@ -24,7 +24,10 @@ export default function Evaluations() {
         <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
       </AboveTheFold>
 
-      <Section title="Accurately evaluate free-form language outputs with LLM judges">
+      <Section
+        id="quality-metrics"
+        title="Accurately evaluate free-form language outputs with LLM judges"
+      >
         <Grid columns={2}>
           <GridItem>
             <Card

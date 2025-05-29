@@ -59,7 +59,7 @@ export default function GenAi(): JSX.Element {
                 "Configure automated online evaluations with alerts to quickly address issues.",
               ]}
               cta={{
-                href: "/genai",
+                href: "/genai/observability#production-monitoring",
                 text: "Learn more >",
               }}
               image={
@@ -86,7 +86,7 @@ export default function GenAi(): JSX.Element {
               title="Accurately measure free-form language with LLM judges"
               body="Utilize LLM-as-a-judge metrics, mimicking human expertise, to assess and enhance GenAI quality. Access pre-built judges for common metrics like hallucination or relevance, or develop custom judges tailored to your business needs and expert insights."
               cta={{
-                href: "/genai",
+                href: "/genai/evaluations#quality-metrics",
                 text: "Learn more >",
               }}
               image={

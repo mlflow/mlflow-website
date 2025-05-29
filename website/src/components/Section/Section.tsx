@@ -5,11 +5,15 @@ type Props = PropsWithChildren<{
   label?: string;
   title: string;
   body?: string;
+  id?: string;
 }>;
 
-export function Section({ label, title, body, children }: Props) {
+export function Section({ id, label, title, body, children }: Props) {
   return (
-    <div className="flex flex-col w-full items-center justify-center gap-16">
+    <div
+      id={id}
+      className="flex flex-col w-full items-center justify-center gap-16"
+    >
       <div className="flex flex-col w-full items-center justify-center gap-6">
         {label && <SectionLabel label={label} />}
         <Heading level={2}>{title}</Heading>
