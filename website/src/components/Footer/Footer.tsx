@@ -4,6 +4,7 @@ import Logo from "@site/static/img/mlflow-logo-white.svg";
 
 import { FooterMenuItem } from "../FooterMenuItem/FooterMenuItem";
 import { cn } from "../../utils";
+import { MLFLOW_DOCS_URL } from "@site/src/constants";
 
 const footerVariants = cva(
   "pb-150 flex flex-col pt-37 bg-linear-to-b from-brand-black to-brand-black bg-bottom bg-no-repeat bg-cover w-full",
@@ -28,9 +29,7 @@ export const Footer = ({ variant }: VariantProps<typeof footerVariants>) => {
           <FooterMenuItem href="/">Product</FooterMenuItem>
           <FooterMenuItem href="/releases">Releases</FooterMenuItem>
           <FooterMenuItem href="/blog">Blog</FooterMenuItem>
-          <FooterMenuItem href="/docs/latest" data-noBrokenLinkCheck>
-            Docs
-          </FooterMenuItem>
+          <FooterMenuItem href={MLFLOW_DOCS_URL}>Docs</FooterMenuItem>
         </div>
       </div>
     </footer>
