@@ -2,6 +2,7 @@ import { Header } from "../Header/Header";
 import { Footer } from "../Footer/Footer";
 import { cva, VariantProps } from "class-variance-authority";
 import { createContext, PropsWithChildren, useContext } from "react";
+import { useLocation } from "@docusaurus/router";
 
 type Props = PropsWithChildren<VariantProps<typeof wrapper>>;
 
@@ -89,10 +90,14 @@ export function useLayoutVariant() {
 }
 
 export const Layout = ({ children, variant, direction }: Props) => {
+  const location = useLocation();
+  const isGenAI =
+    location.pathname.startsWith("/genai") || location.pathname === "/";
+
   return (
     <LayoutContext.Provider value={variant}>
       <div className="flex flex-col min-h-screen w-full bg-[#0E1416]">
-        <Header />
+        <Header isGenAI={isGenAI} />
         <main className="flex flex-col">
           <div className={wrapper({ variant, direction })}>
             <div className="flex flex-col gap-24 w-full px-6 md:px-20 max-w-container">

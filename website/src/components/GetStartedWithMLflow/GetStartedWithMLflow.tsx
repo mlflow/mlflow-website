@@ -6,6 +6,7 @@ import { cn } from "../../utils";
 import { Heading } from "../Typography/Heading";
 import { Body } from "../Typography/Body";
 import { useLayoutVariant } from "../Layout/Layout";
+import { MLFLOW_GET_STARTED_URL } from "@site/src/constants";
 
 export const GetStartedWithMLflow = () => {
   const variant = useLayoutVariant();
@@ -83,7 +84,7 @@ export const GetStartedWithMLflow = () => {
             size="large"
             width="full"
             variant="dark"
-            link="https://mlflow.org/docs/latest/getting-started/index.html"
+            link={MLFLOW_GET_STARTED_URL}
           />
         </div>
       </div>
