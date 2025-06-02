@@ -17,7 +17,7 @@ export const GetStartedWithMLflow = () => {
       </div>
       <div className="flex flex-col lg:flex-row gap-6">
         <div className="flex flex-col gap-8 p-8 bg-[#fff]/4 rounded-2xl @container lg:w-1/2 justify-between">
-          <div>
+          <div className="flex flex-col gap-8">
             <div className="flex flex-row justify-between items-center gap-4">
               <div className="flex flex-row justify-center items-end gap-3 flex-wrap">
                 <h3 className="m-0 text-white">Managed </h3>
@@ -60,7 +60,7 @@ export const GetStartedWithMLflow = () => {
           />
         </div>
         <div className="flex flex-col gap-8 p-8 bg-[#fff]/4 rounded-2xl lg:w-1/2 justify-between">
-          <div>
+          <div className="flex flex-col gap-8">
             <h3 className="m-0 text-white">Self-Hosted Open Source</h3>
             <div className="flex flex-col gap-4">
               {[
