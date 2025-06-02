@@ -79,7 +79,7 @@ export const GetStartedWithMLflow = () => {
             size="large"
             width="full"
             variant="dark"
-            link="http://mlflow.org/docs/latest/getting-started/intro-quickstart/"
+            link="https://mlflow.org/docs/latest/getting-started/index.html"
           />
         </div>
       </div>
