@@ -2,6 +2,7 @@ import { PropsWithChildren } from "react";
 
 import { cva, VariantProps } from "class-variance-authority";
 import { twMerge } from "tailwind-merge";
+import React from "react";
 
 // NOTE: this and the following negative margin styles are to hide the outer padding of the grid items, so it's flush with the container.
 const gridContainer = cva("w-full overflow-hidden");
@@ -36,9 +37,18 @@ export const Grid = ({
   columns,
 }: VariantProps<typeof gridVariants> &
   PropsWithChildren<{ className?: string }>) => {
+  const numItems = React.Children.count(children);
+  const remainder =
+    typeof columns === "number" ? columns - (numItems % columns) : null;
+
   return (
     <div className={gridContainer()}>
-      <div className={grid({ columns, className })}>{children}</div>
+      <div className={grid({ columns, className })}>
+        {children}
+        {remainder
+          ? Array.from({ length: remainder }, (_, i) => <GridItem key={i} />)
+          : null}
+      </div>
     </div>
   );
 };
