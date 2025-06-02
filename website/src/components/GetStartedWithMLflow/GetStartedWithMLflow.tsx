@@ -35,24 +35,21 @@ export const GetStartedWithMLflow = () => {
             </div>
           </div>
           <div className="flex flex-col gap-4">
-            <div className="flex flex-row items-center gap-4">
-              <Checkmark />
-              <span className="text-md font-light text-gray-600">
-                Production-ready
-              </span>
-            </div>
-            <div className="flex flex-row items-center gap-4">
-              <Checkmark />
-              <span className="text-md font-light text-gray-600">
-                Secure & scalable
-              </span>
-            </div>
-            <div className="flex flex-row items-center gap-4">
-              <Checkmark />
-              <span className="text-md font-light text-gray-600">
-                24/7 support
-              </span>
-            </div>
+            {[
+              "Access to all platform features",
+              "Unlimited users",
+              "Unlimited data access",
+              "No charge up to 50K traces, covered by free credits upon signup",
+              "Pay-as-you-go billing with credit card",
+              "Enterprise support available",
+            ].map((bulletPoint, index) => (
+              <div key={index} className="flex flex-row items-center gap-4">
+                <Checkmark className="shrink-0" />
+                <span className="text-md font-light text-gray-600">
+                  {bulletPoint}
+                </span>
+              </div>
+            ))}
           </div>
           <GetStartedButton
             size="large"
