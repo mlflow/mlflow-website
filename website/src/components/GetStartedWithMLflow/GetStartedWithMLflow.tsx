@@ -58,7 +58,23 @@ export const GetStartedWithMLflow = () => {
           />
         </div>
         <div className="flex flex-col gap-8 p-8 bg-[#fff]/4 rounded-2xl">
-          <h3 className="m-0 text-white">Self-Hosting</h3>
+          <h3 className="m-0 text-white">Self-Hosted Open Source</h3>
+          <div className="flex flex-col gap-4">
+            {[
+              "Apache-2.0 license",
+              "Access to all core platform features",
+              "Full control over your own infrastructure",
+              "Ability to customize MLflow to fit your specific needs",
+              "Community support",
+            ].map((bulletPoint, index) => (
+              <div key={index} className="flex flex-row items-center gap-4">
+                <Checkmark className="shrink-0" />
+                <span className="text-md font-light text-gray-600">
+                  {bulletPoint}
+                </span>
+              </div>
+            ))}
+          </div>
           <GetStartedButton
             size="large"
             width="full"
