@@ -56,8 +56,6 @@ export default function Home(): JSX.Element {
 
       <Testimonials />
 
-      <LogosCarousel />
-
       <BelowTheFold>
         <LatestNews />
         <GetStartedTagline />
