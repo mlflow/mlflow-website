@@ -10,46 +10,48 @@ import { useLayoutVariant } from "../Layout/Layout";
 export const GetStartedWithMLflow = () => {
   const variant = useLayoutVariant();
   return (
-    <div className="flex flex-col lg:flex-row w-full justify-between gap-6">
-      <div className="flex flex-col gap-6 w-full lg:w-1/2 items-start">
+    <div className="flex flex-col justify-between gap-6">
+      <div className="flex flex-col gap-6 items-start">
         <Heading level={2}>Get started with MLflow</Heading>
         <Body size="l">Choose from two options depending on your needs</Body>
       </div>
-      <div className="flex flex-col w-full lg:w-1/2 gap-6">
-        <div className="flex flex-col gap-8 p-8 bg-[#fff]/4 rounded-2xl @container">
-          <div className="flex flex-row justify-between items-center gap-4">
-            <div className="flex flex-row justify-center items-end gap-3 flex-wrap">
-              <h3 className="m-0 text-white">Managed </h3>
-              <span className="text-gray-500 text-sm">WITH</span>
-              <DatabricksLogo />
-            </div>
-            <div
-              className={cn(
-                "hidden @md:block rounded-full uppercase px-4 py-2 text-xs font-semibold whitespace-nowrap",
-                variant === "blue"
-                  ? "bg-brand-teal text-black"
-                  : "bg-brand-red text-white",
-              )}
-            >
-              <span>MOST POPULAR</span>
-            </div>
-          </div>
-          <div className="flex flex-col gap-4">
-            {[
-              "Access to all platform features",
-              "Unlimited users",
-              "Unlimited data access",
-              "No charge up to 50K traces, covered by free credits upon signup",
-              "Pay-as-you-go billing with credit card",
-              "Enterprise support available",
-            ].map((bulletPoint, index) => (
-              <div key={index} className="flex flex-row items-center gap-4">
-                <Checkmark className="shrink-0" />
-                <span className="text-md font-light text-gray-600">
-                  {bulletPoint}
-                </span>
+      <div className="flex flex-col lg:flex-row gap-6">
+        <div className="flex flex-col gap-8 p-8 bg-[#fff]/4 rounded-2xl @container lg:w-1/2 justify-between">
+          <div>
+            <div className="flex flex-row justify-between items-center gap-4">
+              <div className="flex flex-row justify-center items-end gap-3 flex-wrap">
+                <h3 className="m-0 text-white">Managed </h3>
+                <span className="text-gray-500 text-sm">WITH</span>
+                <DatabricksLogo />
               </div>
-            ))}
+              <div
+                className={cn(
+                  "hidden @md:block rounded-full uppercase px-4 py-2 text-xs font-semibold whitespace-nowrap",
+                  variant === "blue"
+                    ? "bg-brand-teal text-black"
+                    : "bg-brand-red text-white",
+                )}
+              >
+                <span>MOST POPULAR</span>
+              </div>
+            </div>
+            <div className="flex flex-col gap-4">
+              {[
+                "Access to all platform features",
+                "Unlimited users",
+                "Unlimited data access",
+                "No charge up to 50K traces, covered by free credits upon signup",
+                "Pay-as-you-go billing with credit card",
+                "Enterprise support available",
+              ].map((bulletPoint, index) => (
+                <div key={index} className="flex flex-row items-center gap-4">
+                  <Checkmark className="shrink-0" />
+                  <span className="text-md font-light text-gray-600">
+                    {bulletPoint}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
           <GetStartedButton
             size="large"
@@ -57,23 +59,25 @@ export const GetStartedWithMLflow = () => {
             variant={variant === "blue" ? "blue" : "primary"}
           />
         </div>
-        <div className="flex flex-col gap-8 p-8 bg-[#fff]/4 rounded-2xl">
-          <h3 className="m-0 text-white">Self-Hosted Open Source</h3>
-          <div className="flex flex-col gap-4">
-            {[
-              "Apache-2.0 license",
-              "Access to all core platform features",
-              "Full control over your own infrastructure",
-              "Ability to customize MLflow to fit your specific needs",
-              "Community support",
-            ].map((bulletPoint, index) => (
-              <div key={index} className="flex flex-row items-center gap-4">
-                <Checkmark className="shrink-0" />
-                <span className="text-md font-light text-gray-600">
-                  {bulletPoint}
-                </span>
-              </div>
-            ))}
+        <div className="flex flex-col gap-8 p-8 bg-[#fff]/4 rounded-2xl lg:w-1/2 justify-between">
+          <div>
+            <h3 className="m-0 text-white">Self-Hosted Open Source</h3>
+            <div className="flex flex-col gap-4">
+              {[
+                "Apache-2.0 license",
+                "Access to all core platform features",
+                "Full control over your own infrastructure",
+                "Ability to customize MLflow to fit your specific needs",
+                "Community support",
+              ].map((bulletPoint, index) => (
+                <div key={index} className="flex flex-row items-center gap-4">
+                  <Checkmark className="shrink-0" />
+                  <span className="text-md font-light text-gray-600">
+                    {bulletPoint}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
           <GetStartedButton
             size="large"
