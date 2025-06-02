@@ -7,7 +7,7 @@ import { cn } from "../../utils";
 import { MLFLOW_DOCS_URL } from "@site/src/constants";
 
 const footerVariants = cva(
-  "pb-150 flex flex-col pt-37 bg-linear-to-b from-brand-black to-brand-black bg-bottom bg-no-repeat bg-cover w-full",
+  "pb-30 flex flex-col pt-30 bg-linear-to-b from-brand-black to-brand-black bg-bottom bg-no-repeat bg-cover w-full text-center gap-120",
   {
     variants: {
       variant: {
@@ -32,6 +32,7 @@ export const Footer = ({ variant }: VariantProps<typeof footerVariants>) => {
           <FooterMenuItem href={MLFLOW_DOCS_URL}>Docs</FooterMenuItem>
         </div>
       </div>
+      <div>© 2025 MLflow Project, a Series of LF Projects, LLC.</div>
     </footer>
   );
 };
