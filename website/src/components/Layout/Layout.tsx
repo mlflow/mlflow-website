@@ -95,7 +95,7 @@ export const Layout = ({ children, variant, direction }: Props) => {
         <Header />
         <main className="flex flex-col">
           <div className={wrapper({ variant, direction })}>
-            <div className="flex flex-col gap-40 w-full px-6 md:px-20 max-w-container">
+            <div className="flex flex-col gap-24 w-full px-6 md:px-20 max-w-container">
               {children}
             </div>
           </div>
