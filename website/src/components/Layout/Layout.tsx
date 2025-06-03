@@ -17,7 +17,7 @@ const wrapper = cva(
       },
       direction: {
         down: "bg-size-[auto_1000px] bg-[center_top]",
-        up: "bg-size-[auto_800px] bg-[center_top]",
+        up: "bg-size-[auto_820px] bg-[center_top]",
       },
     },
     compoundVariants: [
