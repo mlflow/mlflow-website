@@ -120,9 +120,9 @@ export const Header = ({ isGenAI }: Props) => {
               onClick={handleProductItemClick}
             >
               <span
-                className={cn(
-                  "flex items-center gap-2 py-2 text-white text-[15px] w-full md:w-auto cursor-pointer",
-                )}
+                className={
+                  "flex items-center gap-2 py-2 text-white text-[15px] w-full md:w-auto cursor-pointer"
+                }
               >
                 Products
                 <DownIcon className="w-6 h-6" />
