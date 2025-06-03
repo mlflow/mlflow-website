@@ -4,7 +4,6 @@ import AssessmentsTab from "@site/static/img/assessments.jpg";
 
 import {
   Layout,
-  CopyCommand,
   LogosCarousel,
   Grid,
   GridItem,
