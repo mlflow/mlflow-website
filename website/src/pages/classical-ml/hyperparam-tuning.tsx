@@ -14,7 +14,7 @@ const FakeImage = () => (
 
 export default function HyperparamTuning() {
   return (
-    <Layout variant="blue" direction="up">
+    <Layout>
       <AboveTheFold
         sectionLabel="Hyperparam tuning"
         title="Simplify your model training workflow"

@@ -13,7 +13,7 @@ import {
 
 export default function Home(): JSX.Element {
   return (
-    <Layout variant="colorful">
+    <Layout>
       <AboveTheFold
         title="AI and ML made simple"
         body="The AI developer platform to build AI applications and models with confidence"

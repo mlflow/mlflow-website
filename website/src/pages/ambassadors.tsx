@@ -6,7 +6,7 @@ import ambassadors from "./ambassadors.json";
 
 export default function Ambassadors() {
   return (
-    <Layout variant="colorful">
+    <Layout>
       <div className="flex flex-col gap-8 max-w-4xl mx-auto mt-40">
         <p>The call was made, and the community answered in droves.</p>
 

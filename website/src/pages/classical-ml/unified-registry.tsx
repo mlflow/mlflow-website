@@ -14,7 +14,7 @@ const FakeImage = () => (
 
 export default function UnifiedRegistry() {
   return (
-    <Layout variant="blue" direction="up">
+    <Layout>
       <AboveTheFold
         sectionLabel="Unified registry"
         title="Centralized Model Governance and Discovery"

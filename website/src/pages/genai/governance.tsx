@@ -13,7 +13,7 @@ const FakeImage = () => (
 
 export default function Governance() {
   return (
-    <Layout variant="red" direction="up">
+    <Layout>
       <AboveTheFold
         sectionLabel="Quality metrics"
         title="Enterprise governance with Unity Catalog"

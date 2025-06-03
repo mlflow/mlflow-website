@@ -17,7 +17,7 @@ import {
 
 export default function GenAi(): JSX.Element {
   return (
-    <Layout variant="blue">
+    <Layout>
       <AboveTheFold
         title="Mastering the ML lifecycle"
         body="From experiment to production, MLflow streamlines your complete machine learning journey with enterprise-grade tracking, model management, and deployment."

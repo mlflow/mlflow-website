@@ -13,7 +13,7 @@ const FakeImage = () => (
 
 export default function AiGateway() {
   return (
-    <Layout variant="red" direction="up">
+    <Layout>
       <AboveTheFold
         sectionLabel="AI gateway"
         title="Build AI Systems with confidence"

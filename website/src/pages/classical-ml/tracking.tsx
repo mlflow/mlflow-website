@@ -14,7 +14,7 @@ const FakeImage = () => (
 
 export default function Tracking() {
   return (
-    <Layout variant="blue" direction="up">
+    <Layout>
       <AboveTheFold
         sectionLabel="Tracking"
         title="Comprehensive Experiment Tracking for ML Excellence"

@@ -1,10 +1,10 @@
 import { Header } from "../Header/Header";
 import { Footer } from "../Footer/Footer";
-import { cva, VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
 import { createContext, PropsWithChildren, useContext } from "react";
 import { useLocation } from "@docusaurus/router";
 
-type Props = PropsWithChildren<VariantProps<typeof wrapper>>;
+type Props = PropsWithChildren;
 
 const wrapper = cva(
   "flex flex-col gap-20 bg-no-repeat w-full pt-42 pb-20 py-20 max-w-container",
@@ -89,15 +89,43 @@ export function useLayoutVariant() {
   return variant;
 }
 
-export const Layout = ({ children, variant, direction }: Props) => {
+function getLayoutType(pathname: string) {
+  if (pathname.startsWith("/genai")) {
+    if (pathname === "/genai" || pathname === "/genai/") {
+      return "genai";
+    } else {
+      return "genai-subpage";
+    }
+  } else if (pathname.startsWith("/classical-ml")) {
+    if (pathname === "/classical-ml" || pathname === "/classical-ml/") {
+      return "classical-ml";
+    } else {
+      return "classical-ml-subpage";
+    }
+  } else if (pathname === "/") {
+    return "home";
+  } else {
+    return "default";
+  }
+}
+
+export const Layout = ({ children }: Props) => {
   const location = useLocation();
-  const isGenAI =
-    location.pathname.startsWith("/genai") || location.pathname === "/";
+
+  const layoutType = getLayoutType(location.pathname);
+  const variant = layoutType.startsWith("genai")
+    ? "red"
+    : layoutType.startsWith("classical-ml")
+      ? "blue"
+      : "colorful";
+  const direction = layoutType.endsWith("subpage") ? "up" : "down";
 
   return (
     <LayoutContext.Provider value={variant}>
       <div className="flex flex-col min-h-screen w-full bg-[#0E1416]">
-        <Header isGenAI={isGenAI} />
+        <Header
+          isGenAI={layoutType.startsWith("genai") || layoutType === "home"}
+        />
         <main className="flex flex-col">
           <div className={wrapper({ variant, direction })}>
             <div className="flex flex-col gap-24 w-full px-6 md:px-20 max-w-container">

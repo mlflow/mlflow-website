@@ -17,7 +17,7 @@ import { MLFLOW_GENAI_GET_STARTED_URL } from "@site/src/constants";
 
 export default function GenAi(): JSX.Element {
   return (
-    <Layout variant="red">
+    <Layout>
       <AboveTheFold
         title="Ship high-quality AI, fast"
         body={[

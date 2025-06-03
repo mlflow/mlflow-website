@@ -14,7 +14,7 @@ const FakeImage = () => (
 
 export default function Models() {
   return (
-    <Layout variant="blue" direction="up">
+    <Layout>
       <AboveTheFold
         sectionLabel="Models"
         title="Transform ML Experiments into Production-Ready Models"

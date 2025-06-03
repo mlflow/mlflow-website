@@ -8,7 +8,7 @@ export default function ReleaseLayout(props) {
   const { sidebar, toc, children, ...layoutProps } = props;
   return (
     <ThemeLayout {...layoutProps}>
-      <Layout variant="colorful">
+      <Layout>
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-row">
             <BlogSidebar className="text-white" sidebar={sidebar} />

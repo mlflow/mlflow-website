@@ -14,7 +14,7 @@ const FakeImage = () => (
 
 export default function Observability() {
   return (
-    <Layout variant="red" direction="up">
+    <Layout>
       <AboveTheFold
         sectionLabel="Observability"
         title="Observability to debug and monitor"

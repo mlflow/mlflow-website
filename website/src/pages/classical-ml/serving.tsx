@@ -14,7 +14,7 @@ const FakeImage = () => (
 
 export default function Serving() {
   return (
-    <Layout variant="blue" direction="up">
+    <Layout>
       <AboveTheFold
         sectionLabel="Serving"
         title="Flexible Model Deployment for Any Production Environment"

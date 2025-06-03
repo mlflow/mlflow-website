@@ -16,7 +16,7 @@ export default function BlogLayout({ children, ...props }) {
 
   return (
     <ThemeLayout {...props}>
-      <Layout variant="colorful">
+      <Layout>
         <div
           className={
             isHomeOrTagsPage

@@ -13,7 +13,7 @@ const FakeImage = () => (
 
 export default function HumanFeedback() {
   return (
-    <Layout variant="red" direction="up">
+    <Layout>
       <AboveTheFold
         sectionLabel="Human feedback"
         title="Incorporate human insight to understand and improve quality"
