@@ -40,7 +40,9 @@ export const Footer = ({ variant }: VariantProps<typeof footerVariants>) => {
           <FooterMenuItem href={MLFLOW_DOCS_URL}>Docs</FooterMenuItem>
         </div>
       </div>
-      <div>© 2025 MLflow Project, a Series of LF Projects, LLC.</div>
+      <div className="text-xs text-gray-800">
+        © 2025 MLflow Project, a Series of LF Projects, LLC.
+      </div>
     </footer>
   );
 };
