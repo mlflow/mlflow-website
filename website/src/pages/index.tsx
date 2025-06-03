@@ -3,8 +3,7 @@ import {
   Layout,
   GlossyCard,
   GetStartedTagline,
-  Testimonials,
-  LogosCarousel,
+  Customers,
   AboveTheFold,
   BelowTheFold,
   Card,
@@ -54,7 +53,7 @@ export default function Home(): JSX.Element {
         </GlossyCardContainer>
       </AboveTheFold>
 
-      <Testimonials />
+      <Customers />
 
       <BelowTheFold>
         <LatestNews />
