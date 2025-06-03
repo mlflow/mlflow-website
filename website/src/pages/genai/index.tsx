@@ -14,6 +14,7 @@ import {
   Section,
   Card,
 } from "../../components";
+import { MLFLOW_GENAI_GET_STARTED_URL } from "@site/src/constants";
 
 export default function GenAi(): JSX.Element {
   return (
@@ -24,9 +25,8 @@ export default function GenAi(): JSX.Element {
           "Traditional software and ML tests aren't built for GenAI's free-form language, making it difficult for teams to measure and improve quality.",
           "MLflow combines metrics that reliably measure GenAI quality with trace observability so you can measure, improve, and monitor quality, cost, and latency.",
         ]}
-      >
-        <CopyCommand code="pip install mlflow" />
-      </AboveTheFold>
+        hasGetStartedButton={MLFLOW_GENAI_GET_STARTED_URL}
+      />
 
       <Section label="Core features" title="Observability to debug and monitor">
         <Grid columns={2}>
