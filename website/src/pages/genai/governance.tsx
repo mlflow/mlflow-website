@@ -13,9 +13,9 @@ const FakeImage = () => (
 
 export default function Governance() {
   return (
-    <Layout variant="red" direction="up">
+    <Layout>
       <AboveTheFold
-        sectionLabel="Quality metrics"
+        sectionLabel="Governance"
         title="Enterprise governance with Unity Catalog"
         body="MLflow is integrated with Unity Catalog to track the lifecycle and lineage of your app’s assets - models, prompts, datasets, and metrics - and apply access controls."
         hasGetStartedButton

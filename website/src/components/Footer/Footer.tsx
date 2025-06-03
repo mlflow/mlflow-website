@@ -3,16 +3,25 @@ import { cva, type VariantProps } from "class-variance-authority";
 import Logo from "@site/static/img/mlflow-logo-white.svg";
 
 import { FooterMenuItem } from "../FooterMenuItem/FooterMenuItem";
-import { cn } from "../../utils";
+import { MLFLOW_DOCS_URL } from "@site/src/constants";
 
 const footerVariants = cva(
-  "pb-150 flex flex-col pt-37 bg-linear-to-b from-brand-black to-brand-black bg-bottom bg-no-repeat bg-cover w-full",
+  "pb-30 flex flex-col pt-30 bg-bottom bg-no-repeat bg-cover max-w-container text-center gap-120 bg-size-[auto_360px]",
   {
     variants: {
       variant: {
-        blue: ` bg-[url('/img/footer-blue-bg.png')] bg-size-[100%_340px]`,
-        red: `bg-[url('/img/footer-red-bg.png')] bg-size-[100%_340px]`,
-        colorful: `bg-[url('/img/footer-colorful-bg.png')] bg-size-[100%_340px]`,
+        blue: [
+          "bg-[linear-gradient(to_top,rgba(12,20,20,0)_0%,rgba(12,20,20,0)_10%,rgba(14,20,20,100)_40%),url('/img/footer-blue-bg.png')]",
+          "2xl:bg-[radial-gradient(farthest-side_at_center_bottom,rgba(12,20,20,0)_0%,rgba(12,20,20,0)_10%,rgba(14,20,20,100)_90%),url('/img/footer-blue-bg.png')]",
+        ],
+        red: [
+          "bg-[linear-gradient(to_top,rgba(12,20,20,0)_0%,rgba(12,20,20,0)_10%,rgba(14,20,20,100)_40%),url('/img/footer-red-bg.png')]",
+          "2xl:bg-[radial-gradient(farthest-side_at_center_bottom,rgba(12,20,20,0)_0%,rgba(12,20,20,0)_10%,rgba(14,20,20,100)_90%),url('/img/footer-red-bg.png')]",
+        ],
+        colorful: [
+          "bg-[linear-gradient(to_top,rgba(12,20,20,0)_0%,rgba(12,20,20,0)_10%,rgba(14,20,20,100)_40%),url('/img/footer-colorful-bg.png')]",
+          "2xl:bg-[radial-gradient(farthest-side_at_center_bottom,rgba(12,20,20,0)_0%,rgba(12,20,20,0)_10%,rgba(14,20,20,100)_90%),url('/img/footer-colorful-bg.png')]",
+        ],
       },
     },
   },
@@ -20,7 +29,7 @@ const footerVariants = cva(
 
 export const Footer = ({ variant }: VariantProps<typeof footerVariants>) => {
   return (
-    <footer className={cn(footerVariants({ variant }))}>
+    <footer className={footerVariants({ variant })}>
       <div className="flex flex-row justify-between items-start md:items-center px-6 lg:px-20 gap-10 xs:gap-0 max-w-container">
         <Logo className="h-[36px] shrink-0" />
 
@@ -28,10 +37,11 @@ export const Footer = ({ variant }: VariantProps<typeof footerVariants>) => {
           <FooterMenuItem href="/">Product</FooterMenuItem>
           <FooterMenuItem href="/releases">Releases</FooterMenuItem>
           <FooterMenuItem href="/blog">Blog</FooterMenuItem>
-          <FooterMenuItem href="/docs/latest" data-noBrokenLinkCheck>
-            Docs
-          </FooterMenuItem>
+          <FooterMenuItem href={MLFLOW_DOCS_URL}>Docs</FooterMenuItem>
         </div>
+      </div>
+      <div className="text-xs text-gray-800">
+        © 2025 MLflow Project, a Series of LF Projects, LLC.
       </div>
     </footer>
   );

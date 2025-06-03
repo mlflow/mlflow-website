@@ -6,43 +6,49 @@ import {
   BelowTheFold,
   Card,
 } from "../../components";
-
-const FakeImage = () => (
-  <div className="w-full aspect-[3/2] bg-black rounded-lg border border-[rgba(255,255,255,0.08)]"></div>
-);
+import AiGatewayImage from "@site/static/img/ai-gateway.png";
+import ImprovedModelAccuracyImage from "@site/static/img/improved-model-accuracy.png";
+import SpendingOversightImage from "@site/static/img/spending-oversight.png";
 
 export default function AiGateway() {
   return (
-    <Layout variant="red" direction="up">
+    <Layout>
       <AboveTheFold
         sectionLabel="AI gateway"
-        title="Build AI Systems with confidence"
-        body="The AI developer platform to build AI applications and models with confidence"
+        title="Unified access to all AI models"
+        body="Protects your data and GenAI deployments through centralized governance across all models."
         hasGetStartedButton
       >
-        <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
+        <div className="w-full aspect-video max-w-[800px] rounded-lg mx-auto">
+          <img src={AiGatewayImage} alt="AI Gateway" />
+        </div>
       </AboveTheFold>
 
       <Grid columns={2}>
         <GridItem>
           <Card
-            title="Feature heading"
-            body="Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos."
-            image={<FakeImage />}
+            title="Improved model accuracy"
+            body="Elevate your model quality with our robust observability tools that capture detailed request and response data. Payload logging enables you to debug, fine-tune and enhance models, improving accuracy and reducing latency."
+            image={
+              <img
+                src={ImprovedModelAccuracyImage}
+                alt="Improved Model Accuracy"
+                className="aspect-[3/2] object-cover rounded-lg"
+              />
+            }
           />
         </GridItem>
         <GridItem>
           <Card
-            title="Feature heading"
-            body="Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos."
-            image={<FakeImage />}
-          />
-        </GridItem>
-        <GridItem width="wide">
-          <Card
-            title="Feature heading"
-            body="Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos."
-            image={<FakeImage />}
+            title="Spending oversight"
+            body="With real-time insights into your AI operations, you can monitor expenses, optimize resource allocation and ensure efficient performance."
+            image={
+              <img
+                src={SpendingOversightImage}
+                alt="Spending Oversight"
+                className="aspect-[3/2] object-cover rounded-lg"
+              />
+            }
           />
         </GridItem>
       </Grid>

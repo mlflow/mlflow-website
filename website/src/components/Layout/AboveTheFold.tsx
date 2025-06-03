@@ -5,7 +5,7 @@ type Props = PropsWithChildren<{
   title: string;
   body: string | string[];
   sectionLabel?: string;
-  hasGetStartedButton?: boolean;
+  hasGetStartedButton?: true | string;
 }>;
 
 export function AboveTheFold({
@@ -28,7 +28,13 @@ export function AboveTheFold({
             </Body>
           ))}
         </div>
-        {hasGetStartedButton && <GetStartedButton />}
+        {hasGetStartedButton && (
+          <GetStartedButton
+            link={
+              hasGetStartedButton === true ? undefined : hasGetStartedButton
+            }
+          />
+        )}
       </div>
       {children}
     </div>

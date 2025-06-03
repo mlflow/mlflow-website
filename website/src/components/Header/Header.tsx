@@ -12,13 +12,18 @@ import { HeaderProductsSubmenu } from "../HeaderProductsSubmenu/HeaderProductsSu
 import "./Header.module.css";
 import {
   MLFLOW_DOCS_URL,
+  MLFLOW_GET_STARTED_URL,
   MLFLOW_LOGIN_URL,
   MLFLOW_SIGNUP_URL,
 } from "@site/src/constants";
 
 const MD_BREAKPOINT = 640;
 
-export const Header = () => {
+type Props = {
+  isGenAI: boolean;
+};
+
+export const Header = ({ isGenAI }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isProductItemHovered, setIsProductItemHovered] = useState(false);
   const [isProductSubmenuOpen, setIsProductSubmenuOpen] = useState(false);
@@ -59,16 +64,26 @@ export const Header = () => {
           <Logo className="h-[36px]" />
         </Link>
         <div className="flex flex-row items-center gap-6 md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
-          <HeaderMenuItem
-            href={MLFLOW_LOGIN_URL}
-            label="Login"
-            className="hidden md:block"
-          />
-          <Link href={MLFLOW_SIGNUP_URL} className="hidden md:block">
-            <Button variant="primary" size="small">
-              Sign up
-            </Button>
-          </Link>
+          {isGenAI ? (
+            <>
+              <HeaderMenuItem
+                href={MLFLOW_LOGIN_URL}
+                label="Login"
+                className="hidden md:block"
+              />
+              <Link href={MLFLOW_SIGNUP_URL} className="hidden md:block">
+                <Button variant="primary" size="small">
+                  Sign up
+                </Button>
+              </Link>
+            </>
+          ) : (
+            <Link href={MLFLOW_GET_STARTED_URL} className="hidden md:block">
+              <Button variant="primary" size="small">
+                Get started
+              </Button>
+            </Link>
+          )}
           <button
             data-collapse-toggle="navbar-sticky"
             type="button"
@@ -105,9 +120,9 @@ export const Header = () => {
               onClick={handleProductItemClick}
             >
               <span
-                className={cn(
-                  "flex items-center gap-2 py-2 text-white text-[15px] w-full md:w-auto cursor-pointer",
-                )}
+                className={
+                  "flex items-center gap-2 py-2 text-white text-[15px] w-full md:w-auto cursor-pointer"
+                }
               >
                 Products
                 <DownIcon className="w-6 h-6" />
@@ -139,16 +154,28 @@ export const Header = () => {
             <li className="w-full md:w-auto">
               <HeaderMenuItem href={MLFLOW_DOCS_URL} label="Docs" />
             </li>
-            <li className="w-full md:w-auto md:hidden">
-              <HeaderMenuItem href={MLFLOW_LOGIN_URL} label="Login" />
-            </li>
-            <li className="w-full md:w-auto md:hidden">
-              <Link href={MLFLOW_SIGNUP_URL}>
-                <Button variant="primary" size="small" width="full">
-                  Sign up
-                </Button>
-              </Link>
-            </li>
+            {isGenAI ? (
+              <>
+                <li className="w-full md:w-auto md:hidden">
+                  <HeaderMenuItem href={MLFLOW_LOGIN_URL} label="Login" />
+                </li>
+                <li className="w-full md:w-auto md:hidden">
+                  <Link href={MLFLOW_SIGNUP_URL}>
+                    <Button variant="primary" size="small" width="full">
+                      Sign up
+                    </Button>
+                  </Link>
+                </li>
+              </>
+            ) : (
+              <li className="w-full md:w-auto md:hidden">
+                <Link href={MLFLOW_GET_STARTED_URL}>
+                  <Button variant="primary" size="small" width="full">
+                    Get started
+                  </Button>
+                </Link>
+              </li>
+            )}
           </ul>
         </div>
       </div>

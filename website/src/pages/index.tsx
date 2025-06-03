@@ -3,8 +3,7 @@ import {
   Layout,
   GlossyCard,
   GetStartedTagline,
-  Testimonials,
-  LogosCarousel,
+  Customers,
   AboveTheFold,
   BelowTheFold,
   Card,
@@ -13,7 +12,7 @@ import {
 
 export default function Home(): JSX.Element {
   return (
-    <Layout variant="colorful">
+    <Layout>
       <AboveTheFold
         title="AI and ML made simple"
         body="The AI developer platform to build AI applications and models with confidence"
@@ -42,7 +41,7 @@ export default function Home(): JSX.Element {
               body="Streamline your machine learning workflows with enterprise-grade tracking, model management, and deployment."
               padded
               cta={{
-                href: "/genai",
+                href: "/classical-ml",
                 text: "Learn more >",
                 prominent: true,
               }}
@@ -54,9 +53,7 @@ export default function Home(): JSX.Element {
         </GlossyCardContainer>
       </AboveTheFold>
 
-      <Testimonials />
-
-      <LogosCarousel />
+      <Customers />
 
       <BelowTheFold>
         <LatestNews />

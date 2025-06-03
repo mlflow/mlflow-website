@@ -1,6 +1,6 @@
+import { MLFLOW_GET_STARTED_URL } from "@site/src/constants";
 import {
   Layout,
-  CopyCommand,
   VerticalTabs,
   VerticalTabsList,
   VerticalTabsTrigger,
@@ -17,12 +17,13 @@ import {
 
 export default function GenAi(): JSX.Element {
   return (
-    <Layout variant="blue">
+    <Layout>
       <AboveTheFold
         title="Mastering the ML lifecycle"
         body="From experiment to production, MLflow streamlines your complete machine learning journey with enterprise-grade tracking, model management, and deployment."
+        hasGetStartedButton={MLFLOW_GET_STARTED_URL}
       >
-        <CopyCommand code="pip install mlflow" />
+        <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
       </AboveTheFold>
 
       <Section

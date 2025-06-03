@@ -2,6 +2,7 @@ import { PropsWithChildren } from "react";
 
 import { cva, VariantProps } from "class-variance-authority";
 import { twMerge } from "tailwind-merge";
+import React from "react";
 
 // NOTE: this and the following negative margin styles are to hide the outer padding of the grid items, so it's flush with the container.
 const gridContainer = cva("w-full overflow-hidden");
@@ -36,9 +37,32 @@ export const Grid = ({
   columns,
 }: VariantProps<typeof gridVariants> &
   PropsWithChildren<{ className?: string }>) => {
+  let numSlots = 0;
+  React.Children.forEach(children, (child) => {
+    if (React.isValidElement(child)) {
+      if ("width" in child.props && child.props.width === "wide") {
+        numSlots += 2;
+      } else {
+        numSlots += 1;
+      }
+    }
+  });
+
+  let missingSlots = 0;
+  if (typeof columns === "number") {
+    const rows = Math.ceil(numSlots / columns);
+    const expectedSlots = rows * columns;
+    missingSlots = expectedSlots - numSlots;
+  }
+
   return (
     <div className={gridContainer()}>
-      <div className={grid({ columns, className })}>{children}</div>
+      <div className={grid({ columns, className })}>
+        {children}
+        {Array.from({ length: missingSlots }, (_, i) => (
+          <GridItem key={i} />
+        ))}
+      </div>
     </div>
   );
 };

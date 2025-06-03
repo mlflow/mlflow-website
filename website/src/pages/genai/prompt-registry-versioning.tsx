@@ -14,7 +14,7 @@ const FakeImage = () => (
 
 export default function PromptRegistryVersioning() {
   return (
-    <Layout variant="red" direction="up">
+    <Layout>
       <AboveTheFold
         sectionLabel="Prompt & Version Management"
         title="Prompt & Version Management"

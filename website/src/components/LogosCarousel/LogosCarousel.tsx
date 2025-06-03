@@ -1,4 +1,5 @@
 import useBaseUrl from "@docusaurus/useBaseUrl";
+import { cx } from "class-variance-authority";
 
 const images = [
   "/img/companies/databricks.svg",
@@ -13,17 +14,21 @@ const images = [
   "/img/companies/asml.svg",
 ];
 
+const container = cx("shrink-0 animate-slide-left-infinite");
+
 export const LogosCarousel = () => {
+  const items = images.map((image, index) => (
+    <img
+      key={index}
+      className="inline h-16 mx-20 opacity-20"
+      src={useBaseUrl(image)}
+    />
+  ));
   return (
-    <div className="group relative overflow-hidden whitespace-nowrap py-10 [mask-image:_linear-gradient(to_right,_transparent_0,_white_128px,white_calc(100%-128px),_transparent_100%)] w-full">
-      <div className="animate-slide-left-infinite inline-block w-full">
-        {images.map((image, index) => (
-          <img
-            key={index}
-            className="inline h-16 mx-20 opacity-20"
-            src={useBaseUrl(image)}
-          />
-        ))}
+    <div className="flex overflow-x-hidden [mask-image:_linear-gradient(to_right,_transparent_0,_white_128px,white_calc(100%-128px),_transparent_100%)] w-full">
+      <div className={container}>{items}</div>
+      <div className={container} aria-hidden>
+        {items}
       </div>
     </div>
   );

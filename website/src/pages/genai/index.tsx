@@ -4,7 +4,6 @@ import AssessmentsTab from "@site/static/img/assessments.jpg";
 
 import {
   Layout,
-  CopyCommand,
   LogosCarousel,
   Grid,
   GridItem,
@@ -14,18 +13,20 @@ import {
   Section,
   Card,
 } from "../../components";
+import { MLFLOW_GENAI_GET_STARTED_URL } from "@site/src/constants";
 
 export default function GenAi(): JSX.Element {
   return (
-    <Layout variant="red">
+    <Layout>
       <AboveTheFold
         title="Ship high-quality AI, fast"
         body={[
           "Traditional software and ML tests aren't built for GenAI's free-form language, making it difficult for teams to measure and improve quality.",
           "MLflow combines metrics that reliably measure GenAI quality with trace observability so you can measure, improve, and monitor quality, cost, and latency.",
         ]}
+        hasGetStartedButton={MLFLOW_GENAI_GET_STARTED_URL}
       >
-        <CopyCommand code="pip install mlflow" />
+        <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
       </AboveTheFold>
 
       <Section label="Core features" title="Observability to debug and monitor">

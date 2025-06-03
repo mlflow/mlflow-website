@@ -11,10 +11,21 @@ import { Body } from "../Typography/Body";
 
 const socials = [
   {
+    key: "docs",
+    icon: (
+      <div>
+        <BookIcon />
+      </div>
+    ),
+    label: "Documentation",
+    description: "Read documentation",
+    href: "https://mlflow.org/docs/latest/",
+  },
+  {
     key: "github",
     icon: <GithubIcon />,
     label: "GitHub",
-    description: "20k followers",
+    description: "20k stars",
     href: "https://github.com/mlflow/mlflow",
   },
   {
@@ -30,17 +41,6 @@ const socials = [
     label: "YouTube",
     description: "View tutorials",
     href: "https://www.youtube.com/@mlflowoss",
-  },
-  {
-    key: "docs",
-    icon: (
-      <div>
-        <BookIcon />
-      </div>
-    ),
-    label: "Documentation",
-    description: "Read documentation",
-    href: "https://mlflow.org/docs/latest/",
   },
 ];
 

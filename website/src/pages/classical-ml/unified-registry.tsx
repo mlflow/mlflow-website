@@ -1,3 +1,4 @@
+import { MLFLOW_GET_STARTED_URL } from "@site/src/constants";
 import {
   Layout,
   Grid,
@@ -13,12 +14,12 @@ const FakeImage = () => (
 
 export default function UnifiedRegistry() {
   return (
-    <Layout variant="blue" direction="up">
+    <Layout>
       <AboveTheFold
         sectionLabel="Unified registry"
         title="Centralized Model Governance and Discovery"
         body="Streamline your ML workflows with MLflow's comprehensive model registry for version control, approvals, and deployment management"
-        hasGetStartedButton
+        hasGetStartedButton={MLFLOW_GET_STARTED_URL}
       >
         <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
       </AboveTheFold>

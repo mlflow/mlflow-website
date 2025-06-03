@@ -1,3 +1,4 @@
+import { MLFLOW_GET_STARTED_URL } from "@site/src/constants";
 import {
   Layout,
   Grid,
@@ -13,12 +14,12 @@ const FakeImage = () => (
 
 export default function Tracking() {
   return (
-    <Layout variant="blue" direction="up">
+    <Layout>
       <AboveTheFold
         sectionLabel="Tracking"
         title="Comprehensive Experiment Tracking for ML Excellence"
         body=" Document, compare, and reproduce your machine learning experiments with MLflow's powerful tracking capabilities"
-        hasGetStartedButton
+        hasGetStartedButton={MLFLOW_GET_STARTED_URL}
       >
         <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
       </AboveTheFold>

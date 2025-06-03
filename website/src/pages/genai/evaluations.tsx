@@ -14,7 +14,7 @@ const FakeImage = () => (
 
 export default function Evaluations() {
   return (
-    <Layout variant="red" direction="up">
+    <Layout>
       <AboveTheFold
         sectionLabel="Evaluations"
         title="Evaluation to measure and improve quality"
