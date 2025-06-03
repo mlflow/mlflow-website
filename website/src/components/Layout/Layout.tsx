@@ -3,6 +3,7 @@ import { Footer } from "../Footer/Footer";
 import { cva } from "class-variance-authority";
 import { createContext, PropsWithChildren, useContext } from "react";
 import { useLocation } from "@docusaurus/router";
+import useBaseUrl from "@docusaurus/useBaseUrl";
 
 type Props = PropsWithChildren;
 
@@ -90,19 +91,22 @@ export function useLayoutVariant() {
 }
 
 function getLayoutType(pathname: string) {
-  if (pathname.startsWith("/genai")) {
-    if (pathname === "/genai" || pathname === "/genai/") {
+  const genAI = useBaseUrl("/genai");
+  const classicalML = useBaseUrl("/classical-ml");
+
+  if (pathname.startsWith(genAI)) {
+    if (pathname === genAI || pathname === `${genAI}/`) {
       return "genai";
     } else {
       return "genai-subpage";
     }
-  } else if (pathname.startsWith("/classical-ml")) {
-    if (pathname === "/classical-ml" || pathname === "/classical-ml/") {
+  } else if (pathname.startsWith(classicalML)) {
+    if (pathname === classicalML || pathname === `${classicalML}/`) {
       return "classical-ml";
     } else {
       return "classical-ml-subpage";
     }
-  } else if (pathname === "/") {
+  } else if (pathname === useBaseUrl("/")) {
     return "home";
   } else {
     return "default";
