@@ -41,7 +41,7 @@ export default function Home(): JSX.Element {
               body="Streamline your machine learning workflows with enterprise-grade tracking, model management, and deployment."
               padded
               cta={{
-                href: "/genai",
+                href: "/classical-ml",
                 text: "Learn more >",
                 prominent: true,
               }}
