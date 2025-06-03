@@ -25,7 +25,9 @@ export default function GenAi(): JSX.Element {
           "MLflow combines metrics that reliably measure GenAI quality with trace observability so you can measure, improve, and monitor quality, cost, and latency.",
         ]}
         hasGetStartedButton={MLFLOW_GENAI_GET_STARTED_URL}
-      />
+      >
+        <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
+      </AboveTheFold>
 
       <Section label="Core features" title="Observability to debug and monitor">
         <Grid columns={2}>
