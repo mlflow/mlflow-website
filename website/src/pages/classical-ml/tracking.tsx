@@ -32,10 +32,6 @@ export default function Tracking() {
           <Card
             title="Visual Comparison"
             body="Compare results across multiple experiments with MLflow's powerful visualization tools. Quickly identify best-performing models and retrieve their corresponding code and parameters based on different metrics of interest across various projects."
-            cta={{
-              text: "Learn more >",
-              href: "/",
-            }}
             image={<img src={Card1} alt="" />}
           />
         </GridItem>
@@ -43,10 +39,6 @@ export default function Tracking() {
           <Card
             title="Reliable Reproducibility"
             body="Automatically logs parameters, weights, artifacts, code, metrics, and dependencies to ensure experiments can be restored accurately, enabling confident governance for enterprise deployments."
-            cta={{
-              text: "Learn more >",
-              href: "/",
-            }}
             image={<img src={Card2} alt="" />}
           />
         </GridItem>
@@ -54,10 +46,6 @@ export default function Tracking() {
           <Card
             title="Seamless Collaboration"
             body="Organize models and iterations into experiments for easy team collaboration while maintaining traceability. Enable team members to share results while maintaining a unified view of all projects through a single interface."
-            cta={{
-              text: "Learn more >",
-              href: "/",
-            }}
             image={<img src={Card3} alt="" />}
           />
         </GridItem>
@@ -65,10 +53,6 @@ export default function Tracking() {
           <Card
             title="Complete Experiment Lifecycle"
             body="MLflow Tracking automatically captures parameters, code versions, metrics, and model weights for each training iteration. Log trained models, visualizations, interface signatures, and data samples to ensure complete reproducibility across your entire ML workflow"
-            cta={{
-              text: "Learn more >",
-              href: "/",
-            }}
             image={<img src={Card4} alt="" />}
           />
         </GridItem>
