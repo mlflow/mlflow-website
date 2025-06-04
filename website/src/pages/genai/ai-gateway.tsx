@@ -29,26 +29,14 @@ export default function AiGateway() {
           <Card
             title="Improved model accuracy"
             body="Elevate your model quality with our robust observability tools that capture detailed request and response data. Payload logging enables you to debug, fine-tune and enhance models, improving accuracy and reducing latency."
-            image={
-              <img
-                src={Card1}
-                alt="Improved Model Accuracy"
-                className="rounded-lg"
-              />
-            }
+            image={<img src={Card1} alt="Improved Model Accuracy" />}
           />
         </GridItem>
         <GridItem width="wide">
           <Card
             title="Spending oversight"
             body="With real-time insights into your AI operations, you can monitor expenses, optimize resource allocation and ensure efficient performance."
-            image={
-              <img
-                src={Card2}
-                alt="Spending Oversight"
-                className="rounded-lg"
-              />
-            }
+            image={<img src={Card2} alt="Spending Oversight" />}
           />
         </GridItem>
       </Grid>

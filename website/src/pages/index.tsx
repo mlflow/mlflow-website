@@ -24,6 +24,7 @@ export default function Home(): JSX.Element {
               bodySize="m"
               body="Enhance your GenAI applications with end-to-end observability, monitoring, and enterprise governance, all in one integrated platform."
               padded
+              rounded={false}
               cta={{
                 href: "/genai",
                 text: "Learn more >",
@@ -40,6 +41,7 @@ export default function Home(): JSX.Element {
               bodySize="m"
               body="Streamline your machine learning workflows with enterprise-grade tracking, model management, and deployment."
               padded
+              rounded={false}
               cta={{
                 href: "/classical-ml",
                 text: "Learn more >",

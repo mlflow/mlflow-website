@@ -43,9 +43,7 @@ export default function GenAi(): JSX.Element {
                 href: "/genai/observability",
                 text: "Learn more >",
               }}
-              image={
-                <img className="rounded-xl" src={Card1} alt="MLflow tracing" />
-              }
+              image={<img src={Card1} alt="MLflow tracing" />}
             />
           </GridItem>
           <GridItem width="wide">
@@ -59,13 +57,7 @@ export default function GenAi(): JSX.Element {
                 href: "/genai/observability#production-monitoring",
                 text: "Learn more >",
               }}
-              image={
-                <img
-                  className="rounded-xl mt-10 mb-4"
-                  src={Card2}
-                  alt="MLflow Monitoring"
-                />
-              }
+              image={<img src={Card2} alt="MLflow Monitoring" />}
             />
           </GridItem>
         </Grid>
@@ -84,13 +76,7 @@ export default function GenAi(): JSX.Element {
                 href: "/genai/evaluations#quality-metrics",
                 text: "Learn more >",
               }}
-              image={
-                <img
-                  className="rounded-xl"
-                  src={Card3}
-                  alt="MLflow LLM judges"
-                />
-              }
+              image={<img src={Card3} alt="MLflow LLM judges" />}
             />
           </GridItem>
           <GridItem width="wide">
@@ -101,13 +87,7 @@ export default function GenAi(): JSX.Element {
                 href: "/genai/evaluations",
                 text: "Learn more >",
               }}
-              image={
-                <img
-                  className="rounded-xl"
-                  src={Card4}
-                  alt="MLflow evaluations"
-                />
-              }
+              image={<img src={Card4} alt="MLflow evaluations" />}
             />
           </GridItem>
           <GridItem width="wide">
@@ -118,13 +98,7 @@ export default function GenAi(): JSX.Element {
                 href: "/genai/human-feedback",
                 text: "Learn more >",
               }}
-              image={
-                <img
-                  className="rounded-xl"
-                  src={Card5}
-                  alt="MLflow LLM judges"
-                />
-              }
+              image={<img src={Card5} alt="MLflow LLM judges" />}
             />
           </GridItem>
         </Grid>
@@ -146,13 +120,7 @@ export default function GenAi(): JSX.Element {
                 href: "/genai/governance",
                 text: "Learn more >",
               }}
-              image={
-                <img
-                  className="rounded-xl"
-                  src={Card6}
-                  alt="MLflow LLM judges"
-                />
-              }
+              image={<img src={Card6} alt="MLflow LLM judges" />}
             />
           </GridItem>
           <GridItem width="wide">
@@ -166,13 +134,7 @@ export default function GenAi(): JSX.Element {
                 href: "/genai/governance",
                 text: "Learn more >",
               }}
-              image={
-                <img
-                  className="rounded-xl"
-                  src={Card7}
-                  alt="MLflow LLM judges"
-                />
-              }
+              image={<img src={Card7} alt="MLflow LLM judges" />}
             />
           </GridItem>
         </Grid>
