@@ -1,7 +1,3 @@
-import TraceTab from "@site/static/img/trace-tab.jpg";
-import EvalsTab from "@site/static/img/evals-tab.jpg";
-import AssessmentsTab from "@site/static/img/assessments.jpg";
-
 import {
   Layout,
   LogosCarousel,
@@ -14,20 +10,25 @@ import {
   Card,
 } from "../../components";
 import { MLFLOW_GENAI_GET_STARTED_URL } from "@site/src/constants";
+import Card1 from "@site/static/img/GenAI_home/GenAI_home_1.png";
+import Card2 from "@site/static/img/GenAI_home/GenAI_home_2.png";
+import Card3 from "@site/static/img/GenAI_home/GenAI_home_3.png";
+import Card4 from "@site/static/img/GenAI_home/GenAI_home_4.png";
+import Card5 from "@site/static/img/GenAI_home/GenAI_home_5.png";
+import Card6 from "@site/static/img/GenAI_home/GenAI_home_6.png";
+import Card7 from "@site/static/img/GenAI_home/GenAI_home_7.png";
 
 export default function GenAi(): JSX.Element {
   return (
     <Layout>
       <AboveTheFold
-        title="Ship high-quality AI, fast"
+        title="Ship high-quality GenAI, fast"
         body={[
-          "Traditional software and ML tests aren't built for GenAI's free-form language, making it difficult for teams to measure and improve quality.",
+          "Traditional software and ML tests aren’t built for GenAI’s free-form language, making it difficult for teams to measure and improve quality.",
           "MLflow combines metrics that reliably measure GenAI quality with trace observability so you can measure, improve, and monitor quality, cost, and latency.",
         ]}
         hasGetStartedButton={MLFLOW_GENAI_GET_STARTED_URL}
-      >
-        <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
-      </AboveTheFold>
+      />
 
       <Section label="Core features" title="Observability to debug and monitor">
         <Grid columns={2}>
@@ -43,16 +44,11 @@ export default function GenAi(): JSX.Element {
                 text: "Learn more >",
               }}
               image={
-                <img
-                  className="rounded-xl"
-                  src={TraceTab}
-                  alt="MLflow tracing"
-                />
+                <img className="rounded-xl" src={Card1} alt="MLflow tracing" />
               }
-              // Product GIF of the tracing UI for a complex trace
             />
           </GridItem>
-          <GridItem width="wide" direction="reverse">
+          <GridItem width="wide">
             <Card
               title="Monitor in production"
               body={[
@@ -66,11 +62,10 @@ export default function GenAi(): JSX.Element {
               image={
                 <img
                   className="rounded-xl mt-10 mb-4"
-                  src={AssessmentsTab}
+                  src={Card2}
                   alt="MLflow Monitoring"
                 />
               }
-              // Product GIF of the Trace UI view + charts
             />
           </GridItem>
         </Grid>
@@ -79,7 +74,6 @@ export default function GenAi(): JSX.Element {
       <Section
         label="Core features"
         title="Evaluation to measure and improve quality"
-        body="MLflow simplifies GenAI evaluation, enabling easy collection and recording of LLM judge and human feedback directly on traces."
       >
         <Grid columns={2}>
           <GridItem width="wide">
@@ -92,15 +86,14 @@ export default function GenAi(): JSX.Element {
               }}
               image={
                 <img
-                  className="rounded-xl mt-10 mb-4"
-                  src={AssessmentsTab}
+                  className="rounded-xl"
+                  src={Card3}
                   alt="MLflow LLM judges"
                 />
               }
-              // Animation showing humans providing feedback and it being synthesized into an llm judge
             />
           </GridItem>
-          <GridItem width="wide" direction="reverse">
+          <GridItem width="wide">
             <Card
               title="Use production traffic to drive offline improvements"
               body="Adapt to user behavior by creating evaluation datasets and regression tests from production logs. Replay these to assess new prompts or app versions in development, ensuring optimal variants reach production."
@@ -111,11 +104,10 @@ export default function GenAi(): JSX.Element {
               image={
                 <img
                   className="rounded-xl"
-                  src={EvalsTab}
+                  src={Card4}
                   alt="MLflow evaluations"
                 />
               }
-              // Product GIF of running mlflow.evaluate and then seeing the eval results list UI
             />
           </GridItem>
           <GridItem width="wide">
@@ -128,12 +120,11 @@ export default function GenAi(): JSX.Element {
               }}
               image={
                 <img
-                  className="rounded-xl mt-10 mb-4"
-                  src={AssessmentsTab}
+                  className="rounded-xl"
+                  src={Card5}
                   alt="MLflow LLM judges"
                 />
               }
-              // Product GIF of the review app adding a custom feedback label and then it showing on the mlflow trace UI
             />
           </GridItem>
         </Grid>
@@ -157,15 +148,14 @@ export default function GenAi(): JSX.Element {
               }}
               image={
                 <img
-                  className="rounded-xl mt-10 mb-4"
-                  src={AssessmentsTab}
+                  className="rounded-xl"
+                  src={Card6}
                   alt="MLflow LLM judges"
                 />
               }
-              // Figma of the prompt registry, showing adding a prompt and then comparing 2 versions
             />
           </GridItem>
-          <GridItem width="wide" direction="reverse">
+          <GridItem width="wide">
             <Card
               title="Agent and application versioning"
               body={[
@@ -178,12 +168,11 @@ export default function GenAi(): JSX.Element {
               }}
               image={
                 <img
-                  className="rounded-xl mt-10 mb-4"
-                  src={AssessmentsTab}
+                  className="rounded-xl"
+                  src={Card7}
                   alt="MLflow LLM judges"
                 />
               }
-              // Product GIF of the versions tab showing multiple models and then zooming into one to see evals + params like a prompt
             />
           </GridItem>
         </Grid>
