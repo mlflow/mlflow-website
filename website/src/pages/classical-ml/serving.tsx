@@ -6,6 +6,7 @@ import {
   AboveTheFold,
   BelowTheFold,
   Card,
+  HeroImage,
 } from "../../components";
 import CardHero from "@site/static/img/Classical_serving/classical_serving_hero.png";
 import Card1 from "@site/static/img/Classical_serving/classical_serving_1.png";
@@ -21,9 +22,7 @@ export default function Serving() {
         body="Deploy your ML and DL models with confidence using MLflow's versatile serving options for real-time and batch inference"
         hasGetStartedButton={MLFLOW_GET_STARTED_URL}
       >
-        <div className="w-full max-w-[800px] rounded-lg overflow-hidden mx-auto">
-          <img src={CardHero} alt="" />
-        </div>
+        <HeroImage src={CardHero} alt="" />
       </AboveTheFold>
 
       <Grid columns={2}>

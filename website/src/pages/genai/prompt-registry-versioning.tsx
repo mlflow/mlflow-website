@@ -6,6 +6,7 @@ import {
   BelowTheFold,
   Card,
   Section,
+  HeroImage,
 } from "../../components";
 import CardHero from "@site/static/img/GenAI_prompts&versions/GenAI_prompt&versioning_hero.png";
 import Card1 from "@site/static/img/GenAI_prompts&versions/GenAI_prompt&versioning_1.png";
@@ -22,9 +23,7 @@ export default function PromptRegistryVersioning() {
         body="Manage prompts and track versions of GenAI applications. Create, store, and version prompts in the Prompt Registry, and track and compare different versions of GenAI applications to ensure quality and maintainability."
         hasGetStartedButton
       >
-        <div className="w-full max-w-[800px] rounded-lg overflow-hidden mx-auto">
-          <img src={CardHero} alt="" />
-        </div>
+        <HeroImage src={CardHero} alt="" />
       </AboveTheFold>
 
       <Section title="Prompt Registry">

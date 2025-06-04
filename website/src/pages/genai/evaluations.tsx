@@ -6,6 +6,7 @@ import {
   BelowTheFold,
   Section,
   Card,
+  HeroImage,
 } from "../../components";
 import CardHero from "@site/static/img/GenAI_evaluations/GenAI_evaluations_hero.png";
 import Card1 from "@site/static/img/GenAI_evaluations/GenAI_evaluations_1.png";
@@ -26,9 +27,7 @@ export default function Evaluations() {
         body="Confidently evaluate quality in development and production to identify issues and iteratively test improvements."
         hasGetStartedButton
       >
-        <div className="w-full max-w-[800px] rounded-lg overflow-hidden mx-auto">
-          <img src={CardHero} alt="" />
-        </div>
+        <HeroImage src={CardHero} alt="" />
       </AboveTheFold>
 
       <Section

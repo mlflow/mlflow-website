@@ -6,6 +6,7 @@ import {
   BelowTheFold,
   Section,
   Card,
+  HeroImage,
 } from "../../components";
 import CardHero from "@site/static/img/GenAI_observability/GenAI_observability_hero.png";
 import Card1 from "@site/static/img/GenAI_observability/GenAI_observability_1.png";
@@ -31,9 +32,7 @@ export default function Observability() {
         body="Gain visibility into your app's logic to debug issues and improve latency. Attach quality feedback and metadata to help you understand user behavior and improve quality."
         hasGetStartedButton
       >
-        <div className="w-full max-w-[800px] rounded-lg overflow-hidden mx-auto">
-          <img src={CardHero} alt="" />
-        </div>
+        <HeroImage src={CardHero} alt="" />
       </AboveTheFold>
 
       <Section title="Best-in-class tracing">

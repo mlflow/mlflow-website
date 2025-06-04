@@ -5,6 +5,7 @@ import {
   AboveTheFold,
   BelowTheFold,
   Card,
+  HeroImage,
 } from "../../components";
 import CardHero from "@site/static/img/GenAI_humanfeedback/GenAI_humanfeedback_hero.png";
 import Card1 from "@site/static/img/GenAI_humanfeedback/GenAI_humanfeedback_1.png";
@@ -24,9 +25,7 @@ export default function HumanFeedback() {
         ]}
         hasGetStartedButton
       >
-        <div className="w-full max-w-[800px] rounded-lg overflow-hidden mx-auto">
-          <img src={CardHero} alt="" />
-        </div>
+        <HeroImage src={CardHero} alt="" />
       </AboveTheFold>
 
       <Grid columns={2}>

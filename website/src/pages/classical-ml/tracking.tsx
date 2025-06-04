@@ -6,6 +6,7 @@ import {
   AboveTheFold,
   BelowTheFold,
   Card,
+  HeroImage,
 } from "../../components";
 import CardHero from "@site/static/img/Classical_tracking/classical_tracking_hero.png";
 import Card1 from "@site/static/img/Classical_tracking/classical_tracking_1.png";
@@ -22,9 +23,7 @@ export default function Tracking() {
         body=" Document, compare, and reproduce your machine learning experiments with MLflow's powerful tracking capabilities"
         hasGetStartedButton={MLFLOW_GET_STARTED_URL}
       >
-        <div className="w-full max-w-[800px] rounded-lg overflow-hidden mx-auto">
-          <img src={CardHero} alt="" />
-        </div>
+        <HeroImage src={CardHero} alt="" />
       </AboveTheFold>
 
       <Grid columns={2}>

@@ -5,6 +5,7 @@ import {
   AboveTheFold,
   BelowTheFold,
   Card,
+  HeroImage,
 } from "../../components";
 import CardHero from "@site/static/img/GenAI_governance/GenAI_governance_hero.png";
 import Card1 from "@site/static/img/GenAI_governance/GenAI_governance_1.png";
@@ -19,9 +20,7 @@ export default function AiGateway() {
         body="Protects your data and GenAI deployments through centralized governance across all models."
         hasGetStartedButton
       >
-        <div className="w-full max-w-[800px] rounded-lg overflow-hidden mx-auto">
-          <img src={CardHero} alt="" />
-        </div>
+        <HeroImage src={CardHero} alt="" />
       </AboveTheFold>
 
       <Grid columns={2}>

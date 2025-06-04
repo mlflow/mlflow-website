@@ -5,6 +5,7 @@ import {
   AboveTheFold,
   BelowTheFold,
   Card,
+  HeroImage,
 } from "../../components";
 import CardHero from "@site/static/img/GenAI_governance/GenAI_governance_hero.png";
 import Card1 from "@site/static/img/GenAI_governance/GenAI_governance_1.png";
@@ -22,9 +23,7 @@ export default function Governance() {
         body="MLflow is integrated with Unity Catalog to track the lifecycle and lineage of your app’s assets - models, prompts, datasets, and metrics - and apply access controls."
         hasGetStartedButton
       >
-        <div className="w-full max-w-[800px] rounded-lg overflow-hidden mx-auto">
-          <img src={CardHero} alt="" />
-        </div>
+        <HeroImage src={CardHero} alt="" />
       </AboveTheFold>
 
       <Grid columns={2}>

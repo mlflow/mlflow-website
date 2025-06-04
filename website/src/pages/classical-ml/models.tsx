@@ -6,6 +6,7 @@ import {
   AboveTheFold,
   BelowTheFold,
   Card,
+  HeroImage,
 } from "../../components";
 import CardHero from "@site/static/img/Classical_models/classical_models_hero.png";
 import Card1 from "@site/static/img/Classical_models/classical_models_1.png";
@@ -21,9 +22,7 @@ export default function Models() {
         body="Build, deploy, and manage machine learning models with confidence using MLflow's comprehensive model lifecycle management"
         hasGetStartedButton={MLFLOW_GET_STARTED_URL}
       >
-        <div className="w-full max-w-[800px] rounded-lg overflow-hidden mx-auto">
-          <img src={CardHero} alt="" />
-        </div>
+        <HeroImage src={CardHero} alt="" />
       </AboveTheFold>
 
       <Grid columns={2}>
