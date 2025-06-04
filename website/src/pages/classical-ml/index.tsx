@@ -1,10 +1,6 @@
 import { MLFLOW_GET_STARTED_URL } from "@site/src/constants";
 import {
   Layout,
-  VerticalTabs,
-  VerticalTabsList,
-  VerticalTabsTrigger,
-  VerticalTabsContent,
   LogosCarousel,
   Grid,
   GridItem,
@@ -14,6 +10,11 @@ import {
   Section,
   Card,
 } from "../../components";
+import Card1 from "@site/static/img/Classical_home/Classical_home_1.png";
+import Card2 from "@site/static/img/Classical_home/Classical_home_2.png";
+import Card3 from "@site/static/img/Classical_home/Classical_home_3.png";
+import Card4 from "@site/static/img/Classical_home/Classical_home_4.png";
+import Card6 from "@site/static/img/Classical_home/Classical_home_6.png";
 
 export default function GenAi(): JSX.Element {
   return (
@@ -22,62 +23,81 @@ export default function GenAi(): JSX.Element {
         title="Mastering the ML lifecycle"
         body="From experiment to production, MLflow streamlines your complete machine learning journey with enterprise-grade tracking, model management, and deployment."
         hasGetStartedButton={MLFLOW_GET_STARTED_URL}
-      >
-        <div className="w-full max-w-[800px] aspect-video bg-black rounded-lg mx-auto"></div>
-      </AboveTheFold>
+      />
 
       <Section
         label="Core features"
         title="Build confidently, deploy seamlessly"
         body="Cover experimentation, reproducibility, deployment, and a central model registry"
       >
-        <VerticalTabs
-          defaultValue="unified-workflow"
-          className="w-full my-12 px-10"
-        >
-          <VerticalTabsList>
-            <VerticalTabsTrigger
-              value="unified-workflow"
-              label="Unified Workflow"
-              description="MLflow streamlines your entire ML process with tracking, packaging, and deployment capabilities, eliminating tool fragmentation so you can focus on model development rather than infrastructure"
+        <Grid columns={2}>
+          <GridItem width="wide">
+            <Card
+              title="Build production quality models"
+              body="lorem ipsum"
+              cta={{
+                text: "Learn more >",
+                href: "/",
+              }}
+              image={<img src={Card1} alt="" />}
             />
-            <VerticalTabsTrigger
-              value="reliable-reproducability"
-              label="Reliable Reproducability"
-              description="Automatically logs parameters, weights, artifacts, code, metrics, and dependencies to ensure experiments can be restored accurately, enabling confident governance for enterprise deployments."
+          </GridItem>
+          <GridItem width="wide">
+            <Card
+              title="Framework neutral"
+              body="Works seamlessly with popular tools like scikit-learn, PyTorch, TensorFlow, and XGBoost without vendor lock-in, providing flexibility with a common interface."
+              cta={{
+                text: "Learn more >",
+                href: "/",
+              }}
+              image={<img src={Card2} alt="" />}
             />
-            <VerticalTabsTrigger
-              value="framework-neutral"
-              label="Framework Neutral"
-              description="Works seamlessly with popular tools like scikit-learn, PyTorch, TensorFlow, and XGBoost without vendor lock-in, providing flexibility with a common interface."
+          </GridItem>
+          <GridItem width="wide">
+            <Card
+              title="Reliable Reproducibility"
+              body="Automatically logs parameters, weights, artifacts, code, metrics, and dependencies to ensure experiments can be restored accurately, enabling confident governance for enterprise deployments."
+              cta={{
+                text: "Learn more >",
+                href: "/",
+              }}
+              image={<img src={Card3} alt="" />}
             />
-            <VerticalTabsTrigger
-              value="deployment-ready"
-              label="Deployment Ready"
-              description="Simplifies the path from experimentation to production with a built-in registry that gives you complete control over model states, whether sharing new approaches or deploying solutions."
+          </GridItem>
+          <GridItem width="wide">
+            <Card
+              title="Deployment Ready"
+              body="Simplifies the path from experimentation to production with a built-in registry that gives you complete control over model states, whether sharing new approaches or deploying solutions."
+              cta={{
+                text: "Learn more >",
+                href: "/",
+              }}
+              image={<img src={Card4} alt="" />}
             />
-            <VerticalTabsTrigger
-              value="enterprise-ready"
-              label="Enterprise Ready"
-              description="Databricks-managed MLflow adds robust security, automated scaling, and high availability for mission-critical workloads while reducing operational overhead and delivering exceptional performance."
+          </GridItem>
+          <GridItem width="wide">
+            <Card
+              title="Unified Workflow"
+              body="MLflow streamlines your entire ML process with tracking, packaging, and deployment capabilities, eliminating tool fragmentation so you can focus on model development rather than infrastructure"
+              cta={{
+                text: "Learn more >",
+                href: "/",
+              }}
+              // image={<img src={Card5} alt="" />}
             />
-          </VerticalTabsList>
-          <VerticalTabsContent value="unified-workflow">
-            <img src="/img/demo-image.png" />
-          </VerticalTabsContent>
-          <VerticalTabsContent value="reliable-reproducability">
-            <img src="/img/demo-image.png" />
-          </VerticalTabsContent>
-          <VerticalTabsContent value="framework-neutral">
-            <img src="/img/demo-image.png" />
-          </VerticalTabsContent>
-          <VerticalTabsContent value="deployment-ready">
-            <img src="/img/demo-image.png" />
-          </VerticalTabsContent>
-          <VerticalTabsContent value="enterprise-ready">
-            <img src="/img/demo-image.png" />
-          </VerticalTabsContent>
-        </VerticalTabs>
+          </GridItem>
+          <GridItem width="wide">
+            <Card
+              title="Enterprise Grade"
+              body="Databricks-managed MLflow adds robust security, automated scaling, and high availability for mission-critical workloads while reducing operational overhead and delivering exceptional performance."
+              cta={{
+                text: "Learn more >",
+                href: "/",
+              }}
+              image={<img src={Card6} alt="" />}
+            />
+          </GridItem>
+        </Grid>
       </Section>
 
       <LogosCarousel />

@@ -13,12 +13,22 @@ type Props = {
     prominent?: boolean;
   };
   image?: ReactNode;
-} & VariantProps<typeof contentWrapper>;
+} & VariantProps<typeof contentWrapper> &
+  VariantProps<typeof imageWrapper>;
 
 const contentWrapper = cva("flex flex-col gap-4", {
   variants: {
     padded: {
       true: "p-6",
+      false: "",
+    },
+  },
+});
+
+const imageWrapper = cva("w-full", {
+  variants: {
+    rounded: {
+      true: "rounded-lg overflow-hidden",
       false: "",
     },
   },
@@ -30,7 +40,8 @@ export function Card({
   bodySize = "l",
   cta,
   image,
-  padded,
+  padded = false,
+  rounded = true,
 }: Props) {
   const bodyParts = Array.isArray(body) ? body : [body];
   return (
@@ -55,7 +66,7 @@ export function Card({
           </Link>
         )}
       </div>
-      {image && <div className="w-full">{image}</div>}
+      {image && <div className={imageWrapper({ rounded })}>{image}</div>}
     </>
   );
 }
