@@ -1,7 +1,7 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import type { PropsWithChildren } from "react";
 
-const styles = cva("text-wrap", {
+const styles = cva("text-balance", {
   variants: {
     level: {
       1: "font-light text-[64px] leading-[100%] tracking-[-3%] text-center",
