@@ -123,9 +123,7 @@ export const Layout = ({ children }: Props) => {
   return (
     <LayoutContext.Provider value={variant}>
       <div className="flex flex-col min-h-screen w-full bg-[#0E1416]">
-        <Header
-          isGenAI={layoutType.startsWith("genai") || layoutType === "home"}
-        />
+        <Header layoutType={layoutType} />
         <main className="flex flex-col">
           <div className={wrapper({ variant, direction })}>
             <div className="flex flex-col gap-24 w-full px-6 md:px-20 max-w-container">
