@@ -6,7 +6,7 @@ import { FooterMenuItem } from "../FooterMenuItem/FooterMenuItem";
 import { MLFLOW_DOCS_URL } from "@site/src/constants";
 
 const footerVariants = cva(
-  "pb-30 flex flex-col pt-30 bg-bottom bg-no-repeat bg-cover max-w-container text-center gap-120 bg-size-[auto_360px]",
+  "pb-30 flex flex-col pt-30 bg-bottom bg-no-repeat bg-cover max-w-container text-center bg-size-[auto_360px]",
   {
     variants: {
       variant: {
@@ -30,8 +30,13 @@ const footerVariants = cva(
 export const Footer = ({ variant }: VariantProps<typeof footerVariants>) => {
   return (
     <footer className={footerVariants({ variant })}>
-      <div className="flex flex-row justify-between items-start md:items-center px-6 lg:px-20 gap-10 xs:gap-0 max-w-container">
-        <Logo className="h-[36px] shrink-0" />
+      <div className="flex flex-row justify-between items-start px-6 lg:px-20 gap-10 xs:gap-0 max-w-container">
+        <div className="flex flex-col gap-8">
+          <Logo className="h-[36px] shrink-0" />
+          <div className="text-xs text-gray-800 text-left md:text-nowrap md:w-0">
+            © 2025 MLflow Project, a Series of LF Projects, LLC.
+          </div>
+        </div>
 
         <div className="flex flex-col md:flex-row gap-10">
           <FooterMenuItem href="/">Product</FooterMenuItem>
@@ -39,9 +44,6 @@ export const Footer = ({ variant }: VariantProps<typeof footerVariants>) => {
           <FooterMenuItem href="/blog">Blog</FooterMenuItem>
           <FooterMenuItem href={MLFLOW_DOCS_URL}>Docs</FooterMenuItem>
         </div>
-      </div>
-      <div className="text-xs text-gray-800">
-        © 2025 MLflow Project, a Series of LF Projects, LLC.
       </div>
     </footer>
   );
