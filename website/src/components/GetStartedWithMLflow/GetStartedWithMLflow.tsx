@@ -39,12 +39,15 @@ export const GetStartedWithMLflow = () => {
             </div>
             <div className="flex flex-col gap-4">
               {[
-                "Access to all platform features",
+                "Access to advanced GenAl evaluation and monitoring features",
+                "Scalable, production ready trace ingestion and storage",
+                "Fully managed infra; no need to manage your own infra",
+                "Store up to 100K traces at no cost",
+                "No fixed platform fees",
                 "Unlimited users",
-                "Unlimited data access",
-                "No charge up to 50K traces, covered by free credits upon signup",
-                "Pay-as-you-go billing with credit card",
-                "Enterprise support available",
+                "Unlimited data retention",
+                "Access to your data via Databricks Delta Tables, Al/BI, SQL, and Notebooks",
+                "Enterprise support",
               ].map((bulletPoint, index) => (
                 <div key={index} className="flex flex-row items-center gap-4">
                   <Checkmark className="shrink-0" />
@@ -66,7 +69,7 @@ export const GetStartedWithMLflow = () => {
               "Apache-2.0 license",
               "Access to all core platform features",
               "Full control over your own infrastructure",
-              "Ability to customize MLflow to fit your specific needs",
+              "Ability to customize MLflow source code",
               "Community support",
             ].map((bulletPoint, index) => (
               <div key={index} className="flex flex-row items-center gap-4">
