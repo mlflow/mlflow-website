@@ -9,6 +9,8 @@ import {
   Card,
   GlossyCardContainer,
 } from "../components";
+import GenAI from "@site/static/img/Home_page_hybrid/GenAI Apps & Agents.png";
+import ModelTraining from "@site/static/img/Home_page_hybrid/Model Training.png";
 
 export default function Home(): JSX.Element {
   return (
@@ -30,9 +32,7 @@ export default function Home(): JSX.Element {
                 text: "Learn more >",
                 prominent: true,
               }}
-              image={
-                <div className="w-full bg-brand-black/60 min-h-[270px] rounded-b-4xl hidden md:block" />
-              }
+              image={<img src={GenAI} alt="" className="hidden md:block" />}
             />
           </GlossyCard>
           <GlossyCard>
@@ -48,7 +48,7 @@ export default function Home(): JSX.Element {
                 prominent: true,
               }}
               image={
-                <div className="w-full bg-brand-black/60 min-h-[270px] rounded-b-4xl hidden md:block" />
+                <img src={ModelTraining} alt="" className="hidden md:block" />
               }
             />
           </GlossyCard>
