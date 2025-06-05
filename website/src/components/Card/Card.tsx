@@ -25,7 +25,7 @@ const contentWrapper = cva("flex flex-col gap-4", {
   },
 });
 
-const imageWrapper = cva("w-full", {
+const imageWrapper = cva("w-full relative", {
   variants: {
     rounded: {
       true: "rounded-lg overflow-hidden",
@@ -66,7 +66,12 @@ export function Card({
           </Link>
         )}
       </div>
-      {image && <div className={imageWrapper({ rounded })}>{image}</div>}
+      {image && (
+        <div className={imageWrapper({ rounded })}>
+          {image}
+          <div className="absolute inset-0 bg-black/5 pointer-events-none" />
+        </div>
+      )}
     </>
   );
 }
