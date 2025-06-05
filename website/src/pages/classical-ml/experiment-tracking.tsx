@@ -18,7 +18,7 @@ export default function Tracking() {
   return (
     <Layout>
       <AboveTheFold
-        sectionLabel="Tracking"
+        sectionLabel="Experiment tracking"
         title="Comprehensive Experiment Tracking"
         body=" Document, compare, and reproduce your machine learning experiments with MLflow's powerful tracking capabilities"
         hasGetStartedButton={MLFLOW_GET_STARTED_URL}
