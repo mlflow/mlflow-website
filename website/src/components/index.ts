@@ -24,3 +24,4 @@ export { Card } from "./Card/Card";
 export { HeroImage } from "./HeroImage";
 export { ValuePropWidget } from "./ValuePropWidget/ValuePropWidget";
 export { EcosystemList } from "./EcosystemList/EcosystemList";
+export { StickyGrid } from "./StickyGrid";

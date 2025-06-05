@@ -1,12 +1,10 @@
 import { MLFLOW_DOCS_URL } from "@site/src/constants";
 import {
   Layout,
-  Grid,
-  GridItem,
   AboveTheFold,
   BelowTheFold,
-  Card,
   HeroImage,
+  StickyGrid,
 } from "../../components";
 import CardHero from "@site/static/img/GenAI_humanfeedback/GenAI_humanfeedback_hero.png";
 import Card1 from "@site/static/img/GenAI_humanfeedback/GenAI_humanfeedback_1.png";
@@ -29,40 +27,34 @@ export default function HumanFeedback() {
         <HeroImage src={CardHero} alt="" />
       </AboveTheFold>
 
-      <Grid columns={2}>
-        <GridItem width="wide">
-          <Card
-            title="Intuitive labeling UIs for business users"
-            body="MLflow's Review App enables busy domain experts to quickly provide feedback on production logs. Share logs for review and use predefined or custom questions."
-            image={<img src={Card1} alt="" />}
+      <StickyGrid
+        cards={[
+          {
+            title: "Intuitive labeling UIs for business users",
+            body: "MLflow's Review App enables busy domain experts to quickly provide feedback on production logs. Share logs for review and use predefined or custom questions.",
+            image: <img src={Card1} alt="" />,
             // Hybrid animation / product GIF of showing a trace in the trace UI, then animating it to go to the review app, and then seeing the review app in action (provide feedback clicked) and then animation to see it on the trace UI
-          />
-        </GridItem>
-        <GridItem width="wide">
-          <Card
-            title="Track and visualize feedback"
-            body="MLflow replaces spreadsheets by attaching expert/user feedback to traces as versioned labels. Visualize this data in MLflow Trace UIs and dashboards to swiftly identify quality issues."
-            image={<img src={Card2} alt="" />}
+          },
+          {
+            title: "Track and visualize feedback",
+            body: "MLflow replaces spreadsheets by attaching expert/user feedback to traces as versioned labels. Visualize this data in MLflow Trace UIs and dashboards to swiftly identify quality issues.",
+            image: <img src={Card2} alt="" />,
             // Animation of an app executing, producing a trace, having feedback attached to it, and then seeing the feedback in the trace UI
-          />
-        </GridItem>
-        <GridItem width="wide">
-          <Card
-            title="Capture end-user feedback"
-            body="MLflow scalable feedback APIs allow you to attach end-user feedback from your deployed app to the source MLflow Trace, so you debug negative feedback with access to the step-by-step execution."
-            image={<img src={Card3} alt="" />}
+          },
+          {
+            title: "Capture end-user feedback",
+            body: "MLflow scalable feedback APIs allow you to attach end-user feedback from your deployed app to the source MLflow Trace, so you debug negative feedback with access to the step-by-step execution.",
+            image: <img src={Card3} alt="" />,
             // Product GIF of a fake production app and then seeing the feedback in the trace UI
-          />
-        </GridItem>
-        <GridItem width="wide">
-          <Card
-            title="Integrated Chat App"
-            body="Deploy new app versions to the Review App's chat UI. Domain experts can interact, give instant feedback, and help rapidly assess quality and pinpoint issues."
-            image={<img src={Card4} alt="" />}
+          },
+          {
+            title: "Integrated Chat App",
+            body: "Deploy new app versions to the Review App's chat UI. Domain experts can interact, give instant feedback, and help rapidly assess quality and pinpoint issues.",
+            image: <img src={Card4} alt="" />,
             // Product GIF of the review app chat mode and then seeing the feedback in the trace UI
-          />
-        </GridItem>
-      </Grid>
+          },
+        ]}
+      />
 
       <BelowTheFold />
     </Layout>
