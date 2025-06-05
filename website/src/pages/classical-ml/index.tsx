@@ -23,6 +23,7 @@ export default function GenAi(): JSX.Element {
         title="Mastering the ML lifecycle"
         body="From experiment to production, MLflow streamlines your complete machine learning journey with enterprise-grade tracking, model management, and deployment."
         hasGetStartedButton={MLFLOW_GET_STARTED_URL}
+        bodyColor="white"
       >
         <div className="md:h-20 lg:h-40" />
       </AboveTheFold>
@@ -36,7 +37,7 @@ export default function GenAi(): JSX.Element {
           <GridItem width="wide">
             <Card
               title="Build production quality models"
-              body="lorem ipsum"
+              body="MLflow makes it easy to iterate toward production-ready models by organizing and comparing runs, helping teams refine training pipelines based on real performance insights."
               cta={{
                 text: "Learn more >",
                 href: "/",

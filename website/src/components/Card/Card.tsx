@@ -47,14 +47,14 @@ export function Card({
   return (
     <>
       <div className={contentWrapper({ padded })}>
-        <Heading level={5} aria-level={3}>
-          {title}
-        </Heading>
-        {bodyParts.map((part, index) => (
-          <Body key={index} size={bodySize}>
-            {part}
-          </Body>
-        ))}
+        <Heading level={3}>{title}</Heading>
+        <div>
+          {bodyParts.map((part, index) => (
+            <Body key={index} size={bodySize} margin="tight">
+              {part}
+            </Body>
+          ))}
+        </div>
         {cta && (
           <Link href={cta.href}>
             <Button
