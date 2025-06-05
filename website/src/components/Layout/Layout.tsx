@@ -8,7 +8,7 @@ import useBaseUrl from "@docusaurus/useBaseUrl";
 type Props = PropsWithChildren;
 
 const wrapper = cva(
-  "flex flex-col gap-20 bg-no-repeat w-full pt-42 pb-20 py-20 max-w-container",
+  "flex flex-col gap-20 bg-no-repeat w-full pt-42 pb-20 py-20",
   {
     variants: {
       variant: {
@@ -17,8 +17,8 @@ const wrapper = cva(
         colorful: "",
       },
       direction: {
-        down: "bg-size-[auto_1000px] bg-[center_top]",
-        up: "bg-size-[auto_820px] bg-[center_top]",
+        down: "bg-size-[auto_1000px] 2xl:bg-size-[100%_1000px] bg-[center_top]",
+        up: "bg-size-[auto_820px] 2xl:bg-size-[100%_820px] bg-[center_top]",
       },
     },
     compoundVariants: [
@@ -27,7 +27,6 @@ const wrapper = cva(
         direction: "down",
         className: [
           "bg-[linear-gradient(to_bottom,rgba(12,20,20,0)_0%,rgba(12,20,20,0)_50%,rgba(14,20,20,100)_75%),url('/img/background-image-2.png')]",
-          "2xl:bg-[radial-gradient(farthest-side_at_center_top,rgba(12,20,20,0)_0%,rgba(12,20,20,0)_80%,rgba(14,20,20,100)_97%),url('/img/background-image-2.png')]",
         ],
       },
       {
@@ -35,7 +34,6 @@ const wrapper = cva(
         direction: "down",
         className: [
           "bg-[linear-gradient(to_bottom,rgba(12,20,20,0)_0%,rgba(12,20,20,0)_50%,rgba(14,20,20,100)_75%),url('/img/background-image-3.png')]",
-          "2xl:bg-[radial-gradient(farthest-side_at_center_top,rgba(12,20,20,0)_0%,rgba(12,20,20,0)_80%,rgba(14,20,20,100)_97%),url('/img/background-image-3.png')]",
         ],
       },
       {
@@ -43,7 +41,6 @@ const wrapper = cva(
         direction: "down",
         className: [
           "bg-[linear-gradient(to_bottom,rgba(12,20,20,0)_0%,rgba(12,20,20,0)_50%,rgba(14,20,20,100)_75%),url('/img/background-image-1.png')]",
-          "2xl:bg-[radial-gradient(farthest-side_at_center_top,rgba(12,20,20,0)_0%,rgba(12,20,20,0)_80%,rgba(14,20,20,100)_97%),url('/img/background-image-1.png')]",
         ],
       },
       {
@@ -51,7 +48,6 @@ const wrapper = cva(
         direction: "up",
         className: [
           "bg-[linear-gradient(to_top,rgba(12,20,20,0)_0%,rgba(12,20,20,0)_10%,rgba(14,20,20,100)_40%),url('/img/background-image-2-flipped.png')]",
-          "2xl:bg-[radial-gradient(farthest-side_at_center_bottom,rgba(12,20,20,0)_0%,rgba(12,20,20,0)_10%,rgba(14,20,20,100)_90%),url('/img/background-image-2-flipped.png')]",
         ],
       },
       {
@@ -59,7 +55,6 @@ const wrapper = cva(
         direction: "up",
         className: [
           "bg-[linear-gradient(to_top,rgba(11,20,20,0)_0%,rgba(12,20,20,0)_10%,rgba(14,20,20,100)_40%),url('/img/background-image-3-flipped.png')]",
-          "2xl:bg-[radial-gradient(farthest-side_at_center_bottom,rgba(12,20,20,0)_0%,rgba(12,20,20,0)_10%,rgba(14,20,20,100)_90%),url('/img/background-image-3-flipped.png')]",
         ],
       },
       {
@@ -67,7 +62,6 @@ const wrapper = cva(
         direction: "up",
         className: [
           "bg-[linear-gradient(to_top,rgba(11,20,20,0)_0%,rgba(12,20,20,0)_10%,rgba(14,20,20,100)_40%),url('/img/background-image-1-flipped.png')]",
-          "2xl:bg-[radial-gradient(farthest-side_at_center_bottom,rgba(12,20,20,0)_0%,rgba(12,20,20,0)_10%,rgba(14,20,20,100)_90%),url('/img/background-image-1-flipped.png')]",
         ],
       },
     ],

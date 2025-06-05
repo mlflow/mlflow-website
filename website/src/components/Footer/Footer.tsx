@@ -6,21 +6,18 @@ import { FooterMenuItem } from "../FooterMenuItem/FooterMenuItem";
 import { MLFLOW_DOCS_URL } from "@site/src/constants";
 
 const footerVariants = cva(
-  "pb-30 flex flex-col pt-30 bg-bottom bg-no-repeat bg-cover max-w-container text-center bg-size-[auto_360px]",
+  "pb-30 flex flex-col pt-30 bg-bottom bg-no-repeat bg-cover text-center bg-size-[auto_360px] 2xl:bg-size-[100%_360px]",
   {
     variants: {
       variant: {
         blue: [
           "bg-[linear-gradient(to_top,rgba(12,20,20,0)_0%,rgba(12,20,20,0)_10%,rgba(14,20,20,100)_40%),url('/img/footer-blue-bg.png')]",
-          "2xl:bg-[radial-gradient(farthest-side_at_center_bottom,rgba(12,20,20,0)_0%,rgba(12,20,20,0)_10%,rgba(14,20,20,100)_90%),url('/img/footer-blue-bg.png')]",
         ],
         red: [
           "bg-[linear-gradient(to_top,rgba(12,20,20,0)_0%,rgba(12,20,20,0)_10%,rgba(14,20,20,100)_40%),url('/img/footer-red-bg.png')]",
-          "2xl:bg-[radial-gradient(farthest-side_at_center_bottom,rgba(12,20,20,0)_0%,rgba(12,20,20,0)_10%,rgba(14,20,20,100)_90%),url('/img/footer-red-bg.png')]",
         ],
         colorful: [
           "bg-[linear-gradient(to_top,rgba(12,20,20,0)_0%,rgba(12,20,20,0)_10%,rgba(14,20,20,100)_40%),url('/img/footer-colorful-bg.png')]",
-          "2xl:bg-[radial-gradient(farthest-side_at_center_bottom,rgba(12,20,20,0)_0%,rgba(12,20,20,0)_10%,rgba(14,20,20,100)_90%),url('/img/footer-colorful-bg.png')]",
         ],
       },
     },
