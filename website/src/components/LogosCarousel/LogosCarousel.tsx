@@ -20,12 +20,12 @@ export const LogosCarousel = () => {
   const items = images.map((image, index) => (
     <img
       key={index}
-      className="inline h-16 mx-20 opacity-20"
+      className="inline h-16 mx-10 opacity-20"
       src={useBaseUrl(image)}
     />
   ));
   return (
-    <div className="flex overflow-x-hidden [mask-image:_linear-gradient(to_right,_transparent_0,_white_128px,white_calc(100%-128px),_transparent_100%)] w-full">
+    <div className="flex overflow-x-hidden [mask-image:_linear-gradient(to_right,_transparent_0,_white_128px,white_calc(100%-128px),_transparent_100%)] w-full p-8">
       <div className={container}>{items}</div>
       <div className={container} aria-hidden>
         {items}
