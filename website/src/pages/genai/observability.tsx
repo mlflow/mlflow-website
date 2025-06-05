@@ -37,7 +37,7 @@ export default function Observability() {
       </AboveTheFold>
 
       <Section title="Best-in-class tracing">
-        <Grid columns={2}>
+        <Grid columns={2} sticky>
           <GridItem width="wide">
             <Card
               title="End to end observability"
@@ -74,7 +74,7 @@ export default function Observability() {
       </Section>
 
       <Section title="Simple, customizable instrumentation">
-        <Grid columns={2}>
+        <Grid columns={2} sticky>
           <GridItem width="wide">
             <Card
               title="Automatic instrumentation that's fully customizable"
@@ -110,7 +110,7 @@ export default function Observability() {
       </Section>
 
       <Section title="Annotation capabilities">
-        <Grid columns={2}>
+        <Grid columns={2} sticky>
           <GridItem width="wide">
             <Card
               title="Attach Quality Feedback"
@@ -139,7 +139,7 @@ export default function Observability() {
       </Section>
 
       <Section id="production-monitoring" title="Production monitoring">
-        <Grid columns={2}>
+        <Grid columns={2} sticky>
           <GridItem width="wide">
             <Card
               title="Dashboards"
