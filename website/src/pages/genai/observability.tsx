@@ -17,6 +17,7 @@ import Card5 from "@site/static/img/GenAI_observability/GenAI_observability_5.pn
 import Card6 from "@site/static/img/GenAI_observability/GenAI_observability_6.png";
 import Card7 from "@site/static/img/GenAI_observability/GenAI_observability_7.png";
 import Card8 from "@site/static/img/GenAI_observability/GenAI_observability_8.png";
+import Card9 from "@site/static/img/GenAI_observability/GenAI_observability_9.png";
 import Card10 from "@site/static/img/GenAI_observability/GenAI_observability_10.png";
 import Card11 from "@site/static/img/GenAI_observability/GenAI_observability_11.png";
 import Card12 from "@site/static/img/GenAI_observability/GenAI_observability_12.png";
@@ -114,7 +115,7 @@ export default function Observability() {
             <Card
               title="Attach Quality Feedback"
               body="Attach quality assessments from users, domain experts, or LLM judges/metrics directly on each trace so you can quickly understand and debug quality issues."
-              image={<img src={Card10} alt="" />}
+              image={<img src={Card9} alt="" />}
               // Product GIF of the feedback annotation view - show judge + review app + then show the feedback showing up on the trace in the trace UI
             />
           </GridItem>
@@ -122,7 +123,7 @@ export default function Observability() {
             <Card
               title="Attach Metadata"
               body="Attach metadata, such as users, converastions sessions, and custom tags to traces to help you slice and dice based on user behavior."
-              image={<img src={Card11} alt="" />}
+              image={<img src={Card10} alt="" />}
               // Animation of grouping traces by user and conversation session
             />
           </GridItem>
@@ -130,7 +131,7 @@ export default function Observability() {
             <Card
               title="Comments and notes"
               body="Add notes and context directly to traces for collaborative analysis."
-              image={<img src={Card12} alt="" />}
+              image={<img src={Card11} alt="" />}
               // Product GIF of adding feedback in the trace UI
             />
           </GridItem>

@@ -16,9 +16,11 @@ export function Section({ id, label, title, body, children }: Props) {
       id={id}
       className="flex flex-col w-full items-center justify-center gap-16"
     >
-      <div className="flex flex-col w-full items-center justify-center gap-6">
+      <div className="flex flex-col w-full max-w-5xl items-center justify-center gap-6">
         {label && <SectionLabel label={label} />}
-        <Heading level={2}>{title}</Heading>
+        <Heading level={1} aria-level={2}>
+          {title}
+        </Heading>
         {body && <Body size="l">{body}</Body>}
       </div>
       {children}

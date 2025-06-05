@@ -13,6 +13,12 @@ import Card1 from "@site/static/img/GenAI_prompts&versions/GenAI_prompt&versioni
 import Card2 from "@site/static/img/GenAI_prompts&versions/GenAI_prompt&versioning_2.png";
 import Card3 from "@site/static/img/GenAI_prompts&versions/GenAI_prompt&versioning_3.png";
 import Card4 from "@site/static/img/GenAI_prompts&versions/GenAI_prompt&versioning_4.png";
+import Card5 from "@site/static/img/GenAI_prompts&versions/GenAI_prompt&versioning_5.png";
+import Card6 from "@site/static/img/GenAI_prompts&versions/GenAI_prompt&versioning_6.png";
+import Card7 from "@site/static/img/GenAI_prompts&versions/GenAI_prompt&versioning_7.png";
+import Card8 from "@site/static/img/GenAI_prompts&versions/GenAI_prompt&versioning_8.png";
+import Card9 from "@site/static/img/GenAI_prompts&versions/GenAI_prompt&versioning_9.png";
+import Card10 from "@site/static/img/GenAI_prompts&versions/GenAI_prompt&versioning_10.png";
 
 export default function PromptRegistryVersioning() {
   return (
@@ -60,7 +66,7 @@ export default function PromptRegistryVersioning() {
             <Card
               title="Manage Prompt Lifecycles with Aliases"
               body="Use aliases (e.g., development, staging, production) to manage prompt versions across environments and implement governance."
-              image={<img src={Card4} alt="" />}
+              image={<img src={Card5} alt="" />}
             />
           </GridItem>
         </Grid>
@@ -72,35 +78,35 @@ export default function PromptRegistryVersioning() {
             <Card
               title="Version Tracking"
               body="Track different versions of your GenAI applications using LoggedModels. Link evaluation results, traces, and prompt versions to specific application versions. Optionally package application code for deployment and compare versions to understand performance impacts."
-              image={<img src={Card4} alt="" />}
+              image={<img src={Card6} alt="" />}
             />
           </GridItem>
           <GridItem width="wide">
             <Card
               title="Track Application Versions with MLflow"
               body="Use LoggedModel as a central metadata record linking to external code (e.g., Git commits), prompt versions, and configurations. Set active models for associating evaluations and traces."
-              image={<img src={Card4} alt="" />}
+              image={<img src={Card7} alt="" />}
             />
           </GridItem>
           <GridItem width="wide">
             <Card
               title="Optionally Package App Code & Files"
               body="Bundle application code, dependencies, and artifacts into a LoggedModel for deployment, especially for environments like Databricks Model Serving."
-              image={<img src={Card4} alt="" />}
+              image={<img src={Card8} alt="" />}
             />
           </GridItem>
           <GridItem width="wide">
             <Card
               title="Compare App Versions"
               body="Compare different LoggedModel versions using metrics like performance, cost, and quality scores to make data-driven decisions."
-              image={<img src={Card4} alt="" />}
+              image={<img src={Card9} alt="" />}
             />
           </GridItem>
           <GridItem width="wide">
             <Card
               title="Link Evaluation Results and Traces to App Versions"
               body="Automatically link evaluation metrics, outputs, and traces from `mlflow.genai.evaluate()` and autologging back to the specific LoggedModel version."
-              image={<img src={Card4} alt="" />}
+              image={<img src={Card10} alt="" />}
             />
           </GridItem>
         </Grid>

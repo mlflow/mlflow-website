@@ -8,6 +8,7 @@ import { SocialWidgetItem } from "../SocialWidgetItem/SocialWidgetItem";
 import { Grid } from "../Grid/Grid";
 import { Heading } from "../Typography/Heading";
 import { Body } from "../Typography/Body";
+import { MLFLOW_DOCS_URL } from "@site/src/constants";
 
 const socials = [
   {
@@ -19,7 +20,7 @@ const socials = [
     ),
     label: "Documentation",
     description: "Read documentation",
-    href: "https://mlflow.org/docs/latest/",
+    href: MLFLOW_DOCS_URL,
   },
   {
     key: "github",

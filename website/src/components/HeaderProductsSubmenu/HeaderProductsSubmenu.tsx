@@ -49,7 +49,10 @@ export const HeaderProductsSubmenu = () => {
           <span className="text-[#F7F8F8]/60 text-sm">Features</span>
           <div className="flex flex-row gap-8">
             <div className="min-w-40 flex flex-col gap-4 md:gap-1">
-              <HeaderMenuItem href="/classical-ml/tracking" label="Tracking" />
+              <HeaderMenuItem
+                href="/classical-ml/experiment-tracking"
+                label="Experiment Tracking"
+              />
               <HeaderMenuItem
                 href="/classical-ml/hyperparam-tuning"
                 label="Hyperparameter tuning"
@@ -58,8 +61,8 @@ export const HeaderProductsSubmenu = () => {
             </div>
             <div className="min-w-40 flex flex-col gap-4 md:gap-1">
               <HeaderMenuItem
-                href="/classical-ml/unified-registry"
-                label="Unified registry"
+                href="/classical-ml/model-registry"
+                label="Model registry"
               />
               <HeaderMenuItem href="/classical-ml/serving" label="Serving" />
             </div>

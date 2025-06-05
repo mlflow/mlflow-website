@@ -29,7 +29,7 @@ export default function HyperparamTuning() {
         <GridItem width="wide">
           <Card
             title="Native ML library integrations with mlflow.autolog"
-            body="lorem ipsum"
+            body="mlflow.autolog() integrates with popular ML libraries to automatically log hyperparameters, metrics, and artifacts—enabling efficient tracking and comparison of tuning experiments with no manual effort."
             image={<img src={Card1} alt="" />}
           />
         </GridItem>
@@ -43,7 +43,7 @@ export default function HyperparamTuning() {
         <GridItem width="wide">
           <Card
             title="Identify the best model for production"
-            body="lorem ipsum"
+            body="By visualizing metrics across runs directly in the MLflow UI, users can quickly evaluate tradeoffs and identify the best model for production."
             image={<img src={Card3} alt="" />}
           />
         </GridItem>

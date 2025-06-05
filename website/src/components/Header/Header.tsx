@@ -20,10 +20,16 @@ import {
 const MD_BREAKPOINT = 640;
 
 type Props = {
-  isGenAI: boolean;
+  layoutType:
+    | "default"
+    | "genai"
+    | "genai-subpage"
+    | "classical-ml"
+    | "classical-ml-subpage"
+    | "home";
 };
 
-export const Header = ({ isGenAI }: Props) => {
+export const Header = ({ layoutType }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isProductItemHovered, setIsProductItemHovered] = useState(false);
   const [isProductSubmenuOpen, setIsProductSubmenuOpen] = useState(false);
@@ -56,15 +62,15 @@ export const Header = ({ isGenAI }: Props) => {
 
   return (
     <nav className="fixed w-full z-20 top-0 start-0 bg-[#F7F8F8]/1 border-b border-[#F7F8F8]/8 backdrop-blur-[20px] drop-shadow-[0px_1px_2px_rgba(0_0_0/75%),0px_1px_12px_rgba(0_0_0/75%)]">
-      <div className="flex flex-wrap items-center justify-between mx-auto px-6 lg:px-20 py-2 max-w-container">
+      <div className="flex flex-wrap items-center mx-auto px-6 lg:px-20 py-2 max-w-container">
         <Link
           href="/"
-          className="flex items-center space-x-3 rtl:space-x-reverse"
+          className="flex items-center space-x-3 rtl:space-x-reverse grow basis-0"
         >
           <Logo className="h-[36px]" />
         </Link>
-        <div className="flex flex-row items-center gap-6 md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
-          {isGenAI ? (
+        <div className="flex flex-row items-center gap-6 md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse grow justify-end basis-0">
+          {layoutType.startsWith("genai") ? (
             <>
               <HeaderMenuItem
                 href={MLFLOW_LOGIN_URL}
@@ -77,13 +83,13 @@ export const Header = ({ isGenAI }: Props) => {
                 </Button>
               </Link>
             </>
-          ) : (
+          ) : layoutType.startsWith("classical-ml") ? (
             <Link href={MLFLOW_GET_STARTED_URL} className="hidden md:block">
               <Button variant="primary" size="small">
                 Get started
               </Button>
             </Link>
-          )}
+          ) : null}
           <button
             data-collapse-toggle="navbar-sticky"
             type="button"
@@ -154,7 +160,7 @@ export const Header = ({ isGenAI }: Props) => {
             <li className="w-full md:w-auto">
               <HeaderMenuItem href={MLFLOW_DOCS_URL} label="Docs" />
             </li>
-            {isGenAI ? (
+            {layoutType.startsWith("genai") ? (
               <>
                 <li className="w-full md:w-auto md:hidden">
                   <HeaderMenuItem href={MLFLOW_LOGIN_URL} label="Login" />
@@ -167,7 +173,7 @@ export const Header = ({ isGenAI }: Props) => {
                   </Link>
                 </li>
               </>
-            ) : (
+            ) : layoutType.startsWith("classical-ml") ? (
               <li className="w-full md:w-auto md:hidden">
                 <Link href={MLFLOW_GET_STARTED_URL}>
                   <Button variant="primary" size="small" width="full">
@@ -175,7 +181,7 @@ export const Header = ({ isGenAI }: Props) => {
                   </Button>
                 </Link>
               </li>
-            )}
+            ) : null}
           </ul>
         </div>
       </div>

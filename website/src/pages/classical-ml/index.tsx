@@ -14,6 +14,7 @@ import Card1 from "@site/static/img/Classical_home/Classical_home_1.png";
 import Card2 from "@site/static/img/Classical_home/Classical_home_2.png";
 import Card3 from "@site/static/img/Classical_home/Classical_home_3.png";
 import Card4 from "@site/static/img/Classical_home/Classical_home_4.png";
+import Card5 from "@site/static/img/Classical_home/Classical_home_5.png";
 import Card6 from "@site/static/img/Classical_home/Classical_home_6.png";
 
 export default function GenAi(): JSX.Element {
@@ -23,7 +24,10 @@ export default function GenAi(): JSX.Element {
         title="Mastering the ML lifecycle"
         body="From experiment to production, MLflow streamlines your complete machine learning journey with enterprise-grade tracking, model management, and deployment."
         hasGetStartedButton={MLFLOW_GET_STARTED_URL}
-      />
+        bodyColor="white"
+      >
+        <div className="md:h-20 lg:h-40" />
+      </AboveTheFold>
 
       <Section
         label="Core features"
@@ -34,7 +38,7 @@ export default function GenAi(): JSX.Element {
           <GridItem width="wide">
             <Card
               title="Build production quality models"
-              body="lorem ipsum"
+              body="MLflow makes it easy to iterate toward production-ready models by organizing and comparing runs, helping teams refine training pipelines based on real performance insights."
               cta={{
                 text: "Learn more >",
                 href: "/",
@@ -83,7 +87,7 @@ export default function GenAi(): JSX.Element {
                 text: "Learn more >",
                 href: "/",
               }}
-              // image={<img src={Card5} alt="" />}
+              image={<img src={Card5} alt="" />}
             />
           </GridItem>
           <GridItem width="wide">
