@@ -62,14 +62,14 @@ export const Header = ({ layoutType }: Props) => {
 
   return (
     <nav className="fixed w-full z-20 top-0 start-0 bg-[#F7F8F8]/1 border-b border-[#F7F8F8]/8 backdrop-blur-[20px] drop-shadow-[0px_1px_2px_rgba(0_0_0/75%),0px_1px_12px_rgba(0_0_0/75%)]">
-      <div className="flex flex-wrap items-center justify-between mx-auto px-6 lg:px-20 py-2 max-w-container">
+      <div className="flex flex-wrap items-center mx-auto px-6 lg:px-20 py-2 max-w-container">
         <Link
           href="/"
-          className="flex items-center space-x-3 rtl:space-x-reverse"
+          className="flex items-center space-x-3 rtl:space-x-reverse grow basis-0"
         >
           <Logo className="h-[36px]" />
         </Link>
-        <div className="flex flex-row items-center gap-6 md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
+        <div className="flex flex-row items-center gap-6 md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse grow justify-end basis-0">
           {layoutType.startsWith("genai") ? (
             <>
               <HeaderMenuItem
