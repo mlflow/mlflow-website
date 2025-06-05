@@ -84,7 +84,7 @@ const gridItemVariants = cva(
         reverse: "md:flex-col-reverse",
       },
       sticky: {
-        true: "sticky top-[56px]",
+        true: "lg:sticky top-[56px]",
         false: "",
       },
     },
