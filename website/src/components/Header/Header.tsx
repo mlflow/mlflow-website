@@ -107,7 +107,7 @@ export const Header = ({ layoutType }: Props) => {
             >
               <span
                 className={
-                  "flex items-center gap-2 py-2 text-white text-[15px] w-full md:w-auto cursor-pointer"
+                  "items-center gap-2 py-2 text-white text-[15px] w-full md:w-auto cursor-pointer hidden md:flex"
                 }
               >
                 Components
@@ -116,9 +116,7 @@ export const Header = ({ layoutType }: Props) => {
               <div
                 className={cn(
                   "transition-all duration-300 ease-in",
-                  isProductSubmenuOpen
-                    ? "h-auto min-h-50"
-                    : "h-0 overflow-hidden",
+                  "h-auto min-h-50",
                 )}
               >
                 <HeaderProductsSubmenu />
