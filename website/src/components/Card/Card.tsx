@@ -3,7 +3,7 @@ import { Body, Button, Heading } from "..";
 import { ComponentProps, ReactNode } from "react";
 import { cva, VariantProps } from "class-variance-authority";
 
-type Props = {
+export type Props = {
   title: string;
   body: string | string[];
   bodySize?: ComponentProps<typeof Body>["size"];

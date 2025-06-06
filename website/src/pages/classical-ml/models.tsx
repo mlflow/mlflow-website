@@ -1,12 +1,10 @@
 import { MLFLOW_GET_STARTED_URL } from "@site/src/constants";
 import {
   Layout,
-  Grid,
-  GridItem,
   AboveTheFold,
   BelowTheFold,
-  Card,
   HeroImage,
+  StickyGrid,
 } from "../../components";
 import CardHero from "@site/static/img/Classical_models/classical_models_hero.png";
 import Card1 from "@site/static/img/Classical_models/classical_models_1.png";
@@ -25,29 +23,25 @@ export default function Models() {
         <HeroImage src={CardHero} alt="" />
       </AboveTheFold>
 
-      <Grid columns={2}>
-        <GridItem width="wide">
-          <Card
-            title="Unified Model Format"
-            body="MLflow's MLModel file provides a standardized structure for packaging models from any framework, capturing essential dependencies and input/output specifications. This consistent packaging approach eliminates integration friction while ensuring models can be reliably deployed across any environment."
-            image={<img src={Card1} alt="" />}
-          />
-        </GridItem>
-        <GridItem width="wide">
-          <Card
-            title="Comprehensive Model Metadata"
-            body="Track crucial model requirements and artifacts including data schemas, preprocessing steps, and environment dependencies automatically with MLflow's metadata system. Create fully reproducible model packages that document the complete model context for simplified governance and troubleshooting."
-            image={<img src={Card2} alt="" />}
-          />
-        </GridItem>
-        <GridItem width="wide">
-          <Card
-            title="Flexible Deployment Options"
-            body="Deploy models as Docker containers, Python functions, REST endpoints, or directly to various serving platforms with MLflow's versatile deployment capabilities. Streamline the transition from development to production with consistent model behavior across any target environment, from local testing to cloud-based serving."
-            image={<img src={Card3} alt="" />}
-          />
-        </GridItem>
-      </Grid>
+      <StickyGrid
+        cards={[
+          {
+            title: "Unified Model Format",
+            body: "MLflow's MLModel file provides a standardized structure for packaging models from any framework, capturing essential dependencies and input/output specifications. This consistent packaging approach eliminates integration friction while ensuring models can be reliably deployed across any environment.",
+            image: <img src={Card1} alt="" />,
+          },
+          {
+            title: "Comprehensive Model Metadata",
+            body: "Track crucial model requirements and artifacts including data schemas, preprocessing steps, and environment dependencies automatically with MLflow's metadata system. Create fully reproducible model packages that document the complete model context for simplified governance and troubleshooting.",
+            image: <img src={Card2} alt="" />,
+          },
+          {
+            title: "Flexible Deployment Options",
+            body: "Deploy models as Docker containers, Python functions, REST endpoints, or directly to various serving platforms with MLflow's versatile deployment capabilities. Streamline the transition from development to production with consistent model behavior across any target environment, from local testing to cloud-based serving.",
+            image: <img src={Card3} alt="" />,
+          },
+        ]}
+      />
 
       <BelowTheFold />
     </Layout>
