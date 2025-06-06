@@ -131,7 +131,7 @@ const config: Config = {
           {
             // See https://slack.com/help/articles/201330256-Invite-new-members-to-your-workspace for how to create a new invite link
             from: "/slack",
-            to: "https://join.slack.com/t/mlflow-users/shared_invite/zt-2nyy6x19s-iBUGKEBExnXXv0zQD28uWg",
+            to: "https://join.slack.com/t/mlflow-users/shared_invite/zt-3585cbav7-2pDXIcSPyycbVd7s5E1E9w",
           },
           {
             from: "/blog/2024/01/25/databricks-ce",
