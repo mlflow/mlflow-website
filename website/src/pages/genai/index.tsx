@@ -8,6 +8,7 @@ import {
   BelowTheFold,
   Section,
   Card,
+  StickyGrid,
 } from "../../components";
 import { MLFLOW_GENAI_GET_STARTED_URL } from "@site/src/constants";
 import Card1 from "@site/static/img/GenAI_home/GenAI_home_1.png";
@@ -34,113 +35,105 @@ export default function GenAi(): JSX.Element {
       </AboveTheFold>
 
       <Section label="Core features" title="Observability to debug and monitor">
-        <Grid columns={2}>
-          <GridItem width="wide">
-            <Card
-              title="Debug with tracing"
-              body={[
+        <StickyGrid
+          cards={[
+            {
+              title: "Debug with tracing",
+              body: [
                 "Debug and iterate on GenAI applications using MLflow's tracing, which captures your app's entire execution, including prompts, retrievals, tool calls.",
                 "MLflow's open-source, OpenTelemetry-compatible tracing SDK helps avoid vendor lock-in.",
-              ]}
-              cta={{
+              ],
+              cta: {
                 href: "/genai/observability",
                 text: "Learn more >",
-              }}
-              image={<img src={Card1} alt="MLflow tracing" />}
-            />
-          </GridItem>
-          <GridItem width="wide">
-            <Card
-              title="Monitor in production"
-              body={[
+              },
+              image: <img src={Card1} alt="MLflow tracing" />,
+            },
+            {
+              title: "Monitor in production",
+              body: [
                 "Maintain production quality with continuous monitoring of quality, latency, and cost. Gain real-time visibility via MLflow's dashboards and trace explorers.",
                 "Configure automated online evaluations with alerts to quickly address issues.",
-              ]}
-              cta={{
+              ],
+              cta: {
                 href: "/genai/observability#production-monitoring",
                 text: "Learn more >",
-              }}
-              image={<img src={Card2} alt="MLflow Monitoring" />}
-            />
-          </GridItem>
-        </Grid>
+              },
+              image: <img src={Card2} alt="MLflow Monitoring" />,
+            },
+          ]}
+        />
       </Section>
 
       <Section
         label="Core features"
         title="Evaluation to measure and improve quality"
       >
-        <Grid columns={2}>
-          <GridItem width="wide">
-            <Card
-              title="Accurately measure free-form language with LLM judges"
-              body="Utilize LLM-as-a-judge metrics, mimicking human expertise, to assess and enhance GenAI quality. Access pre-built judges for common metrics like hallucination or relevance, or develop custom judges tailored to your business needs and expert insights."
-              cta={{
+        <StickyGrid
+          cards={[
+            {
+              title: "Accurately measure free-form language with LLM judges",
+              body: "Utilize LLM-as-a-judge metrics, mimicking human expertise, to assess and enhance GenAI quality. Access pre-built judges for common metrics like hallucination or relevance, or develop custom judges tailored to your business needs and expert insights.",
+              cta: {
                 href: "/genai/evaluations#quality-metrics",
                 text: "Learn more >",
-              }}
-              image={<img src={Card3} alt="MLflow LLM judges" />}
-            />
-          </GridItem>
-          <GridItem width="wide">
-            <Card
-              title="Use production traffic to drive offline improvements"
-              body="Adapt to user behavior by creating evaluation datasets and regression tests from production logs. Replay these to assess new prompts or app versions in development, ensuring optimal variants reach production."
-              cta={{
+              },
+              image: <img src={Card3} alt="MLflow LLM judges" />,
+            },
+            {
+              title: "Use production traffic to drive offline improvements",
+              body: "Adapt to user behavior by creating evaluation datasets and regression tests from production logs. Replay these to assess new prompts or app versions in development, ensuring optimal variants reach production.",
+              cta: {
                 href: "/genai/evaluations",
                 text: "Learn more >",
-              }}
-              image={<img src={Card4} alt="MLflow evaluations" />}
-            />
-          </GridItem>
-          <GridItem width="wide">
-            <Card
-              title="Use human feedback to improve quality"
-              body="Collect expert feedback through web UIs and end-user ratings from your app via APIs. Use this feedback to understand how your app should behave and align your custom LLM-judge metrics with expert judgement."
-              cta={{
+              },
+              image: <img src={Card4} alt="MLflow evaluations" />,
+            },
+            {
+              title: "Use human feedback to improve quality",
+              body: "Collect expert feedback through web UIs and end-user ratings from your app via APIs. Use this feedback to understand how your app should behave and align your custom LLM-judge metrics with expert judgement.",
+              cta: {
                 href: "/genai/human-feedback",
                 text: "Learn more >",
-              }}
-              image={<img src={Card5} alt="MLflow LLM judges" />}
-            />
-          </GridItem>
-        </Grid>
+              },
+              image: <img src={Card5} alt="MLflow LLM judges" />,
+            },
+          ]}
+        />
       </Section>
 
       <Section
         label="Core features"
         title="Lifecycle management to track and version"
       >
-        <Grid columns={2}>
-          <GridItem width="wide">
-            <Card
-              title="Prompt registry"
-              body={[
+        <StickyGrid
+          cards={[
+            {
+              title: "Prompt registry",
+              body: [
                 "Version, compare, iterate on, and discover prompt templates directly through the MLflow UI. Reuse prompts across multiple versions of your agent or application code, and view rich lineage identifying which versions are using each prompt.",
                 "Evaluate and monitor prompt quality and performance across multiple versions.",
-              ]}
-              cta={{
+              ],
+              cta: {
                 href: "/genai/governance",
                 text: "Learn more >",
-              }}
-              image={<img src={Card6} alt="MLflow LLM judges" />}
-            />
-          </GridItem>
-          <GridItem width="wide">
-            <Card
-              title="Agent and application versioning"
-              body={[
+              },
+              image: <img src={Card6} alt="MLflow LLM judges" />,
+            },
+            {
+              title: "Agent and application versioning",
+              body: [
                 "Version your agents, capturing their associated code, parameters, and evalation metrics for each iteration. MLflow's centralized management of agents complements Git, providing full lifecycle capabilities for all your generative AI assets.",
                 "Evaluation and observability data are linked to specific agent/application versions, offering end-to-end versioning and lineage for your entire GenAI application.",
-              ]}
-              cta={{
+              ],
+              cta: {
                 href: "/genai/governance",
                 text: "Learn more >",
-              }}
-              image={<img src={Card7} alt="MLflow LLM judges" />}
-            />
-          </GridItem>
-        </Grid>
+              },
+              image: <img src={Card7} alt="MLflow LLM judges" />,
+            },
+          ]}
+        />
       </Section>
 
       <LogosCarousel />

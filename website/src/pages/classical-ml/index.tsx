@@ -2,12 +2,13 @@ import { MLFLOW_GET_STARTED_URL } from "@site/src/constants";
 import {
   Layout,
   LogosCarousel,
-  Grid,
-  GridItem,
   LatestNews,
   AboveTheFold,
   BelowTheFold,
   Section,
+  StickyGrid,
+  Grid,
+  GridItem,
   Card,
 } from "../../components";
 import Card1 from "@site/static/img/Classical_home/Classical_home_1.png";
@@ -34,74 +35,64 @@ export default function GenAi(): JSX.Element {
         title="Build confidently, deploy seamlessly"
         body="Cover experimentation, reproducibility, deployment, and a central model registry"
       >
-        <Grid columns={2}>
-          <GridItem width="wide">
-            <Card
-              title="Build production quality models"
-              body="MLflow makes it easy to iterate toward production-ready models by organizing and comparing runs, helping teams refine training pipelines based on real performance insights."
-              cta={{
+        <StickyGrid
+          cards={[
+            {
+              title: "Build production quality models",
+              body: "MLflow makes it easy to iterate toward production-ready models by organizing and comparing runs, helping teams refine training pipelines based on real performance insights.",
+              cta: {
                 text: "Learn more >",
                 href: "/",
-              }}
-              image={<img src={Card1} alt="" />}
-            />
-          </GridItem>
-          <GridItem width="wide">
-            <Card
-              title="Framework neutral"
-              body="Works seamlessly with popular tools like scikit-learn, PyTorch, TensorFlow, and XGBoost without vendor lock-in, providing flexibility with a common interface."
-              cta={{
+              },
+              image: <img src={Card1} alt="" />,
+            },
+            {
+              title: "Framework neutral",
+              body: "Works seamlessly with popular tools like scikit-learn, PyTorch, TensorFlow, and XGBoost without vendor lock-in, providing flexibility with a common interface.",
+              cta: {
                 text: "Learn more >",
                 href: "/",
-              }}
-              image={<img src={Card2} alt="" />}
-            />
-          </GridItem>
-          <GridItem width="wide">
-            <Card
-              title="Reliable Reproducibility"
-              body="Automatically logs parameters, weights, artifacts, code, metrics, and dependencies to ensure experiments can be restored accurately, enabling confident governance for enterprise deployments."
-              cta={{
+              },
+              image: <img src={Card2} alt="" />,
+            },
+            {
+              title: "Reliable Reproducibility",
+              body: "Automatically logs parameters, weights, artifacts, code, metrics, and dependencies to ensure experiments can be restored accurately, enabling confident governance for enterprise deployments.",
+              cta: {
                 text: "Learn more >",
                 href: "/",
-              }}
-              image={<img src={Card3} alt="" />}
-            />
-          </GridItem>
-          <GridItem width="wide">
-            <Card
-              title="Deployment Ready"
-              body="Simplifies the path from experimentation to production with a built-in registry that gives you complete control over model states, whether sharing new approaches or deploying solutions."
-              cta={{
+              },
+              image: <img src={Card3} alt="" />,
+            },
+            {
+              title: "Deployment Ready",
+              body: "Simplifies the path from experimentation to production with a built-in registry that gives you complete control over model states, whether sharing new approaches or deploying solutions.",
+              cta: {
                 text: "Learn more >",
                 href: "/",
-              }}
-              image={<img src={Card4} alt="" />}
-            />
-          </GridItem>
-          <GridItem width="wide">
-            <Card
-              title="Unified Workflow"
-              body="MLflow streamlines your entire ML process with tracking, packaging, and deployment capabilities, eliminating tool fragmentation so you can focus on model development rather than infrastructure"
-              cta={{
+              },
+              image: <img src={Card4} alt="" />,
+            },
+            {
+              title: "Unified Workflow",
+              body: "MLflow streamlines your entire ML process with tracking, packaging, and deployment capabilities, eliminating tool fragmentation so you can focus on model development rather than infrastructure",
+              cta: {
                 text: "Learn more >",
                 href: "/",
-              }}
-              image={<img src={Card5} alt="" />}
-            />
-          </GridItem>
-          <GridItem width="wide">
-            <Card
-              title="Enterprise Grade"
-              body="Databricks-managed MLflow adds robust security, automated scaling, and high availability for mission-critical workloads while reducing operational overhead and delivering exceptional performance."
-              cta={{
+              },
+              image: <img src={Card5} alt="" />,
+            },
+            {
+              title: "Enterprise Grade",
+              body: "Databricks-managed MLflow adds robust security, automated scaling, and high availability for mission-critical workloads while reducing operational overhead and delivering exceptional performance.",
+              cta: {
                 text: "Learn more >",
                 href: "/",
-              }}
-              image={<img src={Card6} alt="" />}
-            />
-          </GridItem>
-        </Grid>
+              },
+              image: <img src={Card6} alt="" />,
+            },
+          ]}
+        />
       </Section>
 
       <LogosCarousel />
