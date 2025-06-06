@@ -1,13 +1,11 @@
-import { createContext, PropsWithChildren, useContext } from "react";
+import { PropsWithChildren } from "react";
 
 import { cva, VariantProps } from "class-variance-authority";
 import { twMerge } from "tailwind-merge";
 import React from "react";
 
-const GridStickyContext = createContext<boolean>(false);
-
 // NOTE: this and the following negative margin styles are to hide the outer padding of the grid items, so it's flush with the container.
-const gridContainer = cva("w-full overflow-clip");
+const gridContainer = cva("w-full overflow-hidden");
 
 const gridVariants = cva(
   [
@@ -36,10 +34,9 @@ export const grid: typeof gridVariants = (variants) =>
 export const Grid = ({
   children,
   className,
-  sticky = false,
   columns,
 }: VariantProps<typeof gridVariants> &
-  PropsWithChildren<{ className?: string; sticky?: boolean }>) => {
+  PropsWithChildren<{ className?: string }>) => {
   let numSlots = 0;
   React.Children.forEach(children, (child) => {
     if (React.isValidElement(child)) {
@@ -59,16 +56,14 @@ export const Grid = ({
   }
 
   return (
-    <GridStickyContext.Provider value={sticky}>
-      <div className={gridContainer()}>
-        <div className={grid({ columns, className })}>
-          {children}
-          {Array.from({ length: missingSlots }, (_, i) => (
-            <GridItem key={i} />
-          ))}
-        </div>
+    <div className={gridContainer()}>
+      <div className={grid({ columns, className })}>
+        {children}
+        {Array.from({ length: missingSlots }, (_, i) => (
+          <GridItem key={i} />
+        ))}
       </div>
-    </GridStickyContext.Provider>
+    </div>
   );
 };
 
@@ -82,10 +77,6 @@ const gridItemVariants = cva(
       },
       direction: {
         reverse: "md:flex-col-reverse",
-      },
-      sticky: {
-        true: "lg:sticky top-[56px]",
-        false: "",
       },
     },
     compoundVariants: [
@@ -109,8 +100,5 @@ export const GridItem = ({
   width,
   direction,
 }: PropsWithChildren<VariantProps<typeof gridItem>>) => {
-  const sticky = useContext(GridStickyContext);
-  return (
-    <div className={gridItem({ width, direction, sticky })}>{children}</div>
-  );
+  return <div className={gridItem({ width, direction })}>{children}</div>;
 };
