@@ -2,24 +2,31 @@ import { themes as prismThemes } from "prism-react-renderer";
 import type { Config } from "@docusaurus/types";
 import type * as Preset from "@docusaurus/preset-classic";
 
+import tailwindPlugin from "./plugins/tailwind-config.cjs";
+import extendedBlogPlugin from "./plugins/extended-blog-plugin.cjs";
+
+// ensure baseUrl always ends in `/`
+const baseUrl = (process.env.BASE_URL ?? "/").replace(/\/?$/, "/");
+
 const config: Config = {
   title: "MLflow",
   // tagline: 'Dinosaurs are cool',
   favicon: "img/mlflow-favicon.ico",
 
   // Set the production url of your site here
-  url: "https://your-docusaurus-site.example.com",
+  url: "http://mlflow.org",
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: process.env.BASE_URL || "/",
+  baseUrl,
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: "facebook", // Usually your GitHub org/user name.
-  projectName: "docusaurus", // Usually your repo name.
+  organizationName: "mlflow", // Usually your GitHub org/user name.
+  projectName: "mlflow-website", // Usually your repo name.
 
   onBrokenLinks: "throw",
-  onBrokenMarkdownLinks: "warn",
+  onBrokenMarkdownLinks: "throw",
+  onBrokenAnchors: "throw",
 
   // Even if you don't use internationalization, you can use this field to set
   // useful metadata like html lang. For example, if your site is Chinese, you
@@ -29,20 +36,38 @@ const config: Config = {
     locales: ["en"],
   },
 
+  headTags: [
+    {
+      tagName: "link",
+      attributes: {
+        rel: "preconnect",
+        href: "https://fonts.googleapis.com",
+      },
+    },
+    {
+      tagName: "link",
+      attributes: {
+        rel: "preconnect",
+        href: "https://fonts.gstatic.com",
+        crossorigin: "anonymous",
+      },
+    },
+    {
+      tagName: "link",
+      attributes: {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap",
+        display: "swap",
+      },
+    },
+  ],
+
   presets: [
     [
       "classic",
       {
         docs: false,
-        blog: {
-          showReadingTime: true,
-          blogSidebarTitle: "All posts",
-          blogSidebarCount: "ALL",
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          // editUrl:
-          //   "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
-        },
+        blog: false,
         theme: {
           customCss: "./src/css/custom.css",
         },
@@ -58,6 +83,20 @@ const config: Config = {
   ],
 
   plugins: [
+    tailwindPlugin,
+    [
+      extendedBlogPlugin,
+      {
+        showReadingTime: true,
+        blogSidebarTitle: "All posts",
+        blogSidebarCount: "ALL",
+        // Please change this to your repo.
+        // Remove this to remove the "edit this page" links.
+        // editUrl:
+        //   "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
+        onUntruncatedBlogPosts: "ignore",
+      },
+    ],
     [
       "@docusaurus/plugin-content-blog",
       {
@@ -75,9 +114,12 @@ const config: Config = {
          */
         path: "./releases",
         authorsMapPath: "../blog/authors.yml",
+        blogListComponent: "@site/src/theme/ReleaseItemsList",
+        blogPostComponent: "@site/src/theme/ReleasePost",
         blogSidebarTitle: "All posts",
         blogSidebarCount: "ALL",
         blogTitle: "Releases",
+        onUntruncatedBlogPosts: "ignore",
       },
     ],
     [
@@ -123,112 +165,9 @@ const config: Config = {
   themeConfig: {
     // Replace with your project's social card
     image: "img/docusaurus-social-card.jpg",
-    colorMode: {
-      defaultMode: "dark",
-      disableSwitch: true,
-      respectPrefersColorScheme: false,
-    },
-    // announcementBar: {
-    //   id: "support_us",
-    //   content: "WIP",
-    //   isCloseable: true,
-    // },
-    navbar: {
-      // title: 'My Site',
-      logo: {
-        alt: "MLflow",
-        src: "img/mlflow-white.svg",
-        srcDark: "img/mlflow-black.svg",
-      },
-      items: [
-        // {
-        //   type: 'docSidebar',
-        //   sidebarId: 'tutorialSidebar',
-        //   position: 'left',
-        //   label: 'Tutorial',
-        // },
-        // { to: "/features", label: "Features", position: "right" },
-        { to: "/blog", label: "Blog", position: "right" },
-        { to: "/releases", label: "Releases", position: "right" },
-        {
-          label: "Docs",
-          to: "pathname:///docs/latest/index.html",
-          position: "right",
-          target: "_self",
-        },
-        {
-          href: "https://github.com/mlflow/mlflow",
-          label: "Contribute",
-          position: "right",
-        },
-        { to: "/ambassador", label: "Ambassador Program", position: "right" },
-        {
-          to: "pathname:///docs/latest/getting-started/index.html",
-          label: "Get Started",
-          position: "right",
-          target: "_self",
-          className: "navbar__item__get-started",
-        },
-      ],
-    },
-    footer: {
-      style: "dark",
-      logo: {
-        alt: "MLflow",
-        src: "img/mlflow-white.svg",
-        srcDark: "img/mlflow-black.svg",
-        href: "/",
-        width: "200px",
-      },
-      links: [
-        {
-          title: "Community",
-          items: [
-            {
-              label: "Stack Overflow",
-              href: "https://stackoverflow.com/questions/tagged/mlflow",
-            },
-            {
-              label: "LinkedIn",
-              href: "https://www.linkedin.com/company/mlflow-org",
-            },
-            {
-              label: "X",
-              href: "https://x.com/mlflow",
-            },
-          ],
-        },
-        {
-          title: "Resources",
-          items: [
-            {
-              label: "Docs",
-              to: "pathname:///docs/latest/index.html",
-            },
-            {
-              label: "Releases",
-              to: "/releases",
-            },
-            {
-              label: "Blog",
-              to: "/blog",
-            },
-          ],
-        },
-      ],
-      copyright: `© ${new Date().getFullYear()} MLflow Project, a Series of LF Projects, LLC.`,
-    },
     prism: {
       theme: prismThemes.vsDark,
       darkTheme: prismThemes.vsDark,
-    },
-    announcementBar: {
-      id: "survey_bar",
-      content:
-        'Help us improve MLflow by taking our <a target="_blank" rel="noopener noreferrer" href="https://surveys.training.databricks.com/jfe/form/SV_cA2jrfBjs6vi6SG">survey</a>!',
-      backgroundColor: "#0194e2",
-      textColor: "#ffffff",
-      isCloseable: false,
     },
   } satisfies Preset.ThemeConfig,
 };
