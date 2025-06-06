@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkwebsite=self.webpackChunkwebsite||[]).push([[7739],{19405:e=>{e.exports=JSON.parse('{"permalink":"/mlflow-website/releases/page/3","page":3,"postsPerPage":10,"totalPages":12,"totalCount":113,"previousPage":"/mlflow-website/releases/page/2","nextPage":"/mlflow-website/releases/page/4","blogDescription":"Blog","blogTitle":"Releases"}')}}]);
