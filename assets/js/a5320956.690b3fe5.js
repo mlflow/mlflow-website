@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkwebsite=self.webpackChunkwebsite||[]).push([[4671],{60744:e=>{e.exports=JSON.parse('{"label":"models-from-code","permalink":"/mlflow-website/blog/tags/models-from-code","allTagsPath":"/mlflow-website/blog/tags","count":1,"unlisted":false}')}}]);
