@@ -56,7 +56,7 @@ export const Header = ({ layoutType }: Props) => {
   }, []);
 
   return (
-    <nav className="fixed w-full z-20 top-0 start-0 bg-[#F7F8F8]/1 border-b border-[#F7F8F8]/8 backdrop-blur-[20px] drop-shadow-[0px_1px_2px_rgba(0_0_0/75%),0px_1px_12px_rgba(0_0_0/75%)]">
+    <nav className="fixed w-full z-20 top-0 start-0 bg-black/10 border-b border-[#F7F8F8]/8 backdrop-blur-[20px]">
       <div className="flex flex-wrap items-center mx-auto px-6 lg:px-20 py-2 max-w-container">
         <Link
           href="/"
