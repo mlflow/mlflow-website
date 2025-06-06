@@ -2,7 +2,6 @@ import useBaseUrl from "@docusaurus/useBaseUrl";
 import { cx } from "class-variance-authority";
 
 const images = [
-  "/img/companies/databricks.svg",
   "/img/companies/microsoft.svg",
   "/img/companies/meta.svg",
   "/img/companies/mosaicml.svg",

@@ -1,4 +1,4 @@
-import { MLFLOW_GET_STARTED_URL } from "@site/src/constants";
+import { MLFLOW_DOCS_URL } from "@site/src/constants";
 import {
   Layout,
   LogosCarousel,
@@ -22,8 +22,8 @@ export default function GenAi(): JSX.Element {
     <Layout>
       <AboveTheFold
         title="Mastering the ML lifecycle"
-        body="From experiment to production, MLflow streamlines your complete machine learning journey with enterprise-grade tracking, model management, and deployment."
-        hasGetStartedButton={MLFLOW_GET_STARTED_URL}
+        body="From experiment to production, MLflow streamlines your complete machine learning journey with end-to-end tracking, model management, and deployment."
+        hasGetStartedButton={MLFLOW_DOCS_URL}
         bodyColor="white"
       >
         <div className="md:h-20 lg:h-40" />
@@ -90,17 +90,6 @@ export default function GenAi(): JSX.Element {
               image={<img src={Card5} alt="" />}
             />
           </GridItem>
-          <GridItem width="wide">
-            <Card
-              title="Enterprise Grade"
-              body="Databricks-managed MLflow adds robust security, automated scaling, and high availability for mission-critical workloads while reducing operational overhead and delivering exceptional performance."
-              cta={{
-                text: "Learn more >",
-                href: "/",
-              }}
-              image={<img src={Card6} alt="" />}
-            />
-          </GridItem>
         </Grid>
       </Section>
 
@@ -126,14 +115,14 @@ export default function GenAi(): JSX.Element {
             <Card
               title="Comprehensive Lifecycle Management"
               bodySize="m"
-              body="MLflow uniquely addresses the complete machine learning lifecycle through four integrated components: - MLflow Tracking for logging parameters, metrics, and artifacts - MLflow Projects for reproducible code packaging - MLflow Models for standardized deployment - MLflow Model Registry for centralized version management"
+              body="MLflow uniquely addresses the complete machine learning lifecycle through four integrated components: MLflow Tracking for logging parameters, metrics, and artifacts; MLflow Projects for reproducible code packaging; MLflow Models for standardized deployment; MLflow Model Registry for centralized version management."
             />
           </GridItem>
           <GridItem>
             <Card
               title="Enterprise Adoption"
               bodySize="m"
-              body="MLflow's impact extends beyond its technical capabilities. It has gained significant traction among enterprise teams requiring robust experiment tracking and model lifecycle management. Databricks offers a managed MLflow service with enhanced security and scalability."
+              body="MLflow's impact extends beyond its technical capabilities. It has gained significant traction among enterprise teams requiring robust experiment tracking and model lifecycle management."
             />
           </GridItem>
         </Grid>

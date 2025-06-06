@@ -15,7 +15,7 @@ export default function AiGateway() {
   return (
     <Layout>
       <AboveTheFold
-        sectionLabel="AI gateway"
+        sectionLabel="AI Gateway"
         title="Unified access to all AI models"
         body="Protects your data and GenAI deployments through centralized governance across all models."
         hasGetStartedButton
