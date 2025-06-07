@@ -18,7 +18,7 @@ export default function AiGateway() {
       <AboveTheFold
         sectionLabel="AI gateway"
         title="Unified access to all AI models"
-        body="Protects your data and GenAI deployments through centralized governance across all models."
+        body="Standardize how you interact with different LLM providers using one central interface.."
         hasGetStartedButton={MLFLOW_DOCS_URL}
       >
         <HeroImage src={CardHero} alt="" />
@@ -27,15 +27,15 @@ export default function AiGateway() {
       <Grid columns={2}>
         <GridItem width="wide">
           <Card
-            title="Improved model accuracy"
-            body="Elevate your model quality with our robust observability tools that capture detailed request and response data. Payload logging enables you to debug, fine-tune and enhance models, improving accuracy and reducing latency."
+            title="Configure endpoints"
+            body="Define and manage multiple LLM endpoints across providers in a single YAML file, enabling centralized API key management and seamless integration."
             image={<img src={Card1} alt="Improved Model Accuracy" />}
           />
         </GridItem>
         <GridItem width="wide">
           <Card
-            title="Spending oversight"
-            body="With real-time insights into your AI operations, you can monitor expenses, optimize resource allocation and ensure efficient performance."
+            title="Rate limiting"
+            body="Rate limits can be set per endpoint, such as 10 calls per minute, by specifying the limit and time period in the configuration."
             image={<img src={Card2} alt="Spending Oversight" />}
           />
         </GridItem>
