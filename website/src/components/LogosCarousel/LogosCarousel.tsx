@@ -20,7 +20,7 @@ export const LogosCarousel = () => {
   const items = images.map((image, index) => (
     <img
       key={index}
-      className="inline h-16 mx-10 opacity-20"
+      className="inline h-10 mx-10 opacity-20"
       src={useBaseUrl(image)}
     />
   ));

@@ -50,8 +50,8 @@ export const SocialWidget = () => {
     <div className="flex flex-col w-full gap-16">
       <div className="flex flex-col w-full gap-6 items-center justify-center text-center">
         <SectionLabel label="GET INVOLVED" />
-        <Heading level={2}>Connect with the community</Heading>
-        <Body size="l">Connect with thousands of customers using MLflow</Body>
+        <Heading level={2}>Connect with the open source community</Heading>
+        <Body size="l">Join millions of MLflow users</Body>
       </div>
       <Grid className="px-10">
         {socials.map((social) => (

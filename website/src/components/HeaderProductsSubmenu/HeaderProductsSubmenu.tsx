@@ -24,16 +24,15 @@ export const HeaderProductsSubmenu = () => {
               <HeaderMenuItem href="/genai/evaluations" label="Evaluations" />
               <HeaderMenuItem
                 href="/genai/prompt-registry-versioning"
-                label="Prompt registry & versioning"
+                label="Prompt Registry"
               />
             </div>
             <div className="min-w-40 flex flex-col gap-4 md:gap-1">
               <HeaderMenuItem
                 href="/genai/human-feedback"
-                label="Human feedback"
+                label="App versioning"
               />
-              <HeaderMenuItem href="/genai/governance" label="Governance" />
-              <HeaderMenuItem href="/genai/ai-gateway" label="AI gateway" />
+              <HeaderMenuItem href="/genai/ai-gateway" label="AI Gateway" />
             </div>
           </div>
         </div>
@@ -51,20 +50,22 @@ export const HeaderProductsSubmenu = () => {
             <div className="min-w-40 flex flex-col gap-4 md:gap-1">
               <HeaderMenuItem
                 href="/classical-ml/experiment-tracking"
-                label="Experiment Tracking"
+                label="Experiment tracking"
               />
               <HeaderMenuItem
                 href="/classical-ml/hyperparam-tuning"
                 label="Hyperparameter tuning"
               />
-              <HeaderMenuItem href="/classical-ml/models" label="Models" />
             </div>
             <div className="min-w-40 flex flex-col gap-4 md:gap-1">
               <HeaderMenuItem
                 href="/classical-ml/model-registry"
-                label="Model registry"
+                label="Model Registry & deployment"
               />
-              <HeaderMenuItem href="/classical-ml/serving" label="Serving" />
+              <HeaderMenuItem
+                href="/classical-ml/serving"
+                label="Model evaluation"
+              />
             </div>
           </div>
         </div>

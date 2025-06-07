@@ -10,12 +10,7 @@ import { HeaderMenuItem } from "../HeaderMenuItem/HeaderMenuItem";
 import { HeaderProductsSubmenu } from "../HeaderProductsSubmenu/HeaderProductsSubmenu";
 
 import "./Header.module.css";
-import {
-  MLFLOW_DOCS_URL,
-  MLFLOW_GET_STARTED_URL,
-  MLFLOW_LOGIN_URL,
-  MLFLOW_SIGNUP_URL,
-} from "@site/src/constants";
+import { MLFLOW_DOCS_URL, MLFLOW_DBX_TRIAL_URL } from "@site/src/constants";
 
 const MD_BREAKPOINT = 640;
 
@@ -70,26 +65,11 @@ export const Header = ({ layoutType }: Props) => {
           <Logo className="h-[36px]" />
         </Link>
         <div className="flex flex-row items-center gap-6 md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse grow justify-end basis-0">
-          {layoutType.startsWith("genai") ? (
-            <>
-              <HeaderMenuItem
-                href={MLFLOW_LOGIN_URL}
-                label="Login"
-                className="hidden md:block"
-              />
-              <Link href={MLFLOW_SIGNUP_URL} className="hidden md:block">
-                <Button variant="primary" size="small">
-                  Sign up
-                </Button>
-              </Link>
-            </>
-          ) : layoutType.startsWith("classical-ml") ? (
-            <Link href={MLFLOW_GET_STARTED_URL} className="hidden md:block">
-              <Button variant="primary" size="small">
-                Get started
-              </Button>
-            </Link>
-          ) : null}
+          <Link href={MLFLOW_DOCS_URL} className="hidden md:block">
+            <Button variant="primary" size="small">
+              Get started
+            </Button>
+          </Link>
           <button
             data-collapse-toggle="navbar-sticky"
             type="button"
@@ -130,7 +110,7 @@ export const Header = ({ layoutType }: Props) => {
                   "flex items-center gap-2 py-2 text-white text-[15px] w-full md:w-auto cursor-pointer"
                 }
               >
-                Products
+                Components
                 <DownIcon className="w-6 h-6" />
               </span>
               <div
@@ -149,7 +129,7 @@ export const Header = ({ layoutType }: Props) => {
               onMouseEnter={handleProductItemHover}
               onClick={toggleProductSubmenuHovered}
             >
-              <HeaderMenuItem label="Product" hasDropdown />
+              <HeaderMenuItem label="Components" hasDropdown />
             </li>
             <li className="w-full md:w-auto">
               <HeaderMenuItem href="/releases" label="Releases" />
@@ -160,28 +140,13 @@ export const Header = ({ layoutType }: Props) => {
             <li className="w-full md:w-auto">
               <HeaderMenuItem href={MLFLOW_DOCS_URL} label="Docs" />
             </li>
-            {layoutType.startsWith("genai") ? (
-              <>
-                <li className="w-full md:w-auto md:hidden">
-                  <HeaderMenuItem href={MLFLOW_LOGIN_URL} label="Login" />
-                </li>
-                <li className="w-full md:w-auto md:hidden">
-                  <Link href={MLFLOW_SIGNUP_URL}>
-                    <Button variant="primary" size="small" width="full">
-                      Sign up
-                    </Button>
-                  </Link>
-                </li>
-              </>
-            ) : layoutType.startsWith("classical-ml") ? (
-              <li className="w-full md:w-auto md:hidden">
-                <Link href={MLFLOW_GET_STARTED_URL}>
-                  <Button variant="primary" size="small" width="full">
-                    Get started
-                  </Button>
-                </Link>
-              </li>
-            ) : null}
+            <li className="w-full md:w-auto md:hidden">
+              <Link href={MLFLOW_DOCS_URL}>
+                <Button variant="primary" size="small" width="full">
+                  Get started
+                </Button>
+              </Link>
+            </li>
           </ul>
         </div>
       </div>

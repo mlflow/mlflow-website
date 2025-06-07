@@ -17,14 +17,14 @@ export default function Home(): JSX.Element {
     <Layout>
       <AboveTheFold
         title="Deliver production-ready AI"
-        body="The developer platform to build AI applications and models with confidence"
+        body="The open source developer platform to build AI applications and models with confidence"
       >
         <GlossyCardContainer>
           <GlossyCard>
             <Card
               title="GenAI Apps & Agents"
               bodySize="m"
-              body="Enhance your GenAI applications with end-to-end observability, monitoring, and enterprise governance, all in one integrated platform."
+              body="Enhance your GenAI applications with end-to-end tracking, observability, and evaluations, all in one integrated platform."
               padded
               rounded={false}
               cta={{
@@ -39,7 +39,7 @@ export default function Home(): JSX.Element {
             <Card
               title="Model Training"
               bodySize="m"
-              body="Streamline your machine learning workflows with enterprise-grade tracking, model management, and deployment."
+              body="Streamline your machine learning workflows with end-to-end tracking, model management, and deployment."
               padded
               rounded={false}
               cta={{
