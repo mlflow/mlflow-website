@@ -1,6 +1,6 @@
 import Link from "@docusaurus/Link";
 import { Body, Button, Heading } from "..";
-import { ComponentProps, ReactNode } from "react";
+import { ComponentProps, ReactNode, useEffect, useState } from "react";
 import { cva, VariantProps } from "class-variance-authority";
 
 type Props = {
@@ -34,6 +34,27 @@ const imageWrapper = cva("w-full relative", {
   },
 });
 
+type ThemeColor = {
+  startColor: string;
+  endColor: string;
+} | null;
+
+function getThemeColor(pathname: string): ThemeColor {
+  if (pathname.startsWith("/genai")) {
+    return {
+      startColor: "#EB1700",
+      endColor: "#4A121A",
+    };
+  }
+  if (pathname.startsWith("/classical-ml")) {
+    return {
+      startColor: "#54c7ec",
+      endColor: "#0A2342",
+    };
+  }
+  return null;
+}
+
 export function Card({
   title,
   body,
@@ -41,9 +62,16 @@ export function Card({
   cta,
   image,
   padded = false,
-  rounded = true,
 }: Props) {
   const bodyParts = Array.isArray(body) ? body : [body];
+  const [colors, setColors] = useState(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setColors(getThemeColor(location.pathname));
+    }
+  }, []);
+
   return (
     <>
       <div className={contentWrapper({ padded })}>
@@ -67,9 +95,31 @@ export function Card({
         )}
       </div>
       {image && (
-        <div className={imageWrapper({ rounded })}>
-          {image}
-          <div className="absolute inset-0 bg-black/5 pointer-events-none" />
+        <div
+          className="relative"
+          style={
+            colors
+              ? {
+                  paddingTop: "3%",
+                  paddingLeft: "3%",
+                  backgroundImage: `linear-gradient(to bottom, ${colors.startColor} 0%, ${colors.startColor} 50%, ${colors.endColor} 100%)`,
+                }
+              : undefined
+          }
+        >
+          {(() => {
+            const rounded = colors
+              ? "rounded-tl-3xl rounded-tr-3xl rounded-bl-3xl"
+              : "";
+            return (
+              <div className={`relative overflow-hidden ${rounded}`}>
+                {image}
+                <div
+                  className={`absolute inset-0 bg-black/5 pointer-events-none ${rounded}`}
+                />
+              </div>
+            );
+          })()}
         </div>
       )}
     </>
