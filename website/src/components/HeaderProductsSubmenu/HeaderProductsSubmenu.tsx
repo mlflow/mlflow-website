@@ -62,7 +62,10 @@ export const HeaderProductsSubmenu = () => {
                 href="/classical-ml/model-registry"
                 label="Model Registry & deployment"
               />
-              <HeaderMenuItem href="/classical-ml/serving" label="Model evaluation" />
+              <HeaderMenuItem
+                href="/classical-ml/serving"
+                label="Model evaluation"
+              />
             </div>
           </div>
         </div>

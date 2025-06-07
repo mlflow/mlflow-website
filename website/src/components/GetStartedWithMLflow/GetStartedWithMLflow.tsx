@@ -74,7 +74,12 @@ export const GetStartedWithMLflow = () => {
               ))}
             </div>
           </div>
-          <GetStartedButton size="large" width="full" variant="dark" link={MLFLOW_DBX_TRIAL_URL}/>
+          <GetStartedButton
+            size="large"
+            width="full"
+            variant="dark"
+            link={MLFLOW_DBX_TRIAL_URL}
+          />
         </div>
       ) : null}
     </div>

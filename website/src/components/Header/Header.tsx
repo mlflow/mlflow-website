@@ -10,10 +10,7 @@ import { HeaderMenuItem } from "../HeaderMenuItem/HeaderMenuItem";
 import { HeaderProductsSubmenu } from "../HeaderProductsSubmenu/HeaderProductsSubmenu";
 
 import "./Header.module.css";
-import {
-  MLFLOW_DOCS_URL,
-  MLFLOW_DBX_TRIAL_URL,
-} from "@site/src/constants";
+import { MLFLOW_DOCS_URL, MLFLOW_DBX_TRIAL_URL } from "@site/src/constants";
 
 const MD_BREAKPOINT = 640;
 
