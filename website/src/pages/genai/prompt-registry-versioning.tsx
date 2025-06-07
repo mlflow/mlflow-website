@@ -1,3 +1,4 @@
+import { MLFLOW_DOCS_URL } from "@site/src/constants";
 import {
   Layout,
   Grid,
@@ -27,7 +28,7 @@ export default function PromptRegistryVersioning() {
         sectionLabel="Prompt registry and versioning"
         title="Prompt registry & versioning"
         body="Manage prompts and track versions of GenAI applications. Create, store, and version prompts in the Prompt Registry, and track and compare different versions of GenAI applications to ensure quality and maintainability."
-        hasGetStartedButton
+        hasGetStartedButton={MLFLOW_DOCS_URL}
       >
         <HeroImage src={CardHero} alt="" />
       </AboveTheFold>

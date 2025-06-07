@@ -1,4 +1,4 @@
-import { MLFLOW_GET_STARTED_URL } from "@site/src/constants";
+import { MLFLOW_DOCS_URL } from "@site/src/constants";
 import {
   Layout,
   Grid,
@@ -20,7 +20,7 @@ export default function Serving() {
         sectionLabel="Serving"
         title="Flexible Model Deployment"
         body="Deploy your ML and DL models with confidence using MLflow's versatile serving options for real-time and batch inference"
-        hasGetStartedButton={MLFLOW_GET_STARTED_URL}
+        hasGetStartedButton={MLFLOW_DOCS_URL}
       >
         <HeroImage src={CardHero} alt="" />
       </AboveTheFold>

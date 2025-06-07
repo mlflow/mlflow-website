@@ -1,3 +1,4 @@
+import { MLFLOW_DOCS_URL } from "@site/src/constants";
 import {
   Layout,
   Grid,
@@ -25,7 +26,7 @@ export default function Evaluations() {
         sectionLabel="Evaluations"
         title="Evaluation to measure and improve quality"
         body="Confidently evaluate quality in development and production to identify issues and iteratively test improvements."
-        hasGetStartedButton
+        hasGetStartedButton={MLFLOW_DOCS_URL}
       >
         <HeroImage src={CardHero} alt="" />
       </AboveTheFold>

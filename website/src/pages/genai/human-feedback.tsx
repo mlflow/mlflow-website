@@ -1,3 +1,4 @@
+import { MLFLOW_DOCS_URL } from "@site/src/constants";
 import {
   Layout,
   Grid,
@@ -23,7 +24,7 @@ export default function HumanFeedback() {
           "Capture domain expert feedback to understand how your app should behave and align your custom LLM-judge metrics with those expert's judgement.",
           "Capture end user feedback to quickly pinpoint quality issues in production.",
         ]}
-        hasGetStartedButton
+        hasGetStartedButton={MLFLOW_DOCS_URL}
       >
         <HeroImage src={CardHero} alt="" />
       </AboveTheFold>

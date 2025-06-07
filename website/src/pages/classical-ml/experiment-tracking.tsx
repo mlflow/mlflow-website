@@ -1,4 +1,4 @@
-import { MLFLOW_GET_STARTED_URL } from "@site/src/constants";
+import { MLFLOW_DOCS_URL } from "@site/src/constants";
 import {
   Layout,
   Grid,
@@ -21,7 +21,7 @@ export default function Tracking() {
         sectionLabel="Experiment tracking"
         title="Comprehensive Experiment Tracking"
         body=" Document, compare, and reproduce your machine learning experiments with MLflow's powerful tracking capabilities"
-        hasGetStartedButton={MLFLOW_GET_STARTED_URL}
+        hasGetStartedButton={MLFLOW_DOCS_URL}
       >
         <HeroImage src={CardHero} alt="" />
       </AboveTheFold>
