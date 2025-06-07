@@ -17,6 +17,7 @@ const ExpandableGrid = ({ items, defaultVisibleCount, renderItem }) => {
           </div>
         ))}
       </div>
+
       {items.length > defaultVisibleCount && (
         <div className={styles.buttonContainer}>
           <button
