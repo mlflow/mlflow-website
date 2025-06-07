@@ -8,6 +8,7 @@ import {
   BelowTheFold,
   Card,
   GlossyCardContainer,
+  EcosystemList,
 } from "../components";
 import GenAI from "@site/static/img/Home_page_hybrid/GenAI Apps & Agents.png";
 import ModelTraining from "@site/static/img/Home_page_hybrid/Model Training.png";
@@ -56,6 +57,7 @@ export default function Home(): JSX.Element {
       </AboveTheFold>
 
       <Customers />
+      <EcosystemList />
 
       <BelowTheFold>
         <LatestNews />
