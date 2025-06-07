@@ -64,7 +64,7 @@ export const EcosystemList = () => {
                 {
                   title: "TensorFlow",
                   src: "img/tensorflow.svg",
-                  href: "docs/latest/deep-learning/tensorflow/index.html",
+                  href: "https://mlflow.org/docs/latest/deep-learning/tensorflow/index.html",
                 },
                 {
                   title: "scikit-learn",
