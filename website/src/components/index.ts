@@ -23,3 +23,4 @@ export { Label } from "./Typography/Label";
 export { Card } from "./Card/Card";
 export { HeroImage } from "./HeroImage";
 export { ValuePropWidget } from "./ValuePropWidget/ValuePropWidget";
+export { EcosystemList } from "./EcosystemList/EcosystemList";
