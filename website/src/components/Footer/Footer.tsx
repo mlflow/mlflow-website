@@ -36,7 +36,7 @@ export const Footer = ({ variant }: VariantProps<typeof footerVariants>) => {
         </div>
 
         <div className="flex flex-col md:flex-row gap-10">
-          <FooterMenuItem href="/">Product</FooterMenuItem>
+          <FooterMenuItem href="/">Components</FooterMenuItem>
           <FooterMenuItem href="/releases">Releases</FooterMenuItem>
           <FooterMenuItem href="/blog">Blog</FooterMenuItem>
           <FooterMenuItem href={MLFLOW_DOCS_URL}>Docs</FooterMenuItem>

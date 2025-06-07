@@ -23,13 +23,13 @@ export const HeaderProductsSubmenu = () => {
               />
               <HeaderMenuItem href="/genai/evaluations" label="Evaluations" />
               <HeaderMenuItem
-                href="/genai/prompt-registry-versioning"
+                href="/genai/prompt-registry"
                 label="Prompt Registry"
               />
             </div>
             <div className="min-w-40 flex flex-col gap-4 md:gap-1">
               <HeaderMenuItem
-                href="/genai/human-feedback"
+                href="/genai/app-versioning"
                 label="App versioning"
               />
               <HeaderMenuItem href="/genai/ai-gateway" label="AI Gateway" />
