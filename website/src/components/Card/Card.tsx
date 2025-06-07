@@ -1,6 +1,6 @@
 import Link from "@docusaurus/Link";
 import { Body, Button, Heading } from "..";
-import { ComponentProps, ReactNode } from "react";
+import { ComponentProps, ReactNode, useEffect, useState } from "react";
 import { cva, VariantProps } from "class-variance-authority";
 
 type Props = {
@@ -64,7 +64,13 @@ export function Card({
   padded = false,
 }: Props) {
   const bodyParts = Array.isArray(body) ? body : [body];
-  const colors = getThemeColor(location.pathname);
+  const [colors, setColors] = useState(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setColors(getThemeColor(location.pathname));
+    }
+  }, []);
 
   return (
     <>
