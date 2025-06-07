@@ -1,4 +1,4 @@
-import { MLFLOW_GET_STARTED_URL } from "@site/src/constants";
+import { MLFLOW_DOCS_URL } from "@site/src/constants";
 import {
   Layout,
   Grid,
@@ -20,7 +20,7 @@ export default function Models() {
         sectionLabel="Models"
         title="Transform ML Experiments into Production-Ready Models"
         body="Build, deploy, and manage machine learning models with confidence using MLflow's comprehensive model lifecycle management"
-        hasGetStartedButton={MLFLOW_GET_STARTED_URL}
+        hasGetStartedButton={MLFLOW_DOCS_URL}
       >
         <HeroImage src={CardHero} alt="" />
       </AboveTheFold>

@@ -1,4 +1,4 @@
-import { MLFLOW_GET_STARTED_URL } from "@site/src/constants";
+import { MLFLOW_DOCS_URL } from "@site/src/constants";
 import {
   Layout,
   Grid,
@@ -20,7 +20,7 @@ export default function UnifiedRegistry() {
         sectionLabel="Model registry"
         title="Centralized Model Governance and Discovery"
         body="Streamline your ML workflows with MLflow's comprehensive model registry for version control, approvals, and deployment management"
-        hasGetStartedButton={MLFLOW_GET_STARTED_URL}
+        hasGetStartedButton={MLFLOW_DOCS_URL}
       >
         <HeroImage src={CardHero} alt="" />
       </AboveTheFold>

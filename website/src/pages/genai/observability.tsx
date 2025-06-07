@@ -1,3 +1,4 @@
+import { MLFLOW_DOCS_URL } from "@site/src/constants";
 import {
   Layout,
   Grid,
@@ -31,7 +32,7 @@ export default function Observability() {
         sectionLabel="Observability"
         title="Observability to debug and monitor"
         body="Gain visibility into your app's logic to debug issues and improve latency. Attach quality feedback and metadata to help you understand user behavior and improve quality."
-        hasGetStartedButton
+        hasGetStartedButton={MLFLOW_DOCS_URL}
       >
         <HeroImage src={CardHero} alt="" />
       </AboveTheFold>
