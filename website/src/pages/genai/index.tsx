@@ -62,7 +62,7 @@ export default function GenAi(): JSX.Element {
               title="Accurately measure free-form language with LLM judges"
               body="Utilize LLM-as-a-judge metrics, mimicking human expertise, to assess and enhance GenAI quality. Access pre-built judges for common metrics like hallucination or relevance, or develop custom judges tailored to your business needs and expert insights."
               cta={{
-                href: "/genai/evaluations#quality-metrics",
+                href: "/genai/evaluations",
                 text: "Learn more >",
               }}
               image={<img src={Card3} alt="MLflow LLM judges" />}
@@ -83,7 +83,7 @@ export default function GenAi(): JSX.Element {
                 "Version, compare, iterate on, and discover prompt templates directly through the MLflow UI. Reuse prompts across multiple versions of your agent or application code, and view rich lineage identifying which versions are using each prompt.",
               ]}
               cta={{
-                href: "/genai/governance",
+                href: "/genai/prompt-registry",
                 text: "Learn more >",
               }}
               image={<img src={Card6} alt="MLflow LLM judges" />}
@@ -96,7 +96,7 @@ export default function GenAi(): JSX.Element {
                 "Version your agents, capturing their associated code, parameters, and evalation metrics for each iteration. MLflow's centralized management of agents complements Git, providing full lifecycle capabilities for all your generative AI assets.",
               ]}
               cta={{
-                href: "/genai/governance",
+                href: "/genai/app-versioning",
                 text: "Learn more >",
               }}
               image={<img src={Card7} alt="MLflow LLM judges" />}
