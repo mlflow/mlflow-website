@@ -20,7 +20,7 @@ export default function Tracking() {
       <AboveTheFold
         sectionLabel="Experiment tracking"
         title="Comprehensive experiment tracking"
-        body=" Track, compare, and reproduce your machine learning experiments with MLflow's powerful tracking capabilities"
+        body=" Track, compare, and reproduce your machine learning experiments with MLflow's powerful tracking capabilities."
         hasGetStartedButton={MLFLOW_DOCS_URL}
       >
         <HeroImage src={CardHero} alt="" />

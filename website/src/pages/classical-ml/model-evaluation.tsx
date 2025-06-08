@@ -19,7 +19,7 @@ export default function ModelEvaluation() {
       <AboveTheFold
         sectionLabel="Model evaluation"
         title="Evaluate models with confidence"
-        body="Traditional machine learning techniques like classification and regression remain foundational across industries. MLflow provides automated evaluation tools designed specifically for these classic workflows."
+        body="Automated evaluation tools for foundational ML techniques like classification and regression."
         hasGetStartedButton={MLFLOW_DOCS_URL}
       >
         <HeroImage src={CardHero} alt="" />

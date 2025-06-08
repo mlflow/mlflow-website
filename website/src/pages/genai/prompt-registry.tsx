@@ -20,7 +20,7 @@ export default function PromptRegistryVersioning() {
       <AboveTheFold
         sectionLabel="Prompt registry"
         title="The single source of truth for your prompts"
-        body="Create, store, and version prompts easily in the Prompt Registry"
+        body="Create, store, and version prompts easily in the Prompt Registry."
         hasGetStartedButton={MLFLOW_DOCS_URL}
       >
         <HeroImage src={CardHero} alt="" />
