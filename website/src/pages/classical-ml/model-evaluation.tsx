@@ -18,8 +18,8 @@ export default function ModelEvaluation() {
     <Layout>
       <AboveTheFold
         sectionLabel="Model evaluation"
-        title="Text text"
-        body="text text"
+        title="Evaluate models with confidence"
+        body="Traditional machine learning techniques like classification and regression remain foundational across industries. MLflow provides automated evaluation tools designed specifically for these classic workflows."
         hasGetStartedButton={MLFLOW_DOCS_URL}
       >
         <HeroImage src={CardHero} alt="" />
@@ -28,22 +28,22 @@ export default function ModelEvaluation() {
       <Grid columns={2}>
         <GridItem width="wide">
           <Card
-            title="Scalable Real-Time Serving"
-            body="MLflow provides a unified, scalable interface for deploying models as REST APIs that automatically adjust to meet demand fluctuations. With managed deployment on Databricks, your endpoints can intelligently scale up or down based on traffic patterns, optimizing both performance and infrastructure costs with no manual intervention required."
+            title="Built-in metrics and visualizations"
+            body="MLflow automatically computes standard metrics and visualizations—such as ROC curves, precision-recall curves, confusion matrices, and regression diagnostics. These evaluation results are logged and surfaced directly in the MLflow UI, making it easy to explore, compare, and interpret model performance across runs."
             image={<img src={Card1} alt="" />}
           />
         </GridItem>
         <GridItem width="wide">
           <Card
-            title="High-Performance Batch Inference"
-            body="Deploy production models for batch inference directly on Apache Spark, enabling efficient processing of billions of predictions on massive datasets"
+            title="Custom evaluators"
+            body="You can define your own evaluation logic using the custom evaluator interface. This is useful for model types or domains where standard metrics aren’t enough, such as specialized business KPIs or task-specific scoring."
             image={<img src={Card2} alt="" />}
           />
         </GridItem>
         <GridItem width="wide">
           <Card
-            title="Comprehensive Deployment Options"
-            body="Deploy models across multiple environments including Docker containers, cloud services like Databricks, Azure ML and AWS SageMaker, or Kubernetes clusters with consistent behavior."
+            title="Batch evaluation across multiple models"
+            body="Evaluate multiple models or runs in a single mlflow.evaluate() call using consistent datasets and metrics. This batch evaluation makes side-by-side performance comparison fast and efficient."
             image={<img src={Card3} alt="" />}
           />
         </GridItem>
