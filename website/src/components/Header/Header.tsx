@@ -153,7 +153,7 @@ export const Header = ({ layoutType }: Props) => {
 
       <div
         className={cn(
-          "flex-col w-full py-6",
+          "flex-col w-full py-6 backdrop-blur bg-black/10",
           isProductItemHovered ? "flex" : "hidden",
         )}
         onMouseLeave={handleProductSubmenuLeave}
