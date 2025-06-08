@@ -53,18 +53,18 @@ export const HeaderProductsSubmenu = () => {
                 label="Experiment tracking"
               />
               <HeaderMenuItem
-                href="/classical-ml/hyperparam-tuning"
-                label="Hyperparameter tuning"
+                href="/classical-ml/model-evaluation"
+                label="Model evaluation"
               />
             </div>
             <div className="min-w-40 flex flex-col gap-4 md:gap-1">
               <HeaderMenuItem
-                href="/classical-ml/model-registry"
-                label="Model Registry & deployment"
+                href="/classical-ml/models"
+                label="MLflow models"
               />
               <HeaderMenuItem
-                href="/classical-ml/serving"
-                label="Model evaluation"
+                href="/classical-ml/model-registry"
+                label="Model Registry & deployment"
               />
             </div>
           </div>
