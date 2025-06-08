@@ -40,13 +40,6 @@ export default function ModelEvaluation() {
             image={<img src={Card2} alt="" />}
           />
         </GridItem>
-        <GridItem width="wide">
-          <Card
-            title="Batch evaluation across multiple models"
-            body="Evaluate multiple models or runs in a single mlflow.evaluate() call using consistent datasets and metrics. This batch evaluation makes side-by-side performance comparison fast and efficient."
-            image={<img src={Card3} alt="" />}
-          />
-        </GridItem>
       </Grid>
 
       <BelowTheFold />
