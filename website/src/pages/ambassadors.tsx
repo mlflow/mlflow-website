@@ -7,7 +7,11 @@ import ambassadors from "./ambassadors.json";
 export default function Ambassadors() {
   return (
     <Layout>
-      <div className="flex flex-col gap-8 max-w-4xl mx-auto mt-40">
+      <div className="flex flex-col gap-4 max-w-4xl mx-auto text-xl">
+        <img
+          src="/img/ambassadors/mlflow-ambassador-color.png"
+          className="w-64 h-auto mx-auto mb-20"
+        />
         <p>The call was made, and the community answered in droves.</p>
 
         <p>
@@ -33,7 +37,7 @@ export default function Ambassadors() {
           MLflow project.
         </p>
       </div>
-      <div className="flex flex-col gap-8 max-w-4xl mx-auto mt-20">
+      <div className="flex flex-col gap-8 max-w-4xl mx-auto mt-10">
         <Heading level={1}>Meet the MLflow Ambassadors</Heading>
         <Grid columns={2}>
           {ambassadors.flatMap((row) =>
@@ -56,9 +60,9 @@ export default function Ambassadors() {
           )}
         </Grid>
       </div>
-      <div className="flex flex-col gap-10 max-w-4xl mx-auto mt-20">
+      <div className="flex flex-col gap-10 max-w-4xl mx-auto mt-10 text-xl">
         <div className="flex flex-col gap-4">
-          <h3>The MLflow Ambassador Program</h3>
+          <h1>The MLflow Ambassador Program</h1>
           <span>
             The MLflow Ambassador Program exists to empower community members
             with the tools and resources needed to:
@@ -125,7 +129,11 @@ export default function Ambassadors() {
         <div>
           <p>
             Are you interested in becoming an official MLflow Ambassador?
-            <Link href="https://forms.gle/foW9ZtietYLLYCp99">Apply here!</Link>
+            <Link href="https://forms.gle/foW9ZtietYLLYCp99">
+              <span className="inline-block text-xl ml-2 underline font-semibold">
+                Apply here!
+              </span>
+            </Link>
           </p>
           <p>
             The MLflow Ambassador Selection Committee reviews applications on a
