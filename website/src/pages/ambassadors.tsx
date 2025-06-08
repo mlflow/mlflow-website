@@ -8,10 +8,6 @@ export default function Ambassadors() {
   return (
     <Layout>
       <div className="flex flex-col gap-4 max-w-4xl mx-auto text-xl">
-        <img
-          src="/img/ambassadors/mlflow-ambassador-color.png"
-          className="w-64 h-auto mx-auto mb-20"
-        />
         <p>The call was made, and the community answered in droves.</p>
 
         <p>
@@ -44,7 +40,11 @@ export default function Ambassadors() {
             row.map((item) => (
               <GridItem key={item.title}>
                 <div className="flex flex-col gap-3">
-                  <img src={item.img} alt={item.title} className="rounded-md" />
+                  <img
+                    src={require(`@site/static${item.img}`).default}
+                    alt={item.title}
+                    className="rounded-md"
+                  />
                   <h3>{item.title}</h3>
                   <p>{item.role}</p>
                   <Link
