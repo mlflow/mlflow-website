@@ -91,17 +91,6 @@ export default function GenAi(): JSX.Element {
               image={<img src={Card5} alt="" />}
             />
           </GridItem>
-          <GridItem width="wide">
-            <Card
-              title="Enterprise Grade"
-              body="Databricks-managed MLflow adds robust security, automated scaling, and high availability for mission-critical workloads while reducing operational overhead and delivering exceptional performance."
-              cta={{
-                text: "Learn more >",
-                href: "/",
-              }}
-              image={<img src={Card6} alt="" />}
-            />
-          </GridItem>
         </Grid>
       </Section>
 
