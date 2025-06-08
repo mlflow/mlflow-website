@@ -1,5 +1,6 @@
 import Link from "@docusaurus/Link";
 import { useLocation } from "@docusaurus/router";
+import useBaseUrl from "@docusaurus/useBaseUrl";
 import { Body, Button, Heading } from "..";
 import { ComponentProps, ReactNode } from "react";
 import { cva, VariantProps } from "class-variance-authority";
@@ -41,13 +42,13 @@ type ThemeColor = {
 } | null;
 
 function getThemeColor(pathname: string): ThemeColor {
-  if (pathname.startsWith("/genai")) {
+  if (pathname.startsWith(useBaseUrl("/genai"))) {
     return {
       startColor: "#EB1700",
       endColor: "#4A121A",
     };
   }
-  if (pathname.startsWith("/classical-ml")) {
+  if (pathname.startsWith(useBaseUrl("/classical-ml"))) {
     return {
       startColor: "#54c7ec",
       endColor: "#0A2342",
