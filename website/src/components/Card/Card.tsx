@@ -1,6 +1,4 @@
 import Link from "@docusaurus/Link";
-import { useLocation } from "@docusaurus/router";
-import useBaseUrl from "@docusaurus/useBaseUrl";
 import { Body, Button, Heading } from "..";
 import { ComponentProps, ReactNode } from "react";
 import { cva, VariantProps } from "class-variance-authority";
@@ -30,32 +28,11 @@ const contentWrapper = cva("flex flex-col gap-4", {
 const imageWrapper = cva("w-full relative", {
   variants: {
     rounded: {
-      true: "rounded-lg overflow-hidden",
+      true: "rounded-[16px] overflow-hidden",
       false: "",
     },
   },
 });
-
-type ThemeColor = {
-  startColor: string;
-  endColor: string;
-} | null;
-
-function getThemeColor(pathname: string): ThemeColor {
-  if (pathname.startsWith(useBaseUrl("/genai"))) {
-    return {
-      startColor: "#EB1700",
-      endColor: "#4A121A",
-    };
-  }
-  if (pathname.startsWith(useBaseUrl("/classical-ml"))) {
-    return {
-      startColor: "#54c7ec",
-      endColor: "#0A2342",
-    };
-  }
-  return null;
-}
 
 export function Card({
   title,
@@ -64,10 +41,9 @@ export function Card({
   cta,
   image,
   padded = false,
+  rounded = true,
 }: Props) {
   const bodyParts = Array.isArray(body) ? body : [body];
-  const location = useLocation();
-  const colors = getThemeColor(location.pathname);
 
   return (
     <>
@@ -92,31 +68,9 @@ export function Card({
         )}
       </div>
       {image && (
-        <div
-          className="relative"
-          style={
-            colors
-              ? {
-                  paddingTop: "3%",
-                  paddingLeft: "3%",
-                  backgroundImage: `linear-gradient(to bottom, ${colors.startColor} 0%, ${colors.startColor} 50%, ${colors.endColor} 100%)`,
-                }
-              : undefined
-          }
-        >
-          {(() => {
-            const rounded = colors
-              ? "rounded-tl-3xl rounded-tr-3xl rounded-bl-3xl"
-              : "";
-            return (
-              <div className={`relative overflow-hidden ${rounded}`}>
-                {image}
-                <div
-                  className={`absolute inset-0 bg-black/5 pointer-events-none ${rounded}`}
-                />
-              </div>
-            );
-          })()}
+        <div className={imageWrapper({ rounded })}>
+          {image}
+          <div className="absolute inset-0 bg-black/5 pointer-events-none" />
         </div>
       )}
     </>
