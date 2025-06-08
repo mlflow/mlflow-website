@@ -14,9 +14,11 @@ export default function ReleasePost({
   return (
     <ThemeLayout {...layoutProps}>
       <Layout>
-        <div className="pt-24 max-w-7xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <div className="flex flex-row">
-            <BlogSidebar className="text-white" sidebar={sidebar} />
+            <div className="contents text-white **:[nav_ul]:!mb-6">
+              <BlogSidebar sidebar={sidebar} />
+            </div>
             <BlogPostProvider content={BlogPostContent}>
               <BlogPostItem className="max-w-prose **:[h2>a]:!text-2xl">
                 <BlogPostContent />
