@@ -40,6 +40,9 @@ export const Footer = ({ variant }: VariantProps<typeof footerVariants>) => {
           <FooterMenuItem href="/releases">Releases</FooterMenuItem>
           <FooterMenuItem href="/blog">Blog</FooterMenuItem>
           <FooterMenuItem href={MLFLOW_DOCS_URL}>Docs</FooterMenuItem>
+          <FooterMenuItem href="/ambassadors">
+            Ambassador Program
+          </FooterMenuItem>
         </div>
       </div>
     </footer>

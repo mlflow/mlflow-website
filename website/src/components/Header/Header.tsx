@@ -140,6 +140,9 @@ export const Header = ({ layoutType }: Props) => {
             <li className="w-full md:w-auto">
               <HeaderMenuItem href={MLFLOW_DOCS_URL} label="Docs" />
             </li>
+            <li className="w-full md:w-auto">
+              <HeaderMenuItem href="/ambassadors" label="Ambassador Program" />
+            </li>
             <li className="w-full md:w-auto md:hidden">
               <Link href={MLFLOW_DOCS_URL}>
                 <Button variant="primary" size="small" width="full">
