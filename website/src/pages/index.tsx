@@ -18,7 +18,7 @@ export default function Home(): JSX.Element {
     <Layout>
       <AboveTheFold
         title="Deliver production-ready AI"
-        body="The open source developer platform to build AI applications and models with confidence"
+        body="The open source developer platform to build AI applications and models with confidence."
       >
         <GlossyCardContainer>
           <GlossyCard>

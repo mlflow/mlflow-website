@@ -19,7 +19,7 @@ export default function AppVersioning() {
       <AboveTheFold
         sectionLabel="App versioning"
         title="Manage app versions with ease"
-        body="Track and compare different versions of GenAI applications to ensure quality and maintainability"
+        body="Track and compare different versions of GenAI applications to ensure quality and maintainability."
         hasGetStartedButton={MLFLOW_DOCS_URL}
       >
         <HeroImage src={CardHero} alt="" />

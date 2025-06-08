@@ -18,7 +18,7 @@ export default function AiGateway() {
       <AboveTheFold
         sectionLabel="AI gateway"
         title="Unified access to all AI models"
-        body="Standardize how you interact with different LLM providers using one central interface.."
+        body="Standardize how you interact with different LLM providers using one central interface."
         hasGetStartedButton={MLFLOW_DOCS_URL}
       >
         <HeroImage src={CardHero} alt="" />

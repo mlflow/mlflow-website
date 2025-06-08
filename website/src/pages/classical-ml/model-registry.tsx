@@ -19,7 +19,7 @@ export default function ModelRegistryAndDeployment() {
       <AboveTheFold
         sectionLabel="Model registry & deployment"
         title="Deploy and manage models in production"
-        body="Streamline your ML workflows with MLflow's comprehensive model registry for version control, approvals, and deployment management"
+        body="Streamline your ML workflows with MLflow's comprehensive model registry for version control, approvals, and deployment management."
         hasGetStartedButton={MLFLOW_DOCS_URL}
       >
         <HeroImage src={CardHero} alt="" />
