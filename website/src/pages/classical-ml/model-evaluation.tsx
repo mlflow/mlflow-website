@@ -1,17 +1,14 @@
 import { MLFLOW_DOCS_URL } from "@site/src/constants";
 import {
   Layout,
-  Grid,
-  GridItem,
   AboveTheFold,
   BelowTheFold,
-  Card,
   HeroImage,
+  StickyGrid,
 } from "../../components";
-import CardHero from "@site/static/img/Classical_serving/classical_serving_hero.png";
-import Card1 from "@site/static/img/Classical_serving/classical_serving_1.png";
-import Card2 from "@site/static/img/Classical_serving/classical_serving_2.png";
-import Card3 from "@site/static/img/Classical_serving/classical_serving_3.png";
+import CardHero from "@site/static/img/Classical_evaluations/classical_evaluation_hero.png";
+import Card1 from "@site/static/img/Classical_evaluations/classical_evaluation_1.png";
+import Card2 from "@site/static/img/Classical_evaluations/classical_evaluation_2.png";
 
 export default function ModelEvaluation() {
   return (
@@ -25,22 +22,20 @@ export default function ModelEvaluation() {
         <HeroImage src={CardHero} alt="" />
       </AboveTheFold>
 
-      <Grid columns={2}>
-        <GridItem width="wide">
-          <Card
-            title="Built-in metrics and visualizations"
-            body="MLflow automatically computes standard metrics and visualizations—such as ROC curves, precision-recall curves, confusion matrices, and regression diagnostics. These evaluation results are logged and surfaced directly in the MLflow UI, making it easy to explore, compare, and interpret model performance across runs."
-            image={<img src={Card1} alt="" />}
-          />
-        </GridItem>
-        <GridItem width="wide">
-          <Card
-            title="Custom evaluators"
-            body="You can define your own evaluation logic using the custom evaluator interface. This is useful for model types or domains where standard metrics aren’t enough, such as specialized business KPIs or task-specific scoring."
-            image={<img src={Card2} alt="" />}
-          />
-        </GridItem>
-      </Grid>
+      <StickyGrid
+        cards={[
+          {
+            title: "Built-in metrics and visualizations",
+            body: "MLflow automatically computes standard metrics and visualizations—such as ROC curves, precision-recall curves, confusion matrices, and regression diagnostics. These evaluation results are logged and surfaced directly in the MLflow UI, making it easy to explore, compare, and interpret model performance across runs.",
+            image: <img src={Card1} alt="" />,
+          },
+          {
+            title: "Custom evaluators",
+            body: "You can define your own evaluation logic using the custom evaluator interface. This is useful for model types or domains where standard metrics aren’t enough, such as specialized business KPIs or task-specific scoring.",
+            image: <img src={Card2} alt="" />,
+          },
+        ]}
+      />
 
       <BelowTheFold />
     </Layout>

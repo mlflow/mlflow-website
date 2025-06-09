@@ -7,6 +7,7 @@ interface Props {
   width?: "default" | "full";
   size?: "small" | "medium" | "large";
   link?: string;
+  body?: string;
 }
 
 export const GetStartedButton = ({
@@ -14,11 +15,12 @@ export const GetStartedButton = ({
   size = "medium",
   width = "default",
   variant = "primary",
+  body = "Get started",
 }: Props) => {
   return (
     <Link to={link}>
       <Button size={size} width={width} variant={variant}>
-        Get started
+        {body}
       </Button>
     </Link>
   );
