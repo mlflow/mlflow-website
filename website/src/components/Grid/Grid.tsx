@@ -60,7 +60,7 @@ export const Grid = ({
       <div className={grid({ columns, className })}>
         {children}
         {Array.from({ length: missingSlots }, (_, i) => (
-          <GridItem key={i} />
+          <GridItem key={i} filler />
         ))}
       </div>
     </div>
@@ -68,7 +68,7 @@ export const Grid = ({
 };
 
 const gridItemVariants = cva(
-  ["flex flex-col items-start p-10 gap-20 justify-between w-full bg-[#0E1416]"],
+  ["flex-col items-start p-10 gap-20 justify-between w-full bg-[#0E1416]"],
   {
     variants: {
       width: {
@@ -77,6 +77,10 @@ const gridItemVariants = cva(
       },
       direction: {
         reverse: "md:flex-col-reverse",
+      },
+      filler: {
+        true: "hidden md:flex",
+        false: "flex",
       },
     },
     compoundVariants: [
@@ -99,6 +103,9 @@ export const GridItem = ({
   children,
   width,
   direction,
+  filler = false,
 }: PropsWithChildren<VariantProps<typeof gridItem>>) => {
-  return <div className={gridItem({ width, direction })}>{children}</div>;
+  return (
+    <div className={gridItem({ width, direction, filler })}>{children}</div>
+  );
 };
