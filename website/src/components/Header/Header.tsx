@@ -10,21 +10,11 @@ import { HeaderMenuItem } from "../HeaderMenuItem/HeaderMenuItem";
 import { HeaderProductsSubmenu } from "../HeaderProductsSubmenu/HeaderProductsSubmenu";
 
 import "./Header.module.css";
-import { MLFLOW_DOCS_URL, MLFLOW_DBX_TRIAL_URL } from "@site/src/constants";
+import { MLFLOW_DOCS_URL } from "@site/src/constants";
 
 const MD_BREAKPOINT = 640;
 
-type Props = {
-  layoutType:
-    | "default"
-    | "genai"
-    | "genai-subpage"
-    | "classical-ml"
-    | "classical-ml-subpage"
-    | "home";
-};
-
-export const Header = ({ layoutType }: Props) => {
+export const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isProductItemHovered, setIsProductItemHovered] = useState(false);
   const [isProductSubmenuOpen, setIsProductSubmenuOpen] = useState(false);
