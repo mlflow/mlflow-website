@@ -37,7 +37,7 @@ export default function GenAi(): JSX.Element {
             ],
             cta: {
               href: "/genai/observability",
-              text: "Learn more >",
+              text: "Learn more",
             },
             image: <img src={Card1} alt="MLflow tracing" />,
           },
@@ -47,7 +47,7 @@ export default function GenAi(): JSX.Element {
             body: "Utilize LLM-as-a-judge metrics, mimicking human expertise, to assess and enhance GenAI quality. Access pre-built judges for common metrics like hallucination or relevance, or develop custom judges tailored to your business needs and expert insights.",
             cta: {
               href: "/genai/evaluations",
-              text: "Learn more >",
+              text: "Learn more",
             },
             image: <img src={Card2} alt="MLflow LLM judges" />,
           },
@@ -58,7 +58,7 @@ export default function GenAi(): JSX.Element {
             ],
             cta: {
               href: "/genai/prompt-registry",
-              text: "Learn more >",
+              text: "Learn more",
             },
             image: <img src={Card3} alt="MLflow LLM judges" />,
           },
@@ -69,7 +69,7 @@ export default function GenAi(): JSX.Element {
             ],
             cta: {
               href: "/genai/app-versioning",
-              text: "Learn more >",
+              text: "Learn more",
             },
             image: <img src={Card4} alt="MLflow LLM judges" />,
           },
