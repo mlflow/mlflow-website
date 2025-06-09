@@ -75,6 +75,7 @@ export const GetStartedWithMLflow = () => {
             </div>
           </div>
           <GetStartedButton
+            body="Get started for free"
             size="large"
             width="full"
             variant="dark"
