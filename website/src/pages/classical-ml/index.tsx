@@ -16,7 +16,6 @@ import Card2 from "@site/static/img/Classical_home/Classical_home_2.png";
 import Card3 from "@site/static/img/Classical_home/Classical_home_3.png";
 import Card4 from "@site/static/img/Classical_home/Classical_home_4.png";
 import Card5 from "@site/static/img/Classical_home/Classical_home_5.png";
-import Card6 from "@site/static/img/Classical_home/Classical_home_6.png";
 
 export default function GenAi(): JSX.Element {
   return (

@@ -12,10 +12,10 @@ import {
 import CardHero from "@site/static/img/GenAI_evaluations/GenAI_evaluations_hero.png";
 import Card1 from "@site/static/img/GenAI_evaluations/GenAI_evaluations_1.png";
 import Card2 from "@site/static/img/GenAI_evaluations/GenAI_evaluations_2.png";
+import Card3 from "@site/static/img/GenAI_evaluations/GenAI_evaluations_3.png";
 import Card4 from "@site/static/img/GenAI_evaluations/GenAI_evaluations_4.png";
 import Card5 from "@site/static/img/GenAI_evaluations/GenAI_evaluations_5.png";
 import Card6 from "@site/static/img/GenAI_evaluations/GenAI_evaluations_6.png";
-import Card7 from "@site/static/img/GenAI_evaluations/GenAI_evaluations_7.png";
 
 export default function Evaluations() {
   return (
@@ -59,7 +59,7 @@ export default function Evaluations() {
             <Card
               title="Test new app / prompt variants"
               body="MLflow's GenAI evaluation API lets you test new application variants (prompts, models, code) against evaluation and regression datasets. Each variant is linked to its evaluation results, enabling tracking of improvements over time."
-              image={<img src={Card4} alt="" />}
+              image={<img src={Card3} alt="" />}
               // Product GIF of running mlflow.evaluate and then seeing the eval results list UI
             />
           </GridItem>
@@ -67,7 +67,7 @@ export default function Evaluations() {
             <Card
               title="Customize with code-based metrics"
               body="Customize evaluation to measure any aspect of your app's quality or performance using our custom metrics API. Convert any Python function—from regex to custom logic—into a metric."
-              image={<img src={Card5} alt="" />}
+              image={<img src={Card4} alt="" />}
               // Code snippet of a custom metric function
             />
           </GridItem>
@@ -75,7 +75,7 @@ export default function Evaluations() {
             <Card
               title="Identify root causes with evaluation review UIs"
               body="Use MLflow's Evaluation UI to visualize a summary of your evals and view results record-by-record to quickly identify root causes and further improvement opportunities."
-              image={<img src={Card6} alt="" />}
+              image={<img src={Card5} alt="" />}
               // Product GIF of the evaluation UI and using it to filter and view individual results
             />
           </GridItem>
@@ -83,7 +83,7 @@ export default function Evaluations() {
             <Card
               title="Compare versions side-by-side"
               body="Compare evaluations of 2 app variants to understand if your changes improved or regressed quality. Review individual questions side-by-side in the Trace Comparison UI to find differences, debug regressions, and inform your next version."
-              image={<img src={Card7} alt="" />}
+              image={<img src={Card6} alt="" />}
               // Product GIF of the eval results compare UI, along with opening the trace compare UI
             />
           </GridItem>

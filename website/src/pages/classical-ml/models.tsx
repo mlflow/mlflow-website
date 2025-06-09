@@ -11,7 +11,6 @@ import {
 import CardHero from "@site/static/img/Classical_models/classical_models_hero.png";
 import Card1 from "@site/static/img/Classical_models/classical_models_1.png";
 import Card2 from "@site/static/img/Classical_models/classical_models_2.png";
-import Card3 from "@site/static/img/Classical_models/classical_models_3.png";
 
 export default function Models() {
   return (
