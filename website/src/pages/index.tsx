@@ -30,7 +30,7 @@ export default function Home(): JSX.Element {
               rounded={false}
               cta={{
                 href: "/genai",
-                text: "Learn more >",
+                text: "Learn more",
                 prominent: true,
               }}
               image={<img src={GenAI} alt="" className="hidden md:block" />}
@@ -45,7 +45,7 @@ export default function Home(): JSX.Element {
               rounded={false}
               cta={{
                 href: "/classical-ml",
-                text: "Learn more >",
+                text: "Learn more",
                 prominent: true,
               }}
               image={
