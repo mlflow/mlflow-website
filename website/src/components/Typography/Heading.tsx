@@ -1,7 +1,7 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import type { PropsWithChildren } from "react";
 
-const styles = cva("", {
+const styles = cva("hyphens-auto break-word", {
   variants: {
     level: {
       1: "text-balance font-light text-[64px] leading-[100%] tracking-[-3%] text-center",
@@ -23,7 +23,12 @@ export const Heading = ({
   "aria-level": ariaLevel = level, // use stylistic level by default, but allow aria-level override
 }: Props) => {
   return (
-    <div role="heading" aria-level={ariaLevel} className={styles({ level })}>
+    <div
+      role="heading"
+      aria-level={ariaLevel}
+      className={styles({ level })}
+      lang="en"
+    >
       {children}
     </div>
   );
