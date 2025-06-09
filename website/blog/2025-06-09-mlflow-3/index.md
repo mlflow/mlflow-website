@@ -97,15 +97,12 @@ conversation_traces = mlflow.search_traces(
 eval_data = conversation_traces.select(["inputs.query", "outputs.result"]).to_pandas()
 
 # Run systematic evaluation
-evaluation_results = mlflow.evaluate(
+evaluation_results = mlflow.genai.evaluate(
     data=eval_data,
-    model_type="question-answering",
-    evaluators=[
+    scorers=[
         "answer_relevance",
         "faithfulness",
         "answer_correctness"
-    ],
-    extra_metrics=[
         mlflow.metrics.genai.answer_similarity(),
         mlflow.metrics.genai.toxicity()
     ]
@@ -252,7 +249,6 @@ After running a few dozen queries, you can examine the MLflow UI to understand:
 
 - Which documents are being retrieved most frequently
 - Average response latency across different question types
-- Token usage patterns and associated costs
 - Where in the pipeline latency bottlenecks occur
 
 ### Phase 2: Quality Assessment and Improvement
@@ -265,10 +261,9 @@ test_traces = mlflow.search_traces(
 )
 
 # Evaluate quality systematically
-eval_results = mlflow.evaluate(
+eval_results = mlflow.genai.evaluate(
     data=test_traces,
-    model_type="question-answering",
-    evaluators=[
+    scorers=[
         "answer_relevance",
         "faithfulness",
         "answer_correctness"
@@ -303,81 +298,13 @@ def build_improved_assistant():
     return query_engine
 
 # Test improvements with same evaluation dataset
-improved_eval = mlflow.evaluate(
+improved_eval = mlflow.genai.evaluate(
     data=test_traces,
-    model=build_improved_assistant,
-    model_type="question-answering",
-    evaluators=["answer_relevance", "faithfulness"]
+    predict_fn=build_improved_assistant,
+    scorers=["answer_relevance", "faithfulness"]
 )
 
 # Relevance improved to 0.84, faithfulness maintained at 0.90
-```
-
-### Phase 3: Production Deployment
-
-```python
-# Package the improved assistant for production
-class TechnicalDocsAssistant(mlflow.pyfunc.PythonModel):
-    def load_context(self, context):
-        from llama_index.core import load_index_from_storage
-
-        # Load pre-built index and configuration
-        self.index = load_index_from_storage(
-            storage_context=context.artifacts["index_storage"]
-        )
-        self.config = load_config(context.artifacts["config"])
-
-    def predict(self, context, model_input):
-        questions = model_input["question"]
-        responses = []
-
-        for question in questions:
-            query_engine = self.index.as_query_engine(**self.config["query_params"])
-            response = query_engine.query(question)
-
-            responses.append({
-                "answer": str(response),
-                "source_nodes": [node.node_id for node in response.source_nodes],
-                "confidence": response.metadata.get("confidence", 0.0)
-            })
-
-        return responses
-
-# Deploy with quality gates
-with mlflow.start_run():
-    # Log the production-ready model
-    production_model = mlflow.pyfunc.log_model(
-        artifact_path="docs_assistant_v2",
-        python_model=TechnicalDocsAssistant(),
-        artifacts={
-            "index_storage": "./index_storage",
-            "config": "./production_config.yaml"
-        }
-    )
-
-    # Final quality check before registration
-    final_eval = mlflow.evaluate(
-        data=test_traces,
-        model=production_model.model_uri,
-        model_type="question-answering"
-    )
-
-    # Register only if quality thresholds are met
-    if (final_eval.metrics["answer_relevance/v1/mean"] > 0.8 and
-        final_eval.metrics["faithfulness/v1/mean"] > 0.85):
-
-        mlflow.register_model(
-            model_uri=production_model.model_uri,
-            name="technical_docs_assistant",
-            tags={
-                "quality_gate_passed": "true",
-                "eval_dataset": "technical_queries_v1",
-                "target_latency": "< 3s"
-            }
-        )
-        print("Model registered and ready for production deployment")
-    else:
-        print("Quality gates not met, review evaluation results")
 ```
 
 ## Beyond GenAI: Improvements for All ML Workloads
