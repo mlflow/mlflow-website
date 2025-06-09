@@ -1,4 +1,4 @@
-import { useState, useLayoutEffect } from "react";
+import { useState, useLayoutEffect, useEffect } from "react";
 import Link from "@docusaurus/Link";
 import Logo from "@site/static/img/mlflow-logo-white.svg";
 import DownIcon from "@site/static/img/chevron-down-small.svg";
@@ -11,8 +11,21 @@ import { HeaderProductsSubmenu } from "../HeaderProductsSubmenu/HeaderProductsSu
 
 import "./Header.module.css";
 import { MLFLOW_DOCS_URL } from "@site/src/constants";
+import { cva } from "class-variance-authority";
 
 const MD_BREAKPOINT = 640;
+
+const navStyles = cva(
+  "fixed w-full z-20 top-0 start-0 bg-[#F7F8F8]/1 border-b border-[#F7F8F8]/8 backdrop-blur-[20px] drop-shadow-[0px_1px_2px_rgba(0_0_0/75%),0px_1px_12px_rgba(0_0_0/75%)] overflow-y-auto",
+  {
+    variants: {
+      isOpen: {
+        true: "h-dvh",
+        false: "",
+      },
+    },
+  },
+);
 
 export const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -45,8 +58,16 @@ export const Header = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add("noScroll");
+    } else {
+      document.body.classList.remove("noScroll");
+    }
+  }, [isOpen]);
+
   return (
-    <nav className="fixed w-full z-20 top-0 start-0 bg-[#F7F8F8]/1 border-b border-[#F7F8F8]/8 backdrop-blur-[20px] drop-shadow-[0px_1px_2px_rgba(0_0_0/75%),0px_1px_12px_rgba(0_0_0/75%)]">
+    <nav className={navStyles({ isOpen })}>
       <div className="flex flex-wrap items-center mx-auto px-6 lg:px-20 py-2 max-w-container">
         <Link
           href="/"
