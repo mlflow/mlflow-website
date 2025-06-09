@@ -54,16 +54,16 @@ export const GetStartedWithMLflow = () => {
           <div className="flex flex-col gap-8">
             <div className="flex flex-row justify-between items-center gap-4">
               <div className="flex flex-row justify-center items-end gap-3 flex-wrap">
-                <h3 className="m-0 text-white">Free hosted </h3>
+                <h3 className="m-0 text-white">Managed hosting </h3>
                 <span className="text-gray-500 text-sm">ON</span>
                 <DatabricksLogo />
               </div>
             </div>
             <div className="flex flex-col gap-4">
               {[
-                "Explore MLflow with a fully managed experience",
-                "Built and maintained by the creators of MLflow",
-                "Full OSS compatability",
+                "Free and fully managed — experience MLflow without the setup hassle",
+                "Built and maintained by the original creators of MLflow",
+                "Full OSS compatibility",
               ].map((bulletPoint, index) => (
                 <div key={index} className="flex flex-row items-center gap-4">
                   <Checkmark className="shrink-0" />
@@ -75,6 +75,7 @@ export const GetStartedWithMLflow = () => {
             </div>
           </div>
           <GetStartedButton
+            body="Get started for free"
             size="large"
             width="full"
             variant="dark"
