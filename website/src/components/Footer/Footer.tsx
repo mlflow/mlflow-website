@@ -6,7 +6,7 @@ import { FooterMenuItem } from "../FooterMenuItem/FooterMenuItem";
 import { MLFLOW_DOCS_URL } from "@site/src/constants";
 
 const footerVariants = cva(
-  "pb-30 flex flex-col pt-30 bg-bottom bg-no-repeat bg-cover text-center bg-size-[auto_360px] 2xl:bg-size-[100%_360px]",
+  "pb-30 flex flex-col pt-30 bg-bottom bg-no-repeat bg-cover bg-size-[auto_360px] 2xl:bg-size-[100%_360px]",
   {
     variants: {
       variant: {
@@ -35,7 +35,7 @@ export const Footer = ({ variant }: VariantProps<typeof footerVariants>) => {
           </div>
         </div>
 
-        <div className="flex flex-col md:flex-row gap-10">
+        <div className="flex flex-col flex-wrap justify-end md:text-right md:flex-row gap-x-10 gap-y-5 w-2/5 md:w-auto md:pt-2">
           <FooterMenuItem href="/">Components</FooterMenuItem>
           <FooterMenuItem href="/releases">Releases</FooterMenuItem>
           <FooterMenuItem href="/blog">Blog</FooterMenuItem>
