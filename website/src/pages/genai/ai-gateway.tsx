@@ -8,9 +8,9 @@ import {
   Card,
   HeroImage,
 } from "../../components";
-import CardHero from "@site/static/img/GenAI_governance/GenAI_governance_hero.png";
-import Card1 from "@site/static/img/GenAI_governance/GenAI_governance_1.png";
-import Card2 from "@site/static/img/GenAI_governance/GenAI_governance_2.png";
+import CardHero from "@site/static/img/GenAI_gateway/GenAI_aigateway_hero.png";
+import Card1 from "@site/static/img/GenAI_gateway/GenAI_gateway_1.png";
+import Card2 from "@site/static/img/GenAI_gateway/GenAI_gateway_2.png";
 
 export default function AiGateway() {
   return (

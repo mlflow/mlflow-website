@@ -15,9 +15,6 @@ import Card1 from "@site/static/img/GenAI_home/GenAI_home_1.png";
 import Card2 from "@site/static/img/GenAI_home/GenAI_home_2.png";
 import Card3 from "@site/static/img/GenAI_home/GenAI_home_3.png";
 import Card4 from "@site/static/img/GenAI_home/GenAI_home_4.png";
-import Card5 from "@site/static/img/GenAI_home/GenAI_home_5.png";
-import Card6 from "@site/static/img/GenAI_home/GenAI_home_6.png";
-import Card7 from "@site/static/img/GenAI_home/GenAI_home_7.png";
 
 export default function GenAi(): JSX.Element {
   return (
@@ -57,7 +54,7 @@ export default function GenAi(): JSX.Element {
               href: "/genai/evaluations",
               text: "Learn more >",
             }}
-            image={<img src={Card3} alt="MLflow LLM judges" />}
+            image={<img src={Card2} alt="MLflow LLM judges" />}
           />
         </GridItem>
         <GridItem width="wide">
@@ -70,7 +67,7 @@ export default function GenAi(): JSX.Element {
               href: "/genai/prompt-registry",
               text: "Learn more >",
             }}
-            image={<img src={Card6} alt="MLflow LLM judges" />}
+            image={<img src={Card3} alt="MLflow LLM judges" />}
           />
         </GridItem>
         <GridItem width="wide">
@@ -83,7 +80,7 @@ export default function GenAi(): JSX.Element {
               href: "/genai/app-versioning",
               text: "Learn more >",
             }}
-            image={<img src={Card7} alt="MLflow LLM judges" />}
+            image={<img src={Card4} alt="MLflow LLM judges" />}
           />
         </GridItem>
       </Grid>

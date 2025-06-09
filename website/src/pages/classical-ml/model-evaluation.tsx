@@ -8,10 +8,9 @@ import {
   Card,
   HeroImage,
 } from "../../components";
-import CardHero from "@site/static/img/Classical_serving/classical_serving_hero.png";
-import Card1 from "@site/static/img/Classical_serving/classical_serving_1.png";
-import Card2 from "@site/static/img/Classical_serving/classical_serving_2.png";
-import Card3 from "@site/static/img/Classical_serving/classical_serving_3.png";
+import CardHero from "@site/static/img/Classical_evaluations/classical_evaluation_hero.png";
+import Card1 from "@site/static/img/Classical_evaluations/classical_evaluation_1.png";
+import Card2 from "@site/static/img/Classical_evaluations/classical_evaluation_2.png";
 
 export default function ModelEvaluation() {
   return (
