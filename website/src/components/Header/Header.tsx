@@ -69,41 +69,43 @@ export const Header = () => {
   return (
     <nav className={navStyles({ isOpen })}>
       <div className="flex flex-wrap items-center mx-auto px-6 lg:px-20 py-2 max-w-container">
-        <Link
-          href="/"
-          className="flex items-center space-x-3 rtl:space-x-reverse grow basis-0"
-        >
-          <Logo className="h-[36px]" />
-        </Link>
-        <div className="flex flex-row items-center gap-6 md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse grow justify-end basis-0">
-          <Link href={MLFLOW_DOCS_URL} className="hidden md:block">
-            <Button variant="primary" size="small">
-              Get started
-            </Button>
-          </Link>
-          <button
-            data-collapse-toggle="navbar-sticky"
-            type="button"
-            className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-white md:hidden focus:outline-none cursor-pointer"
-            onClick={() => setIsOpen(!isOpen)}
+        <div className="md:contents flex flex-row justify-between w-full sticky top-[8px]">
+          <Link
+            href="/"
+            className="flex items-center space-x-3 rtl:space-x-reverse grow basis-0"
           >
-            <span className="sr-only">Open main menu</span>
-            <svg
-              className="w-5 h-5"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 17 14"
+            <Logo className="h-[36px]" />
+          </Link>
+          <div className="flex flex-row items-center gap-6 md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse grow justify-end basis-0">
+            <Link href={MLFLOW_DOCS_URL} className="hidden md:block">
+              <Button variant="primary" size="small">
+                Get started
+              </Button>
+            </Link>
+            <button
+              data-collapse-toggle="navbar-sticky"
+              type="button"
+              className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-white md:hidden focus:outline-none cursor-pointer"
+              onClick={() => setIsOpen(!isOpen)}
             >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M1 1h15M1 7h15M1 13h15"
-              />
-            </svg>
-          </button>
+              <span className="sr-only">Open main menu</span>
+              <svg
+                className="w-5 h-5"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 17 14"
+              >
+                <path
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M1 1h15M1 7h15M1 13h15"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
         <div
           className={cn(
