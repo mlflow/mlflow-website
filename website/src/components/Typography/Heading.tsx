@@ -4,10 +4,10 @@ import type { PropsWithChildren } from "react";
 const styles = cva("hyphens-auto break-word", {
   variants: {
     level: {
-      1: "text-balance font-light text-[64px] leading-[100%] tracking-[-3%] text-center",
-      2: "text-wrap font-light text-[52px] leading-[120%] tracking-[-1%] text-center text-white",
-      3: "text-wrap font-regular text-[40px] leading-[120%] tracking-[-1%]",
-      4: "text-wrap font-regular text-[32px] leading-[120%] tracking-[0%]",
+      1: "text-balance font-light text-[40px] xxs:text-[52px] xs:text-[64px] leading-[100%] tracking-[-3%] text-center",
+      2: "text-wrap font-light text-[32px] xxs:text-[40px] xs:text-[52px] leading-[120%] tracking-[-1%] text-center text-white",
+      3: "text-wrap font-regular text-[24px] xxs:text-[32px] xs:text-[40px] leading-[120%] tracking-[-1%]",
+      4: "text-wrap font-regular text-[24px] xxs:text-[32px] leading-[120%] tracking-[0%]",
       5: "text-wrap font-medium text-[24px] leading-[120%] tracking-[0%]",
     },
   },
