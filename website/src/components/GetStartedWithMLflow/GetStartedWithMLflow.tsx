@@ -61,9 +61,9 @@ export const GetStartedWithMLflow = () => {
             </div>
             <div className="flex flex-col gap-4">
               {[
-                "Explore MLflow with a fully managed experience",
+                "Free and fully managed — experience MLflow without the setup hassle",
                 "Built and maintained by the original creators of MLflow",
-                "Full OSS compatability",
+                "Full OSS compatibility",
               ].map((bulletPoint, index) => (
                 <div key={index} className="flex flex-row items-center gap-4">
                   <Checkmark className="shrink-0" />
