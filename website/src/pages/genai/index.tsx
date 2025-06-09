@@ -26,9 +26,7 @@ export default function GenAi(): JSX.Element {
         ]}
         hasGetStartedButton={MLFLOW_DOCS_URL}
         bodyColor="white"
-      >
-        <div className="md:h-40 lg:h-80" />
-      </AboveTheFold>
+      />
 
       <Grid columns={2}>
         <GridItem width="wide">
