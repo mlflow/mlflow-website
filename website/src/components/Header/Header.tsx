@@ -113,7 +113,7 @@ export const Header = () => {
             isOpen ? "flex" : "hidden md:flex",
           )}
         >
-          <ul className="flex flex-col font-medium md:flex-row gap-6 md:gap-10 w-full md:w-auto">
+          <ul className="flex flex-col font-medium md:flex-row gap-y-6 gap-x-4 lg:gap-x-10 w-full md:w-auto">
             <li
               className="w-full md:w-auto md:hidden"
               onClick={handleProductItemClick}
