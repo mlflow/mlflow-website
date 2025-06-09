@@ -19,10 +19,10 @@ export default function BlogPostItems({
 
     return (
       <div className="flex flex-col mb-10 max-w-7xl mx-auto gap-20">
-        <div className="flex flex-col-reverse md:flex-row gap-10">
+        <div className="flex flex-col-reverse items-center md:flex-row gap-10">
           <Link
             href={firstBlogPost.content.metadata.permalink}
-            className="flex flex-col justify-center items-start gap-4 w-1/2"
+            className="flex flex-col justify-center items-start gap-4 md:w-1/2"
           >
             <SectionLabel label="Featured" />
             <Heading level={2}>{firstBlogPost.content.metadata.title}</Heading>
@@ -30,12 +30,12 @@ export default function BlogPostItems({
           </Link>
           <Link
             href={firstBlogPost.content.metadata.permalink}
-            className="w-1/2"
+            className="md:w-1/2"
           >
             <img
               src={useBaseUrl(firstBlogPost.content.frontMatter.thumbnail)}
               alt={firstBlogPost.content.frontMatter.title}
-              className="w-full h-full object-cover rounded-md"
+              className="w-full aspect-video object-cover rounded-md"
             />
           </Link>
         </div>

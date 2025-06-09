@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { flushSync } from "react-dom";
 import styles from "./styles.module.css";
 
 const ExpandableGrid = ({ items, defaultVisibleCount, renderItem }) => {
@@ -21,7 +22,17 @@ const ExpandableGrid = ({ items, defaultVisibleCount, renderItem }) => {
       {items.length > defaultVisibleCount && (
         <div className={styles.buttonContainer}>
           <button
-            onClick={() => setIsExpanded(!isExpanded)}
+            onClick={(event) => {
+              if (isExpanded) {
+                flushSync(() => setIsExpanded(false));
+                event.currentTarget.scrollIntoView({
+                  behavior: "smooth",
+                  block: "center",
+                });
+              } else {
+                setIsExpanded(true);
+              }
+            }}
             className={styles.toggleButton}
           >
             {isExpanded ? "See Less ∧" : "See All ∨"}

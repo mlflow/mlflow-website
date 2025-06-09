@@ -22,9 +22,7 @@ export default function GenAi(): JSX.Element {
         body="From experiment to production, MLflow streamlines your complete machine learning journey with end-to-end tracking, model management, and deployment."
         hasGetStartedButton={MLFLOW_DOCS_URL}
         bodyColor="white"
-      >
-        <div className="md:h-40 lg:h-80" />
-      </AboveTheFold>
+      />
 
       <StickyGrid
         cards={[
