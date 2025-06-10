@@ -1,9 +1,9 @@
 ---
-title: Announcing MLflow 3.0
+title: MLflow 3.0: Bringing Enterprise-Grade GenAI to Open Source
 tags: [mlflow, genai, tracing, evaluation, mlops]
 slug: mlflow-3-0-launch
 authors: [mlflow-maintainers]
-thumbnail: /img/blog/mlflow-3-trace-ui.png
+thumbnail: /img/blog/mlflow-3-launch.png
 ---
 
 The open source MLflow community has reached a major milestone. Today, we're releasing **MLflow 3.0**, which brings production-ready generative AI capabilities to the platform that millions of developers trust for ML operations.
@@ -33,8 +33,6 @@ This means you can instrument a transformer training pipeline and a multi-agent 
 
 The centerpiece of MLflow 3.0 is comprehensive tracing that works across the entire GenAI ecosystem. Unlike logging frameworks that capture basic inputs and outputs, MLflow Tracing provides hierarchical visibility into complex execution flows.
 
-![MLflow Trace UI](mlflow-3-trace-ui.png)
-
 ```python
 import mlflow
 from langchain.chains import RetrievalQA
@@ -43,22 +41,18 @@ from langchain_community.vectorstores import Chroma
 # Instrument your entire application with one line
 mlflow.langchain.autolog()
 
-def create_qa_system():
+@mlflow.trace(name="customer_support")
+def answer_question(question, customer_tier="standard"):
     vectorstore = Chroma.from_documents(documents, embeddings)
     qa_chain = RetrievalQA.from_chain_type(
         llm=ChatOpenAI(temperature=0),
         retriever=vectorstore.as_retriever(search_kwargs={"k": 3}),
         return_source_documents=True
     )
-    return qa_chain
-
-@mlflow.trace(name="customer_support")
-def answer_question(question, customer_tier="standard"):
-    qa_system = create_qa_system()
-
+    
     # Tracing captures the full execution tree automatically
-    result = qa_system({"query": question})
-
+    result = qa_chain({"query": question})
+    
     # Add business context to traces
     mlflow.update_current_trace(
         tags={
@@ -66,7 +60,7 @@ def answer_question(question, customer_tier="standard"):
             "question_category": classify_question(question)
         }
     )
-
+    
     return result["result"]
 ```
 
@@ -82,9 +76,7 @@ This creates a complete execution timeline that you can drill into when issues a
 
 ### Systematic Quality Evaluation
 
-Evaluating GenAI quality has traditionally meant manual review processes that don't scale. MLflow 3.0 includes research-backed evaluation metrics that can assess quality dimensions automatically.
-
-![Evaluation Results](mlflow-3-trace-ui-2.png)
+Evaluating GenAI quality has traditionally meant manual review processes that don't scale. MLflow 3.0 includes a comprehensive evaluation framework that can assess quality dimensions systematically.
 
 ```python
 # Extract traces from your instrumented application
@@ -96,59 +88,26 @@ conversation_traces = mlflow.search_traces(
 # Convert traces to evaluation dataset
 eval_data = conversation_traces.select(["inputs.query", "outputs.result"]).to_pandas()
 
-# Run systematic evaluation
+# Run systematic evaluation with the evaluation harness
 evaluation_results = mlflow.genai.evaluate(
     data=eval_data,
+    predict_fn=my_genai_app,
     scorers=[
-        "answer_relevance",
-        "faithfulness",
-        "answer_correctness"
-        mlflow.metrics.genai.answer_similarity(),
-        mlflow.metrics.genai.toxicity()
+        mlflow.genai.scorers.RelevanceToQuery(),
+        mlflow.genai.scorers.Safety(),
+        mlflow.genai.scorers.Correctness()
     ]
 )
 
-print(f"Average relevance score: {evaluation_results.metrics['answer_relevance/v1/mean']}")
-print(f"Faithfulness rate: {evaluation_results.metrics['faithfulness/v1/mean']}")
+print(f"Average relevance score: {evaluation_results.metrics['relevance_to_query/v1/mean']}")
+print(f"Safety rate: {evaluation_results.metrics['safety/v1/mean']}")
 ```
 
-These aren't simple keyword matching algorithms. MLflow's evaluation metrics use sophisticated LLM-based judges that correlate well with human assessment across multiple quality dimensions.
-
-You can also build custom evaluators for domain-specific requirements:
-
-```python
-@mlflow.metrics.genai.make_genai_metric(name="technical_accuracy")
-def evaluate_technical_accuracy(eval_arg, model_output, metrics_args):
-    """Custom evaluator for technical documentation accuracy"""
-
-    prompt = f"""
-    Evaluate if this technical answer is accurate and complete:
-
-    Question: {eval_arg}
-    Answer: {model_output}
-
-    Rate accuracy from 1-5 and explain your reasoning.
-    """
-
-    response = openai_client.chat.completions.create(
-        model="gpt-4",
-        messages=[{"role": "user", "content": prompt}]
-    )
-
-    # Parse the response to extract score and justification
-    score, justification = parse_evaluation_response(response.choices[0].message.content)
-
-    return {
-        "score": score,
-        "justification": justification
-    }
-```
+The evaluation harness supports both direct evaluation (where MLflow calls your application to generate fresh traces) and answer sheet evaluation (for pre-computed outputs). You can also build custom scorers for domain-specific requirements using the `@mlflow.genai.scorers.scorer` decorator.
 
 ### Application Lifecycle Management
 
 GenAI applications are more than just models—they're complex systems involving prompts, retrieval logic, tool integrations, and orchestration code. MLflow 3.0 treats these applications as first-class artifacts that can be versioned, registered, and deployed atomically.
-
-![Prompt Registry](mlflow-3-prompt-registry.png)
 
 ```python
 import mlflow.pyfunc
@@ -159,17 +118,17 @@ class CustomerServiceBot(mlflow.pyfunc.PythonModel):
         self.llm = load_model_from_artifacts(context.artifacts["llm_config"])
         self.vector_store = initialize_vector_store(context.artifacts["knowledge_base"])
         self.prompt_template = load_prompt_template(context.artifacts["prompt_template"])
-
+    
     def predict(self, context, model_input):
         # Your application logic
         query = model_input["query"][0]
         relevant_docs = self.vector_store.similarity_search(query, k=3)
-
+        
         formatted_prompt = self.prompt_template.format(
             query=query,
             context="\n".join([doc.page_content for doc in relevant_docs])
         )
-
+        
         response = self.llm.predict(formatted_prompt)
         return {"response": response, "sources": [doc.metadata for doc in relevant_docs]}
 
@@ -180,13 +139,13 @@ with mlflow.start_run():
         python_model=CustomerServiceBot(),
         artifacts={
             "llm_config": "configs/llm_config.yaml",
-            "knowledge_base": "data/knowledge_embeddings.pkl",
+            "knowledge_base": "data/knowledge_embeddings.pkl", 
             "prompt_template": "prompts/customer_service_v2.txt"
         },
         pip_requirements=["openai", "langchain", "chromadb"],
         signature=mlflow.models.infer_signature(example_input, example_output)
     )
-
+    
     # Register in model registry for deployment
     registered_model = mlflow.register_model(
         model_uri=model_info.model_uri,
@@ -197,117 +156,7 @@ with mlflow.start_run():
 
 This approach ensures that when you deploy version 2.1 of your customer service bot, you're deploying exactly the same combination of model weights, prompts, retrieval logic, and dependencies that you tested. No more "it worked in dev" deployment surprises.
 
-## Putting It All Together: A Real Implementation
-
-Here's how these capabilities work together in practice. Let's say you're building a technical documentation assistant:
-
-### Phase 1: Rapid Prototyping with Observability
-
-```python
-import mlflow
-from llama_index.core import VectorStoreIndex, SimpleDirectoryReader
-from llama_index.llms.openai import OpenAI
-
-mlflow.set_experiment("docs_assistant_v1")
-
-# Automatic tracing for LlamaIndex
-mlflow.llama_index.autolog()
-
-def build_docs_assistant():
-    documents = SimpleDirectoryReader("./technical_docs").load_data()
-    index = VectorStoreIndex.from_documents(documents)
-
-    query_engine = index.as_query_engine(
-        llm=OpenAI(model="gpt-3.5-turbo", temperature=0.1),
-        similarity_top_k=5
-    )
-
-    return query_engine
-
-@mlflow.trace
-def ask_documentation(question: str, user_role: str = "developer"):
-    engine = build_docs_assistant()
-
-    # All LlamaIndex calls are automatically traced
-    response = engine.query(question)
-
-    mlflow.update_current_trace(
-        tags={
-            "user_role": user_role,
-            "doc_version": "v1.2.0"
-        }
-    )
-
-    return str(response)
-
-# Every call generates detailed traces
-ask_documentation("How do I configure SSL certificates?", "devops")
-ask_documentation("What's the rate limiting policy?", "developer")
-```
-
-After running a few dozen queries, you can examine the MLflow UI to understand:
-
-- Which documents are being retrieved most frequently
-- Average response latency across different question types
-- Where in the pipeline latency bottlenecks occur
-
-### Phase 2: Quality Assessment and Improvement
-
-```python
-# Collect traces from your prototype testing
-test_traces = mlflow.search_traces(
-    experiment_ids=["docs_assistant_v1"],
-    max_results=100
-)
-
-# Evaluate quality systematically
-eval_results = mlflow.genai.evaluate(
-    data=test_traces,
-    scorers=[
-        "answer_relevance",
-        "faithfulness",
-        "answer_correctness"
-    ]
-)
-
-# Analysis shows good faithfulness (0.91) but lower relevance (0.72)
-# Investigation reveals retrieval is finding related but not directly relevant docs
-
-# Create improved version with better retrieval
-def build_improved_assistant():
-    documents = SimpleDirectoryReader("./technical_docs").load_data()
-
-    # Enhanced retrieval with re-ranking
-    index = VectorStoreIndex.from_documents(
-        documents,
-        transformations=[
-            SentenceSplitter(chunk_size=512, chunk_overlap=50),
-            # Add more sophisticated chunking and metadata
-        ]
-    )
-
-    query_engine = index.as_query_engine(
-        llm=OpenAI(model="gpt-4", temperature=0),  # Upgraded model
-        similarity_top_k=10,  # Cast wider net
-        node_postprocessors=[
-            SimilarityPostprocessor(similarity_cutoff=0.7),
-            KeywordNodePostprocessor(required_keywords=["configuration", "setup"])
-        ]
-    )
-
-    return query_engine
-
-# Test improvements with same evaluation dataset
-improved_eval = mlflow.genai.evaluate(
-    data=test_traces,
-    predict_fn=build_improved_assistant,
-    scorers=["answer_relevance", "faithfulness"]
-)
-
-# Relevance improved to 0.84, faithfulness maintained at 0.90
-```
-
-## Beyond GenAI: Improvements for All ML Workloads
+## Enhanced Traditional ML & Deep Learning
 
 While GenAI capabilities are the headline feature, MLflow 3.0 includes significant improvements for traditional machine learning and deep learning workflows:
 
@@ -324,12 +173,12 @@ MLflow 3.0 is available now and designed to work alongside your existing ML infr
 ### Installation and Setup
 
 ```bash
-# Install MLflow 3.0 with enhanced GenAI support
+# Install MLflow 3.0 with GenAI support
 pip install "mlflow>=3.0.0"
 
 # Install integration packages as needed
 pip install "mlflow[genai]"          # Core GenAI evaluation
-pip install "mlflow[langchain]"      # LangChain tracing
+pip install "mlflow[langchain]"      # LangChain tracing  
 pip install "mlflow[llamaindex]"     # LlamaIndex tracing
 ```
 
@@ -355,7 +204,7 @@ MLflow 3.0 represents a significant step forward in making GenAI development mor
 **How to Get Involved:**
 
 - **Contribute Code**: We welcome contributions of all sizes, from bug fixes to new integrations
-- **Share Use Cases**: Help others learn by documenting your MLflow implementations
+- **Share Use Cases**: Help others learn by documenting your MLflow implementations  
 - **Report Issues**: Help us improve by reporting bugs and requesting features
 - **Join Discussions**: Participate in technical discussions and roadmap planning
 
@@ -363,6 +212,6 @@ The future of AI development is unified, observable, and reliable. MLflow 3.0 br
 
 ---
 
-**Ready to try MLflow 3.0?** Head over to the revamped for 3.0 [MLflow Documentation](https://mlflow.org/docs/latest/) to see what's possible.
+**Ready to try MLflow 3.0?** Check out our [GenAI tutorials](https://mlflow.org/docs/latest/llms/index.html) and explore the [full documentation](https://mlflow.org/docs/latest/) to see what's possible.
 
-_MLflow is an open source project under the Apache 2.0 license, contributed to by the global ML community._
+*MLflow is an open source project under the Apache 2.0 license, maintained by Databricks with contributions from the global ML community.*
