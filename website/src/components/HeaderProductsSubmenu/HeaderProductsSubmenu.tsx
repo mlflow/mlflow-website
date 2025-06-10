@@ -1,22 +1,43 @@
 import Link from "@docusaurus/Link";
 import { HeaderMenuItem } from "../HeaderMenuItem/HeaderMenuItem";
+import { cva } from "class-variance-authority";
+
+const wrapper = cva(
+  "flex flex-col md:flex-row md:max-w-4xl mx-auto gap-6 md:gap-8 lg:gap-10 px-1 md:px-4 lg:pl-0 products-submenu overflow-x-hidden",
+);
+
+const component = cva("flex flex-col gap-4");
+
+const titleContainer = cva(
+  "flex flex-col gap-1 md:gap-4 border-b border-[#F7F8F8]/8 pb-4",
+);
+
+const title = cva("text-white");
+
+const subtitle = cva("text-[#F7F8F8]/60 m-0");
+
+const feature = cva("flex flex-col gap-3");
+
+const featureTitle = cva("text-[#F7F8F8]/60 text-sm");
+
+const columns = cva("flex flex-row gap-6 xxs:gap-8");
+
+const column = cva("min-w-30 xxs:min-w-40 flex flex-col md:gap-1");
 
 export const HeaderProductsSubmenu = () => {
   return (
-    <div className="flex flex-col md:flex-row md:max-w-4xl mx-auto gap-6 md:gap-8 lg:gap-10 px-1 md:px-4 lg:pl-0 products-submenu">
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-1 md:gap-4 border-b border-[#F7F8F8]/8 pb-4">
+    <div className={wrapper()}>
+      <div className={component()}>
+        <div className={titleContainer()}>
           <Link to="/genai">
-            <h3 className="text-white">Gen AI</h3>
-            <p className="text-[#F7F8F8]/60 m-0">
-              Ship high-quality GenAI, fast
-            </p>
+            <h3 className={title()}>Gen AI</h3>
+            <p className={subtitle()}>Ship high-quality GenAI, fast</p>
           </Link>
         </div>
-        <div className="flex flex-col gap-3">
-          <span className="text-[#F7F8F8]/60 text-sm">Features</span>
-          <div className="flex flex-row gap-8">
-            <div className="min-w-40 flex flex-col md:gap-1">
+        <div className={feature()}>
+          <span className={featureTitle()}>Features</span>
+          <div className={columns()}>
+            <div className={column()}>
               <HeaderMenuItem
                 href="/genai/observability"
                 label="Observability"
@@ -27,7 +48,7 @@ export const HeaderProductsSubmenu = () => {
                 label="Prompt Registry"
               />
             </div>
-            <div className="min-w-40 flex flex-col md:gap-1">
+            <div className={column()}>
               <HeaderMenuItem
                 href="/genai/app-versioning"
                 label="App versioning"
@@ -37,17 +58,17 @@ export const HeaderProductsSubmenu = () => {
           </div>
         </div>
       </div>
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-1 md:gap-4 border-b border-[#F7F8F8]/8 pb-4">
+      <div className={component()}>
+        <div className={titleContainer()}>
           <Link to="/classical-ml">
-            <h3 className="text-white">Model training</h3>
-            <p className="text-[#F7F8F8]/60">Mastering the ML lifecycle</p>
+            <h3 className={title()}>Model training</h3>
+            <p className={subtitle()}>Mastering the ML lifecycle</p>
           </Link>
         </div>
-        <div className="flex flex-col gap-3">
-          <span className="text-[#F7F8F8]/60 text-sm">Features</span>
-          <div className="flex flex-row gap-8">
-            <div className="min-w-40 flex flex-col md:gap-1">
+        <div className={feature()}>
+          <span className={featureTitle()}>Features</span>
+          <div className={columns()}>
+            <div className={column()}>
               <HeaderMenuItem
                 href="/classical-ml/experiment-tracking"
                 label="Experiment tracking"
@@ -57,7 +78,7 @@ export const HeaderProductsSubmenu = () => {
                 label="Model evaluation"
               />
             </div>
-            <div className="min-w-40 flex flex-col md:gap-1">
+            <div className={column()}>
               <HeaderMenuItem
                 href="/classical-ml/models"
                 label="MLflow models"
