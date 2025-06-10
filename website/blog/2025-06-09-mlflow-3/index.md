@@ -49,10 +49,10 @@ def answer_question(question, customer_tier="standard"):
         retriever=vectorstore.as_retriever(search_kwargs={"k": 3}),
         return_source_documents=True
     )
-    
+
     # Tracing captures the full execution tree automatically
     result = qa_chain({"query": question})
-    
+
     # Add business context to traces
     mlflow.update_current_trace(
         tags={
@@ -60,7 +60,7 @@ def answer_question(question, customer_tier="standard"):
             "question_category": classify_question(question)
         }
     )
-    
+
     return result["result"]
 ```
 
@@ -118,17 +118,17 @@ class CustomerServiceBot(mlflow.pyfunc.PythonModel):
         self.llm = load_model_from_artifacts(context.artifacts["llm_config"])
         self.vector_store = initialize_vector_store(context.artifacts["knowledge_base"])
         self.prompt_template = load_prompt_template(context.artifacts["prompt_template"])
-    
+
     def predict(self, context, model_input):
         # Your application logic
         query = model_input["query"][0]
         relevant_docs = self.vector_store.similarity_search(query, k=3)
-        
+
         formatted_prompt = self.prompt_template.format(
             query=query,
             context="\n".join([doc.page_content for doc in relevant_docs])
         )
-        
+
         response = self.llm.predict(formatted_prompt)
         return {"response": response, "sources": [doc.metadata for doc in relevant_docs]}
 
@@ -139,13 +139,13 @@ with mlflow.start_run():
         python_model=CustomerServiceBot(),
         artifacts={
             "llm_config": "configs/llm_config.yaml",
-            "knowledge_base": "data/knowledge_embeddings.pkl", 
+            "knowledge_base": "data/knowledge_embeddings.pkl",
             "prompt_template": "prompts/customer_service_v2.txt"
         },
         pip_requirements=["openai", "langchain", "chromadb"],
         signature=mlflow.models.infer_signature(example_input, example_output)
     )
-    
+
     # Register in model registry for deployment
     registered_model = mlflow.register_model(
         model_uri=model_info.model_uri,
@@ -173,13 +173,7 @@ MLflow 3.0 is available now and designed to work alongside your existing ML infr
 ### Installation and Setup
 
 ```bash
-# Install MLflow 3.0 with GenAI support
-pip install "mlflow>=3.0.0"
-
-# Install integration packages as needed
-pip install "mlflow[genai]"          # Core GenAI evaluation
-pip install "mlflow[langchain]"      # LangChain tracing  
-pip install "mlflow[llamaindex]"     # LlamaIndex tracing
+pip install -U mlflow
 ```
 
 ### First Steps
@@ -204,7 +198,7 @@ MLflow 3.0 represents a significant step forward in making GenAI development mor
 **How to Get Involved:**
 
 - **Contribute Code**: We welcome contributions of all sizes, from bug fixes to new integrations
-- **Share Use Cases**: Help others learn by documenting your MLflow implementations  
+- **Share Use Cases**: Help others learn by documenting your MLflow implementations
 - **Report Issues**: Help us improve by reporting bugs and requesting features
 - **Join Discussions**: Participate in technical discussions and roadmap planning
 
@@ -214,4 +208,4 @@ The future of AI development is unified, observable, and reliable. MLflow 3.0 br
 
 **Ready to try MLflow 3.0?** Check out our [GenAI tutorials](https://mlflow.org/docs/latest/llms/index.html) and explore the [full documentation](https://mlflow.org/docs/latest/) to see what's possible.
 
-*MLflow is an open source project under the Apache 2.0 license, maintained by Databricks with contributions from the global ML community.*
+_MLflow is an open source project under the Apache 2.0 license, maintained by Databricks with contributions from the global ML community._
