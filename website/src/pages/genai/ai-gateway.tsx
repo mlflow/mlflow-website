@@ -6,7 +6,7 @@ import {
   HeroImage,
   StickyGrid,
 } from "../../components";
-import CardHero from "@site/static/img/GenAI_gateway/GenAI_aigateway_hero.png";
+import CardHero from "@site/static/img/GenAI_gateway/GenAI_gateway_hero.png";
 import Card1 from "@site/static/img/GenAI_gateway/GenAI_gateway_1.png";
 import Card2 from "@site/static/img/GenAI_gateway/GenAI_gateway_2.png";
 
