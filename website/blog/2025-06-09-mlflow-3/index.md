@@ -3,7 +3,7 @@ title: Announcing MLflow 3.0
 tags: [mlflow, genai, tracing, evaluation, mlops]
 slug: mlflow-3-0-launch
 authors: [mlflow-maintainers]
-thumbnail: /img/blog/mlflow-3-launch.png
+thumbnail: /img/blog/mlflow-3-trace-ui.png
 ---
 
 The open source MLflow community has reached a major milestone. Today, we're releasing **MLflow 3.0**, which brings production-ready generative AI capabilities to the platform that millions of developers trust for ML operations.
@@ -64,13 +64,14 @@ def answer_question(question, customer_tier="standard"):
     return result["result"]
 ```
 
-What makes this powerful is the automatic instrumentation. When `answer_question()` executes, MLflow captures:
+What makes this powerful is the automatic instrumentation. When `answer_question()` executes, MLflow tracing captures:
 
 - The initial LLM call for query processing
 - Vector database retrieval with embedding calculations
 - Document ranking and selection logic
 - Final answer generation with token usage
 - All intermediate inputs, outputs, and timing information
+- Detailed and comprehensive error messages, including stack traces, if any error occurs
 
 This creates a complete execution timeline that you can drill into when issues arise. No more guessing why your RAG system returned irrelevant documents or why response times spiked.
 
@@ -78,32 +79,7 @@ This creates a complete execution timeline that you can drill into when issues a
 
 Evaluating GenAI quality has traditionally meant manual review processes that don't scale. MLflow 3.0 includes a comprehensive evaluation framework that can assess quality dimensions systematically.
 
-```python
-# Extract traces from your instrumented application
-conversation_traces = mlflow.search_traces(
-    experiment_ids=["genai_experiment"],
-    filter_string="tags.customer_tier = 'premium'"
-)
-
-# Convert traces to evaluation dataset
-eval_data = conversation_traces.select(["inputs.query", "outputs.result"]).to_pandas()
-
-# Run systematic evaluation with the evaluation harness
-evaluation_results = mlflow.genai.evaluate(
-    data=eval_data,
-    predict_fn=my_genai_app,
-    scorers=[
-        mlflow.genai.scorers.RelevanceToQuery(),
-        mlflow.genai.scorers.Safety(),
-        mlflow.genai.scorers.Correctness()
-    ]
-)
-
-print(f"Average relevance score: {evaluation_results.metrics['relevance_to_query/v1/mean']}")
-print(f"Safety rate: {evaluation_results.metrics['safety/v1/mean']}")
-```
-
-The evaluation harness supports both direct evaluation (where MLflow calls your application to generate fresh traces) and answer sheet evaluation (for pre-computed outputs). You can also build custom scorers for domain-specific requirements using the `@mlflow.genai.scorers.scorer` decorator.
+The evaluation harness supports both direct evaluation (where MLflow calls your application to generate fresh traces) and answer sheet evaluation (for pre-computed outputs). You can also build custom scorers for domain-specific requirements using the `@scorer` decorator for full customization of your evaluation needs.
 
 ### Application Lifecycle Management
 
@@ -184,8 +160,8 @@ import mlflow
 # Create your first GenAI experiment
 mlflow.set_experiment("my_genai_prototype")
 
-# Enable automatic tracing
-mlflow.autolog()
+# Enable automatic tracing for openai (choose any tracing integration to enable auto-tracing for any of the 20+ supported tracing integrations)
+mlflow.openai.autolog()
 
 # Your existing GenAI code will now generate traces automatically
 # No additional instrumentation required for supported libraries
@@ -206,6 +182,6 @@ The future of AI development is unified, observable, and reliable. MLflow 3.0 br
 
 ---
 
-**Ready to try MLflow 3.0?** Check out our [GenAI tutorials](https://mlflow.org/docs/latest/llms/index.html) and explore the [full documentation](https://mlflow.org/docs/latest/) to see what's possible.
+**Ready to try MLflow 3.0?** Explore the [full documentation](https://mlflow.org/docs/latest/) to see what's possible.
 
-_MLflow is an open source project under the Apache 2.0 license, maintained by Databricks with contributions from the global ML community._
+_MLflow is an open source project under the Apache 2.0 license, built with contributions from the global ML community._
