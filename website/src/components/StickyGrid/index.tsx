@@ -1,10 +1,5 @@
-import React, { ComponentProps, useId, useRef } from "react";
-import {
-  AnimatePresence,
-  motion,
-  useMotionValueEvent,
-  useScroll,
-} from "motion/react";
+import React, { ComponentProps, useRef } from "react";
+import { useMotionValueEvent, useScroll } from "motion/react";
 import { Card } from "..";
 
 type Props = {
@@ -33,7 +28,6 @@ export const StickyGrid = ({ cards }: Props) => {
     );
     setActiveCard(closestBreakpointIndex);
   });
-  const id = useId();
 
   return (
     <div className="w-full flex flex-row gap-20" ref={ref}>
@@ -50,18 +44,8 @@ export const StickyGrid = ({ cards }: Props) => {
           </div>
         ))}
       </div>
-      <div className="sticky top-24 right-0 hidden aspect-[3/2] h-full w-1/2 overflow-hidden rounded-md md:block">
-        <AnimatePresence mode="popLayout">
-          <motion.div
-            key={activeCardIndex}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            {cards[activeCardIndex].image}
-          </motion.div>
-        </AnimatePresence>
+      <div className="sticky top-24 hidden aspect-[3/2] h-full w-1/2 overflow-hidden rounded-md md:block">
+        {cards[activeCardIndex].image}
       </div>
     </div>
   );
