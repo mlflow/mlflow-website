@@ -47,11 +47,15 @@ export const LatestNews = () => {
                   {post.metadata.title}
                 </h3>
               </div>
-              <img
-                src={useBaseUrl(post.metadata.frontMatter.thumbnail as string)}
-                alt={post.metadata.title}
-                className="rounded-2xl md:max-h-[210px] object-cover max-w-full"
-              />
+              <div className="w-full aspect-[7/4] rounded-2xl overflow-hidden">
+                <img
+                  src={useBaseUrl(
+                    post.metadata.frontMatter.thumbnail as string,
+                  )}
+                  alt={post.metadata.title}
+                  className="w-full h-full object-cover object-top"
+                />
+              </div>
             </Link>
           </GridItem>
         ))}

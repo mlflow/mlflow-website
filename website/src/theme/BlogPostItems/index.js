@@ -32,11 +32,13 @@ export default function BlogPostItems({
             href={firstBlogPost.content.metadata.permalink}
             className="md:w-1/2"
           >
-            <img
-              src={useBaseUrl(firstBlogPost.content.frontMatter.thumbnail)}
-              alt={firstBlogPost.content.frontMatter.title}
-              className="w-full aspect-video object-cover rounded-md"
-            />
+            <div className="w-full aspect-video rounded-2xl overflow-hidden">
+              <img
+                src={useBaseUrl(firstBlogPost.content.frontMatter.thumbnail)}
+                alt={firstBlogPost.content.frontMatter.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
           </Link>
         </div>
 
@@ -47,11 +49,15 @@ export default function BlogPostItems({
                 href={blogPost.content.metadata.permalink}
                 className="flex flex-col w-full h-full gap-4"
               >
-                <img
-                  src={useBaseUrl(blogPost.content.frontMatter.thumbnail)}
-                  alt={blogPost.content.frontMatter.title}
-                  className="object-contain rounded-md max-h-[210px] grow"
-                />
+                <div className="w-full aspect-[7/4] rounded-2xl overflow-hidden">
+                  <img
+                    src={useBaseUrl(
+                      blogPost.content.metadata.frontMatter.thumbnail,
+                    )}
+                    alt={blogPost.content.metadata.title}
+                    className="w-full h-full object-cover object-top"
+                  />
+                </div>
                 <div role="time" dateTime={blogPost.content.metadata.date}>
                   {new Date(blogPost.content.metadata.date).toLocaleDateString(
                     "en-US",
