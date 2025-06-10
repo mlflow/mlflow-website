@@ -1,5 +1,5 @@
 ---
-title: MLflow 3.0: Bringing Enterprise-Grade GenAI to Open Source
+title: Announcing MLflow 3.0
 tags: [mlflow, genai, tracing, evaluation, mlops]
 slug: mlflow-3-0-launch
 authors: [mlflow-maintainers]
