@@ -1,5 +1,10 @@
 import React, { ComponentProps, useRef } from "react";
-import { useMotionValueEvent, useScroll } from "motion/react";
+import {
+  AnimatePresence,
+  motion,
+  useMotionValueEvent,
+  useScroll,
+} from "motion/react";
 import { Card } from "..";
 
 type Props = {
@@ -44,8 +49,16 @@ export const StickyGrid = ({ cards }: Props) => {
           </div>
         ))}
       </div>
-      <div className="sticky top-24 hidden aspect-[3/2] h-full w-1/2 overflow-hidden rounded-md md:block">
-        {cards[activeCardIndex].image}
+      <div className="sticky top-24 right-0 hidden aspect-[3/2] h-full w-1/2 overflow-hidden rounded-md md:block">
+        <AnimatePresence initial={false}>
+          <motion.div
+            key={activeCardIndex}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            {cards[activeCardIndex].image}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );
