@@ -7,7 +7,7 @@ import useBaseUrl from "@docusaurus/useBaseUrl";
 
 type Props = PropsWithChildren;
 
-const wrapper = cva("flex flex-col gap-20 bg-no-repeat w-full py-20", {
+const wrapper = cva("flex flex-col gap-20 bg-no-repeat w-full py-32", {
   variants: {
     variant: {
       red: "",
