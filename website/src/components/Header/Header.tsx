@@ -16,7 +16,7 @@ import { cva } from "class-variance-authority";
 const MD_BREAKPOINT = 640;
 
 const navStyles = cva(
-  "fixed w-full z-20 top-0 start-0 bg-[#F7F8F8]/1 border-b border-[#F7F8F8]/8 backdrop-blur-[20px] drop-shadow-[0px_1px_2px_rgba(0_0_0/75%),0px_1px_12px_rgba(0_0_0/75%)] overflow-y-auto",
+  "fixed w-full z-20 top-0 start-0 bg-black/20 border-b border-[#F7F8F8]/8 backdrop-blur-[20px] overflow-y-auto",
   {
     variants: {
       isOpen: {
