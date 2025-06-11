@@ -17,13 +17,7 @@ export default function Home(): JSX.Element {
   return (
     <Layout>
       <AboveTheFold
-        title={
-          <>
-            Deliver production-ready
-            <br />
-            AI
-          </>
-        }
+        title="Deliver production-ready AI"
         body="The open source developer platform to build AI applications and models with confidence."
         minHeight="small"
       >
