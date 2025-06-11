@@ -1,9 +1,3 @@
----
-title: MLflow 3.0.0
-slug: 3.0.0
-authors: [mlflow-maintainers]
----
-
 # MLflow 3.0
 
 The open source MLflow community has reached a major milestone. Today, we're releasing MLflow 3.0, which brings production-ready generative AI capabilities to the platform that millions of developers trust for ML operations.
@@ -14,7 +8,7 @@ This isn't just another feature update. MLflow 3.0 fundamentally expands what's 
 
 ### Model-centric Architecture
 
-MLflow 3.0 introduces a refined architecture with the new `LoggedModel` entity as a first-class citizen, moving beyond the traditional run-centric approach. This enables better organization and comparison of GenAI agents, deep learning checkpoints, and model variants across experiments.
+MLflow 3.0 introduces a refined architecture with the new LoggedModel entity as a first-class citizen, moving beyond the traditional run-centric approach. This enables better organization and comparison of GenAI agents, deep learning checkpoints, and model variants across experiments.
 
 ### Strong Lineage Support
 
