@@ -4,7 +4,7 @@ import { cva, VariantProps } from "class-variance-authority";
 
 type Props = VariantProps<typeof innerWrapper> &
   PropsWithChildren<{
-    title: string;
+    title: string | React.ReactNode;
     body: string | string[];
     sectionLabel?: string;
     hasGetStartedButton?: true | string;

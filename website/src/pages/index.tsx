@@ -12,12 +12,18 @@ import {
 } from "../components";
 import GenAI from "@site/static/img/Home_page_hybrid/GenAI Apps & Agents.png";
 import ModelTraining from "@site/static/img/Home_page_hybrid/Model Training.png";
+import styles from "./styles.module.css";
 
 export default function Home(): JSX.Element {
   return (
     <Layout>
       <AboveTheFold
-        title="Deliver production-ready AI"
+        title={
+          <>
+            Deliver <br className={styles.smallDeviceOnly} /> production-ready
+            AI
+          </>
+        }
         body="The open source developer platform to build AI applications and models with confidence."
         minHeight="small"
       >
