@@ -1,10 +1,10 @@
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, ReactNode } from "react";
 import { Heading, Body, SectionLabel, GetStartedButton } from "../index";
 import { cva, VariantProps } from "class-variance-authority";
 
 type Props = VariantProps<typeof innerWrapper> &
   PropsWithChildren<{
-    title: string | React.ReactNode;
+    title: string | ReactNode;
     body: string | string[];
     sectionLabel?: string;
     hasGetStartedButton?: true | string;

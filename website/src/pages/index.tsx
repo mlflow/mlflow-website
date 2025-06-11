@@ -12,7 +12,6 @@ import {
 } from "../components";
 import GenAI from "@site/static/img/Home_page_hybrid/GenAI Apps & Agents.png";
 import ModelTraining from "@site/static/img/Home_page_hybrid/Model Training.png";
-import styles from "./styles.module.css";
 
 export default function Home(): JSX.Element {
   return (
@@ -20,7 +19,8 @@ export default function Home(): JSX.Element {
       <AboveTheFold
         title={
           <>
-            Deliver <br className={styles.smallDeviceOnly} /> production-ready
+            Deliver production-ready
+            <br />
             AI
           </>
         }
