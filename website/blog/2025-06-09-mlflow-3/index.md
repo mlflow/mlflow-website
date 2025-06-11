@@ -1,7 +1,7 @@
 ---
 title: Announcing MLflow 3
 tags: [mlflow, genai, tracing, evaluation, mlops]
-slug: mlflow-3-0-launch
+slug: mlflow-3-launch
 authors: [mlflow-maintainers]
 thumbnail: /img/blog/mlflow-3-trace-ui.png
 ---
