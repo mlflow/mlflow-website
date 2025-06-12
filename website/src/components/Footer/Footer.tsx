@@ -35,7 +35,7 @@ export const Footer = ({ variant }: VariantProps<typeof footerVariants>) => {
           </div>
         </div>
 
-        <div className="flex flex-col flex-wrap justify-end md:text-right md:flex-row gap-x-10 gap-y-5 w-2/5 md:w-auto md:pt-2">
+        <div className="flex flex-col flex-wrap justify-end md:text-right md:flex-row gap-x-10 lg:gap-x-20 gap-y-5 w-2/5 md:w-auto md:pt-2 max-w-fit">
           <FooterMenuItem href="/">Components</FooterMenuItem>
           <FooterMenuItem href="/releases">Releases</FooterMenuItem>
           <FooterMenuItem href="/blog">Blog</FooterMenuItem>
