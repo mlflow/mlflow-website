@@ -1,7 +1,7 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import type { PropsWithChildren } from "react";
 
-const styles = cva("hyphens-auto break-word", {
+const styles = cva("wrap-anywhere auto-phrase", {
   variants: {
     level: {
       1: "text-balance font-light text-[40px] xxs:text-[52px] xs:text-[64px] leading-[100%] tracking-[-3%] text-center",
