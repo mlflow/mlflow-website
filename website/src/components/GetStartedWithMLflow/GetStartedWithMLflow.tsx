@@ -2,6 +2,7 @@ import DatabricksLogo from "@site/static/img/databricks-logo.svg";
 import Checkmark from "@site/static/img/checkmark.svg";
 import { useLocation } from "@docusaurus/router";
 import useBaseUrl from "@docusaurus/useBaseUrl";
+import useBrokenLinks from "@docusaurus/useBrokenLinks";
 
 import { GetStartedButton } from "../GetStartedButton/GetStartedButton";
 import { cn } from "../../utils";
@@ -17,6 +18,8 @@ export const GetStartedWithMLflow = () => {
   const isClassicalMLPage = location.pathname.startsWith(classicalMLPath);
   const databricksUrl = isClassicalMLPage ? MLFLOW_DBX_INSTALL_URL : MLFLOW_DBX_TRIAL_URL;
   const databricksButtonText = isClassicalMLPage ? "Get started" : "Get started for free";
+  
+  useBrokenLinks().collectAnchor("get-started");
 
   return (
     <div id="get-started" className={cn("grid grid-cols-1 lg:grid-cols-2 gap-8")}>

@@ -17,6 +17,20 @@ import { cva } from "class-variance-authority";
 
 const MD_BREAKPOINT = 640;
 
+// Helper function to determine the appropriate "Get started" link based on current page
+function getStartedLinkForPage(pathname: string): string {
+  const classicalMLPath = useBaseUrl("/classical-ml");
+  const genAIPath = useBaseUrl("/genai");
+  
+  if (pathname.startsWith(classicalMLPath)) {
+    return "/classical-ml#get-started";
+  } else if (pathname.startsWith(genAIPath)) {
+    return "/genai#get-started";
+  } else {
+    return "/#get-started";
+  }
+}
+
 const navStyles = cva(
   "fixed w-full z-20 top-0 start-0 bg-black/20 border-b border-[#F7F8F8]/8 backdrop-blur-[20px] overflow-y-auto",
   {
@@ -34,9 +48,8 @@ export const Header = () => {
   const [isProductItemHovered, setIsProductItemHovered] = useState(false);
   const [isProductSubmenuOpen, setIsProductSubmenuOpen] = useState(false);
   const location = useLocation();
-  const classicalMLPath = useBaseUrl("/classical-ml");
-  const isClassicalMLPage = location.pathname.startsWith(classicalMLPath);
-  const getStartedHref = isClassicalMLPage ? "/classical-ml#get-started" : "/#get-started";
+  
+  const getStartedHref = getStartedLinkForPage(location.pathname);
 
   const handleProductItemHover = () => {
     setIsProductItemHovered(true);
