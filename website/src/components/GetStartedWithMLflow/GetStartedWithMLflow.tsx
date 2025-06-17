@@ -5,7 +5,7 @@ import useBaseUrl from "@docusaurus/useBaseUrl";
 import useBrokenLinks from "@docusaurus/useBrokenLinks";
 
 import { GetStartedButton } from "../GetStartedButton/GetStartedButton";
-import { cn } from "../../utils";
+import { cn, isClassicalMLPage } from "../../utils";
 import { Heading } from "../Typography/Heading";
 import { Body } from "../Typography/Body";
 import { useLayoutVariant } from "../Layout/Layout";
@@ -19,11 +19,11 @@ export const GetStartedWithMLflow = () => {
   const variant = useLayoutVariant();
   const location = useLocation();
   const classicalMLPath = useBaseUrl("/classical-ml");
-  const isClassicalMLPage = location.pathname.startsWith(classicalMLPath);
-  const databricksUrl = isClassicalMLPage
+  const isClassicalML = isClassicalMLPage(location.pathname, classicalMLPath);
+  const databricksUrl = isClassicalML
     ? MLFLOW_DBX_INSTALL_URL
     : MLFLOW_DBX_TRIAL_URL;
-  const databricksButtonText = isClassicalMLPage
+  const databricksButtonText = isClassicalML
     ? "Get started"
     : "Get started for free";
 
