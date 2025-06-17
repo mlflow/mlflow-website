@@ -9,20 +9,31 @@ import { cn } from "../../utils";
 import { Heading } from "../Typography/Heading";
 import { Body } from "../Typography/Body";
 import { useLayoutVariant } from "../Layout/Layout";
-import { MLFLOW_DOCS_URL, MLFLOW_DBX_TRIAL_URL, MLFLOW_DBX_INSTALL_URL } from "@site/src/constants";
+import {
+  MLFLOW_DOCS_URL,
+  MLFLOW_DBX_TRIAL_URL,
+  MLFLOW_DBX_INSTALL_URL,
+} from "@site/src/constants";
 
 export const GetStartedWithMLflow = () => {
   const variant = useLayoutVariant();
   const location = useLocation();
   const classicalMLPath = useBaseUrl("/classical-ml");
   const isClassicalMLPage = location.pathname.startsWith(classicalMLPath);
-  const databricksUrl = isClassicalMLPage ? MLFLOW_DBX_INSTALL_URL : MLFLOW_DBX_TRIAL_URL;
-  const databricksButtonText = isClassicalMLPage ? "Get started" : "Get started for free";
-  
+  const databricksUrl = isClassicalMLPage
+    ? MLFLOW_DBX_INSTALL_URL
+    : MLFLOW_DBX_TRIAL_URL;
+  const databricksButtonText = isClassicalMLPage
+    ? "Get started"
+    : "Get started for free";
+
   useBrokenLinks().collectAnchor("get-started");
 
   return (
-    <div id="get-started" className={cn("grid grid-cols-1 lg:grid-cols-2 gap-8")}>
+    <div
+      id="get-started"
+      className={cn("grid grid-cols-1 lg:grid-cols-2 gap-8")}
+    >
       <div className="flex flex-col gap-6 items-start lg:col-span-2">
         <Heading level={2}>Get started with MLflow</Heading>
         <Body size="l">Choose from two options depending on your needs</Body>

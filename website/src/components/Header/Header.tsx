@@ -21,7 +21,7 @@ const MD_BREAKPOINT = 640;
 function getStartedLinkForPage(pathname: string): string {
   const classicalMLPath = useBaseUrl("/classical-ml");
   const genAIPath = useBaseUrl("/genai");
-  
+
   if (pathname.startsWith(classicalMLPath)) {
     return "/classical-ml#get-started";
   } else if (pathname.startsWith(genAIPath)) {
@@ -48,7 +48,7 @@ export const Header = () => {
   const [isProductItemHovered, setIsProductItemHovered] = useState(false);
   const [isProductSubmenuOpen, setIsProductSubmenuOpen] = useState(false);
   const location = useLocation();
-  
+
   const getStartedHref = getStartedLinkForPage(location.pathname);
 
   const handleProductItemHover = () => {
