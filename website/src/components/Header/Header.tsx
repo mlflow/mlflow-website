@@ -17,7 +17,6 @@ import { cva } from "class-variance-authority";
 
 const MD_BREAKPOINT = 640;
 
-
 const navStyles = cva(
   "fixed w-full z-20 top-0 start-0 bg-black/20 border-b border-[#F7F8F8]/8 backdrop-blur-[20px] overflow-y-auto",
   {
@@ -38,7 +37,11 @@ export const Header = () => {
   const classicalMLPath = useBaseUrl("/classical-ml");
   const genAIPath = useBaseUrl("/genai");
 
-  const getStartedHref = getStartedLinkForPage(location.pathname, classicalMLPath, genAIPath);
+  const getStartedHref = getStartedLinkForPage(
+    location.pathname,
+    classicalMLPath,
+    genAIPath,
+  );
 
   const handleProductItemHover = () => {
     setIsProductItemHovered(true);

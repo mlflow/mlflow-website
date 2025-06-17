@@ -9,7 +9,7 @@ export function cn(...inputs: ClassValue[]) {
 export function getStartedLinkForPage(
   pathname: string,
   classicalMLPath: string,
-  genAIPath: string
+  genAIPath: string,
 ): string {
   if (pathname.startsWith(classicalMLPath)) {
     return "/classical-ml#get-started";
@@ -21,7 +21,10 @@ export function getStartedLinkForPage(
 }
 
 // Helper function to determine if current page is classical ML
-export function isClassicalMLPage(pathname: string, classicalMLPath: string): boolean {
+export function isClassicalMLPage(
+  pathname: string,
+  classicalMLPath: string,
+): boolean {
   return pathname.startsWith(classicalMLPath);
 }
 
