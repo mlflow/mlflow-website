@@ -77,7 +77,7 @@ export const Header = () => {
             <Logo className="h-[36px]" />
           </Link>
           <div className="flex flex-row items-center gap-6 md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse grow justify-end basis-0">
-            <Link href={MLFLOW_DOCS_URL} className="hidden md:block">
+            <Link href="/#get-started" className="hidden md:block">
               <Button variant="primary" size="small">
                 Get started
               </Button>
@@ -155,7 +155,7 @@ export const Header = () => {
               <HeaderMenuItem href="/ambassadors" label="Ambassador Program" />
             </li>
             <li className="w-full md:w-auto md:hidden">
-              <Link href={MLFLOW_DOCS_URL}>
+              <Link href="/#get-started">
                 <Button variant="primary" size="small" width="full">
                   Get started
                 </Button>
