@@ -33,14 +33,9 @@ export const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isProductItemHovered, setIsProductItemHovered] = useState(false);
   const [isProductSubmenuOpen, setIsProductSubmenuOpen] = useState(false);
-  
   const location = useLocation();
   const classicalMLPath = useBaseUrl("/classical-ml");
-  
-  // Determine if we're on a classical ML page
   const isClassicalMLPage = location.pathname.startsWith(classicalMLPath);
-  
-  // Set the appropriate link for the "Get started" button
   const getStartedHref = isClassicalMLPage ? "/classical-ml#get-started" : "/#get-started";
 
   const handleProductItemHover = () => {
