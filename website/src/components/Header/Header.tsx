@@ -1,9 +1,11 @@
 import { useState, useLayoutEffect, useEffect } from "react";
 import Link from "@docusaurus/Link";
+import { useLocation } from "@docusaurus/router";
+import useBaseUrl from "@docusaurus/useBaseUrl";
 import Logo from "@site/static/img/mlflow-logo-white.svg";
 import DownIcon from "@site/static/img/chevron-down-small.svg";
 
-import { cn } from "../../utils";
+import { cn, getStartedLinkForPage } from "../../utils";
 
 import { Button } from "../Button/Button";
 import { HeaderMenuItem } from "../HeaderMenuItem/HeaderMenuItem";
@@ -31,6 +33,15 @@ export const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isProductItemHovered, setIsProductItemHovered] = useState(false);
   const [isProductSubmenuOpen, setIsProductSubmenuOpen] = useState(false);
+  const location = useLocation();
+  const classicalMLPath = useBaseUrl("/classical-ml");
+  const genAIPath = useBaseUrl("/genai");
+
+  const getStartedHref = getStartedLinkForPage(
+    location.pathname,
+    classicalMLPath,
+    genAIPath,
+  );
 
   const handleProductItemHover = () => {
     setIsProductItemHovered(true);
@@ -77,7 +88,7 @@ export const Header = () => {
             <Logo className="h-[36px]" />
           </Link>
           <div className="flex flex-row items-center gap-6 md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse grow justify-end basis-0">
-            <Link href={MLFLOW_DOCS_URL} className="hidden md:block">
+            <Link href={getStartedHref} className="hidden md:block">
               <Button variant="primary" size="small">
                 Get started
               </Button>
@@ -155,7 +166,7 @@ export const Header = () => {
               <HeaderMenuItem href="/ambassadors" label="Ambassador Program" />
             </li>
             <li className="w-full md:w-auto md:hidden">
-              <Link href={MLFLOW_DOCS_URL}>
+              <Link href={getStartedHref}>
                 <Button variant="primary" size="small" width="full">
                   Get started
                 </Button>
