@@ -1,4 +1,3 @@
-import { MLFLOW_DOCS_URL } from "@site/src/constants";
 import {
   Layout,
   AboveTheFold,
@@ -17,7 +16,7 @@ export default function ModelEvaluation() {
         sectionLabel="Model evaluation"
         title="Evaluate models with confidence"
         body="Automated evaluation tools for foundational ML techniques like classification and regression."
-        hasGetStartedButton={MLFLOW_DOCS_URL}
+        hasGetStartedButton="#get-started"
       >
         <HeroImage src={CardHero} alt="" />
       </AboveTheFold>

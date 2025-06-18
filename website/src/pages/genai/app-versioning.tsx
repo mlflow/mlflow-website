@@ -1,4 +1,3 @@
-import { MLFLOW_DOCS_URL } from "@site/src/constants";
 import {
   Layout,
   AboveTheFold,
@@ -18,7 +17,7 @@ export default function AppVersioning() {
         sectionLabel="App versioning"
         title="Manage app versions with ease"
         body="Track and compare different versions of GenAI applications to ensure quality and maintainability."
-        hasGetStartedButton={MLFLOW_DOCS_URL}
+        hasGetStartedButton="#get-started"
       >
         <HeroImage src={CardHero} alt="" />
       </AboveTheFold>

@@ -1,4 +1,3 @@
-import { MLFLOW_DOCS_URL } from "@site/src/constants";
 import {
   Layout,
   AboveTheFold,
@@ -17,7 +16,7 @@ export default function Models() {
         sectionLabel="MLflow Models"
         title="Unified model packaging"
         body="A unified format to package, share, and deploy models across frameworks."
-        hasGetStartedButton={MLFLOW_DOCS_URL}
+        hasGetStartedButton="#get-started"
       >
         <HeroImage src={CardHero} alt="" />
       </AboveTheFold>
