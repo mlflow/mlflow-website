@@ -1,4 +1,3 @@
-import { MLFLOW_DOCS_URL } from "@site/src/constants";
 import {
   Layout,
   AboveTheFold,
@@ -17,7 +16,7 @@ export default function ModelRegistryAndDeployment() {
         sectionLabel="Model registry & deployment"
         title="Deploy and manage models in production"
         body="Streamline your ML workflows with MLflow's comprehensive model registry for version control, approvals, and deployment management."
-        hasGetStartedButton={MLFLOW_DOCS_URL}
+        hasGetStartedButton="#get-started"
       >
         <HeroImage src={CardHero} alt="" />
       </AboveTheFold>

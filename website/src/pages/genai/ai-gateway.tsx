@@ -1,4 +1,3 @@
-import { MLFLOW_DOCS_URL } from "@site/src/constants";
 import {
   Layout,
   AboveTheFold,
@@ -17,7 +16,7 @@ export default function AiGateway() {
         sectionLabel="AI gateway"
         title="Unified access to all AI models"
         body="Standardize how you interact with different LLM providers using one central interface."
-        hasGetStartedButton={MLFLOW_DOCS_URL}
+        hasGetStartedButton="#get-started"
       >
         <HeroImage src={CardHero} alt="" />
       </AboveTheFold>
