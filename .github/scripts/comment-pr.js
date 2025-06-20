@@ -14,9 +14,14 @@ module.exports = async ({ github, context }) => {
   const comment = `🚀 **Netlify Preview Deployed!**
 
 **Preview URL:** ${previewUrl}
+
+<details><summary>Details</summary>
+
 **PR:** #${prNumber}
 **Build Action:** ${buildActionUrl}
 **Deploy Action:** ${deployActionUrl}
+
+</details>
 
 This preview will be updated automatically on new commits.`;
 
