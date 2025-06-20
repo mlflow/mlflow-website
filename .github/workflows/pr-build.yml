@@ -1,0 +1,46 @@
+name: PR Build
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build Website
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        working-directory: website
+        run: yarn install --frozen-lockfile
+
+      - name: Build website
+        working-directory: website
+        env:
+          GTM_ID: ${{ secrets.GTM_ID }}
+        run: yarn build
+
+      - name: Save PR number
+        run: echo "${{ github.event.pull_request.number }}" > pr-number.txt
+
+      - name: Upload PR number
+        uses: actions/upload-artifact@v3
+        with:
+          name: pr-number
+          path: pr-number.txt
+          retention-days: 1
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: website-build-${{ github.event.pull_request.number }}
+          path: website/build
+          retention-days: 7
