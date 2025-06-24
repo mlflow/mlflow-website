@@ -188,7 +188,7 @@ import os
 
 os.environ["MLFLOW_ENABLE_SYSTEM_METRICS_LOGGING"] = "true"
 
-# Load the COCO dataset from Huggingface
+# Load the COCO dataset from Hugging Face
 dataset = load_dataset("detection-datasets/coco", split="val")
 
 # Transform to MLFlow Dataset
