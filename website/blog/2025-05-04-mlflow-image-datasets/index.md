@@ -126,7 +126,7 @@ One of the examples requires compute; therefore, be sure to turn on [MLflow syst
 > if you want to train/finetune the model on the full dataset (requires +25 GB storage).
 > Number of epochs and a subset of the dataset are also used during training.
 
-### Logging Artifacts of Datasets Together with Model
+### Logging Dataset As An Artifact Together with Model
 
 Since the COCO dataset is file-based, files need to be downloaded first. We use the smallest version of the newest version of the dataset from the official author's website.
 
@@ -188,7 +188,7 @@ Image and text visualization of files is supported.
 
 ![COCO dataset annotated image example](coco-dataset.png)
 
-### Logging Artifacts of Datasets Together with Model
+### Logging of Dataset Together with Model
 We can do this in a more structured way using a Hugging Face dataset and leverage a convenient way to read in the data. In this way, we have our MLflow tracked dataset, training metrics and models all in the same experiment run!  
 
 ```python
