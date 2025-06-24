@@ -24,13 +24,16 @@ Tracking image datasets is essential for structured machine learning projects. I
 There exist many formats for datasets in the global machine-learning community. 
 In this blog post, we will use a widely used format for computer-vision models, COCO, in the traditional file format and a Hugging Face version of the same dataset. These two formats have pros and cons and different possibilities for MLflow tracking.
 
-Pros using the native fileformat:
+Pros using the native file format:
+
 - dataloaders ready to use in `pycocotools` / `torchvision`
 - fast to load
-- smaller filesize
+- smaller file size
 - simple directory structure
 - artifacts can be tracked and shown, e.g. as image
+
 Cons:
+
 - not trackable
 - unstructured data so can be messy to search and explore
 - not queryable
