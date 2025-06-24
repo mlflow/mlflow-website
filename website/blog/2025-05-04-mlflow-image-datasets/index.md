@@ -21,7 +21,7 @@ Tracking image datasets is essential for structured machine learning projects. I
 
 ## Understanding Image Dataset Formats
 
-There exist many formats for datasets in the global machine-learning community. 
+There exist many formats for datasets in the global machine-learning community.
 In this blog post, we will use a widely used format for computer-vision models, COCO, in the traditional file format and a Hugging Face version of the same dataset. These two formats have pros and cons and different possibilities for MLflow tracking.
 
 Pros using the native file format:
@@ -50,8 +50,10 @@ Cons:
 - requires a custom dataloader
 
 ### COCO: Common Objects in Context
-COCO is a widely used dataset format in computer vision, known for its rich annotations. 
+
+COCO is a widely used dataset format in computer vision, known for its rich annotations.
 It supports:
+
 - Object Detection, Keypoint Detection, Stuff Segmentation, Image Captioning, and more.
 - JSON-based annotations for storing metadata.
 
@@ -63,7 +65,9 @@ Image datasets have annotations which can be segments of an object in picture or
 > ![COCO dataset annotated image example](id-337458-COCO.png)
 
 ### Hugging Face Image Datasets
+
 Hugging Face offers a simple `Image Folder` type for creating datasets from local files. It supports:
+
 - Metadata integration for text captions and object detection.
 - Quick dataset creation using directory file paths.
 
@@ -71,33 +75,40 @@ This can be used with several formats such as COCO and is supported by MLflow.
 
 ## Tracking Datasets with MLflow
 
-Understanding the properties of your dataset is crucial for effective ML model training, testing, and evaluation. This includes analyzing class balance, annotation quality, and other key characteristics. By doing so, you can ensure that your dataset aligns with the requirements of your machine learning tasks and identify potential biases or gaps that may impact model performance. Therefore, datasets need to be tracked together with your model during experiment runs.
+Understanding the properties of your dataset is crucial for effective ML model training, testing, and evaluation. This includes analyzing class balance, annotation quality, and other key characteristics. By thoroughly reviewing these aspects of your source data, you can ensure that your dataset aligns with the requirements of your machine learning tasks and identify potential biases or gaps that may impact model performance. Therefore, datasets need to be tracked together along with your model during experimentation and refinement of your project.
 
-**MLflow** provides robust tools to ensure reproducibility and model lineage. 
+**MLflow** provides robust tools to ensure reproducibility and model lineage:
+
 - Log dataset metadata, such as format (e.g., COCO, Hugging Face Image Folder).
 - Log parameters used in feature transformation/data augmentation steps.
 - Track dataset versions for reproducibility.
 - Store and retrieve dataset-related artifacts like dataset descriptions.
 - Link datasets with specific model training runs.
 
-In this post we will show how we can easeli use `mlflow.log_artifacts` [method](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.html#mlflow.log_artifact), `mlflow.log_input` [method doc](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.html#mlflow.log_input), and we will see how one using `mlflow.data` [module doc](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.data.html#mlflow-data) can add more structure to dataset tracking using Huggingface.
-Furthermore, we will use the `mlflow.pytorch` [module doc](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.pytorch.html#mlflow.pytorch.log_model) to log a model.
+One of the key APIs that enable us to track our source data is through the use of the `mlflow.log_artifacts` [method](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.html#mlflow.log_artifact), the `mlflow.log_input` [method](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.html#mlflow.log_input), and we will see how incorporating the use of the `mlflow.data` [module](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.data.html#mlflow-data) can add more structure to dataset tracking when used with Hugging Face.
+We will use the `mlflow.pytorch` [module doc](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.pytorch.html#mlflow.pytorch.log_model) to log a model along with our dataset tracking.
 
 ## Example Using Computer Vision Model and Image Datasets Tracking
 
-There are two approaches to log an image dataset—using `mlflow.artifacts` or `mlflow.data` (datasets). Lastly, you can also log an evaluation dataset, which I will not cover in this post.
+There are two approaches to log an image dataset: 
+* using `mlflow.artifacts` 
+* using `mlflow.data` (the datasets API). 
 
-Why are there two approaches? Because converting an image dataset from file-based formats like COCO to a tabular format is challenging, as most dataloaders expect the file-based COCO format. Logging artifacts provides a quick and straightforward solution without the need to reformat files, but it can easely also be messy. Make sure to create meaningful paths for your artifacts.
+> You can also log an evaluation dataset, which I will not cover in this post.
+
+### Why two approaches? 
+
+Converting an image dataset from file-based formats like COCO to a tabular format is challenging, as most data loaders expect the file-based COCO format. Logging artifacts provides a quick and straightforward solution without the need to reformat files. However, this can also get a bit messy if you're not careful about organizing your files within a directory structure. Make sure to create meaningful paths for your artifacts.
 
 The key artifact for COCO datasets is the `instances.json` file, which describes your image dataset's metadata and annotations. This file can, for example, be used to check the class balance in your dataset by analyzing the `category` field.
 
-If you are not too concerned about this, Hugging Face can help with logging datasets the MLflow way. Some Hugging Face datasets contain rich metadata that can be transferred to MLflow tracking. This is where `mlflow.data` comes in. Compared to logging artifacts, this add much more reach metadata and structure to your dataset and makes it easier to manage and see in the experiment run. If you can fit your dataset into a Huggingface type dataset and make that work in your dataloader or training script, this is the recommended apporach.
+If you are not too concerned about this, Hugging Face can help with logging datasets the MLflow way. Some Hugging Face datasets contain rich metadata that can be transferred to MLflow's tracking functionality. This is where `mlflow.data` comes in. Compared to logging artifacts, this add much more rich metadata and structure to your dataset and makes it easier to manage and see within a given experiment run. If you can fit your dataset into a Hugging Face type dataset and make that work in your dataloader or training script, this is the recommended approach.
 
 In this post, I will go through both approaches in code.
 
 ### Install MLflow and Other Dependencies
 
-Start by installing the dependencies for both code examples in your `python >= 3.10` environment. `opencv` can be omitted if only using the first examples and `pycocotools` can be omitted if only using the second example.
+Start by installing the dependencies for both code examples in your `python >= 3.10` environment. `opencv` can be omitted if only using the first example and `pycocotools` can be omitted if only using the second example.
 
 `pip install mlflow datasets torch torchvision pycocotools opencv-python-headless psutil`
 
@@ -111,11 +122,12 @@ One of the examples requires compute; therefore, be sure to turn on [MLflow syst
 
 `export MLFLOW_ENABLE_SYSTEM_METRICS_LOGGING=true`
 
-> Note: The validation split is used to save space, but you can also use the "train" split 
+> Note: The validation split is used to save space, but you can also use the "train" split
 > if you want to train/finetune the model on the full dataset (requires +25 GB storage).
-> Number of epochs and a subset of the dataset is also used during training.
+> Number of epochs and a subset of the dataset are also used during training.
 
 ### Logging Artifacts of Datasets Together with Model
+
 Since the COCO dataset is file-based, files need to be downloaded first. We use the smallest version of the newest version of the dataset from the official author's website.
 
 ```bash
@@ -130,6 +142,8 @@ rm datasets/val2017.zip & rm datasets/annotations_trainval2017.zip
 We can now train a model and track the artifacts of the training dataset as well as inputs in the same run.
 
 ```python
+import json
+
 from torchvision.datasets import CocoDetection
 from torchvision import models
 import mlflow
@@ -278,6 +292,7 @@ Under the second experiment, you will now have a dataset logged.
 ## Limitations
 
 While MLflow is powerful in itself, it needs support. Consider these limitations:
+
 - **Storage Overhead**: Logging large datasets can require significant storage.
 - **Annotation Complexity**: Managing complex annotations may need custom scripts like `pycocotools` or open-source tools like [CVAT](https://docs.cvat.ai/docs/getting_started/overview/) which also provides an extensive UI feature for image dataset management.
 - **Visualization**: MLflow's UI and Databricks are not optimized for visualizing image dataset annotations and require tools like `CVAT` or custom scripts.
@@ -285,7 +300,7 @@ While MLflow is powerful in itself, it needs support. Consider these limitations
 
 ## Additional Resources
 
-- [MLflow tutorial on how to use the dataset module](https://mlflow.org/docs/latest/dataset/). 
+- [MLflow tutorial on how to use the dataset module](https://mlflow.org/docs/latest/dataset/).
 - [COCO Dataset Format](https://cocodataset.org/#format-data)
 - [Hugging Face Image Datasets](https://huggingface.co/docs/datasets/en/image_dataset)
 - [MLflow tutorial on how to evaluate a model on a dataset](https://mlflow.org/docs/latest/model#evaluating-with-a-static-dataset)
