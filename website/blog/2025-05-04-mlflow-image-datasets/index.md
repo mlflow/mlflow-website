@@ -20,7 +20,7 @@ Tracking image datasets is essential for structured machine learning projects. I
 
 ## Understanding Image Dataset Formats
 There exist many formats for datasets in the global machine-learning community. 
-In this blog post, we will use a widely used format for computer-vision models, COCO, in the traditional fileformat and a Hugging Face version of the same dataset. These two formats have pros and cons and different possibilites for MLflow tracking.
+In this blog post, we will use a widely used format for computer-vision models, COCO, in the traditional file format and a Hugging Face version of the same dataset. These two formats have pros and cons and different possibilities for MLflow tracking.
 
 Pros using the native fileformat:
 - dataloaders ready to use in `pycocotools` / `torchvision`
