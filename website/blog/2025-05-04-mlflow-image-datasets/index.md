@@ -38,12 +38,15 @@ Cons:
 - unstructured data so can be messy to search and explore
 - not queryable
 
-Pros using Huggingface datasets / tabular datasets
+Pros using Hugging Face datasets / tabular datasets:
+
 - very structured
-- fully trackable as a training dataset using mlflow.data  (se more below)
-- metadata can be added for data in mlflow
+- fully trackable as a training dataset using `mlflow.data` (see more below)
+- metadata can be added for data in MLflow
+
 Cons:
-- huge filesize due to binary written as text in tabel entries
+
+- huge file size due to binary written as text in table entries
 - requires a custom dataloader
 
 ### COCO: Common Objects in Context
