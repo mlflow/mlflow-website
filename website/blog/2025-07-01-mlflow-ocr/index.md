@@ -1,7 +1,7 @@
 ---
 title: "Improving OCR with MLflow"
 slug: mlflow-ocr
-tags: [ocr]
+tags: [ocr, tracing, prompt-registry]
 authors: [allison-bennett, shyam-sankararaman, michael-berk, mlflow-maintainers]
 thumbnail: /
 ---
@@ -9,10 +9,7 @@ thumbnail: /
 *Intro Sentence*
 
 ## Introduction to Optical Character Recognition (OCR)
-
-In this blog post, we'll walk you through how to apply Optical Character Recognition (OCR) to scanned documents, and how to use MLflow for tracing and Prompt registry while using LLMs to process the extracted text. 
-
-OCR is the technique of text extraction or text recognition from documents containing printed text or handwritten text. The documents are commonly in the form of invoices, reports, forms, and articles. Did you know that the earliest form of OCR was introduced in 1914, a device called Optophone that helped 
+ 
 
 ## The Problem
 
@@ -33,6 +30,8 @@ We require the following packages in the requirement.txt file -
 ```
 openai
 mlflow
+tiktoken 
+aiohttp
 ```
 which can then be installed as the required packages for this demo to work.
 
@@ -195,10 +194,9 @@ mlflow.openai.autolog()
 ```
 
 
-+ We set mlruns as the local directory for MLflow tracking
-+ We create an experiment called quickstart
-+ We log the API calls for metrics like etc
-
+        We set mlruns as the local directory for MLflow tracking
+        We create an experiment called quickstart
+        We log the API calls for metrics like etc.
 
 On the OpenAI side, we initialize the OpenAI client and provide the prompt to the LLM (for example, instructing the LLM to act as an OCR expert). 
 
@@ -211,8 +209,8 @@ base64_image = get_image(random_file, encode_as_str=True)
 
 *get_image()* can be a nice helper function that can handle 
 
-+ Reading the image file from a specified path
-+ Resizing the file and convert it into a JPEG of a specified quality
+        Reading the image file from a specified path
+        Resizing the file and convert it into a JPEG of a specified quality
 
 
 ```python
@@ -246,23 +244,165 @@ def get_image(
 ```
 
 
-
-
 #### 3. Tracing UI 
+
+    ![MLflow UI showing the tracing](./TracingUI.png)
+
 
 ### Create Model and Evaluate 
 
-#### 1. Determine Accuracy 
+```python
+system_prompt = """You are an expert at Optical Character Recognition (OCR). Extract the questions and answers from the image."""
+
+def get_completion(inputs: str) -> str:
+    completion = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {
+                "role": "user",
+                "content": [
+                    { "type": "text", "text": "what's in this image?" },
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": f"data:image/jpeg;base64,{inputs}",
+                        },
+                    },
+                ],
+            }
+        ],
+    )
+
+    return completion.choices[0].message.content
+
+with mlflow.start_run() as run:
+    predicted = get_completion(images[0])
+    print(predicted)
+
+```
+
+
+
+#### 1. Defining a custom metric for LLM evaluation 
+
+For simplicity, we define (custom) GenAI metric called *correct_format*, which returns a boolean value depending on whether the output from the LLM contains only the required keys 'question' and 'answer'
+
+```python
+correct_format = mlflow.metrics.genai.make_genai_metric(
+    name="correct_format",
+    definition=(
+        """The answer is a list of dicts where keys are `question` and `answer`."""
+    ),
+    grading_prompt=(
+        """If formatted correctly, return 1. Otherwise, return 0."""
+    ),
+    model="openai:/gpt-4o-mini",
+    greater_is_better=True,
+)
+```
 
 #### 2. MLflow Evaluate 
+
+In this step, we pass the defined metric to mlflow.evaluate(), which also accepts LLM completion response for every image
+
+
+```python
+def batch_completion(df: pd.DataFrame) -> list[str]:
+    return [get_completion(image) for image in df["inputs"]]
+
+eval_result = mlflow.evaluate(
+    model=batch_completion,
+    data=pd.DataFrame({"inputs": images, "truth": jsons}),
+    targets="truth",
+    model_type="text",
+    extra_metrics=[correct_format],
+)
+```
 
 #### 3. View in UI 
 
 ### Prompt Registry 
 
+
 #### Prompt Engineer: Improve the Prompt 
 
+
+```python
+new_template = """\
+You are an expert at key information extraction and OCR.
+
+Format as a list of dictionaries as shown below. They keys should only be `question` and `answer`. 
+
+```\
+[
+    {
+        "question": "question field",
+        "answer": "answer to question field"
+
+    },
+...
+]
+```\
+
+Question refers to a field in the form that takes in information. Answer refers to the information 
+that is filled in the field.
+
+Follow these rules:
+- Only use the information present in the text.
+{{ additional_rules }}
+"""
+```
+
+```python
+# Register a new version of an existing prompt
+updated_prompt = mlflow.register_prompt(
+    name="ocr-question-answer",
+    template=new_template,
+    version_metadata={
+        "author": "author@example.com",
+    },
+)
+
+```
+
 #### ML Engineer: Use the Prompt 
+
+```python 
+prompt = mlflow.load_prompt("prompts:/ocr-question-answer/latest")
+
+
+def get_completion(inputs: str) -> str:
+    completion = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {
+                "role": "system", 
+                "content": prompt.format( # Add system prompt here
+                    additional_rules="Use exact formatting you see in the form."
+                )
+            },
+            {
+                "role": "user",
+                "content": [
+                    { "type": "text", "text": "what's in this image?" },
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": f"data:image/jpeg;base64,{inputs}",
+                        },
+                    },
+                ],
+            }
+        ],
+    )
+
+    return completion.choices[0].message.content
+
+with mlflow.start_run() as run:
+    predicted = get_completion(images[0])
+    print(predicted)
+```
 
 ## Configuration and Customization
 
