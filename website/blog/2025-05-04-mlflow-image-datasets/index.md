@@ -13,7 +13,8 @@ Dataset tracking is fundamental to building robust and reproducible machine lear
 ## Why Track Image Datasets?
 
 Tracking image datasets is essential for structured machine learning projects. It ensures:
-- **High-quality training data**: Unlike structured datasets, image datasets are hard to understand and read, but their importance for model performance is the same, and they still require annotation, curation, and feature transformations. 
+
+- **High-quality training data**: Unlike structured datasets, image datasets are hard to understand and read, but their importance for model performance is the same, and they still require annotation, curation, and feature transformations.
 - **Reproducibility**: Experiments can be replicated with the same dataset version and preprocessing steps.
 - **Data and model lineage**: Tracking maintains a record of data usage, essential for adhering to data governance as well as tracking the lineage of the model and data used in training, validation, and testing.
 - **Debugging**: Tracking helps identify issues related to data quality or preprocessing that may affect model performance.
