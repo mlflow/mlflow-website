@@ -20,7 +20,7 @@ This new feature aims to provide greater visibility and control over your applic
 
 ## What is MLflow Tracing?
 
-MLflow Tracing offers a variety of methods to enable [tracing](https://mlflow.org/docs/latest/llms/tracing/overview.html) in your applications:
+MLflow Tracing offers a variety of methods to enable [tracing](https://mlflow.org/docs/latest/genai/tracing/app-instrumentation/#tracing-approaches) in your applications:
 
 - **Automated Tracing with LangChain**: A fully automated integration with [LangChain](https://www.langchain.com/) allows you to activate tracing simply by enabling `mlflow.langchain.autolog()`.
 - **Manual Trace Instrumentation with High-Level Fluent APIs**: Use decorators, function wrappers, and context managers via the fluent API to add tracing functionality with minimal code modifications.
