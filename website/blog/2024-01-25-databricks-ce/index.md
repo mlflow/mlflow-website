@@ -146,7 +146,7 @@ the [Creating Custom Pyfunc tutorial](https://mlflow.org/docs/latest/traditional
 
    .../notebooks/basic-pyfunc.~~html~~ &rarr; .../notebooks/basic-pyfunc.**ipynb**[^3]
 
-[^3]: Or you can [download the notebook](https://mlflow.org/docs/latest/traditional-ml/creating-custom-pyfunc/notebooks/basic-pyfunc.ipynb) and manually load it in the UI by selecting `File` instead of `URL`.
+[^3]: Or you can [download the notebook](https://raw.githubusercontent.com/mlflow/mlflow/v3.0.0/docs/docs/classic-ml/traditional-ml/tutorials/creating-custom-pyfunc/notebooks/basic-pyfunc.ipynb) and manually load it in the UI by selecting `File` instead of `URL`.
 
 ![Select the Notebook for Importing](import-notebook-2.png)
 

@@ -151,4 +151,4 @@ They are not, however, the right solution for all use cases. If you only need to
   - [Statsmodels](https://mlflow.org/docs/latest/python_api/mlflow.statsmodels.html#mlflow.statsmodels.autolog)
   - [LightGBM](https://mlflow.org/docs/latest/python_api/mlflow.lightgbm.html#mlflow.lightgbm.autolog)
   - [Paddle](https://mlflow.org/docs/latest/python_api/mlflow.paddle.html#mlflow.paddle.autolog)
-  - [Fastai](https://mlflow.org/docs/latest/python_api/mlflow.fastai.html#mlflow.fastai.autolog)
+  - [Fastai](https://mlflow.org/docs/2.7.0/python_api/mlflow.fastai.html#mlflow.fastai.autolog)

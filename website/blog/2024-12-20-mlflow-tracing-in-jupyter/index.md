@@ -65,7 +65,7 @@ The trace UI will show up whenever any of the following events happen:
 3. When the `mlflow.search_traces()` API is called
 
 For a hands-on experience with this feature, please try running our
-[**demo notebook**](https://github.com/mlflow/mlflow/blob/master/docs/docs/tracing/tutorials/jupyter-trace-demo.ipynb)!
+[**demo notebook**](https://github.com/mlflow/mlflow/blob/v2.22.1/docs/docs/tracing/tutorials/jupyter-trace-demo.ipynb)!
 The notebook contains detailed examples of all three scenarios above, as well as a short LangChain RAG demo to
 get a more realistic impression of how this feature will feel during your development loop.
 

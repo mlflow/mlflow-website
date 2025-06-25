@@ -94,7 +94,7 @@ In this section, I'll provide a generic workflow for implementing MLflow's Model
 
 A key "ingredient" of the implementation is MLflow's component [`pyfunc`](https://mlflow.org/docs/latest/python_api/mlflow.pyfunc.html). If you're not familiar with it, think of `pyfunc` as a universal interface in MLflow that lets you turn any model, from any framework, into an MLflow model by defining a _custom_ Python function. You can also refer to [this earlier post](https://mlflow.org/blog/custom-pyfunc) if you wish to gain a deeper understanding.
 
-For our Models from Code logging, we’ll particularly use the [`PythonModel`](https://mlflow.org/docs/latest/_modules/mlflow/pyfunc/model.html#PythonModel) class within `pyfunc`. This class in the MLflow Python client library allows us to create and manage Python functions as MLflow models. It enables us to define a custom function that processes input data and returns predictions or results. This model can then be deployed, tracked, and shared using MLflow's features.
+For our Models from Code logging, we’ll particularly use the [`PythonModel`](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.pyfunc.html#mlflow.pyfunc.PythonModel) class within `pyfunc`. This class in the MLflow Python client library allows us to create and manage Python functions as MLflow models. It enables us to define a custom function that processes input data and returns predictions or results. This model can then be deployed, tracked, and shared using MLflow's features.
 
 It seems to be exactly what we're looking for—we have some code that serves as our model, and we want to log it! That's why you'll soon see `mlflow.pyfunc.PythonModel` in our code example!
 
