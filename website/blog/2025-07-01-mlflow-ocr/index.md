@@ -6,33 +6,25 @@ authors: [allison-bennett, shyam-sankararaman, michael-berk, mlflow-maintainers]
 thumbnail: /
 ---
 
-*Intro Sentence*
+_Intro Sentence_
 
 ## Introduction to Optical Character Recognition (OCR)
- 
 
 ## The Problem
 
-
-
-
 ## Iterative MLflow and Other Concepts
 
-
-
-
-
-## Setting it Up 
-
+## Setting it Up
 
 We require the following packages in the requirement.txt file -
 
 ```
 openai
 mlflow
-tiktoken 
+tiktoken
 aiohttp
 ```
+
 which can then be installed as the required packages for this demo to work.
 
 ```bash
@@ -40,7 +32,6 @@ pip install -r requirements.txt -qU
 ```
 
 Since we need to make calls to OpenAI's LLMs, we can utilize helper functions to read the OpenAI API key that is stored in a (known) secure location. We can then set the environment variable OPENAI_API_KEY.
-
 
 ```python
 import os
@@ -53,9 +44,10 @@ def _set_openai_api_key_for_demo() -> bool:
             return True
     except Exception:
         pass
-    
+
     return False
 ```
+
 Alternatively, we can prompt the user to type in the OpenAI API key without echoing it using getpass
 
 ```python
@@ -66,16 +58,14 @@ if (not _set_openai_api_key_for_demo()) and (not os.getenv("OPENAI_API_KEY")):
     os.environ["OPENAI_API_KEY"] = getpass("Your OpenAI API Key: ")
 ```
 
-
-
-### Explore Our Data 
-
+### Explore Our Data
 
 We are going to use the [FUNSD dataset](https://guillaumejaume.github.io/FUNSD/) for this exercise, which contains around 200 fully annotated forms, in the form of semantic entity labels and word groupings as showing in the example below:
 
     ![Annotated form example](./word_grouping_semantic_entity_labeling.png)
 
 All these annotations are encoded as JSON files like this (for detailed description of each entry, refer to the [original paper](https://arxiv.org/pdf/1905.13538.pdf)):
+
 ```
 {
         "form": [
@@ -118,11 +108,9 @@ All these annotations are encoded as JSON files like this (for detailed descript
     }
 ```
 
+#### 1. Observe Data
 
-
-#### 1. Observe Data 
-
-Let's try to read a random annotated file, *get_json* can be a useful function in a utils.py file
+Let's try to read a random annotated file, _get_json_ can be a useful function in a utils.py file
 
 ```python
 DATA_DIRECTORY = "./data" # for simplicity, a local directory
@@ -161,13 +149,14 @@ def get_json(file_name: str, directory: str = ANNOTATIONS_DIRECTORY) -> dict:
             return _extract_qa_pairs(contents)
 
 ```
-What does *_extract_qa_pairs* do here? Let's break down it down for a second:
 
-+ We create a lookup dictionary *qa_pairs*
-+ We identify "question" items that have linked answer pair(s) in the form of *(q_id, a_id)*
-+ Construct question-answer pairs by joining the individual words
+What does _\_extract_qa_pairs_ do here? Let's break down it down for a second:
 
-Subsequently, we can call *get_json* to get the OCR-identified question:: answer structure based on the form image data.
+- We create a lookup dictionary _qa_pairs_
+- We identify "question" items that have linked answer pair(s) in the form of _(q_id, a_id)_
+- Construct question-answer pairs by joining the individual words
+
+Subsequently, we can call _get_json_ to get the OCR-identified question:: answer structure based on the form image data.
 
 ```python
 
@@ -180,8 +169,7 @@ get_json(random_file)
 
 ```
 
-
-#### 2. Example LLM Call 
+#### 2. Example LLM Call
 
 Before we make a call to OpenAI, we need to set up MLflow tracking and create and experiment, which can then automatically log all the API calls we make
 
@@ -193,12 +181,11 @@ mlflow.set_experiment("quickstart")
 mlflow.openai.autolog()
 ```
 
-
         We set mlruns as the local directory for MLflow tracking
         We create an experiment called quickstart
         We log the API calls for metrics like etc.
 
-On the OpenAI side, we initialize the OpenAI client and provide the prompt to the LLM (for example, instructing the LLM to act as an OCR expert). 
+On the OpenAI side, we initialize the OpenAI client and provide the prompt to the LLM (for example, instructing the LLM to act as an OCR expert).
 
 ```python
 client = OpenAI()
@@ -207,11 +194,10 @@ system_prompt = """You are an expert at Optical Character Recognition (OCR). Ext
 base64_image = get_image(random_file, encode_as_str=True)
 ```
 
-*get_image()* can be a nice helper function that can handle 
+_get_image()_ can be a nice helper function that can handle
 
         Reading the image file from a specified path
         Resizing the file and convert it into a JPEG of a specified quality
-
 
 ```python
 import base64
@@ -240,16 +226,14 @@ def get_image(
         if encode_as_str:
             return base64.b64encode(compressed).decode("utf-8")
         else:
-            return compressed 
+            return compressed
 ```
 
-
-#### 3. Tracing UI 
+#### 3. Tracing UI
 
     ![MLflow UI showing the tracing](./TracingUI.png)
 
-
-### Create Model and Evaluate 
+### Create Model and Evaluate
 
 ```python
 system_prompt = """You are an expert at Optical Character Recognition (OCR). Extract the questions and answers from the image."""
@@ -282,11 +266,9 @@ with mlflow.start_run() as run:
 
 ```
 
+#### 1. Defining a custom metric for LLM evaluation
 
-
-#### 1. Defining a custom metric for LLM evaluation 
-
-For simplicity, we define (custom) GenAI metric called *correct_format*, which returns a boolean value depending on whether the output from the LLM contains only the required keys 'question' and 'answer'
+For simplicity, we define (custom) GenAI metric called _correct_format_, which returns a boolean value depending on whether the output from the LLM contains only the required keys 'question' and 'answer'
 
 ```python
 correct_format = mlflow.metrics.genai.make_genai_metric(
@@ -302,10 +284,9 @@ correct_format = mlflow.metrics.genai.make_genai_metric(
 )
 ```
 
-#### 2. MLflow Evaluate 
+#### 2. MLflow Evaluate
 
 In this step, we pass the defined metric to mlflow.evaluate(), which also accepts LLM completion response for every image
-
 
 ```python
 def batch_completion(df: pd.DataFrame) -> list[str]:
@@ -320,19 +301,17 @@ eval_result = mlflow.evaluate(
 )
 ```
 
-#### 3. View in UI 
+#### 3. View in UI
 
-### Prompt Registry 
+### Prompt Registry
 
+#### Prompt Engineer: Improve the Prompt
 
-#### Prompt Engineer: Improve the Prompt 
-
-
-```python
+````python
 new_template = """\
 You are an expert at key information extraction and OCR.
 
-Format as a list of dictionaries as shown below. They keys should only be `question` and `answer`. 
+Format as a list of dictionaries as shown below. They keys should only be `question` and `answer`.
 
 ```\
 [
@@ -345,14 +324,14 @@ Format as a list of dictionaries as shown below. They keys should only be `quest
 ]
 ```\
 
-Question refers to a field in the form that takes in information. Answer refers to the information 
+Question refers to a field in the form that takes in information. Answer refers to the information
 that is filled in the field.
 
 Follow these rules:
 - Only use the information present in the text.
 {{ additional_rules }}
 """
-```
+````
 
 ```python
 # Register a new version of an existing prompt
@@ -366,9 +345,9 @@ updated_prompt = mlflow.register_prompt(
 
 ```
 
-#### ML Engineer: Use the Prompt 
+#### ML Engineer: Use the Prompt
 
-```python 
+```python
 prompt = mlflow.load_prompt("prompts:/ocr-question-answer/latest")
 
 
@@ -377,7 +356,7 @@ def get_completion(inputs: str) -> str:
         model="gpt-4o",
         messages=[
             {
-                "role": "system", 
+                "role": "system",
                 "content": prompt.format( # Add system prompt here
                     additional_rules="Use exact formatting you see in the form."
                 )
@@ -411,4 +390,3 @@ with mlflow.start_run() as run:
 Adding information about Agents here tomorrow
 
 ## Further Reading
-
