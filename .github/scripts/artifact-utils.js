@@ -1,4 +1,4 @@
-module.exports = async ({ github, context }) => {
+async function downloadArtifact({ github, context }) {
   const runId = context.payload.workflow_run.id;
   const artifactName = process.env.ARTIFACT_NAME;
   const extractPath = process.env.EXTRACT_PATH || ".";
@@ -38,4 +38,32 @@ module.exports = async ({ github, context }) => {
   fs.unlinkSync(zipPath);
 
   console.log(`Artifact ${artifactName} extracted to ${extractPath}`);
-};
+}
+
+async function deleteArtifacts({ github, context }) {
+  const runId = context.payload.workflow_run.id;
+  const prNumber = process.env.PR_NUMBER;
+
+  const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+    run_id: runId,
+  });
+
+  const artifactsToDelete = artifacts.data.artifacts.filter(
+    (artifact) =>
+      artifact.name === `website-build-${prNumber}` ||
+      artifact.name === "pr-number"
+  );
+
+  for (const artifact of artifactsToDelete) {
+    await github.rest.actions.deleteArtifact({
+      owner: context.repo.owner,
+      repo: context.repo.repo,
+      artifact_id: artifact.id,
+    });
+    console.log(`Deleted artifact: ${artifact.name}`);
+  }
+}
+
+module.exports = { downloadArtifact, deleteArtifacts };

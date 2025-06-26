@@ -7,6 +7,7 @@ on:
       - completed
 
 permissions:
+  actions: write
   contents: read
   pull-requests: write
 
@@ -24,8 +25,8 @@ jobs:
           ARTIFACT_NAME: pr-number
         with:
           script: |
-            const script = require('./.github/scripts/download-artifact.js');
-            await script({ github, context });
+            const { downloadArtifact } = require('./.github/scripts/artifact-utils.js');
+            await downloadArtifact({ github, context });
 
       - name: Read PR number
         id: get-pr
@@ -41,8 +42,20 @@ jobs:
           EXTRACT_PATH: website/build
         with:
           script: |
-            const script = require('./.github/scripts/download-artifact.js');
-            await script({ github, context });
+            const { downloadArtifact } = require('./.github/scripts/artifact-utils.js');
+            await downloadArtifact({ github, context });
+
+      - name: Clean up GitHub artifacts
+        uses: actions/github-script@v7
+        env:
+          PR_NUMBER: ${{ steps.get-pr.outputs.result }}
+        with:
+          script: |
+            // Remove artifacts immediately after download to save storage space
+            // and keep the repository clean. Artifacts are no longer needed
+            // once they've been extracted for deployment.
+            const { deleteArtifacts } = require('./.github/scripts/artifact-utils.js');
+            await deleteArtifacts({ github, context });
 
       - name: Install Netlify CLI
         run: npm install -g netlify-cli
