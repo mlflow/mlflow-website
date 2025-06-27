@@ -62,6 +62,7 @@ We will be using this dataset throughout this blog post.
 > It is important to visualize annotations in image datasets to perform comprehensive quality checks. You can explore the dataset on the [COCO dataset official site](https://cocodataset.org/#explore) to understand more about the nature of the data included within it.
 
 Image datasets have annotations which can be segments of an object in picture or an bounding box. This means that for every image, there will be a class and a set of coordinates for each identified object. See the following example from the COCO dataset:
+
 > ![COCO dataset annotated image example](id-337458-COCO.png)
 
 ### Hugging Face Image Datasets
@@ -90,13 +91,14 @@ We will use the `mlflow.pytorch` [module doc](https://mlflow.org/docs/latest/api
 
 ## Example Using Computer Vision Model and Image Datasets Tracking
 
-There are two approaches to log an image dataset: 
-* using `mlflow.artifacts` 
-* using `mlflow.data` (the datasets API). 
+There are two approaches to log an image dataset:
+
+- using `mlflow.artifacts`
+- using `mlflow.data` (the datasets API).
 
 > You can also log an evaluation dataset, which I will not cover in this post.
 
-### Why two approaches? 
+### Why two approaches?
 
 Converting an image dataset from file-based formats like COCO to a tabular format is challenging, as most data loaders expect the file-based COCO format. Logging artifacts provides a quick and straightforward solution without the need to reformat files. However, this can also get a bit messy if you're not careful about organizing your files within a directory structure. Make sure to create meaningful paths for your artifacts.
 
@@ -132,9 +134,9 @@ Since the COCO dataset is file-based, files need to be downloaded first. We use 
 
 ```bash
 # download the COCO val 2017 dataset
-wget -P datasets http://images.cocodataset.org/zips/val2017.zip 
+wget -P datasets http://images.cocodataset.org/zips/val2017.zip
 unzip -q datasets/val2017.zip -d datasets
-wget -P datasets http://images.cocodataset.org/annotations/annotations_trainval2017.zip 
+wget -P datasets http://images.cocodataset.org/annotations/annotations_trainval2017.zip
 unzip -q datasets/annotations_trainval2017.zip -d datasets
 rm datasets/val2017.zip & rm datasets/annotations_trainval2017.zip
 ```
@@ -164,7 +166,7 @@ mlflow.set_experiment("coco_experiment")
 # Save dataset artifacts and model
 with mlflow.start_run():
 
-  # log dataset 
+  # log dataset
   with open(coco_annotation_file, 'r') as f:
       dataset_metadata = json.load(f)
   mlflow.log_dict(dataset_metadata, "coco_annotation_file")
@@ -189,7 +191,8 @@ Image and text visualization of files is supported.
 ![COCO dataset annotated image example](coco-dataset.png)
 
 ### Logging of Dataset Together with Model
-We can do this in a more structured way using a Hugging Face dataset and leverage a convenient way to read in the data. In this way, we have our MLflow tracked dataset, training metrics and models all in the same experiment run!  
+
+We can do this in a more structured way using a Hugging Face dataset and leverage a convenient way to read in the data. In this way, we have our MLflow tracked dataset, training metrics and models all in the same experiment run!
 
 ```python
 import numpy as np
@@ -216,7 +219,7 @@ mlflow_eval_dataset = mlflow_dataset.to_evaluation_dataset()
 
 # Load a pre-trained object detection / segmentation model
 model = models.detection.fasterrcnn_resnet50_fpn(weights=FasterRCNN_ResNet50_FPN_Weights.DEFAULT)
-# Let’s fine-tune it, log dataset, metrics, and model in an MLflow Experiment run 
+# Let’s fine-tune it, log dataset, metrics, and model in an MLflow Experiment run
 
 mlflow.set_experiment("hg_image_experiment")
 
@@ -231,7 +234,7 @@ with mlflow.start_run():
     print(f"Training object detection model, epoch {epoch+1}...")
 
     for row in subset_dataset: # We run a subset of the dataset to save time
-      
+
       # In this example we are not using a dataloader but just converting image bytes to ndarray
       image_bytes = io.BytesIO()
       row["image"].save(image_bytes, format="JPEG")
@@ -245,14 +248,14 @@ with mlflow.start_run():
       image = np.array(image)
 
       # Prepare annotations as target
-      annotations = row["objects"] 
+      annotations = row["objects"]
       target = []
       for i in range(len(annotations['category'])):
           d = {}
           d['boxes'] = torch.tensor(annotations['bbox'][i], dtype=torch.float32).reshape(-1, 4)  # Ensure shape [N, 4]
           d['labels'] = torch.tensor([annotations['category'][i]], dtype=torch.int64)  # Wrap in a list for correct shape
           target.append(d)
-      
+
       # Convert the image to a PyTorch tensor and normalize it
       image_tensor = torch.tensor(image, dtype=torch.float32).permute(2, 0, 1) / 255.0
 
@@ -263,22 +266,22 @@ with mlflow.start_run():
       # Compute loss
       loss_dict = output[0] if isinstance(output, list) else output
       loss = sum(loss for loss in loss_dict.values())
-      
+
       # Backpropagation and optimization step
       optimizer.zero_grad()
       loss.backward()
       optimizer.step()
-      
+
       # Pretty print the loss
       print(f"Epoch {epoch+1}, Loss: {loss.item():.4f}")
-      
+
       mlflow.log_metrics({"epoch": epoch+1})
       mlflow.log_metrics({"loss": loss.item()})
 
     # finally log model
     mlflow.pytorch.log_model(
-      model, 
-      "model", 
+      model,
+      "model",
       input_example=input_batch
     )
 ```
