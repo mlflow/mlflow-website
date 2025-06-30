@@ -11,3 +11,4 @@ If you're looking to get a great tutorial, use case, or cover the usage of advan
 ## Development
 
 Whether you're looking to build a development environment for writing and validating your blog post, or you're a maintainer working on a new page for the website, the [Development Guide](DEVELOPMENT_GUIDE.md) will help get you started with contributing!
+
