@@ -214,9 +214,6 @@ mlflow_dataset = mlflow.data.huggingface_dataset.from_huggingface(dataset)
 # For this example we create a subset of the dataset with the first 100 rows
 subset_dataset = dataset.select(range(100))
 
-# Note; evaluation, we transform it again
-mlflow_eval_dataset = mlflow_dataset.to_evaluation_dataset()
-
 # Load a pre-trained object detection / segmentation model
 model = models.detection.fasterrcnn_resnet50_fpn(weights=FasterRCNN_ResNet50_FPN_Weights.DEFAULT)
 # Let’s fine-tune it, log dataset, metrics, and model in an MLflow Experiment run
