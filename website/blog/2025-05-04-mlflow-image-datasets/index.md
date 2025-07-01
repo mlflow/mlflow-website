@@ -96,7 +96,7 @@ There are two approaches to log an image dataset:
 - using `mlflow.artifacts`
 - using `mlflow.data` (the datasets API).
 
-> You can also log an evaluation dataset, which I will not cover in this post.
+> You can also log an [evaluation dataset](https://mlflow.org/docs/latest/ml/evaluation/dataset-eval), which I will not cover in this post.
 
 ### Why two approaches?
 
@@ -308,6 +308,6 @@ While MLflow is powerful in itself, it needs support. Consider these limitations
 
 We hope this guide helps you streamline your image dataset tracking with MLflow and gives you some new ideas about image datasets. Happy ML model training!
 
-**And never let those GPU/CPUs cool down.**
+**And never let those GPU/CPUs cool down.** Check your system metrics during model training in the MLflow UI.
 
 ![System metrics](systemmetrics.png)
