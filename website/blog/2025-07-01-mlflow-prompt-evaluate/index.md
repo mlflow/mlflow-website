@@ -6,7 +6,7 @@ authors: [allison-bennett, shyam-sankararaman, michael-berk, mlflow-maintainers]
 thumbnail: /img/blog/prompt-evaluate/prompt-evaluate.png
 ---
 
-Building GenAI tools presents a unique set of challenges. As we evaluate accuracy, iterate on prompts, and enable collaboration, we often encounter bottlenecks that slow down our progress toward production. In this blog, we explore how MLflow's GenAI capabilities, namely MLflow Prompt Registry and MLflow Evaluate, help us streamline development and unlock value for both technical and non-technical contributors. 
+Building GenAI tools presents a unique set of challenges. As we evaluate accuracy, iterate on prompts, and enable collaboration, we often encounter bottlenecks that slow down our progress toward production. In this blog, we explore how MLflow's GenAI capabilities, namely MLflow Prompt Registry and MLflow Evaluate, help us streamline development and unlock value for both technical and non-technical contributors.
 
 In this example, we will build an LLM-based tool that applies Optical Character Recognition (OCR) to scanned documents, demonstrating how these MLflow features support each step.
 
@@ -14,7 +14,7 @@ In this example, we will build an LLM-based tool that applies Optical Character 
 
 Optical Character Recognition, or OCR, is the process of extracting text from scanned documents and images. The resulting text is machine-encoded, editable, and searchable, unlocking a wide range of downstream use cases.
 
-Here, we leverage multi-modal LLMs to extract formatted text from various forms. Unlike traditional OCR tools such as PyTesseract, LLM-based methods offer greater flexibility for complex layouts, handwritten content, and context-aware extraction.  While these methods may require more computational resources and careful prompt engineering, they provide significant advantages for advanced use cases.
+Here, we leverage multi-modal LLMs to extract formatted text from various forms. Unlike traditional OCR tools such as PyTesseract, LLM-based methods offer greater flexibility for complex layouts, handwritten content, and context-aware extraction. While these methods may require more computational resources and careful prompt engineering, they provide significant advantages for advanced use cases.
 
 Fun fact: The earliest form of OCR, the Optophone, was introduced in 1914 to help blind individuals read printed text without Braille.
 ![Optophone](/img/blog/prompt-evaluate/margaret-hogan-used-the-black-sounding-optophone-to-read-a-book.jpg)
@@ -29,9 +29,9 @@ Verification and assessment of outputs also present challenges. Does the respons
 
 ### MLflow Prompt Registry
 
-[MLflow Prompt Registry](https://mlflow.org/docs/latest/genai/prompt-version-mgmt/prompt-registry) addresses many of the challenges prompt engineers face today. With a Git-inspired setup, prompt engineers have a streamlined way to version, track, and reuse prompts.  
+[MLflow Prompt Registry](https://mlflow.org/docs/latest/genai/prompt-version-mgmt/prompt-registry) addresses many of the challenges prompt engineers face today. With a Git-inspired setup, prompt engineers have a streamlined way to version, track, and reuse prompts.
 
-A typical workflow looks like this: 
+A typical workflow looks like this:
 
 **1. Create and Register Your Prompt:** A _prompt object_ is a versioned, parameterized template that can be dynamically filled at runtime. The object includes metadata such as name, version #, and aliases.  
 Register your prompt using -  
@@ -43,9 +43,9 @@ Register your prompt using -
 Load your prompt using -  
 `mlflow.genai.load_prompt()`
 
-**4. Iterate on Prompts:** _Prompt iteration_ is the process of improving and updating prompts within a centralized repository. This enables us to continuously refine accuracy while maintaining organized version control. Because prompts are registered and versioned, we can make updates asynchronously and safely, supporting agile and collaborative workflows. 
+**4. Iterate on Prompts:** _Prompt iteration_ is the process of improving and updating prompts within a centralized repository. This enables us to continuously refine accuracy while maintaining organized version control. Because prompts are registered and versioned, we can make updates asynchronously and safely, supporting agile and collaborative workflows.
 
-Prompt registry enables non-technical subject matter experts (SMEs) to contribute directly to prompt optimization. By decoupling prompt engineering from the more technical aspects of GenAI development, organizations can outsource prompt iteration and improvement to SMEs, reducing costs and accelerating development.  
+Prompt registry enables non-technical subject matter experts (SMEs) to contribute directly to prompt optimization. By decoupling prompt engineering from the more technical aspects of GenAI development, organizations can outsource prompt iteration and improvement to SMEs, reducing costs and accelerating development.
 
 ### MLflow Evaluate
 
@@ -53,17 +53,17 @@ Prompt registry enables non-technical subject matter experts (SMEs) to contribut
 
 **Built-in Metrics:** Automatically computed based on model type, including NLP metrics such as BLEU and ROUGE, as well as LLM-judged metrics for accuracy, relevance, and toxicity.
 
-**Custom Metrics:** Define user-specific evaluation functions to validate outputs based on criteria such as formatting, compliance, or business logic. These metrics are particularly valuable for GenAI and agentic workflows, where standard metrics may not capture the full complexity of our use case.   
+**Custom Metrics:** Define user-specific evaluation functions to validate outputs based on criteria such as formatting, compliance, or business logic. These metrics are particularly valuable for GenAI and agentic workflows, where standard metrics may not capture the full complexity of our use case.
 
-We pass custom metrics into the `mlflow.evaluate` API to enable targeted, meaningful evaluations that ensure our model meets specific requirements and quality thresholds for production.  All results are logged to an MLflow run, accessible through the MLflow UI or APIs.  
+We pass custom metrics into the `mlflow.evaluate` API to enable targeted, meaningful evaluations that ensure our model meets specific requirements and quality thresholds for production. All results are logged to an MLflow run, accessible through the MLflow UI or APIs.
 
-Let’s see MLflow Prompt Registry and MLflow Evaluate in action in our OCR use case.   
+Let’s see MLflow Prompt Registry and MLflow Evaluate in action in our OCR use case.
 
 ## Our Use Case
 
-Our task is to create a document parsing tool for text extraction (OCR) using LLMs. The data consists of scanned documents and their corresponding text extracted as JSON. We use the [FUNSD dataset](https://guillaumejaume.github.io/FUNSD/), which contains around 200 fully annotated forms, structured as semantic entity labels and word groupings.  
+Our task is to create a document parsing tool for text extraction (OCR) using LLMs. The data consists of scanned documents and their corresponding text extracted as JSON. We use the [FUNSD dataset](https://guillaumejaume.github.io/FUNSD/), which contains around 200 fully annotated forms, structured as semantic entity labels and word groupings.
 
-Example: 
+Example:
 
 ![Annotated form example](/img/blog/prompt-evaluate/word_grouping_semantic_entity_labeling.png)
 
@@ -110,24 +110,24 @@ All of these annotations are encoded as JSON files like below.
     ]
     }
 ```
-For a detailed description of each entry, refer to the [original paper](https://arxiv.org/pdf/1905.13538.pdf). 
+
+For a detailed description of each entry, refer to the [original paper](https://arxiv.org/pdf/1905.13538.pdf).
 
 ## Setting it Up
 
-Install the required packages:  
+Install the required packages:
 
 ```bash
 pip install openai mlflow tiktoken aiohttp
 ```
 
-**openai:** For interacting with OpenAI models and APIs   
-**mlflow:** For experiment tracking, model management, and GenAI workflow tools   
-**tiktoken:** For efficient tokenization, especially useful with OpenAI models   
-**aiohttp:** For asynchronous HTTP requests, enabling efficient API calls   
+**openai:** For interacting with OpenAI models and APIs  
+**mlflow:** For experiment tracking, model management, and GenAI workflow tools  
+**tiktoken:** For efficient tokenization, especially useful with OpenAI models  
+**aiohttp:** For asynchronous HTTP requests, enabling efficient API calls
 
 For this tutorial we use OpenAI, but the approach extends to other LLM providers.
 We can prompt the user to type the OpenAI API key without echoing using getpass():
-
 
 ```python
 import os
@@ -210,8 +210,8 @@ def get_image(
         if encode_as_str:
             return base64.b64encode(compressed).decode("utf-8")
         else:
-            return compressed 
-        
+            return compressed
+
 def _compress_image(file_path: str, quality: int = 40, max_size: tuple[int, int] = (1000, 1000)) -> bytes:
     """Compresses an image by resizing and converting to JPEG with given quality."""
     with im.open(file_path) as img:
@@ -224,9 +224,9 @@ def _compress_image(file_path: str, quality: int = 40, max_size: tuple[int, int]
 
 Let’s take a moment to break down the `_extract_qa_pairs` function:
 
-+ We create a look-up dictionary qa_pairs
-+ We identify "question" items that have linked answer pair(s) in the form of (q_id, a_id)
-+ Construct question-answer pairs by joining the individual words
+- We create a look-up dictionary qa_pairs
+- We identify "question" items that have linked answer pair(s) in the form of (q_id, a_id)
+- Construct question-answer pairs by joining the individual words
 
 We can then call `get_json` to fetch the OCR-identified question/answer structure based on the form image data.
 
@@ -244,7 +244,7 @@ get_json(random_file)
 
 #### 2. Example LLM Call
 
-Before we make a call to OpenAI, we need to set up [MLflow tracking](https://mlflow.org/docs/latest/ml/tracking) and create an experiment. MLflow Tracking allows us to log, organize, and visualize experiment results. This makes our result set more ingestible and auditable.  
+Before we make a call to OpenAI, we need to set up [MLflow tracking](https://mlflow.org/docs/latest/ml/tracking) and create an experiment. MLflow Tracking allows us to log, organize, and visualize experiment results. This makes our result set more ingestible and auditable.
 
 We can automatically log all API calls using `mlflow.openai.autolog()`. [Autolog](https://mlflow.org/docs/latest/ml/tracking/autolog) simplifies the tracking process by reducing the need for manual log statements. Metrics, params, artifacts, and other useful information is logged automatically.
 
@@ -293,7 +293,6 @@ The following screenshot represents the extracted questions and answers for this
 
 ![Screenshot of LLM completion response](/img/blog/prompt-evaluate/llm_response.png)
 
-
 #### 3. Tracing UI
 
 [MLflow Tracing](https://mlflow.org/docs/latest/genai/tracing/) provides end-to-end observability for GenAI workflows. We gain a comprehensive view of each step in our GenAI pipeline from prompt construction and model inference to tool calls and final outputs. This level of detail allows us to diagnose issues, optimize performance, and ensure reproducibility across experiments. During development stage, tracing can provide feedback to developers on application behavior, and the possibility to better understand the different components used in the workflow and debug. In production environments, tracing becomes even more crucial by providing real-time insights into application performance, helping identify issues before they impact users.
@@ -307,7 +306,6 @@ mlflow ui
 The simplicity of MLflow tracing is that, within a few lines of code, `mlflow.openai.autolog()` can immediately start tracing every LLM call in the application, and the below example shows all the LLM calls along with requests/response, performance metrics, and other metadata.
 
 ![MLflow UI showing the tracing for each LLM execution](/img/blog/prompt-evaluate/eval_traces.png)
-
 
 ### Create Model and Evaluate
 
@@ -347,7 +345,6 @@ with mlflow.start_run() as run:
 
 ```
 
-
 #### 1. Defining a Custom Gen AI Metric for Evaluation
 
 We can create a custom LLM-as-a-judge metric within MLflow using [`mlflow.metrics.genai.make_genai_metric()`](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.metrics.html#mlflow.metrics.genai.make_genai_metric/). For simplicity, we define a custom metric called `correct_format`, which returns a boolean value depending on whether the output contains a list of dicts with the required keys "question" and "answer". The `definition` parameter explains the metric, and `grading_prompt` sets the grading criteria for the LLM.
@@ -368,7 +365,7 @@ correct_format = mlflow.metrics.genai.make_genai_metric(
 
 #### 2. MLflow Evaluate
 
-Pass the defined metric `correct_format` to `mlflow.evaluate()`, which evaluates each selected image. The JSONs created from the OCR extraction using `get_json()` serve as ground truth. 
+Pass the defined metric `correct_format` to `mlflow.evaluate()`, which evaluates each selected image. The JSONs created from the OCR extraction using `get_json()` serve as ground truth.
 
 ```python
 def batch_completion(df: pd.DataFrame) -> list[str]:
@@ -386,7 +383,6 @@ eval_result = mlflow.evaluate(
 The following screenshot shows the `correct_format` metric computed for a single run. \
 ![MLflow UI showing the metric correct_format computed for a single run](/img/blog/prompt-evaluate/eval_metrics.png)
 
-
 ### Applying Prompt Registry and Evaluate to the OCR Use Case
 
 When developing an OCR application, various roles collaborate to ensure the project's success. The key contributors are prompt engineers and machine learning engineers, who can significantly benefit from the capabilities offered by MLflow.
@@ -395,7 +391,7 @@ When developing an OCR application, various roles collaborate to ensure the proj
 
 As prompt engineers, we iteratively modify prompts. `mlflow.genai.register_prompt()` allows us to version different prompts or system messages, set a template text, and include metadata such as author and project. We can compare different prompt versions and search for specific prompts from the past.
 
-Here's an example of a prompt template, specifically instructing the LLM to generate results in our expected format. 
+Here's an example of a prompt template, specifically instructing the LLM to generate results in our expected format.
 
 ````python
 new_template = """\
@@ -445,22 +441,20 @@ Follow the steps in [Defining a Gen AI metric](#1-defining-a-custom-gen-ai-metri
 
 By leveraging MLflow GenAI capabilities, we efficiently manage prompts and evaluate models for our OCR tool. These features enable both technical and non-technical contributors to collaborate, iterate, and deploy AI solutions confidently.
 
-We can take several directions to further enhance our workflow and outcomes:  
+We can take several directions to further enhance our workflow and outcomes:
 
-**Expand Your Custom Metrics:** Scale out your custom evaluation metrics to more accurately capture the requirements of our specific OCR problem. This allows us to measure what truly matters for the use case, such as domain-specific accuracy, formatting compliance, or business logic adherence.  
+**Expand Your Custom Metrics:** Scale out your custom evaluation metrics to more accurately capture the requirements of our specific OCR problem. This allows us to measure what truly matters for the use case, such as domain-specific accuracy, formatting compliance, or business logic adherence.
 
-**Experiment with Multiple LLMs:** Take advantage of MLflow’s ability to track and compare experiments by iterating with different LLMs. We can view and analyze results side-by-side in the MLflow UI, making it easier to identify which model best fits our needs and to justify model selection with clear, data-driven evidence. 
+**Experiment with Multiple LLMs:** Take advantage of MLflow’s ability to track and compare experiments by iterating with different LLMs. We can view and analyze results side-by-side in the MLflow UI, making it easier to identify which model best fits our needs and to justify model selection with clear, data-driven evidence.
 
-**Utilize Tracing and Model Logging:** Leverage MLflow’s tracing and model logging features to gain end-to-end visibility into our GenAI workflows. By capturing detailed traces and logs, we can iteratively refine our models and prompts, diagnose issues, and ensure reproducibility—all within the context of our custom metrics.  
+**Utilize Tracing and Model Logging:** Leverage MLflow’s tracing and model logging features to gain end-to-end visibility into our GenAI workflows. By capturing detailed traces and logs, we can iteratively refine our models and prompts, diagnose issues, and ensure reproducibility—all within the context of our custom metrics.
 
-**Expand Governance and Access Control**: Implement robust governance practices to ensure secure, compliant, and auditable management of our GenAI assets and workflows. This is especially important for scaling in enterprise or regulated environments.  
+**Expand Governance and Access Control**: Implement robust governance practices to ensure secure, compliant, and auditable management of our GenAI assets and workflows. This is especially important for scaling in enterprise or regulated environments.
 
 These are just a few of the many ways we can build on this solution. Whether we are aiming to improve model performance, streamline collaboration, or scale our solution to new domains, these MLflow capabilities support us in our GenAI development.
-
 
 ## Further Reading
 
 [Practical AI Observability: Getting Started with MLflow Tracing](https://mlflow.org/blog/ai-observability-mlflow-tracing)  
 [Beyond Autolog: Add MLflow Tracing to a New LLM Provider](https://mlflow.org/blog/custom-tracing)  
-[LLM as Judge](https://mlflow.org/blog/llm-as-judge)  
-
+[LLM as Judge](https://mlflow.org/blog/llm-as-judge)
