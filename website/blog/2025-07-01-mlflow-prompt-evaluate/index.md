@@ -126,23 +126,28 @@ pip install openai mlflow tiktoken aiohttp
 **aiohttp:** For asynchronous HTTP requests, enabling efficient API calls   
 
 For this tutorial we use OpenAI, but the approach extends to other LLM providers.
+We can prompt the user to type the OpenAI API key without echoing using getpass():
 
 
 ```python
 import os
-from utils import _set_openai_api_key_for_demo
+from getpass import getpass
 
-if (not _set_openai_api_key_for_demo()) and (not os.getenv("OPENAI_API_KEY")):
-    os.environ["OPENAI_API_KEY"] = getpass("Your OpenAI API Key: ")
+os.environ["OPENAI_API_KEY"] = getpass("Your OpenAI API Key: ")
 ```
 
 #### 1. Observe Data
 
-Let's read a randomly selected annotated file.
+Let's read a randomly selected annotated file. The following utils functions faciliate this task.
 
 ```python
+from PIL import Image as im
+import base64
+from io import BytesIO
+
 DATA_DIRECTORY = "./data" # for simplicity, a local directory
 ANNOTATIONS_DIRECTORY = os.path.join(DATA_DIRECTORY, "annotations")
+IMAGES_DIRECTORY = os.path.join(DATA_DIRECTORY, "images")
 
 def _extract_qa_pairs(data: dict) -> dict:
     """Extracts question-answer pairs from OCR-style linked data."""
@@ -176,14 +181,60 @@ def get_json(file_name: str, directory: str = ANNOTATIONS_DIRECTORY) -> dict:
         else:
             return _extract_qa_pairs(contents)
 
+def get_random_files(
+    directory: str = ANNOTATIONS_DIRECTORY, n: int = 1
+    ) -> list[str] | str | None:
+    if not os.path.exists(directory):
+        raise FileNotFoundError(f"Directory {directory} does not exist.")
+
+    if files := os.listdir(directory):
+        selected_filed = random.sample(files, k=n)
+        cleaned_files = [file.rsplit(".", 1)[0] for file in selected_filed]
+
+        if len(cleaned_files) == 1:
+            return cleaned_files[0]
+
+        return cleaned_files
+
+    return None
+
+def get_image(
+    file_name: str, directory: str = IMAGES_DIRECTORY, encode_as_str: bool = False
+) -> bytes:
+    file_name += ".png" if not file_name.endswith(".png") else file_name
+    path = os.path.join(directory, file_name)
+    with open(path, "rb") as f:
+        file = f.read()
+        compressed = _compress_image(path)
+
+        if encode_as_str:
+            return base64.b64encode(compressed).decode("utf-8")
+        else:
+            return compressed 
+        
+def _compress_image(file_path: str, quality: int = 40, max_size: tuple[int, int] = (1000, 1000)) -> bytes:
+    """Compresses an image by resizing and converting to JPEG with given quality."""
+    with im.open(file_path) as img:
+        img = img.convert("RGB")  # Ensure JPEG compatibility
+        img.thumbnail(max_size)  # Resize
+        buf = BytesIO()
+        img.save(buf, format="JPEG", quality=quality)
+        return buf.getvalue()
 ```
 
-The `_extract_qa_pairs` function creates a lookup dictionary of question-answer pairs by identifying "question" items linked to their corresponding "answer" items. This structure allows us to easily retrieve the OCR-identified question/answer pairs from the form image data.
+Let’s take a moment to break down the `_extract_qa_pairs` function:
+
++ We create a look-up dictionary qa_pairs
++ We identify "question" items that have linked answer pair(s) in the form of (q_id, a_id)
++ Construct question-answer pairs by joining the individual words
+
+We can then call `get_json` to fetch the OCR-identified question/answer structure based on the form image data.
+
+Similarly, `get_image()` can serve as a utils function that reads an image file from a specified path and resizes or converts it into a JPEG with a defined quality setting.
 
 ```python
-
-from utils import get_image, get_json, get_random_files
 from IPython.display import Image, display
+import random
 
 random_file = get_random_files()
 image_bytes = get_image(random_file)
@@ -205,7 +256,7 @@ mlflow.set_experiment("quickstart")
 mlflow.openai.autolog()
 ```
 
-On the OpenAI side, initialize the client and provide the prompt to the LLM, instructing it to act as an OCR expert.
+On the OpenAI side, initialize the client and provide the prompt to the LLM, instructing it to act as an OCR expert. Further, let's try to invoke the LLM and log the execution and see what the response looks like.
 
 ```python
 client = OpenAI()
@@ -214,49 +265,58 @@ system_prompt = """You are an expert at Optical Character Recognition (OCR). Ext
 base64_image = get_image(random_file, encode_as_str=True)
 ```
 
-The `get_image()` helper function reads the image file from a specified path, resizes it, and converts it into a JPEG of specified quality. 
-
 ```python
-import base64
-from PIL import Image
-from io import BytesIO
+with mlflow.start_run() as run:
+    completion = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": "what's in this image?"},
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": f"data:image/jpeg;base64,{base64_image}",
+                        },
+                    },
+                ],
+            },
+        ],
+    )
 
-def _compress_image(file_path: str, quality: int = 40, max_size: tuple[int, int] = (1000, 1000)) -> bytes:
-    """Compresses an image by resizing and converting to JPEG with given quality."""
-    with Image.open(file_path) as img:
-        img = img.convert("RGB")  # Ensure JPEG compatibility
-        img.thumbnail(max_size)  # Resize
-        buf = BytesIO()
-        img.save(buf, format="JPEG", quality=quality)
-        return buf.getvalue()
-
-
-def get_image(
-    file_name: str, directory: str = IMAGES_DIRECTORY, encode_as_str: bool = False
-) -> bytes:
-    file_name += ".png" if not file_name.endswith(".png") else file_name
-    path = os.path.join(directory, file_name)
-    with open(path, "rb") as f:
-        file = f.read()
-        compressed = _compress_image(path)
-
-        if encode_as_str:
-            return base64.b64encode(compressed).decode("utf-8")
-        else:
-            return compressed
+print(completion.choices[0].message.content)
 ```
+
+The following screenshot represents the extracted questions and answers for this specific image.
+
+![Screenshot of LLM completion response](/img/blog/prompt-evaluate/llm_response.png)
+
 
 #### 3. Tracing UI
 
-[MLflow Tracing](https://mlflow.org/docs/latest/genai/tracing/) provides end-to-end observability for GenAI workflows. We gain a comprehensive view of each step in our GenAI pipeline from prompt construction and model inference to tool calls and final outputs. This level of detail allows us to diagnose issues, optimize performance, and ensure reproducibility across experiments. 
+[MLflow Tracing](https://mlflow.org/docs/latest/genai/tracing/) provides end-to-end observability for GenAI workflows. We gain a comprehensive view of each step in our GenAI pipeline from prompt construction and model inference to tool calls and final outputs. This level of detail allows us to diagnose issues, optimize performance, and ensure reproducibility across experiments. During development stage, tracing can provide feedback to developers on application behavior, and the possibility to better understand the different components used in the workflow and debug. In production environments, tracing becomes even more crucial by providing real-time insights into application performance, helping identify issues before they impact users.
 
-![MLflow UI showing the tracing](/img/blog/prompt-evaluate/TracingUI.png)
+In order to access the MLflow UI, we need to run the following and the UI will start on `http://localhost:5000` by default:
+
+```bash
+mlflow ui
+```
+
+The simplicity of MLflow tracing is that, within a few lines of code, `mlflow.openai.autolog()` can immediately start tracing every LLM call in the application, and the below example shows all the LLM calls along with requests/response, performance metrics, and other metadata.
+
+![MLflow UI showing the tracing for each LLM execution](/img/blog/prompt-evaluate/eval_traces.png)
+
 
 ### Create Model and Evaluate
 
-In this section, we define the system prompt and extract the contents of the images into lists of "questions" and "answers" using an LLM. These are tracked as MLflow experiment runs.
+In this section, we define the system prompt and extract the contents of the images into lists of "questions" and "answers" using an LLM. These are then tracked as MLflow experiment runs.
 
 ```python
+mlflow.set_tracking_uri(os.getcwd() + "/mlruns")
+mlflow.set_experiment("evaluation")
+
 system_prompt = """You are an expert at Optical Character Recognition (OCR). Extract the questions and answers from the image."""
 
 def get_completion(inputs: str) -> str:
@@ -287,11 +347,10 @@ with mlflow.start_run() as run:
 
 ```
 
-[WIP] Add a screenshot for the logged runs of the LLM completion
 
 #### 1. Defining a Custom Gen AI Metric for Evaluation
 
-You can create a custom LLM-as-a-judge metric within MLflow using [`mlflow.metrics.genai.make_genai_metric()`](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.metrics.html#mlflow.metrics.genai.make_genai_metric/). For simplicity, we define a custom metric called `correct_format`, which returns a boolean value depending on whether the output contains a list of dicts with the required keys "question" and "answer". The `definition` parameter explains the metric, and `grading_prompt` sets the grading criteria for the LLM.
+We can create a custom LLM-as-a-judge metric within MLflow using [`mlflow.metrics.genai.make_genai_metric()`](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.metrics.html#mlflow.metrics.genai.make_genai_metric/). For simplicity, we define a custom metric called `correct_format`, which returns a boolean value depending on whether the output contains a list of dicts with the required keys "question" and "answer". The `definition` parameter explains the metric, and `grading_prompt` sets the grading criteria for the LLM.
 
 ```python
 correct_format = mlflow.metrics.genai.make_genai_metric(
@@ -324,11 +383,13 @@ eval_result = mlflow.evaluate(
 )
 ```
 
-[WIP] - Add a screenshot of the MLflow UI + explanation
+The following screenshot shows the `correct_format` metric computed for a single run. \
+![MLflow UI showing the metric correct_format computed for a single run](/img/blog/prompt-evaluate/eval_metrics.png)
+
 
 ### Applying Prompt Registry and Evaluate to the OCR Use Case
 
-Suppose you are developing an OCR application with different roles contributing to the project. Here's how a prompt engineer and a ML engineer benefit from these MLflow capabilities.
+When developing an OCR application, various roles collaborate to ensure the project's success. The key contributors are prompt engineers and machine learning engineers, who can significantly benefit from the capabilities offered by MLflow.
 
 #### Prompt Engineer: Improve the Prompt
 
