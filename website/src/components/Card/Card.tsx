@@ -2,6 +2,7 @@ import Link from "@docusaurus/Link";
 import { Body, Button, Heading } from "..";
 import { ComponentProps, ReactNode } from "react";
 import { cva, VariantProps } from "class-variance-authority";
+import RightIcon from "@site/static/img/chevron-right-small.svg";
 
 type Props = {
   title: string;
@@ -28,7 +29,7 @@ const contentWrapper = cva("flex flex-col gap-4", {
 const imageWrapper = cva("w-full relative", {
   variants: {
     rounded: {
-      true: "rounded-lg overflow-hidden",
+      true: "rounded-[16px] overflow-hidden",
       false: "",
     },
   },
@@ -44,6 +45,7 @@ export function Card({
   rounded = true,
 }: Props) {
   const bodyParts = Array.isArray(body) ? body : [body];
+
   return (
     <>
       <div className={contentWrapper({ padded })}>
@@ -60,8 +62,9 @@ export function Card({
             <Button
               variant={cta.prominent ? "primary" : "outline"}
               size={cta.prominent ? "medium" : "small"}
+              className="gap-2"
             >
-              {cta.text}
+              {cta.text} <RightIcon className="w-6 h-6" />
             </Button>
           </Link>
         )}

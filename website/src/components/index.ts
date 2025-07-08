@@ -1,11 +1,9 @@
 export { Button } from "./Button/Button";
-export { CopyCommand } from "./CopyCommand/CopyCommand";
 export { Footer } from "./Footer/Footer";
 export { Grid, GridItem } from "./Grid/Grid";
 export { LogosCarousel } from "./LogosCarousel/LogosCarousel";
 export { SectionLabel } from "./Section/SectionLabel";
 export { Section } from "./Section/Section";
-export * from "./VerticalTabs/VerticalTabs";
 export { SocialWidget } from "./SocialWidget/SocialWidget";
 export { LatestNews } from "./LatestNews/LatestNews";
 export { GetStartedWithMLflow } from "./GetStartedWithMLflow/GetStartedWithMLflow";
@@ -22,3 +20,6 @@ export { Body } from "./Typography/Body";
 export { Label } from "./Typography/Label";
 export { Card } from "./Card/Card";
 export { HeroImage } from "./HeroImage";
+export { ValuePropWidget } from "./ValuePropWidget/ValuePropWidget";
+export { EcosystemList } from "./EcosystemList/EcosystemList";
+export { StickyGrid } from "./StickyGrid";

@@ -14,7 +14,11 @@ export default function ReleaseLayout(props) {
             <div className="contents text-white **:[nav_ul]:!mb-6">
               <BlogSidebar sidebar={sidebar} />
             </div>
-            <main itemScope itemType="https://schema.org/Blog">
+            <main
+              itemScope
+              itemType="https://schema.org/Blog"
+              className="hyphens-auto break-word"
+            >
               {children}
             </main>
             {toc && <div className="col col--2">{toc}</div>}

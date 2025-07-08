@@ -44,7 +44,7 @@ Great! We've setup our authentication configuration and are ready to start build
 
 ## Create Our Agent Framework with AutoGen and MLflow
 
-In this tutorial we will be creating an image generation agent framework. There is a lot of code copied and modified from the [autogen tutorial](https://github.com/microsoft/autogen/blob/main/notebook/agentchat_dalle_and_gpt4v.ipynb), but the core agent functionality remains the same.
+In this tutorial we will be creating an image generation agent framework. There is a lot of code copied and modified from the [autogen tutorial](https://github.com/microsoft/autogen/blob/v0.2.40/notebook/agentchat_dalle_and_gpt4v.ipynb), but the core agent functionality remains the same.
 
 ### Agent Code
 

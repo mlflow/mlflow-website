@@ -1,65 +1,73 @@
 import Link from "@docusaurus/Link";
+import useBaseUrl from "@docusaurus/useBaseUrl";
 
-import { Layout, Grid, GridItem, Heading } from "../components";
+import { Layout, Grid, GridItem, Heading, Button } from "../components";
 
 import ambassadors from "./ambassadors.json";
 
 export default function Ambassadors() {
   return (
     <Layout>
-      <div className="flex flex-col gap-8 max-w-4xl mx-auto mt-40">
-        <p>The call was made, and the community answered in droves.</p>
-
-        <p>
-          We're thrilled to present our MLflow Ambassadors, a select group
-          distinguished by their commitment to mentoring, teaching, and most
-          importantly, building AI solutions.
-        </p>
-        <p>
-          These ambassadors will be visible at various industry meetups and
-          speaking engagements, as well as through their insightful
-          contributions right here in our [MLflow Blog](blog). They'll be
-          sharing their invaluable expertise, experiences, and tips on
-          leveraging MLflow for practical MLOps applications, as well as
-          in-depth tutorials on how to leverage some of the more advanced
-          features of MLflow. Representing a wide array of backgrounds and
-          industries, each ambassador brings a unique perspective fueled by a
-          shared enthusiasm for innovation and education in the field.
-        </p>
-
-        <p>
-          Over the next few months, you'll be seeing a lot more from them both
-          on our platform, at local meetups, and as speakers on behalf of the
-          MLflow project.
-        </p>
+      <div className="max-w-4xl mx-auto">
+        <Heading level={1}>MLflow Ambassador program</Heading>
+        <div className="flex flex-col gap-2 text-xl pt-16">
+          <p>The call was made, and the community answered in droves.</p>
+          <p>
+            We're thrilled to present our MLflow Ambassadors, a select group
+            distinguished by their commitment to mentoring, teaching, and most
+            importantly, building AI solutions.
+          </p>
+          <p>
+            These ambassadors will be visible at various industry meetups and
+            speaking engagements, as well as through their insightful
+            contributions right here in our [MLflow Blog](blog). They'll be
+            sharing their invaluable expertise, experiences, and tips on
+            leveraging MLflow for practical MLOps applications, as well as
+            in-depth tutorials on how to leverage some of the more advanced
+            features of MLflow. Representing a wide array of backgrounds and
+            industries, each ambassador brings a unique perspective fueled by a
+            shared enthusiasm for innovation and education in the field.
+          </p>
+          <p>
+            Over the next few months, you'll be seeing a lot more from them both
+            on our platform, at local meetups, and as speakers on behalf of the
+            MLflow project.
+          </p>
+        </div>
       </div>
-      <div className="flex flex-col gap-8 max-w-4xl mx-auto mt-20">
-        <Heading level={1}>Meet the MLflow Ambassadors</Heading>
-        <Grid columns={2}>
+
+      <div className="flex flex-col max-w-4xl mx-auto">
+        <Heading level={2}>MLflow Ambassadors</Heading>
+        <div className="grid grid-cols-1 sm:grid-cols-2 pt-10 lg:grid-cols-3 gap-10">
           {ambassadors.flatMap((row) =>
             row.map((item) => (
-              <GridItem key={item.title}>
-                <div className="flex flex-col gap-3">
-                  <img src={item.img} alt={item.title} className="rounded-md" />
-                  <h3>{item.title}</h3>
-                  <p>{item.role}</p>
-                  <Link
-                    href={item.companyLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {item.company}
-                  </Link>
+              <div
+                key={item.title}
+                className="bg-white/5 rounded-[16px] p-4 text-center flex flex-col items-center"
+              >
+                <img
+                  src={useBaseUrl(item.img)}
+                  alt={item.title}
+                  className="rounded-[16px] p-2 w-60 h-60 object-cover"
+                />
+                <div>
+                  <h3 className="text-xl font-semibold mt-2 pt-6">
+                    {item.title}
+                  </h3>
+                  <div className="text-base text-white/50 mt-1">
+                    {item.role}, {item.company}
+                  </div>
                 </div>
-              </GridItem>
+              </div>
             )),
           )}
-        </Grid>
+        </div>
       </div>
-      <div className="flex flex-col gap-10 max-w-4xl mx-auto mt-20">
-        <div className="flex flex-col gap-4">
-          <h3>The MLflow Ambassador Program</h3>
-          <span>
+      <div className="flex flex-col gap-10 max-w-4xl mx-auto mt-10 text-xl">
+        <div className="flex flex-col gap-2">
+          <Heading level={1}>About the program</Heading>
+
+          <span className="pt-10">
             The MLflow Ambassador Program exists to empower community members
             with the tools and resources needed to:
           </span>
@@ -72,7 +80,7 @@ export default function Ambassadors() {
             <li>Engage in MLflow community growth</li>
           </ul>
         </div>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
           <h3>Requirements</h3>
           <ul className="list-disc list-inside">
             <li>
@@ -91,7 +99,7 @@ export default function Ambassadors() {
             </ul>
           </ul>
         </div>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
           <h3>Responsibilities</h3>
           <ul className="list-disc list-inside">
             <li>
@@ -124,10 +132,6 @@ export default function Ambassadors() {
 
         <div>
           <p>
-            Are you interested in becoming an official MLflow Ambassador?
-            <Link href="https://forms.gle/foW9ZtietYLLYCp99">Apply here!</Link>
-          </p>
-          <p>
             The MLflow Ambassador Selection Committee reviews applications on a
             rolling basis. We are focused on creating a group of Ambassadors
             that meet all our requirements and represent our community and
@@ -141,6 +145,14 @@ export default function Ambassadors() {
             events, training sessions, workshops, and various related
             activities.
           </p>
+          <p>Are you interested in becoming an official MLflow Ambassador?</p>
+          <div className="pt-4 flex justify-center">
+            <Link href="https://forms.gle/foW9ZtietYLLYCp99">
+              <Button variant="primary" size="small">
+                Apply
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
     </Layout>

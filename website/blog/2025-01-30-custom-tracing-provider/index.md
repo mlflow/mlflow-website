@@ -22,7 +22,7 @@ We'll use [the Ollama Python SDK](https://github.com/ollama/ollama-python), an o
 
 The MLflow docs have an [excellent guide](https://mlflow.org/docs/latest/llms/tracing/contribute.html) to contributing to MLflow tracing. Though we will not be contributing to MLflow itself in this example, we will follow the same general principles.
 
-This post assumes that you have a basic understanding of what MLflow Tracing is and how it works. If you are just learning, or you need a refresher, take a look at the [Tracing Concepts](https://mlflow.org/docs/latest/llms/tracing/overview.html) guide.
+This post assumes that you have a basic understanding of what MLflow Tracing is and how it works. If you are just learning, or you need a refresher, take a look at the [Tracing Concepts](https://mlflow.org/docs/latest/genai/tracing/concepts/trace-instrumentation) guide.
 
 Adding tracing to a new provider involves a few key considerations:
 

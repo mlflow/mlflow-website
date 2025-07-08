@@ -19,10 +19,10 @@ export default function BlogPostItems({
 
     return (
       <div className="flex flex-col mb-10 max-w-7xl mx-auto gap-20">
-        <div className="flex flex-col-reverse md:flex-row gap-10">
+        <div className="flex flex-col-reverse items-center md:flex-row gap-10">
           <Link
             href={firstBlogPost.content.metadata.permalink}
-            className="flex flex-col justify-center items-start gap-4 w-1/2"
+            className="flex flex-col justify-center items-start gap-4 md:w-1/2"
           >
             <SectionLabel label="Featured" />
             <Heading level={2}>{firstBlogPost.content.metadata.title}</Heading>
@@ -30,13 +30,15 @@ export default function BlogPostItems({
           </Link>
           <Link
             href={firstBlogPost.content.metadata.permalink}
-            className="w-1/2"
+            className="md:w-1/2"
           >
-            <img
-              src={useBaseUrl(firstBlogPost.content.frontMatter.thumbnail)}
-              alt={firstBlogPost.content.frontMatter.title}
-              className="w-full h-full object-cover rounded-md"
-            />
+            <div className="w-full aspect-video rounded-2xl overflow-hidden">
+              <img
+                src={useBaseUrl(firstBlogPost.content.frontMatter.thumbnail)}
+                alt={firstBlogPost.content.frontMatter.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
           </Link>
         </div>
 
@@ -47,11 +49,15 @@ export default function BlogPostItems({
                 href={blogPost.content.metadata.permalink}
                 className="flex flex-col w-full h-full gap-4"
               >
-                <img
-                  src={useBaseUrl(blogPost.content.frontMatter.thumbnail)}
-                  alt={blogPost.content.frontMatter.title}
-                  className="object-contain rounded-md max-h-[210px] grow"
-                />
+                <div className="w-full aspect-[7/4] rounded-2xl overflow-hidden">
+                  <img
+                    src={useBaseUrl(
+                      blogPost.content.metadata.frontMatter.thumbnail,
+                    )}
+                    alt={blogPost.content.metadata.title}
+                    className="w-full h-full object-cover object-top"
+                  />
+                </div>
                 <div role="time" dateTime={blogPost.content.metadata.date}>
                   {new Date(blogPost.content.metadata.date).toLocaleDateString(
                     "en-US",

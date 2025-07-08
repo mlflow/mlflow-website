@@ -1,4 +1,4 @@
-import { MLFLOW_GET_STARTED_URL } from "@site/src/constants";
+import { MLFLOW_DOCS_URL } from "@site/src/constants";
 import { GetStartedButton } from "../GetStartedButton/GetStartedButton";
 
 export const GetStartedTagline = () => {
@@ -7,7 +7,7 @@ export const GetStartedTagline = () => {
       <span className="text-lg text-gray-600 text-center">
         Join the industry leading companies building with MLflow
       </span>
-      <GetStartedButton variant="primary" link={MLFLOW_GET_STARTED_URL} />
+      <GetStartedButton variant="primary" link="#get-started" />
     </div>
   );
 };

@@ -1,11 +1,10 @@
+import { MLFLOW_DOCS_URL } from "@site/src/constants";
 import {
   Layout,
-  Grid,
-  GridItem,
   AboveTheFold,
   BelowTheFold,
-  Card,
   HeroImage,
+  StickyGrid,
 } from "../../components";
 import CardHero from "@site/static/img/GenAI_governance/GenAI_governance_hero.png";
 import Card1 from "@site/static/img/GenAI_governance/GenAI_governance_1.png";
@@ -21,54 +20,46 @@ export default function Governance() {
         sectionLabel="Governance"
         title="Enterprise governance with Unity Catalog"
         body="MLflow is integrated with Unity Catalog to track the lifecycle and lineage of your app’s assets - models, prompts, datasets, and metrics - and apply access controls."
-        hasGetStartedButton
+        hasGetStartedButton={MLFLOW_DOCS_URL}
       >
         <HeroImage src={CardHero} alt="" />
       </AboveTheFold>
 
-      <Grid columns={2}>
-        <GridItem width="wide">
-          <Card
-            title="Unified Data and AI governance"
-            body="Unity Catalog provides central, unified governance over all your data and AI assets - including GenAI and classic/deep learning ML. Enforce access controls and automatically track lineage."
-            image={<img src={Card1} alt="" />}
-          />
-        </GridItem>
-        <GridItem width="wide">
-          <Card
-            title="Prompt Registry"
-            body="Track every prompt template, its version history, and deployment lifecycle in the Unity Catalog. Each prompt is linked to its associated apps and evaluation results. Integrate prompts into your app’s code base via our SDK to allow non-technical users to edit prompts without access to your code base."
-            image={<img src={Card2} alt="" />}
-          />
-        </GridItem>
-        <GridItem width="wide">
-          <Card
-            title="App Version Registry"
-            body={[
+      <StickyGrid
+        cards={[
+          {
+            title: "Unified Data and AI governance",
+            body: "Unity Catalog provides central, unified governance over all your data and AI assets - including GenAI and classic/deep learning ML. Enforce access controls and automatically track lineage.",
+            image: <img src={Card1} alt="" />,
+          },
+          {
+            title: "Prompt Registry",
+            body: "Track every prompt template, its version history, and deployment lifecycle in the Unity Catalog. Each prompt is linked to its associated apps and evaluation results. Integrate prompts into your app’s code base via our SDK to allow non-technical users to edit prompts without access to your code base.",
+            image: <img src={Card2} alt="" />,
+          },
+          {
+            title: "App Version Registry",
+            body: [
               "Track every application version and its associated prompts and evaluation results in the Unity Catalog.",
               "You can store the app’s code as a deployable asset or link to Git commits to integrate with your existing software development lifecycle.",
-            ]}
-            image={<img src={Card3} alt="" />}
-          />
-        </GridItem>
-        <GridItem width="wide">
-          <Card
-            title="Collaboration & Sharing"
-            body={[
+            ],
+            image: <img src={Card3} alt="" />,
+          },
+          {
+            title: "Collaboration & Sharing",
+            body: [
               "Enable cross-organization discovery and sharing of prompts and apps",
               "You can store the app’s code as a deployable asset or link to Git commits to integrate with your existing software development lifecycle.",
-            ]}
-            image={<img src={Card4} alt="" />}
-          />
-        </GridItem>
-        <GridItem width="wide">
-          <Card
-            title="Evaluation Dataset & Metric Registry"
-            body="Track and manage evaluation datasets and custom metrics as UC assets."
-            image={<img src={Card5} alt="" />}
-          />
-        </GridItem>
-      </Grid>
+            ],
+            image: <img src={Card4} alt="" />,
+          },
+          {
+            title: "Evaluation Dataset & Metric Registry",
+            body: "Track and manage evaluation datasets and custom metrics as UC assets.",
+            image: <img src={Card5} alt="" />,
+          },
+        ]}
+      />
 
       <BelowTheFold />
     </Layout>

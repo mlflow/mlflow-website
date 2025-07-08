@@ -1,13 +1,27 @@
 import { PropsWithChildren } from "react";
 import { Heading, Body, SectionLabel, GetStartedButton } from "../index";
+import { cva, VariantProps } from "class-variance-authority";
 
-type Props = PropsWithChildren<{
-  title: string;
-  body: string | string[];
-  sectionLabel?: string;
-  hasGetStartedButton?: true | string;
-  bodyColor?: "default" | "white";
-}>;
+type Props = VariantProps<typeof innerWrapper> &
+  PropsWithChildren<{
+    title: string;
+    body: string | string[];
+    sectionLabel?: string;
+    hasGetStartedButton?: true | string;
+    bodyColor?: "default" | "white";
+  }>;
+
+const innerWrapper = cva(
+  "flex flex-col justify-center items-center flex-1 gap-6 w-full max-w-5xl mx-auto md:px-4",
+  {
+    variants: {
+      minHeight: {
+        small: "min-h-[350px]",
+        default: "min-h-[550px]",
+      },
+    },
+  },
+);
 
 export function AboveTheFold({
   children,
@@ -16,11 +30,12 @@ export function AboveTheFold({
   sectionLabel,
   hasGetStartedButton,
   bodyColor,
+  minHeight = "default",
 }: Props) {
   const bodyParts = Array.isArray(body) ? body : [body];
   return (
-    <div className="flex flex-col gap-16">
-      <div className="flex flex-col justify-center items-center gap-6 w-full max-w-5xl mx-auto">
+    <div className="flex flex-col gap-6">
+      <div className={innerWrapper({ minHeight })}>
         {sectionLabel && <SectionLabel label={sectionLabel} />}
         <div className="max-w-4xl mx-auto">
           <Heading level={1}>{title}</Heading>

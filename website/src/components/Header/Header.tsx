@@ -1,38 +1,47 @@
-import { useState, useLayoutEffect } from "react";
+import { useState, useLayoutEffect, useEffect } from "react";
 import Link from "@docusaurus/Link";
+import { useLocation } from "@docusaurus/router";
+import useBaseUrl from "@docusaurus/useBaseUrl";
 import Logo from "@site/static/img/mlflow-logo-white.svg";
 import DownIcon from "@site/static/img/chevron-down-small.svg";
 
-import { cn } from "../../utils";
+import { cn, getStartedLinkForPage } from "../../utils";
 
 import { Button } from "../Button/Button";
 import { HeaderMenuItem } from "../HeaderMenuItem/HeaderMenuItem";
 import { HeaderProductsSubmenu } from "../HeaderProductsSubmenu/HeaderProductsSubmenu";
 
 import "./Header.module.css";
-import {
-  MLFLOW_DOCS_URL,
-  MLFLOW_GET_STARTED_URL,
-  MLFLOW_LOGIN_URL,
-  MLFLOW_SIGNUP_URL,
-} from "@site/src/constants";
+import { MLFLOW_DOCS_URL } from "@site/src/constants";
+import { cva } from "class-variance-authority";
 
 const MD_BREAKPOINT = 640;
 
-type Props = {
-  layoutType:
-    | "default"
-    | "genai"
-    | "genai-subpage"
-    | "classical-ml"
-    | "classical-ml-subpage"
-    | "home";
-};
+const navStyles = cva(
+  "fixed w-full z-20 top-0 start-0 bg-black/20 border-b border-[#F7F8F8]/8 backdrop-blur-[20px] overflow-y-auto",
+  {
+    variants: {
+      isOpen: {
+        true: "h-dvh",
+        false: "",
+      },
+    },
+  },
+);
 
-export const Header = ({ layoutType }: Props) => {
+export const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isProductItemHovered, setIsProductItemHovered] = useState(false);
   const [isProductSubmenuOpen, setIsProductSubmenuOpen] = useState(false);
+  const location = useLocation();
+  const classicalMLPath = useBaseUrl("/classical-ml");
+  const genAIPath = useBaseUrl("/genai");
+
+  const getStartedHref = getStartedLinkForPage(
+    location.pathname,
+    classicalMLPath,
+    genAIPath,
+  );
 
   const handleProductItemHover = () => {
     setIsProductItemHovered(true);
@@ -60,59 +69,54 @@ export const Header = ({ layoutType }: Props) => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add("noScroll");
+    } else {
+      document.body.classList.remove("noScroll");
+    }
+  }, [isOpen]);
+
   return (
-    <nav className="fixed w-full z-20 top-0 start-0 bg-[#F7F8F8]/1 border-b border-[#F7F8F8]/8 backdrop-blur-[20px] drop-shadow-[0px_1px_2px_rgba(0_0_0/75%),0px_1px_12px_rgba(0_0_0/75%)]">
+    <nav className={navStyles({ isOpen })}>
       <div className="flex flex-wrap items-center mx-auto px-6 lg:px-20 py-2 max-w-container">
-        <Link
-          href="/"
-          className="flex items-center space-x-3 rtl:space-x-reverse grow basis-0"
-        >
-          <Logo className="h-[36px]" />
-        </Link>
-        <div className="flex flex-row items-center gap-6 md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse grow justify-end basis-0">
-          {layoutType.startsWith("genai") ? (
-            <>
-              <HeaderMenuItem
-                href={MLFLOW_LOGIN_URL}
-                label="Login"
-                className="hidden md:block"
-              />
-              <Link href={MLFLOW_SIGNUP_URL} className="hidden md:block">
-                <Button variant="primary" size="small">
-                  Sign up
-                </Button>
-              </Link>
-            </>
-          ) : layoutType.startsWith("classical-ml") ? (
-            <Link href={MLFLOW_GET_STARTED_URL} className="hidden md:block">
+        <div className="md:contents flex flex-row justify-between w-full sticky top-[8px]">
+          <Link
+            href="/"
+            className="flex items-center space-x-3 rtl:space-x-reverse grow basis-0"
+          >
+            <Logo className="h-[36px]" />
+          </Link>
+          <div className="flex flex-row items-center gap-6 md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse grow justify-end basis-0">
+            <Link href={getStartedHref} className="hidden md:block">
               <Button variant="primary" size="small">
                 Get started
               </Button>
             </Link>
-          ) : null}
-          <button
-            data-collapse-toggle="navbar-sticky"
-            type="button"
-            className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-white md:hidden focus:outline-none cursor-pointer"
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            <span className="sr-only">Open main menu</span>
-            <svg
-              className="w-5 h-5"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 17 14"
+            <button
+              data-collapse-toggle="navbar-sticky"
+              type="button"
+              className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-white md:hidden focus:outline-none cursor-pointer"
+              onClick={() => setIsOpen(!isOpen)}
             >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M1 1h15M1 7h15M1 13h15"
-              />
-            </svg>
-          </button>
+              <span className="sr-only">Open main menu</span>
+              <svg
+                className="w-5 h-5"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 17 14"
+              >
+                <path
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M1 1h15M1 7h15M1 13h15"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
         <div
           className={cn(
@@ -120,25 +124,23 @@ export const Header = ({ layoutType }: Props) => {
             isOpen ? "flex" : "hidden md:flex",
           )}
         >
-          <ul className="flex flex-col font-medium md:flex-row gap-6 md:gap-10 w-full md:w-auto">
+          <ul className="flex flex-col font-medium md:flex-row gap-y-6 gap-x-4 lg:gap-x-10 w-full md:w-auto">
             <li
               className="w-full md:w-auto md:hidden"
               onClick={handleProductItemClick}
             >
               <span
                 className={
-                  "flex items-center gap-2 py-2 text-white text-[15px] w-full md:w-auto cursor-pointer"
+                  "items-center gap-2 py-2 text-white text-[15px] w-full md:w-auto cursor-pointer hidden md:flex"
                 }
               >
-                Products
+                Components
                 <DownIcon className="w-6 h-6" />
               </span>
               <div
                 className={cn(
                   "transition-all duration-300 ease-in",
-                  isProductSubmenuOpen
-                    ? "h-auto min-h-50"
-                    : "h-0 overflow-hidden",
+                  "h-auto min-h-50",
                 )}
               >
                 <HeaderProductsSubmenu />
@@ -149,7 +151,7 @@ export const Header = ({ layoutType }: Props) => {
               onMouseEnter={handleProductItemHover}
               onClick={toggleProductSubmenuHovered}
             >
-              <HeaderMenuItem label="Product" hasDropdown />
+              <HeaderMenuItem label="Components" hasDropdown />
             </li>
             <li className="w-full md:w-auto">
               <HeaderMenuItem href="/releases" label="Releases" />
@@ -160,28 +162,16 @@ export const Header = ({ layoutType }: Props) => {
             <li className="w-full md:w-auto">
               <HeaderMenuItem href={MLFLOW_DOCS_URL} label="Docs" />
             </li>
-            {layoutType.startsWith("genai") ? (
-              <>
-                <li className="w-full md:w-auto md:hidden">
-                  <HeaderMenuItem href={MLFLOW_LOGIN_URL} label="Login" />
-                </li>
-                <li className="w-full md:w-auto md:hidden">
-                  <Link href={MLFLOW_SIGNUP_URL}>
-                    <Button variant="primary" size="small" width="full">
-                      Sign up
-                    </Button>
-                  </Link>
-                </li>
-              </>
-            ) : layoutType.startsWith("classical-ml") ? (
-              <li className="w-full md:w-auto md:hidden">
-                <Link href={MLFLOW_GET_STARTED_URL}>
-                  <Button variant="primary" size="small" width="full">
-                    Get started
-                  </Button>
-                </Link>
-              </li>
-            ) : null}
+            <li className="w-full md:w-auto">
+              <HeaderMenuItem href="/ambassadors" label="Ambassador Program" />
+            </li>
+            <li className="w-full md:w-auto md:hidden">
+              <Link href={getStartedHref}>
+                <Button variant="primary" size="small" width="full">
+                  Get started
+                </Button>
+              </Link>
+            </li>
           </ul>
         </div>
       </div>
