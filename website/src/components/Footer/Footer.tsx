@@ -9,7 +9,7 @@ const footerVariants = cva("relative pb-30 flex flex-col pt-30");
 
 type Variant = "blue" | "red" | "colorful";
 
-function getColors(variant: Variant) {
+export function getColors(variant: Variant) {
   switch (variant) {
     case "blue":
       return {
@@ -21,7 +21,7 @@ function getColors(variant: Variant) {
       return {
         center: "var(--color-brand-red)",
         left: "black 10%",
-        right: "plum 40%",
+        right: "oklch(0.91 0.09 326.28) 40%",
       };
     case "colorful":
       return {
