@@ -31,6 +31,7 @@ export function getGradientStyles(
   variant: Variant,
   direction: Direction = "up",
   radial = true,
+  height?: number,
 ): CSSProperties {
   const colors = getColors(variant);
   return {
@@ -38,6 +39,7 @@ export function getGradientStyles(
     inset: 0,
     pointerEvents: "none",
     maskComposite: "intersect",
+    height,
     backgroundImage: `
       repeating-linear-gradient(
         to right,
@@ -65,7 +67,7 @@ type Props = PropsWithChildren<{
   variant: Variant;
   direction?: Direction;
   radial: boolean;
-  gradientClassName?: string;
+  height?: number;
   className?: string;
 }>;
 
@@ -75,15 +77,12 @@ export function GradientWrapper({
   direction = "up",
   radial,
   children,
-  gradientClassName,
+  height,
   className,
 }: Props) {
   return (
     <Element className={cx("relative", className)}>
-      <div
-        className={gradientClassName}
-        style={getGradientStyles(variant, direction, radial)}
-      />
+      <div style={getGradientStyles(variant, direction, radial, height)} />
       <div className="z-1">{children}</div>
     </Element>
   );

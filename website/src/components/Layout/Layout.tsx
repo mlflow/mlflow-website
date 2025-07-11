@@ -65,7 +65,7 @@ export const Layout = ({ children }: Props) => {
         <main className="flex flex-col">
           <GradientWrapper
             className={wrapper()}
-            gradientClassName="h-[820px]"
+            height={820}
             variant={variant}
             direction={direction}
             radial={false}
