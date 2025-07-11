@@ -53,9 +53,7 @@ export const Layout = ({ children }: Props) => {
     ? "red"
     : layoutType.startsWith("classical-ml")
       ? "blue"
-      : layoutType === "home"
-        ? "colorful"
-        : null;
+      : "colorful";
   const direction = layoutType.endsWith("subpage") ? "up" : "down";
 
   return (
@@ -75,7 +73,7 @@ export const Layout = ({ children }: Props) => {
             </div>
           </GradientWrapper>
         </main>
-        <Footer variant={variant === null ? "colorful" : variant} />
+        <Footer variant={variant} />
       </div>
     </LayoutContext.Provider>
   );
