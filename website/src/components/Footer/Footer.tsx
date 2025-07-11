@@ -4,62 +4,21 @@ import Logo from "@site/static/img/mlflow-logo-white.svg";
 
 import { FooterMenuItem } from "../FooterMenuItem/FooterMenuItem";
 import { MLFLOW_DOCS_URL } from "@site/src/constants";
+import {
+  GradientWrapper,
+  type Variant,
+} from "../GradientWrapper/GradientWrapper";
 
-const footerVariants = cva("relative pb-30 flex flex-col pt-30");
-
-type Variant = "blue" | "red" | "colorful";
-
-export function getColors(variant: Variant) {
-  switch (variant) {
-    case "blue":
-      return {
-        center: "oklch(0.66 0.11 221.53)",
-        left: "navy 40%",
-        right: "teal 40%",
-      };
-    case "red":
-      return {
-        center: "var(--color-brand-red)",
-        left: "black 10%",
-        right: "oklch(0.91 0.09 326.28) 40%",
-      };
-    case "colorful":
-      return {
-        center: "var(--color-brand-red)",
-        left: "oklch(0.33 0.15 328.37) 80%",
-        right: "oklch(0.66 0.17 248.82) 100%",
-      };
-  }
-}
+const footerVariants = cva("pb-30 flex flex-col pt-30");
 
 export const Footer = ({ variant }: { variant: Variant }) => {
-  const colors = getColors(variant);
   return (
-    <footer className={footerVariants()}>
-      <div
-        className="absolute inset-0 pointer-events-none mask-intersect"
-        style={{
-          backgroundImage: `
-            repeating-linear-gradient(
-              to right,
-              rgba(0, 0, 0, 0.05),
-              rgba(0, 0, 0, 0.25) 18px,
-              transparent 2px,
-              transparent 10px
-            ),
-            radial-gradient(
-              circle at center,
-              ${colors.center} 0%,
-              transparent 60%
-            ),
-            linear-gradient(to right, color-mix(in srgb, ${colors.center}, ${colors.left}), color-mix(in srgb, ${colors.center}, ${colors.right}))
-          `,
-          maskImage: `
-            radial-gradient(ellipse at center bottom, black 60%, transparent 80%),
-            linear-gradient(to top, black 10%, transparent 40%)
-          `,
-        }}
-      />
+    <GradientWrapper
+      variant={variant}
+      radial
+      className={footerVariants()}
+      element="footer"
+    >
       <div className="flex flex-row justify-between items-start px-6 lg:px-20 gap-10 xs:gap-0 max-w-container">
         <div className="flex flex-col gap-8">
           <Logo className="h-[36px] shrink-0" />
@@ -78,6 +37,6 @@ export const Footer = ({ variant }: { variant: Variant }) => {
           </FooterMenuItem>
         </div>
       </div>
-    </footer>
+    </GradientWrapper>
   );
 };
