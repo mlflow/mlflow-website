@@ -23,3 +23,4 @@ export { HeroImage } from "./HeroImage";
 export { ValuePropWidget } from "./ValuePropWidget/ValuePropWidget";
 export { EcosystemList } from "./EcosystemList/EcosystemList";
 export { StickyGrid } from "./StickyGrid";
+export { GradientWrapper } from "./GradientWrapper/GradientWrapper";
