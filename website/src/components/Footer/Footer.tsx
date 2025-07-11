@@ -15,9 +15,10 @@ export const Footer = ({ variant }: { variant: Variant }) => {
   return (
     <GradientWrapper
       variant={variant}
-      radial
+      isFooter
       className={footerVariants()}
       element="footer"
+      height={360}
     >
       <div className="flex flex-row justify-between items-start px-6 lg:px-20 gap-10 xs:gap-0 max-w-container">
         <div className="flex flex-col gap-8">

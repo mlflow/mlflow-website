@@ -66,7 +66,6 @@ export const Layout = ({ children }: Props) => {
             height={820}
             variant={variant}
             direction={direction}
-            radial={false}
           >
             <div className="flex flex-col gap-24 w-full px-6 md:px-20 max-w-container">
               {children}

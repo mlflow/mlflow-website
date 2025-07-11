@@ -30,13 +30,14 @@ function getColors(variant: Variant) {
 export function getGradientStyles(
   variant: Variant,
   direction: Direction = "up",
-  radial = true,
+  isFooter: boolean,
   height?: number,
 ): CSSProperties {
   const colors = getColors(variant);
   return {
     position: "absolute",
-    inset: 0,
+    width: "100%",
+    [isFooter ? "bottom" : "top"]: 0,
     pointerEvents: "none",
     maskComposite: "intersect",
     height,
@@ -56,7 +57,7 @@ export function getGradientStyles(
       linear-gradient(to right, color-mix(in srgb, ${colors.center}, ${colors.left}), color-mix(in srgb, ${colors.center}, ${colors.right}))
     `,
     maskImage: `
-      ${radial ? "radial-gradient(ellipse at center bottom, black 60%, transparent 80%)," : ""}
+      ${isFooter ? "radial-gradient(ellipse at center bottom, black 60%, transparent 80%)," : ""}
       linear-gradient(to ${direction === "down" ? "bottom" : "top"}, black ${direction === "down" ? "40%" : "10%"}, transparent ${direction === "down" ? "90%" : "40%"})
     `,
   };
@@ -66,7 +67,7 @@ type Props = PropsWithChildren<{
   element?: keyof HTMLElementTagNameMap;
   variant: Variant;
   direction?: Direction;
-  radial: boolean;
+  isFooter?: boolean;
   height?: number;
   className?: string;
 }>;
@@ -75,14 +76,14 @@ export function GradientWrapper({
   element: Element = "div",
   variant,
   direction = "up",
-  radial,
+  isFooter = false,
   children,
   height,
   className,
 }: Props) {
   return (
     <Element className={cx("relative", className)}>
-      <div style={getGradientStyles(variant, direction, radial, height)} />
+      <div style={getGradientStyles(variant, direction, isFooter, height)} />
       <div className="z-1">{children}</div>
     </Element>
   );
