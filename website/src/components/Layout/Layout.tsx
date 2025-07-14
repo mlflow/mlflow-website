@@ -4,70 +4,11 @@ import { cva } from "class-variance-authority";
 import { createContext, PropsWithChildren, useContext } from "react";
 import { useLocation } from "@docusaurus/router";
 import useBaseUrl from "@docusaurus/useBaseUrl";
+import { GradientWrapper } from "../GradientWrapper/GradientWrapper";
 
 type Props = PropsWithChildren;
 
-const wrapper = cva("flex flex-col gap-20 bg-no-repeat w-full py-32", {
-  variants: {
-    variant: {
-      red: "",
-      blue: "",
-      colorful: "",
-    },
-    direction: {
-      down: "bg-size-[auto_1000px] 2xl:bg-size-[100%_1000px] bg-[center_top]",
-      up: "bg-size-[auto_820px] 2xl:bg-size-[100%_820px] bg-[center_top]",
-    },
-  },
-  compoundVariants: [
-    {
-      variant: "red",
-      direction: "down",
-      className: [
-        "bg-[linear-gradient(to_bottom,rgba(12,20,20,0)_0%,rgba(12,20,20,0)_50%,rgba(14,20,20,100)_75%),url('/img/background-image-2.png')]",
-      ],
-    },
-    {
-      variant: "blue",
-      direction: "down",
-      className: [
-        "bg-[linear-gradient(to_bottom,rgba(12,20,20,0)_0%,rgba(12,20,20,0)_50%,rgba(14,20,20,100)_75%),url('/img/background-image-3.png')]",
-      ],
-    },
-    {
-      variant: "colorful",
-      direction: "down",
-      className: [
-        "bg-[linear-gradient(to_bottom,rgba(12,20,20,0)_0%,rgba(12,20,20,0)_50%,rgba(14,20,20,100)_75%),url('/img/background-image-1.png')]",
-      ],
-    },
-    {
-      variant: "red",
-      direction: "up",
-      className: [
-        "bg-[linear-gradient(to_top,rgba(12,20,20,0)_0%,rgba(12,20,20,0)_10%,rgba(14,20,20,100)_40%),url('/img/background-image-2-flipped.png')]",
-      ],
-    },
-    {
-      variant: "blue",
-      direction: "up",
-      className: [
-        "bg-[linear-gradient(to_top,rgba(11,20,20,0)_0%,rgba(12,20,20,0)_10%,rgba(14,20,20,100)_40%),url('/img/background-image-3-flipped.png')]",
-      ],
-    },
-    {
-      variant: "colorful",
-      direction: "up",
-      className: [
-        "bg-[linear-gradient(to_top,rgba(11,20,20,0)_0%,rgba(12,20,20,0)_10%,rgba(14,20,20,100)_40%),url('/img/background-image-1-flipped.png')]",
-      ],
-    },
-  ],
-  defaultVariants: {
-    variant: "colorful",
-    direction: "down",
-  },
-});
+const wrapper = cva("flex flex-col gap-20 bg-no-repeat w-full py-32");
 
 export const LayoutContext = createContext<"red" | "blue" | "colorful">(
   "colorful",
@@ -112,9 +53,7 @@ export const Layout = ({ children }: Props) => {
     ? "red"
     : layoutType.startsWith("classical-ml")
       ? "blue"
-      : layoutType === "home"
-        ? "colorful"
-        : null;
+      : "colorful";
   const direction = layoutType.endsWith("subpage") ? "up" : "down";
 
   return (
@@ -122,13 +61,18 @@ export const Layout = ({ children }: Props) => {
       <div className="flex flex-col min-h-screen w-full bg-[#0E1416]">
         <Header />
         <main className="flex flex-col">
-          <div className={wrapper({ variant, direction })}>
+          <GradientWrapper
+            className={wrapper()}
+            height={820}
+            variant={variant}
+            direction={direction}
+          >
             <div className="flex flex-col gap-24 w-full px-6 md:px-20 max-w-container">
               {children}
             </div>
-          </div>
+          </GradientWrapper>
         </main>
-        <Footer variant={variant === null ? "colorful" : variant} />
+        <Footer variant={variant} />
       </div>
     </LayoutContext.Provider>
   );
