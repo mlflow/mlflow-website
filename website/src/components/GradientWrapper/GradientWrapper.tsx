@@ -8,13 +8,13 @@ function getColors(variant: Variant) {
   switch (variant) {
     case "blue":
       return {
-        center: "oklch(0.66 0.11 221.53)",
+        center: "oklch(0.7533 0.11 216.4)",
         left: "navy 40%",
         right: "teal 40%",
       };
     case "red":
       return {
-        center: "var(--color-brand-red)",
+        center: "oklch(0.6 0.22 30.59)",
         left: "black 10%",
         right: "oklch(0.91 0.09 326.28) 40%",
       };
