@@ -347,7 +347,8 @@ new_prompt = mlflow.genai.register_prompt(
     },
 )
 
-system_prompt = new_prompt
+prompt = mlflow.genai.load_prompt(name_or_uri="ocr-question-answer", version=new_prompt.version)
+system_prompt = prompt.template
 ```
 
 ### 6. Defining and Evaluating Performance 
@@ -422,9 +423,9 @@ print(eval_table[['key_value_accuracy/score']])
 
 ![MLflow UI showing the metric key_value_accuracy computed for a single run](/img/blog/prompt-evaluate/new_eval_metrics.png)  
 
-This metric requires an exact match between the key-value pairs in the ground truth and the LLM-generated response. Upon reviewing the individual scores for each image, we observe that the model performs the worst on the last image. Specifically, one of the keys is incorrectly generated as `CHAINS - ACCEPTANCEMERCHANDISING` instead of `CHAINS ACCEPTANCE/ MERCHANDISING`. A similar pattern where different topics are improperly separated or . 
+This metric requires an exact match between the key-value pairs in the ground truth and the LLM-generated output. Upon reviewing the individual scores for each image, we observe that the model performs the worst on the last image. Specifically, one of the keys is incorrectly generated as `CHAINS - ACCEPTANCEMERCHANDISING` instead of `CHAINS ACCEPTANCE/ MERCHANDISING`. A similar pattern can be observed in other keys where different topics are improperly separated or unnecessarily paraphrased. 
 
-To address this, we can refine the prompt template by explicitly instructing the model to separate distinct topics using the `/` separator. Additionally, we can instruct the LLM to avoid paraphrasing the topics in the keys and instead focus on maintaining precision and exactness to the image text.
+To address this, we can refine the prompt template by explicitly instructing the model to separate distinct topics using the `/` separator. Additionally, we can instruct the LLM to avoid paraphrasing the topics in the keys and instead focus on maintaining exactness to the image text.
 
 ```python
 updated_template = """\
@@ -469,12 +470,14 @@ results_updated = mlflow.models.evaluate(
     predictions="predictions",
     extra_metrics=[custom_key_value_accuracy]
 )
+
 print("Custom metric results:", results_updated.metrics)
 eval_table_updated = results_updated.tables["eval_results_table"]
 print("\n Per-row scores:")
 print(eval_table_updated[['key_value_accuracy/score']])
 ```
 
+This updated prompt may lead to a marginal improvement in the metric for each image. However, there are still mismatches in values between the ground truth and the LLM response. As showcased above using Prompt Registry, iteratively refining the prompt can address these issues, leading to better alignment with the expected output.
 
 
 ## Conclusion and Next Steps
