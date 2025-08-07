@@ -6,9 +6,9 @@ authors: [allison-bennett, shyam-sankararaman, michael-berk, mlflow-maintainers]
 thumbnail: /img/blog/prompt-evaluate/prompt-evaluate.png
 ---
 
-Building GenAI tools presents a unique set of challenges. As we evaluate accuracy, iterate on prompts, and enable collaboration, we often encounter bottlenecks that slow down our progress toward production. 
+Building GenAI tools presents a unique set of challenges. As we evaluate accuracy, iterate on prompts, and enable collaboration, we often encounter bottlenecks that slow down our progress toward production.
 
-In this blog, we explore how MLflow's GenAI capabilities help us streamline development and unlock value for both technical and non-technical contributors when building an LLM-based Optical Character Recognition (OCR) tool. 
+In this blog, we explore how MLflow's GenAI capabilities help us streamline development and unlock value for both technical and non-technical contributors when building an LLM-based Optical Character Recognition (OCR) tool.
 
 ## What is OCR?
 
@@ -19,21 +19,21 @@ Here, we leverage multi-modal LLMs to extract formatted text from scanned docume
 Fun fact: The earliest form of OCR, the Optophone, was introduced in 1914 to help blind individuals read printed text without Braille.
 ![Optophone](/img/blog/prompt-evaluate/margaret-hogan-used-the-black-sounding-optophone-to-read-a-book.jpg)
 
-## The Challenge 
+## The Challenge
 
-We face several recurring challenges when building an LLM-based OCR application.  
+We face several recurring challenges when building an LLM-based OCR application.
 
 **Prompt Iteration and Versioning:** Prompts need to be updated and tweaked to improve extraction quality. A new prompt can introduce performance regression, but we do not save the old version. Without rigorous versioning, it's hard to roll back or compare.
 
-**Debugging Unexpected Results:** Unexpected results may show up periodically in our OCR attempts. We need a way to understand why. Without detailed traceability, it is difficult to diagnose whether the issue is with the prompt, the model, or the data (e.g., a new document strucutre). 
+**Debugging Unexpected Results:** Unexpected results may show up periodically in our OCR attempts. We need a way to understand why. Without detailed traceability, it is difficult to diagnose whether the issue is with the prompt, the model, or the data (e.g., a new document strucutre).
 
-**Evaluating and Comparing Models:** Accuracy in OCR can mean many things. We may want to measure correct field extraction, formatting, or even business logic compliance. In order to compare different model or prompt strategies, we need a way to define and track what matters. 
+**Evaluating and Comparing Models:** Accuracy in OCR can mean many things. We may want to measure correct field extraction, formatting, or even business logic compliance. In order to compare different model or prompt strategies, we need a way to define and track what matters.
 
-MLflow addresses these directly in our workflow. 
+MLflow addresses these directly in our workflow.
 
 ## OCR Use Case:
 
-Our task is to create a document parsing tool for text extraction (OCR) using LLMs, using MLflow features to address our challenges. The data consists of scanned documents and their corresponding text extracted as JSON. 
+Our task is to create a document parsing tool for text extraction (OCR) using LLMs, using MLflow features to address our challenges. The data consists of scanned documents and their corresponding text extracted as JSON.
 
 We use the [FUNSD dataset](https://guillaumejaume.github.io/FUNSD/), which contains around 200 fully annotated forms, structured as semantic entity labels and word groupings.
 
@@ -85,7 +85,7 @@ Example:
 
 For a detailed description of each entry, refer to the [original paper](https://arxiv.org/pdf/1905.13538.pdf).
 
-### 1. Set Up 
+### 1. Set Up
 
 Install the required packages:
 
@@ -116,7 +116,7 @@ Let's read a randomly selected annotated file. The following utils functions fac
 from PIL import Image as im
 import base64
 from io import BytesIO
-import pandas as pd 
+import pandas as pd
 import re
 from typing import Any
 
@@ -190,8 +190,8 @@ def get_image(
 def _compress_image(file_path: str, quality: int = 40, max_size: tuple[int, int] = (1000, 1000)) -> bytes:
     """Compresses an image by resizing and converting to JPEG with given quality."""
     with im.open(file_path) as img:
-        img = img.convert("RGB")  
-        img.thumbnail(max_size) 
+        img = img.convert("RGB")
+        img.thumbnail(max_size)
         buf = BytesIO()
         img.save(buf, format="JPEG", quality=quality)
         return buf.getvalue()
@@ -253,9 +253,8 @@ In order to access the MLflow UI, we need to run the following. The UI will star
 mlflow ui
 ```
 
-![MLflow UI showing the tracing for each LLM execution](/img/blog/prompt-evaluate/eval_traces.png)  
+![MLflow UI showing the tracing for each LLM execution](/img/blog/prompt-evaluate/eval_traces.png)
 
- 
 ### 4. Loading inputs and Prompting
 
 We start by defining the system prompt for extracting the contents of the images into lists of "questions" and "answers" using an LLM. These are then tracked under the MLflow experiment runs when the LLM completion calls are invoked for each image file.
@@ -271,7 +270,8 @@ system_prompt = """You are an expert at Optical Character Recognition (OCR). Ext
 ```
 
 ### 5. Setting up the LLM
-On the OpenAI side, we initialize the client and send a prompt to the LLM, instructing it to act as an OCR expert. The expected output is a Structured Output containing a list of key-value pairs. To enforce this structure, we can define Pydantic models that validate the response format. Let's try to invoke the LLM and log the execution and see what the response looks like. 
+
+On the OpenAI side, we initialize the client and send a prompt to the LLM, instructing it to act as an OCR expert. The expected output is a Structured Output containing a list of key-value pairs. To enforce this structure, we can define Pydantic models that validate the response format. Let's try to invoke the LLM and log the execution and see what the response looks like.
 
 ```python
 from pydantic import BaseModel
@@ -307,8 +307,8 @@ def get_completion(inputs: str) -> str:
             }
         ],
     )
-    
-    
+
+
     generated_response = {pair.key: pair.value for pair in completion.choices[0].message.parsed.pairs}
     return normalize_json_keys(generated_response)
 
@@ -322,15 +322,17 @@ The following screenshot represents the extracted questions and answers for this
 
 ![Screenshot of LLM completion response](/img/blog/prompt-evaluate/llm_output.png)
 
-#### Prompt Registry 
-Prompt engineering is central to LLM-based OCR, but creating an initial prompt is often not sufficient. In order to track which prompt version produced which results as we iterate, we will enable [MLflow Prompt Registry](https://mlflow.org/docs/latest/genai/prompt-version-mgmt/prompt-registry). This allows us to register, version, and add tags to prompts.  
+#### Prompt Registry
+
+Prompt engineering is central to LLM-based OCR, but creating an initial prompt is often not sufficient. In order to track which prompt version produced which results as we iterate, we will enable [MLflow Prompt Registry](https://mlflow.org/docs/latest/genai/prompt-version-mgmt/prompt-registry). This allows us to register, version, and add tags to prompts.
 
 Here's an example of a prompt template, specifically instructing the LLM to generate results in our expected format.
 
-````python
+```python
 new_template = """You are an expert at Optical Character Recognition (OCR). Extract the questions and answers from the image as a JSON object, where the keys are questions and the values are answers. If there are no questions or answers, return an empty JSON object {}.
 """
-````
+```
+
 This initial prompt can be registered along with a prompt name, commit message, and relevant tags. Once registered, it can later be retrieved using `mlflow.genai.load_prompt()` for reuse or further improvements.
 
 ```python
@@ -351,9 +353,9 @@ prompt = mlflow.genai.load_prompt(name_or_uri="ocr-question-answer", version=new
 system_prompt = prompt.template
 ```
 
-### 6. Defining and Evaluating Performance 
+### 6. Defining and Evaluating Performance
 
-As ML engineers, we ensure that the OCR application using the LLM is robustly evaluated against ground truth. When evaluating an OCR system, we care about more than just accuracy. We may look at format compliance, business logic, or field extraction results. [MLflow Evaluate](https://mlflow.org/docs/latest/genai/eval-monitor/) allows us to define [built-in and custom metrics](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.metrics.html) that align with our use case. 
+As ML engineers, we ensure that the OCR application using the LLM is robustly evaluated against ground truth. When evaluating an OCR system, we care about more than just accuracy. We may look at format compliance, business logic, or field extraction results. [MLflow Evaluate](https://mlflow.org/docs/latest/genai/eval-monitor/) allows us to define [built-in and custom metrics](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.metrics.html) that align with our use case.
 
 While MLflow supports LLM-as-a-judge metrics, for this OCR example it's better and cheaper to use deterministic metrics. For example, we can define a custom metric `key_value_accuracy` to check if key-value pair of the generated output correctly matches that of the ground truth.
 
@@ -373,21 +375,21 @@ def key_value_accuracy(predictions: pd.Series, truth: pd.Series) -> MetricValue:
     For each prediction-truth pair, compute the fraction of correct key-value matches.
     """
     scores = []
-    
+
     # Normalize the ground truth data
     truth = truth.apply(normalize_json_keys)
     truth_normalized = normalize_json_keys(truth)
-    
+
     for pred_dict, truth_dict in zip(pred, truth_normalized):
         if not isinstance(pred_dict, dict) or not isinstance(truth_dict, dict):
             scores.append(0.0)
             continue
-            
-        correct = sum(1 for k, v in truth_dict.items() 
+
+        correct = sum(1 for k, v in truth_dict.items()
                      if k in pred_dict and pred_dict[k] == v)
-        
+
         scores.append(correct / len(truth_dict) if truth_dict else 0.0)
-    
+
     return MetricValue(
         scores=scores,
         aggregate_results={
@@ -402,6 +404,7 @@ custom_key_value_accuracy = make_metric(
     name="key_value_accuracy",
 )
 ```
+
 After defining this custom metric, we can evaluate it over a dataframe, which includes a subset of base64-encoded images and their corresponding ground truth JSONs. Using the `batch_completion` function, we run a batch completion request on this subset, retrieving outputs in the predefined Structured Output format.
 
 ```python
@@ -409,7 +412,7 @@ results = mlflow.models.evaluate(
     model=batch_completion,
     data=pd.DataFrame({"inputs": images, "truth": jsons}),
     targets="truth",
-    model_type="text",  
+    model_type="text",
     predictions="predictions",
     extra_metrics=[custom_key_value_accuracy]
 )
@@ -420,10 +423,9 @@ print("\n Per-row scores:")
 print(eval_table[['key_value_accuracy/score']])
 ```
 
+![MLflow UI showing the metric key_value_accuracy computed for a single run](/img/blog/prompt-evaluate/new_eval_metrics.png)
 
-![MLflow UI showing the metric key_value_accuracy computed for a single run](/img/blog/prompt-evaluate/new_eval_metrics.png)  
-
-This metric requires an exact match between the key-value pairs in the ground truth and the LLM-generated output. Upon reviewing the individual scores for each image, we observe that the model performs the worst on the last image. Specifically, one of the keys is incorrectly generated as `CHAINS - ACCEPTANCEMERCHANDISING` instead of `CHAINS ACCEPTANCE/ MERCHANDISING`. A similar pattern can be observed in other keys where different topics are improperly separated or unnecessarily paraphrased. 
+This metric requires an exact match between the key-value pairs in the ground truth and the LLM-generated output. Upon reviewing the individual scores for each image, we observe that the model performs the worst on the last image. Specifically, one of the keys is incorrectly generated as `CHAINS - ACCEPTANCEMERCHANDISING` instead of `CHAINS ACCEPTANCE/ MERCHANDISING`. A similar pattern can be observed in other keys where different topics are improperly separated or unnecessarily paraphrased.
 
 To address this, we can refine the prompt template by explicitly instructing the model to separate distinct topics using the `/` separator. Additionally, we can instruct the LLM to avoid paraphrasing the topics in the keys and instead focus on maintaining exactness to the image text.
 
@@ -432,7 +434,7 @@ updated_template = """\
 You are an expert at key information extraction and OCR. Extract the questions and answers from the image, where the keys are questions and the values are answers.
 
 
-Question refers to a field in the form that takes in information. Answer refers to the information 
+Question refers to a field in the form that takes in information. Answer refers to the information
 that is filled in the field.
 
 Follow these rules:
@@ -442,7 +444,7 @@ Follow these rules:
 """
 ```
 
-The next step is to register the updated prompt template, load it back later and format it with any additional rule before rerunning the evaluation. 
+The next step is to register the updated prompt template, load it back later and format it with any additional rule before rerunning the evaluation.
 
 ```python
 updated_prompt = mlflow.genai.register_prompt(
@@ -466,7 +468,7 @@ results_updated = mlflow.models.evaluate(
     model=batch_completion,
     data=pd.DataFrame({"inputs": images, "truth": jsons}),
     targets="truth",
-    model_type="text",  
+    model_type="text",
     predictions="predictions",
     extra_metrics=[custom_key_value_accuracy]
 )
@@ -478,7 +480,6 @@ print(eval_table_updated[['key_value_accuracy/score']])
 ```
 
 This updated prompt may lead to a marginal improvement in the metric for each image. However, there are still mismatches in values between the ground truth and the LLM response. As showcased above using Prompt Registry, iteratively refining the prompt can address these issues, leading to better alignment with the expected output.
-
 
 ## Conclusion and Next Steps
 
