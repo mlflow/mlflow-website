@@ -5,6 +5,7 @@ tags: [pyfunc, mlflow, ensemble-models]
 slug: pyfunc-in-practice
 authors: [hugo-carvalho, joana-ferreira, rahul-pandey, filipe-miranda]
 thumbnail: /img/blog/pyfunc-in-practice.png
+image: /img/blog/pyfunc-in-practice.png
 ---
 
 If you're looking to fully leverage the capabilities of `mlflow.pyfunc` and understand how it can be utilized in a Machine Learning project, this blog post will guide you through the process. MLflow PyFunc offers creative freedom and flexibility, allowing the development of complex systems encapsulated as models in MLflow that follow the same lifecycle as traditional ones. This blog will showcase how to create multi-model setups, seamlessly connect to databases, and implement your own custom fit method in your MLflow PyFunc model.

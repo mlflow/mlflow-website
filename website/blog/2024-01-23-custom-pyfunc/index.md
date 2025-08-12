@@ -5,6 +5,7 @@ slug: custom-pyfunc
 authors: [daniel-liden]
 tags: [pyfunc, models]
 thumbnail: /img/blog/custom-pyfunc.png
+image: /img/blog/custom-pyfunc.png
 ---
 
 If you're looking to learn about all of the flexibility and customization that is possible within

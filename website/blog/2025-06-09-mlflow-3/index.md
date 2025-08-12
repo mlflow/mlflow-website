@@ -4,6 +4,7 @@ tags: [mlflow, genai, tracing, evaluation, mlops]
 slug: mlflow-3-launch
 authors: [mlflow-maintainers]
 thumbnail: /img/blog/mlflow-3-trace-ui.png
+image: /img/blog/mlflow-3-trace-ui.png
 ---
 
 The open source MLflow community has reached a major milestone. Today, we're releasing **MLflow 3**, which brings production-ready generative AI capabilities to the platform that millions of developers trust for ML operations.

@@ -5,6 +5,7 @@ tags: [genai, mlops]
 slug: autogen-image-agent
 authors: [michael-berk, mlflow-maintainers]
 thumbnail: /img/blog/autogen-blog.png
+image: /img/blog/autogen-blog.png
 ---
 
 In this blog, we'll guide you through creating an [AutoGen](https://microsoft.github.io/autogen/) agent framework within an MLflow custom PyFunc. By combining MLflow with AutoGen's ability to create multi-agent frameworks, we are able to create scalable and stable GenAI applications.

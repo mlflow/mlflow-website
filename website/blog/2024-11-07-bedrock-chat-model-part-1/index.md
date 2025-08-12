@@ -5,6 +5,7 @@ slug: bedrock-chat-model-part-1
 authors: [jas-bali]
 tags: [genai, pyfunc, bedrock, tracing]
 thumbnail: /img/blog/bedrock-chatmodel.png
+image: /img/blog/bedrock-chatmodel.png
 ---
 
 ![Thumbnail](bedrock_chatmodel.png)

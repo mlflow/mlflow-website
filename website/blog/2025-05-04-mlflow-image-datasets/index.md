@@ -4,6 +4,7 @@ tags: [mlflow, datasets, mlops, computer-vision]
 slug: tracking-image-datasets
 authors: [thorsteen]
 thumbnail: /img/blog/coco-dataset.png
+image: /img/blog/coco-dataset.png
 ---
 
 Dataset tracking is fundamental to building robust and reproducible machine learning models. Among all data types, images present unique tracking challenges due to their high dimensionality, variability, and storage requirements. In this post, we'll demonstrate how to effectively track image datasets using MLflow's experiment tracking capabilities and UI, providing you with practical techniques to enhance your computer vision workflows' tracking of data and models.
