@@ -4,6 +4,7 @@ tags: [genai, pyfunc, mlops]
 slug: models_from_code
 authors: [awadelrahman-ahmed]
 thumbnail: /img/blog/thumbnail-models-from-code.gif
+image: /img/blog/thumbnail-models-from-code.gif
 ---
 
 We all (well, most of us) remember November 2022 when the public release of ChatGPT by OpenAI marked a significant turning point in the world of AI. While generative artificial intelligence (GenAI) had been evolving for some time, ChatGPT, built on OpenAI's GPT-3.5 architecture, quickly captured the public’s imagination. This led to an explosion of interest in GenAI, both within the tech industry and among the general public.

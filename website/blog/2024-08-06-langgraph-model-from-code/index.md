@@ -4,6 +4,7 @@ tags: [genai, mlops]
 slug: langgraph-model-from-code
 authors: [michael-berk, mlflow-maintainers]
 thumbnail: /img/blog/release-candidates.png
+image: /img/blog/release-candidates.png
 ---
 
 In this blog, we'll guide you through creating a LangGraph chatbot using MLflow. By combining MLflow with LangGraph's ability to create and manage cyclical graphs, you can create powerful stateful, multi-actor applications in a scalable fashion.

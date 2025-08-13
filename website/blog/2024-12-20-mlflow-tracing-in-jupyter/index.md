@@ -5,6 +5,7 @@ slug: mlflow-tracing-in-jupyter
 authors: [daniel-lok]
 tags: [genai, mlops, tracing]
 thumbnail: /img/blog/mlflow-tracing-in-jupyter.png
+image: /img/blog/mlflow-tracing-in-jupyter.png
 ---
 
 ![Thumbnail](mlflow-tracing-in-jupyter-title.png)

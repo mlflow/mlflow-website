@@ -5,6 +5,7 @@ slug: mlflow-llama-index-workflow
 authors: [yuki-watanabe]
 tags: [genai, mlops, mlflow-evaluate]
 thumbnail: /img/blog/llama-index-thumbnail.png
+image: /img/blog/llama-index-thumbnail.png
 ---
 
 ![Thumbnail](llama_index_workflow_title.png)

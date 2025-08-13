@@ -5,6 +5,7 @@ slug: mlflow-year-in-review
 authors: [carly-akerly]
 tags: [MLflow, "2023", Linux Foundation]
 thumbnail: /img/blog/2023-year-in-review.png
+image: /img/blog/2023-year-in-review.png
 ---
 
 With more than **16 million** monthly downloads, MLflow has established itself as a leading open-source MLOps platform worldwide.
