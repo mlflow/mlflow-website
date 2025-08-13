@@ -4,6 +4,7 @@ tags: [docs]
 slug: mlflow-docs-overhaul
 authors: [mlflow-maintainers]
 thumbnail: /img/blog/docs-overhaul.png
+image: /img/blog/docs-overhaul.png
 ---
 
 The MLflow Documentation is getting an upgrade.

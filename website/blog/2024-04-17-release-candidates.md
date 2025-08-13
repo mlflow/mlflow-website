@@ -4,6 +4,7 @@ tags: [mlflow]
 slug: release-candidates
 authors: [mlflow-maintainers]
 thumbnail: /img/blog/release-candidates.png
+image: /img/blog/release-candidates.png
 ---
 
 # Announcing MLflow Release Candidates
