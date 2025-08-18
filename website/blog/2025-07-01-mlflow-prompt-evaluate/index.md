@@ -113,6 +113,8 @@ os.environ["OPENAI_API_KEY"] = getpass("Your OpenAI API Key: ")
 Let's read a randomly selected annotated file. The following utils functions faciliate this task.
 
 ```python
+import json
+import random
 from PIL import Image as im
 import base64
 from io import BytesIO
@@ -257,7 +259,7 @@ mlflow ui
 
 ### 4. Loading inputs and Prompting
 
-We start by defining the system prompt for extracting the contents of the images into lists of "questions" and "answers" using an LLM. These are then tracked under the MLflow experiment runs when the LLM completion calls are invoked for each image file.
+We start by defining a system prompt for extracting the contents of the images into lists of "questions" and "answers" using an LLM. We start with a "first pass" prompt, deliberately made short and  minimially desctiptive so that subsequent improvements can be made later on. These are tracked under the MLflow experiment runs when the LLM completion calls are invoked for each image file.
 
 ```python
 
@@ -324,7 +326,7 @@ The following screenshot represents the extracted questions and answers for this
 
 #### Prompt Registry
 
-Prompt engineering is central to LLM-based OCR, but creating an initial prompt is often not sufficient. In order to track which prompt version produced which results as we iterate, we will enable [MLflow Prompt Registry](https://mlflow.org/docs/latest/genai/prompt-version-mgmt/prompt-registry). This allows us to register, version, and add tags to prompts.
+Prompt engineering is central to LLM-based OCR, but creating an initial prompt is often not sufficient. In order to track which prompt version produced which results as we iterate, we will use [MLflow Prompt Registry](https://mlflow.org/docs/latest/genai/prompt-version-mgmt/prompt-registry). This allows us to register, version, and add tags to prompts.
 
 Here's an example of a prompt template, specifically instructing the LLM to generate results in our expected format.
 
@@ -486,8 +488,6 @@ This updated prompt may lead to a marginal improvement in the metric for each im
 By leveraging MLflow GenAI capabilities, we efficiently manage prompts and evaluate models for our OCR tool. With all runs, prompts, and metrics logged, we can compare different models or prompt strategies side-by-side in the MLflow UI. This enables data-driven decisions, justifies model selection, and enables both technical and non-technical contributors to collaborate, iterate, and deploy AI solutions confidently.
 
 We can take several directions to further enhance our workflow and outcomes:
-
-**Adopt Managed MLflow:** For enterprise-grade scalability, governance, and zero infrastructure management, try Managed MLflow on Databricks
 
 **Expand Your Custom Metrics:** Scale out your custom evaluation metrics to more accurately capture the requirements of our specific OCR problem. This allows us to measure what truly matters for the use case, such as domain-specific accuracy, formatting compliance, or business logic adherence.
 
