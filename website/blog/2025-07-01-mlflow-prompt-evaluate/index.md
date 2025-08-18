@@ -259,7 +259,7 @@ mlflow ui
 
 ### 4. Loading inputs and Prompting
 
-We start by defining a system prompt for extracting the contents of the images into lists of "questions" and "answers" using an LLM. We start with a "first pass" prompt, deliberately made short and  minimially desctiptive so that subsequent improvements can be made later on. These are tracked under the MLflow experiment runs when the LLM completion calls are invoked for each image file.
+We start by defining a system prompt for extracting the contents of the images into lists of "questions" and "answers" using an LLM. We will use a "first pass" prompt, deliberately made short and minimally descriptive so that subsequent improvements can be made later on. These are tracked under the MLflow experiment runs when the LLM completion calls are invoked for each image file.
 
 ```python
 
