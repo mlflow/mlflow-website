@@ -160,34 +160,26 @@ def get_json(file_name: str, directory: str = ANNOTATIONS_DIRECTORY) -> dict:
 
 def get_random_files(
     directory: str = ANNOTATIONS_DIRECTORY, n: int = 1
-    ) -> list[str] | str | None:
+) -> list[str]:
     if not os.path.exists(directory):
         raise FileNotFoundError(f"Directory {directory} does not exist.")
 
     if files := os.listdir(directory):
         selected_files = random.sample(files, k=n)
-        cleaned_files = [file.rsplit(".", 1)[0] for file in selected_files]
+        return [file.rsplit(".", 1)[0] for file in selected_files]
 
-        if len(cleaned_files) == 1:
-            return cleaned_files[0]
-
-        return cleaned_files
-
-    return None
+    return []
 
 def get_image(
-    file_name: str, directory: str = IMAGES_DIRECTORY, encode_as_str: bool = False
-) -> bytes:
+    file_name: str, directory: str = IMAGES_DIRECTORY) -> bytes:
     file_name += ".png" if not file_name.endswith(".png") else file_name
     path = os.path.join(directory, file_name)
-    with open(path, "rb") as f:
-        file = f.read()
-        compressed = _compress_image(path)
 
-        if encode_as_str:
-            return base64.b64encode(compressed).decode("utf-8")
-        else:
-            return compressed
+    return _compress_image(path)
+
+def encode_image_as_base64(image_bytes: bytes) -> str:
+    """Convert image bytes to base64 string."""
+    return base64.b64encode(image_bytes).decode("utf-8")
 
 def _compress_image(file_path: str, quality: int = 40, max_size: tuple[int, int] = (1000, 1000)) -> bytes:
     """Compresses an image by resizing and converting to JPEG with given quality."""
@@ -228,7 +220,7 @@ from IPython.display import Image, display
 import random
 
 random_file = get_random_files()
-image_bytes = get_image(random_file)
+image_bytes = get_image(random_file[0])
 get_json(random_file)
 
 ```
@@ -264,7 +256,7 @@ We start by defining a system prompt for extracting the contents of the images i
 ```python
 
 _files = get_random_files(n=5)
-images = [get_image(file, encode_as_str=True) for file in _files]
+images = [encode_image_as_base64(get_image(file)) for file in _files]
 jsons = [get_json(file) for file in _files]
 
 system_prompt = """You are an expert at Optical Character Recognition (OCR). Extract the questions and answers from the image."""
@@ -365,7 +357,7 @@ While MLflow supports LLM-as-a-judge metrics, for this OCR example it's better a
 from mlflow.metrics.base import MetricValue
 from mlflow.models import make_metric
 
-def batch_completion(df: pd.DataFrame) -> pd.DataFrame:
+def batch_completion(df: pd.DataFrame) -> pd.Series:
     result = [get_completion(image) for image in df["inputs"]]
     return pd.Series(result)
 
