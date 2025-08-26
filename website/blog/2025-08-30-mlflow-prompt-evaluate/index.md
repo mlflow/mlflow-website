@@ -145,7 +145,7 @@ def _extract_qa_pairs(data: dict) -> list[tuple[str, str]]:
 
     return qa_pairs
 
-def get_json(file_name: str, directory: str = ANNOTATIONS_DIRECTORY) -> dict:
+def get_json(file_name: str, directory: str = ANNOTATIONS_DIRECTORY) -> dict[str, str]:
     file_name += ".json" if not file_name.endswith(".json") else file_name
     path = os.path.join(directory, file_name)
     with open(path, "r", encoding="utf-8") as f:
@@ -155,9 +155,9 @@ def get_json(file_name: str, directory: str = ANNOTATIONS_DIRECTORY) -> dict:
                 flat_items = [item for page in contents for item in page]
             else:
                 flat_items = contents
-            tuples_result = _extract_qa_pairs_tuple(flat_items)
+            tuples_result = _extract_qa_pairs(flat_items)
         else:
-            tuples_result = _extract_qa_pairs_tuple(contents)
+            tuples_result = _extract_qa_pairs(contents)
 
         # Convert list of tuples to dict before returning
         return {key.rstrip(':'): value for key, value in tuples_result}
@@ -165,17 +165,13 @@ def get_json(file_name: str, directory: str = ANNOTATIONS_DIRECTORY) -> dict:
 def get_random_files(
     directory: str = ANNOTATIONS_DIRECTORY, n: int = 1
 ) -> list[str]:
-    if not os.path.exists(directory):
-        raise FileNotFoundError(f"Directory {directory} does not exist.")
-
     if files := os.listdir(directory):
         selected_files = random.sample(files, k=n)
         return [file.rsplit(".", 1)[0] for file in selected_files]
 
     return []
 
-def get_image(
-    file_name: str, directory: str = IMAGES_DIRECTORY) -> bytes:
+def get_image(file_name: str, directory: str = IMAGES_DIRECTORY) -> bytes:
     file_name += ".png" if not file_name.endswith(".png") else file_name
     path = os.path.join(directory, file_name)
 
@@ -219,7 +215,16 @@ Let’s take a moment to break down the `_extract_qa_pairs` function:
 
 We can then call `get_json` to fetch the OCR-identified question/answer structure based on the form image data.
 
-Similarly, `get_image` can serve as a utils function that reads an image file from a specified path and resizes or converts it into a JPEG with a defined quality setting. To normalise and clean up any JSON key strings, we can use `normalise_json_keys`.
+For LLM inputs, we favor small, predictable payloads over lossless fidelity. We use `get_image` to read PNG images from a directory and use `_compress_image` to convert PNG images to JPEG format, then `encode_image_as_base64` to encode them as LLM input.
+
+**Bandwidth & Cost:** PNG scans of forms are often 5–10× larger than a JPEG of the same resolution. Since we send images as base64 (with ≈33% overhead), shrinking bytes directly reduces request size, latency, and API cost—especially when batch-evaluating many pages.
+
+**Normalization:** Converting to 8-bit RGB and flattening transparency removes PNG quirks (alpha, indexed palettes, 16-bit depth, etc.), so every image reaches the model in a consistent form. This eliminates "works on my machine" ingestion issues across providers.
+
+**Throughput Over Perfection:** Our pages are high-contrast forms, so modest JPEG compression keeps text legible while dramatically shrinking files. For this tutorial, we also downscale to a max side of 1000 px, which is typically sufficient for field labels while speeding up end-to-end runs and evals.
+
+**Trade-offs & Not Converting:**
+With tiny type, low-contrast scans, or while using classical OCR (e.g., Tesseract), we prefer lossless formats (PNG/TIFF) or use higher JPEG quality. Compression artifacts can blur thin strokes and hurt accuracy.
 
 ```python
 from IPython.display import Image, display
@@ -235,12 +240,12 @@ get_json(random_file)
 
 Before we make a call to OpenAI, we need to set up [MLflow Tracking](https://mlflow.org/docs/latest/ml/tracking) to ensure every experiment, prompt, and result is recorded and traceable.
 
-We will also enable [MLflow Autolog](https://mlflow.org/docs/latest/ml/tracking/autolog) to simplify the tracking process by reducing the need for manual log statements. Metrics, params, artifacts, and other useful information are logged automatically.
+We will also enable [MLflow Autolog](https://mlflow.org/docs/latest/ml/tracking/autolog) to simplify the tracking process by reducing the need for manual log statements. Below, we point MLflow to a local SQLite database as the backend store, where metrics, parameters, artifacts, and other useful information are logged automatically.
 
 ```python
 import mlflow
 
-mlflow.set_tracking_uri("./mlruns")
+mlflow.set_tracking_uri("sqlite:///mlflow_runs.db")
 mlflow.set_experiment("ocr-initial-experiment")
 mlflow.openai.autolog()
 ```
@@ -250,7 +255,8 @@ mlflow.openai.autolog()
 In order to access the MLflow UI, we need to run the following. The UI will start on `http://localhost:5000` by default:
 
 ```bash
-mlflow ui
+mlflow ui --backend-store-uri sqlite:///mlflow_runs.db
+
 ```
 
 ![MLflow UI showing the tracing for each LLM execution](/img/blog/prompt-evaluate/eval_traces.png)
@@ -285,7 +291,6 @@ class KeyValueList(BaseModel):
     pairs: list[KeyValueModel]
 
 client = OpenAI()
-predictions = []
 
 def get_completion(inputs: str) -> str:
     completion = client.chat.completions.parse(
