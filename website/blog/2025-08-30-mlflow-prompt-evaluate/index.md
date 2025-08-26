@@ -126,11 +126,11 @@ DATA_DIRECTORY = "./data" # for simplicity, a local directory
 ANNOTATIONS_DIRECTORY = os.path.join(DATA_DIRECTORY, "annotations")
 IMAGES_DIRECTORY = os.path.join(DATA_DIRECTORY, "images")
 
-def _extract_qa_pairs(data: dict) -> dict:
-    """Extracts question-answer pairs from OCR-style linked data."""
-    qa_pairs = {}
-
+def _extract_qa_pairs(data: dict) -> list[tuple[str, str]]:
+    """Extracts question-answer pairs from OCR-style linked data as a list of tuples"""
+    qa_pairs = []
     elements = {item["id"]: item for item in data}
+
     for item in data:
         if item["label"] != "question" or not item["linking"]:
             continue
@@ -141,7 +141,8 @@ def _extract_qa_pairs(data: dict) -> dict:
             if answer and answer["label"] == "answer":
                 q_text = " ".join(w["text"] for w in item["words"])
                 a_text = " ".join(w["text"] for w in answer["words"])
-                qa_pairs[q_text] = a_text
+                qa_pairs.append((q_text, a_text))
+
     return qa_pairs
 
 def get_json(file_name: str, directory: str = ANNOTATIONS_DIRECTORY) -> dict:
@@ -154,9 +155,12 @@ def get_json(file_name: str, directory: str = ANNOTATIONS_DIRECTORY) -> dict:
                 flat_items = [item for page in contents for item in page]
             else:
                 flat_items = contents
-            return _extract_qa_pairs(flat_items)
+            tuples_result = _extract_qa_pairs_tuple(flat_items)
         else:
-            return _extract_qa_pairs(contents)
+            tuples_result = _extract_qa_pairs_tuple(contents)
+
+        # Convert list of tuples to dict before returning
+        return {key.rstrip(':'): value for key, value in tuples_result}
 
 def get_random_files(
     directory: str = ANNOTATIONS_DIRECTORY, n: int = 1
@@ -188,6 +192,7 @@ def _compress_image(file_path: str, quality: int = 40, max_size: tuple[int, int]
         img.thumbnail(max_size)
         buf = BytesIO()
         img.save(buf, format="JPEG", quality=quality)
+
         return buf.getvalue()
 
 def clean_keys(key: str) -> str:
@@ -203,11 +208,12 @@ def normalize_json_keys(json_obj: Any) -> Any:
         return [normalize_json_keys(item) for item in json_obj]
     else:
         return json_obj
+
 ```
 
 Let’s take a moment to break down the `_extract_qa_pairs` function:
 
-1. We create a look-up dictionary - qa_pairs
+1. We create a look-up list of tuples for preserving duplicates - qa_pairs
 2. We identify "question" items that have linked answer pair(s) in the form of (q_id, a_id)
 3. We construct question-answer pairs by joining the individual words
 
@@ -371,7 +377,6 @@ def key_value_accuracy(predictions: pd.Series, truth: pd.Series) -> MetricValue:
     scores = []
 
     # Normalize the ground truth data
-    truth = truth.apply(normalize_json_keys)
     truth_normalized = normalize_json_keys(truth)
 
     for pred_dict, truth_dict in zip(pred, truth_normalized):
