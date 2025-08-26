@@ -11,28 +11,31 @@ export default function Ambassadors() {
       <div className="max-w-4xl mx-auto">
         <Heading level={1}>MLflow Ambassador program</Heading>
         <div className="flex flex-col gap-2 text-xl pt-16">
-          <p>The call was made, and the community answered in droves.</p>
           <p>
-            We're thrilled to present our MLflow Ambassadors, a select group
+            We're thrilled to recognize our MLflow Ambassadors, a select group
             distinguished by their commitment to mentoring, teaching, and most
             importantly, building AI solutions.
           </p>
           <p>
-            These ambassadors will be visible at various industry meetups and
+            These ambassadors are visible at various industry meetups and
             speaking engagements, as well as through their insightful
-            contributions right here in our [MLflow Blog](blog). They'll be
-            sharing their invaluable expertise, experiences, and tips on
-            leveraging MLflow for practical MLOps applications, as well as
-            in-depth tutorials on how to leverage some of the more advanced
-            features of MLflow. Representing a wide array of backgrounds and
-            industries, each ambassador brings a unique perspective fueled by a
-            shared enthusiasm for innovation and education in the field.
+            contributions right here in our{" "}
+            <Link href="/blog">MLflow Blog</Link>. They regularly share their
+            invaluable expertise, experiences, and tips on leveraging MLflow for
+            practical MLOps applications, as well as in-depth tutorials on how
+            to leverage some of the more advanced features of MLflow.
+            Representing a wide array of backgrounds and industries, each
+            ambassador brings a unique perspective fueled by a shared enthusiasm
+            for innovation and education in the field.
           </p>
-          <p>
-            Over the next few months, you'll be seeing a lot more from them both
-            on our platform, at local meetups, and as speakers on behalf of the
-            MLflow project.
-          </p>
+          <p>Are you interested in becoming an official MLflow Ambassador?</p>
+          <div className="pt-4 flex justify-center">
+            <Link href="https://docs.google.com/forms/d/e/1FAIpQLSefBkC-bBtk81ByRkM97ONnQ1DGwNR9hlEVa5yF2TLQmdQ9vA/viewform">
+              <Button variant="primary" size="small">
+                Apply
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -106,10 +109,7 @@ export default function Ambassadors() {
               Contribute technical content such as blog posts, video tutorials,
               training modules, etc.
             </li>
-            <li>
-              Organize and host at least one local MLflow community event/year
-              (Meetup).
-            </li>
+            <li>Organize and host local MLflow community events and meetups</li>
             <li>Help the community learn more about MLflow</li>
             <li>
               Advocate for MLflow at events, evangelizing and disseminating
@@ -132,27 +132,11 @@ export default function Ambassadors() {
 
         <div>
           <p>
-            The MLflow Ambassador Selection Committee reviews applications on a
-            rolling basis. We are focused on creating a group of Ambassadors
-            that meet all our requirements and represent our community and
-            geographical diversity. Once you submit your application, you enter
-            the pool of applicants that get reviewed on a rolling basis.{" "}
+            The MLflow Ambassador Selection Committee reviews applications every
+            6 months. We are focused on creating a group of Ambassadors that
+            meet our requirements and represent our community and geographical
+            diversity.
           </p>
-          <p>
-            Successful ambassadors encompass engineers, developers, bloggers,
-            influencers, and evangelists who are actively involved in MLflow.
-            They contribute to work groups, online communities, community
-            events, training sessions, workshops, and various related
-            activities.
-          </p>
-          <p>Are you interested in becoming an official MLflow Ambassador?</p>
-          <div className="pt-4 flex justify-center">
-            <Link href="https://forms.gle/foW9ZtietYLLYCp99">
-              <Button variant="primary" size="small">
-                Apply
-              </Button>
-            </Link>
-          </div>
         </div>
       </div>
     </Layout>
