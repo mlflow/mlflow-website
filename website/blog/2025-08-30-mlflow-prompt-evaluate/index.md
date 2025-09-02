@@ -110,112 +110,208 @@ os.environ["OPENAI_API_KEY"] = getpass("Your OpenAI API Key: ")
 
 ### 2. Observe the Data
 
-Let's read a randomly selected annotated file. The following utils functions faciliate this task.
+Let's read a randomly selected image and its corresponding annotation JSON file. The following utils functions faciliate this task.
 
 ```python
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from io import BytesIO
+from pathlib import Path
+from typing import Any, Mapping, Sequence, TypedDict, Literal
+import pandas as pd
+import base64
 import json
 import random
-from PIL import Image as im
-import base64
-from io import BytesIO
-import pandas as pd
 import re
-from typing import Any
 
-DATA_DIRECTORY = "./data" # for simplicity, a local directory
-ANNOTATIONS_DIRECTORY = os.path.join(DATA_DIRECTORY, "annotations")
-IMAGES_DIRECTORY = os.path.join(DATA_DIRECTORY, "images")
+from PIL import Image as PILImage
 
-def _extract_qa_pairs(data: dict) -> list[tuple[str, str]]:
-    """Extracts question-answer pairs from OCR-style linked data as a list of tuples"""
-    qa_pairs = []
-    elements = {item["id"]: item for item in data}
 
-    for item in data:
-        if item["label"] != "question" or not item["linking"]:
+DATA_DIRECTORY = Path("./data")
+ANNOTATIONS_DIRECTORY = DATA_DIRECTORY / "annotations"
+IMAGES_DIRECTORY = DATA_DIRECTORY / "images"
+
+
+class Word(TypedDict):
+    text: str
+
+class Item(TypedDict, total=False):
+    id: str | int
+    label: Literal["question", "answer", "other"]
+    words: list[Word]
+    linking: list[tuple[str | int, str | int]]
+
+@dataclass(frozen=True)
+class QAPair:
+    question: str
+    answer: str
+
+def _flatten_form(form: Any) -> list[Item]:
+    """
+    Flattens the 'form' section into a simple list of items.
+    Accepts list[Item], list[list[Item]], or a single list-like page.
+    """
+    if isinstance(form, list):
+
+        if form and all(isinstance(page, list) for page in form):
+            return [item for page in form for item in page]  # 2D -> 1D
+        return form
+
+    raise TypeError("Expected 'form' to be a list or list of lists.")
+
+def extract_qa_pairs(items: Sequence[Mapping[str, Any]]) -> list[QAPair]:
+    """
+    Robustly extract Q&A pairs. Supports multiple answers per question.
+    Does not assume unique question text; uses ids to match.
+    """
+    by_id: dict[Any, Mapping[str, Any]] = {}
+    for it in items:
+        if "id" in it:
+            by_id[it["id"]] = it
+
+    pairs: list[QAPair] = []
+
+    for it in items:
+        if it.get("label") != "question":
             continue
-        for q_id, a_id in item["linking"]:
-            if q_id != item["id"]:
+        links = it.get("linking") or []
+        q_words = it.get("words") or []
+        q_text = " ".join(w.get("text", "") for w in q_words).strip()
+
+        for link in links:
+            if not isinstance(link, (list, tuple)) or len(link) != 2:
                 continue
-            answer = elements.get(a_id)
-            if answer and answer["label"] == "answer":
-                q_text = " ".join(w["text"] for w in item["words"])
-                a_text = " ".join(w["text"] for w in answer["words"])
-                qa_pairs.append((q_text, a_text))
+            q_id, a_id = link
+            if q_id != it.get("id"):
+                # Skip foreign link edges
+                continue
+            ans = by_id.get(a_id)
+            if not ans or ans.get("label") != "answer":
+                continue
+            a_words = ans.get("words") or []
+            a_text = " ".join(w.get("text", "") for w in a_words).strip()
+            if q_text and a_text:
+                pairs.append(
+                    QAPair(
+                        question=q_text,
+                        answer=a_text,
+                    )
+                )
+    return pairs
 
-    return qa_pairs
+def load_annotation_file(file_name: str | Path, directory: Path = ANNOTATIONS_DIRECTORY) -> list[QAPair]:
+    """
+    Load one annotation JSON and return extracted Q&A pairs.
+    Always returns a list; empty if none found.
+    """
+    file_path = (directory / file_name) if isinstance(file_name, str) else file_name
+    if file_path.suffix.lower() != ".json":
+        file_path = file_path.with_suffix(".json")
 
-def get_json(file_name: str, directory: str = ANNOTATIONS_DIRECTORY) -> dict[str, str]:
-    file_name += ".json" if not file_name.endswith(".json") else file_name
-    path = os.path.join(directory, file_name)
-    with open(path, "r", encoding="utf-8") as f:
-        contents = json.load(f)["form"]
-        if isinstance(contents, list):
-            if all(isinstance(page, list) for page in contents):
-                flat_items = [item for page in contents for item in page]
-            else:
-                flat_items = contents
-            tuples_result = _extract_qa_pairs(flat_items)
-        else:
-            tuples_result = _extract_qa_pairs(contents)
+    with file_path.open("r", encoding="utf-8") as f:
+        data = json.load(f)
+    form = data.get("form")
+    items = _flatten_form(form)
+    return extract_qa_pairs(items)
 
-        # Convert list of tuples to dict before returning
-        return {key.rstrip(':'): value for key, value in tuples_result}
-
-def get_random_files(
-    directory: str = ANNOTATIONS_DIRECTORY, n: int = 1
+def choose_random_annotation_names(
+    directory: Path = ANNOTATIONS_DIRECTORY,
+    n: int = 1,
+    suffix: str = ".json",
+    seed: int | None = None,
 ) -> list[str]:
-    if files := os.listdir(directory):
-        selected_files = random.sample(files, k=n)
-        return [file.rsplit(".", 1)[0] for file in selected_files]
+    """
+    Returns a list of basenames (without extension). Raises if directory missing or empty.
+    Deterministic when seed is provided.
+    """
+    if not directory.exists():
+        raise FileNotFoundError(f"Directory {directory} does not exist.")
+    files = sorted(p for p in directory.iterdir() if p.is_file() and p.suffix.lower() == suffix)
+    if not files:
+        raise FileNotFoundError(f"No {suffix} files found in {directory}.")
 
-    return []
+    if seed is not None:
+        rnd = random.Random(seed)
+        selected = rnd.sample(files, k=min(n, len(files)))
+    else:
+        selected = random.sample(files, k=min(n, len(files)))
+    return [p.stem for p in selected]
 
-def get_image(file_name: str, directory: str = IMAGES_DIRECTORY) -> bytes:
-    file_name += ".png" if not file_name.endswith(".png") else file_name
-    path = os.path.join(directory, file_name)
 
-    return _compress_image(path)
-
-def encode_image_as_base64(image_bytes: bytes) -> str:
-    """Convert image bytes to base64 string."""
-    return base64.b64encode(image_bytes).decode("utf-8")
-
-def _compress_image(file_path: str, quality: int = 40, max_size: tuple[int, int] = (1000, 1000)) -> bytes:
-    """Compresses an image by resizing and converting to JPEG with given quality."""
-    with im.open(file_path) as img:
+def compress_image(
+    file_path: str | Path,
+    *,
+    quality: int = 40,
+    max_size: tuple[int, int] = (1000, 1000),
+) -> bytes:
+    """
+    Resize and convert to JPEG with the given quality. Returns JPEG bytes.
+    """
+    file_path = Path(file_path)
+    with PILImage.open(file_path) as img:
         img = img.convert("RGB")
         img.thumbnail(max_size)
         buf = BytesIO()
-        img.save(buf, format="JPEG", quality=quality)
-
+        img.save(buf, format="JPEG", quality=quality, optimize=True)
         return buf.getvalue()
 
-def clean_keys(key: str) -> str:
-    """Remove unwanted characters and convert to upper case."""
-    key = re.sub(r'[^\w\s\-_]', '', key).upper()
-    return key
+def get_image_bytes_or_b64(
+    file_name: str | Path,
+    *,
+    directory: Path = IMAGES_DIRECTORY,
+    as_base64: bool = False,
+    quality: int = 40,
+    max_size: tuple[int, int] = (1000, 1000),
+) -> bytes | str:
+    """
+    Returns compressed JPEG bytes or a base64 string. File extension is coerced to .png on input,
+    but compression always outputs JPEG bytes/base64.
+    """
+    path = (directory / file_name) if isinstance(file_name, str) else file_name
+    if path.suffix.lower() != ".png":
+        path = path.with_suffix(".png")
 
-def normalize_json_keys(json_obj: Any) -> Any:
+    jpeg_bytes = compress_image(path, quality=quality, max_size=max_size)
+    if as_base64:
+        return base64.b64encode(jpeg_bytes).decode("utf-8")
+    return jpeg_bytes
 
-    if isinstance(json_obj, dict):
-        return {clean_keys(k): normalize_json_keys(v) for k, v in json_obj.items()}
-    elif isinstance(json_obj, list) or isinstance(json_obj, pd.Series):
-        return [normalize_json_keys(item) for item in json_obj]
-    else:
-        return json_obj
+
+_key_chars_re = re.compile(r"[^\w\s\-_]")  # keep word chars, space, dash, underscore
+_ws_re = re.compile(r"\s+")
+
+def clean_key(key: str) -> str:
+    """Remove unwanted characters, collapse whitespace, trim, and convert to UPPER_SNAKE-ish."""
+    key = _key_chars_re.sub("", key)
+    key = _ws_re.sub(" ", key).strip()
+    # If you prefer underscores: key = key.replace(" ", "_")
+    return key.upper()
+
+def normalize_dict_keys(obj: Any) -> Any:
+    """
+    Recursively normalize mapping keys; preserves lists/tuples;
+    """
+    from collections.abc import Mapping as ABMapping, Sequence as ABSequence
+
+    if isinstance(obj, ABMapping):
+        return {clean_key(str(k)): normalize_dict_keys(v) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple)):
+        return obj.__class__(normalize_dict_keys(v) for v in obj)
+    return obj
 
 ```
 
 Let’s take a moment to break down the `_extract_qa_pairs` function:
 
-1. We create a look-up list of tuples for preserving duplicates - qa_pairs
+1. We create an ID lookup dictionary to find items by their ID
 2. We identify "question" items that have linked answer pair(s) in the form of (q_id, a_id)
-3. We construct question-answer pairs by joining the individual words
+3. We construct structured QAPair objects by extracting text from both question and answer words
 
-We can then call `get_json` to fetch the OCR-identified question/answer structure based on the form image data.
+We can then call `load_annotation_file` to load an annotation JSON file and return question-answer pair (structured QAPair object).
 
-For LLM inputs, we favor small, predictable payloads over lossless fidelity. We use `get_image` to read PNG images from a directory and use `_compress_image` to convert PNG images to JPEG format, then `encode_image_as_base64` to encode them as LLM input.
+For LLM inputs, we favor small, predictable payloads over lossless fidelity. We use `get_image_bytes_or_b64` to read PNG images from a directory and convert to either compressed JPEG bytes using `_compress_image` or base64 depending depending on the boolean as_base64.
 
 **Bandwidth & Cost:** PNG scans of forms are often 5–10× larger than a JPEG of the same resolution. Since we send images as base64 (with ≈33% overhead), shrinking bytes directly reduces request size, latency, and API cost—especially when batch-evaluating many pages.
 
@@ -227,12 +323,9 @@ For LLM inputs, we favor small, predictable payloads over lossless fidelity. We 
 With tiny type, low-contrast scans, or while using classical OCR (e.g., Tesseract), we prefer lossless formats (PNG/TIFF) or use higher JPEG quality. Compression artifacts can blur thin strokes and hurt accuracy.
 
 ```python
-from IPython.display import Image, display
-import random
-
-random_file = get_random_files()
-image_bytes = get_image(random_file[0])
-get_json(random_file)
+random_files = choose_random_annotation_names(n=1, seed=42)
+image_bytes = get_image_bytes_or_b64(random_files[0], as_base64=True)
+load_annotation_file(random_files[0])
 
 ```
 
@@ -263,13 +356,18 @@ mlflow ui --backend-store-uri sqlite:///mlflow_runs.db
 
 ### 4. Loading inputs and Prompting
 
-We start by defining a system prompt for extracting the contents of the images into lists of "questions" and "answers" using an LLM. We will use a "first pass" prompt, deliberately made short and minimally descriptive so that subsequent improvements can be made later on. These are tracked under the MLflow experiment runs when the LLM completion calls are invoked for each image file.
+We start by defining a system prompt for extracting the contents of the images into lists of "questions" and "answers" using an LLM. We will use a "first pass" prompt, deliberately made short and minimally descriptive so that subsequent improvements can be made later on. These are tracked under the MLflow experiment runs when the LLM completion calls are invoked for each image file. We convert the QAPair object into a dictionary for easier comparison with the LLM response during evaluation.
 
 ```python
 
-_files = get_random_files(n=5)
-images = [encode_image_as_base64(get_image(file)) for file in _files]
-jsons = [get_json(file) for file in _files]
+_files = choose_random_annotation_names(n=5, seed=42)
+annotation_items = [
+    {pair.question: pair.answer for pair in load_annotation_file(file_name)}
+    for file_name in _files
+]
+annotation_normalized = normalize_dict_keys(annotation_items)
+images = [get_image_bytes_or_b64(file, as_base64=True) for file in _files]
+
 
 system_prompt = """You are an expert at Optical Character Recognition (OCR). Extract the questions and answers from the image."""
 
@@ -281,8 +379,9 @@ On the OpenAI side, we initialize the client and send a prompt to the LLM, instr
 
 ```python
 from pydantic import BaseModel
+from openai import OpenAI
 
-# Define Pydantic models for structured output in the form of key-value pair list
+# Define Pydantic models for structured output in the form of key-value pair list similar to the QAPair objects
 class KeyValueModel(BaseModel):
     key: str
     value: str
@@ -315,7 +414,7 @@ def get_completion(inputs: str) -> str:
 
 
     generated_response = {pair.key: pair.value for pair in completion.choices[0].message.parsed.pairs}
-    return normalize_json_keys(generated_response)
+    return normalize_dict_keys(generated_response)
 
 with mlflow.start_run() as run:
     predicted = get_completion(images[0])
@@ -373,18 +472,15 @@ def batch_completion(df: pd.DataFrame) -> pd.Series:
     return pd.Series(result)
 
 
-def key_value_accuracy(predictions: pd.Series, truth: pd.Series) -> MetricValue:
+def key_value_accuracy(predictions: pd.Series, truth_normalized: pd.Series) -> MetricValue:
     """
-    Calculate accuracy scores by comparing predicted JSONs with ground truth JSONs
+    Calculate accuracy scores by comparing predicted dictionary with ground truth dictionary
 
     For each prediction-truth pair, compute the fraction of correct key-value matches.
     """
     scores = []
 
-    # Normalize the ground truth data
-    truth_normalized = normalize_json_keys(truth)
-
-    for pred_dict, truth_dict in zip(pred, truth_normalized):
+    for pred_dict, truth_dict in zip(predictions, truth_normalized):
         if not isinstance(pred_dict, dict) or not isinstance(truth_dict, dict):
             scores.append(0.0)
             continue
@@ -409,12 +505,12 @@ custom_key_value_accuracy = make_metric(
 )
 ```
 
-After defining this custom metric, we can evaluate it over a dataframe, which includes a subset of base64-encoded images and their corresponding ground truth JSONs. Using the `batch_completion` function, we run a batch completion request on this subset, retrieving outputs in the predefined Structured Output format.
+After defining this custom metric, we can evaluate it over a dataframe, which includes a subset of base64-encoded images and their corresponding ground truth dictionaries. Using the `batch_completion` function, we run a batch completion request on this subset, retrieving outputs in the predefined Structured Output format.
 
 ```python
 results = mlflow.models.evaluate(
     model=batch_completion,
-    data=pd.DataFrame({"inputs": images, "truth": jsons}),
+    data=pd.DataFrame({"inputs": images, "truth": annotation_normalized}),
     targets="truth",
     model_type="text",
     predictions="predictions",
@@ -470,7 +566,7 @@ system_prompt = prompt.format(additional_rules="Use exact formatting you see in 
 
 results_updated = mlflow.models.evaluate(
     model=batch_completion,
-    data=pd.DataFrame({"inputs": images, "truth": jsons}),
+    data=pd.DataFrame({"inputs": images, "truth": annotation_normalized}),
     targets="truth",
     model_type="text",
     predictions="predictions",
