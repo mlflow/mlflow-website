@@ -359,15 +359,19 @@ mlflow ui --backend-store-uri sqlite:///mlflow_runs.db
 We start by defining a system prompt for extracting the contents of the images into lists of "questions" and "answers" using an LLM. We will use a "first pass" prompt, deliberately made short and minimally descriptive so that subsequent improvements can be made later on. These are tracked under the MLflow experiment runs when the LLM completion calls are invoked for each image file. We convert the QAPair object into a dictionary for easier comparison with the LLM response during evaluation.
 
 ```python
+from collections import defaultdict
 
 _files = choose_random_annotation_names(n=5, seed=42)
-annotation_items = [
-    {pair.question: pair.answer for pair in load_annotation_file(file_name)}
-    for file_name in _files
-]
+#Store multiple answers per question as list
+annotation_items = []
+for file_name in _files:
+    file_dict = defaultdict(list)
+    for pair in load_annotation_file(file_name):
+        file_dict[pair.question].append(pair.answer)
+    annotation_items.append(dict(file_dict))
+
 annotation_normalized = normalize_dict_keys(annotation_items)
 images = [get_image_bytes_or_b64(file, as_base64=True) for file in _files]
-
 
 system_prompt = """You are an expert at Optical Character Recognition (OCR). Extract the questions and answers from the image."""
 
@@ -381,10 +385,10 @@ On the OpenAI side, we initialize the client and send a prompt to the LLM, instr
 from pydantic import BaseModel
 from openai import OpenAI
 
-# Define Pydantic models for structured output in the form of key-value pair list similar to the QAPair objects
+# Define Pydantic models for structured output in the form of key-value pair accounting for duplicate questions
 class KeyValueModel(BaseModel):
     key: str
-    value: str
+    value: list[str]
 
 class KeyValueList(BaseModel):
     pairs: list[KeyValueModel]
@@ -472,23 +476,33 @@ def batch_completion(df: pd.DataFrame) -> pd.Series:
     return pd.Series(result)
 
 
-def key_value_accuracy(predictions: pd.Series, truth_normalized: pd.Series) -> MetricValue:
+def key_value_accuracy(predictions: pd.Series, truth: pd.Series) -> MetricValue:
     """
-    Calculate accuracy scores by comparing predicted dictionary with ground truth dictionary
-
-    For each prediction-truth pair, compute the fraction of correct key-value matches.
+    Calculate accuracy scores by comparing predicted dictionaries with ground truth dictionaries.
+    Both predictions and truth are expected to be dict[str, list[str]] format.
     """
     scores = []
 
-    for pred_dict, truth_dict in zip(predictions, truth_normalized):
+    for pred_dict, truth_dict in zip(predictions, truth):
         if not isinstance(pred_dict, dict) or not isinstance(truth_dict, dict):
             scores.append(0.0)
             continue
 
-        correct = sum(1 for k, v in truth_dict.items()
-                     if k in pred_dict and pred_dict[k] == v)
+        correct = 0
+        total_answers = 0
 
-        scores.append(correct / len(truth_dict) if truth_dict else 0.0)
+        for question, truth_answers in truth_dict.items():
+            total_answers += len(truth_answers)
+
+            if question in pred_dict:
+                pred_answers = pred_dict[question]
+
+                # Count how many truth answers are correctly predicted
+                for truth_ans in truth_answers:
+                    if truth_ans in pred_answers:
+                        correct += 1
+
+        scores.append(correct / total_answers if total_answers > 0 else 0.0)
 
     return MetricValue(
         scores=scores,
