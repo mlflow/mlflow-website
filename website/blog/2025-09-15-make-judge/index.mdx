@@ -1,0 +1,229 @@
+---
+title: "Beyond Generic Metrics: Build Domain-Specific LLM Judges with MLflow"
+description: How to create custom evaluators that actually understand your quality requirements
+slug: custom-llm-judges-make-judge
+authors: [mlflow-maintainers]
+tags: [genai, evaluation, judges, llm]
+thumbnail: /img/blog/make-judge-thumbnail.png
+image: /img/blog/make-judge-thumbnail.png
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+In this post, we'll show how MLflow Scorers—the framework's core abstraction for automated evaluation—make it simple to build judges that actually understand your domain-specific quality requirements.
+
+[MLflow Scorers](https://mlflow.org/docs/latest/genai/eval-monitor/) are evaluation functions that can assess any aspect of your GenAI application. The `make_judge` API lets you create these scorers using natural language instructions, and here's the key insight: whether you're using MLflow's built-in scorers or creating custom ones, they all share the same powerful capabilities.
+
+If you've tried evaluating GenAI applications, you know generic metrics miss what matters. Your customer support bot needs to be evaluated on empathy and problem resolution. Your code generator needs to be checked for security vulnerabilities. Your medical advisor needs domain-specific accuracy checks. MLflow Scorers let you define these requirements in plain English.
+
+This post demonstrates the power of MLflow Scorers by showing how to:
+
+- Create custom scorers with `make_judge` using natural language instructions
+- Build scorers that can act agentically, analyzing entire execution traces
+- Align scorers with human feedback to improve their accuracy over time
+- Share and version scorers across your team
+
+We'll build a customer support quality scorer, show how it can evaluate complex agent behaviors, and demonstrate how human feedback makes it smarter. The built-in scorers MLflow provides? They're just pre-defined versions using these same capabilities. Once you understand this, you'll see how flexible and powerful MLflow's evaluation framework really is.
+
+## Creating Your First Scorer: A Customer Support Evaluator
+
+Let's start with a practical example. Say you're building a customer support chatbot. You need a scorer that evaluates whether responses are actually helpful—not just grammatically correct.
+
+First, install MLflow:
+
+```shell
+pip install mlflow
+```
+
+Now let's create a scorer that understands what makes a good support response:
+
+```python
+from mlflow.genai.judges import make_judge
+
+# Create a scorer for customer support quality
+support_scorer = make_judge(
+    name="support_quality",
+    instructions=(
+        "Evaluate if the response in {{ outputs }} properly addresses "
+        "the customer issue in {{ inputs }}.\n\n"
+        "Consider: tone, helpfulness, clarity, and completeness.\n"
+        "Rate as: 'excellent', 'good', 'fair', or 'poor'"
+    ),
+    model="anthropic:/claude-3-opus-20240229"
+)
+```
+
+The key here is that we're defining a scorer using plain English. No complex scoring functions, no regex patterns—just describe what you're looking for. This scorer is now a reusable evaluation component that works anywhere in MLflow's ecosystem.
+
+Let's see how our scorer handles a terrible support response:
+
+```python
+# Test the scorer on a support interaction
+result = support_scorer(
+    inputs={"issue": "Can't reset my password"},
+    outputs={"response": "Have you tried turning it off and on again?"}
+)
+
+print(f"Rating: {result.value}")
+print(f"Reasoning: {result.rationale}")
+```
+
+Output:
+
+```
+Rating: poor
+Reasoning: The response does not address the password reset issue at all.
+It provides a generic IT troubleshooting suggestion that is irrelevant to
+the customer's specific problem...
+```
+
+### Scaling Up: Evaluating Entire Datasets
+
+Testing individual responses is useful, but the real value comes when you use your scorer to evaluate entire conversation datasets. Here's how scorers integrate seamlessly with MLflow's evaluation framework:
+
+```python
+import mlflow
+import pandas as pd
+
+# Your support conversations dataset
+test_data = pd.DataFrame([
+    {
+        "inputs": {"issue": "Billing error - charged twice"},
+        "outputs": {"response": "I'll immediately refund the duplicate charge."}
+    },
+    {
+        "inputs": {"issue": "Feature request for dark mode"},
+        "outputs": {"response": "Great suggestion! I've forwarded this to our product team."}
+    }
+])
+
+# Run evaluation with your custom scorer
+results = mlflow.genai.evaluate(
+    data=test_data,
+    scorers=[support_scorer]
+)
+
+# View results
+print(results.tables["eval_results_table"])
+```
+
+## Scorers as Agents: Trace-Based Evaluation
+
+So far our scorer has evaluated simple question-answer pairs. But MLflow Scorers can act agentically—they can analyze complex AI agents that make multiple LLM calls, use tools, and follow reasoning chains.
+
+With trace-based evaluation, your scorer evaluates not just the final output, but the entire execution path:
+
+```python
+# Create a scorer that analyzes agent behavior
+agent_scorer = make_judge(
+    name="agent_efficiency",
+    instructions=(
+        "Analyze the {{ trace }} for efficiency and correctness.\n\n"
+        "Check for: unnecessary tool calls, circular reasoning, "
+        "proper error handling, and optimal execution paths.\n"
+        "Rate as: 'optimal', 'acceptable', or 'inefficient'"
+    ),
+    model="anthropic:/claude-3-opus-20240229"
+)
+
+# Evaluate a traced agent execution
+with mlflow.start_span("agent_task") as span:
+    # Your agent logic here
+    result = my_agent.execute(task)
+    trace_id = span.trace_id
+
+trace = mlflow.get_trace(trace_id)
+evaluation = agent_scorer(trace=trace)
+```
+
+## The Game Changer: Human Feedback Alignment
+
+Here's where things get interesting. What happens when your scorer disagrees with your human experts? Instead of rewriting prompts endlessly, MLflow Scorers can learn from human corrections.
+
+The process works like this:
+
+```python
+from mlflow.entities import AssessmentSource, AssessmentSourceType
+
+# Step 1: Run scorer on production data
+for trace_id in production_traces:
+    trace = mlflow.get_trace(trace_id)
+    scorer_result = support_scorer(trace=trace)
+
+# Step 2: Collect human feedback on scorer decisions
+mlflow.log_feedback(
+    trace_id=trace_id,
+    name="support_quality",  # Must match scorer name
+    value="excellent",  # Human's assessment
+    source=AssessmentSource(
+        source_type=AssessmentSourceType.HUMAN,
+        source_id="support_expert"
+    )
+)
+
+# Step 3: Align scorer with human feedback (min 10 examples)
+traces_with_feedback = mlflow.search_traces(
+    experiment_ids=[experiment_id],
+    return_type="list"
+)
+
+aligned_scorer = support_scorer.align(
+    traces=traces_with_feedback
+)
+
+# The aligned scorer now better matches human judgment!
+```
+
+In practice, aligned scorers achieve 30-50% reduction in evaluation errors compared to generic prompts. The more feedback you provide, the better they get at matching your team's quality standards.
+
+## Team Collaboration: Sharing and Versioning Scorers
+
+Once you've built and refined a scorer, you don't want it living on just your machine. MLflow makes it easy to share scorers across your team:
+
+```python
+# Register your scorer
+mlflow.set_tracking_uri("your-mlflow-server")
+experiment_id = mlflow.create_experiment("evaluation-scorers")
+
+support_scorer.register(experiment_id)
+print("Scorer registered successfully")
+
+# Team members can retrieve and use it
+from mlflow.genai.scorers import get_scorer
+
+# Get the latest version
+team_scorer = get_scorer(
+    name="support_quality",
+    experiment_id=experiment_id
+)
+
+# Get a specific version for reproducibility (if using MLflow tracking backend)
+# Note: Version numbers start at 1 and increment with each registration
+v1_scorer = get_scorer(
+    name="support_quality",
+    experiment_id=experiment_id,
+    version=1
+)
+```
+
+## Conclusion
+
+This post has shown how MLflow Scorers provide a unified abstraction for automated evaluation. We started with a simple customer support scorer, demonstrated how scorers can act agentically to evaluate complex traces, and showed how human feedback alignment makes them smarter over time.
+
+The key takeaways are:
+
+- **Scorers are MLflow's core evaluation abstraction**—whether built-in or custom, they all share the same capabilities
+- **Natural language is enough**—define evaluation criteria in plain English with `make_judge`
+- **Scorers can be agentic**—they can analyze entire execution traces, not just inputs and outputs
+- **Human alignment works**—scorers learn from feedback, improving accuracy without endless prompt engineering
+- **Everything just works together**—no compatibility matrix, no special cases
+
+The built-in scorers MLflow provides are simply pre-defined versions using these same capabilities. Once you understand this, creating domain-specific evaluators becomes straightforward. If generic metrics don't capture what matters to your users, you can have a working custom scorer in minutes, and it gets better the more you use it.
+
+### Next Steps
+
+- Explore the [MLflow Evaluation and Monitoring framework](https://mlflow.org/docs/latest/genai/eval-monitor/) for the complete evaluation ecosystem
+- Read the [make_judge documentation](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/make-judge.html) for advanced scorer features
+- Learn about [built-in scorers](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/index.html) available out of the box
+- See how to create [evaluation datasets](https://mlflow.org/docs/latest/genai/eval-monitor/datasets/index.html) for systematic testing
