@@ -108,6 +108,8 @@ print(results.tables["eval_results_table"])
 
 So far our scorer has evaluated simple question-answer pairs. But MLflow Scorers can act agentically to analyze complex AI agents that make multiple LLM calls, use tools, and follow reasoning chains.
 
+![MLflow Trace UI showing detailed execution flow](genai-trace-debug.png)
+
 ### Why We Call Them "Agentic"
 
 Without `make_judge`, implementing a comprehensive trace evaluator would require significant effort. You would need to:
@@ -204,6 +206,8 @@ You can provide feedback either through the MLflow Trace UI or programmatically:
 
 Navigate to your MLflow tracking server and use the feedback interface directly on traced executions. This is ideal for subject matter experts who prefer a visual interface.
 
+![MLflow Trace UI with human feedback interface](genai-human-feedback.png)
+
 #### Option B: Programmatic Feedback
 
 ```python
@@ -254,6 +258,31 @@ results = mlflow.genai.evaluate(
 
 print(f"Alignment improved accuracy by: {results.metrics['alignment_improvement']}%")
 ```
+
+#### Pluggable Optimization Framework
+
+MLflow's alignment implementation is designed to be extensible. While the current release includes a built-in SIMBA optimizer from DSPy, the architecture supports custom alignment optimizers through the `AlignmentOptimizer` abstract base class:
+
+```python
+# Use the default SIMBA optimizer
+aligned_scorer = support_scorer.align(traces=traces_with_feedback)
+
+# Or provide your own custom optimizer
+from mlflow.genai.judges.base import AlignmentOptimizer
+
+class CustomOptimizer(AlignmentOptimizer):
+    def align(self, judge, traces):
+        # Your optimization logic here
+        return optimized_judge
+
+custom_optimizer = CustomOptimizer()
+aligned_scorer = support_scorer.align(
+    traces=traces_with_feedback,
+    optimizer=custom_optimizer
+)
+```
+
+This pluggable design means you can leverage external optimization frameworks or implement domain-specific alignment strategies while maintaining compatibility with MLflow's evaluation ecosystem.
 
 In practice, aligned scorers achieve 30-50% reduction in evaluation errors compared to generic prompts. The more feedback you provide, the better they get at matching your team's quality standards.
 
