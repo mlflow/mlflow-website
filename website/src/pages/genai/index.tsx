@@ -12,6 +12,7 @@ import Card1 from "@site/static/img/GenAI_home/GenAI_home_1.png";
 import Card2 from "@site/static/img/GenAI_home/GenAI_home_2.png";
 import Card3 from "@site/static/img/GenAI_home/GenAI_home_3.png";
 import Card4 from "@site/static/img/GenAI_home/GenAI_home_4.png";
+import CardGateway from "@site/static/img/GenAI_gateway/GenAI_gateway_1.png";
 
 export default function GenAi(): JSX.Element {
   return (
@@ -70,6 +71,17 @@ export default function GenAi(): JSX.Element {
               text: "Learn more",
             },
             image: <img src={Card4} alt="MLflow LLM judges" />,
+          },
+          {
+            title: "AI Gateway",
+            body: [
+              "Standardize access to multiple LLM providers with unified endpoints, centralized key management, and rate limiting.",
+            ],
+            cta: {
+              href: "/genai/ai-gateway",
+              text: "Learn more",
+            },
+            image: <img src={CardGateway} alt="MLflow AI Gateway" />,
           },
         ]}
       />
