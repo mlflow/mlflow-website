@@ -12,6 +12,7 @@ import { useLayoutVariant } from "../Layout/Layout";
 import {
   MLFLOW_DOCS_URL,
   MLFLOW_GENAI_DOCS_URL,
+  MLFLOW_ML_DOCS_URL,
   MLFLOW_DBX_TRIAL_URL,
   MLFLOW_DBX_INSTALL_URL,
 } from "@site/src/constants";
@@ -38,6 +39,9 @@ export const GetStartedWithMLflow = ({ contentType }: GetStartedWithMLflowProps 
   const getDocsUrl = () => {
     if (contentType === "genai") {
       return MLFLOW_GENAI_DOCS_URL;
+    }
+    if (contentType === "classical-ml") {
+      return MLFLOW_ML_DOCS_URL;
     }
     return MLFLOW_DOCS_URL;
   };
