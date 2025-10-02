@@ -61,7 +61,7 @@ export default function Governance() {
         ]}
       />
 
-      <BelowTheFold />
+      <BelowTheFold contentType="genai" />
     </Layout>
   );
 }

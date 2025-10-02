@@ -42,7 +42,7 @@ export default function AppVersioning() {
         ]}
       />
 
-      <BelowTheFold />
+      <BelowTheFold contentType="genai" />
     </Layout>
   );
 }

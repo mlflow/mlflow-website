@@ -56,7 +56,7 @@ export default function HumanFeedback() {
         ]}
       />
 
-      <BelowTheFold />
+      <BelowTheFold contentType="genai" />
     </Layout>
   );
 }

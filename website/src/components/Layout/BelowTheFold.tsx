@@ -1,10 +1,16 @@
 import { PropsWithChildren } from "react";
 import { SocialWidget, GetStartedWithMLflow } from "..";
 
-export function BelowTheFold({ children }: PropsWithChildren) {
+type ContentType = "genai" | "classical-ml";
+
+interface BelowTheFoldProps extends PropsWithChildren {
+  contentType?: ContentType;
+}
+
+export function BelowTheFold({ children, contentType }: BelowTheFoldProps) {
   return (
     <>
-      <GetStartedWithMLflow />
+      <GetStartedWithMLflow contentType={contentType} />
       {children}
       <SocialWidget />
     </>

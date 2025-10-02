@@ -48,7 +48,7 @@ export default function PromptRegistryVersioning() {
         ]}
       />
 
-      <BelowTheFold />
+      <BelowTheFold contentType="genai" />
     </Layout>
   );
 }

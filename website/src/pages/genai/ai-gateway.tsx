@@ -36,7 +36,7 @@ export default function AiGateway() {
         ]}
       />
 
-      <BelowTheFold />
+      <BelowTheFold contentType="genai" />
     </Layout>
   );
 }

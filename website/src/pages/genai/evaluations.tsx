@@ -79,7 +79,7 @@ export default function Evaluations() {
         />
       </Section>
 
-      <BelowTheFold />
+      <BelowTheFold contentType="genai" />
     </Layout>
   );
 }
