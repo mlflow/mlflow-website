@@ -60,7 +60,7 @@ export default function Tracking() {
         ]}
       />
 
-      <BelowTheFold />
+      <BelowTheFold contentType="classical-ml" />
     </Layout>
   );
 }

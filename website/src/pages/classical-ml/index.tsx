@@ -77,7 +77,7 @@ export default function GenAi(): JSX.Element {
       <LogosCarousel />
       <ValuePropWidget />
 
-      <BelowTheFold>
+      <BelowTheFold contentType="classical-ml">
         <LatestNews />
       </BelowTheFold>
     </Layout>

@@ -36,7 +36,7 @@ export default function Models() {
         ]}
       />
 
-      <BelowTheFold />
+      <BelowTheFold contentType="classical-ml" />
     </Layout>
   );
 }

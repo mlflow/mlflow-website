@@ -11,11 +11,20 @@ import { Body } from "../Typography/Body";
 import { useLayoutVariant } from "../Layout/Layout";
 import {
   MLFLOW_DOCS_URL,
+  MLFLOW_GENAI_DOCS_URL,
+  MLFLOW_ML_DOCS_URL,
   MLFLOW_DBX_TRIAL_URL,
   MLFLOW_DBX_INSTALL_URL,
 } from "@site/src/constants";
+import { ContentType } from "../types";
 
-export const GetStartedWithMLflow = () => {
+interface GetStartedWithMLflowProps {
+  contentType?: ContentType;
+}
+
+export const GetStartedWithMLflow = ({
+  contentType,
+}: GetStartedWithMLflowProps = {}) => {
   const variant = useLayoutVariant();
   const location = useLocation();
   const classicalMLPath = useBaseUrl("/classical-ml");
@@ -26,6 +35,17 @@ export const GetStartedWithMLflow = () => {
   const databricksButtonText = isClassicalML
     ? "Get started"
     : "Get started for free";
+
+  // Determine the appropriate docs URL based on content type
+  const getDocsUrl = () => {
+    if (contentType === "genai") {
+      return MLFLOW_GENAI_DOCS_URL;
+    }
+    if (contentType === "classical-ml") {
+      return MLFLOW_ML_DOCS_URL;
+    }
+    return MLFLOW_DOCS_URL;
+  };
 
   useBrokenLinks().collectAnchor("get-started");
 
@@ -60,7 +80,7 @@ export const GetStartedWithMLflow = () => {
           size="large"
           width="full"
           variant="primary"
-          link={MLFLOW_DOCS_URL}
+          link={getDocsUrl()}
         />
       </div>
       <div className="flex flex-col gap-8 p-8 bg-[#fff]/4 rounded-2xl @container justify-between">

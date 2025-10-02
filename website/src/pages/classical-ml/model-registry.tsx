@@ -36,7 +36,7 @@ export default function ModelRegistryAndDeployment() {
         ]}
       />
 
-      <BelowTheFold />
+      <BelowTheFold contentType="classical-ml" />
     </Layout>
   );
 }

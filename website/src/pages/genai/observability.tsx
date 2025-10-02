@@ -89,7 +89,7 @@ export default function Observability() {
         />
       </Section>
 
-      <BelowTheFold />
+      <BelowTheFold contentType="genai" />
     </Layout>
   );
 }
