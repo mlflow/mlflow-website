@@ -43,7 +43,7 @@ export default function Serving() {
         ]}
       />
 
-      <BelowTheFold />
+      <BelowTheFold contentType="classical-ml" />
     </Layout>
   );
 }

@@ -43,7 +43,7 @@ export default function HyperparamTuning() {
         ]}
       />
 
-      <BelowTheFold />
+      <BelowTheFold contentType="classical-ml" />
     </Layout>
   );
 }

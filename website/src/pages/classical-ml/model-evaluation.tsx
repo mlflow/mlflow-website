@@ -36,7 +36,7 @@ export default function ModelEvaluation() {
         ]}
       />
 
-      <BelowTheFold />
+      <BelowTheFold contentType="classical-ml" />
     </Layout>
   );
 }

@@ -1,7 +1,6 @@
 import { PropsWithChildren } from "react";
 import { SocialWidget, GetStartedWithMLflow } from "..";
-
-type ContentType = "genai" | "classical-ml";
+import { ContentType } from "../types";
 
 interface BelowTheFoldProps extends PropsWithChildren {
   contentType?: ContentType;

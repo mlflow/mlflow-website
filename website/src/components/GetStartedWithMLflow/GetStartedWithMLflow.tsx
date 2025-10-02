@@ -16,14 +16,15 @@ import {
   MLFLOW_DBX_TRIAL_URL,
   MLFLOW_DBX_INSTALL_URL,
 } from "@site/src/constants";
-
-type ContentType = "genai" | "classical-ml";
+import { ContentType } from "../types";
 
 interface GetStartedWithMLflowProps {
   contentType?: ContentType;
 }
 
-export const GetStartedWithMLflow = ({ contentType }: GetStartedWithMLflowProps = {}) => {
+export const GetStartedWithMLflow = ({
+  contentType,
+}: GetStartedWithMLflowProps = {}) => {
   const variant = useLayoutVariant();
   const location = useLocation();
   const classicalMLPath = useBaseUrl("/classical-ml");
