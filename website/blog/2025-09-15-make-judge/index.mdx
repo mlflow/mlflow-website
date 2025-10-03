@@ -108,7 +108,13 @@ print(results.tables["eval_results_table"])
 
 So far our scorer has evaluated simple question-answer pairs. But MLflow Scorers can act agentically to analyze complex AI agents that make multiple LLM calls, use tools, and follow reasoning chains.
 
-![MLflow Trace UI showing detailed execution flow](genai-trace-debug.png)
+### Agent Scorers Evaluating Complex Agents
+
+One of the most powerful aspects of Agent-based Scorers is their ability to diagnose complex tool calling and logical chains in complex agent workflows. For example, the following clip shows an advanced agent that can answer questions about the logistics of fantasy currency systems. It has at its disposal dozens of tools that can perform physics calculations, logistical assessments, and standard reference information to determine just how ridiculous a fantasy character's treasure haul can be.
+
+The Agent-based judges used for evaluation are capable of reviewing the entire process flow of each span, permitting the scorer to not only be more accurate in its overall rating, but allows its rationale to be targeted and more evidence-based.
+
+![MLflow Trace UI showing detailed execution flow](make_judge_eval.gif)
 
 ### Why We Call Them "Agentic"
 
@@ -202,13 +208,17 @@ Here's where things get interesting. What happens when your scorer disagrees wit
 
 You can provide feedback either through the MLflow Trace UI or programmatically:
 
-#### Option A: Using the Trace UI
+#### Option A: Using the Trace UI / Evaluation UI
 
-Navigate to your MLflow tracking server and use the feedback interface directly on traced executions. This is ideal for subject matter experts who prefer a visual interface.
+Navigate to your MLflow tracking server and use the feedback interface directly on the evaluation traces. This is ideal for subject matter experts who prefer a visual interface or for comprehensive feedback to be added that directly corrects rationale that the agent provided.
 
-![MLflow Trace UI with human feedback interface](genai-human-feedback.png)
+![MLflow Trace UI with human feedback interface](make_judge_human_feedback.gif)
+
+The feedback you provide here will be logged as part of the trace and can be used for alignment.
 
 #### Option B: Programmatic Feedback
+
+The example below shows how to log feedback programmatically. This is useful for integrating expert reviews into your existing workflows. You can even embed feedback from users of your application directly within your application using the MLflow SDK APIs.
 
 ```python
 from mlflow.entities import AssessmentSource, AssessmentSourceType
