@@ -105,7 +105,7 @@ export const EcosystemList = () => {
                 {
                   title: "ONNX",
                   src: "img/onnx.svg",
-                  href: "https://mlflow.org/docs/latest/ml/model/inex.html#onnx-onnx",
+                  href: "https://mlflow.org/docs/latest/ml/model/index.html#onnx-onnx",
                 },
                 {
                   title: "Spacy",
