@@ -57,9 +57,6 @@ jobs:
             const { deleteArtifacts } = require('./.github/scripts/artifact-utils.js');
             await deleteArtifacts({ github, context });
 
-      - name: Install Netlify CLI
-        run: npm install -g netlify-cli
-
       - name: Deploy to Netlify
         working-directory: website
         env:
@@ -68,7 +65,7 @@ jobs:
           PR_NUMBER: ${{ steps.get-pr.outputs.result }}
           ACTION_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          netlify deploy \
+          npx netlify-cli deploy \
             --dir=build \
             --no-build \
             --message="PR Preview #${PR_NUMBER} - GitHub Action: ${ACTION_URL}" \
