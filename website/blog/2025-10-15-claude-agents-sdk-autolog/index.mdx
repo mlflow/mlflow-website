@@ -1,5 +1,5 @@
 ---
-title: "Rapidly Prototype and Evaluate Agents with Claude Agents SDK and MLflow"
+title: "Rapidly Prototype and Evaluate Agents with Claude Agent SDK and MLflow"
 description: How to quickly prototype an agent using the Claude Agent SDK then instrument and evaluate it with MLflow
 slug: mlflow-autolog-claude-agents-sdk
 authors: [samraj-moorjani]
@@ -82,7 +82,7 @@ You are a travel agent assistant with access to flight search and travel documen
 4. Combine both capabilities when planning complete trips
 
 ## Success Criteria
-Present the user with clear, relevant, specific, and actionable advice. Cover all aspects of their travel (e.g., logistics, activities, local inisghts, etc.) and present them with tradeoffs of any choices they need to make.
+Present the user with clear, relevant, specific, and actionable advice. Cover all aspects of their travel (e.g., logistics, activities, local insights, etc.) and present them with tradeoffs of any choices they need to make.
 """
 ```
 
@@ -156,7 +156,7 @@ import mlflow
 
 Once you have autotracing set up, invocations of claude should result in new traces flowing into your experiment. You can configure your experiment or the tracking store using `mlflow.set_experiment` and `mlflow.set_tracking_uri`, respectively.
 
-![MLflow Trace UI showing autotracing of the Claude Agents SDK](claude_code_tracing.gif)
+![MLflow Trace UI showing autotracing of the Claude Agent SDK](claude_code_tracing.gif)
 
 As we were going through some of the traces, we noticed that our agent tends to have redundant retrieval steps.
 
@@ -166,7 +166,7 @@ In the next section, we’re going to discuss how we can use MLflow evaluations 
 
 ## Running Evaluations
 
-Building an agentic system is just the first step. To ensure your travel agent performs reliably in production, you need systematic evaluation. Without structured testing, you can't measure improvements, catch regressions, or understand where your agent succeeds and fails. Now that we have tracing for Claude Code, running evaluations is really easy with `mlflow.genai.evaluate`:
+Building an agentic system is just the first step. To ensure your travel agent performs reliably in production, you need systematic evaluation. Without structured testing, you can't measure improvements, catch regressions, or understand where your agent succeeds and fails. Now that we have tracing enabled for the Claude Agent SDK, running evaluations is really easy with `mlflow.genai.evaluate`:
 
 ```python
 mlflow.genai.evaluate(
@@ -180,7 +180,7 @@ We'll talk about what goes in each of these parameters in the following sections
 
 ### What goes in `predict_fn`?
 
-The predict function is the code that runs your agent and produces a trace to evaluate. Here's a `predict_fn` for our working travel agent example:
+The predict function is the code that runs your agent and produces a trace to evaluate. Here's a `predict_fn` for our travel agent working example:
 
 ```python
 def run_travel_agent_with_timeout(query: str, timeout: int = 300) -> str:
@@ -312,7 +312,14 @@ This will generate assessments tied to your traces as well as an evaluation run 
 
 Getting back to our original scenario with redundant retrieval calls - we can see that our retrieval redundancy judge is failing on many of our test cases. To combat this, we’ve added a line into the system prompt to emphasize efficiency with retrieval calls:
 
-**When using this tool, please ensure you only query about a topic once. All queries should be completely distinct!**
+```python
+TRAVEL_AGENT_SYSTEM_PROMPT = """
+...
+3. For travel information, use the `search_travel_docs` tool to extract relevant information about destinations, activities, logistics
+  - When using this tool, please ensure you only query about a topic once. All queries should be completely distinct!
+...
+"""
+```
 
 Re-running our evaluation yields the following results:
 
@@ -334,5 +341,5 @@ With observability and evaluation built in from day one, you can move from proto
 Next Steps
 
 - Explore the [Claude Agent SDK documentation](https://docs.claude.com/en/api/agent-sdk/python#claudeagentoptions) for advanced agent features
-- Learn about [Claude Code Auto-tracing](https://mlflow.org/docs/latest/genai/tracing/integrations/listing/claude_code/) for tracing the Claude Agents SDK and Claude Code CLI automatically
+- Learn about [Claude Code Auto-tracing](https://mlflow.org/docs/latest/genai/tracing/integrations/listing/claude_code/) for tracing the Claude Agent SDK and Claude Code CLI automatically
 - Read about [MLflow's evaluation and monitoring framework](https://mlflow.org/docs/latest/genai/eval-monitor/) for the complete evaluation ecosystem
