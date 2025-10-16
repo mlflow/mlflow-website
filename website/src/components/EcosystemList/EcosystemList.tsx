@@ -6,7 +6,7 @@ import MiniLogoCard from "../MiniLogoCard/MiniLogoCard";
 export const EcosystemList = () => {
   return (
     <div className="w-full px-4 md:px-8 lg:px-16">
-      <Section title="Integrates with 25+ apps and frameworks">
+      <Section title="Integrates with 40+ apps and frameworks">
         <BrowserOnly>
           {() => (
             <ExpandableGrid
@@ -42,14 +42,14 @@ export const EcosystemList = () => {
                   href: "https://mlflow.org/docs/latest/genai/tracing/integrations/listing/gemini.html",
                 },
                 {
-                  title: "AutoGen",
-                  src: "img/autogen.jpeg",
-                  href: "https://mlflow.org/docs/latest/genai/tracing/integrations/listing/autogen.html",
+                  title: "DSPy",
+                  src: "img/dspy.png",
+                  href: "https://mlflow.org/docs/latest/genai/tracing/integrations/listing/dspy.html",
                 },
                 {
-                  title: "LlamaIndex",
-                  src: "img/llamaindex.svg",
-                  href: "https://mlflow.org/docs/latest/genai/flavors/llama-index/index.html",
+                  title: "Bedrock",
+                  src: "img/bedrock.png",
+                  href: "https://mlflow.org/docs/latest/genai/tracing/integrations/listing/bedrock.html",
                 },
                 {
                   title: "Spark",
@@ -72,6 +72,26 @@ export const EcosystemList = () => {
                   href: "https://mlflow.org/docs/latest/ml/traditional-ml/sklearn/index.html",
                 },
                 {
+                  title: "AutoGen",
+                  src: "img/autogen.jpeg",
+                  href: "https://mlflow.org/docs/latest/genai/tracing/integrations/listing/autogen.html",
+                },
+                {
+                  title: "LlamaIndex",
+                  src: "img/llamaindex.svg",
+                  href: "https://mlflow.org/docs/latest/genai/flavors/llama-index/index.html",
+                },
+                {
+                  title: "CrewAI",
+                  src: "img/crewai.svg",
+                  href: "https://mlflow.org/docs/latest/genai/tracing/integrations/listing/crewai.html",
+                },
+                {
+                  title: "LiteLLM",
+                  src: "img/litellm.png",
+                  href: "https://mlflow.org/docs/latest/genai/tracing/integrations/listing/litellm.html",
+                },
+                {
                   title: "XGBoost",
                   src: "img/xgboost.svg",
                   href: "https://mlflow.org/docs/latest/ml/traditional-ml/xgboost/index.html",
@@ -87,15 +107,64 @@ export const EcosystemList = () => {
                   href: "https://mlflow.org/docs/latest/ml/model/index.html#catboost-catboost",
                 },
                 {
-                  title: "CrewAI",
-                  src: "img/crewai.svg",
-                  href: "https://mlflow.org/docs/latest/genai/tracing/integrations/listing/crewai.html",
+                  title: "Agno",
+                  src: "img/agno.jpeg",
+                  href: "https://mlflow.org/docs/latest/genai/tracing/integrations/listing/agno.html",
                 },
-
                 {
-                  title: "LiteLLM",
-                  src: "img/litellm.png",
-                  href: "https://mlflow.org/docs/latest/genai/tracing/integrations/listing/litellm.html",
+                  title: "Strands Agent SDK",
+                  src: "img/strands-agents.svg",
+                  href: "https://mlflow.org/docs/latest/genai/tracing/integrations/listing/strands.html",
+                },
+                {
+                  title: "Semantic Kernel",
+                  src: "img/semantic-kernel.png",
+                  href: "https://mlflow.org/docs/latest/genai/tracing/integrations/listing/semantic_kernel.html",
+                },
+                {
+                  title: "PydanticAI",
+                  src: "img/pydantic-ai.png",
+                  href: "https://mlflow.org/docs/latest/genai/tracing/integrations/listing/pydantic_ai.html",
+                },
+                {
+                  title: "Smolagents",
+                  src: "img/smolagents.png",
+                  href: "https://mlflow.org/docs/latest/genai/tracing/integrations/listing/smolagents.html",
+                },
+                {
+                  title: "Ollama",
+                  src: "img/ollama.png",
+                  href: "https://mlflow.org/docs/latest/genai/tracing/integrations/listing/ollama.html",
+                },
+                {
+                  title: "Groq",
+                  src: "img/groq.svg",
+                  href: "https://mlflow.org/docs/latest/genai/tracing/integrations/listing/groq.html",
+                },
+                {
+                  title: "Mistral",
+                  src: "img/mistral.png",
+                  href: "https://mlflow.org/docs/latest/genai/tracing/integrations/listing/mistral.html",
+                },
+                {
+                  title: "DeepSeek",
+                  src: "img/deepseek.png",
+                  href: "https://mlflow.org/docs/latest/genai/tracing/integrations/listing/deepseek.html",
+                },
+                {
+                  title: "Haystack",
+                  src: "img/haystack.png",
+                  href: "https://mlflow.org/docs/latest/genai/tracing/integrations/listing/haystack.html",
+                },
+                {
+                  title: "Claude Code",
+                  src: "img/claude.png",
+                  href: "https://mlflow.org/docs/latest/genai/tracing/integrations/listing/claude_code.html",
+                },
+                {
+                  title: "AG2",
+                  src: "img/ag2.svg",
+                  href: "https://mlflow.org/docs/latest/genai/tracing/integrations/listing/ag2.html",
                 },
                 {
                   title: "Sentence Transformers",
