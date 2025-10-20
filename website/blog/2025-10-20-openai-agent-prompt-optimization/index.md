@@ -11,7 +11,7 @@ Prompt engineering is critical for building reliable AI systems, but it's fraugh
 
 MLflow changes this equation. With `mlflow.genai.optimize_prompts`, you can now systematically optimize prompts for any task—whether it's question answering, classification, summarization, or code generation—**as long as you manage your prompts in MLflow Prompt Registry**.
 
-In this blog post, we'll demonstrate the complete workflow using the OpenAI Agent framework on a question-answering task with the HotpotQA dataset. We'll show how automated optimization with the [GEPA](https://github.com/gepa-ai/gepa?tab=readme-ov-file) algorithm achieved an 10% accuracy improvement, but the approach applies broadly to any GenAI application you're building.
+In this blog post, we'll demonstrate the complete workflow using the OpenAI Agent framework on a question-answering task with the HotpotQA dataset. We'll show how automated optimization with the [GEPA](https://github.com/gepa-ai/gepa?tab=readme-ov-file) algorithm achieved a 10% accuracy improvement, but the approach applies broadly to any GenAI application you're building.
 
 ## The Challenge: Question Answering
 
@@ -76,7 +76,7 @@ os.environ["MLFLOW_GENAI_EVAL_MAX_WORKERS"] = "1"
 Start your MLflow tracking server:
 
 ```bash
-mlflow ui --backend-store-uri http://localhost:5000
+mlflow ui --backend-store-uri sqlite:///mlruns.db
 ```
 
 ### 2. Create and Register Your Base Prompt
@@ -128,7 +128,7 @@ def create_predict_fn(prompt_uri: str):
 
     @mlflow.trace
     def predict_fn(context: str, question: str) -> str:
-        """Predict function that uses the agent with the MLFlow prompt."""
+        """Predict function that uses the agent with the MLflow prompt."""
         # Use prompt.format() with template variables
         user_message = prompt.format(context=context, question=question)
 
