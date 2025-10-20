@@ -141,7 +141,7 @@ def create_predict_fn(prompt_uri: str):
 
 ### 5. Baseline Evaluation
 
-Before optimizing, establish a baseline by evaluating the agent on a validation set:
+Before optimizing, establish a baseline by evaluating the agent on a validation set. Here, we use the [Equivalence](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.scorers.Equivalence) built-in scorer, but you can use any Scorer objects. See [Scorer Overview](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/) for more information.
 
 ```python
 def prepare_hotpotqa_data(num_samples: int, split: str = "validation", offset: int = 0) -> list[dict]:
