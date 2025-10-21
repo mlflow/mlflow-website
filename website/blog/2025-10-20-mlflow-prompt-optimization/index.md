@@ -416,7 +416,7 @@ Ready to optimize your own prompts? Try:
 
 - [MLflow Prompt Optimization Documentation](https://mlflow.org/docs/latest/genai/prompt-registry/optimize-prompts/)
 - [MLflow Prompt Registry](https://mlflow.org/docs/latest/genai/prompt-registry/)
-- [OpenAI Agent Framework](https://github.com/openai/openai-agents)
+- [OpenAI Agent Framework](https://github.com/openai/openai-agents-python)
 - [HotpotQA Dataset](https://hotpotqa.github.io/)
 - [Building and Managing LLM Systems with MLflow](https://mlflow.org/blog/mlflow-prompt-evaluate)
 - [LLM as Judge](https://mlflow.org/blog/llm-as-judge)
