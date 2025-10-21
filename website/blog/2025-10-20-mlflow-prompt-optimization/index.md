@@ -1,7 +1,7 @@
 ---
-title: "Systematic Prompt Optimization with MLflow and OpenAI Agents"
-slug: openai-agent-prompt-optimization
-tags: [mlflow, genai, prompt-optimization, openai, agents, evaluation]
+title: "Systematic Prompt Optimization with MLflow and GEPA"
+slug: mlflow-prompt-optimization
+tags: [mlflow, genai, prompt-optimization, openai, agents, evaluation, gepa]
 authors: [mlflow-maintainers]
 thumbnail: /img/blog/prompt-opt-thumbnail.svg
 image: /img/blog/prompt-opt-thumbnail.svg
