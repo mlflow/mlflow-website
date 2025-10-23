@@ -1,5 +1,5 @@
 ---
-title: "Systematic Prompt Optimization with MLflow and GEPA"
+title: "Systematic Prompt Optimization for OpenAI Agents with GEPA"
 slug: mlflow-prompt-optimization
 tags: [mlflow, genai, prompt-optimization, openai, agents, evaluation, gepa]
 authors: [mlflow-maintainers]
@@ -77,6 +77,10 @@ mlflow.openai.autolog()
 
 # Avoid hanging due to the conflict between async and threading (not necessary for sync agents)
 os.environ["MLFLOW_GENAI_EVAL_MAX_WORKERS"] = "1"
+
+# Notebook environment
+import nest_asyncio
+nest_asyncio.apply()
 ```
 
 Start your MLflow tracking server:
@@ -129,6 +133,7 @@ agent = Agent(
 The prediction function formats the context and question using the prompt template, then runs the agent:
 
 ```python
+# Create a wrapper for `predict_fn` to run the agent with different prompts
 def create_predict_fn(prompt_uri: str):
     prompt = mlflow.genai.load_prompt(prompt_uri)
 
@@ -141,8 +146,6 @@ def create_predict_fn(prompt_uri: str):
         # On Python script
         result = asyncio.run(Runner.run(agent, user_message))
 
-        # On notebook
-        # result await Runner.run(agent, user_message)
         return result.final_output
 
     return predict_fn
@@ -150,10 +153,10 @@ def create_predict_fn(prompt_uri: str):
 
 ### 5. Baseline Evaluation
 
-Before optimizing, establish a baseline by evaluating the agent on a validation set. Here, we use the [Equivalence](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.scorers.Equivalence) built-in scorer, but you can use any Scorer objects. See [Scorer Overview](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/) for more information.
+Before optimizing, establish a baseline by evaluating the agent on a validation set. Here, we use the [Equivalence](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.scorers.Equivalence) built-in scorer that evaluates the semantic and formatting similarity between the system outputs and expected outputs, but you can use any Scorer objects. See [Scorer Overview](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/) for more information.
 
 ```python
-def prepare_hotpotqa_data(num_samples: int, split: str = "validation", offset: int = 0) -> list[dict]:
+def prepare_hotpotqa_data(num_samples: int, split: str = "validation") -> list[dict]:
     """Load and prepare HotpotQA data for MLflow GenAI (evaluate/optimize)."""
     print(f"\nLoading HotpotQA dataset ({split} split, offset={offset})...")
     dataset = load_dataset("hotpot_qa", "distractor", split=split)
@@ -185,12 +188,11 @@ def run_benchmark(
     prompt_uri: str,
     num_samples: int,
     split: str = "validation",
-    offset: int = 0,
 ) -> dict:
     """Run the agent on HotpotQA benchmark using mlflow.genai.evaluate()."""
 
     # Prepare evaluation data
-    eval_data = prepare_hotpotqa_data(num_samples, split, offset)
+    eval_data = prepare_hotpotqa_data(num_samples, split)
 
     # Create prediction function
     predict_fn = create_predict_fn(prompt_uri)
@@ -228,39 +230,28 @@ print(f"Baseline Accuracy: {baseline_metrics['accuracy']:.1%}")
 Now comes the exciting part - using MLflow to automatically improve the prompt:
 
 ```python
-def optimize_prompt(base_prompt_uri: str, train_samples: int = 100) -> str:
-    """Optimize the prompt using MLflow GenAI optimization."""
-
-    print("\nStarting prompt optimization (this may take a while)...")
-
-    # Prepare training data using shared function
-    train_data = prepare_hotpotqa_data(num_samples=train_samples, split="train", offset=0)
-
-    # Run optimization
-    result = mlflow.genai.optimize_prompts(
-        predict_fn=create_predict_fn(base_prompt_uri),
-        train_data=train_data,
-        prompt_uris=[base_prompt_uri],
-        optimizer=GepaPromptOptimizer(
-            reflection_model="openai:/gpt-4o",
-            max_metric_calls=500,
-        ),
-        scorers=[
-            Equivalence(model="openai:/gpt-4o-mini"),
-        ],
-        enable_tracking=True,
-    )
-
-    # Get the optimized prompt URI
-    optimized_prompt_uri = result.optimized_prompts[0].uri
-    print(f"\n✓ Optimization complete!")
-    print(f"  Base prompt: {base_prompt_uri}")
-    print(f"  Optimized prompt: {optimized_prompt_uri}")
-
-    return optimized_prompt_uri
+# Prepare training data using shared function
+train_data = prepare_hotpotqa_data(num_samples=100, split="train")
 
 # Run optimization
-optimized_prompt_uri = optimize_prompt(base_prompt.uri, train_samples=100)
+result = mlflow.genai.optimize_prompts(
+    predict_fn=create_predict_fn(base_prompt.uri),
+    train_data=train_data,
+    prompt_uris=[base_prompt.uri],
+    optimizer=GepaPromptOptimizer(
+        reflection_model="openai:/gpt-4o",
+        max_metric_calls=500,
+    ),
+    scorers=[
+        Equivalence(model="openai:/gpt-4o-mini"),
+    ],
+    enable_tracking=True,
+)
+
+# Get the optimized prompt URI
+optimized_prompt_uri = result.optimized_prompts[0].uri
+print(f"  Base prompt: {base_prompt.uri}")
+print(f"  Optimized prompt: {optimized_prompt_uri}")
 ```
 
 The optimization process:
