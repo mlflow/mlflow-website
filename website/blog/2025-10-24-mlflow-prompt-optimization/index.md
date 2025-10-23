@@ -7,7 +7,7 @@ thumbnail: /img/blog/prompt-opt-thumbnail.svg
 image: /img/blog/prompt-opt-thumbnail.svg
 ---
 
-Prompt engineering is critical for building reliable AI systems, but it's fraught with challenges. Manual iteration is time-consuming, lacks systematic guarantees for improvement, and often yields inconsistent results. To address this, automatic prompt optimization algorithms such as [GEPA](https://github.com/gepa-ai/gepa?tab=readme-ov-file) and [MIPRO](https://dspy.ai/api/optimizers/MIPROv2/) have been developed. While [DSPy](https://dspy.ai/) has made these optimization techniques accessible within its framework, applying them to other agent frameworks—such as OpenAI Agents SDK, LangChain, or Pydantic AI—has historically required significant integration effort.
+Prompt engineering is critical for building reliable AI systems, but it's fraught with challenges. Manual iteration is time-consuming, lacks systematic guarantees for improvement, and often yields inconsistent results. It is even harder if your system has multiple different prompts. To address this, automatic joint prompt optimization algorithms such as [GEPA](https://github.com/gepa-ai/gepa?tab=readme-ov-file) and [MIPRO](https://dspy.ai/api/optimizers/MIPROv2/) have been developed. While [DSPy](https://dspy.ai/) has made these optimization techniques accessible within its framework, applying them to other agent frameworks—such as OpenAI Agents SDK, LangChain, or Pydantic AI—has historically required significant integration effort.
 
 MLflow changes this equation. With `mlflow.genai.optimize_prompts`, you can now systematically optimize prompts, regardless of which agent framework you are using—**as long as you manage your prompts in MLflow Prompt Registry**.
 
@@ -125,7 +125,6 @@ Set up your agent.
 ```python
 agent = Agent(
     name="HotpotQA Question Answerer",
-    instructions="You are a helpful assistant. Follow the instructions in the user message exactly.",
     model="gpt-4o-mini",
 )
 ```
