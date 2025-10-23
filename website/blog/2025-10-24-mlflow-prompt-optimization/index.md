@@ -159,9 +159,9 @@ Before optimizing, establish a baseline by evaluating the agent on a validation 
 ```python
 def prepare_hotpotqa_data(num_samples: int, split: str = "validation") -> list[dict]:
     """Load and prepare HotpotQA data for MLflow GenAI (evaluate/optimize)."""
-    print(f"\nLoading HotpotQA dataset ({split} split, offset={offset})...")
+    print(f"\nLoading HotpotQA dataset ({split} split)...")
     dataset = load_dataset("hotpot_qa", "distractor", split=split)
-    dataset = dataset.select(range(offset, min(offset + num_samples, len(dataset))))
+    dataset = dataset.select(range(0, min(num_samples, len(dataset))))
 
     data = []
     for example in dataset:
@@ -218,7 +218,7 @@ def run_benchmark(
 
 
 # Run baseline evaluation
-baseline_metrics = run_benchmark(base_prompt.uri, num_samples=100, offset=0)
+baseline_metrics = run_benchmark(base_prompt.uri, num_samples=100)
 
 print(f"Baseline Accuracy: {baseline_metrics['accuracy']:.1%}")
 # Output: Baseline Accuracy: 50.0%
@@ -271,7 +271,7 @@ Let's see how much we improved:
 
 ```python
 # Evaluate optimized prompt on the same validation set
-optimized_metrics = run_benchmark(optimized_prompt_uri, num_samples=100, offset=0)
+optimized_metrics = run_benchmark(optimized_prompt_uri, num_samples=100)
 
 print(f"Optimized Accuracy: {optimized_metrics['accuracy']:.1%}")
 # Output: Optimized Accuracy: 60.0%
