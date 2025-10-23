@@ -9,11 +9,11 @@ image: /img/blog/prompt-opt-thumbnail.svg
 
 Prompt engineering is critical for building reliable AI systems, but it's fraught with challenges. Manual iteration is time-consuming, lacks systematic guarantees for improvement, and often yields inconsistent results. While frameworks like [DSPy](https://dspy.ai/) have made automatic prompt optimization accessible, applying these techniques to your own workflows has historically required significant integration effort.
 
-MLflow changes this equation. With `mlflow.genai.optimize_prompts`, you can now systematically optimize prompts for any task—whether it's question answering, classification, summarization, or code generation—**as long as you manage your prompts in MLflow Prompt Registry**.
+MLflow changes this equation. With `mlflow.genai.optimize_prompts`, you can now systematically optimize prompts, regardless of which agent framework you are using (e.g., OpenAI Agents SDK, Langchain, Pydantic AI)—**as long as you manage your prompts in MLflow Prompt Registry**.
 
 In this blog post, we'll demonstrate the complete workflow using the OpenAI Agent framework on a question-answering task with the HotpotQA dataset. We'll show how automated optimization with the [GEPA](https://github.com/gepa-ai/gepa?tab=readme-ov-file) algorithm achieved a 10% accuracy improvement, but the approach applies broadly to any GenAI application you're building.
 
-## The Challenge: Question Answering
+## The Challenge: Complex Question Answering
 
 Question answering systems often struggle with complex queries that require reasoning across multiple pieces of information. Consider this example from the HotpotQA dataset:
 
@@ -114,7 +114,7 @@ The MLflow Prompt Registry provides version control for your prompts, making it 
 
 ### 3. Initialize the OpenAI Agent
 
-Set up your agent with the desired model:
+Set up your agent.
 
 ```python
 agent = Agent(
@@ -138,8 +138,11 @@ def create_predict_fn(prompt_uri: str):
         # Use prompt.format() with template variables
         user_message = prompt.format(context=context, question=question)
 
-        # Run the agent
+        # On Python script
         result = asyncio.run(Runner.run(agent, user_message))
+
+        # On notebook
+        # result await Runner.run(agent, user_message)
         return result.final_output
 
     return predict_fn
@@ -356,12 +359,7 @@ Answer:
 
 ### Key Improvements Identified by GEPA:
 
-1. **Explicit Output Format**: The optimized prompt clearly specifies what constitutes a valid answer
-2. **Better Yes/No Detection**: Provides examples of question words that indicate yes/no questions
-3. **Multi-Document Reasoning**: Explicitly allows combining information across documents
-4. **Name Handling**: Instructs the model to use full canonical forms with titles
-5. **Edge Cases**: Addresses specific failure patterns discovered during optimization
-6. **Format Preservation**: Ensures exact spelling, capitalization, and formatting from context
+The improvements achieved by GEPA include: clarifying the explicit output format so the prompt defines exactly what makes a valid answer; enhancing yes/no question detection with examples of indicative question words; allowing for multi-document reasoning by specifying that information can be combined across documents; instructing the model to handle names by using their full canonical forms with titles; addressing notable edge cases by directly targeting specific failure patterns uncovered during optimization; and enforcing strict format preservation, requiring the answer to match the spelling, capitalization, and formatting found in the context.
 
 ![Prompt Comparison](prompt_comparison.png)
 
@@ -378,45 +376,15 @@ Throughout this workflow, MLflow automatically tracks:
 
 **Training Time**: Optimization with 100 training samples and 500 max metric calls took approximately 30 minutes.
 
-**Scaling**: For production systems:
-
-- Start with smaller sample sizes (50-100) for faster iteration
-- Use validation sets to verify improvements generalize
-- Consider caching predictions to avoid redundant API calls
-
-## Applying to Other Tasks
-
-The workflow we demonstrated with question answering applies to any GenAI task. [mlflow.genai.optimize_prompts](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.optimize_prompts) is task-agnostic and works across:
-
-- **Text Classification**: Optimize prompts for sentiment analysis, intent detection, topic categorization
-- **Information Extraction**: Improve entity extraction, relationship identification, and structured data parsing
-- **Summarization**: Refine prompts for different summarization styles, lengths, and target audiences
-- **Code Generation**: Enhance prompts for specific coding tasks, languages, and documentation generation
-- **Translation**: Improve accuracy while preserving cultural nuances and idiomatic expressions
-- **Content Generation**: Optimize prompts for creative writing, marketing copy, or technical documentation
-
-The key requirement is having training data with inputs and expected outputs, and a prediction function that uses your MLflow prompt. The GEPA optimizer handles the rest, regardless of your domain.
+**Scaling**: For production systems, it is recommended to start with smaller sample sizes (50-100) for faster iteration. Use validation sets to verify that improvements generalize beyond the training data. To improve efficiency and reduce costs, consider caching predictions to avoid redundant API calls.
 
 ## Conclusion
 
 Manual prompt engineering is time-consuming and often yields suboptimal results. MLflow's `optimize_prompts` provides a systematic, data-driven approach to improve prompt quality automatically.
 
-In our HotpotQA experiment, we achieved:
-
-- **+10% accuracy improvement** (from 50% to 60%)
-- **Systematic optimization** instead of trial and error
-- **Full experiment tracking** for reproducibility
-- **Transferable prompt patterns** for future QA tasks
+In our HotpotQA experiment, we observed a 10% absolute accuracy improvement (from 50% to 60%) after optimization. This workflow enabled systematic optimization rather than relying on trial and error, and provided full experiment tracking for reproducibility.
 
 The combination of OpenAI's Agent framework for execution and MLflow's optimization capabilities creates a powerful workflow for building production-ready AI systems.
-
-## Next Steps
-
-Ready to optimize your own prompts? Try:
-
-1. **Bring your own agent**: Modify it for your specific task and data
-2. **Experiment with scorers**: Try different evaluation metrics
-3. **Scale up**: Apply to larger datasets and more complex tasks
 
 ## Further Reading
 
@@ -425,7 +393,7 @@ Ready to optimize your own prompts? Try:
 - [OpenAI Agent Framework](https://github.com/openai/openai-agents-python)
 - [HotpotQA Dataset](https://hotpotqa.github.io/)
 - [Building and Managing LLM Systems with MLflow](https://mlflow.org/blog/mlflow-prompt-evaluate)
-- [LLM as Judge](https://mlflow.org/blog/llm-as-judge)
+- [LLM as Judge](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/)
 
 ---
 
