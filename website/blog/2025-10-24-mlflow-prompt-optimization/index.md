@@ -78,7 +78,7 @@ mlflow.openai.autolog()
 # Avoid hanging due to the conflict between async and threading (not necessary for sync agents)
 os.environ["MLFLOW_GENAI_EVAL_MAX_WORKERS"] = "1"
 
-# Notebook environment
+# If running on notebooks
 import nest_asyncio
 nest_asyncio.apply()
 ```
