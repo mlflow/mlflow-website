@@ -397,4 +397,4 @@ The combination of OpenAI's Agent framework for execution and MLflow's optimizat
 
 ---
 
-Have questions or want to share your optimization results? Join the conversation on [MLflow's GitHub Discussions](https://github.com/mlflow/mlflow/discussions).
+Have questions or face issues? Please file a report on [MLflow's GitHub Issues](https://github.com/mlflow/mlflow/issues).
