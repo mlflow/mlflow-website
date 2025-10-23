@@ -53,7 +53,7 @@ Let's walk through building a complete question-answering system using the OpenA
 First, install the required packages:
 
 ```bash
-pip install openai-agents mlflow datasets openai dspy
+pip install openai-agents mlflow datasets openai gepa
 ```
 
 Set up your environment:
