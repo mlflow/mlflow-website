@@ -145,7 +145,7 @@ def create_predict_fn(prompt_uri: str):
         # Use prompt.format() with template variables
         user_message = prompt.format(context=context, question=question)
 
-        # On Python script
+        # Run your agent
         result = asyncio.run(Runner.run(agent, user_message))
 
         return result.final_output
