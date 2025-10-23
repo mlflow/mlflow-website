@@ -17,20 +17,24 @@ In this blog post, we'll demonstrate the complete workflow using the OpenAI Agen
 
 Question answering systems often struggle with complex queries that require reasoning across multiple pieces of information. Consider this example from the HotpotQA dataset:
 
-**Question:** "Were Dennis Howard Marks and Gregory Hines both Welsh?"
+**Question:** "Which publishing company has published Bizarre and a sister publication devoted to the anomalous phenomena popularised by Charles Fort?"
 
-**Context:**
+**Context (10 documents):**
 
-- Document 1: Dennis Howard Marks (13 August 1945 – 10 April 2016) was a Welsh drug smuggler and author...
-- Document 2: Gregory Oliver Hines (February 14, 1946 – August 9, 2003) was an American dancer, actor, and choreographer...
+- Document 1: Fortean Times is a British monthly magazine devoted to the anomalous phenomena popularised by Charles Fort... it is now published by Dennis Publishing Ltd.
+- Document 2: Charles Fort Charles Hoy Fort (August 6, 1874 – May 3, 1932) was an American writer and researcher who specialized in anomalous phenomena...
+- Document 3: Bob Rickard Robert "Bob" J M Rickard is the founder and editor of the UK magazine "Fortean Times: The Journal of Strange Phenomena"...
+- Document 4: Bizarre was a British alternative magazine published from 1997 to 2015. It was published by Dennis Publishing, and was a sister publication to the "Fortean Times".
+  ....
 
-**Expected Answer:** "no"
+**Expected Answer:** "Dennis Publishing"
 
 This requires the agent to:
 
-1. Extract information about Dennis Howard Marks from Document 1 (Welsh)
-2. Extract information about Gregory Hines from Document 2 (American)
-3. Synthesize the information to answer "no"
+1. Identify that "Fortean Times" is devoted to phenomena popularized by Charles Fort (Document 1)
+2. Recognize that "Bizarre" was published by Dennis Publishing (Document 4)
+3. Connect that Bizarre and Fortean Times are sister publications (Document 4)
+4. Synthesize the information to answer "Dennis Publishing"
 
 Getting models to consistently provide the correct format and reasoning for such questions is non-trivial.
 
@@ -68,6 +72,8 @@ from mlflow.genai.scorers import Equivalence
 # Configure MLflow
 mlflow.set_tracking_uri("http://localhost:5000")
 mlflow.set_experiment("HotpotQA Optimization")
+
+mlflow.openai.autolog()
 
 # Avoid hanging due to the conflict between async and threading (not necessary for sync agents)
 os.environ["MLFLOW_GENAI_EVAL_MAX_WORKERS"] = "1"
@@ -364,9 +370,9 @@ Answer:
 Throughout this workflow, MLflow automatically tracks:
 
 - **Prompts**: All versions with timestamps and metadata
-- **Experiments**: Each optimization run with its configuration
+- **Runs**: Each optimization run with its configuration
 - **Metrics**: Baseline and optimized accuracy scores
-- **Artifacts**: Detailed results, predictions, and analysis
+- **Traces**: Detailed execution traces of your agent
 
 ## Performance Considerations
 
