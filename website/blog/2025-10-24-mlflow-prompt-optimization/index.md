@@ -7,11 +7,13 @@ thumbnail: /img/blog/prompt-opt-thumbnail.svg
 image: /img/blog/prompt-opt-thumbnail.svg
 ---
 
-Prompt engineering is critical for building reliable AI systems, but it's fraught with challenges. Manual iteration is time-consuming, lacks systematic guarantees for improvement, and often yields inconsistent results. While frameworks like [DSPy](https://dspy.ai/) have made automatic prompt optimization accessible, applying these techniques to your own workflows has historically required significant integration effort.
+Prompt engineering is critical for building reliable AI systems, but it's fraught with challenges. Manual iteration is time-consuming, lacks systematic guarantees for improvement, and often yields inconsistent results. To address this, automatic prompt optimization algorithms such as [GEPA](https://github.com/gepa-ai/gepa?tab=readme-ov-file) and [MIPRO](https://dspy.ai/api/optimizers/MIPROv2/) have been developed. While [DSPy](https://dspy.ai/) has made these optimization techniques accessible within its framework, applying them to other agent frameworks—such as OpenAI Agents SDK, LangChain, or Pydantic AI—has historically required significant integration effort.
 
-MLflow changes this equation. With `mlflow.genai.optimize_prompts`, you can now systematically optimize prompts, regardless of which agent framework you are using (e.g., OpenAI Agents SDK, Langchain, Pydantic AI)—**as long as you manage your prompts in MLflow Prompt Registry**.
+MLflow changes this equation. With `mlflow.genai.optimize_prompts`, you can now systematically optimize prompts, regardless of which agent framework you are using—**as long as you manage your prompts in MLflow Prompt Registry**.
 
 In this blog post, we'll demonstrate the complete workflow using the OpenAI Agent framework on a question-answering task with the HotpotQA dataset. We'll show how automated optimization with the [GEPA](https://github.com/gepa-ai/gepa?tab=readme-ov-file) algorithm achieved a 10% accuracy improvement, but the approach applies broadly to any GenAI application you're building.
+
+![Prompt Comparison](prompt_comparison.png)
 
 ## The Challenge: Complex Question Answering
 
@@ -351,8 +353,6 @@ Answer:
 ### Key Improvements Identified by GEPA:
 
 The improvements achieved by GEPA include: clarifying the explicit output format so the prompt defines exactly what makes a valid answer; enhancing yes/no question detection with examples of indicative question words; allowing for multi-document reasoning by specifying that information can be combined across documents; instructing the model to handle names by using their full canonical forms with titles; addressing notable edge cases by directly targeting specific failure patterns uncovered during optimization; and enforcing strict format preservation, requiring the answer to match the spelling, capitalization, and formatting found in the context.
-
-![Prompt Comparison](prompt_comparison.png)
 
 ## Tracking Everything in MLflow
 
