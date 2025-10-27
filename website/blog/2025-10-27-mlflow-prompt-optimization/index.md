@@ -63,13 +63,15 @@ Set up your environment:
 ```python
 import asyncio
 import os
+from typing import Any
 
 import mlflow
 from agents import Agent, Runner
 from datasets import load_dataset
-from mlflow.genai import evaluate
+from mlflow.entities import Feedback
+from mlflow.genai import evaluate, scorer
 from mlflow.genai.optimize import GepaPromptOptimizer
-from mlflow.genai.scorers import Equivalence
+from mlflow.genai.judges import CategoricalRating
 
 # Configure MLflow
 mlflow.set_tracking_uri("http://localhost:5000")
@@ -154,7 +156,7 @@ def create_predict_fn(prompt_uri: str):
 
 ### 5. Baseline Evaluation
 
-Before optimizing, establish a baseline by evaluating the agent on a validation set. Here, we use the [Equivalence](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.scorers.Equivalence) built-in scorer that evaluates the semantic and formatting similarity between the system outputs and expected outputs, but you can use any Scorer objects. See [Scorer Overview](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/) for more information.
+Before optimizing, establish a baseline by evaluating the agent on a validation set. Here, we define a simple custom scorer that compares the system outputs and expected outputs for equality, but you can use any Scorer objects. See the [Scorer Overview](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/) for more information.
 
 ```python
 def prepare_hotpotqa_data(num_samples: int, split: str = "validation") -> list[dict]:
@@ -184,6 +186,13 @@ def prepare_hotpotqa_data(num_samples: int, split: str = "validation") -> list[d
     print(f"Prepared {len(data)} samples")
     return data
 
+# Define a scorer for exact match
+@scorer
+def equivalence(outputs: str, expectations: dict[str, Any]) -> Feedback:
+    return Feedback(
+        name="equivalence",
+        value=CategoricalRating.YES if outputs == expectations["expected_response"] else CategoricalRating.NO,
+    )
 
 def run_benchmark(
     prompt_uri: str,
@@ -204,7 +213,7 @@ def run_benchmark(
     results = evaluate(
         data=eval_data,
         predict_fn=predict_fn,
-        scorers=[Equivalence(model="openai:/gpt-4o-mini")],
+        scorers=[equivalence],
     )
 
     # Extract metrics
@@ -220,7 +229,7 @@ def run_benchmark(
 # Run baseline evaluation
 baseline_metrics = run_benchmark(base_prompt.uri, num_samples=100)
 
-print(f"Baseline Accuracy: {baseline_metrics['accuracy']:.1%}")
+print(f"Baseline Accuracy: {baseline_metrics['accuracy']:.2%}")
 # Output: Baseline Accuracy: 50.0%
 ```
 
@@ -243,9 +252,7 @@ result = mlflow.genai.optimize_prompts(
         reflection_model="openai:/gpt-4o",
         max_metric_calls=500,
     ),
-    scorers=[
-        Equivalence(model="openai:/gpt-4o-mini"),
-    ],
+    scorers=[equivalence],
     enable_tracking=True,
 )
 
@@ -273,12 +280,12 @@ Let's see how much we improved:
 # Evaluate optimized prompt on the same validation set
 optimized_metrics = run_benchmark(optimized_prompt_uri, num_samples=100)
 
-print(f"Optimized Accuracy: {optimized_metrics['accuracy']:.1%}")
+print(f"Optimized Accuracy: {optimized_metrics['accuracy']:.2%}")
 # Output: Optimized Accuracy: 60.0%
 
 improvement = optimized_metrics['accuracy'] - baseline_metrics['accuracy']
-print(f"Improvement: {improvement:+.1%}")
-# Output: Improvement: +10.0%
+print(f"Improvement: {improvement:+.2%}")
+# Output: Improvement: +14.0%
 ```
 
 ![Eval Comparison](eval_comparison.png)
@@ -372,7 +379,7 @@ Throughout this workflow, MLflow automatically tracks:
 
 Manual prompt engineering is time-consuming and often yields suboptimal results. MLflow's `optimize_prompts` provides a systematic, data-driven approach to improve prompt quality automatically.
 
-In our HotpotQA experiment, we observed a 10% absolute accuracy improvement (from 50% to 60%) after optimization. This workflow enabled systematic optimization rather than relying on trial and error, and provided full experiment tracking for reproducibility.
+In our HotpotQA experiment, we observed a 14% absolute accuracy improvement (from 46% to 60%) after optimization. This workflow enabled systematic optimization rather than relying on trial and error, and provided full experiment tracking for reproducibility.
 
 The combination of OpenAI's Agent framework for execution and MLflow's optimization capabilities creates a powerful workflow for building production-ready AI systems.
 
