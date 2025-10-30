@@ -26,7 +26,7 @@ export default function Home(): JSX.Element {
             <Card
               title="GenAI Apps & Agents"
               bodySize="m"
-              body="Enhance your GenAI applications with end-to-end tracking, observability, and evaluations, all in one integrated platform."
+              body="Enhance your GenAI applications with end-to-end observability, evaluations, AI gateway and tracking all in one integrated platform."
               padded
               rounded={false}
               cta={{
