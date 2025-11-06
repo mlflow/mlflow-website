@@ -8,7 +8,7 @@ thumbnail: /img/blog/mlflow-opentelemetry-thumbnail.png
 image: /img/blog/mlflow-opentelemetry-thumbnail.png
 ---
 
-We're excited to announce that MLflow 3.6.0 brings **full OpenTelemetry support** to the open-source MLflow server. This integration represents a major step forward in making MLflow a **vendor-neutral, standards-based observability platform** for GenAI applications.
+We're excited to announce that MLflow 3.6.0 brings **full OpenTelemetry support** to the open-source MLflow server. This integration represents a major step forward in making MLflow a **vendor-neutral observability platform** for GenAI applications.
 
 <img
 src={require("./hero.png").default}
@@ -21,9 +21,9 @@ width="100%"
 MLflow has always been committed to providing powerful tracing capabilities for GenAI applications. With the addition of comprehensive OpenTelemetry integration, you can now:
 
 - **Create unified traces** that combine MLflow SDK instrumentation with OpenTelemetry auto-instrumentation from third-party libraries
-- **Ingest OTLP spans** directly into the MLflow tracking server
-- **Seamlessly integrate** with existing OTel-instrumented applications without vendor lock-in
-- **Visualize traces** from industry-standard OTel libraries with proper attribute translation
+- **Ingest OpenTelemetry spans** directly into the MLflow tracking server
+- **Seamlessly integrate** with existing applications that are instrumented with OpenTelemetry
+- **Choose Arbitrary Languages** for your AI applications and trace them, including Java, Go, Rust, and more.
 
 ## Send OpenTelemetry traces to MLflow server
 
@@ -122,7 +122,13 @@ width="100%"
 
 ## Unified Observability Across Your Stack
 
-With MLflow 3.6.0, you can now instrument your FastAPI application with OpenTelemetry auto-instrumentation and use MLflow's auto-tracing or `@trace` decorator, they'll work together to create a **single, unified trace**. This gives you complete visibility across your entire application stack—from HTTP requests to LLM calls to database queries.
+With MLflow 3.6.0, you can now seamlessly combine:
+
+- **OpenTelemetry auto-instrumentation** (FastAPI, Django, Flask, etc.)
+- **MLflow auto-logging** (OpenAI, LangChain, DSPy, etc.)
+- **MLflow @trace decorator** for custom spans
+
+They can produce a **single, unified trace** across your application, providing end-to-end visibility from incoming requests to LLM calls and final outputs.
 
 ```python
 # These now create a single unified trace
@@ -139,13 +145,6 @@ def my_llm_function(input_text):
     return result
 ```
 
-With MLflow 3.6.0, you can now seamlessly combine:
-
-- **OpenTelemetry auto-instrumentation** (FastAPI, Django, Flask, etc.)
-- **MLflow auto-logging** (OpenAI, LangChain, LlamaIndex, etc.)
-- **MLflow @trace decorator** for custom spans
-- All traces are unified into a single view in MLflow UI
-
 <img
 src={require("./otel_and_mlflow_trace.png").default}
 alt="OpenTelemetry and MLflow Trace"
@@ -154,11 +153,11 @@ width="100%"
 
 ## Benefits of OpenTelemetry Integration
 
-### Vendor Neutrality
+### ⚖️ Vendor Neutrality
 
 OpenTelemetry is an open standard supported by the Cloud Native Computing Foundation (CNCF). By fully supporting OTel, MLflow ensures you're never locked into a proprietary observability solution.
 
-### Ecosystem Compatibility
+### 🌐 Ecosystem Compatibility
 
 Leverage the extensive OpenTelemetry ecosystem, including:
 
@@ -166,7 +165,7 @@ Leverage the extensive OpenTelemetry ecosystem, including:
 - Language support beyond Python (TypeScript, Java, Go, and more)
 - Integration with existing observability tools and platforms
 
-### Unified Visibility
+### 🔭 Unified Visibility
 
 See the complete picture of your application's behavior in a single trace, from HTTP requests through your business logic to external API calls.
 
