@@ -178,6 +178,8 @@ Click on the logos below to learn more about the individual integration:
 
 [![Mistral Logo](/mlflow-website/docs/latest/images/logos/mistral-ai-logo.svg)](/mlflow-website/docs/latest/genai/tracing/integrations/listing/mistral.md)
 
+[![FireworksAI Logo](/mlflow-website/docs/latest/images/logos/fireworks-ai-logo.svg)](/mlflow-website/docs/latest/genai/tracing/integrations/listing/fireworksai.md)
+
 [![DeepSeek Logo](/mlflow-website/docs/latest/images/logos/deepseek-logo.png)](/mlflow-website/docs/latest/genai/tracing/integrations/listing/deepseek.md)
 
 [![LiteLLM Logo](/mlflow-website/docs/latest/images/logos/litellm-logo.jpg)](/mlflow-website/docs/latest/genai/tracing/integrations/listing/litellm.md)
